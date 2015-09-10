@@ -4,6 +4,8 @@
 
 #include <fmr/fmr.h>
 
+#if 0
+
 void __attribute__ ((constructor)) libflipper_init() {
 	
 	verbose("The library 'libflipper' was configured successfully.\n\n");
@@ -14,15 +16,11 @@ void __attribute__ ((constructor)) libflipper_init() {
 	
 	flash_configure();
 	
-	host_configure();
-	
-	self_configure();
-	
-	device_configure();
-	
 	io_configure();
 	
 	led_configure();
+	
+	self_configure();
 	
 	pwm_configure();
 	
@@ -30,6 +28,6 @@ void __attribute__ ((constructor)) libflipper_init() {
 	
 	timer_configure();
 	
-	usart0_configure(0);
-	
 }
+
+#endif

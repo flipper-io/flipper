@@ -16,7 +16,7 @@ const struct _target host = {
 	
 };
 
-void host_configure(void) {
+void host_configure(const struct _bus *bus) {
 	
 	/* ~ Configure USB as the host's communication protocol. ~ */
 	

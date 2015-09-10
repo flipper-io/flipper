@@ -16,11 +16,11 @@ const struct _target device = {
 	
 };
 
-void device_configure(void) {
+void device_configure(const struct _bus *bus) {
 	
 	/* ~ Configure USB as the device's communication protocol. ~ */
 	
-	((struct _target *)(&device)) -> bus = &usb;
+	((struct _target *)(&device)) -> bus = bus;
 	
 }
 

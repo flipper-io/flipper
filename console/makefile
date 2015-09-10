@@ -1,45 +1,33 @@
-.PHONY: clean
+# ~ Specifiy the name of the output file. ~ #
 
 output = flipper
 
-find = $(shell which find)
+# ~ Specify a compiler and the other utilities needed to deploy for the target. ~ #
 
-cc = $(shell which clang)
+cc = $(shell which 'clang')
 
-copy = $(shell which cp)
+# ~ Declare the preprocessor statements to be used during object generation. ~ #
 
-include_dirs = ../include
+preprocess = -std=c99
 
-includes = $(foreach dir, $(include_dirs), -I "$(dir)")
+# ~ Declare the library dependancies neededed for linking. ~ #
 
-library_search_dirs = ../sdk/lib
+libraries = -L "../libflipper" -lflipper
 
-library_dirs = $(foreach dir, $(library_search_dirs), -L "$(dir)")
+# ~ Include this file to recursively compile all supported file types and generate object files using the preprocessor statements above. ~ #
 
-libraries = flipper
-
-libs = $(foreach lib, $(libraries), -l$(lib))
-
-files = $(shell $(find) . -name '*.c')
-
-flags = -std=c99 -rdynamic
-
-prefix = $(flags) $(includes) $(library_dirs) $(libs)
-
-all: libflipper
-
-	$(cc) $(prefix) $(files) -o $(output)
-
-	$(copy) $(output) ../sdk/bin
+include rules.make
 
 libflipper:
 
-	$(MAKE) -C ../libflipper all install
+	$(MAKE) -C "../libflipper" all install
 
-run:
+all: libflipper
 
-	./$(output)
+	# ~ Link the object files together to produce an output file. ~ #
+
+	$(cc) $(prefix) $(sort $(objects)) -o $(output) $(libraries)
 
 clean:
 
-	$(find) . -name '*.o' -or -name '$(output)' -exec rm -rf {} \;
+	rm -rf $(shell find . -follow -name "*.o" -or -name "*.elf") $(output)

@@ -6,23 +6,31 @@
 
 uint32_t target_invoke(const struct _target *target, uint8_t module, uint8_t index, uint8_t argc, va_list *argv) {
 	
+	if (!(target -> bus)) {
+		
+		error("Error. No device is attached to this instance of libflipper. Use flipper.attach(\"device name\", FLIPPER_SOURCE_USB) to connect over USB.\n\n");
+		
+	}
+	
 	/* ~ Multiply the argument count by two. ~ */
 	
-	argc *= 4;
+	argc *= 2;
+	
+	fmr_buffer[0] = 0xFE;
 	
 	/* ~ Populate the message body with the information needed to make a remote procedure call. ~ */
 	
-	fmr_buffer[0] = module;
+	fmr_buffer[1] = module;
 	
-	fmr_buffer[1] = index;
+	fmr_buffer[2] = index;
 	
-	fmr_buffer[2] = argc;
+	fmr_buffer[3] = argc;
 	
 	for (unsigned i = 0; i < argc; i += 2) {
 		
 		unsigned arg = va_arg(*argv, unsigned);
 		
-		fmr_buffer[i + 3] = hi(arg); fmr_buffer[i + 4] = lo(arg);
+		fmr_buffer[i + 4] = hi(arg); fmr_buffer[i + 5] = lo(arg);
 		
 	}
 	

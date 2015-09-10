@@ -1,41 +1,51 @@
-.PHONY: clean
+# ~ Specifiy the name of the output file. ~ #
 
 output = libflipper.dylib
 
+# ~ Specify the target platform. ~ #
+
 target = osx
 
-target_flags = -framework CoreFoundation -framework IOKit
+# ~ Specify a compiler and the other utilities needed to deploy for the target. ~ #
 
-find = $(shell which find)
+cc = $(shell which 'clang')
 
-cc = $(shell which clang)
+rsync = $(shell which 'rsync')
 
-copy = $(shell which cp)
+ln = $(shell which 'ln')
 
-ln = $(shell which ln)
+# ~ Declare the preprocessor statements to be used during object generation. ~ #
 
-common = $(shell $(find) ../common -name '*.c')
+preprocess = -std=c99 -DOVERRIDE_USB -D__verbose__
 
-include_dirs = ../include
+# ~ Pass flags to find so that it only isolates files pertainant to the target platform. ~ #
 
-includes = $(foreach dir, $(include_dirs), -I "$(dir)")
+findflags = \( ! -wholename "./platforms/*" -or -wholename "./platforms/osx/*" \)
 
-files = $(shell $(find) . -name platforms -prune -or -name '*.c' -print)
+# ~ Declare the library dependancies neededed for linking. ~ #
 
-target_files = $(shell $(find) platforms/$(target) -name '*.c' -print)
+libraries = -framework CoreFoundation -framework IOKit
 
-flags = -std=c99 -undefined dynamic_lookup -dynamiclib -DOVERRIDE_USB
+# ~ Include this file to recursively compile all supported file types and generate object files using the preprocessor statements above. ~ #
 
-all:
+include rules.make
 
-	$(cc) $(flags) $(includes) $(common) $(files) $(target_files) $(target_flags) -o $(output)
+all: clean
 
-	$(copy) $(output) ../sdk/lib
+	# ~ Link the object files together to produce an output file. ~ #
+
+	$(cc) -shared -rdynamic $(prefix) $(sort $(objects)) -o $(output) $(libraries)
 
 install:
 
-	$(ln) -sf ~/Desktop/flipper-toolbox/sdk/lib/$(output) /usr/local/lib
+	# Copy the library into the SDK's library directory.
+
+	$(rsync) -r $(output) $(FLIPPERSDK)/lib/$(output)
+
+	# Symlink the library into the system's library directory.
+
+	$(ln) -sf $(FLIPPERSDK)/lib/$(output) /usr/local/lib/$(output)
 
 clean:
 
-	$(find) . -name '*.o' -or -name '$(output)' -exec rm -rf {} \;
+	rm -rf $(shell find . -follow -name "*.o" -or -name "*.elf") $(output)
