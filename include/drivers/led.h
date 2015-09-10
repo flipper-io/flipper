@@ -14,7 +14,7 @@ extern const struct _led {
 
 #ifdef __private_include__
 
-enum { _led_configure, _led_rgb };
+enum { _led_configure, _led_set_rgb };
 
 void led_configure(void);
 

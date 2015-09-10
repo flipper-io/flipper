@@ -1,1 +1,8 @@
 .DS_Store
+*.xcworkspace
+*.xcodeproj
+*.o
+*.elf
+*.bin
+*.so
+*.dylib

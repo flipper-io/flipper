@@ -4,7 +4,7 @@
 
 void button_configure(void) {
 	
-	
+	printf("BUTTON CONFIGURED ON HOST!\n\n");
 	
 }
 

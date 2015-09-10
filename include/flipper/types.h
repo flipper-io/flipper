@@ -24,15 +24,17 @@ typedef uint32_t fsp;
 
 /* Define a macro for verbose printing. */
 
-#define __verbose__
-
 #if defined(__verbose__)
 
 #define verbose(...) fprintf(stdout, __VA_ARGS__);
 
+#define error(...) fprintf(stdout, __VA_ARGS__);
+
 #else
 
 #define verbose(...) ;
+
+#define error(...) ;
 
 #endif
 
