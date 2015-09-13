@@ -8,13 +8,30 @@
 #include <unistd.h>
 #include <fmr/fmr.h>
 
-static inline int to_color(float c) { return fabsf(sinf(c) * 50.0f); }
+static inline int to_color(float c) { return fabsf(sinf(c) * 75.0f); }
+
+int a = 0;
 
 int main(int argc, char *argv[]) {
 	
 	printf("Welcome to the Flipper Console!\n\n");
 	
-	flipper.attach("elroy", FLIPPER_SOURCE_NETWORK, "129.21.81.81");
+	//flipper.attach(FLIPPER_SOURCE_NETWORK, "129.21.81.81");
+	
+	flipper.attach(FLIPPER_SOURCE_USB);
+	
+	while (1) {
+	
+		sleep(1);
+		
+		device.invoke(_led, _led_set_rgb, 3, 0, 0, a * 25);
+		
+		a ^= 1;
+		
+	}
+	
+#if 0
+	
 	float red = 1.0;
 	float green = 2.0;
 	float blue = 3.0;
@@ -31,7 +48,8 @@ int main(int argc, char *argv[]) {
 		device.invoke(_led, _led_set_rgb, 3, r, g, b);
 		printf("Sent r: %d g: %d b: %d\n", r, g, b);
 	}
-	
+ 
+#endif
 	return EXIT_SUCCESS;
 	
 }

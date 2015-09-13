@@ -6,6 +6,8 @@
 
 #include <fmr/fmr.h>
 
+#include <platform/hid.h>
+
 void __attribute__ ((naked)) __attribute__ ((section(".init8"))) atmega_init(void) {
 
 	/* ~ Clear the WDT reset flag. ~ */
@@ -24,11 +26,13 @@ void __attribute__ ((naked)) __attribute__ ((section(".init8"))) atmega_init(voi
 	
 	host_configure(&usart);
 	
+	device_configure(&usb);
+	
+	usb_configure(0);
+	
 	memset(fmr_buffer, 0, FLIPPER_PACKET_SIZE);
 	
 	led.configure();
-	
-	delay_seconds(5);
 	
 	led.rgb(0, 16, 0);
 	
@@ -39,6 +43,10 @@ char a = 0;
 int main(void) {
 	
 	while (1) {
+		
+		uint8_t packet = usb_receive_packet((void *)(fmr_buffer));
+		
+		if (packet) { memmove(fmr_buffer, fmr_buffer + 1, FLIPPER_PACKET_SIZE - 1); self_invoke(&device); }
 		
 	}
 	

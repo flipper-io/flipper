@@ -16,7 +16,7 @@ ln = $(shell which 'ln')
 
 # ~ Declare the preprocessor statements to be used during object generation. ~ #
 
-preprocess = -std=c99 -DOVERRIDE_USB -D__verbose__
+preprocess = -std=c99 -D__verbose__
 
 # ~ Pass flags to find so that it only isolates files pertainant to the target platform. ~ #
 
@@ -37,6 +37,8 @@ all: clean
 	$(cc) -shared -rdynamic $(prefix) $(sort $(objects)) -o $(output) $(libraries)
 
 install:
+
+	mkdir -p $(FLIPPERSDK)/lib
 
 	# Copy the library into the SDK's library directory.
 
