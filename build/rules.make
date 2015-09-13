@@ -14,7 +14,7 @@ objects = $(foreach source, $(targets), $(addsuffix .o, $(basename $(source))))
 
 # ~ Use 'find' to discover any include directories. ~ #
 
-includes = $(foreach directory, $(shell find . -follow -type d -name 'include'), -I "$(directory)")
+includes = $(foreach directory, $(FLIPPERSDK)/include $(shell find . -follow -type d -name 'include') $(include_directories), -I "$(directory)")
 
 # ~ Gather compatable linker scripts. ~ #
 

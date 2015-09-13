@@ -4,8 +4,6 @@
 
 void usb_configure(uint16_t configuration) {
 	
-	#ifndef OVERRIDE_USB
-	
 	uint8_t devices = hid_enumerate(1, CARBON_VENDOR_ID, CARBON_PRODUCT_ID, CARBON_USAGE_PAGE, CARBON_USAGE);
 	
 	if (!devices) {
@@ -15,8 +13,6 @@ void usb_configure(uint16_t configuration) {
 		exit(EXIT_FAILURE);
 		
 	}
-	
-	#endif
 	
 }
 

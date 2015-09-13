@@ -1,6 +1,6 @@
 #define __private_include__
 
-#include <bus/bus.h>
+#include <flipper/bus.h>
 
 #include <fmr/fmr.h>
 

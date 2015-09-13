@@ -1,6 +1,6 @@
 #define __private_include__
 
-#include <master/flipper.h>
+#include <flipper/flipper.h>
 
 #include <fmr/fmr.h>
 
@@ -22,7 +22,7 @@ void flipper_configure(void) {
 	
 }
 
-void flipper_attach(char *device, uint8_t source, ...) {
+void flipper_attach(uint8_t source, ...) {
 	
 	/* ~ Construct a va_list to access varidic arguments. ~ */
 	

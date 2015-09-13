@@ -4,13 +4,11 @@
 
 #include <fmr/fmr.h>
 
-#if 0
+#if 1
 
 void __attribute__ ((constructor)) libflipper_init() {
 	
 	verbose("The library 'libflipper' was configured successfully.\n\n");
-	
-	usb_configure(0);
 	
 	button_configure();
 	
@@ -19,8 +17,6 @@ void __attribute__ ((constructor)) libflipper_init() {
 	io_configure();
 	
 	led_configure();
-	
-	self_configure();
 	
 	pwm_configure();
 	

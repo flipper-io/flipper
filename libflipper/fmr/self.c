@@ -2,10 +2,6 @@
 
 #include <fmr/fmr.h>
 
-#include <drivers/usart.h>
-
-#include <drivers/button.h>
-
 const struct _target self = {
 	
 	self_configure,
@@ -26,7 +22,7 @@ void self_configure(const struct _bus *bus) {
 
 uint32_t fmr_call(void *function, uint8_t argc, void *argv) {
 	
-	
+	return 0;
 	
 }
 
