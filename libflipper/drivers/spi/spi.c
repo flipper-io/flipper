@@ -1,6 +1,6 @@
 #define __private_include__
 
-#include <drivers/spi.h>
+#include <spi/spi.h>
 
 void spi_configure(uint16_t configuration) {
 	

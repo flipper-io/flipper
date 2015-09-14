@@ -1,20 +1,12 @@
 #define __private_include__
 
-#include <flipper/flipper.h>
+#include <flipper.h>
 
 #include <fmr/fmr.h>
 
-#include <drivers/usb.h>
+#include <usb/usb.h>
 
 #include <network/network.h>
-
-const struct _flipper flipper = {
-	
-	flipper_configure,
-	
-	flipper_attach
-	
-};
 
 void flipper_configure(void) {
 	

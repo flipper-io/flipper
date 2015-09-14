@@ -2,7 +2,7 @@
 
 #define __timer_h__
 
-#include <flipper/types.h>
+#include <types.h>
 
 enum { _timer_configure };
 

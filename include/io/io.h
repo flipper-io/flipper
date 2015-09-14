@@ -2,7 +2,7 @@
 
 #define __io_h__
 
-#include <flipper/types.h>
+#include <types.h>
 
 enum { _io_configure, _io_direction, _io_write, _io_read };
 

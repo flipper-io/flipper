@@ -1,6 +1,6 @@
 #define __private_include__
 
-#include <drivers/flash.h>
+#include <flash/flash.h>
 
 const struct _flash flash = {
 	

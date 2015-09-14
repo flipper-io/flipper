@@ -2,7 +2,7 @@
 
 #define __pwm_h__
 
-#include <flipper/types.h>
+#include <types.h>
 
 extern const struct _pwm {
 	

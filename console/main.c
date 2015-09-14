@@ -24,7 +24,11 @@ int main(int argc, char *argv[]) {
 	
 		sleep(1);
 		
-		device.invoke(_led, _led_set_rgb, 3, 0, 0, a * 25);
+		//device.invoke(_led, _led_set_rgb, 3, 0, 0, a * 25);
+		
+		uint32_t ret = device.invoke(_button, _button_read, 0);
+		
+		printf("RET: 0x%04X\n", ret);
 		
 		a ^= 1;
 		

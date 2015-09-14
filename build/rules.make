@@ -6,15 +6,13 @@ $(shell find . -name '.DS_Store' -exec rm -rf {} \;)
 
 targets = $(shell find . -follow -type f $(findflags) -name '*.c' -or -name '*.s' -or -name '*.S')
 
-$(info $(targets))
-
 # ~ Convert the target file names into object file names ~ #
 
 objects = $(foreach source, $(targets), $(addsuffix .o, $(basename $(source))))
 
 # ~ Use 'find' to discover any include directories. ~ #
 
-includes = $(foreach directory, $(FLIPPERSDK)/include $(shell find . -follow -type d -name 'include') $(include_directories), -I "$(directory)")
+includes = $(foreach directory, $(shell find . -follow -type d -name 'include') $(include_directories), -I "$(directory)")
 
 # ~ Gather compatable linker scripts. ~ #
 

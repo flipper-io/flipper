@@ -2,9 +2,9 @@
 
 #define network_h
 
-#include <flipper/types.h>
+#include <types.h>
 
-#include <flipper/bus.h>
+#include <bus.h>
 
 #define FLIPPER_NETWORK_PORT 7777
 

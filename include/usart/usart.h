@@ -2,9 +2,9 @@
 
 #define __usart_h__
 
-#include <flipper/types.h>
+#include <types.h>
 
-#include <flipper/bus.h>
+#include <bus.h>
 
 extern const struct _bus usart, usart1, dbgu;
 

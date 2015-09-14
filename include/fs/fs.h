@@ -2,7 +2,7 @@
 
 #define __fs_h__
 
-#include <flipper/types.h>
+#include <types.h>
 
 /* A simple data structure used to represent files. */
 

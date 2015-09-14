@@ -44,9 +44,13 @@ all: clean
 
 install:
 
+	# ~ Create the install director if it doesn't exist. ~ #
+
+	mkdir -p $(FLIPPERSDK)/osmium
+
 	# Copy the binary into the SDK's firmware directory.
 
-	$(rsync) -r $(output) $(FLIPPERSDK)/firmware/$(output)
+	$(rsync) -r $(output) $(FLIPPERSDK)/osmium/$(output)
 
 burn:
 
