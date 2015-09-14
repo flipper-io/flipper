@@ -1,6 +1,6 @@
 #define __private_include__
 
-#include <drivers/button.h>
+#include <button/button.h>
 
 void flash_configure(void) {
 

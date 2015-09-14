@@ -8,7 +8,7 @@
 
 #include <platform/atmega.h>
 
-const struct _target self = {
+const struct _self self = {
 	
 	self_configure,
 	
@@ -50,7 +50,7 @@ uint32_t self_invoke(const struct _target *sender) {
 	
 	/* ~ Return whatever we received back to the device that sent us a message. ~ */
 	
-	//sender -> bus -> push(fmr_buffer, sizeof(uint32_t));
+	sender -> bus -> push(fmr_buffer, sizeof(uint32_t));
 	
 	/* ~ There is no point in returning the retval here, as self_invoke is not implemented. ~ */
 	

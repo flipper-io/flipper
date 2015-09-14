@@ -2,9 +2,9 @@
 
 #define __fmr_h__
 
-#include <flipper/types.h>
+#include <types.h>
 
-#include <flipper/bus.h>
+#include <bus.h>
 
 #define FLIPPER_PACKET_SIZE 32
 
@@ -32,8 +32,6 @@ struct _fmr_packet {
 
 struct _target {
 	
-	/* Configure the target. */
-	
 	void (* configure)(const struct _bus *bus);
 	
 	uint32_t (* invoke)(uint8_t module, uint8_t index, uint8_t argc, ...);
@@ -46,7 +44,21 @@ struct _target {
 	
 };
 
-extern const struct _target host, self, device;
+extern const struct _self {
+	
+	void (* configure)(const struct _bus *bus);
+	
+	uint32_t (* invoke)(const struct _target *sender);
+	
+	uint32_t (* push)(uint8_t module, uint8_t index, uint8_t argc, void *source, uint32_t length, ...);
+	
+	void (* pull)(uint8_t module, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...);
+	
+	const struct _bus *bus;
+	
+} self;
+
+extern const struct _target host, device;
 
 extern const void * const modules[];
 

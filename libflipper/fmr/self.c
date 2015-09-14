@@ -2,7 +2,7 @@
 
 #include <fmr/fmr.h>
 
-const struct _target self = {
+const struct _self self = {
 	
 	self_configure,
 	

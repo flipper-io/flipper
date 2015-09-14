@@ -1,6 +1,6 @@
 #define __private_include__
 
-#include <drivers/usb.h>
+#include <usb/usb.h>
 
 void usb_configure(uint16_t configuration) {
 	

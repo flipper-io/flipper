@@ -2,7 +2,7 @@
 
 #define __bus_h__
 
-#include <flipper/types.h>
+#include <types.h>
 
 struct _bus {
 	

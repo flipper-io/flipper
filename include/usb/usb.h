@@ -2,9 +2,9 @@
 
 #define __usb_h__
 
-#include <flipper/types.h>
+#include <types.h>
 
-#include <flipper/bus.h>
+#include <bus.h>
 
 extern const struct _bus usb;
 

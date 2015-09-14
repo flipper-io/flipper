@@ -1,6 +1,6 @@
 #define __private_include__
 
-#include <flipper/bus.h>
+#include <bus.h>
 
 #include <fmr/fmr.h>
 
@@ -42,7 +42,13 @@ uint32_t target_invoke(const struct _target *target, uint8_t module, uint8_t ind
 	
 	target -> bus -> push(fmr_buffer, sizeof(fmr_buffer));
 	
-	return 0;
+	uint32_t retval;
+	
+	/* ~ Retrieve the return value from the device. ~ */
+	
+	target -> bus -> pull(&retval, sizeof(uint32_t));
+	
+	return retval;
 	
 }
 

@@ -1,6 +1,6 @@
 #define __private_include__
 
-#include <drivers/fs.h>
+#include <fs/fs.h>
 
 fsp root;
 
