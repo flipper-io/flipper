@@ -2,9 +2,9 @@
 
 #include <fmr/fmr.h>
 
-#include <drivers/usart.h>
+#include <usart/usart.h>
 
-#include <drivers/button.h>
+#include <button/button.h>
 
 #include <platform/atmega.h>
 

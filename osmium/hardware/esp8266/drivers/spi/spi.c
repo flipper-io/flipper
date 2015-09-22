@@ -1,6 +1,6 @@
 #define __private_include__
 
-#include <drivers/spi.h>
+#include <spi/spi.h>
 
 const struct _bus spi = {
 	

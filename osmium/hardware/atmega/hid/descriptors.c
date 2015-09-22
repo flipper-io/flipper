@@ -4,7 +4,7 @@
 
 #include <platform/hid.h>
 
-#include <drivers/usb.h>
+#include <usb/usb.h>
 
 const uint8_t PROGMEM endpoint[] = {
 	

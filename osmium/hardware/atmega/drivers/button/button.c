@@ -1,8 +1,8 @@
 #define __private_include__
 
-#include <drivers/button.h>
+#include <button/button.h>
 
-#include <drivers/led.h>
+#include <led/led.h>
 
 void button_configure(void) {
 	

@@ -1,6 +1,6 @@
 #define __private_include__
 
-#include <flipper/flipper.h>
+#include <flipper.h>
 
 #include <platform/atmega.h>
 
