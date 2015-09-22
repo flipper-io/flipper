@@ -1,6 +1,6 @@
 #define __private_include__
 
-#include <drivers/pwm.h>
+#include <pwm/pwm.h>
 
 const struct _pwm pwm = {
 	

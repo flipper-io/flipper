@@ -1,6 +1,6 @@
 #define __private_include__
 
-#include <drivers/usart.h>
+#include <usart/usart.h>
 
 #include <platform/atmega.h>
 

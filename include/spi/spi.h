@@ -4,7 +4,7 @@
 
 #include <types.h>
 
-#include <bus.h>
+#include <fmr/bus.h>
 
 extern const struct _bus spi;
 

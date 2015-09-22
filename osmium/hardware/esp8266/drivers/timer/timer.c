@@ -1,6 +1,6 @@
 #define __private_include__
 
-#include <drivers/timer.h>
+#include <timer/timer.h>
 
 const struct _timer timer = {
 	

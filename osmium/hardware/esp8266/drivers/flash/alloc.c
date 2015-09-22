@@ -1,6 +1,6 @@
 #define __private_include__
 
-#include <drivers/flash.h>
+#include <flash/flash.h>
 
 fsp flash_alloc(uint32_t length) {
 	

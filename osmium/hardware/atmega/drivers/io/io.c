@@ -1,6 +1,6 @@
 #define __private_include__
 
-#include <drivers/io.h>
+#include <io/io.h>
 
 void io_configure(void) {
 	

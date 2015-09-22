@@ -2,7 +2,7 @@
 
 #define __definitions_h__
 
-#include <flipper/types.h>
+#include <types.h>
 
 typedef uint32_t fp;
 

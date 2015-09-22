@@ -8,6 +8,14 @@
 
 #include <network/network.h>
 
+const struct _flipper flipper = {
+	
+	flipper_configure,
+	
+	flipper_attach
+	
+};
+
 void flipper_configure(void) {
 	
 	
