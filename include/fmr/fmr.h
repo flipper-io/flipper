@@ -8,11 +8,23 @@
 
 #define FLIPPER_PACKET_SIZE 32
 
-typedef struct _fmr_packet {
+/* ~ It is very important that this structure be packed. ~ */
+
+typedef struct __attribute__((__packed__)) _fmr_packet {
 	
 	/* ~ Fixed packet header to ensure sync. ~ */
 	
 	uint8_t header;
+	
+	/* ~ The length of the contents of the packet. ~ */
+	
+	uint16_t length;
+	
+	/* ~ A checksum of everything below. ~ */
+	
+	uint16_t checksum;
+	
+	/* ------------ CONTENTS ------------ */
 	
 	/* ~ The destination object. ~ */
 	
@@ -26,17 +38,9 @@ typedef struct _fmr_packet {
 	
 	uint8_t argc;
 	
-	/* ~ The length of the message body. ~ */
-	
-	uint16_t length;
-	
-	/* ~ A checksum of the packet. ~ */
-	
-	uint16_t checksum;
-	
 	/* ~ The body of the packet. ~ */
 	
-	uint8_t body[23];
+	uint8_t body[FLIPPER_PACKET_SIZE - 8];
 	
 } fmr_packet;
 

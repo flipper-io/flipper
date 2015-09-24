@@ -20,9 +20,7 @@ uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t ind
 	
 	/* ~ Populate the message body with the information needed to make a remote procedure call. ~ */
 	
-	uint16_t len = sizeof(fmr_packet) + argc - sizeof(uint8_t);
-	
-	fmrpacket.length = len;
+	fmrpacket.length = 8 + argc;
 	
 	fmrpacket.object = object;
 	
@@ -44,11 +42,11 @@ uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t ind
 	
 	/* ~ Generate a checksum. ~ */
 	
-	fmrpacket.checksum = checksum(&fmrpacket, fmrpacket.length);
+	fmrpacket.checksum = checksum((void *)(&fmrpacket.object), 3 + fmrpacket.argc);
 	
 	/* ~ Push the message to the device. ~ */
 	
-	target -> bus -> push(&fmrpacket, len);
+	target -> bus -> push(&fmrpacket, fmrpacket.length);
 	
 	/* ~ Use a local variable to store the return value. ~ */
 	

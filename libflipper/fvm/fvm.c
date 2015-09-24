@@ -120,7 +120,13 @@ void fdb_push(void *source, uint32_t length) {
 	
 	for (unsigned i = 0; i < length; i ++) { if (i % 8 == 0) printf("\n\t"); printf("%02X ", ((uint8_t *)(source))[i]); }
 	
-	printf("\n\n");
+	verbose("\n\n");
+	
+	memcpy(&fmrpacket, source, length);
+	
+	verbose("fdb (fvm) ->");
+	
+	self.invoke(&fvm);
 	
 }
 

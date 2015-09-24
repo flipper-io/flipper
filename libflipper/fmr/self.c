@@ -28,8 +28,19 @@ uint32_t fmr_call(void *function, uint8_t argc, void *argv) {
 
 uint32_t self_invoke(const struct _target *sender) {
 	
-
-	return 0;
+	verbose(" self -> invoke\n\n");
+	
+	/* ~ Dereference a pointer to the targeted object. ~ */
+	
+	void *object = (void *)(objects[fmrpacket.object]);
+	
+	/* ~ Dereference a pointer to the targeted function. ~ */
+	
+	void *function = ((void **)(object))[fmrpacket.index];
+	
+	/* ~ Invoke the targeted function with the appropriate arguments. ~ */
+	
+	return 0; //((uint32_t (*)(void))(function))();
 	
 }
 
