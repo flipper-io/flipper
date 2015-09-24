@@ -50,9 +50,7 @@ uint32_t self_invoke(const struct _target *sender) {
 	
 	/* ~ Return whatever we received back to the device that sent us a message. ~ */
 	
-	//sender -> bus -> push(fmrpacket.body, sizeof(uint32_t));
-	
-	/* ~ There is no point in returning the retval here, as self_invoke is not implemented. ~ */
+	sender -> bus -> push(&fmrpacket.body, sizeof(uint32_t));
 	
 	return 0;
 	

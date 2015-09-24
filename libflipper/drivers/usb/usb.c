@@ -76,7 +76,7 @@ void usb_push(void *source, uint32_t length) {
 
 void usb_pull(void *destination, uint32_t length) {
 	
-	uint8_t buffer[32];
+	uint8_t *buffer = (uint8_t *)(malloc(sizeof(uint8_t) * 64));
 	
 	hid_receive_packet(buffer);
 	

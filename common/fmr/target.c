@@ -54,7 +54,7 @@ uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t ind
 	
 	/* ~ Retrieve the return value from the device. ~ */
 	
-	//target -> bus -> pull(&retval, sizeof(uint32_t));
+	target -> bus -> pull(&retval, sizeof(uint32_t));
 	
 	/* ~ Give the return value back to the parent function. ~ */
 	

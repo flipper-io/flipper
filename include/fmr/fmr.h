@@ -86,7 +86,7 @@ extern fmr_packet fmrpacket;
 
 #ifdef __private_include__
 
-enum { _button, _flash, _host, _self, _device, _fs, _i2c, _io, _led, _pwm, _spi, _timer, _usart, _usart1, _dbgu, _usb };
+enum { _button, _flash, _host, _self, _device, _fs, _i2c, _io, _led, _pwm, _spi, _timer, _usart, _usart1, _dbgu, _usb, _wifi };
 
 extern uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, va_list *argv);
 

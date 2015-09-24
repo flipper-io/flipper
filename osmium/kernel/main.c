@@ -72,6 +72,6 @@ ISR(USART1_RX_vect) {
 		
 	enable_interrupts();
 	
-	self_invoke(&device);
+	self_invoke(&host);
 	
 }

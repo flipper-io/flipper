@@ -30,6 +30,8 @@
 
 #include <usb/usb.h>
 
+#include <wifi/wifi.h>
+
 /* ~ Define the flippper control type. ~ */
 
 enum { FLIPPER_SOURCE_USB, FLIPPER_SOURCE_NETWORK, FLIPPER_SOURCE_FVM };
