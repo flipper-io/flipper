@@ -2,11 +2,11 @@
 
 #define __crc_h__
 
-#include <flipper/flipper.h>
+#include <types.h>
 
 #ifdef __private_include__
 
-uint16_t checksum(const void *source, uint16_t length);
+extern uint16_t checksum(const void *source, uint16_t length);
 
 #endif
 

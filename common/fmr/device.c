@@ -18,15 +18,15 @@ const struct _target device = {
 
 void device_configure(const struct _bus *bus) {
 	
-	/* ~ Configure USB as the device's communication protocol. ~ */
+	/* ~ Configure the device's communication protocol. ~ */
 	
 	((struct _target *)(&device)) -> bus = bus;
 	
 }
 
-uint32_t device_invoke(uint8_t module, uint8_t index, uint8_t argc, ...) {
-	
-	/* ~ Construct a va_list to access varidic arguments. ~ */
+uint32_t device_invoke(uint8_t object, uint8_t index, uint8_t argc, ...) {
+		
+	/* ~ Construct a va_list to access variadic arguments. ~ */
 	
 	va_list argv;
 	
@@ -36,17 +36,17 @@ uint32_t device_invoke(uint8_t module, uint8_t index, uint8_t argc, ...) {
 	
 	/* ~ Invoke the function on the selected target. ~ */
 	
-	return target_invoke(&device, module, index, argc, &argv);
+	return target_invoke(&device, object, index, argc, &argv);
 	
 }
 
-uint32_t device_push(uint8_t module, uint8_t index, uint8_t argc, void *source, uint32_t length, ...) {
+uint32_t device_push(uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, ...) {
 	
 	return 0;
 	
 }
 
-void device_pull(uint8_t module, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...) {
+void device_pull(uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...) {
 	
 	
 	

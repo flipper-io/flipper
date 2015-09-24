@@ -22,9 +22,9 @@ extern void network_disable(void);
 
 extern bool network_ready(void);
 
-extern void network_put_byte(uint8_t byte);
+extern void network_put(uint8_t byte);
 
-extern uint8_t network_get_byte(void);
+extern uint8_t network_get(void);
 
 extern void network_push(void *source, uint32_t length);
 

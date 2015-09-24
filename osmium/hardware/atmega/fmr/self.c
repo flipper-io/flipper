@@ -4,7 +4,7 @@
 
 #include <usart/usart.h>
 
-#include <button/button.h>
+#include <led/led.h>
 
 #include <platform/atmega.h>
 
@@ -28,29 +28,25 @@ void self_configure(const struct _bus *bus) {
 
 uint32_t self_invoke(const struct _target *sender) {
 	
-	/* ~ Dereference a pointer to the targeted module. ~ */
+	/* ~ Dereference a pointer to the targeted object. ~ */
 	
-	void *object = (void *)(pgm_read_word(&modules[fmr_buffer[0]]));
+	void *object = (void *)(pgm_read_word(&objects[fmrpacket.object]));
 	
 	/* ~ Dereference a pointer to the targeted function. ~ */
 	
-	void *function = ((void **)(object))[fmr_buffer[1]];
+	void *function = ((void **)(object))[fmrpacket.index];
 	
 	/* ~ Save a copy of the argument count. ~ */
 	
-	uint8_t argc = fmr_buffer[2];
-	
-	/* Offset the message. */
-	
-	memmove(fmr_buffer, fmr_buffer + 3, FLIPPER_PACKET_SIZE - 3);
+	uint8_t argc = fmrpacket.argc;
 	
 	/* ~ Invoke the targeted function with the appropriate arguments. ~ */
 	
-	fmr_call(function, argc, fmr_buffer);
+	fmr_call(function, argc, &fmrpacket.body);
 	
 	/* ~ Return whatever we received back to the device that sent us a message. ~ */
 	
-	sender -> bus -> push(fmr_buffer, sizeof(uint32_t));
+	//sender -> bus -> push(fmrpacket.body, sizeof(uint32_t));
 	
 	/* ~ There is no point in returning the retval here, as self_invoke is not implemented. ~ */
 	
@@ -58,13 +54,13 @@ uint32_t self_invoke(const struct _target *sender) {
 	
 }
 
-uint32_t self_push(uint8_t module, uint8_t index, uint8_t argc, void *source, uint32_t length, ...) {
+uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, ...) {
 	
 	return 0;
 	
 }
 
-void self_pull(uint8_t module, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...) {
+void self_pull(uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...) {
 	
 	
 	

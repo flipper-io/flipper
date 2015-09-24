@@ -16,11 +16,15 @@ ln = $(shell which 'ln')
 
 # ~ Declare the preprocessor statements to be used during object generation. ~ #
 
-preprocess = -std=c99 -D__verbose__
+preprocess = -std=c99 -D__verbose__ # -DOVERRIDE_USB
 
 # ~ Pass flags to find so that it only isolates files pertainant to the target platform. ~ #
 
 findflags = \( ! -wholename "./platforms/*" -or -wholename "./platforms/osx/*" \)
+
+# ~ Declare the include directories needed for compilation. ~ #
+
+include_directories = ../include
 
 # ~ Declare the library dependancies neededed for linking. ~ #
 

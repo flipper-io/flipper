@@ -40,7 +40,7 @@ bool usart0_ready(void) {
 	
 }
 
-void usart0_put_byte(uint8_t byte) {
+void usart0_put(uint8_t byte) {
 	
 	while (!(UCSR1A & (1 << UDRE1)));
 	
@@ -48,7 +48,7 @@ void usart0_put_byte(uint8_t byte) {
 	
 }
 
-uint8_t usart0_get_byte(void) {
+uint8_t usart0_get(void) {
 	
 	while (!(UCSR1A & (1 << RXC1)));
 	
@@ -58,13 +58,13 @@ uint8_t usart0_get_byte(void) {
 
 void usart0_push(void *source, uint32_t length) {
 	
-	while (length --) usart0_put_byte(*(uint8_t *)(source ++));
+	while (length --) usart0_put(*(uint8_t *)(source ++));
 	
 }
 
 void usart0_pull(void *destination, uint32_t length) {
 	
-	while (length --) *(uint8_t *)(destination ++) = usart0_get_byte();
+	while (length --) *(uint8_t *)(destination ++) = usart0_get();
 	
 }
 
@@ -94,13 +94,13 @@ bool usart1_ready(void) {
 	
 }
 
-void usart1_put_byte(uint8_t byte) {
+void usart1_put(uint8_t byte) {
 	
 	
 	
 }
 
-uint8_t usart1_get_byte(void) {
+uint8_t usart1_get(void) {
 	
 	return 0;
 	
@@ -144,13 +144,13 @@ bool dbgu_ready(void) {
 	
 }
 
-void dbgu_put_byte(uint8_t byte) {
+void dbgu_put(uint8_t byte) {
 	
 	
 	
 }
 
-uint8_t dbgu_get_byte(void) {
+uint8_t dbgu_get(void) {
 	
 	return 0;
 	

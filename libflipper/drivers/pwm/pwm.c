@@ -2,6 +2,8 @@
 
 #include <pwm/pwm.h>
 
+#include <fmr/fmr.h>
+
 void pwm_configure(void) {
 	
 	

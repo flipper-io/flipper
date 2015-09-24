@@ -22,11 +22,9 @@ install:
 
 	# ~ Copy the header files into the SDK directory. ~ */
 
-	mkdir -p $(FLIPPERSDK)/include/drivers
+	mkdir -p $(FLIPPERSDK)/include
 
-	$(rsync) -r include/drivers/* $(FLIPPERSDK)/include/drivers
-	
-	$(rsync) -r include/flipper/* $(FLIPPERSDK)/include
+	$(rsync) -r include/* $(FLIPPERSDK)/include
 	
 	# ~ Install libflipper to the SDK. ~ */
 	

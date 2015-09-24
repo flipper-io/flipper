@@ -4,6 +4,6 @@
 
 #include <fmr/fmr.h>
 
-uint8_t fmr_buffer[FLIPPER_PACKET_SIZE];
+fmr_packet fmrpacket;
 
-const void * const modules[] = { &button, &flash, &host, &self, &device, &fs, &i2c, &io, &led, &pwm, &spi, &timer, &usart, &usb };
+const void * const objects[] = { &button, &flash, &host, &self, &device, &fs, &i2c, &io, &led, &pwm, &spi, &timer, &usart, &usart1, &dbgu, &usb };

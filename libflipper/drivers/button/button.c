@@ -2,16 +2,16 @@
 
 #include <button/button.h>
 
+#include <fmr/fmr.h>
+
 void button_configure(void) {
 	
-	printf("BUTTON CONFIGURED ON HOST!\n\n");
+	
 	
 }
 
 bool button_read(void) {
 	
-	
-	
-	return 0;
+	return (bool)(host.invoke(_button, _button_read, NO_ARGS));
 	
 }

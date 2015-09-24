@@ -48,7 +48,7 @@ install:
 
 	mkdir -p $(FLIPPERSDK)/osmium
 
-	# Copy the binary into the SDK's firmware directory.
+	# ~ Copy the binary into the SDK's firmware directory. ~
 
 	$(rsync) -r $(output) $(FLIPPERSDK)/osmium/$(output)
 
@@ -56,7 +56,7 @@ burn:
 
 	# Flash the connected device with the binary using 'avrdude'.
 
-	$(avrdude) -p $(target) -c usbtiny -U lfuse:w:0xFF:m -U hfuse:w:0xD9:m -U flash:w:$(output)
+	$(avrdude) -p $(target) -c usbtiny -V -U lfuse:w:0xFF:m -U hfuse:w:0xD9:m -U flash:w:$(output)
 
 clean:
 

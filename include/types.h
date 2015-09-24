@@ -48,4 +48,10 @@ typedef uint32_t fsp;
 
 #define hi16(x)	((uint16_t)(((uint32_t)(x)) >> 16))
 
+#define little(x) ((((uint16_t)(x)) << 8 ) | (((uint16_t)(x)) >> 8))
+
+/* ~ Miscelaneous. ~ */
+
+#define NO_ARGS 0
+
 #endif
