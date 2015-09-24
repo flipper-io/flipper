@@ -12,9 +12,9 @@ const struct _bus spi = {
 	
 	spi_ready,
 	
-	spi_put_byte,
+	spi_put,
 	
-	spi_get_byte,
+	spi_get,
 	
 	spi_push,
 	

@@ -30,8 +30,6 @@ void __attribute__ ((naked)) __attribute__ ((section(".init8"))) atmega_init(voi
 	
 	usb_configure(0);
 	
-	memset(fmr_buffer, 0, FLIPPER_PACKET_SIZE);
-	
 	led.configure();
 	
 	led.rgb(0, 16, 0);
@@ -44,9 +42,9 @@ int main(void) {
 	
 	while (1) {
 		
-		uint8_t packet = usb_receive_packet((void *)(fmr_buffer));
+		uint8_t packet = usb_receive_packet((void *)(&fmrpacket));
 		
-		if (packet) { memmove(fmr_buffer, fmr_buffer + 1, FLIPPER_PACKET_SIZE - 1); self_invoke(&device); }
+		if (packet) { self_invoke(&device); }
 		
 	}
 	
@@ -60,15 +58,15 @@ ISR(USART1_RX_vect) {
 	
 	disable_interrupts();
 	
-	while (usart0_get_byte() != 0xFE);
+	while (usart0_get() != 0xFE);
 	
-	for (unsigned i = 0; i < FLIPPER_PACKET_SIZE - 1; i ++) {
-		
-		fmr_buffer[i] = usart0_get_byte();
-		
-		usart0_put_byte(fmr_buffer[i]);
-		
-	}
+	/* ~ Load the header of the packet. ~ */
+	
+	for (unsigned i = 1; i < 8; i ++) ((char *)(&fmrpacket))[i] = usart0_get();
+	
+	for (unsigned i = 0; i < fmrpacket.argc; i ++) ((char *)(&fmrpacket.body))[i] = usart0_get();
+	
+	usart.push(&fmrpacket, fmrpacket.length);
 	
 	self_invoke(&host);
 	

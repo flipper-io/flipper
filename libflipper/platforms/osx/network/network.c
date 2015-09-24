@@ -18,9 +18,9 @@ const struct _bus network = {
 	
 	network_ready,
 	
-	network_put_byte,
+	network_put,
 	
-	network_get_byte,
+	network_get,
 	
 	network_push,
 	
@@ -34,7 +34,7 @@ struct sockaddr_in network_address;
 
 void network_configure(char *ip) {
 	
-	/* Open a socket. */
+	/* ~ Open a socket on the current network. ~ */
 	
 	network_socket = socket(AF_INET, SOCK_DGRAM, 0);
 	
@@ -46,7 +46,7 @@ void network_configure(char *ip) {
 		
 	}
 	
-	/* Clear the network address. */
+	/* ~ Clear the network address. ~ */
 	
 	bzero(&network_address, sizeof(network_address));
 	
@@ -90,13 +90,13 @@ bool network_ready(void) {
 	
 }
 
-void network_put_byte(uint8_t byte) {
+void network_put(uint8_t byte) {
 	
 	
 	
 }
 
-uint8_t network_get_byte(void) {
+uint8_t network_get(void) {
 	
 	return 0;
 	

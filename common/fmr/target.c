@@ -2,35 +2,39 @@
 
 #include <fmr/bus.h>
 
+#include <fs/crc.h>
+
 #include <fmr/fmr.h>
 
-uint32_t target_invoke(const struct _target *target, uint8_t module, uint8_t index, uint8_t argc, va_list *argv) {
+uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, va_list *argv) {
 	
-	if (!(target -> bus)) {
-		
-		error("Error. No device is attached to this instance of libflipper. Use flipper.attach(\"device name\", FLIPPER_SOURCE_USB) to connect over USB.\n\n");
-		
-	}
+	if (!(target -> bus)) { error("Error. No device is attached to this instance of libflipper. Use flipper.attach(\"device name\", FLIPPER_SOURCE_USB) to connect over USB.\n\n"); return  0; }
 	
 	/* ~ Multiply the argument count by two. ~ */
 	
-	argc *= 2;
+	argc *= sizeof(uint16_t);
 	
-	fmr_buffer[0] = 0xFE;
+	/* ~ Allocate memory to store a packet. ~ */
+	
+	fmrpacket.header = 0xFE;
 	
 	/* ~ Populate the message body with the information needed to make a remote procedure call. ~ */
 	
-	fmr_buffer[1] = module;
+	uint16_t len = sizeof(fmr_packet) + argc - sizeof(uint8_t);
 	
-	fmr_buffer[2] = index;
+	fmrpacket.length = len;
 	
-	fmr_buffer[3] = argc;
+	fmrpacket.object = object;
+	
+	fmrpacket.index = index;
+	
+	fmrpacket.argc = argc;
 	
 	for (unsigned i = 0; i < argc; i += 2) {
 		
 		unsigned arg = va_arg(*argv, unsigned);
 		
-		fmr_buffer[i + 4] = hi(arg); fmr_buffer[i + 5] = lo(arg);
+		fmrpacket.body[i] = hi(arg); fmrpacket.body[i + 1] = lo(arg);
 		
 	}
 	
@@ -38,27 +42,35 @@ uint32_t target_invoke(const struct _target *target, uint8_t module, uint8_t ind
 	
 	va_end(*argv);
 	
+	/* ~ Generate a checksum. ~ */
+	
+	fmrpacket.checksum = checksum(&fmrpacket, fmrpacket.length);
+	
 	/* ~ Push the message to the device. ~ */
 	
-	target -> bus -> push(fmr_buffer, sizeof(fmr_buffer));
+	target -> bus -> push(&fmrpacket, len);
+	
+	/* ~ Use a local variable to store the return value. ~ */
 	
 	uint32_t retval;
 	
 	/* ~ Retrieve the return value from the device. ~ */
 	
-	target -> bus -> pull(&retval, sizeof(uint32_t));
+	//target -> bus -> pull(&retval, sizeof(uint32_t));
+	
+	/* ~ Give the return value back to the parent function. ~ */
 	
 	return retval;
 	
 }
 
-uint32_t target_push(const struct _target *target, uint8_t _module, uint8_t _index, uint8_t module, uint8_t index, uint8_t argc, void *source, uint32_t length, va_list *argv) {
+uint32_t target_push(const struct _target *target, uint8_t _object, uint8_t _index, uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, va_list *argv) {
 	
 	return 0;
 	
 }
 
-void target_pull(const struct _target *target, uint8_t _module, uint8_t _index, uint8_t module, uint8_t index, uint8_t argc, void *destination, uint32_t length, va_list *argv) {
+void target_pull(const struct _target *target, uint8_t _object, uint8_t _index, uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, va_list *argv) {
 	
 	
 	

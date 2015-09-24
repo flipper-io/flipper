@@ -20,9 +20,9 @@ extern void usart0_disable(void);
 
 extern bool usart0_ready(void);
 
-extern void usart0_put_byte(uint8_t byte);
+extern void usart0_put(uint8_t byte);
 
-extern uint8_t usart0_get_byte();
+extern uint8_t usart0_get();
 
 extern void usart0_push(void *source, uint32_t length);
 
@@ -39,9 +39,9 @@ extern void usart1_disable(void);
 
 extern bool usart1_ready(void);
 
-extern void usart1_put_byte(uint8_t byte);
+extern void usart1_put(uint8_t byte);
 
-extern uint8_t usart1_get_byte();
+extern uint8_t usart1_get();
 
 extern void usart1_push(void *source, uint32_t length);
 
@@ -58,9 +58,9 @@ extern void dbgu_disable(void);
 
 extern bool dbgu_ready(void);
 
-extern void dbgu_put_byte(uint8_t byte);
+extern void dbgu_put(uint8_t byte);
 
-extern uint8_t dbgu_get_byte();
+extern uint8_t dbgu_get();
 
 extern void dbgu_push(void *source, uint32_t length);
 

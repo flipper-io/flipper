@@ -1,8 +1,10 @@
 #define __private_include__
 
-#include <flipper.h>
+#include <libflipper.h>
 
 #include <fmr/fmr.h>
+
+#include <fvm/fvm.h>
 
 #include <usb/usb.h>
 
@@ -24,7 +26,7 @@ void flipper_configure(void) {
 
 void flipper_attach(uint8_t source, ...) {
 	
-	/* ~ Construct a va_list to access varidic arguments. ~ */
+	/* ~ Construct a va_list to access variadic arguments. ~ */
 	
 	va_list argv;
 	
@@ -73,6 +75,22 @@ void flipper_attach(uint8_t source, ...) {
 			/* ~ Release the va_list. ~ */
 			
 			va_end(argv);
+			
+			break;
+			
+		case FLIPPER_SOURCE_FVM:
+			
+			verbose("Successfully attatched to FVM.\n\n");
+			
+			/* Redirect the host and the device to FVM. */
+			
+			memcpy((void *)(&host), (void *)(&fvm), sizeof(struct _target));
+			
+			memcpy((void *)(&device), (void *)(&fvm), sizeof(struct _target));
+			
+			/* ~ Configure FVM to use the FDB communications channel. ~ */
+			
+			fvm_configure(&fdb);
 			
 			break;
 			

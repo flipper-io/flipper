@@ -33,13 +33,13 @@ uint32_t self_invoke(const struct _target *sender) {
 	
 }
 
-uint32_t self_push(uint8_t module, uint8_t index, uint8_t argc, void *source, uint32_t length, ...) {
+uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, ...) {
 	
 	return 0;
 	
 }
 
-void self_pull(uint8_t module, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...) {
+void self_pull(uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...) {
 	
 	
 	

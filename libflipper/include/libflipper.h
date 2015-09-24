@@ -1,34 +1,8 @@
-#ifndef flipper_h
+#ifndef libflipper_h
 
-#define flipper_h
-
-/* ~ Include the types header. ~ */
+#define libflipper_h
 
 #include <types.h>
-
-/* ~ Include the header files for user-accessable drivers. ~ */
-
-#include <button/button.h>
-
-#include <flash/flash.h>
-
-#include <fs/fs.h>
-
-#include <i2c/i2c.h>
-
-#include <io/io.h>
-
-#include <led/led.h>
-
-#include <pwm/pwm.h>
-
-#include <spi/spi.h>
-
-#include <timer/timer.h>
-
-#include <usart/usart.h>
-
-#include <usb/usb.h>
 
 /* ~ Define the flippper control type. ~ */
 

@@ -2,6 +2,8 @@
 
 #include <usb/usb.h>
 
+#include <fmr/fmr.h>
+
 void usb_configure(uint16_t configuration) {
 	
 	uint8_t devices = hid_enumerate(1, CARBON_VENDOR_ID, CARBON_PRODUCT_ID, CARBON_USAGE_PAGE, CARBON_USAGE);
@@ -11,6 +13,12 @@ void usb_configure(uint16_t configuration) {
 		printf("No device appears to be connected to this computer.\n\nPlease ensure that Flipper is properly connected and try again.\n\n");
 		
 		exit(EXIT_FAILURE);
+		
+	}
+	
+	else {
+		
+		printf("Successfully connected to Flipper device over USB.\n\n");
 		
 	}
 	
@@ -48,11 +56,21 @@ uint8_t usb_get(void) {
 
 void usb_push(void *source, uint32_t length) {
 	
-	for (unsigned i = 0; i < length; i ++) { if (i % 8 == 0) printf("\n"); printf("%02X ", ((uint8_t *)(source))[i]); }
+	/* ~ Allocate a buffer to store a USB packet. ~ */
 	
-	printf("\n");
+	void *packet = malloc(USB_PACKET_LENGTH);
 	
-	hid_transmit_packet(source);
+	/* ~ Clear the buffer. ~ */
+	
+	memset(packet, 0x00, USB_PACKET_LENGTH);
+	
+	/* ~ Copy the data into the buffer. ~ */
+	
+	memcpy(packet, source, length);
+	
+	/* ~ Send the packet. ~ */
+	
+	hid_transmit_packet(packet);
 	
 }
 

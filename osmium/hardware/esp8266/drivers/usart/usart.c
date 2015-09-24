@@ -14,9 +14,9 @@ const struct _bus usart = {
 	
 	usart0_ready,
 	
-	usart0_put_byte,
+	usart0_put,
 	
-	usart0_get_byte,
+	usart0_get,
 	
 	usart0_push,
 	
@@ -36,9 +36,9 @@ const struct _bus usart1 = {
 	
 	usart1_ready,
 	
-	usart1_put_byte,
+	usart1_put,
 	
-	usart1_get_byte,
+	usart1_get,
 	
 	usart1_push,
 	
@@ -58,9 +58,9 @@ const struct _bus dbgu = {
 	
 	dbgu_ready,
 	
-	dbgu_put_byte,
+	dbgu_put,
 	
-	dbgu_get_byte,
+	dbgu_get,
 	
 	dbgu_push,
 	

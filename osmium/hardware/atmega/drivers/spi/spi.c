@@ -26,13 +26,13 @@ bool spi_ready(void) {
 	
 }
 
-void spi_put_byte(uint8_t byte) {
+void spi_put(uint8_t byte) {
 	
 	
 	
 }
 
-uint8_t spi_get_byte(void) {
+uint8_t spi_get(void) {
 	
 	return 0;
 	

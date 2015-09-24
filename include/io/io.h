@@ -4,7 +4,7 @@
 
 #include <types.h>
 
-enum { _io_configure, _io_direction, _io_write, _io_read };
+enum { _io_configure, _io_set_direction, _io_write, _io_read };
 
 extern const struct _io {
 	

@@ -44,8 +44,6 @@ enum { _fs_configure };
 
 void fs_configure(void);
 
-uint16_t checksum(void *data, uint16_t size);
-
 #endif
 
 #endif

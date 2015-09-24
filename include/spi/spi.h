@@ -20,9 +20,9 @@ extern void spi_disable(void);
 
 extern bool spi_ready(void);
 
-extern void spi_put_byte(uint8_t byte);
+extern void spi_put(uint8_t byte);
 
-extern uint8_t spi_get_byte(void);
+extern uint8_t spi_get(void);
 
 extern void spi_push(void *source, uint32_t length);
 
