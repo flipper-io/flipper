@@ -91,7 +91,7 @@ int8_t hid_receive_packet(uint8_t *buffer) {
 			break;
 		}
 		if (!hid->open) {
-			printf("hid_receive_packet, device not open\n");
+			printf("rawhid_recv, device not open\n");
 			ret = -1;
 			break;
 		}
@@ -100,6 +100,7 @@ int8_t hid_receive_packet(uint8_t *buffer) {
 	CFRunLoopTimerInvalidate(timer);
 	CFRelease(timer);
 	return ret;
+
 }
 
 static void input_callback(void *context, IOReturn ret, void *sender,
