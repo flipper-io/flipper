@@ -6,6 +6,8 @@
 
 #include <fmr/fmr.h>
 
+#include <fs/crc.h>
+
 #include <platform/hid.h>
 
 void __attribute__ ((naked)) __attribute__ ((section(".init8"))) atmega_init(void) {
@@ -44,7 +46,7 @@ int main(void) {
 		
 		uint8_t packet = usb_receive_packet((void *)(&fmrpacket));
 		
-		if (packet) { self_invoke(&device); }
+		if (packet) self_invoke(&device);
 		
 	}
 	
@@ -62,16 +64,14 @@ ISR(USART1_RX_vect) {
 	
 	/* ~ Load the header of the packet. ~ */
 	
-	for (unsigned i = 1; i < 8; i ++) ((char *)(&fmrpacket))[i] = usart0_get();
+	for (unsigned i = 1; i < 5; i ++) ((char *)(&fmrpacket))[i] = usart0_get();
 	
-	for (unsigned i = 0; i < fmrpacket.argc; i ++) ((char *)(&fmrpacket.body))[i] = usart0_get();
+	for (unsigned i = 0; i < fmrpacket.argc + 3; i ++) ((char *)(&fmrpacket.object))[i] = usart0_get();
 	
-	usart.push(&fmrpacket, fmrpacket.length);
-	
-	self_invoke(&host);
-	
+	while (usart0_ready()) { (void)usart0_get(); }
+		
 	enable_interrupts();
 	
-	reti();
+	self_invoke(&device);
 	
 }

@@ -8,6 +8,8 @@
 
 #include <platform/atmega.h>
 
+#include <fs/crc.h>
+
 const struct _self self = {
 	
 	self_configure,
@@ -28,6 +30,12 @@ void self_configure(const struct _bus *bus) {
 
 uint32_t self_invoke(const struct _target *sender) {
 	
+	/* ~ Compare the checksums of the packets to ensure the data was sent successfully. ~ */
+	
+	uint16_t cs = checksum((void *)(&fmrpacket.object), 3 + fmrpacket.argc);
+	
+	if (cs != fmrpacket.checksum) { led.rgb(25, 0, 0); return 0; }
+	
 	/* ~ Dereference a pointer to the targeted object. ~ */
 	
 	void *object = (void *)(pgm_read_word(&objects[fmrpacket.object]));
@@ -36,13 +44,9 @@ uint32_t self_invoke(const struct _target *sender) {
 	
 	void *function = ((void **)(object))[fmrpacket.index];
 	
-	/* ~ Save a copy of the argument count. ~ */
-	
-	uint8_t argc = fmrpacket.argc;
-	
 	/* ~ Invoke the targeted function with the appropriate arguments. ~ */
 	
-	fmr_call(function, argc, &fmrpacket.body);
+	fmr_call(function, fmrpacket.argc, &fmrpacket.body);
 	
 	/* ~ Return whatever we received back to the device that sent us a message. ~ */
 	

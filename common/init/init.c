@@ -8,6 +8,8 @@ void __attribute__ ((constructor)) libflipper_init() {
 	
 	verbose("The library 'libflipper' was configured successfully.\n\n");
 	
+	usart.push("INIT", 4);
+
 	button_configure();
 	
 	flash_configure();

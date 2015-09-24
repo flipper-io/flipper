@@ -18,9 +18,9 @@ const struct _target host = {
 
 void host_configure(const struct _bus *bus) {
 	
-	/* ~ Configure the host's communication protocol. ~ */
+	/* ~ Configure the device's communication protocol. ~ */
 	
-	((struct _target *)(&host)) -> bus = &usb;
+	((struct _target *)(&host)) -> bus = bus;
 	
 }
 
