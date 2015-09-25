@@ -36,6 +36,8 @@ void __attribute__ ((naked)) __attribute__ ((section(".init8"))) atmega_init(voi
 	
 	led.rgb(0, 16, 0);
 	
+	_delay_ms(1);
+	
 }
 
 char a = 0;
@@ -62,11 +64,15 @@ ISR(USART1_RX_vect) {
 	
 	while (usart0_get() != 0xFE);
 	
+	struct _fmr_header *header = &(fmrpacket.header);
+	
 	/* ~ Load the header of the packet. ~ */
 	
-	for (unsigned i = 1; i < 5; i ++) ((char *)(&fmrpacket))[i] = usart0_get();
+	for (unsigned i = 1; i < sizeof(struct _fmr_header); i ++) ((char *)(header))[i] = usart0_get();
 	
-	for (unsigned i = 0; i < fmrpacket.argc + 3; i ++) ((char *)(&fmrpacket.object))[i] = usart0_get();
+	/* ~ Load the body of the packet. ~*/
+	
+	for (unsigned i = 0; i < (header -> length); i ++) ((char *)(&fmrpacket.destination.object))[i] = usart0_get();
 	
 	while (usart0_ready()) { (void)usart0_get(); }
 		

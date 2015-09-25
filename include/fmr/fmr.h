@@ -6,15 +6,15 @@
 
 #include <fmr/bus.h>
 
-#define FLIPPER_PACKET_SIZE 32
+#define FLIPPER_DATAGRAM_SIZE 32
 
 /* ~ It is very important that this structure be packed. ~ */
 
-typedef struct __attribute__((__packed__)) _fmr_packet {
+struct __attribute__((__packed__)) _fmr_header {
 	
 	/* ~ Fixed packet header to ensure sync. ~ */
 	
-	uint8_t header;
+	uint8_t fe;
 	
 	/* ~ The length of the contents of the packet. ~ */
 	
@@ -24,7 +24,9 @@ typedef struct __attribute__((__packed__)) _fmr_packet {
 	
 	uint16_t checksum;
 	
-	/* ------------ CONTENTS ------------ */
+};
+
+struct __attribute__((__packed__)) _fmr_destination {
 	
 	/* ~ The destination object. ~ */
 	
@@ -38,9 +40,21 @@ typedef struct __attribute__((__packed__)) _fmr_packet {
 	
 	uint8_t argc;
 	
+};
+
+typedef struct __attribute__((__packed__)) _fmr_packet {
+	
+	/* ~ The packet header. ~ */
+	
+	struct _fmr_header header;
+	
+	/* ~ The packet destination. ~ */
+	
+	struct _fmr_destination destination;
+	
 	/* ~ The body of the packet. ~ */
 	
-	uint8_t body[FLIPPER_PACKET_SIZE - 8];
+	uint8_t body[FLIPPER_DATAGRAM_SIZE - sizeof(struct _fmr_header)];
 	
 } fmr_packet;
 

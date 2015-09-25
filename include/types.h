@@ -38,7 +38,24 @@ typedef uint32_t fsp;
 
 #endif
 
+
 /* ~ Bit manipulation, cause let's face it, nobody remembers these. ~ */
+
+#define bit(b)                              (0x01 << (b))
+
+#define get_bit_from_port(b, p)             ((p) & bit(b))
+
+#define set_bit_in_port(b, p)               ((p) |= bit(b))
+
+#define set_bits_in_port_with_mask(p, m)	((p) |= (m))
+
+#define clear_bit_in_port(b, p)             ((p) &= ~(bit(b)))
+
+#define clear_bits_in_port_with_mask(p, m)	((p) &= ~(m))
+
+#define flip_bit_in_port(b, p)              ((p) ^= bit(b))
+
+#define flip_bits_in_port_with_mask(p, m)	((p) ^= (m))
 
 #define lo(x)	((uint8_t)(x))
 

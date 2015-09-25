@@ -52,6 +52,16 @@ extern void flash_pull(void *destination, uint32_t length, fsp source);
 
 extern void *flash_dereference(fsp source, uint32_t length);
 
+/* ~ Helper functions. ~ */
+
+extern void flash_transfer_page_to_buffer_with_erase(uint16_t page, uint8_t buffer);
+
+extern void flash_transfer_buffer_to_page_with_erase(uint8_t buffer, uint16_t page, bool erase);
+
+extern void flash_begin_writing_to_buffer_with_offset(uint8_t buffer, uint16_t offset);
+
+extern void flash_begin_continuous_read(uint16_t page, uint16_t offset);
+
 #endif
 
 #endif

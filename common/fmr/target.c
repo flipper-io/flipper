@@ -14,25 +14,35 @@ uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t ind
 	
 	argc *= sizeof(uint16_t);
 	
+	struct _fmr_header *header = &fmrpacket.header;
+
+	struct _fmr_destination *destination = &fmrpacket.destination;
+	
+	uint8_t *body = fmrpacket.body;
+	
 	/* ~ Allocate memory to store a packet. ~ */
 	
-	fmrpacket.header = 0xFE;
+	header -> fe = 0xFE;
 	
 	/* ~ Populate the message body with the information needed to make a remote procedure call. ~ */
 	
-	fmrpacket.length = 8 + argc;
+	header -> length = sizeof(struct _fmr_destination) + argc;
 	
-	fmrpacket.object = object;
+	/* ~ Populate the packet's destination. ~ */
 	
-	fmrpacket.index = index;
+	destination -> object = object;
 	
-	fmrpacket.argc = argc;
+	destination -> index = index;
+	
+	destination -> argc = argc;
+	
+	/* ~ Populate the packet's body. ~ */
 	
 	for (unsigned i = 0; i < argc; i += 2) {
 		
 		unsigned arg = va_arg(*argv, unsigned);
 		
-		fmrpacket.body[i] = hi(arg); fmrpacket.body[i + 1] = lo(arg);
+		body[i] = hi(arg); body[i + 1] = lo(arg);
 		
 	}
 	
@@ -42,11 +52,11 @@ uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t ind
 	
 	/* ~ Generate a checksum. ~ */
 	
-	fmrpacket.checksum = checksum((void *)(&fmrpacket.object), 3 + fmrpacket.argc);
+	header -> checksum = checksum((void *)(&(destination -> object)), sizeof(struct _fmr_destination) + argc);
 	
 	/* ~ Push the message to the device. ~ */
 	
-	target -> bus -> push(&fmrpacket, fmrpacket.length);
+	target -> bus -> push(&fmrpacket, sizeof(struct _fmr_header) + sizeof(struct _fmr_destination) + argc);
 	
 	/* ~ Use a local variable to store the return value. ~ */
 	
@@ -63,6 +73,8 @@ uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t ind
 }
 
 uint32_t target_push(const struct _target *target, uint8_t _object, uint8_t _index, uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, va_list *argv) {
+	
+	
 	
 	return 0;
 	
