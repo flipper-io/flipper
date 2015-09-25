@@ -32,9 +32,9 @@ int main(int argc, char *argv[]) {
 	
 	/* ~ Attatch this instance of libflipper to the Flipper Virtual Machine for verbose debugging output. ~ */
 	
-	//flipper.attach(FLIPPER_SOURCE_FVM);
+	flipper.attach(FLIPPER_SOURCE_FVM);
 	
-	//led.rgb(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]));
+	led.rgb(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]));
 	
 	return 0;
 	

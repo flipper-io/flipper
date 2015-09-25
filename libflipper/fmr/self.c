@@ -32,11 +32,11 @@ uint32_t self_invoke(const struct _target *sender) {
 	
 	/* ~ Dereference a pointer to the targeted object. ~ */
 	
-	void *object = (void *)(objects[fmrpacket.object]);
+	void *object = (void *)(objects[fmrpacket.destination.object]);
 	
 	/* ~ Dereference a pointer to the targeted function. ~ */
 	
-	void *function = ((void **)(object))[fmrpacket.index];
+	void *function = ((void **)(object))[fmrpacket.destination.index];
 	
 	/* ~ Invoke the targeted function with the appropriate arguments. ~ */
 	

@@ -32,21 +32,21 @@ uint32_t self_invoke(const struct _target *sender) {
 	
 	/* ~ Compare the checksums of the packets to ensure the data was sent successfully. ~ */
 	
-	uint16_t cs = checksum((void *)(&fmrpacket.object), 3 + fmrpacket.argc);
+	uint16_t cs = checksum((void *)(&fmrpacket.destination.object), fmrpacket.header.length);
 	
-	if (cs != fmrpacket.checksum) { led.rgb(25, 0, 0); return 0; }
+	if (cs != fmrpacket.header.checksum) { led_set_rgb(25, 0, 0); return 0; }
 	
 	/* ~ Dereference a pointer to the targeted object. ~ */
 	
-	void *object = (void *)(pgm_read_word(&objects[fmrpacket.object]));
+	void *object = (void *)(pgm_read_word(&objects[fmrpacket.destination.object]));
 	
 	/* ~ Dereference a pointer to the targeted function. ~ */
 	
-	void *function = ((void **)(object))[fmrpacket.index];
+	void *function = ((void **)(object))[fmrpacket.destination.index];
 	
 	/* ~ Invoke the targeted function with the appropriate arguments. ~ */
 	
-	fmr_call(function, fmrpacket.argc, &fmrpacket.body);
+	fmr_call(function, fmrpacket.destination.argc, &fmrpacket.body);
 	
 	/* ~ Return whatever we received back to the device that sent us a message. ~ */
 	

@@ -26,7 +26,7 @@ preprocess = -std=gnu99 -Os -fno-builtin-printf -DARCH=ARCH_AVR8 -mmcu=$(target)
 
 # ~ Pass flags to find so that it only isolates files pertainant to the target platform. ~ #
 
-findflags = \( ! -wholename "./hardware/*" -or -wholename "./hardware/atmega/*" \)
+findflags = \( ! -wholename "./hardware/*" -or -wholename "./hardware/atmega/*" -or -wholename "./hardware/common/*" \)
 
 # ~ Include this file to recursively compile all supported file types and generate object files using the preprocessor statements above. ~ #
 
