@@ -64,7 +64,19 @@ uint32_t fvm_invoke(uint8_t object, uint8_t index, uint8_t argc, ...) {
 
 uint32_t fvm_push(uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, ...) {
 	
-	return 0;
+	verbose("fvm ");
+	
+	/* ~ Construct a va_list to access variadic arguments. ~ */
+	
+	va_list argv;
+	
+	/* ~ Initialize the va_list that we created above. ~ */
+	
+	va_start(argv, length);
+	
+	/* ~ Invoke the function on the selected target. ~ */
+	
+	return target_push(&fvm, object, index, argc, source, length, &argv);
 	
 }
 

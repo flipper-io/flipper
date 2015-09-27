@@ -10,6 +10,8 @@
 
 #include <platform/hid.h>
 
+#include <usart/usart.h>
+
 void __attribute__ ((naked)) __attribute__ ((section(".init8"))) atmega_init(void) {
 
 	/* ~ Clear the WDT reset flag. ~ */
@@ -44,6 +46,14 @@ char a = 0;
 
 int main(void) {
 	
+	flash_push("Welcome", 7, 0x1234);
+	
+	char derp[7];
+	
+	flash_pull(derp, 7, 0x1234);
+	
+	usart0_push(derp, 7);
+	
 	while (1) {
 		
 		uint8_t packet = usb_receive_packet((void *)(&fmrpacket));
@@ -72,7 +82,7 @@ ISR(USART1_RX_vect) {
 	
 	/* ~ Load the body of the packet. ~*/
 	
-	for (unsigned i = 0; i < (header -> length); i ++) ((char *)(&fmrpacket.destination.object))[i] = usart0_get();
+	for (unsigned i = 0; i < (header -> length); i ++) ((char *)(&fmrpacket.recipient.object))[i] = usart0_get();
 	
 	while (usart0_ready()) { (void)usart0_get(); }
 		

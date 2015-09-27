@@ -82,15 +82,15 @@ void flipper_attach(uint8_t source, ...) {
 			
 			verbose("Successfully attatched to FVM.\n\n");
 			
+			/* ~ Configure FVM to use the FDB communications channel. ~ */
+			
+			fvm_configure(&fdb);
+			
 			/* Redirect the host and the device to FVM. */
 			
 			memcpy((void *)(&host), (void *)(&fvm), sizeof(struct _target));
 			
 			memcpy((void *)(&device), (void *)(&fvm), sizeof(struct _target));
-			
-			/* ~ Configure FVM to use the FDB communications channel. ~ */
-			
-			fvm_configure(&fdb);
 			
 			break;
 			

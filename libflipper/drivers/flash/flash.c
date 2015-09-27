@@ -42,13 +42,13 @@ void flash_format(void) {
 
 void flash_push(void *source, uint32_t length, fsp destination) {
 	
-	host.push(_flash, _flash_push, 1, source, length, destination);
+	host.push(_flash, _flash_push, 2, source, length, hi16(destination), lo16(destination));
 	
 }
 
 void flash_pull(void *destination, uint32_t length, fsp source) {
 	
-	host.pull(_flash, _flash_pull, 1, destination, length, source);
+	host.pull(_flash, _flash_pull, 2, destination, length, hi16(source), lo16(source));
 	
 }
 
