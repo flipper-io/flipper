@@ -8,6 +8,10 @@
 
 #define FLIPPER_DATAGRAM_SIZE 32
 
+#define FMR_BODY_SIZE (FLIPPER_DATAGRAM_SIZE - sizeof(struct _fmr_header) - sizeof(struct _fmr_recipient))
+
+#define FMR_PUSH_PARAMETER_SIZE (5 * 2)
+
 /* ~ It is very important that this structure be packed. ~ */
 
 struct __attribute__((__packed__)) _fmr_header {
@@ -26,7 +30,7 @@ struct __attribute__((__packed__)) _fmr_header {
 	
 };
 
-struct __attribute__((__packed__)) _fmr_destination {
+struct __attribute__((__packed__)) _fmr_recipient {
 	
 	/* ~ The destination object. ~ */
 	
@@ -50,11 +54,11 @@ typedef struct __attribute__((__packed__)) _fmr_packet {
 	
 	/* ~ The packet destination. ~ */
 	
-	struct _fmr_destination destination;
+	struct _fmr_recipient recipient;
 	
 	/* ~ The body of the packet. ~ */
 	
-	uint8_t body[FLIPPER_DATAGRAM_SIZE - sizeof(struct _fmr_header)];
+	uint8_t body[FMR_BODY_SIZE];
 	
 } fmr_packet;
 
@@ -82,9 +86,9 @@ extern const struct _self {
 	
 	uint32_t (* invoke)(const struct _target *sender);
 	
-	uint32_t (* push)(uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, ...);
+	uint32_t (* push)(uint8_t object, uint8_t index, uint8_t argc, uint32_t length);
 	
-	void (* pull)(uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...);
+	void (* pull)(uint8_t object, uint8_t index, uint8_t argc, uint32_t length);
 	
 	const struct _bus *bus;
 	
@@ -104,9 +108,9 @@ enum { _button, _flash, _host, _self, _device, _fs, _i2c, _io, _led, _pwm, _spi,
 
 extern uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, va_list *argv);
 
-extern uint32_t target_push(const struct _target *target, uint8_t _object, uint8_t _index, uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, va_list *argv);
+extern uint32_t target_push(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, va_list *argv);
 
-extern void target_pull(const struct _target *target, uint8_t _object, uint8_t _index, uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, va_list *argv);
+extern void target_pull(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, va_list *argv);
 
 
 enum { _host_configure, _host_invoke, _host_call, _host_push, _host_pull };
@@ -120,15 +124,15 @@ extern uint32_t host_push(uint8_t object, uint8_t index, uint8_t argc, void *sou
 extern void host_pull(uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...);
 
 
-enum { _self_configure, _self_invoke, _self_call, _self_push, _self_pull };
+enum { _self_configure, _self_invoke, _self_push, _self_pull };
 
 extern void self_configure(const struct _bus *bus);
 
 extern uint32_t self_invoke(const struct _target *sender);
 
-extern uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, ...);
+extern uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, uint32_t length);
 
-extern void self_pull(uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...);
+extern void self_pull(uint8_t object, uint8_t index, uint8_t argc, uint32_t length);
 
 
 enum { _device_configure, _device_invoke, _device_call, _device_push, _device_pull };

@@ -32,7 +32,7 @@ bool usart0_ready(void) {
 
 void usart0_put(uint8_t byte) {
 	
-	device.invoke(_usart, _usart_put, NO_ARGS);
+	device.invoke(_usart, _usart_put, 1, byte);
 	
 }
 

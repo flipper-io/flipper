@@ -32,25 +32,25 @@ uint32_t self_invoke(const struct _target *sender) {
 	
 	/* ~ Dereference a pointer to the targeted object. ~ */
 	
-	void *object = (void *)(objects[fmrpacket.destination.object]);
+	//void *object = (void *)(objects[fmrpacket.destination.object]);
 	
 	/* ~ Dereference a pointer to the targeted function. ~ */
 	
-	void *function = ((void **)(object))[fmrpacket.destination.index];
+	//void *function = ((void **)(object))[fmrpacket.destination.index];
 	
 	/* ~ Invoke the targeted function with the appropriate arguments. ~ */
 	
-	return 0; //((uint32_t (*)(void))(function))();
+	return 0;//((uint32_t (*)(void))(function))();
 	
 }
 
-uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, ...) {
+uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, uint32_t length) {
 	
 	return 0;
 	
 }
 
-void self_pull(uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...) {
+void self_pull(uint8_t object, uint8_t index, uint8_t argc, uint32_t length) {
 	
 	
 	

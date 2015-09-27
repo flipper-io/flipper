@@ -1,16 +1,12 @@
-# Introducing the Flipper Toolbox
+# Components of the Flipper Toolbox
 
-**This repository contains the entirety of the software infrastructure needed to take full advantage of Flipper and its hardware components.**
+The Flipper Toolbox is a repository of sofware components that enable hardware control of Flipper which can be compiled on a per-application basis. For example, the component `FlipperiOS.framework` enables hardware control of Flipper from Apple's iOS compatable devices.
 
-###### All material found in this repository is strictly private. Sharing details about its implementation is punishable by law.
+This document provides a brief overview of the major components of the Flipper Toolbox. Specifics pertaining to each component can be found in the README of the respective component's root directory.
 
-Copyright © Flipper Engineering 2015-2016 • All Rights Reserved
+-
 
-# Components of the Toolbox
-
-Listed below are the major components of the toolbox and a brief description of how they relate to the Flipper Toolbox as a whole.
-
-### console
+### Flipper Console
 
 The Flipper Console is a powerful tool that can be used to access Flipper hardware without first writing or compiling code of any kind.
 
@@ -92,3 +88,34 @@ pinMode(1, OUTPUT);
 
 digitalWrite(0, HIGH);
 ```
+
+## Prebuilt Frameworks for your Convienience
+
+### Apple
+
+Include any of the below in Xcode, and any of these devices can control Flipper.
+
+#### `FlipperiOS.framework`
+
+Control Flipper from any iOS device.
+
+#### `FlipperWatchOS.framework`
+
+Control Flipper from the Apple Watch.
+
+#### `FlipperTvOS.framework`
+
+Control Flipper from the Apple TV.
+
+### Android
+
+#### `FlipperAndroid.jar`
+
+Control Flipper from any Android phone or Tablet.
+
+-
+### Legal Notice
+
+**This repository contains the entirety of the software infrastructure needed to take full advantage of Flipper and its hardware components. All material found in this repository is strictly private. Sharing details about its implementation is punishable by law.**
+
+Copyright © Flipper Engineering 2015-2016 • All Rights Reserved
