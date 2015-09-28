@@ -6,43 +6,77 @@
 
 #include <fmr/fmr.h>
 
-/* ~ Make it easier to access parts of the packet. ~ */
+/* ~ This function ensures that the target still has a heartbeat. ~ */
 
-struct _fmr_header *header = &fmrpacket.header;
+void validate_target(const struct _target *target) {
+	
+	/* ~ If we've been asked to send a packet but have no target, this is a dangling instance of libflipper. ~ */
+	
+	if (!(target -> bus)) {
+		
+		/* ~ Report the issue to the user and panic. ~ */
+		
+		error("Oops. No device has been attached to this instance of libflipper.\n\n"
+			  
+			  "Make sure you specify how your Flipper device is connected before talking to it: USB, Wi-Fi, and Bluetooth are currently supported.\n\n"
+			  
+			  "See http://api.flipper.io/attatch for more information.\n\n");
+		
+		exit(EXIT_FAILURE);
+		
+	}
+	
+}
 
-struct _fmr_recipient *recipient = &fmrpacket.recipient;
-
-uint8_t *body = fmrpacket.body;
+/* ~ This function wraps up a message needed to perform a remote procedure call and sends it off to its target. ~ */
 
 uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, va_list *argv) {
 	
-	if (!(target -> bus)) { error("Error. No device is attached to this instance of libflipper. Use flipper.attach(\"device name\", FLIPPER_SOURCE_USB) to connect over USB.\n\n"); return  0; }
+	/* ~ Ensure we are talking to a valid target. ~ */
 	
-	/* ~ Multiply the argument count by two. ~ */
+	validate_target(target);
 	
-	argc *= sizeof(uint16_t);
+	/* ~ Since our target has 32-bit registers, we package each argument in a 32-bit container. ~ */
 	
-	header -> fe = 0xFE;
+	argc = argc * sizeof(uint16_t);
 	
-	/* ~ Populate the message body with the information needed to make a remote procedure call. ~ */
+	/* ~ Set the first byte of the packet to 0xFE, an arbitrary unique identifier that gives the FMR the ability to detect the start of a packet. ~ */
 	
-	header -> length = sizeof(struct _fmr_packet) - FMR_BODY_SIZE + argc;
+	fmrpacket.header.fe = 0xFE;
 	
-	/* ~ Populate the packet's destination. ~ */
+	/* ~ Set the header's length equal to the size of the full packet after the parameters have been loaded. ~ */
 	
-	recipient -> object = object;
+	fmrpacket.header.length = sizeof(struct _fmr_header) + sizeof(struct _fmr_recipient) + argc;
 	
-	recipient -> index = index;
+	/* ~ Ensure the arguments will fit into one packet. ~ */
 	
-	recipient -> argc = argc;
+	if (fmrpacket.header.length > FLIPPER_DATAGRAM_SIZE) {
+		
+		verbose("\tError. Too many arguments provided for the requested function call. Skipping.\n\n");
+		
+		return 0;
+		
+	}
 	
-	/* ~ Populate the packet's body. ~ */
+	/* ~ Load the recipient information into the packet. This information describes to the FMR which function to invoke. ~ */
+	
+	fmrpacket.recipient.object = object;
+	
+	fmrpacket.recipient.index = index;
+	
+	fmrpacket.recipient.argc = argc;
+	
+	/* ~ The packet's body will contain the parameters which will be passed to the function. ~ */
 	
 	for (unsigned i = 0; i < argc; i += 2) {
 		
+		/* ~ Unstage an argument from the variadic argument list. ~ */
+		
 		unsigned arg = va_arg(*argv, unsigned);
 		
-		body[i] = hi(arg); body[i + 1] = lo(arg);
+		/* ~ Load it into the packet. ~ */
+		
+		fmrpacket.body[i] = hi(arg); fmrpacket.body[i + 1] = lo(arg);
 		
 	}
 	
@@ -50,111 +84,153 @@ uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t ind
 	
 	va_end(*argv);
 	
-	/* ~ Generate a checksum. ~ */
+	/* ~ Generate a checksum for the packet. When a packet is received, the FMR will perform its own checksum and compare it to this before proceeding. ~ */
 	
-	header -> checksum = checksum((void *)(&(recipient -> object)), (header -> length) - sizeof(struct _fmr_header));
+	fmrpacket.header.checksum = checksum((void *)(&(fmrpacket.recipient.object)), (fmrpacket.header.length) - sizeof(struct _fmr_header));
 	
-	/* ~ Push the message to the device. ~ */
+	/* ~ Send the constructed packet to the target. ~ */
 	
 	target -> bus -> push(&fmrpacket, sizeof(struct _fmr_header) + sizeof(struct _fmr_recipient) + argc);
 	
+	/* ~ We will now expect the FMR to send us a packet in return, acknowledging that the packet has been received successfully. ~ */
+	
+	/* --- TO BE IMPLEMENTED --- */
+	
 	/* ~ Use a local variable to store the return value. ~ */
 	
 	uint32_t retval;
 	
-	/* ~ Retrieve the return value from the device. ~ */
+	/* ~ Load the value that the function returned from the target. ~ */
 	
 	target -> bus -> pull(&retval, sizeof(uint32_t));
 	
-	/* ~ Give the return value back to the parent function. ~ */
+	/* ~ Return this value back up the function chain. ~ */
 	
 	return retval;
 	
 }
+
+/* ~ This function moves data from the isolated address space of the host to the device using the FMR. ~ */
 
 uint32_t target_push(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, va_list *argv) {
 	
-	/* ~ The parameter 'argc' specifies the number of arguments the target function expects. Multiply it by the size of a uint16_t. ~ */
+	/* ~ Ensure we are talking to a valid target. ~ */
+	
+	validate_target(target);
+	
+	/* ~ Since our target has 32-bit registers, we package each argument in a 32-bit container. ~ */
 	
 	argc = argc * sizeof(uint16_t);
 	
-	/* ~ Construct the header of the packet. ~ */
+	/* ~ Set the first byte of the packet to 0xFE, an arbitrary unique identifier that gives the FMR the ability to detect the start of a packet. ~ */
 	
-	header -> fe = 0xFE;
+	fmrpacket.header.fe = 0xFE;
 	
-	/* ~ The length of the packet will be equal to a full packet plus the space required to make a nested invocation, as well as the argument count. This does not yet accout for the first data chunk. ~ */
+	/* ~ Set the header's length equal to the size of the full packet after the parameters have been loaded. ~ */
 	
-	header -> length = sizeof(struct _fmr_packet) - FMR_BODY_SIZE + FMR_PUSH_PARAMETER_SIZE + argc;
+	fmrpacket.header.length = sizeof(struct _fmr_header) + sizeof(struct _fmr_recipient) + FMR_PUSH_PARAMETER_SIZE + argc;
 	
-	/* ~ Construct the packet's destination. This is the function that will be called on the device to handle receiving data. ~ */
+	/* ~ Ensure the arguments will fit into one packet. ~ */
 	
-	recipient -> object = _self;
+	if (fmrpacket.header.length > FLIPPER_DATAGRAM_SIZE) {
+		
+		verbose("\tError. Too many arguments provided for the requested function call. Skipping.\n\n");
+		
+		return 0;
+		
+	}
 	
-	recipient -> index = _self_push;
+	/* ~ Load the recipient information into the packet. This information describes to the FMR which function to invoke. ~ */
 	
-	recipient -> argc = FMR_PUSH_PARAMETER_SIZE;
+	fmrpacket.recipient.object = _self;
 	
-	/* ~ Now we need to construct the packet's body. This contains layered destination information regarding the target function that will be processed by the self's helper function. ~ */
+	fmrpacket.recipient.index = _self_push;
 	
-	body[0] = hi(object);
+	fmrpacket.recipient.argc = FMR_PUSH_PARAMETER_SIZE;
 	
-	body[1] = lo(object);
+	/* ~ The packet's body will contain layered information regarding the recipient function that will be processed by the helper function. ~ */
 	
-	body[2] = hi(index);
+	fmrpacket.body[0] = hi(object);
 	
-	body[3] = lo(index);
+	fmrpacket.body[1] = lo(object);
 	
-	body[4] = hi(argc);
+	fmrpacket.body[2] = hi(index);
 	
-	body[5] = lo(argc);
+	fmrpacket.body[3] = lo(index);
 	
-	body[6] = hi(hi16(length));
+	fmrpacket.body[4] = hi(argc);
 	
-	body[7] = lo(hi16(length));
+	fmrpacket.body[5] = lo(argc);
 	
-	body[8] = hi(lo16(length));
+	fmrpacket.body[6] = hi(hi16(length));
 	
-	body[9] = lo(lo16(length));
+	fmrpacket.body[7] = lo(hi16(length));
 	
-	/* ~ We use this space in the packet to load the arguments just as we normally would. ~ */
+	fmrpacket.body[8] = hi(lo16(length));
+	
+	fmrpacket.body[9] = lo(lo16(length));
+	
+	/* ~ If they fit, the parameters which will be passed to the function are loaded into the packet. ~ */
 	
 	for (int i = 0; i < argc; i += 2) {
 		
 		unsigned arg = va_arg(*argv, unsigned);
 		
-		body[i + 10] = hi(arg); body[i + 11] = lo(arg);
+		fmrpacket.body[i + 10] = hi(arg); fmrpacket.body[i + 11] = lo(arg);
 		
 	}
 	
-	/* -------------------------------------- ACTUALLY MOVE THE DATA -------------------------------------- */
-
-	size_t remaining;
+	/* ~ For the first iteration of this loop, specify that the data has been loaded after the layered parameter list and parameters. ~ */
 	
-	char *current = (char *)(body + FMR_PUSH_PARAMETER_SIZE + argc);
+	uint8_t *offset = (uint8_t *)(fmrpacket.body + FMR_PUSH_PARAMETER_SIZE + argc);
 	
-out:
+	/* ~ Create a local variable to keep track of how much data still needs to be sent. ~ */
 	
-	/* ~ Okay, we've now consumed quite a bit of the maximum FLIPPER_DATAGRAM_SIZE. How much do we have left? ~ */
+	uint32_t remaining;
 	
-	remaining = FLIPPER_DATAGRAM_SIZE - (header -> length);
+push:
 	
-	/* ~ Now, let's use the space we have left to send some data! ~ */
+	/* ~ Calculate how much space we have left in the current packet. ~ */
 	
-	do { *(char *)(current ++) = *(char *)(source ++); (header -> length) ++; } while ((-- length) && (-- remaining));
+	remaining = FLIPPER_DATAGRAM_SIZE - fmrpacket.header.length;
 	
-	header -> checksum = checksum((void *)(&(recipient -> object)), (header -> length) - sizeof(struct _fmr_header));
+	/* ~ Load the next chunk of data into the packet while we still have data to send and we still have space in the current packet. ~ */
 	
-	target -> bus -> push(&fmrpacket, header -> length);
+	do {
+		
+		/* ~ Load a byte into the packet. ~ */
+		
+		*(uint8_t *)(offset ++) = *(uint8_t *)(source ++);
+		
+		/* ~ Advance the size of the packet each time a byte is loaded into the packet. ~ */
+		
+		fmrpacket.header.length ++;
+	
+	} while ((-- length) && (-- remaining));
+	
+	/* ~ Generate a checksum for the packet. When a packet is received, the FMR will perform its own checksum and compare it to this before proceeding. ~ */
+	
+	fmrpacket.header.checksum = checksum((void *)(&(fmrpacket.recipient)), fmrpacket.header.length - sizeof(struct _fmr_header));
+	
+	/* ~ Send the constructed packet to the target. ~ */
+	
+	target -> bus -> push(&fmrpacket, fmrpacket.header.length);
+	
+	/* ~ Check to see if we still have data to send. ~ */
 	
 	if (length) {
 		
-		/* ~ We need to send another packet! ~ */
+		/* ~ If we do, reset the length. ~ */
 		
-		header -> length = sizeof(struct _fmr_header);
+		fmrpacket.header.length = sizeof(struct _fmr_header);
 		
-		current = (char *)(recipient);
+		/* ~ Reset the offset within the packet from which data will be loaded. ~ */
 		
-		goto out;
+		offset = (uint8_t *)(&fmrpacket.recipient);
+		
+		/* ~ Jump back to the beginning of the broadcast sequence. ~ */
+		
+		goto push;
 		
 	}
 	
@@ -162,105 +238,138 @@ out:
 	
 	uint32_t retval;
 	
-	/* ~ Retrieve the return value from the device. ~ */
+	/* ~ Load the value that the function returned from the target. ~ */
 	
 	target -> bus -> pull(&retval, sizeof(uint32_t));
 	
-	/* ~ Give the return value back to the parent function. ~ */
+	/* ~ Return this value back up the function chain. ~ */
 	
 	return retval;
 	
 }
 
+#warning Not portable to non-parallel busses.
+
+/* ~ This function moves data from the isolated address space of the device to the host using the FMR. ~ */
+
 void target_pull(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, va_list *argv) {
 	
-	/* ~ The parameter 'argc' specifies the number of arguments the target function expects. Multiply it by the size of a uint16_t. ~ */
+	/* ~ Ensure we are talking to a valid target. ~ */
+	
+	validate_target(target);
+	
+	/* ~ Since our target has 32-bit registers, we package each argument in a 32-bit container. ~ */
 	
 	argc = argc * sizeof(uint16_t);
 	
-	/* ~ Construct the header of the packet. ~ */
+	/* ~ Set the first byte of the packet to 0xFE, an arbitrary unique identifier that gives the FMR the ability to detect the start of a packet. ~ */
 	
-	header -> fe = 0xFE;
+	fmrpacket.header.fe = 0xFE;
 	
-	/* ~ The length of the packet will be equal to a full packet plus the space required to make a nested invocation, as well as the argument count. This does not yet accout for the first data chunk. ~ */
+	/* ~ Set the header's length equal to the size of the full packet after the parameters have been loaded. ~ */
 	
-	header -> length = sizeof(struct _fmr_packet) - FMR_BODY_SIZE + FMR_PUSH_PARAMETER_SIZE + argc;
+	fmrpacket.header.length = sizeof(struct _fmr_packet) - FMR_BODY_SIZE + FMR_PUSH_PARAMETER_SIZE + argc;
 	
-	/* ~ Construct the packet's destination. This is the function that will be called on the device to handle receiving data. ~ */
+	/* ~ Ensure the arguments will fit into one packet. ~ */
 	
-	recipient -> object = _self;
+	if (fmrpacket.header.length > FLIPPER_DATAGRAM_SIZE) {
+		
+		verbose("\tError. Too many arguments provided for the requested function call. Skipping.\n\n");
+		
+		return;
+		
+	}
 	
-	recipient -> index = _self_pull;
+	/* ~ Load the recipient information into the packet. This information describes to the FMR which function to invoke. ~ */
 	
-	recipient -> argc = FMR_PUSH_PARAMETER_SIZE;
+	fmrpacket.recipient.object = _self;
 	
-	/* ~ Now we need to construct the packet's body. This contains layered destination information regarding the target function that will be processed by the self's helper function. ~ */
+	fmrpacket.recipient.index = _self_pull;
 	
-	body[0] = hi(object);
+	fmrpacket.recipient.argc = FMR_PUSH_PARAMETER_SIZE;
 	
-	body[1] = lo(object);
+	/* ~ The packet's body will contain layered information regarding the recipient function that will be processed by the helper function. ~ */
 	
-	body[2] = hi(index);
+	fmrpacket.body[0] = hi(object);
 	
-	body[3] = lo(index);
+	fmrpacket.body[1] = lo(object);
 	
-	body[4] = hi(argc);
+	fmrpacket.body[2] = hi(index);
 	
-	body[5] = lo(argc);
+	fmrpacket.body[3] = lo(index);
 	
-	body[6] = hi(hi16(length));
+	fmrpacket.body[4] = hi(argc);
 	
-	body[7] = lo(hi16(length));
+	fmrpacket.body[5] = lo(argc);
 	
-	body[8] = hi(lo16(length));
+	fmrpacket.body[6] = hi(hi16(length));
 	
-	body[9] = lo(lo16(length));
+	fmrpacket.body[7] = lo(hi16(length));
 	
-	/* ~ We use this space in the packet to load the arguments just as we normally would. ~ */
+	fmrpacket.body[8] = hi(lo16(length));
+	
+	fmrpacket.body[9] = lo(lo16(length));
+	
+	/* ~ If they fit, the parameters which will be passed to the function are loaded into the packet. ~ */
 	
 	for (int i = 0; i < argc; i += 2) {
 		
 		unsigned arg = va_arg(*argv, unsigned);
 		
-		body[i + 10] = hi(arg); body[i + 11] = lo(arg);
+		fmrpacket.body[i + 10] = hi(arg); fmrpacket.body[i + 11] = lo(arg);
 		
 	}
 	
-	/* ~ Send the packet to initiate the pulling sequence. ~ */
+	/* ~ Generate a checksum for the packet. When a packet is received, the FMR will perform its own checksum and compare it to this before proceeding. ~ */
 	
-	header -> checksum = checksum((void *)(&(recipient -> object)), (header -> length) - sizeof(struct _fmr_header));
+	fmrpacket.header.checksum = checksum((void *)(&(fmrpacket.recipient.object)), (fmrpacket.header.length) - sizeof(struct _fmr_header));
 	
-	target -> bus -> push(&fmrpacket, header -> length);
+	/* ~ Send the constructed packet to the target. ~ */
+	
+	target -> bus -> push(&fmrpacket, fmrpacket.header.length);
+	
+	/* ~ Retrieve a packet from the target containing the pulled data. ~ */
 	
 	target -> bus -> pull(&fmrpacket, sizeof(fmrpacket));
 	
-	/* -------------------------------------- ACTUALLY GET THE DATA -------------------------------------- */
+	/* ~ Create a local variable to keep track of the offset in the packet at which we are loading data. ~ */
 	
-	uint32_t len = length;
+	uint8_t *offset;
+	
+	/* ~ Create a local variable to keep track of how much data still needs to be sent. ~ */
 	
 	size_t remaining;
 	
-	char *current;
+pull:
 	
-in:
+	/* ~ Calculate how much space we have left in the current packet. ~ */
 	
 	remaining = FLIPPER_DATAGRAM_SIZE - sizeof(struct _fmr_header);
 	
-	current = (char *)(&fmrpacket.recipient);
+	offset = (uint8_t *)(&fmrpacket.recipient);
 	
-	/* ~ Now, let's use the space we have left to send some data! ~ */
+	/* ~ While we are still expecting data and still have data to read from the current packet, transfer it to the destination. ~ */
 	
-	do { *(char *)(destination ++) = *(char *)(current ++); } while ((-- len) && (-- remaining));
-	
-	if (len) {
+	do {
 		
-		/* ~ We need to get another packet! ~ */
+		/* ~ Move a byte from the received packet to the destination. ~ */
+		
+		*(uint8_t *)(destination ++) = *(uint8_t *)(offset ++);
+	
+	} while ((-- length) && (-- remaining));
+	
+	/* ~ Check to see if we still have data to receive. ~ */
+	
+	if (length) {
+		
+		/* ~ If we do, grab another packet. ~ */
 		
 		target -> bus -> pull(&fmrpacket, sizeof(fmrpacket));
 		
-		goto in;
+		/* ~ Jump back to the beginning of the loading sequence. ~ */
+		
+		goto pull;
 		
 	}
-
 	
 }
