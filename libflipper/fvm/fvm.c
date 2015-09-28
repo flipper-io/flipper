@@ -1,5 +1,7 @@
 #define __private_include__
 
+#include <usb/usb.h>
+
 #include <fvm/fvm.h>
 
 const struct _target fvm = {
@@ -13,6 +15,68 @@ const struct _target fvm = {
 	fvm_pull
 	
 };
+
+void fvm_configure(const struct _bus *bus) {
+	
+	/* ~ Configure the fvm's communication protocol. ~ */
+	
+	((struct _target *)(&fvm)) -> bus = bus;
+	
+}
+
+uint32_t fvm_invoke(uint8_t object, uint8_t index, uint8_t argc, ...) {
+	
+	verbose("fvm (invoke):\n\n");
+	
+	/* ~ Construct a va_list to access variadic arguments. ~ */
+	
+	va_list argv;
+	
+	/* ~ Initialize the va_list that we created above. ~ */
+	
+	va_start(argv, argc);
+	
+	/* ~ Invoke the function on the selected target. ~ */
+	
+	return target_invoke(&fvm, object, index, argc, &argv);
+	
+}
+
+uint32_t fvm_push(uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, ...) {
+	
+	verbose("fvm (push):\n\n");
+	
+	/* ~ Construct a va_list to access variadic arguments. ~ */
+	
+	va_list argv;
+	
+	/* ~ Initialize the va_list that we created above. ~ */
+	
+	va_start(argv, length);
+	
+	/* ~ Invoke the function on the selected target. ~ */
+	
+	return target_push(&fvm, object, index, argc, source, length, &argv);
+	
+}
+
+void fvm_pull(uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...) {
+	
+	verbose("fvm (pull):\n\n");
+	
+	/* ~ Construct a va_list to access variadic arguments. ~ */
+	
+	va_list argv;
+	
+	/* ~ Initialize the va_list that we created above. ~ */
+	
+	va_start(argv, length);
+	
+	/* ~ Invoke the function on the selected target. ~ */
+	
+	target_pull(&fvm, object, index, argc, destination, length, &argv);
+	
+}
 
 /* ------------------------ FDB ------------------------ */
 
@@ -35,58 +99,6 @@ const struct _bus fdb = {
 	fdb_pull
 	
 };
-
-void fvm_configure(const struct _bus *bus) {
-	
-	/* ~ Configure the fvm's communication protocol. ~ */
-	
-	((struct _target *)(&fvm)) -> bus = bus;
-	
-}
-
-uint32_t fvm_invoke(uint8_t object, uint8_t index, uint8_t argc, ...) {
-	
-	verbose("fvm ");
-	
-	/* ~ Construct a va_list to access variadic arguments. ~ */
-	
-	va_list argv;
-	
-	/* ~ Initialize the va_list that we created above. ~ */
-	
-	va_start(argv, argc);
-	
-	/* ~ Invoke the function on the selected target. ~ */
-	
-	return target_invoke(&fvm, object, index, argc, &argv);
-	
-}
-
-uint32_t fvm_push(uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, ...) {
-	
-	verbose("fvm ");
-	
-	/* ~ Construct a va_list to access variadic arguments. ~ */
-	
-	va_list argv;
-	
-	/* ~ Initialize the va_list that we created above. ~ */
-	
-	va_start(argv, length);
-	
-	/* ~ Invoke the function on the selected target. ~ */
-	
-	return target_push(&fvm, object, index, argc, source, length, &argv);
-	
-}
-
-void fvm_pull(uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...) {
-	
-	
-	
-}
-
-/* ------------------------ fdb ------------------------ */
 
 void fdb_configure(uint16_t baud) {
 	
@@ -128,22 +140,40 @@ void fdb_push(void *source, uint32_t length) {
 	
 	/* ~ Print debugging information. ~ */
 	
-	printf("-> push -> fdb:\n\t");
+	verbose("\tfdb ->\t");
 	
-	for (unsigned i = 0; i < length; i ++) { if (i % 8 == 0) printf("\n\t"); printf("%02X ", ((uint8_t *)(source))[i]); }
+	for (unsigned i = 0; i < length; i ++) { if ((i % 8 == 0) && (i != 0)) printf("\n\t\t"); printf("%02X  ", ((uint8_t *)(source))[i]); }
 	
 	verbose("\n\n");
 	
 	memcpy(&fmrpacket, source, length);
 	
-	verbose("fdb (fvm) ->");
+	//verbose("fdb (fvm) ->");
 	
-	self.invoke(&fvm);
+	//self.invoke(&fvm);
 	
 }
 
 void fdb_pull(void *destination, uint32_t length) {
 	
+	verbose("\tfdb <-\t");
 	
+	system ("/bin/stty raw");
+	
+	while (length --) {
+		
+		char c = getchar();
+		
+		printf("%02X ", c);
+		
+		if (c == '\n') break;
+		
+		*(char *)(destination ++) = c;
+		
+	}
+	
+	system ("/bin/stty cooked");
+	
+	verbose("\n\t\n");
 	
 }

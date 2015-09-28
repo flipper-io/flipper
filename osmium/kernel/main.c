@@ -34,15 +34,11 @@ void __attribute__ ((naked)) __attribute__ ((section(".init8"))) atmega_init(voi
 	
 	usb_configure(0);
 	
-	led.configure();
-	
 	led.rgb(0, 16, 0);
-	
-	_delay_ms(1);
 	
 }
 
-char a = 0;
+extern void usb_receive_interrupt(void);
 
 int main(void) {
 	
@@ -58,36 +54,10 @@ int main(void) {
 		
 		uint8_t packet = usb_receive_packet((void *)(&fmrpacket));
 		
-		if (packet) self_invoke(&device);
+		if (packet) { usb_receive_interrupt(); }
 		
 	}
 	
 	return 0;
-	
-}
-
-/* ~ USART recieve interrupt. ~ */
-
-ISR(USART1_RX_vect) {
-	
-	disable_interrupts();
-	
-	while (usart0_get() != 0xFE);
-	
-	struct _fmr_header *header = &(fmrpacket.header);
-	
-	/* ~ Load the header of the packet. ~ */
-	
-	for (unsigned i = 1; i < sizeof(struct _fmr_header); i ++) ((char *)(header))[i] = usart0_get();
-	
-	/* ~ Load the body of the packet. ~*/
-	
-	for (unsigned i = 0; i < (header -> length); i ++) ((char *)(&fmrpacket.recipient.object))[i] = usart0_get();
-	
-	while (usart0_ready()) { (void)usart0_get(); }
-		
-	enable_interrupts();
-	
-	self_invoke(&host);
 	
 }
