@@ -2,7 +2,7 @@
 
 #define __i2c_h__
 
-#include <types.h>
+#include <flipper/types.h>
 
 enum { _i2c_configure };
 

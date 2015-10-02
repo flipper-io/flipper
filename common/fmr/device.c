@@ -12,7 +12,7 @@ const struct _target device = {
 	
 	device_push,
 	
-	device_pull
+	device_pull,
 	
 };
 

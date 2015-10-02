@@ -2,7 +2,7 @@
 
 #define network_h
 
-#include <types.h>
+#include <flipper/types.h>
 
 #include <fmr/bus.h>
 

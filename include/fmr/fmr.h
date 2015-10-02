@@ -2,7 +2,7 @@
 
 #define __fmr_h__
 
-#include <types.h>
+#include <flipper/types.h>
 
 #include <fmr/bus.h>
 
@@ -11,6 +11,8 @@
 #define FMR_BODY_SIZE (FLIPPER_DATAGRAM_SIZE - sizeof(struct _fmr_header) - sizeof(struct _fmr_recipient))
 
 #define FMR_PUSH_PARAMETER_SIZE (5 * 2)
+
+#define fmr_associate_target(target) sender = (struct _target *)(target);
 
 /* ~ It is very important that this structure be packed. ~ */
 
@@ -102,6 +104,8 @@ extern const void * const objects[];
 
 extern fmr_packet fmrpacket;
 
+extern struct _target *sender;
+
 #ifdef __private_include__
 
 enum { _button, _flash, _host, _self, _device, _fs, _i2c, _io, _led, _pwm, _spi, _timer, _usart, _usart1, _dbgu, _usb, _wifi };
@@ -147,6 +151,10 @@ extern void device_pull(uint8_t object, uint8_t index, uint8_t argc, void *desti
 
 
 extern uint32_t fmr_call(void *function, uint8_t argc, void *argv);
+
+void fmr_broadcast(void);
+
+void fmr_retrieve(uint32_t length);
 
 #endif
 

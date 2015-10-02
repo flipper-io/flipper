@@ -12,18 +12,6 @@
 
 #include <platform/hid.h>
 
-const struct _self self = {
-	
-	self_configure,
-	
-	self_invoke,
-		
-	self_push,
-	
-	self_pull
-	
-};
-
 void self_configure(const struct _bus *bus) {
 	
 	
@@ -54,7 +42,7 @@ uint32_t self_invoke(const struct _target *sender) {
 	
 	uint16_t cs = checksum((void *)(&fmrpacket.recipient.object), fmrpacket.header.length - sizeof(struct _fmr_header));
 	
-	uint32_t retval;
+	uint32_t retval = 0;
 	
 	/* ~ If the checksums are different, then we have a problem. ~ */
 	
@@ -64,17 +52,17 @@ uint32_t self_invoke(const struct _target *sender) {
 		
 		led_set_rgb(LED_COLOR_ERROR);
 		
-		/* ~ Our host will expect a return value, so send a response with the appropriate error code. ~ */
+		/* ~ Skip the call. ~ */
 		
-		sender -> bus -> push(&retval, sizeof(uint32_t));
-		
-		return 0;
+		goto end;
 	
 	}
 	
 	/* ~ If all is well, perform the function call. ~ */
 	
 	retval = self_call();
+	
+end:
 	
 	/* ~ Return whatever we received back to the device that sent us a message. ~ */
 	
@@ -85,8 +73,6 @@ uint32_t self_invoke(const struct _target *sender) {
 }
 
 char ppbuf[128];
-
-extern void fmr_retrieve(void);
 
 uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, uint32_t length) {
 	
@@ -152,7 +138,7 @@ pull:
 		
 		/* ~ If we do, grab another packet. ~ */
 		
-		fmr_retrieve();
+		fmr_retrieve(sizeof(fmrpacket));
 		
 		/* ~ Reset the offset within the packet from which data will be loaded. ~ */
 		
@@ -212,8 +198,6 @@ pull:
 	
 }
 
-extern void fmr_broadcast(void);
-
 void self_pull(uint8_t object, uint8_t index, uint8_t argc, uint32_t length) {
 	
 	/* ~ Allocate the appropriate amount of memory in external memory to buffer the outgoing data. ~ */
@@ -244,7 +228,7 @@ void self_pull(uint8_t object, uint8_t index, uint8_t argc, uint32_t length) {
 	
 	/* ~ Move the variadic argument list to the appropriate location in the new packet. ~ */
 	
-	memmove((void *)(fmrpacket.body) + 6, (void *)(fmrpacket.body) + 10, argc);
+	memmove((void *)(fmrpacket.body) + 6, (void *)(fmrpacket.body) + FMR_PUSH_PARAMETER_SIZE, argc);
 	
 	/* ~ Perform the function call. ~ */
 	

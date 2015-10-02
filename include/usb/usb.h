@@ -2,7 +2,7 @@
 
 #define __usb_h__
 
-#include <types.h>
+#include <flipper/types.h>
 
 #include <fmr/bus.h>
 

@@ -4,62 +4,19 @@
 
 #include <fmr/fmr.h>
 
-#include <platform/atmega.h>
+#include <usart/usart.h>
 
 #include <platform/hid.h>
 
-fmr_packet fmrpacket;
-
 const void * const objects[] PROGMEM = { &button, &flash, &host, &self, &device, &fs, &i2c, &io, &led, &pwm, &spi, &timer, &usart, &usart, &usart, &usb, &wifi };
-
-struct _target *sender;
-
-extern void fmr_broadcast(void) {
-	
-	sender -> bus -> push(&fmrpacket, (fmrpacket.header.length));
-	
-}
-
-/* ~ Populate the global fmr_packet for use by the message runtime itself. Handles implementations of different busses. ~ */
-
-void fmr_retrieve(void) {
-	
-	if (sender == &device) {
-		
-		usb_receive_packet((void *)(&fmrpacket));
-		
-	}
-	
-	else if (sender == &host) {
-		
-		disable_interrupts();
-		
-		while (usart0_get() != 0xFE);
-		
-		struct _fmr_header *header = &(fmrpacket.header);
-		
-		/* ~ Load the header of the packet. ~ */
-		
-		for (unsigned i = 1; i < sizeof(struct _fmr_header); i ++) ((char *)(header))[i] = usart0_get();
-		
-		/* ~ Load the body of the packet. ~ */
-		
-		for (unsigned i = 0; i < (header -> length); i ++) ((char *)(&fmrpacket.recipient.object))[i] = usart0_get();
-		
-		while (usart0_ready()) { (void)usart0_get(); }
-		
-		enable_interrupts();
-		
-	}
-	
-}
-
-/* ~ USB receive interrupt. ~ */
-
 
 void usb_receive_interrupt(void) {
 	
-	sender = &device;
+	/* ~ Associate this interrupt with the device target. ~ */
+	
+	fmr_associate_target(&device);
+	
+	/* ~ Invoke the FMR. ~ */
 	
 	self_invoke(&device);
 	
@@ -69,10 +26,21 @@ void usb_receive_interrupt(void) {
 
 ISR(USART1_RX_vect) {
 	
-	sender = &host;
+	/* ~ Associate this interrupt with the host target. ~ */
 	
-	fmr_retrieve();
+	fmr_associate_target(&host);
+	
+	/* ~ Disable interrupts to prevent alignment issues. ~ */
+	
+	disable_interrupts();
+	
+	/* ~ Load a packet from the bus. ~ */
+	
+	fmr_retrieve(0);
+	
+	/* ~ Invoke the FMR. ~ */
 	
 	self_invoke(&host);
+
 	
 }

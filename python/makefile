@@ -12,7 +12,7 @@ rsync = $(shell which 'rsync')
 
 preprocess = -std=gnu99 -Os -fpic
 
-include_directories = $(shell find '/System/Library/Frameworks/Python.framework/Versions/Current/include' -type d)
+include_directories = $(shell find '/System/Library/Frameworks/Python.framework/Versions/Current/include' -type d) $(FLIPPERSDK)/include
 
 # ~ Include this file to recursively compile all supported file types and generate object files using the preprocessor statements above. ~ #
 

@@ -20,7 +20,9 @@ const struct _bus usart = {
 	
 	usart0_push,
 	
-	usart0_pull
+	usart0_pull,
+	
+	false
 	
 };
 
@@ -42,7 +44,9 @@ const struct _bus usart1 = {
 	
 	usart1_push,
 	
-	usart1_pull
+	usart1_pull,
+	
+	false
 	
 };
 
@@ -64,6 +68,8 @@ const struct _bus dbgu = {
 	
 	dbgu_push,
 	
-	dbgu_pull
+	dbgu_pull,
+	
+	false
 	
 };

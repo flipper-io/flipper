@@ -22,11 +22,11 @@ fsp fs_empty_branch_for_key(fsp _branch, fsp current, uint16_t key) {
 	
 	if (_current -> key < key)
 	
-	return fs_empty_branch_for_key(forward(current, leaf, left), _current -> left, key);
+		return fs_empty_branch_for_key(forward(current, leaf, left), _current -> left, key);
 	
 	else if (_current -> key > key)
 	
-	return fs_empty_branch_for_key(forward(current, leaf, right), _current -> right, key);
+		return fs_empty_branch_for_key(forward(current, leaf, right), _current -> right, key);
 	
 	else {
 		
