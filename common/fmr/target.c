@@ -32,6 +32,10 @@ void validate_target(const struct _target *target) {
 
 uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, va_list *argv) {
 	
+	/* ~ Associate this request with the appropriate target. ~ */
+	
+	fmr_associate_target(target);
+	
 	/* ~ Ensure we are talking to a valid target. ~ */
 	
 	validate_target(target);
@@ -86,11 +90,11 @@ uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t ind
 	
 	/* ~ Generate a checksum for the packet. When a packet is received, the FMR will perform its own checksum and compare it to this before proceeding. ~ */
 	
-	fmrpacket.header.checksum = checksum((void *)(&(fmrpacket.recipient.object)), (fmrpacket.header.length) - sizeof(struct _fmr_header));
+	fmrpacket.header.checksum = checksum((void *)(&fmrpacket.recipient.object), fmrpacket.header.length - sizeof(struct _fmr_header));
 	
 	/* ~ Send the constructed packet to the target. ~ */
 	
-	target -> bus -> push(&fmrpacket, sizeof(struct _fmr_header) + sizeof(struct _fmr_recipient) + argc);
+	fmr_broadcast();
 	
 	/* ~ We will now expect the FMR to send us a packet in return, acknowledging that the packet has been received successfully. ~ */
 	
@@ -113,6 +117,10 @@ uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t ind
 /* ~ This function moves data from the isolated address space of the host to the device using the FMR. ~ */
 
 uint32_t target_push(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, va_list *argv) {
+	
+	/* ~ Associate this request with the appropriate target. ~ */
+	
+	fmr_associate_target(target);
 	
 	/* ~ Ensure we are talking to a valid target. ~ */
 	
@@ -176,7 +184,7 @@ uint32_t target_push(const struct _target *target, uint8_t object, uint8_t index
 		
 		unsigned arg = va_arg(*argv, unsigned);
 		
-		fmrpacket.body[i + 10] = hi(arg); fmrpacket.body[i + 11] = lo(arg);
+		fmrpacket.body[i + FMR_PUSH_PARAMETER_SIZE] = hi(arg); fmrpacket.body[i + FMR_PUSH_PARAMETER_SIZE + 1] = lo(arg);
 		
 	}
 	
@@ -210,11 +218,11 @@ push:
 	
 	/* ~ Generate a checksum for the packet. When a packet is received, the FMR will perform its own checksum and compare it to this before proceeding. ~ */
 	
-	fmrpacket.header.checksum = checksum((void *)(&(fmrpacket.recipient)), fmrpacket.header.length - sizeof(struct _fmr_header));
+	fmrpacket.header.checksum = checksum((void *)(&fmrpacket.recipient.object), fmrpacket.header.length - sizeof(struct _fmr_header));
 	
 	/* ~ Send the constructed packet to the target. ~ */
 	
-	target -> bus -> push(&fmrpacket, fmrpacket.header.length);
+	fmr_broadcast();
 	
 	/* ~ Check to see if we still have data to send. ~ */
 	
@@ -253,6 +261,10 @@ push:
 /* ~ This function moves data from the isolated address space of the device to the host using the FMR. ~ */
 
 void target_pull(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, va_list *argv) {
+	
+	/* ~ Associate this request with the appropriate target. ~ */
+	
+	fmr_associate_target(target);
 	
 	/* ~ Ensure we are talking to a valid target. ~ */
 	
@@ -316,7 +328,7 @@ void target_pull(const struct _target *target, uint8_t object, uint8_t index, ui
 		
 		unsigned arg = va_arg(*argv, unsigned);
 		
-		fmrpacket.body[i + 10] = hi(arg); fmrpacket.body[i + 11] = lo(arg);
+		fmrpacket.body[i + FMR_PUSH_PARAMETER_SIZE] = hi(arg); fmrpacket.body[i + FMR_PUSH_PARAMETER_SIZE + 1] = lo(arg);
 		
 	}
 	

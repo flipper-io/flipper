@@ -18,6 +18,8 @@ const struct _bus usb = {
 	
 	usb_push,
 	
-	usb_pull
+	usb_pull,
+	
+	true
 	
 };

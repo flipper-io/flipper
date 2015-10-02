@@ -10,17 +10,13 @@
 
 int main(int argc, char *argv[]) {
 	
-	flipper.attach(FLIPPER_SOURCE_FVM);
+	flipper.attach(FLIPPER_SOURCE_NETWORK, "129.21.81.189");
 	
-	char *data = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas nec dictum mi. Curabitur sem ante, sagittis sit amet blandit ac, varius sollicitudin lacus. Suspendisse diam sem, tristique ac neque non, finibus tempor diam. Donec accumsan ipsum eget finibus dignissim. Duis ut feugiat lectus. Etiam sit amet ligula metus. Donec eros orci, dapibus a lorem at, vestibulum maximus neque. Donec id tellus sit amet nisi aliquam luctus. Suspendisse erat augue, ultrices non tellus sed, tincidunt semper nunc. Praesent turpis metus, pharetra sit amet metus sed, facilisis lacinia libero.";
+	led.rgb(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]));
 	
-	device.invoke(0, 0, 100);
+	//uint32_t ip = wifi.ip();
 	
-	usart.push(data, strlen(data));
-	
-	uint32_t ip = wifi.ip();
-	
-	printf("Got: 0x%08X\n\n", ip);
+	//printf("Wi-Fi with IP address %d.%d.%d.%d\n\n", (uint8_t)(ip), (uint8_t)(ip >> 8), (uint8_t)(ip >> 16), (uint8_t)(ip >> 24));
 	
 	return 0;
 	

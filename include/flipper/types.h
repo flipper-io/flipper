@@ -67,6 +67,12 @@ typedef uint32_t fsp;
 
 #define little(x) ((((uint16_t)(x)) << 8 ) | (((uint16_t)(x)) >> 8))
 
+/* ~ These macros are defined in platform specific header files. ~ */
+
+#define enable_interrupts()
+
+#define disable_interrupts()
+
 /* ~ Miscelaneous. ~ */
 
 #define NO_ARGS 0

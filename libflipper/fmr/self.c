@@ -2,18 +2,6 @@
 
 #include <fmr/fmr.h>
 
-const struct _self self = {
-	
-	self_configure,
-	
-	self_invoke,
-		
-	self_push,
-	
-	self_pull
-	
-};
-
 void self_configure(const struct _bus *bus) {
 	
 	

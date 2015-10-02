@@ -164,7 +164,7 @@ void fdb_pull(void *destination, uint32_t length) {
 		
 		char c = getchar();
 		
-		printf("%02X ", c);
+		printf("%02X  ", c);
 		
 		if (c == '\n') break;
 		

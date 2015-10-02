@@ -41,7 +41,7 @@ void network_configure(char *ip) {
 	if (network_socket < 0) {
 		
 		printf("Failed to open a new socket. Abort.\n\n");
-	
+		
 		exit(EXIT_FAILURE);
 		
 	}
@@ -59,7 +59,7 @@ void network_configure(char *ip) {
 	if (connect(network_socket, (struct sockaddr *) &network_address, sizeof(network_address)) < 0)
 		
 		printf("Got socket but failed to connect. Abort.\n\n");
-
+	
 	
 	verbose("Successfully connected to 'Elroy' at '%s'.\n\n", ip);
 	

@@ -2,7 +2,7 @@
 
 #define tree_h
 
-#include <types.h>
+#include <flipper/types.h>
 
 /* This macro is used to compute the offset of a member of a leaf located at a given fsp. */
 

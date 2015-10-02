@@ -2,7 +2,7 @@
 
 #define libflipper_h
 
-#include <types.h>
+#include <flipper/types.h>
 
 /* ~ Define the flippper control type. ~ */
 

@@ -27,6 +27,15 @@
 #include <avr/wdt.h>
 
 
+#if (defined(enable_interrupts) && defined(disable_interrupts))
+
+#undef enable_interrupts
+
+#undef disable_interrupts
+
+#endif
+
+
 #define enable_interrupts() sei()
 
 #define disable_interrupts() cli()

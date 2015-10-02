@@ -20,7 +20,7 @@ preprocess = -std=c99 -D__verbose__ # -DOVERRIDE_USB
 
 # ~ Pass flags to find so that it only isolates files pertainant to the target platform. ~ #
 
-findflags = \( ! -wholename "./platforms/*" -or -wholename "./platforms/osx/*" \)
+findflags = \( ! -wholename "./platforms/*" -or -wholename "./platforms/$(target)/*" \)
 
 # ~ Declare the include directories needed for compilation. ~ #
 

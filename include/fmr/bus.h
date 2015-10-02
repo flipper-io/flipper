@@ -2,7 +2,7 @@
 
 #define __bus_h__
 
-#include <types.h>
+#include <flipper/types.h>
 
 struct _bus {
 	
@@ -21,6 +21,8 @@ struct _bus {
 	void (* push)(void *source, uint32_t length);
 	
 	void (* pull)(void *destination, uint32_t length);
+	
+	bool synchronous;
 	
 };
 

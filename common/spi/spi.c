@@ -18,6 +18,8 @@ const struct _bus spi = {
 	
 	spi_push,
 	
-	spi_pull
+	spi_pull,
+	
+	false
 	
 };
