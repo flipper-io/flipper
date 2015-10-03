@@ -4,7 +4,7 @@
 
 #include <fmr/fmr.h>
 
-const struct _target host = {
+struct _target host = {
 	
 	host_configure,
 	

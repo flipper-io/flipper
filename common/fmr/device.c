@@ -4,7 +4,7 @@
 
 #include <fmr/fmr.h>
 
-const struct _target device = {
+struct _target device = {
 	
 	device_configure,
 	
