@@ -1,10 +1,18 @@
 # ~ Specifiy the name of the output file. ~ #
 
-output = libflipper.so
+ifeq ($(target),osx)
 
-# ~ Specify the target platform. ~ #
+	output = libflipper.dylib
 
-target = linux
+else ifeq ($(target),linux)
+
+	output = libflipper.so
+
+else
+
+	$(error "Please specify a target.")
+
+endif
 
 # ~ Specify a compiler and the other utilities needed to deploy for the target. ~ #
 
@@ -16,7 +24,7 @@ ln = $(shell which 'ln')
 
 # ~ Declare the preprocessor statements to be used during object generation. ~ #
 
-preprocess = -std=c99 -fpic -D__verbose__ # -DOVERRIDE_USB
+preprocess = -std=c99 -fpic -D__verbose__
 
 # ~ Pass flags to find so that it only isolates files pertainant to the target platform. ~ #
 
@@ -28,7 +36,19 @@ include_directories = ../include
 
 # ~ Declare the library dependancies neededed for linking. ~ #
 
-libraries = -lusb # -framework CoreFoundation -framework IOKit
+ifeq ($(target),osx)
+
+	libraries = -framework CoreFoundation -framework IOKit
+
+else ifeq ($(target),linux)
+
+	libraries = -lusb
+
+else
+
+	$(error "Please specify a target.")
+
+endif
 
 # ~ Include this file to recursively compile all supported file types and generate object files using the preprocessor statements above. ~ #
 
@@ -42,23 +62,38 @@ all: clean
 
 install:
 
+	# ~ Create the SDK and its subdirectories if they do not already exist. ~ #
+
 	sudo mkdir -p $(FLIPPERSDK)/lib $(FLIPPERSDK)/include
+
+	# ~ Give the user the ability to read from and write to these directories. ~ #
 
 	sudo chown -R $(shell 'whoami') $(FLIPPERSDK) 
 
-	# Copy the library into the SDK's library directory.
+	# ~ Copy the library into the SDK's library directory. ~ #
 
 	$(rsync) -r $(output) $(FLIPPERSDK)/lib/$(output)
 
-	# Symlink the library into the system's library directory.
+	# ~ Symlink the library into the system's library directory. ~ #
 
-	sudo $(ln) -sf $(FLIPPERSDK)/lib/$(output) /usr/local/lib/$(output)
+	$(ln) -sf $(FLIPPERSDK)/lib/$(output) /usr/local/lib/$(output)
 
-	sudo $(ln) -sf $(FLIPPERSDK)/include /usr/local/include/flipper
+	# ~ Symlink the include directory into the system's include directory. ~ #
 
-	sudo $(ln) -sf $(FLIPPERSDK)/include/flipper/flipper.h /usr/local/include
+	$(ln) -sfn $(FLIPPERSDK)/include /usr/local/include/flipper
 
-	$(rsync) -r ../include/* $(FLIPPERSDK)/include
+	# ~ Symlink the master header file into the system's include directory. ~ #
+
+	$(ln) -sf $(FLIPPERSDK)/include/flipper.h /usr/local/include
+
+	# ~ Copy the header files into the SDK's include directory. ~ #
+
+	$(rsync) -r ../include/* $(FLIPPERSDK)/include --exclude 'flipper'
+
+	# ~ Copy the special header files into the SDK's include directory. ~ */
+
+	$(rsync) -r ../include/flipper/* $(FLIPPERSDK)/include
+
 
 clean:
 

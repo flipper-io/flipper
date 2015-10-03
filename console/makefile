@@ -6,6 +6,8 @@ output = flipper
 
 cc = $(shell which 'gcc')
 
+rsync = $(shell which 'rsync')
+
 # ~ Declare the preprocessor statements to be used during object generation. ~ #
 
 preprocess = -std=c99
@@ -27,6 +29,16 @@ all: libflipper
 	# ~ Link the object files together to produce an output file. ~ #
 
 	$(cc) $(prefix) $(sort $(objects)) -o $(output) $(libraries)
+
+install:
+
+	# ~ Create the SDK's binary directory if it does not already exist. ~ #
+
+	mkdir -p $(FLIPPERSDK)/bin
+
+	# ~ Copy the executable into the SDK's binary directory. ~ #
+
+	$(rsync) -r $(output) $(FLIPPERSDK)/bin
 
 clean:
 

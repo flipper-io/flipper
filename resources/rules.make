@@ -12,7 +12,7 @@ objects = $(foreach source, $(targets), $(addsuffix .o, $(basename $(source))))
 
 # ~ Use 'find' to discover any include directories. ~ #
 
-includes = $(foreach directory, $(shell find . -follow -type d -name 'include') $(include_directories), -I "$(directory)")
+includes = $(foreach directory, $(shell find . -follow -type d -name 'include') $(include_directories) /usr/local/include, -I "$(directory)")
 
 # ~ Gather compatable linker scripts. ~ #
 
@@ -42,4 +42,4 @@ $(patsubst %.s, %.o, $(filter %.s, $(targets))) : %.o : %.S
 
 $(patsubst %.S, %.o, $(filter %.S, $(targets))) : %.o : %.S
 
-	$(cc) $(prefix) -c "$<" -o "$@"
+	(cc) $(prefix) -c "$<" -o "$@"

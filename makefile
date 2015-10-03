@@ -20,12 +20,6 @@ all:
 
 install:
 
-	# ~ Copy the header files into the SDK directory. ~ */
-
-	mkdir -p $(FLIPPERSDK)/include
-
-	$(rsync) -r include/* $(FLIPPERSDK)/include
-	
 	# ~ Install libflipper to the SDK. ~ */
 	
 	$(MAKE) -C libflipper install

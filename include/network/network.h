@@ -4,7 +4,7 @@
 
 #include <flipper/types.h>
 
-#include <fmr/bus.h>
+#include <flipper/fmr/bus.h>
 
 #define FLIPPER_NETWORK_PORT 7777
 
