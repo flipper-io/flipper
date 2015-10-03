@@ -48,7 +48,7 @@ void network_configure(char *ip) {
 	
 	/* ~ Clear the network address. ~ */
 	
-	bzero(&network_address, sizeof(network_address));
+	memset(&network_address, 0, sizeof(network_address));
 	
 	network_address.sin_family = AF_INET;
 	

@@ -39,8 +39,7 @@
 #include <stdint.h>
 #include <usb.h>
 
-#include "hid.h"
-
+#include <usb/usb.h>
 
 // On Linux there are several options to access HID devices.
 //
@@ -150,7 +149,7 @@ int hid_transmit_packet(uint8_t *buf)
 	if (hid->ep_out) {
 		return usb_interrupt_write(hid->usb, hid->ep_out, buf, FLIPPER_PACKET_SIZE, DEFAULT_TIMEOUT);
 	} else {
-		return usb_control_msg(hid->usb, 0x21, 9, 0, hid->iface, buf, len, timeout);
+		return usb_control_msg(hid->usb, 0x21, 9, 0, hid->iface, buf, FLIPPER_PACKET_SIZE, DEFAULT_TIMEOUT);
 	}
 }
 
