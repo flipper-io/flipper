@@ -4,7 +4,7 @@ output = flipper
 
 # ~ Specify a compiler and the other utilities needed to deploy for the target. ~ #
 
-cc = $(shell which 'clang')
+cc = $(shell which 'gcc')
 
 # ~ Declare the preprocessor statements to be used during object generation. ~ #
 
@@ -19,7 +19,7 @@ libraries = -L "../libflipper" -lflipper
 include rules.make
 
 libflipper:
-
+        
 	$(MAKE) -C "../libflipper" all install
 
 all: libflipper
