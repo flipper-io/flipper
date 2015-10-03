@@ -4,8 +4,6 @@
 
 #include <flipper/types.h>
 
-#include <flipper/fmr/bus.h>
-
 extern const struct _bus spi;
 
 #ifdef __private_include__

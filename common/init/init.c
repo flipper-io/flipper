@@ -1,8 +1,20 @@
 #define __private_include__
 
-#include <flipper/flipper.h>
+#include <button/button.h>
 
-#include <fmr/fmr.h>
+#include <flash/flash.h>
+
+#include <i2c/i2c.h>
+
+#include <io/io.h>
+
+#include <led/led.h>
+
+#include <pwm/pwm.h>
+
+#include <spi/spi.h>
+
+#include <timer/timer.h>
 
 void __attribute__ ((constructor)) libflipper_init() {
 	
