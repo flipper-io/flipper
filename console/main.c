@@ -10,7 +10,7 @@
 
 int main(int argc, char *argv[]) {
 	
-	flipper.attach(FLIPPER_SOURCE_NETWORK, "129.21.81.189");
+	flipper.attach(FLIPPER_SOURCE_USB);
 	
 	led.rgb(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]));
 	
