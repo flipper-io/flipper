@@ -1,1 +1,1 @@
-../build/rules.make
+../resources/rules.make

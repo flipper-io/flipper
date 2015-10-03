@@ -2,6 +2,8 @@
 
 #define fdl_h
 
+#include <flipper/types.h>
+
 extern const struct _fdl {
 
 	void (* configure)(void);

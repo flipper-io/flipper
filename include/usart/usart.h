@@ -4,7 +4,7 @@
 
 #include <flipper/types.h>
 
-#include <fmr/bus.h>
+#include <flipper/fmr/bus.h>
 
 extern const struct _bus usart, usart1, dbgu;
 

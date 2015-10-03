@@ -8,29 +8,29 @@
 
 /* ~ Include the header files for user-accessable drivers. ~ */
 
-#include <button/button.h>
+#include <flipper/button/button.h>
 
-#include <flash/flash.h>
+#include <flipper/flash/flash.h>
 
-#include <fs/fs.h>
+#include <flipper/fs/fs.h>
 
-#include <i2c/i2c.h>
+#include <flipper/i2c/i2c.h>
 
-#include <io/io.h>
+#include <flipper/io/io.h>
 
-#include <led/led.h>
+#include <flipper/led/led.h>
 
-#include <pwm/pwm.h>
+#include <flipper/pwm/pwm.h>
 
-#include <spi/spi.h>
+#include <flipper/spi/spi.h>
 
-#include <timer/timer.h>
+#include <flipper/timer/timer.h>
 
-#include <usart/usart.h>
+#include <flipper/usart/usart.h>
 
-#include <usb/usb.h>
+#include <flipper/usb/usb.h>
 
-#include <wifi/wifi.h>
+#include <flipper/wifi/wifi.h>
 
 /* ~ Define the flippper control type. ~ */
 
