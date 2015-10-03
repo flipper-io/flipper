@@ -98,7 +98,7 @@ extern const struct _self {
 
 /* ~ Every FMR compliant target will have a host as well as a device. ~ */
 
-extern const struct _target host, device;
+extern struct _target host, device;
 
 extern const void * const objects[];
 
