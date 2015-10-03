@@ -18,6 +18,8 @@
 
 #include <string.h>
 
+#include <fmr/bus.h>
+
 /* Define the Flipper filesystem pointer type. */
 
 typedef uint32_t fsp;

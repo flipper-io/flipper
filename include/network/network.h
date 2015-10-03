@@ -4,8 +4,6 @@
 
 #include <flipper/types.h>
 
-#include <flipper/fmr/bus.h>
-
 #define FLIPPER_NETWORK_PORT 7777
 
 extern const struct _bus network;
