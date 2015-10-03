@@ -6,3 +6,9 @@
 *.bin
 *.so
 *.dylib
+.cproject
+.project
+.settings/
+java/.classpath
+java/.gitignore
+java/.project
