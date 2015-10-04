@@ -118,6 +118,8 @@ uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t ind
 
 uint32_t target_push(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, va_list *argv) {
 	
+	if (!length) return 0;
+	
 	/* ~ Associate this request with the appropriate target. ~ */
 	
 	fmr_associate_target(target);
@@ -206,6 +208,8 @@ push:
 	
 	do {
 		
+		verbose("!");
+		
 		/* ~ Load a byte into the packet. ~ */
 		
 		*(uint8_t *)(offset ++) = *(uint8_t *)(source ++);
@@ -227,6 +231,8 @@ push:
 	/* ~ Check to see if we still have data to send. ~ */
 	
 	if (length) {
+		
+		verbose("@");
 		
 		/* ~ If we do, reset the length. ~ */
 		
@@ -261,6 +267,8 @@ push:
 /* ~ This function moves data from the isolated address space of the device to the host using the FMR. ~ */
 
 void target_pull(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, va_list *argv) {
+	
+	if (!length) return;
 	
 	/* ~ Associate this request with the appropriate target. ~ */
 	
@@ -338,11 +346,11 @@ void target_pull(const struct _target *target, uint8_t object, uint8_t index, ui
 	
 	/* ~ Send the constructed packet to the target. ~ */
 	
-	target -> bus -> push(&fmrpacket, fmrpacket.header.length);
+	fmr_broadcast();
 	
 	/* ~ Retrieve a packet from the target containing the pulled data. ~ */
 	
-	target -> bus -> pull(&fmrpacket, sizeof(fmrpacket));
+	fmr_retrieve();
 	
 	/* ~ Create a local variable to keep track of the offset in the packet at which we are loading data. ~ */
 	
@@ -376,7 +384,7 @@ pull:
 		
 		/* ~ If we do, grab another packet. ~ */
 		
-		target -> bus -> pull(&fmrpacket, sizeof(fmrpacket));
+		fmr_retrieve();
 		
 		/* ~ Jump back to the beginning of the loading sequence. ~ */
 		

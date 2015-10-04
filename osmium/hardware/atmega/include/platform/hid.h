@@ -2,7 +2,8 @@
 
 #define __hid_h__
 
-#include <types.h>
+#include <flipper/types.h>
+
 #include <platform/atmega.h>
 
 #ifdef __private_include__

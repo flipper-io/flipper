@@ -6,7 +6,7 @@
 
 struct _bus {
 	
-	void (* configure)(uint16_t configuration);
+	void (* configure)(void *configuration);
 	
 	void (* enable)(void);
 	

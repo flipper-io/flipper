@@ -16,6 +16,8 @@
 
 #include <pwm/pwm.h>
 
+#include <sam/sam.h>
+
 #include <spi/spi.h>
 
 #include <timer/timer.h>
@@ -26,4 +28,4 @@
 
 #include <wifi/wifi.h>
 
-const void * const objects[] = { &button, &flash, &host, &self, &device, &fs, &i2c, &io, &led, &pwm, &spi, &timer, &usart, &usart1, &dbgu, &usb, &wifi };
+const void * const objects[] = { &button, &flash, &host, &self, &device, &fs, &i2c, &io, &led, &pwm, &sam, &spi, &timer, &usart, &usart1, &dbgu, &usb, &wifi };
