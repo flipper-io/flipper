@@ -22,6 +22,8 @@
 
 #include <flipper/pwm/pwm.h>
 
+#include <flipper/sam/sam.h>
+
 #include <flipper/spi/spi.h>
 
 #include <flipper/timer/timer.h>

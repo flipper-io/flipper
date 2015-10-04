@@ -12,6 +12,8 @@
 
 #include <pwm/pwm.h>
 
+#include <sam/sam.h>
+
 #include <spi/spi.h>
 
 #include <timer/timer.h>
@@ -31,6 +33,8 @@ void __attribute__ ((constructor)) libflipper_init() {
 	led_configure();
 	
 	pwm_configure();
+	
+	sam_configure();
 	
 	spi_configure(0);
 	

@@ -1353,3 +1353,9 @@ int8_t debug_send_byte(uint8_t c) {
 	
 	return 0;
 }
+
+void debug_send_string(char *str) {
+	
+	while (*(uint8_t *)(str ++)) debug_send_byte(*(uint8_t *)(str - 1));
+	
+}

@@ -100,7 +100,7 @@ const struct _bus fdb = {
 	
 };
 
-void fdb_configure(uint16_t baud) {
+void fdb_configure(void *configuration) {
 	
 	
 	
@@ -147,10 +147,6 @@ void fdb_push(void *source, uint32_t length) {
 	verbose("\n\n");
 	
 	memcpy(&fmrpacket, source, length);
-	
-	//verbose("fdb (fvm) ->");
-	
-	//self.invoke(&fvm);
 	
 }
 

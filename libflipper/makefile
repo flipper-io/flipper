@@ -1,3 +1,7 @@
+# ~ No sudo? ~ #
+
+sudo =
+
 # ~ Specifiy the name of the output file. ~ #
 
 ifeq ($(target),osx)
@@ -42,7 +46,7 @@ ifeq ($(target),osx)
 
 else ifeq ($(target),linux)
 
-	libraries = -lusb
+	libraries = -lusb-compat
 
 else
 
@@ -64,11 +68,11 @@ install:
 
 	# ~ Create the SDK and its subdirectories if they do not already exist. ~ #
 
-	sudo mkdir -p $(FLIPPERSDK)/lib $(FLIPPERSDK)/include
+	$(sudo) mkdir -p $(FLIPPERSDK)/lib $(FLIPPERSDK)/include
 
 	# ~ Give the user the ability to read from and write to these directories. ~ #
 
-	sudo chown -R $(shell 'whoami') $(FLIPPERSDK) 
+	$(sudo) chown -R $(shell 'whoami') $(FLIPPERSDK)
 
 	# ~ Copy the library into the SDK's library directory. ~ #
 

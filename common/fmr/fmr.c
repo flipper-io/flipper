@@ -2,6 +2,8 @@
 
 #include <fmr/fmr.h>
 
+bool fmr_busy = false;
+
 /* ~ Global scratch space for FMR processing. ~ */
 
 fmr_packet fmrpacket;
@@ -20,13 +22,13 @@ void fmr_broadcast(void) {
 
 /* ~ Retrieve a packet from its sender. ~ */
 
-void fmr_retrieve(uint32_t length) {
+void fmr_retrieve(void) {
 	
 	/* ~ If the bus is synchronous, we can load in an entire packet at once. ~*/
 	
 	if (sender -> bus -> synchronous)
 		
-		sender -> bus -> pull(&fmrpacket, length);
+		sender -> bus -> pull(&fmrpacket, sizeof(fmr_packet));
 	
 	/* ~ If the bus is asynchronous, we have to load it in chunks. ~ */
 	
@@ -38,11 +40,11 @@ void fmr_retrieve(uint32_t length) {
 		
 		/* ~ Load the header of the packet. ~ */
 		
-		for (unsigned i = 1; i < sizeof(struct _fmr_header); i ++) ((char *)(&fmrpacket.header))[i] = sender -> bus -> get();
+		for (unsigned i = 1; i < sizeof(struct _fmr_header); i ++) ((uint8_t *)(&fmrpacket.header))[i] = sender -> bus -> get();
 		
 		/* ~ Load the body of the packet. ~ */
 		
-		for (unsigned i = 0; i < (fmrpacket.header.length) - sizeof(struct _fmr_header); i ++) ((char *)(&fmrpacket.recipient.object))[i] = sender -> bus -> get();
+		for (unsigned i = 0; i < (fmrpacket.header.length) - sizeof(struct _fmr_header); i ++) ((uint8_t *)(&fmrpacket.recipient.object))[i] = sender -> bus -> get();
 		
 		/* ~ Flush any remaining data. ~ */
 		

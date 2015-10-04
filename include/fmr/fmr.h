@@ -106,7 +106,7 @@ extern struct _target *sender;
 
 #ifdef __private_include__
 
-enum { _button, _flash, _host, _self, _device, _fs, _i2c, _io, _led, _pwm, _spi, _timer, _usart, _usart1, _dbgu, _usb, _wifi };
+enum { _button, _flash, _host, _self, _device, _fs, _i2c, _io, _led, _pwm, _sam, _spi, _timer, _usart, _usart1, _dbgu, _usb, _wifi };
 
 extern uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, va_list *argv);
 
@@ -150,9 +150,11 @@ extern void device_pull(uint8_t object, uint8_t index, uint8_t argc, void *desti
 
 extern uint32_t fmr_call(void *function, uint8_t argc, void *argv);
 
-void fmr_broadcast(void);
+extern bool fmr_busy;
 
-void fmr_retrieve(uint32_t length);
+extern void fmr_broadcast(void);
+
+extern void fmr_retrieve(void);
 
 #endif
 
