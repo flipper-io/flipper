@@ -12,7 +12,7 @@ extern const struct _bus network;
 
 enum { _network_configure, _network_enable, _network_disable, _network_ready, _network_put, _network_get, _network_push, _network_pull };
 
-extern void network_configure(char *ip);
+extern void network_configure(void *ip);
 
 extern void network_enable(void);
 

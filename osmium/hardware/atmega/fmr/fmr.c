@@ -8,17 +8,25 @@
 
 #include <platform/hid.h>
 
-const void * const objects[] PROGMEM = { &button, &flash, &host, &self, &device, &fs, &i2c, &io, &led, &pwm, &spi, &timer, &usart, &usart, &usart, &usb, &wifi };
+const void * const objects[] PROGMEM = { &button, &flash, &host, &self, &device, &fs, &i2c, &io, &led, &pwm, &sam, &spi, &timer, &usart, &usart, &usart, &usb, &wifi };
 
 void usb_receive_interrupt(void) {
 	
 	/* ~ Associate this interrupt with the device target. ~ */
 	
-	fmr_associate_target(&device);
+	fmr_associate_target(&host);
+	
+	/*  ~ Alert the system that the FMR is busy. ~ */
+	
+	fmr_busy = true;
 	
 	/* ~ Invoke the FMR. ~ */
 	
-	self_invoke(&device);
+	self_invoke(&host);
+	
+	/* ~ Free the FMR. ~ */
+	
+	fmr_busy = false;
 	
 }
 
@@ -28,19 +36,31 @@ ISR(USART1_RX_vect) {
 	
 	/* ~ Associate this interrupt with the host target. ~ */
 	
-	fmr_associate_target(&host);
+	fmr_associate_target(&device);
 	
 	/* ~ Disable interrupts to prevent alignment issues. ~ */
 	
 	disable_interrupts();
 	
+	/*  ~ Alert the system that the FMR is busy. ~ */
+	
+	fmr_busy = true;
+	
 	/* ~ Load a packet from the bus. ~ */
 	
-	fmr_retrieve(0);
+	fmr_retrieve();
 	
 	/* ~ Invoke the FMR. ~ */
 	
-	self_invoke(&host);
+	self_invoke(&device);
+	
+	/* ~ Free the FMR. ~ */
+	
+	fmr_busy = false;
+	
+	/* ~ Re-enable interrupts. ~ */
+	
+	enable_interrupts();
 
 	
 }

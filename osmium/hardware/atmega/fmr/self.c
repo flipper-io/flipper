@@ -30,9 +30,9 @@ uint32_t self_call(void) {
 	
 	/* ~ Invoke the recipient function with the appropriate arguments. ~ */
 	
-	fmr_call(function, fmrpacket.recipient.argc, &fmrpacket.body);
+	fmr_call(function, fmrpacket.recipient.argc, fmrpacket.body);
 	
-	return *(uint32_t *)(&fmrpacket.body);
+	return *(uint32_t *)(fmrpacket.body);
 	
 }
 
@@ -72,17 +72,19 @@ end:
 	
 }
 
-char ppbuf[128];
-
 uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, uint32_t length) {
+	
+	uint8_t ppbuf[128];
+	
+	uint8_t argbuf[32];
 	
 	/* ~ Allocate the appropriate amount of memory in external memory to buffer the incoming data. ~ */
 	
-	void *destination = malloc(length);
+	void *destination = ppbuf; //malloc(length);
 	
 	/* ~ Allocate the appropriate amount of memory to store the variadic argument array until it is needed later. ~ */
 	
-	char *argv = malloc(argc);
+	uint8_t *argv = argbuf; //malloc(argc);
 	
 	/* ~ If malloc failed to satisfy our request, panic. ~ */
 	
@@ -118,7 +120,7 @@ uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, uint32_t length)
 	
 	/* ~ For the first iteration of this loop, specify that the data has been loaded after the layered parameter list and parameters. ~ */
 
-	uint8_t *offset = (uint8_t *)(fmrpacket.body + FMR_PUSH_PARAMETER_SIZE + argc);
+	uint8_t *offset = (uint8_t *)(fmrpacket.body) + FMR_PUSH_PARAMETER_SIZE + argc;
 	
 pull:
 	
@@ -126,9 +128,11 @@ pull:
 	
 	do {
 		
+		usart0_put('!');
+		
 		/* ~ Load a byte from the packet. ~ */
 		
-		*(uint8_t *)(dest ++) = *(uint8_t *)(offset ++);
+		*((uint8_t *)(dest ++)) = *((uint8_t *)(offset ++));
 	
 	} while ((-- len) && (-- remaining));
 	
@@ -136,10 +140,12 @@ pull:
 	
 	if (len) {
 		
+		usart0_put('@');
+		
 		/* ~ If we do, grab another packet. ~ */
 		
-		fmr_retrieve(sizeof(fmrpacket));
-		
+		fmr_retrieve();
+				
 		/* ~ Reset the offset within the packet from which data will be loaded. ~ */
 		
 		offset = (uint8_t *)(&fmrpacket.recipient);
@@ -178,11 +184,11 @@ pull:
 	
 	/* ~ Move the earlier cached variadic argument list into the new packet. ~ */
 	
-	memmove((void *)(fmrpacket.body) + 7, argv, argc);
+	memmove((void *)(fmrpacket.body) + 6, argv, argc);
 	
 	/* ~ Relase the memory allocated to cache the above list. ~ */
 	
-	free(argv);
+	//free(argv);
 	
 	/* ~ Perform the function call and get a return value. ~ */
 	
@@ -190,7 +196,7 @@ pull:
 	
 	/* ~ Free the memory we allocated to buffer the incoming data. ~ */
 	
-	free(destination);
+	//free(destination);
 	
 	/* ~ Return the return value back up the function chain. ~ */
 	
@@ -199,6 +205,8 @@ pull:
 }
 
 void self_pull(uint8_t object, uint8_t index, uint8_t argc, uint32_t length) {
+	
+	uint8_t ppbuf[64];
 	
 	/* ~ Allocate the appropriate amount of memory in external memory to buffer the outgoing data. ~ */
 	

@@ -2,7 +2,19 @@
 
 output = flipper
 
-python_install_directory = /Library/Python/2.7/site-packages/$(output)
+ifeq ($(target),osx)
+
+	python_install_directory = /Library/Python/2.7/site-packages/$(output)
+
+else ifeq ($(target),linux)
+
+	include_directories = $(shell find '/usr/include/python$(version)' -type d) $(FLIPPERSDK)/include
+
+else
+
+	$(error "Please specify a target.")
+
+endif
 
 version = 2.7
 
@@ -42,7 +54,7 @@ all:
 
 	# ~ Compile each output file into a 'so' Python class. ~ #
 
-	$(foreach object, $(objects), $(shell $(cc) $(prefix) -shared -lpython$(version) -lflipper $(object) -o $(output)/$(notdir $(patsubst %.o,%,$(object)).so)))
+	$(foreach object, $(objects), $(shell echo $(cc) $(prefix) -shared -lpython$(version) -lflipper $(object) -o $(output)/$(notdir $(patsubst %.o,%,$(object)).so)))
 
 	# ~ Generate the __init__.py file. ~ #
 

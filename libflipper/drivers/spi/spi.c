@@ -4,7 +4,7 @@
 
 #include <fmr/fmr.h>
 
-void spi_configure(uint16_t configuration) {
+void spi_configure(void *configuration) {
 	
 	
 	

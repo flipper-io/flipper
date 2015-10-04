@@ -28,7 +28,7 @@ extern void fvm_pull(uint8_t object, uint8_t index, uint8_t argc, void *destinat
 
 enum { _fdb_configure, _fdb_enable, _fdb_disable, _fdb_ready, _fdb_put, _fdb_get, _fdb_push, _fdb_pull };
 
-extern void fdb_configure(uint16_t baud);
+extern void fdb_configure(void *configuration);
 
 extern void fdb_enable(void);
 

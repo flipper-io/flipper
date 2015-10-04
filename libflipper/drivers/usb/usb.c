@@ -1,10 +1,12 @@
 #define __private_include__
 
+#include <unistd.h>
+
 #include <usb/usb.h>
 
 #include <fmr/fmr.h>
 
-void usb_configure(uint16_t configuration) {
+void usb_configure(void *configuration) {
 	
 	uint8_t devices = hid_enumerate(1, CARBON_VENDOR_ID, CARBON_PRODUCT_ID, CARBON_USAGE_PAGE, CARBON_USAGE);
 	
@@ -72,6 +74,8 @@ void usb_push(void *source, uint32_t length) {
 	
 	hid_transmit_packet(packet);
 	
+	free(packet);
+	
 }
 
 void usb_pull(void *destination, uint32_t length) {
@@ -81,5 +85,7 @@ void usb_pull(void *destination, uint32_t length) {
 	hid_receive_packet(buffer);
 	
 	memcpy(destination, buffer, length);
+	
+	free(buffer);
 	
 }

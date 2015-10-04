@@ -6,11 +6,11 @@
 
 /* ------------------------ USART0 ------------------------ */
 
-void usart0_configure(uint16_t baud) {
+void usart0_configure(void *baud) {
 	
-	UBRR1H = hi(baud);
+	UBRR1H = hi((uint16_t)(baud));
 	
-	UBRR1L = lo(baud);
+	UBRR1L = lo((uint16_t)(baud));
 	
 	UCSR1B = (1 << RXEN1) | (1 << TXEN1);
 	
@@ -70,7 +70,7 @@ void usart0_pull(void *destination, uint32_t length) {
 
 /* ------------------------ USART1 ------------------------ */
 
-void usart1_configure(uint16_t baud) {
+void usart1_configure(void *baud) {
 	
 	
 	
@@ -120,7 +120,7 @@ void usart1_pull(void *destination, uint32_t length) {
 
 /* ------------------------ DBGU ------------------------ */
 
-void dbgu_configure(uint16_t baud) {
+void dbgu_configure(void *baud) {
 	
 	
 	
