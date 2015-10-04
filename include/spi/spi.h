@@ -10,7 +10,7 @@ extern const struct _bus spi;
 
 enum { _spi_configure, _spi_enable, _spi_disable, _spi_ready, _spi_put, _spi_get, _spi_push, _spi_pull };
 
-extern void spi_configure(uint16_t configuration);
+extern void spi_configure(void *configuration);
 
 extern void spi_enable(void);
 

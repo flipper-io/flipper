@@ -32,7 +32,7 @@
 
 #define SPI_2X_CLOCK_DIVISION_MASK  0x01
 
-void spi_configure(uint16_t configuration) {
+void spi_configure(void *configuration) {
 	
 	/* ~ Set MOSI and SCK as outputs. ~ */
 	

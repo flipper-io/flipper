@@ -26,6 +26,6 @@ void initled() {
 	
 	Py_InitModule("led", py_led_methods);
 	
-	flipper.attach(FLIPPER_SOURCE_NETWORK, "129.21.82.164");
+	flipper.attach(FLIPPER_SOURCE_USB);
 	
 }

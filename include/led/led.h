@@ -4,6 +4,14 @@
 
 #include <flipper/types.h>
 
+#define LED_OFF 0, 0, 0
+
+#define LED_COLOR_BUSY 25, 0, 0
+
+#define LED_COLOR_SUCCESS 0, 25, 0
+
+#define LED_COLOR_ERROR 25, 0, 0
+
 extern const struct _led {
 	
 	void (* configure)(void);

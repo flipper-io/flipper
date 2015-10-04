@@ -20,7 +20,7 @@ extern const struct _bus usb;
 
 enum { _usb_configure, _usb_enable, _usb_disable, _usb_ready, _usb_put, _usb_get, _usb_push, _usb_pull };
 
-extern void usb_configure(uint16_t configuration);
+extern void usb_configure(void *configuration);
 
 extern void usb_enable(void);
 

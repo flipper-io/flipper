@@ -79,6 +79,4 @@ typedef uint32_t fsp;
 
 #define NO_ARGS 0
 
-#define LED_COLOR_ERROR 25, 0, 0
-
 #endif
