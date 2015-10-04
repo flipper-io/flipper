@@ -74,17 +74,17 @@ end:
 
 uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, uint32_t length) {
 	
-	uint8_t ppbuf[128];
-	
-	uint8_t argbuf[32];
-	
 	/* ~ Allocate the appropriate amount of memory in external memory to buffer the incoming data. ~ */
 	
-	void *destination = ppbuf; //malloc(length);
+	void *destination = malloc(length);
 	
 	/* ~ Allocate the appropriate amount of memory to store the variadic argument array until it is needed later. ~ */
 	
-	uint8_t *argv = argbuf; //malloc(argc);
+	uint8_t *argv = malloc(argc);
+	
+	/* ~ Create the return value. ~ */
+	
+	uint32_t retval;
 	
 	/* ~ If malloc failed to satisfy our request, panic. ~ */
 	
@@ -96,7 +96,7 @@ uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, uint32_t length)
 		
 		/* ~ Our host will expect a return value, so send a response with the appropriate error code. ~ */
 		
-		// sender -> bus -> push(&retval, sizeof(uint32_t));
+		sender -> bus -> push(&retval, sizeof(uint32_t));
 		
 		return 0;
 		
@@ -128,8 +128,6 @@ pull:
 	
 	do {
 		
-		usart0_put('!');
-		
 		/* ~ Load a byte from the packet. ~ */
 		
 		*((uint8_t *)(dest ++)) = *((uint8_t *)(offset ++));
@@ -139,8 +137,6 @@ pull:
 	/* ~ Check to see if we still have data to receive. ~ */
 	
 	if (len) {
-		
-		usart0_put('@');
 		
 		/* ~ If we do, grab another packet. ~ */
 		
@@ -188,15 +184,15 @@ pull:
 	
 	/* ~ Relase the memory allocated to cache the above list. ~ */
 	
-	//free(argv);
+	free(argv);
 	
 	/* ~ Perform the function call and get a return value. ~ */
 	
-	uint32_t retval = self_call();
+	retval = self_call();
 	
 	/* ~ Free the memory we allocated to buffer the incoming data. ~ */
 	
-	//free(destination);
+	free(destination);
 	
 	/* ~ Return the return value back up the function chain. ~ */
 	
@@ -206,11 +202,29 @@ pull:
 
 void self_pull(uint8_t object, uint8_t index, uint8_t argc, uint32_t length) {
 	
-	uint8_t ppbuf[64];
-	
 	/* ~ Allocate the appropriate amount of memory in external memory to buffer the outgoing data. ~ */
 	
-	void *source = ppbuf;
+	void *source = malloc(length);
+	
+	/* ~ Save the source in a local variable we can modify. ~ */
+	
+	void *src = source;
+	
+	/* ~ If malloc failed to satisfy our request, panic. ~ */
+	
+	if (!source) {
+		
+		/* ~ Set the status led to its error color to alert the user of a problem. ~ */
+		
+		led_set_rgb(LED_COLOR_ERROR);
+		
+		/* ~ Our host will expect a return value, so send a response with the appropriate error code. ~ */
+		
+		sender -> bus -> push(&source, sizeof(uint32_t));
+		
+		return 0;
+		
+	}
 	
 	/* ~ Load the recipient information into the packet. This information describes to the FMR which function to invoke. ~ */
 	
@@ -270,7 +284,7 @@ push:
 		
 		/* ~ Move a byte from the received packet to the destination. ~ */
 		
-		*(uint8_t *)(offset ++) = *(uint8_t *)(source ++);
+		*(uint8_t *)(offset ++) = *(uint8_t *)(src ++);
 		
 		/* ~ Advance the size of the packet each time a byte is loaded into the packet. ~ */
 		
@@ -299,5 +313,9 @@ push:
 		goto push;
 		
 	}
+	
+	/* ~ Free the memory we allocated to buffer the outgoing data. ~ */
+	
+	free(source);
 	
 }

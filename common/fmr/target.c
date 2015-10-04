@@ -208,8 +208,6 @@ push:
 	
 	do {
 		
-		verbose("!");
-		
 		/* ~ Load a byte into the packet. ~ */
 		
 		*(uint8_t *)(offset ++) = *(uint8_t *)(source ++);
@@ -231,8 +229,6 @@ push:
 	/* ~ Check to see if we still have data to send. ~ */
 	
 	if (length) {
-		
-		verbose("@");
 		
 		/* ~ If we do, reset the length. ~ */
 		
