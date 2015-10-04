@@ -85,21 +85,19 @@ int main(int argc, char *argv[]) {
 	
 	led.rgb(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]));
 	
-	char *out = "Lorem ipsum dolor sit amet viverra fusce..sit amet viverra fusce..sit amet viverra fusce..";
+	char *out = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam in ligula pretium purus elementum sollicitudin eget nec nullam.";
+
+	flash.push(out, strlen(out), 0);
 	
-	host_push(_usart, _usart_push, 0, out, strlen(out));
+	char *data = malloc(strlen(out));
 	
-	usart.put('\n');
+	memset(data, 0, strlen(out));
 	
-	printf("\n\n");
+	host_pull(_flash, _flash_pull, 2, data, strlen(out), 0, 0);
 	
-	//char *data = malloc(128);
+	printf("String: %s\n\n", data);
 	
-	//memset(data, 0, 128);
-	
-	//flash.pull(data, strlen(out), 0x1234);
-	
-	//printf("String: %s\n\n", data);
+	free(data);
 	
 	//uint32_t ip = wifi.ip();
 	
