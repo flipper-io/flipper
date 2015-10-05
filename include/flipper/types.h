@@ -40,6 +40,7 @@ typedef uint32_t fsp;
 
 #endif
 
+#define ceiling(x, y) ((x + y - 1) / y)
 
 /* ~ Bit manipulation, cause let's face it, nobody remembers these. ~ */
 

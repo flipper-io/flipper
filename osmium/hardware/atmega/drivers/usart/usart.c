@@ -16,21 +16,21 @@ void usart0_configure(void *baud) {
 	
 	UCSR1C = (1 << USBS1) | (3 << UCSZ10);
 	
+}
+
+void usart0_enable(void) {
+	
 	/* ~ Enable the USART interrupt. ~ */
 	
 	UCSR1B |= (1 << RXCIE1);
 	
 }
 
-void usart0_enable(void) {
-	
-	
-	
-}
-
 void usart0_disable(void) {
 	
+	/* ~ Disable the USART interrupt. ~ */
 	
+	UCSR1B &= ~(1 << RXCIE1);
 	
 }
 

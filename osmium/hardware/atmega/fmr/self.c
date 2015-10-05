@@ -221,9 +221,7 @@ void self_pull(uint8_t object, uint8_t index, uint8_t argc, uint32_t length) {
 		/* ~ Our host will expect a return value, so send a response with the appropriate error code. ~ */
 		
 		sender -> bus -> push(&source, sizeof(uint32_t));
-		
-		return 0;
-		
+				
 	}
 	
 	/* ~ Load the recipient information into the packet. This information describes to the FMR which function to invoke. ~ */

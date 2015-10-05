@@ -4,8 +4,6 @@
 
 #include <flash/flash.h>
 
-#if false
-
 /* ~ This function traverses the filesystem tree starting at a leaf pointed to by the 'current' argument until an empty branch pointer corresponding to the given key is found. ~ */
 
 fsp fs_empty_branch_for_key(fsp _branch, fsp current, uint16_t key) {
@@ -227,5 +225,3 @@ void fs_remove_leaf_with_key(fsp parent, uint16_t key) {
 	free(_match);
 	
 }
-
-#endif
