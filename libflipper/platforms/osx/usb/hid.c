@@ -8,7 +8,7 @@
 
 #define SELECTED_DEVICE			0
 
-#define DEFAULT_TIMEOUT			250
+#define DEFAULT_TIMEOUT			50
 
 #define printf(...)
 

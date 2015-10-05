@@ -4,9 +4,13 @@
 
 #include <fmr/fmr.h>
 
+#include "console.h"
+
 #include <fs/crc.h>
 
 #include <flash/flash.h>
+
+#include <fs/tree.h>
 
 typedef void rawhid_t;
 void* rawhid_open_only1(int vid, int pid, int usage_page, int usage);
@@ -79,25 +83,27 @@ void debug_listen(void) {
 
 int main(int argc, char *argv[]) {
 	
-	if (!strcmp(argv[1], "listen")) debug_listen();
+	if (argc < 2) { printf("Insufficient arguments.\n\n"); return 1; }
 	
 	flipper.attach(FLIPPER_SOURCE_USB);
 	
-	led.rgb(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]));
+	if (!strcmp(argv[1], "listen")) debug_listen();
 	
-	char *out = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam in ligula pretium purus elementum sollicitudin eget nec nullam.";
-
-	flash.push(out, strlen(out), 0);
+	else if (!strcmp(argv[1], "erase")) sam_erase_flash();
 	
-	char *data = malloc(strlen(out));
+	else if (!strcmp(argv[1], "flash")) { if (argc < 3) { printf("Please provide a path to a firmware file.\n\n"); return 1; } sam_load_firmware(argv[2]); }
 	
-	memset(data, 0, strlen(out));
-	
-	host_pull(_flash, _flash_pull, 2, data, strlen(out), 0, 0);
-	
-	printf("String: %s\n\n", data);
-	
-	free(data);
+	else if (!strcmp(argv[1], "test")) {
+		
+		fs_configure();
+		
+		fs.format();
+		
+		fsp _create = flash.alloc(128);
+		
+		printf("Allocated at 0x%08x\n", _create);
+		
+	}
 	
 	//uint32_t ip = wifi.ip();
 	

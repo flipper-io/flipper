@@ -42,7 +42,11 @@ void __attribute__ ((naked)) __attribute__ ((section(".init8"))) atmega_init(voi
 	
 	/* ~ Configure the USART bus. ~ */
 	
-	usart.configure((void *)(baudrate(115200)));
+	usart0_configure((void *)(baudrate(115200)));
+	
+	/* ~ Enable the USART interrupt. ~ */
+	
+	usart0_enable();
 	
 	/* ~ Configure the host for this platform. ~ */
 	
@@ -51,6 +55,8 @@ void __attribute__ ((naked)) __attribute__ ((section(".init8"))) atmega_init(voi
 	/* ~ Configure the device for this platform. ~ */
 	
 	device_configure(&usart);
+	
+	fs_configure();
 	
 	/* ~ Configure USB. ~ */
 	
