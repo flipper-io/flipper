@@ -83,9 +83,13 @@ void debug_listen(void) {
 
 int main(int argc, char *argv[]) {
 	
-	if (argc < 2) { printf("Insufficient arguments.\n\n"); return 1; }
+	flipper.attach(FLIPPER_SOURCE_FVM, "/Development/flipper-toolbox/fvm/hal.fvm");
 	
-	flipper.attach(FLIPPER_SOURCE_USB);
+	led.rgb(1, 2, 3);
+	
+#if 0
+	
+	if (argc < 2) { printf("Insufficient arguments.\n\n"); return 1; }
 	
 	if (!strcmp(argv[1], "listen")) debug_listen();
 	
@@ -108,6 +112,8 @@ int main(int argc, char *argv[]) {
 	//uint32_t ip = wifi.ip();
 	
 	//printf("Wi-Fi with IP address %d.%d.%d.%d\n\n", (uint8_t)(ip), (uint8_t)(ip >> 8), (uint8_t)(ip >> 16), (uint8_t)(ip >> 24));
+	
+#endif
 	
 	return 0;
 	
