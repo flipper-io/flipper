@@ -32,7 +32,7 @@ int network_socket;
 
 struct sockaddr_in network_address;
 
-void network_configure(char *ip) {
+void network_configure(void *ip) {
 	
 	/* ~ Open a socket on the current network. ~ */
 	
