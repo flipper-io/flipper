@@ -22,12 +22,10 @@
 
 void __attribute__ ((constructor)) libflipper_init() {
 	
-	verbose("The library 'libflipper' was configured successfully.\n\n");
-	
 	button_configure();
 	
 	flash_configure();
-		
+	
 	i2c_configure();
 	
 	io_configure();
