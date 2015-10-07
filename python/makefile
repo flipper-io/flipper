@@ -54,7 +54,7 @@ all:
 
 	# ~ Compile each output file into a 'so' Python class. ~ #
 
-	$(foreach object, $(objects), $(shell echo $(cc) $(prefix) -shared -lpython$(version) -lflipper $(object) -o $(output)/$(notdir $(patsubst %.o,%,$(object)).so)))
+	$(foreach object, $(objects), $(shell $(cc) $(prefix) -shared -lpython$(version) -lflipper $(object) -o $(output)/$(notdir $(patsubst %.o,%,$(object)).so)))
 
 	# ~ Generate the __init__.py file. ~ #
 

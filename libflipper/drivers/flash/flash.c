@@ -28,11 +28,17 @@ void flash_reset(void) {
 	
 }
 
-/*
- 
- Note that flash_alloc() and flash_free() are defined in the common 'alloc.c' for organizational purposes.
- 
-*/
+fsp flash_alloc(uint32_t length) {
+	
+	return host.invoke(_flash, _flash_alloc, 2, hi16(length), lo16(length));
+	
+}
+
+void flash_free(fsp pointer) {
+	
+	host.invoke(_flash, _flash_free, 2, hi16(pointer), lo16(pointer));
+	
+}
 
 void flash_format(void) {
 	
