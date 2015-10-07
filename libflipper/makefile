@@ -48,7 +48,7 @@ findflags = \( ! -wholename "./platforms/*" -or -wholename "./platforms/$(target
 
 # ~ Declare the include directories needed for compilation. ~ #
 
-include_directories = ../include
+include_directories = ../include include
 
 # ~ Include this file to recursively compile all supported file types and generate object files using the preprocessor statements above. ~ #
 

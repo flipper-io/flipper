@@ -188,7 +188,7 @@ void sam_ba_copy_chunk(void *destination, void *source) {
 
 void sam_erase_flash(void) {
 	
-	sam.format(); printf("Erasing flash memory.\n\n"); wait_with_progress(18); printf("\nDone.\n\n");
+	sam.format(); printf("Erasing flash memory.\n\n"); wait_with_progress(20); printf("\nDone.\n\n");
 	
 }
 
@@ -208,13 +208,13 @@ int sam_load_firmware(char *firmware) {
 	
 	/* ~ Turn off the USART interrupt. ~ */
 	
-	usart.disable();
+//	usart.disable();
 	
 	/* Next, we need to verify that the device has properly entered programming mode. Send the handshake sequence. */
 	
 	uint8_t connected = false;
 	
-	for (int i = 0; (i < 3) && !connected; i ++) { usart.push((char []){ 0x80, 0x80, 0x23 }, 3); /* connected = (usart.get() == 0x3E); */ }
+	while (!connected) { usart.push((char []){ 0x80, 0x80, 0x23 }, 3); char exp[3] = { 0x0A, 0x0D, 0x3E }; char res[3]; usart.pull(res, 3); connected = !memcmp(exp, res, 3); }
 	
 	//if (!connected) { printf("Unable to communicate with the 7S. Abort.\n\n"); exit(EXIT_FAILURE); };
 	
@@ -306,7 +306,7 @@ int sam_load_firmware(char *firmware) {
 	
 	/* ~ Turn on the USART interrupt. ~ */
 	
-	usart.disable();
+//	usart.disable();
 	
 	/* Disconnect Flipper. */
 	

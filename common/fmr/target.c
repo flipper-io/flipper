@@ -98,7 +98,7 @@ uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t ind
 	
 	/* ~ We will now expect the FMR to send us a packet in return, acknowledging that the packet has been received successfully. ~ */
 	
-	/* --- TO BE IMPLEMENTED --- */
+	/* ~-- TO BE IMPLEMENTED --~ */
 	
 	/* ~ Use a local variable to store the return value. ~ */
 	

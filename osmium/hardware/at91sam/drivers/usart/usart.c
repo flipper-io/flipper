@@ -2,7 +2,7 @@
 
 #include <usart/usart.h>
 
-/* ------------------------ USART0 ------------------------ */
+/* ~----------------------- USART0 -----------------------~ */
 
 void usart0_configure(void *baud) {
 	
@@ -52,7 +52,7 @@ void usart0_pull(void *destination, uint32_t length) {
 	
 }
 
-/* ------------------------ USART1 ------------------------ */
+/* ~----------------------- USART1 -----------------------~ */
 
 void usart1_configure(void *baud) {
 	
@@ -102,7 +102,7 @@ void usart1_pull(void *destination, uint32_t length) {
 	
 }
 
-/* ------------------------ DBGU ------------------------ */
+/* ~----------------------- DBGU -----------------------~ */
 
 void dbgu_configure(void *baud) {
 	
