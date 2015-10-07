@@ -6,7 +6,7 @@
 
 #include <led/led.h>
 
-#include <power.h>
+#include <platform/power.h>
 
 #define DEBOUNCE 25
 

@@ -2,6 +2,10 @@
 
 #include <fmr/fmr.h>
 
+#include <fs/crc.h>
+
+#include <led/led.h>
+
 const struct _self self = {
 	
 	self_configure,
@@ -13,3 +17,285 @@ const struct _self self = {
 	self_pull
 	
 };
+
+uint32_t self_invoke(const struct _target *sender) {
+	
+	/* ~ Compare the checksums of the packets to ensure the data was sent successfully. ~ */
+	
+	uint16_t cs = checksum((void *)(&fmrpacket.recipient.object), fmrpacket.header.length - sizeof(struct _fmr_header));
+	
+	uint32_t retval = 0;
+	
+	/* ~ If the checksums are different, then we have a problem. ~ */
+	
+	if (cs != fmrpacket.header.checksum) {
+		
+		/* ~ Set the status led to its error color to alert the user of a problem. ~ */
+		
+		led_set_rgb(LED_COLOR_ERROR);
+		
+		/* ~ Skip the call. ~ */
+		
+		goto end;
+		
+	}
+	
+	/* ~ If all is well, perform the function call. ~ */
+	
+	retval = self_call();
+	
+end:
+	
+	/* ~ Return whatever we received back to the device that sent us a message. ~ */
+	
+	sender -> bus -> push(&retval, sizeof(uint32_t));
+	
+	return 0;
+	
+}
+
+uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, uint32_t length) {
+	
+	/* ~ Allocate the appropriate amount of memory in external memory to buffer the incoming data. ~ */
+	
+	void *destination = malloc(length);
+	
+	/* ~ Allocate the appropriate amount of memory to store the variadic argument array until it is needed later. ~ */
+	
+	uint8_t *argv = malloc(argc);
+	
+	/* ~ Create the return value. ~ */
+	
+	uint32_t retval;
+	
+	/* ~ If malloc failed to satisfy our request, panic. ~ */
+	
+	if (!destination || !argv) {
+		
+		/* ~ Set the status led to its error color to alert the user of a problem. ~ */
+		
+		led_set_rgb(LED_COLOR_ERROR);
+		
+		/* ~ Our host will expect a return value, so send a response with the appropriate error code. ~ */
+		
+		sender -> bus -> push(&retval, sizeof(uint32_t));
+		
+		return 0;
+		
+	}
+	
+	/* ~ If all is well, cache the variadic argument list. ~ */
+	
+	memcpy(argv, (void *)(fmrpacket.body) + FMR_PUSH_PARAMETER_SIZE, argc);
+	
+	/* ~ Save the length in a local variable we can modify. ~ */
+	
+	uint32_t len = length;
+	
+	/* ~ Calculate the amount of space we have left in the packet after the parameters have been loaded. ~ */
+	
+	size_t remaining = FLIPPER_DATAGRAM_SIZE - (sizeof(struct _fmr_header) + sizeof(struct _fmr_recipient) + FMR_PUSH_PARAMETER_SIZE + argc);
+	
+	/* ~ Save the destination in a local variable we can modify. ~ */
+	
+	void *dest = destination;
+	
+	/* ~ For the first iteration of this loop, specify that the data has been loaded after the layered parameter list and parameters. ~ */
+	
+	uint8_t *offset = (uint8_t *)(fmrpacket.body) + FMR_PUSH_PARAMETER_SIZE + argc;
+	
+pull:
+	
+	/* ~ While we are still expecting data and still have data to read from the current packet, transfer it to the destination. ~ */
+	
+	do {
+		
+		/* ~ Load a byte from the packet. ~ */
+		
+		*((uint8_t *)(dest ++)) = *((uint8_t *)(offset ++));
+		
+	} while ((-- len) && (-- remaining));
+	
+	/* ~ Check to see if we still have data to receive. ~ */
+	
+	if (len) {
+		
+		/* ~ If we do, grab another packet. ~ */
+		
+		fmr_retrieve();
+		
+		/* ~ Reset the offset within the packet from which data will be loaded. ~ */
+		
+		offset = (uint8_t *)(&fmrpacket.recipient);
+		
+		/* ~ Reset how much space we have left to read from in the current packet. ~ */
+		
+		remaining = FLIPPER_DATAGRAM_SIZE - sizeof(struct _fmr_header);
+		
+		/* ~ Jump back to the beginning of the loading sequence. ~ */
+		
+		goto pull;
+		
+	}
+	
+	/* ~ Load the recipient information into the packet. This information describes to the FMR which function to invoke. ~ */
+	
+	fmrpacket.recipient.object = object;
+	
+	fmrpacket.recipient.index = index;
+	
+	fmrpacket.recipient.argc = argc + 6;
+	
+	/* ~ Manually load the default parameters expected by a push compliant function. ~ */
+	
+	fmrpacket.body[0] = hi((uint16_t)(destination));
+	
+	fmrpacket.body[1] = lo((uint16_t)(destination));
+	
+	fmrpacket.body[2] = hi(hi16(length));
+	
+	fmrpacket.body[3] = lo(hi16(length));
+	
+	fmrpacket.body[4] = hi(lo16(length));
+	
+	fmrpacket.body[5] = lo(lo16(length));
+	
+	/* ~ Move the earlier cached variadic argument list into the new packet. ~ */
+	
+	memmove((void *)(fmrpacket.body) + 6, argv, argc);
+	
+	/* ~ Relase the memory allocated to cache the above list. ~ */
+	
+	free(argv);
+	
+	/* ~ Perform the function call and get a return value. ~ */
+	
+	retval = self_call();
+	
+	/* ~ Free the memory we allocated to buffer the incoming data. ~ */
+	
+	free(destination);
+	
+	/* ~ Return the return value back up the function chain. ~ */
+	
+	return retval;
+	
+}
+
+void self_pull(uint8_t object, uint8_t index, uint8_t argc, uint32_t length) {
+	
+	/* ~ Allocate the appropriate amount of memory in external memory to buffer the outgoing data. ~ */
+	
+	void *source = malloc(length);
+	
+	/* ~ Save the source in a local variable we can modify. ~ */
+	
+	void *src = source;
+	
+	/* ~ If malloc failed to satisfy our request, panic. ~ */
+	
+	if (!source) {
+		
+		/* ~ Set the status led to its error color to alert the user of a problem. ~ */
+		
+		led_set_rgb(LED_COLOR_ERROR);
+		
+		/* ~ Our host will expect a return value, so send a response with the appropriate error code. ~ */
+		
+		sender -> bus -> push(&source, sizeof(uint32_t));
+		
+	}
+	
+	/* ~ Load the recipient information into the packet. This information describes to the FMR which function to invoke. ~ */
+	
+	fmrpacket.recipient.object = object;
+	
+	fmrpacket.recipient.index = index;
+	
+	fmrpacket.recipient.argc = argc + 6;
+	
+	/* ~ Manually load the default parameters expected by a pull compliant function. ~ */
+	
+	fmrpacket.body[0] = hi((uint16_t)(source));
+	
+	fmrpacket.body[1] = lo((uint16_t)(source));
+	
+	fmrpacket.body[2] = hi(hi16(length));
+	
+	fmrpacket.body[3] = lo(hi16(length));
+	
+	fmrpacket.body[4] = hi(lo16(length));
+	
+	fmrpacket.body[5] = lo(lo16(length));
+	
+	/* ~ Move the variadic argument list to the appropriate location in the new packet. ~ */
+	
+	memmove((void *)(fmrpacket.body) + 6, (void *)(fmrpacket.body) + FMR_PUSH_PARAMETER_SIZE, argc);
+	
+	/* ~ Perform the function call. ~ */
+	
+	self_call();
+	
+	/* ~ Calculate how much space we have left in the current packet. ~ */
+	
+	size_t remaining;
+	
+	/* ~ Create a local variable to keep track of the offset in the packet at which we are loading data. ~ */
+	
+	uint8_t *offset;
+	
+	/* ~ Construct the header of the packet. ~ */
+	
+	fmrpacket.header.fe = 0xFE;
+	
+	fmrpacket.header.length = sizeof(struct _fmr_header);
+	
+push:
+	
+	/* ~ Okay, we've now consumed quite a bit of the maximum FLIPPER_DATAGRAM_SIZE. How much do we have left? ~ */
+	
+	remaining = FLIPPER_DATAGRAM_SIZE - sizeof(struct _fmr_header);
+	
+	offset = (uint8_t *)(&fmrpacket.recipient);
+	
+	/* ~ Load the next chunk of data into the packet while we still have data to send and we still have space in the current packet. ~ */
+	
+	do {
+		
+		/* ~ Move a byte from the received packet to the destination. ~ */
+		
+		*(uint8_t *)(offset ++) = *(uint8_t *)(src ++);
+		
+		/* ~ Advance the size of the packet each time a byte is loaded into the packet. ~ */
+		
+		(fmrpacket.header.length) ++;
+		
+	} while ((-- length) && (-- remaining));
+	
+	/* ~ Generate a checksum for the packet. When a packet is received, the FMR will perform its own checksum and compare it to this before proceeding. ~ */
+	
+	fmrpacket.header.checksum = checksum((void *)(&(fmrpacket.recipient)), fmrpacket.header.length - sizeof(struct _fmr_header));
+	
+	/* ~ Deliver the constructed packet to whomever requested it. ~ */
+	
+	fmr_broadcast();
+	
+	/* ~ Check to see if we still have data to send. ~ */
+	
+	if (length) {
+		
+		/* ~ If we do, reset the length. ~ */
+		
+		fmrpacket.header.length = sizeof(struct _fmr_header);
+		
+		/* ~ Jump back to the beginning of the broadcast sequence. ~ */
+		
+		goto push;
+		
+	}
+	
+	/* ~ Free the memory we allocated to buffer the outgoing data. ~ */
+	
+	free(source);
+	
+}

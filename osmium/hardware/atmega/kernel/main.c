@@ -12,7 +12,7 @@
 
 #include <usart/usart.h>
 
-#include <power.h>
+#include <platform/power.h>
 
 void __attribute__ ((naked)) __attribute__ ((section(".init8"))) atmega_init(void) {
 

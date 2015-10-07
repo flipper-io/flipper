@@ -1,32 +1,76 @@
-# ~ Specifiy the name of the output file. ~ #
+# ~ Set platform specific macros. ~ */
 
-output = osmium-atmega.bin
+ifeq ($(platform),atmega16u2)
 
-# ~ Specify the target platform. ~ #
+	# ~ Specifiy the name of the output file. ~ #
 
-target = atmega16u2
+	output = osmium-atmega.bin
 
-# ~ Specify the target clock frequency in MHz. ~ #
+	# ~ Specify the target clock frequency in MHz. ~ #
 
-clock = 16
+	clock = 16000000
 
-# ~ Specify a compiler and the other utilities needed to deploy for the target. ~ #
+	# ~ Specify a compiler and the other utilities needed to deploy for the target. ~ #
 
-cc = $(shell which 'avr-gcc')
+	cc = $(shell which 'avr-gcc')
 
-objcopy = $(shell which 'avr-objcopy')
+	objcopy = $(shell which 'avr-objcopy')
+
+	flasher = $(shell which 'avrdude')
+
+	# ~ Specify platform specific preprocessor flags. ~ #
+
+	platform_flags = -DARCH=ARCH_AVR8 -mmcu=$(platform) -D__AVR_$(shell echo $(platform) | tr a-z A-Z)__
+
+	flasher_flags = -p $(platform) -c usbtiny -V -U lfuse:w:0xFF:m -U hfuse:w:0xD9:m -U flash:w:$(output)
+
+	# ~ Specify the platform's hardware directory. ~ #
+
+	hardware_directory = atmega
+
+else ifeq ($(platform),at91sam7s)
+
+	# ~ Do the same for the other platforms. ~ #
+
+	output = osmium-sam7s.bin
+
+	clock = 48054850
+
+	cc = $(shell which 'arm-elf-gcc-4.7')
+
+	objcopy = $(shell which 'arm-elf-objcopy')
+
+	flasher = $(shell which 'flipper')
+
+	flasher_flags = flash $(output)
+
+	platform_flags = -mcpu=arm7tdmi
+
+	hardware_directory = at91sam
+
+else
+
+	# ~ If we have no platform, specify an error. ~ #
+
+	$(error "Please specify a platform.")
+
+endif
+
+# ~ Specify platform-inspecific utilities needed to deploy for the target. ~ #
 
 rsync = $(shell which 'rsync')
 
-avrdude = $(shell which 'avrdude')
-
 # ~ Declare the preprocessor statements to be used during object generation. ~ #
 
-preprocess = -std=gnu99 -Os -fno-builtin-printf -DARCH=ARCH_AVR8 -mmcu=$(target) -D__AVR_$(shell echo $(target) | tr a-z A-Z)__ -DF_CPU=$(clock)000000UL
+preprocess = -std=gnu99 -Os -fno-builtin-printf $(platform_flags) -DF_CPU=$(clock)UL
 
 # ~ Pass flags to find so that it only isolates files pertainant to the target platform. ~ #
 
-findflags = \( ! -wholename "./hardware/*" -or -wholename "./hardware/atmega/*" -or -wholename "./hardware/common/*" \)
+findflags = \( ! -wholename "./hardware/*" -or -wholename "./hardware/$(hardware_directory)/*" -or -wholename "./hardware/common/*" \)
+
+# ~ Specify the include directories. ~ #
+
+include_directories = ./hardware/$(hardware_directory)/include ./include
 
 # ~ Include this file to recursively compile all supported file types and generate object files using the preprocessor statements above. ~ #
 
@@ -36,7 +80,7 @@ all: clean
 
 	# ~ Link the object files together to produce an output file. ~ #
 
-	$(cc) $(prefix) $(sort $(objects)) -o $(basename $(output)).elf
+	$(cc) $(prefix) $(ldflags) $(sort $(objects)) -o $(basename $(output)).elf
 
 	# ~ Convert the 'elf' file into a raw binary. ~ #
 
@@ -54,9 +98,9 @@ install:
 
 burn:
 
-	# Flash the connected device with the binary using 'avrdude'.
+	# Flash the connected device with the binary using 'flasher'.
 
-	$(avrdude) -p $(target) -c usbtiny -V -U lfuse:w:0xFF:m -U hfuse:w:0xD9:m -U flash:w:$(output)
+	$(flasher) $(flasher_flags)
 
 clean:
 

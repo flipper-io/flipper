@@ -2,8 +2,8 @@
 
 #include <pwm/pwm.h>
 
-const struct _pwm pwm = {
+void pwm_configure(void) {
 	
-	pwm_configure,
 	
-};
+	
+}

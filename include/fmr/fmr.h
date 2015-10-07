@@ -130,6 +130,8 @@ enum { _self_configure, _self_invoke, _self_push, _self_pull };
 
 extern void self_configure(const struct _bus *bus);
 
+extern uint32_t self_call(void);
+
 extern uint32_t self_invoke(const struct _target *sender);
 
 extern uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, uint32_t length);

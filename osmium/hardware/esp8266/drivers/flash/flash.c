@@ -2,26 +2,56 @@
 
 #include <flash/flash.h>
 
-const struct _flash flash = {
+void flash_configure(void) {
+
 	
-	flash_configure,
 	
-	flash_enable,
+}
+
+void flash_enable(void) {
 	
-	flash_disable,
 	
-	flash_reset,
 	
-	flash_alloc,
+}
+
+void flash_disable(void) {
 	
-	flash_free,
 	
-	flash_format,
 	
-	flash_push,
+}
+
+void flash_reset(void) {
 	
-	flash_pull,
 	
-	flash_dereference
 	
-};
+}
+
+/*
+ 
+ Note that flash_alloc() and flash_free() are defined in the common 'alloc.c' for organizational purposes.
+ 
+*/
+
+void flash_format(void) {
+	
+	
+	
+}
+
+void flash_push(void *source, uint32_t length, fsp destination) {
+	
+	
+	
+}
+
+void flash_pull(void *destination, uint32_t length, fsp source) {
+	
+	
+	
+}
+
+void *flash_dereference(fsp source, uint32_t length) {
+	
+	
+	
+}

@@ -2,22 +2,50 @@
 
 #include <spi/spi.h>
 
-const struct _bus spi = {
+void spi_configure(void *configuration) {
 	
-	spi_configure,
 	
-	spi_enable,
 	
-	spi_disable,
+}
+
+void spi_enable(void) {
 	
-	spi_ready,
 	
-	spi_put,
 	
-	spi_get,
+}
+
+void spi_disable(void) {
 	
-	spi_push,
 	
-	spi_pull
 	
-};
+}
+
+bool spi_ready(void) {
+	
+	return false;
+	
+}
+
+void spi_put(uint8_t byte) {
+	
+	
+	
+}
+
+uint8_t spi_get(void) {
+	
+	return 0;
+	
+}
+
+void spi_push(void *source, uint32_t length) {
+	
+	
+	
+}
+
+void spi_pull(void *destination, uint32_t length) {
+	
+	
+	
+}

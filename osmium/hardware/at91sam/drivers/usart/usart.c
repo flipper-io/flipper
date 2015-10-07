@@ -4,66 +4,150 @@
 
 /* ------------------------ USART0 ------------------------ */
 
-const struct _bus usart = {
+void usart0_configure(void *baud) {
 	
-	usart0_configure,
 	
-	usart0_enable,
 	
-	usart0_disable,
+}
+
+void usart0_enable(void) {
 	
-	usart0_ready,
 	
-	usart0_put,
 	
-	usart0_get,
+}
+
+void usart0_disable(void) {
 	
-	usart0_push,
 	
-	usart0_pull
 	
-};
+}
+
+bool usart0_ready(void) {
+	
+	return false;
+	
+}
+
+void usart0_put(uint8_t byte) {
+	
+	
+	
+}
+
+uint8_t usart0_get(void) {
+	
+	return 0;
+	
+}
+
+void usart0_push(void *source, uint32_t length) {
+	
+	
+	
+}
+
+void usart0_pull(void *destination, uint32_t length) {
+	
+	
+	
+}
 
 /* ------------------------ USART1 ------------------------ */
 
-const struct _bus usart1 = {
+void usart1_configure(void *baud) {
 	
-	usart1_configure,
 	
-	usart1_enable,
 	
-	usart1_disable,
+}
+
+void usart1_enable(void) {
 	
-	usart1_ready,
 	
-	usart1_put,
 	
-	usart1_get,
+}
+
+void usart1_disable(void) {
 	
-	usart1_push,
 	
-	usart1_pull
 	
-};
+}
+
+bool usart1_ready(void) {
+	
+	return 0;
+	
+}
+
+void usart1_put(uint8_t byte) {
+	
+	
+	
+}
+
+uint8_t usart1_get(void) {
+	
+	return 0;
+	
+}
+
+void usart1_push(void *source, uint32_t length) {
+	
+	
+	
+}
+
+void usart1_pull(void *destination, uint32_t length) {
+	
+	
+	
+}
 
 /* ------------------------ DBGU ------------------------ */
 
-const struct _bus dbgu = {
+void dbgu_configure(void *baud) {
 	
-	dbgu_configure,
 	
-	dbgu_enable,
 	
-	dbgu_disable,
+}
+
+void dbgu_enable(void) {
 	
-	dbgu_ready,
 	
-	dbgu_put,
 	
-	dbgu_get,
+}
+
+void dbgu_disable(void) {
 	
-	dbgu_push,
 	
-	dbgu_pull
 	
-};
+}
+
+bool dbgu_ready(void) {
+	
+	return 0;
+	
+}
+
+void dbgu_put(uint8_t byte) {
+	
+	
+	
+}
+
+uint8_t dbgu_get(void) {
+	
+	return 0;
+	
+}
+
+void dbgu_push(void *source, uint32_t length) {
+	
+	
+	
+}
+
+void dbgu_pull(void *destination, uint32_t length) {
+	
+	
+	
+}

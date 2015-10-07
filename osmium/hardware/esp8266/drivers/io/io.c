@@ -2,14 +2,26 @@
 
 #include <io/io.h>
 
-const struct _io io = {
+void io_configure(void) {
 	
-	io_configure,
 	
-	io_set_direction,
 	
-	io_write,
+}
+
+void io_set_direction(uint8_t pin, uint8_t direction) {
 	
-	io_read
 	
-};
+	
+}
+
+void io_write(uint8_t pin, uint16_t value) {
+	
+	
+	
+}
+
+uint16_t io_read(uint8_t pin) {
+	
+	return 0;
+	
+}
