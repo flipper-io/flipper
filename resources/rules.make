@@ -4,7 +4,7 @@ $(shell find . -name '.DS_Store' -exec rm -rf {} \;)
 
 # ~ Use 'find' to isolate compilable files. Any file names denoted by $(exclude) will not be factored into the search. ~ #
 
-targets = $(shell find . -follow -type f $(findflags) -name '*.c' -or -name '*.s' -or -name '*.S')
+targets = $(shell find . -follow -type f $(findflags) -name '*.c' -or $(findflags) -name '*.s' -or $(findflags) -name '*.S')
 
 # ~ Convert the target file names into object file names ~ #
 
@@ -12,11 +12,11 @@ objects = $(foreach source, $(targets), $(addsuffix .o, $(basename $(source))))
 
 # ~ Use 'find' to discover any include directories. ~ #
 
-includes = $(foreach directory, $(shell find . -follow -type d -name 'include') $(include_directories) /usr/local/include, -I "$(directory)")
+includes = $(foreach directory, $(include_directories) /usr/local/include, -I "$(directory)")
 
 # ~ Gather compatable linker scripts. ~ #
 
-ldflags = $(foreach directory, $(shell find . -follow -name '*.ld'), -Wl,-T "$(directory)")
+ldflags = $(foreach file, $(shell find . -follow -name '*.ld'), -Wl,-T "$(file)")
 
 # ~ Specify the compilation prefix. ~ #
 

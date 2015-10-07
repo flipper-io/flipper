@@ -2,10 +2,14 @@
 
 #include <button/button.h>
 
-const struct _button button = {
+void button_configure(void) {
 	
-	button_configure,
 	
-	button_read
 	
-};
+}
+
+bool button_read(void) {
+	
+	return false;
+	
+}

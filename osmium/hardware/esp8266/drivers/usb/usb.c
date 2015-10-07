@@ -2,22 +2,50 @@
 
 #include <usb/usb.h>
 
-const struct _bus usb = {
+void usb_configure(void *configuration) {
 	
-	usb_configure,
 	
-	usb_enable,
 	
-	usb_disable,
+}
+
+void usb_enable(void) {
 	
-	usb_ready,
 	
-	usb_put,
 	
-	usb_get,
+}
+
+void usb_disable(void) {
 	
-	usb_push,
 	
-	usb_pull
 	
-};
+}
+
+bool usb_ready(void) {
+	
+	return 0;
+	
+}
+
+void usb_put(uint8_t byte) {
+	
+	
+	
+}
+
+uint8_t usb_get(void) {
+	
+	return 0;
+	
+}
+
+void usb_push(void *source, uint32_t length) {
+	
+	
+	
+}
+
+void usb_pull(void *destination, uint32_t length) {
+	
+	
+	
+}

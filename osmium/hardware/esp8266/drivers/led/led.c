@@ -2,10 +2,14 @@
 
 #include <led/led.h>
 
-const struct _led led = {
+void led_configure(void) {
 	
-	led_configure,
 	
-	led_set_rgb,
 	
-};
+}
+
+void led_set_rgb(uint8_t r, uint8_t g, uint8_t b) {
+	
+	
+	
+}

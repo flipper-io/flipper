@@ -2,17 +2,29 @@
 
 sudo =
 
-# ~ Specifiy the name of the output file. ~ #
+# ~ Set target specific macros. ~ */
 
 ifeq ($(target),osx)
 
+	# ~ Specifiy the name of the output file. ~ #
+
 	output = libflipper.dylib
+
+	# ~ Declare the library dependancies neededed for linking. ~ #
+
+	libraries = -framework CoreFoundation -framework IOKit
 
 else ifeq ($(target),linux)
 
+	# ~ Do the same for the other targets. ~ #
+
 	output = libflipper.so
 
+	libraries = -lusb
+
 else
+
+	# ~ If we have no target, specify an error. ~ #
 
 	$(error "Please specify a target.")
 
@@ -37,22 +49,6 @@ findflags = \( ! -wholename "./platforms/*" -or -wholename "./platforms/$(target
 # ~ Declare the include directories needed for compilation. ~ #
 
 include_directories = ../include
-
-# ~ Declare the library dependancies neededed for linking. ~ #
-
-ifeq ($(target),osx)
-
-	libraries = -framework CoreFoundation -framework IOKit
-
-else ifeq ($(target),linux)
-
-	libraries = -lusb
-
-else
-
-	$(error "Please specify a target.")
-
-endif
 
 # ~ Include this file to recursively compile all supported file types and generate object files using the preprocessor statements above. ~ #
 
