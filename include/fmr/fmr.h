@@ -4,7 +4,7 @@
 
 #include <flipper/types.h>
 
-#define FLIPPER_DATAGRAM_SIZE 32
+#define FLIPPER_DATAGRAM_SIZE 64
 
 #define FMR_BODY_SIZE (FLIPPER_DATAGRAM_SIZE - sizeof(struct _fmr_header) - sizeof(struct _fmr_recipient))
 

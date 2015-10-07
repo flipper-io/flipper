@@ -4,6 +4,8 @@
 
 #include <flash/flash.h>
 
+#include <fs/fs.h>
+
 #include <i2c/i2c.h>
 
 #include <io/io.h>
@@ -19,8 +21,6 @@
 #include <timer/timer.h>
 
 void __attribute__ ((constructor)) libflipper_init() {
-	
-	verbose("The library 'libflipper' was configured successfully.\n\n");
 	
 	button_configure();
 	

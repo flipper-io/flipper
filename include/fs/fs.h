@@ -4,6 +4,18 @@
 
 #include <flipper/types.h>
 
+#define _FREE_LIST		32
+
+extern fsp _free_list;
+
+#define _BREAK_VALUE	64
+
+extern fsp _break_value;
+
+#define _ROOT_LEAF 128
+
+extern fsp _root_leaf;
+
 /* A simple data structure used to represent files. */
 
 typedef struct _file {
@@ -36,13 +48,17 @@ extern const struct _fs {
 	
 	void (* configure)(void);
 	
+	void (* format)(void);
+	
 } fs;
 
 #ifdef __private_include__
 
-enum { _fs_configure };
+enum { _fs_configure, _fs_format };
 
-void fs_configure(void);
+extern void fs_configure(void);
+
+extern void fs_format(void);
 
 #endif
 

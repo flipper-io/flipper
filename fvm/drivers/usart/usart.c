@@ -2,69 +2,55 @@
 
 #include <usart/usart.h>
 
-#include <platform/atmega.h>
+#include <fmr/fmr.h>
 
 /* ------------------------ USART0 ------------------------ */
 
 void usart0_configure(void *baud) {
+
 	
-	UBRR1H = hi((uint16_t)(baud));
-	
-	UBRR1L = lo((uint16_t)(baud));
-	
-	UCSR1B = (1 << RXEN1) | (1 << TXEN1);
-	
-	UCSR1C = (1 << USBS1) | (3 << UCSZ10);
 	
 }
 
 void usart0_enable(void) {
 	
-	/* ~ Enable the USART interrupt. ~ */
 	
-	UCSR1B |= (1 << RXCIE1);
 	
 }
 
 void usart0_disable(void) {
 	
-	/* ~ Disable the USART interrupt. ~ */
 	
-	UCSR1B &= ~(1 << RXCIE1);
 	
 }
 
 bool usart0_ready(void) {
 	
-	return (UCSR1A & (1 << RXC1));
+	return false;
 	
 }
 
 void usart0_put(uint8_t byte) {
 	
-	while (!(UCSR1A & (1 << UDRE1)));
 	
-	UDR1 = byte;
 	
 }
 
 uint8_t usart0_get(void) {
 	
-	while (!(UCSR1A & (1 << RXC1)));
-	
-	return UDR1;
+	return 0;
 	
 }
 
 void usart0_push(void *source, uint32_t length) {
 	
-	while (length --) usart0_put(*(uint8_t *)(source ++));
+	
 	
 }
 
 void usart0_pull(void *destination, uint32_t length) {
 	
-	while (length --) *(uint8_t *)(destination ++) = usart0_get();
+	
 	
 }
 
@@ -90,7 +76,7 @@ void usart1_disable(void) {
 
 bool usart1_ready(void) {
 	
-	return 0;
+	return false;
 	
 }
 
@@ -140,7 +126,7 @@ void dbgu_disable(void) {
 
 bool dbgu_ready(void) {
 	
-	return 0;
+	return false;
 	
 }
 
