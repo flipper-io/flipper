@@ -46,7 +46,7 @@ ifeq ($(target),osx)
 
 else ifeq ($(target),linux)
 
-	libraries = -lusb-compat
+	libraries = -lusb
 
 else
 

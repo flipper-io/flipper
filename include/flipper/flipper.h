@@ -6,7 +6,7 @@
 
 #include <flipper/types.h>
 
-/* ~ Include the header files for user-accessable drivers. ~ */
+/* ~ Include the header files for user-accessible drivers. ~ */
 
 #include <flipper/button/button.h>
 
@@ -34,7 +34,7 @@
 
 #include <flipper/wifi/wifi.h>
 
-/* ~ Define the flippper control type. ~ */
+/* ~ Define the flipper control type. ~ */
 
 enum { FLIPPER_SOURCE_USB, FLIPPER_SOURCE_NETWORK, FLIPPER_SOURCE_FVM };
 
