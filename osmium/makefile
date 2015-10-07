@@ -24,6 +24,10 @@ ifeq ($(platform),atmega16u2)
 
 	flasher_flags = -p $(platform) -c usbtiny -V -U lfuse:w:0xFF:m -U hfuse:w:0xD9:m -U flash:w:$(output)
 
+	# ~ Specify dependant libraries. ~ #
+
+	libraries = 
+
 	# ~ Specify the platform's hardware directory. ~ #
 
 	hardware_directory = atmega

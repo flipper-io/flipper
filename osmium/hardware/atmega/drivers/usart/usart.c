@@ -4,7 +4,7 @@
 
 #include <platform/atmega.h>
 
-/* ------------------------ USART0 ------------------------ */
+/* ~----------------------- USART0 -----------------------~ */
 
 void usart0_configure(void *baud) {
 	
@@ -12,25 +12,23 @@ void usart0_configure(void *baud) {
 	
 	UBRR1L = lo((uint16_t)(baud));
 	
-	UCSR1B = (1 << RXEN1) | (1 << TXEN1);
-	
 	UCSR1C = (1 << USBS1) | (3 << UCSZ10);
+	
+	/* ~ Enable the USART interrupt. ~ */
+	
+	// UCSR1B |= (1 << RXCIE1);
 	
 }
 
 void usart0_enable(void) {
 	
-	/* ~ Enable the USART interrupt. ~ */
-	
-	UCSR1B |= (1 << RXCIE1);
+	UCSR1B = (1 << RXEN1) | (1 << TXEN1);
 	
 }
 
 void usart0_disable(void) {
 	
-	/* ~ Disable the USART interrupt. ~ */
-	
-	UCSR1B &= ~(1 << RXCIE1);
+	UCSR1B &= ~((1 << RXEN1) | (1 << TXEN1));
 	
 }
 
@@ -50,7 +48,7 @@ void usart0_put(uint8_t byte) {
 
 uint8_t usart0_get(void) {
 	
-	while (!(UCSR1A & (1 << RXC1)));
+	//while (!(UCSR1A & (1 << RXC1)));
 	
 	return UDR1;
 	
@@ -68,7 +66,7 @@ void usart0_pull(void *destination, uint32_t length) {
 	
 }
 
-/* ------------------------ USART1 ------------------------ */
+/* ~----------------------- USART1 -----------------------~ */
 
 void usart1_configure(void *baud) {
 	
@@ -118,7 +116,7 @@ void usart1_pull(void *destination, uint32_t length) {
 	
 }
 
-/* ------------------------ DBGU ------------------------ */
+/* ~----------------------- DBGU -----------------------~ */
 
 void dbgu_configure(void *baud) {
 	

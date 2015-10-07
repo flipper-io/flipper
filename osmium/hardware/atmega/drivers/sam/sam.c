@@ -4,6 +4,8 @@
 
 #include <platform/atmega.h>
 
+#include <usart/usart.h>
+
 #include <led/led.h>
 
 /* ~ This function configures the main processor. ~ */
@@ -36,9 +38,21 @@ void sam_configure(void) {
 
 void sam_set_power(bool power) {
 
-	if (power) set_bit_in_port(SAM_POWER_PIN, PORTD);
+	if (power) {
+		
+		usart0_enable();
+		
+		set_bit_in_port(SAM_POWER_PIN, PORTD);
+		
+	}
 	
-	else clear_bit_in_port(SAM_POWER_PIN, PORTD);
+	else {
+		
+		usart0_disable();
+		
+		clear_bit_in_port(SAM_POWER_PIN, PORTD);
+		
+	}
 	
 }
 
@@ -72,9 +86,9 @@ void sam_load_dfu(void) {
 	
 	led_set_rgb(LED_COLOR_BUSY);
 	
-	/* ~ Turn the SAM7S off. ~ */
+	/* ~ Turn the SAM7S off, including all of its communications busses. ~ */
 	
-	clear_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
+	sam_set_power(false);
 	
 	/* ~ Wait for the 7S to completely power down. ~ */
 	
@@ -82,7 +96,7 @@ void sam_load_dfu(void) {
 	
 	/* ~ Set the 7S' test pin high. ~ */
 	
-	set_bit_in_port(SAM_TEST_PIN, SAM_POWER_PORT);
+	set_bit_in_port(SAM_TEST_PIN, SAM_TEST_PORT);
 	
 	/* ~ Power the 7S on. ~ */
 	
@@ -100,7 +114,7 @@ void sam_load_dfu(void) {
 	
 	/* ~ Release the 7S' TST pin. ~ */
 	
-	clear_bit_in_port(SAM_TEST_PIN, SAM_POWER_PORT);
+	clear_bit_in_port(SAM_TEST_PIN, SAM_TEST_PORT);
 	
 	/* ~ Again, wait for the 7S to completely power down. ~ */
 	
@@ -108,11 +122,15 @@ void sam_load_dfu(void) {
 	
 	/* ~ Power the 7S back on. ~ */
 	
-	set_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
+	sam_set_power(true);
 	
 	/* ~ Wait for the processor to load the SAM-BA. ~ */
 	
 	delay_seconds(1);
+	
+	/* ~ See if we have booted into DFU mode. ~ */
+	
+	
 	
 	/* ~ Indicate that the operation was successful. ~ */
 	
@@ -138,7 +156,7 @@ void sam_format(void) {
 	
 	/* ~ Power down the 7S. ~ */
 	
-	clear_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
+	sam_set_power(false);
 	
 	/* ~ Put the 7S into erase mode by pulling its erase pin high. ~ */
 	
@@ -172,7 +190,7 @@ void sam_format(void) {
 	
 	/* ~ Power the 7S back on. ~ */
 	
-	set_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
+	sam_set_power(true);
 	
 	/* ~ Indicate that the operation was successful. ~ */
 	

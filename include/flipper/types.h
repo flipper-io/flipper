@@ -42,6 +42,34 @@ typedef uint32_t fsp;
 
 #define ceiling(x, y) ((x + y - 1) / y)
 
+#define ON			true
+
+#define on			true
+
+#define OFF			false
+
+#define off			false
+
+#define YES			true
+
+#define yes			true
+
+#define NO			false
+
+#define no			false
+
+#define HIGH		true
+
+#define LOW			false
+
+#define pull_up		true
+
+#define nil			false
+
+#define INPUT		false
+
+#define OUTPUT		true
+
 /* ~ Bit manipulation, cause let's face it, nobody remembers these. ~ */
 
 #define bit(b)                              (0x01 << (b))

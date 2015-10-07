@@ -12,6 +12,8 @@ rsync = $(shell which 'rsync')
 
 preprocess = -std=c99
 
+include_directories = ../include
+
 # ~ Declare the library dependancies neededed for linking. ~ #
 
 libraries = -L "../libflipper" -lflipper

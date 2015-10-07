@@ -83,11 +83,11 @@ void debug_listen(void) {
 
 int main(int argc, char *argv[]) {
 	
-	flipper.attach(FLIPPER_SOURCE_FVM, "/Development/flipper-toolbox/fvm/hal.fvm");
+	flipper.attach(FLIPPER_SOURCE_USB); //FVM, "/Development/flipper-toolbox/fvm/hal.fvm");
 	
-	led.rgb(1, 2, 3);
+	//led.rgb(1, 2, 3);
 	
-#if 0
+#if 1
 	
 	if (argc < 2) { printf("Insufficient arguments.\n\n"); return 1; }
 	
@@ -96,6 +96,18 @@ int main(int argc, char *argv[]) {
 	else if (!strcmp(argv[1], "erase")) sam_erase_flash();
 	
 	else if (!strcmp(argv[1], "flash")) { if (argc < 3) { printf("Please provide a path to a firmware file.\n\n"); return 1; } sam_load_firmware(argv[2]); }
+	
+	else if (!strcmp(argv[1], "ping")) {
+		
+		usart.push((char []){ 0x80, 0x80, 0x23 }, 3);
+		
+		char buf[3];
+		
+		usart.pull(buf, 3);
+		
+		printf("0x%02X, 0x%02X ,0x%02X\n\n", buf[0], buf[1], buf[2]);
+		
+	}
 	
 	else if (!strcmp(argv[1], "test")) {
 		

@@ -56,7 +56,7 @@ void __attribute__ ((naked)) __attribute__ ((section(".init8"))) atmega_init(voi
 	
 	device_configure(&usart);
 	
-	fs_configure();
+	//fs_configure();
 	
 	/* ~ Configure USB. ~ */
 	
@@ -98,13 +98,13 @@ int main(void) {
 	
 	//enable_timer();
 	
-	flash_push("Welcome", 7, 0x1234);
+	//flash_push("Welcome", 7, 0x1234);
 	
-	char derp[7];
+	//char derp[7];
 	
-	flash_pull(derp, 7, 0x1234);
+	//flash_pull(derp, 7, 0x1234);
 	
-	usart0_push(derp, 7);
+	//usart0_push(derp, 7);
 	
 	while (1) {
 		

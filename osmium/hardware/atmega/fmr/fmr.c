@@ -34,6 +34,10 @@ void usb_receive_interrupt(void) {
 
 ISR(USART1_RX_vect) {
 	
+	/* ~ Alert the system that the FMR is busy. ~ */
+	
+	fmr_busy = true;
+	
 	/* ~ Associate this interrupt with the host target. ~ */
 	
 	fmr_associate_target(&device);
@@ -41,10 +45,6 @@ ISR(USART1_RX_vect) {
 	/* ~ Disable interrupts to prevent alignment issues. ~ */
 	
 	disable_interrupts();
-	
-	/*  ~ Alert the system that the FMR is busy. ~ */
-	
-	fmr_busy = true;
 	
 	/* ~ Load a packet from the bus. ~ */
 	
@@ -54,13 +54,13 @@ ISR(USART1_RX_vect) {
 	
 	self_invoke(&device);
 	
-	/* ~ Free the FMR. ~ */
-	
-	fmr_busy = false;
-	
 	/* ~ Re-enable interrupts. ~ */
 	
 	enable_interrupts();
+	
+	/* ~ Free the FMR. ~ */
+	
+	fmr_busy = false;
 
 	
 }

@@ -1,0 +1,14 @@
+/*---------------------------------------------------------------------------*/
+/*- File source          : AT91SAM7S64_memory.ldh                            */
+/*- Object               : AT91SAM7S64 Memory-Definitions                    */
+/*                         (an include-file for the linker-script)           */
+/*- Compilation flag     : None                                              */
+/*-                                                                          */
+/*- 1.0 03.Aug.2006 mth  : Creation                                          */
+/*---------------------------------------------------------------------------*/
+
+MEMORY
+{
+  CODE (rx)  : ORIGIN = 0x00100000, LENGTH = 0x00010000
+  DATA (rwx) : ORIGIN = 0x00200000, LENGTH = 0x00004000
+}
