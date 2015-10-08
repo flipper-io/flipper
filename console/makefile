@@ -16,7 +16,7 @@ include_directories = ../include
 
 # ~ Declare the library dependancies neededed for linking. ~ #
 
-libraries = -L "../libflipper" -lflipper
+libraries = -L "../libflipper" -lflipper -ldl
 
 # ~ Include this file to recursively compile all supported file types and generate object files using the preprocessor statements above. ~ #
 
