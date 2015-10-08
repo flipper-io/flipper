@@ -1,6 +1,6 @@
 # ~ No sudo? ~ #
 
-sudo =
+sudo = sudo
 
 # ~ Set target specific macros. ~ */
 
@@ -76,15 +76,15 @@ install:
 
 	# ~ Symlink the library into the system's library directory. ~ #
 
-	$(ln) -sf $(FLIPPERSDK)/lib/$(output) /usr/local/lib/$(output)
+	$(sudo) $(ln) -sf $(FLIPPERSDK)/lib/$(output) /usr/local/lib/$(output)
 
 	# ~ Symlink the include directory into the system's include directory. ~ #
 
-	$(ln) -sfn $(FLIPPERSDK)/include /usr/local/include/flipper
+	$(sudo) $(ln) -sfn $(FLIPPERSDK)/include /usr/local/include/flipper
 
 	# ~ Symlink the master header file into the system's include directory. ~ #
 
-	$(ln) -sf $(FLIPPERSDK)/include/flipper.h /usr/local/include
+	$(sudo) $(ln) -sf $(FLIPPERSDK)/include/flipper.h /usr/local/include
 
 	# ~ Copy the header files into the SDK's include directory. ~ #
 
