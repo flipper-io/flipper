@@ -236,7 +236,7 @@ int sam_load_firmware(char *firmware) {
 	
 	/* Next, we can move the copy applet into userspace. Since we can't directly access flash space through the SAM-BA, we need to have this code do it for us. */
 	
-	void *applet = page_data_from_file_with_path("/Development/flipper-toolbox/resources/copy.applet");
+	void *applet = page_data_from_file_with_path("copy.applet");
 	
 	sam_ba_copy_chunk(USERSPACE, applet);
 	
