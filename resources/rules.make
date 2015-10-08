@@ -42,4 +42,4 @@ $(patsubst %.s, %.o, $(filter %.s, $(targets))) : %.o : %.S
 
 $(patsubst %.S, %.o, $(filter %.S, $(targets))) : %.o : %.S
 
-	(cc) $(prefix) -c "$<" -o "$@"
+	$(cc) $(prefix) -c "$<" -o "$@"
