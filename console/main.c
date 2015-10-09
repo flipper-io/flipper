@@ -40,13 +40,7 @@ int main(int argc, char *argv[]) {
 	
 	else if (!strcmp(argv[1], "test")) {
 		
-		fs_configure();
-		
-		fs.format();
-		
-		fsp _create = flash.alloc(128);
-		
-		printf("Allocated at 0x%08x\n", _create);
+		usart.put('a');
 		
 	}
 	

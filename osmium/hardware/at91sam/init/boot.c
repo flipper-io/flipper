@@ -2,7 +2,25 @@
 
 #include <platform/at91sam.h>
 
-__attribute__ ((constructor)) void at91sam_init(void) {
+void fiq_handler(void) {
+	
+	
+	
+}
+
+void default_handler(void) {
+	
+	
+	
+}
+
+void spurious_handler(void) {
+	
+	
+	
+}
+
+void boot(void) {
 	
 	AT91C_BASE_MC -> MC_FMR = AT91C_MC_FWS_1FWS;
 	
@@ -26,10 +44,10 @@ __attribute__ ((constructor)) void at91sam_init(void) {
 	
 	while(!(AT91C_BASE_PMC -> PMC_SR & AT91C_PMC_MCKRDY));
 	
-}
-
-void _delay_ms(unsigned long time) {
+	AT91C_BASE_AIC -> AIC_SVR[0] = (unsigned)(&fiq_handler);
 	
-	for (volatile unsigned int i = 0; (i < (F_CPU / 10250) * (time)); i ++);
+	for (int i = 1; i < 31; i ++) AT91C_BASE_AIC -> AIC_SVR[i] = (unsigned)(&default_handler);
+
+	AT91C_BASE_AIC -> AIC_SPU  = (unsigned)(&spurious_handler);
 	
 }

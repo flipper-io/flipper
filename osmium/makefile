@@ -30,7 +30,7 @@ ifeq ($(platform),atmega16u2)
 
 	# ~ Specify the platform's hardware directory. ~ #
 
-	hardware_directory = atmega
+	hardware_directory = ./hardware/atmega
 
 else ifeq ($(platform),at91sam7s)
 
@@ -48,9 +48,9 @@ else ifeq ($(platform),at91sam7s)
 
 	flasher_flags = flash $(output)
 
-	platform_flags = -mcpu=arm7tdmi
+	platform_flags = -std=gnu99 -Os -mcpu=arm7tdmi -mtune=arm7tdmi -mthumb -mthumb-interwork -nostartfiles
 
-	hardware_directory = at91sam
+	hardware_directory = ./hardware/at91sam
 
 else
 
@@ -70,11 +70,11 @@ preprocess = -std=gnu99 -Os -fno-builtin-printf $(platform_flags) -DF_CPU=$(cloc
 
 # ~ Pass flags to find so that it only isolates files pertainant to the target platform. ~ #
 
-findflags = \( ! -wholename "./hardware/*" -or -wholename "./hardware/$(hardware_directory)/*" -or -wholename "./hardware/common/*" \)
+findflags = \( ! -wholename "./hardware/*" -or -wholename "$(hardware_directory)/*" -or -wholename "./hardware/common/*" \)
 
 # ~ Specify the include directories. ~ #
 
-include_directories = ./hardware/$(hardware_directory)/include ./include
+include_directories = $(hardware_directory)/include ./include
 
 # ~ Include this file to recursively compile all supported file types and generate object files using the preprocessor statements above. ~ #
 
