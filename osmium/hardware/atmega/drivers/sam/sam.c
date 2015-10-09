@@ -92,7 +92,7 @@ void sam_load_dfu(void) {
 	
 	/* ~ Wait for the 7S to completely power down. ~ */
 	
-	delay_seconds(1);
+	delay_ms(50);
 	
 	/* ~ Set the 7S' test pin high. ~ */
 	
@@ -104,9 +104,7 @@ void sam_load_dfu(void) {
 	
 	/* ~ Atmel recommends waiting 10 seconds for the SAM-BA to be copied into the 7S' flash memory space. ~ */
 	
-	delay_seconds(5);
-	
-	delay_seconds(5);
+	delay_seconds(1);
 	
 	/* ~ Power down the 7S. ~ */
 	
@@ -118,7 +116,7 @@ void sam_load_dfu(void) {
 	
 	/* ~ Again, wait for the 7S to completely power down. ~ */
 	
-	delay_seconds(1);
+	delay_ms(50);
 	
 	/* ~ Power the 7S back on. ~ */
 	
@@ -126,7 +124,7 @@ void sam_load_dfu(void) {
 	
 	/* ~ Wait for the processor to load the SAM-BA. ~ */
 	
-	delay_seconds(1);
+	delay_ms(50);
 	
 	/* ~ See if we have booted into DFU mode. ~ */
 	
@@ -164,7 +162,7 @@ void sam_format(void) {
 	
 	/* ~ Wait for the 7S to power down. ~ */
 	
-	delay_seconds(1);
+	delay_ms(50);
 	
 	/* ~ Power the 7S back on. ~ */
 	
@@ -172,9 +170,7 @@ void sam_format(void) {
 	
 	/* ~ Wait for flash to be completely erased. ~ */
 	
-	delay_seconds(5);
-	
-	delay_seconds(5);
+	delay_seconds(1);
 	
 	/* ~ Power down the 7S. ~ */
 	
@@ -182,7 +178,7 @@ void sam_format(void) {
 	
 	/* ~ Wait for everything to settle. ~ */
 	
-	delay_seconds(1);
+	delay_ms(50);
 	
 	/* ~ Take the 7S out of erase mode by pulling its erase pin back low. ~ */
 	
