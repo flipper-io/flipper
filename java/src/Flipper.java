@@ -31,6 +31,8 @@
  * as this file.
  */
 
+package io.flipper;
+
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 
