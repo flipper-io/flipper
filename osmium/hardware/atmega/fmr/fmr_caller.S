@@ -12,11 +12,11 @@
 
 #define address_hi						r25
 
-.func									fmr_call
+.func									internal_call
 
-.global									fmr_call
+.global									internal_call
 
-fmr_call:								; Push all of the registers we will be using onto the stack.
+internal_call:							; Push all of the registers we will be using onto the stack.
 
 										push ZH
 

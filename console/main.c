@@ -4,6 +4,8 @@
 
 #include <fmr/fmr.h>
 
+#include <platform/fmr.h>
+
 #include "console.h"
 
 #include <fs/crc.h>
@@ -16,7 +18,7 @@ int main(int argc, char *argv[]) {
 	
 	flipper.attach(FLIPPER_SOURCE_USB); //FVM, "/Development/flipper-toolbox/fvm/hal.fvm");
 	
-	//led.rgb(1, 2, 3);
+	//host_invoke(_io, _io_write, 2, 8, 1);
 	
 #if 1
 	
@@ -38,15 +40,17 @@ int main(int argc, char *argv[]) {
 		
 	}
 	
+	else if (!strcmp(argv[1], "reset")) {
+		
+		sam.reset();
+		
+	}
+	
 	else if (!strcmp(argv[1], "test")) {
 		
-		fs_configure();
+		//usart.put('a');
 		
-		fs.format();
-		
-		fsp _create = flash.alloc(128);
-		
-		printf("Allocated at 0x%08x\n", _create);
+		host.invoke(_button, _button_configure, 0);
 		
 	}
 	

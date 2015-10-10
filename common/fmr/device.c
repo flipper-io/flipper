@@ -4,9 +4,17 @@
 
 #include <fmr/fmr.h>
 
+#include <platform/fmr.h>
+
+#include <platform/fmr.h>
+
+#include <usart/usart.h>
+
 struct _target device = {
 	
 	device_configure,
+	
+	device_call,
 	
 	device_invoke,
 	
@@ -21,6 +29,20 @@ void device_configure(const struct _bus *bus) {
 	/* ~ Configure the device's communication protocol. ~ */
 	
 	((struct _target *)(&device)) -> bus = bus;
+	
+	((struct _target *)(&device)) -> id = _device;
+	
+}
+
+uint32_t device_call(void) {
+	
+	/* ~ Send the packet to the device. ~ */
+	
+	device.bus -> push(&fmrpacket, fmrpacket.header.length);
+	
+	/* ~ Get a response from the device. ~ */
+	
+	return 0;
 	
 }
 
@@ -65,7 +87,7 @@ void device_pull(uint8_t object, uint8_t index, uint8_t argc, void *destination,
 	/* ~ Initialize the va_list that we created above. ~ */
 	
 	va_start(argv, length);
-	
+		
 	/* ~ Invoke the function on the selected target. ~ */
 	
 	target_pull(&device, object, index, argc, destination, length, &argv);

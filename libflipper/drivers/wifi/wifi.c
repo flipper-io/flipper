@@ -4,6 +4,8 @@
 
 #include <fmr/fmr.h>
 
+#include <platform/fmr.h>
+
 void wifi_configure(void) {
 	
 	
@@ -12,6 +14,6 @@ void wifi_configure(void) {
 
 uint32_t wifi_ip(void) {
 	
-	return host.invoke(_wifi, _wifi_ip, 0);
+	return device.invoke(_wifi, _wifi_ip, 0);
 	
 }

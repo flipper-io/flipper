@@ -1,16 +1,24 @@
-.PHONY: all install
-
-# ~ Specify the other utilities needed by the makefile. ~ #
-
-rsync = $(shell which 'rsync')
+.PHONY: all install clean
 
 # ~ The 'all' target builds every component of the Flipper toolchain from source. ~ #
 
-all:
+all: clean
 
 	# ~ Build libflipper. ~ */
 
 	$(MAKE) -C libflipper all
+	
+	# ~ Build the console. ~ */
+
+	$(MAKE) -C console all
+	
+	# ~ Build Osmium for the AVR. ~ */
+
+	$(MAKE) -C osmium all platform=atmega16u2
+	
+	# ~ Build Osmium for the ARM. ~ */
+
+	$(MAKE) -C osmium all platform=at91sam7s
 	
 	# ~ Build the Python module. ~ */
 	
@@ -20,11 +28,23 @@ all:
 
 install:
 
-	# ~ Install libflipper to the SDK. ~ */
-	
+	# ~ Install libflipper. ~ */
+
 	$(MAKE) -C libflipper install
 	
-	# ~ Install Python module to the SDK. ~ */
+	# ~ Install the console. ~ */
+
+	$(MAKE) -C console install
+	
+	# ~ Install Osmium for the AVR. ~ */
+
+	$(MAKE) -C osmium install platform=atmega16u2
+	
+	# ~ Install Osmium for the ARM. ~ */
+
+	$(MAKE) -C osmium install platform=at91sam7s
+	
+	# ~ Install the Python module. ~ */
 	
 	$(MAKE) -C python install
 

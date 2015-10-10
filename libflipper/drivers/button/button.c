@@ -4,6 +4,8 @@
 
 #include <fmr/fmr.h>
 
+#include <platform/fmr.h>
+
 void button_configure(void) {
 	
 	
@@ -12,6 +14,6 @@ void button_configure(void) {
 
 bool button_read(void) {
 	
-	return (bool)(host.invoke(_button, _button_read, NO_ARGS));
+	return (bool)(device.invoke(_button, _button_read, NO_ARGS));
 	
 }

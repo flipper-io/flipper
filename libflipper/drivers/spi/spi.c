@@ -4,6 +4,8 @@
 
 #include <fmr/fmr.h>
 
+#include <platform/fmr.h>
+
 void spi_configure(void *configuration) {
 	
 	

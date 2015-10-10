@@ -4,6 +4,8 @@
 
 #include <fmr/fmr.h>
 
+#include <platform/fmr.h>
+
 #include <usb/usb.h>
 
 #include <dlfcn.h>

@@ -4,11 +4,13 @@
 
 #include <fmr/fmr.h>
 
+#include <platform/fmr.h>
+
 #include <usart/usart.h>
 
 #include <platform/hid.h>
 
-const void * const objects[] PROGMEM = { &button, &flash, &host, &self, &device, &fs, &i2c, &io, &led, &pwm, &sam, &spi, &timer, &usart, &usart, &usart, &usb, &wifi };
+const void * const objects[] PROGMEM = { &button, &flash, &host, &device, &self, &fs, &i2c, &io, &led, &pwm, &sam, &spi, &timer, &usart, &usart, &usart, &usb, &wifi };
 
 void usb_receive_interrupt(void) {
 	
@@ -22,7 +24,7 @@ void usb_receive_interrupt(void) {
 	
 	/* ~ Invoke the FMR. ~ */
 	
-	self_invoke(&host);
+	fmr_invoke(&host);
 	
 	/* ~ Free the FMR. ~ */
 	
@@ -52,7 +54,7 @@ ISR(USART1_RX_vect) {
 	
 	/* ~ Invoke the FMR. ~ */
 	
-	self_invoke(&device);
+	fmr_invoke(&device);
 	
 	/* ~ Re-enable interrupts. ~ */
 	

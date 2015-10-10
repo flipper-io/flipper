@@ -6,6 +6,8 @@
 
 #include <fmr/fmr.h>
 
+#include <platform/fmr.h>
+
 /* ~ This function ensures that the target still has a heartbeat. ~ */
 
 void validate_target(const struct _target *target) {
@@ -64,6 +66,8 @@ uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t ind
 	
 	/* ~ Load the recipient information into the packet. This information describes to the FMR which function to invoke. ~ */
 	
+	fmrpacket.recipient.target = target -> id;
+	
 	fmrpacket.recipient.object = object;
 	
 	fmrpacket.recipient.index = index;
@@ -90,7 +94,7 @@ uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t ind
 	
 	/* ~ Generate a checksum for the packet. When a packet is received, the FMR will perform its own checksum and compare it to this before proceeding. ~ */
 	
-	fmrpacket.header.checksum = checksum((void *)(&fmrpacket.recipient.object), fmrpacket.header.length - sizeof(struct _fmr_header));
+	fmrpacket.header.checksum = checksum((void *)(&fmrpacket.recipient), fmrpacket.header.length - sizeof(struct _fmr_header));
 	
 	/* ~ Send the constructed packet to the target. ~ */
 	
@@ -152,7 +156,9 @@ uint32_t target_push(const struct _target *target, uint8_t object, uint8_t index
 	
 	/* ~ Load the recipient information into the packet. This information describes to the FMR which function to invoke. ~ */
 	
-	fmrpacket.recipient.object = _self;
+	fmrpacket.recipient.target = target -> id;
+	
+	fmrpacket.recipient.object = target -> id;
 	
 	fmrpacket.recipient.index = _self_push;
 	
@@ -220,7 +226,7 @@ push:
 	
 	/* ~ Generate a checksum for the packet. When a packet is received, the FMR will perform its own checksum and compare it to this before proceeding. ~ */
 	
-	fmrpacket.header.checksum = checksum((void *)(&fmrpacket.recipient.object), fmrpacket.header.length - sizeof(struct _fmr_header));
+	fmrpacket.header.checksum = checksum((void *)(&fmrpacket.recipient), fmrpacket.header.length - sizeof(struct _fmr_header));
 	
 	/* ~ Send the constructed packet to the target. ~ */
 	
@@ -298,7 +304,9 @@ void target_pull(const struct _target *target, uint8_t object, uint8_t index, ui
 	
 	/* ~ Load the recipient information into the packet. This information describes to the FMR which function to invoke. ~ */
 	
-	fmrpacket.recipient.object = _self;
+	fmrpacket.recipient.target = target -> id;
+	
+	fmrpacket.recipient.object = target -> id;
 	
 	fmrpacket.recipient.index = _self_pull;
 	
@@ -338,7 +346,7 @@ void target_pull(const struct _target *target, uint8_t object, uint8_t index, ui
 	
 	/* ~ Generate a checksum for the packet. When a packet is received, the FMR will perform its own checksum and compare it to this before proceeding. ~ */
 	
-	fmrpacket.header.checksum = checksum((void *)(&(fmrpacket.recipient.object)), (fmrpacket.header.length) - sizeof(struct _fmr_header));
+	fmrpacket.header.checksum = checksum((void *)(&(fmrpacket.recipient)), (fmrpacket.header.length) - sizeof(struct _fmr_header));
 	
 	/* ~ Send the constructed packet to the target. ~ */
 	

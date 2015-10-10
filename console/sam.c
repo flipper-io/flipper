@@ -102,7 +102,7 @@ size_t page_count_for_file_with_path(const char *path) {
 	
 	FILE *file = fopen (path, "rb");
 	
-	if (file == NULL) { printf("The file being opened does not exist.\n"); exit(EXIT_FAILURE); }
+	if (file == NULL) { printf("The file being opened, '%s', does not exist.\n", path); exit(EXIT_FAILURE); }
 	
 	/* Determine the size of the file. */
 	
@@ -188,7 +188,7 @@ void sam_ba_copy_chunk(void *destination, void *source) {
 
 void sam_erase_flash(void) {
 	
-	sam.format(); printf("Erasing flash memory.\n\n"); wait_with_progress(20); printf("\nDone.\n\n");
+	sam.format(); printf("Erasing flash memory.\n\n"); wait_with_progress(2); printf("\nDone.\n\n");
 	
 }
 
@@ -204,7 +204,7 @@ int sam_load_firmware(char *firmware) {
 	
 	sam.dfu();
 	
-	wait_with_progress(20);
+	wait_with_progress(2);
 	
 	/* ~ Turn off the USART interrupt. ~ */
 	
@@ -214,7 +214,17 @@ int sam_load_firmware(char *firmware) {
 	
 	uint8_t connected = false;
 	
-	while (!connected) { usart.push((char []){ 0x80, 0x80, 0x23 }, 3); char exp[3] = { 0x0A, 0x0D, 0x3E }; char res[3]; usart.pull(res, 3); connected = !memcmp(exp, res, 3); }
+	for (int i = 0; (i < 100) && !connected; i ++) { usart.push((char []){ 0x80, 0x80, 0x23 }, 3); char exp[3] = { 0x0A, 0x0D, 0x3E }; char res[3]; usart.pull(res, 3); connected = !memcmp(exp, res, 3); }
+	
+	if (!connected) {
+		
+		printf("\nERROR. Did not receive adknowledgement from the DFU.\n\n");
+		
+		return 1;
+		
+	}
+	
+	printf("\nReceived adknowledgement from the DFU.\n");
 	
 	//if (!connected) { printf("Unable to communicate with the 7S. Abort.\n\n"); exit(EXIT_FAILURE); };
 	
@@ -226,17 +236,21 @@ int sam_load_firmware(char *firmware) {
 	
 	sam_ba_disable_auto_erase();
 	
+	printf("\nErasing flash memory. ");
+	
 	/* Erase all internal flash. */
 	
 	sam_ba_write_fcr0(EFC_FCMD_EA, 0);
 	
-	/* Let the user know and wait for flash to be erased. */
+	char *sdk_path = getenv("FLIPPERSDK");
 	
-	printf("\nErasing flash memory.\n\n");
+	if (!strlen(sdk_path)) { printf("FATAL ERROR. No environment variables declared for the Flipper SDK. Please reinstall the SDK and try again.\n\n"); exit(EXIT_FAILURE); }
+	
+	char *applet_path = strcat(sdk_path, "/resources/copy.applet");
 	
 	/* Next, we can move the copy applet into userspace. Since we can't directly access flash space through the SAM-BA, we need to have this code do it for us. */
 	
-	void *applet = page_data_from_file_with_path("copy.applet");
+	void *applet = page_data_from_file_with_path(applet_path);
 	
 	sam_ba_copy_chunk(USERSPACE, applet);
 	
@@ -256,7 +270,17 @@ int sam_load_firmware(char *firmware) {
 	
 	void *os = page_data_from_file_with_path(firmware);
 	
+	printf("Done.\n\nStarting the programming process. Writing page ");
+	
 	for (int i = 0; i < pages; i ++) {
+		
+		char buf[32];
+		
+		sprintf(buf, "%i / %zu.", i + 1, pages);
+		
+		printf("%s", buf);
+		
+		fflush(stdout);
 		
 		/* Copy the chunk into RAM as a buffer. */
 		
@@ -288,7 +312,13 @@ int sam_load_firmware(char *firmware) {
 		
 		//printf("Wrote fcr0\n");
 		
+		for (int j = 0; j < strlen(buf); j ++) printf("\b");
+		
+		fflush(stdout);
+				
 	}
+	
+	printf("\n\n");
 	
 	free(os);
 	
@@ -296,9 +326,7 @@ int sam_load_firmware(char *firmware) {
 	
 	sam.power(false);
 	
-	printf("Resetting the device.\n\n");
-	
-	wait_with_progress(1);
+	printf("Resetting the device.\n");
 	
 	sam.power(true);
 	
