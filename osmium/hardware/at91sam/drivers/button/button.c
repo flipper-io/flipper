@@ -2,9 +2,11 @@
 
 #include <button/button.h>
 
+extern void pio_interrupt(void);
+
 void button_configure(void) {
 	
-	
+	pio_interrupt();
 	
 }
 

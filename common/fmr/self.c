@@ -2,13 +2,19 @@
 
 #include <fmr/fmr.h>
 
+#include <platform/fmr.h>
+
 #include <fs/crc.h>
 
 #include <led/led.h>
 
-const struct _self self = {
+#include <usart/usart.h>
+
+struct _target self = {
 	
 	self_configure,
+	
+	self_call,
 	
 	self_invoke,
 	
@@ -18,37 +24,31 @@ const struct _self self = {
 	
 };
 
+void self_configure(const struct _bus *bus) {
+	
+	
+	
+}
+
+uint32_t self_call(void) {
+	
+	/* ~ Dereference a pointer to the recipient object. ~ */
+	
+	void *object = (void *)(fmr_access_array(fmrpacket.recipient.object));
+	
+	/* ~ Dereference a pointer to the recipient function. ~ */
+	
+	void *function = ((void **)(object))[fmrpacket.recipient.index];
+	
+	/* ~ Invoke the recipient function with the appropriate arguments. ~ */
+	
+	internal_call(function, fmrpacket.recipient.argc, fmrpacket.body);
+	
+	return *(uint32_t *)(fmrpacket.body);
+	
+}
+
 uint32_t self_invoke(const struct _target *sender) {
-	
-	/* ~ Compare the checksums of the packets to ensure the data was sent successfully. ~ */
-	
-	uint16_t cs = checksum((void *)(&fmrpacket.recipient.object), fmrpacket.header.length - sizeof(struct _fmr_header));
-	
-	uint32_t retval = 0;
-	
-	/* ~ If the checksums are different, then we have a problem. ~ */
-	
-	if (cs != fmrpacket.header.checksum) {
-		
-		/* ~ Set the status led to its error color to alert the user of a problem. ~ */
-		
-		led_set_rgb(LED_COLOR_ERROR);
-		
-		/* ~ Skip the call. ~ */
-		
-		goto end;
-		
-	}
-	
-	/* ~ If all is well, perform the function call. ~ */
-	
-	retval = self_call();
-	
-end:
-	
-	/* ~ Return whatever we received back to the device that sent us a message. ~ */
-	
-	sender -> bus -> push(&retval, sizeof(uint32_t));
 	
 	return 0;
 	
@@ -139,6 +139,8 @@ pull:
 	}
 	
 	/* ~ Load the recipient information into the packet. This information describes to the FMR which function to invoke. ~ */
+	
+	fmrpacket.recipient.target = _self;
 	
 	fmrpacket.recipient.object = object;
 	

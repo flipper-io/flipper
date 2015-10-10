@@ -1,6 +1,6 @@
 # ~ No sudo? ~ #
 
-sudo = sudo
+sudo =
 
 # ~ Set target specific macros. ~ */
 
@@ -64,7 +64,7 @@ install:
 
 	# ~ Create the SDK and its subdirectories if they do not already exist. ~ #
 
-	$(sudo) mkdir -p $(FLIPPERSDK)/lib $(FLIPPERSDK)/include
+	$(sudo) mkdir -p $(FLIPPERSDK)/lib $(FLIPPERSDK)/include $(FLIPPERSDK)/resources
 
 	# ~ Give the user the ability to read from and write to these directories. ~ #
 
@@ -93,6 +93,10 @@ install:
 	# ~ Copy the special header files into the SDK's include directory. ~ */
 
 	$(rsync) -r ../include/flipper/* $(FLIPPERSDK)/include
+
+	# ~ Copy the resources into the SDK directory. ~ #
+
+	$(rsync) -r ../resources/* $(FLIPPERSDK)/resources
 
 
 clean:
