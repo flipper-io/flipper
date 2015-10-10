@@ -6,6 +6,8 @@
 
 #include <usart/usart.h>
 
+#include <spi/spi.h>
+
 #include <led/led.h>
 
 /* ~ This function configures the main processor. ~ */
@@ -42,6 +44,8 @@ void sam_set_power(bool power) {
 		
 		usart0_enable();
 		
+		spi_enable();
+		
 		set_bit_in_port(SAM_POWER_PIN, PORTD);
 		
 	}
@@ -49,6 +53,8 @@ void sam_set_power(bool power) {
 	else {
 		
 		usart0_disable();
+		
+		spi_disable();
 		
 		clear_bit_in_port(SAM_POWER_PIN, PORTD);
 		

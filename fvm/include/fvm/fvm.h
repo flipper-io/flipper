@@ -18,6 +18,8 @@ enum { _fvm_configure, _fvm_invoke, _fvm_call, _fvm_push, _fvm_pull };
 
 extern void fvm_configure(const struct _bus *bus);
 
+extern uint32_t fvm_call(void);
+
 extern uint32_t fvm_invoke(uint8_t object, uint8_t index, uint8_t argc, ...);
 
 extern uint32_t fvm_push(uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, ...);

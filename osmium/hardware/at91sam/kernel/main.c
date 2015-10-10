@@ -2,6 +2,10 @@
 
 #include <flipper/flipper.h>
 
+#include <fmr/fmr.h>
+
+#include <platform/fmr.h>
+
 #include <platform/at91sam.h>
 
 void _delay_ms(unsigned long time) {
@@ -30,7 +34,35 @@ void usart_interrupt(void) {
 	
 	io.write(8, state);
 	
-	usart.put(usart.get());
+	/* ~ Alert the system that the FMR is busy. ~ */
+	
+	fmr_busy = true;
+	
+	/* ~ Associate this interrupt with the host target. ~ */
+	
+	fmr_associate_target(&device);
+	
+	/* ~ Disable interrupts to prevent alignment issues. ~ */
+	
+	
+	
+	/* ~ Load a packet from the bus. ~ */
+	
+	fmr_retrieve();
+	
+	/* ~ Invoke the FMR. ~ */
+	
+	//fmr_invoke(&device);
+	
+	/* ~ Re-enable interrupts. ~ */
+	
+	
+	
+	/* ~ Free the FMR. ~ */
+	
+	fmr_busy = false;
+	
+	AT91C_BASE_US0 -> US_CR = AT91C_US_RSTSTA;
 	
 }
 
@@ -53,6 +85,16 @@ int main(void) {
 	io.write(8, state);
 	
 	usart.configure((void *)(baudrate(115200)));
+	
+	usart1.configure((void *)(baudrate(115200)));
+	
+	/* ~ Configure the host for this platform. ~ */
+	
+	host_configure(&usart);
+	
+	/* ~ Configure the device for this platform. ~ */
+	
+	device_configure(&usart);
 	
 	/* ~ IO16 PC Interrupt ~ */
 	
@@ -90,7 +132,13 @@ int main(void) {
 	
 	AT91C_BASE_US0 -> US_IER = AT91C_US_RXRDY;
 	
-	while (true);
+	while (true) {
+		
+		delay_ms(500);
+		
+		usart1.put('a');
+		
+	}
 	
 	return 0;
 	

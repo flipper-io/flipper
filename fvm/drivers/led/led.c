@@ -4,6 +4,10 @@
 
 #include <fmr/fmr.h>
 
+#include <platform/fmr.h>
+
+#include <platform/fmr.h>
+
 void led_configure(void) {
 	
 	
@@ -12,6 +16,6 @@ void led_configure(void) {
 
 void led_set_rgb(uint8_t r, uint8_t g, uint8_t b) {
 	
-	printf("Setting LED color with red: %i green: %i blue: %i\n\n", r, g, b);
+	printf("Setting LED color.\n\n");
 	
 }

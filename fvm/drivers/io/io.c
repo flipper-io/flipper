@@ -4,6 +4,10 @@
 
 #include <fmr/fmr.h>
 
+#include <platform/fmr.h>
+
+#include <platform/fmr.h>
+
 void io_configure(void) {
 	
 	

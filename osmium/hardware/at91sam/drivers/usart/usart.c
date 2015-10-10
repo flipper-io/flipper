@@ -32,7 +32,7 @@ void usart_enable(AT91S_USART *usart) {
 
 void usart_disable(AT91S_USART *usart) {
 	
-	clear_bits_in_port_with_mask(usart -> US_CR, (AT91C_US_RXEN | AT91C_US_TXEN));
+	set_bits_in_port_with_mask(usart -> US_CR, (AT91C_US_RXDIS | AT91C_US_TXDIS));
 	
 }
 
@@ -90,6 +90,8 @@ void usart0_configure(void *baud) {
 	
 	set_bits_in_port_with_mask(AT91C_BASE_PIOA -> PIO_PDR, (AT91C_PA5_RXD0 | AT91C_PA6_TXD0));
 	
+	/* ~ Configure the USART hardware. ~ */
+	
 	usart_configure(AT91C_BASE_US0,(uint32_t)(baud));
 	
 }
@@ -140,49 +142,59 @@ void usart0_pull(void *destination, uint32_t length) {
 
 void usart1_configure(void *baud) {
 	
+	/* ~ Enable usart1 in the PCER (peripheral clock enable register). ~ */
 	
+	set_bit_in_port(AT91C_ID_US1, AT91C_BASE_PMC -> PMC_PCER);
+	
+	/* ~ Disable use of the RX and TX pins by the peripheral IO controller. They are now in use by the USART controller. ~ */
+	
+	set_bits_in_port_with_mask(AT91C_BASE_PIOA -> PIO_PDR, (AT91C_PA21_RXD1 | AT91C_PA22_TXD1));
+	
+	/* ~ Configure the USART hardware. ~ */
+	
+	usart_configure(AT91C_BASE_US1, (uint32_t)(baud));
 	
 }
 
 void usart1_enable(void) {
 	
-	
+	usart_enable(AT91C_BASE_US1);
 	
 }
 
 void usart1_disable(void) {
 	
-	
+	usart_disable(AT91C_BASE_US1);
 	
 }
 
 bool usart1_ready(void) {
 	
-	return 0;
+	return usart_ready(AT91C_BASE_US1);
 	
 }
 
 void usart1_put(uint8_t byte) {
 	
-	
+	usart_put_byte(AT91C_BASE_US1, byte);
 	
 }
 
 uint8_t usart1_get(void) {
 	
-	return 0;
+	return usart_get_byte(AT91C_BASE_US1);
 	
 }
 
 void usart1_push(void *source, uint32_t length) {
 	
-	
+	usart_push(AT91C_BASE_US1, source, length);
 	
 }
 
 void usart1_pull(void *destination, uint32_t length) {
 	
-	
+	usart_pull(AT91C_BASE_US1, destination, length);
 	
 }
 

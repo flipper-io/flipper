@@ -4,9 +4,15 @@
 
 #include <fvm/fvm.h>
 
+#include <fmr/fmr.h>
+
+#include <platform/fmr.h>
+
 const struct _target fvm = {
 	
 	fvm_configure,
+	
+	fvm_call,
 	
 	fvm_invoke,
 	
@@ -21,6 +27,14 @@ void fvm_configure(const struct _bus *bus) {
 	/* ~ Configure the fvm's communication protocol. ~ */
 	
 	((struct _target *)(&fvm)) -> bus = bus;
+	
+	((struct _target *)(&fvm)) -> id = _self;
+	
+}
+
+uint32_t fvm_call(void) {
+	
+	return 0;
 	
 }
 
@@ -148,7 +162,7 @@ void fdb_push(void *source, uint32_t length) {
 	
 	memcpy(&fmrpacket, source, length);
 	
-	self_invoke(&fvm);
+	//fmr_invoke(&fvm);
 	
 }
 

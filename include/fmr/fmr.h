@@ -32,6 +32,10 @@ struct __attribute__((__packed__)) _fmr_header {
 
 struct __attribute__((__packed__)) _fmr_recipient {
 	
+	/* ~ The target device. ~ */
+	
+	uint8_t target;
+	
 	/* ~ The destination object. ~ */
 	
 	uint8_t object;
@@ -68,6 +72,8 @@ struct _target {
 	
 	void (* configure)(const struct _bus *bus);
 	
+	uint32_t (* call)(void);
+	
 	uint32_t (* invoke)(uint8_t object, uint8_t index, uint8_t argc, ...);
 	
 	uint32_t (* push)(uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, ...);
@@ -76,27 +82,13 @@ struct _target {
 	
 	const struct _bus *bus;
 	
+	uint8_t id;
+	
 };
-
-/* ~ Declare the object structure for the 'self' target. ~ */
-
-extern const struct _self {
-	
-	void (* configure)(const struct _bus *bus);
-	
-	uint32_t (* invoke)(const struct _target *sender);
-	
-	uint32_t (* push)(uint8_t object, uint8_t index, uint8_t argc, uint32_t length);
-	
-	void (* pull)(uint8_t object, uint8_t index, uint8_t argc, uint32_t length);
-	
-	const struct _bus *bus;
-	
-} self;
 
 /* ~ Every FMR compliant target will have a host as well as a device. ~ */
 
-extern struct _target host, device;
+extern struct _target device, self, host;
 
 extern const void * const objects[];
 
@@ -106,8 +98,6 @@ extern struct _target *sender;
 
 #ifdef __private_include__
 
-enum { _button, _flash, _host, _self, _device, _fs, _i2c, _io, _led, _pwm, _sam, _spi, _timer, _usart, _usart1, _dbgu, _usb, _wifi };
-
 extern uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, va_list *argv);
 
 extern uint32_t target_push(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, va_list *argv);
@@ -115,9 +105,11 @@ extern uint32_t target_push(const struct _target *target, uint8_t object, uint8_
 extern void target_pull(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, va_list *argv);
 
 
-enum { _host_configure, _host_invoke, _host_call, _host_push, _host_pull };
+enum { _host_configure, _host_call, _host_invoke, _host_push, _host_pull };
 
 extern void host_configure(const struct _bus *bus);
+
+extern uint32_t host_call(void);
 
 extern uint32_t host_invoke(uint8_t object, uint8_t index, uint8_t argc, ...);
 
@@ -126,7 +118,7 @@ extern uint32_t host_push(uint8_t object, uint8_t index, uint8_t argc, void *sou
 extern void host_pull(uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...);
 
 
-enum { _self_configure, _self_invoke, _self_push, _self_pull };
+enum { _self_configure, _self_call, _self_invoke, _self_push, _self_pull };
 
 extern void self_configure(const struct _bus *bus);
 
@@ -139,9 +131,11 @@ extern uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, uint32_t 
 extern void self_pull(uint8_t object, uint8_t index, uint8_t argc, uint32_t length);
 
 
-enum { _device_configure, _device_invoke, _device_call, _device_push, _device_pull };
+enum { _device_configure, _device_call, _device_invoke, _device_push, _device_pull };
 
 extern void device_configure(const struct _bus *bus);
+
+extern uint32_t device_call(void);
 
 extern uint32_t device_invoke(uint8_t object, uint8_t index, uint8_t argc, ...);
 
@@ -150,7 +144,11 @@ extern uint32_t device_push(uint8_t object, uint8_t index, uint8_t argc, void *s
 extern void device_pull(uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...);
 
 
-extern uint32_t fmr_call(void *function, uint8_t argc, void *argv);
+extern uint32_t fmr_call(void);
+
+extern uint32_t fmr_invoke(const struct _target *sender);
+
+extern uint32_t internal_call(void *function, uint8_t argc, void *argv);
 
 extern bool fmr_busy;
 
