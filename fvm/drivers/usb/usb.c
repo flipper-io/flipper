@@ -6,6 +6,10 @@
 
 #include <fmr/fmr.h>
 
+#include <platform/fmr.h>
+
+#include <platform/fmr.h>
+
 void usb_configure(void *configuration) {
 
 	

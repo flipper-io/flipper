@@ -16,9 +16,7 @@ includes = $(foreach directory, $(include_directories) /usr/local/include, -I "$
 
 # ~ Gather compatable linker scripts. ~ #
 
-ldflags = $(foreach file, $(shell find . -follow -name '*.ld'), -L "$(dir $(file))" -Wl,-T "$(file)") $(libraries)
-
-$(info LDFLAGS: $(ldflags))
+ldflags = $(foreach file, $(shell find $(hardware_directory) -follow -name '*.ld'), -L "$(dir $(file))" -Wl,-T "$(file)") $(libraries)
 
 # ~ Specify the compilation prefix. ~ #
 

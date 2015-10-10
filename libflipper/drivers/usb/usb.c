@@ -6,6 +6,8 @@
 
 #include <fmr/fmr.h>
 
+#include <platform/fmr.h>
+
 void usb_configure(void *configuration) {
 	
 	uint8_t devices = hid_enumerate(1, CARBON_VENDOR_ID, CARBON_PRODUCT_ID, CARBON_USAGE_PAGE, CARBON_USAGE);
@@ -15,12 +17,6 @@ void usb_configure(void *configuration) {
 		printf("No device appears to be connected to this computer.\n\nPlease ensure that Flipper is properly connected and try again.\n\n");
 		
 		exit(EXIT_FAILURE);
-		
-	}
-	
-	else {
-		
-		printf("Successfully connected to Flipper device over USB.\n\n");
 		
 	}
 	

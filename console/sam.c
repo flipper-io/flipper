@@ -214,7 +214,15 @@ int sam_load_firmware(char *firmware) {
 	
 	uint8_t connected = false;
 	
-	while (!connected) { usart.push((char []){ 0x80, 0x80, 0x23 }, 3); char exp[3] = { 0x0A, 0x0D, 0x3E }; char res[3]; usart.pull(res, 3); connected = !memcmp(exp, res, 3); }
+	for (int i = 0; (i < 100) && !connected; i ++) { usart.push((char []){ 0x80, 0x80, 0x23 }, 3); char exp[3] = { 0x0A, 0x0D, 0x3E }; char res[3]; usart.pull(res, 3); connected = !memcmp(exp, res, 3); }
+	
+	if (!connected) {
+		
+		printf("\nERROR. Did not receive adknowledgement from the DFU.\n\n");
+		
+		return 1;
+		
+	}
 	
 	printf("\nReceived adknowledgement from the DFU.\n");
 	

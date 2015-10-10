@@ -6,6 +6,8 @@
 
 #include <fmr/fmr.h>
 
+#include <platform/fmr.h>
+
 #include <fs/crc.h>
 
 #include <platform/hid.h>
@@ -98,13 +100,13 @@ int main(void) {
 	
 	//enable_timer();
 	
-	//flash_push("Welcome", 7, 0x1234);
+	flash_push("Welcome", 7, 0x1234);
 	
-	//char derp[7];
+	char derp[7];
 	
-	//flash_pull(derp, 7, 0x1234);
+	flash_pull(derp, 7, 0x1234);
 	
-	//usart0_push(derp, 7);
+	usart0_push(derp, 7);
 	
 	while (1) {
 		

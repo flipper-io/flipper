@@ -4,6 +4,8 @@
 
 #include <fmr/fmr.h>
 
+#include <platform/fmr.h>
+
 /* ~ This function configures the main processor. ~ */
 
 void sam_configure(void) {
@@ -16,7 +18,7 @@ void sam_configure(void) {
 
 void sam_set_power(bool power) {
 
-	host.invoke(_sam, _sam_set_power, 1, power);
+	device.invoke(_sam, _sam_set_power, 1, power);
 	
 }
 
@@ -24,7 +26,7 @@ void sam_set_power(bool power) {
 
 void sam_reset(void) {
 
-	host.invoke(_sam, _sam_reset, 0, NO_ARGS);
+	device.invoke(_sam, _sam_reset, 0, NO_ARGS);
 
 }
 
@@ -32,7 +34,7 @@ void sam_reset(void) {
 
 void sam_load_dfu(void) {
 	
-	host.invoke(_sam, _sam_load_dfu, 0, NO_ARGS);
+	device.invoke(_sam, _sam_load_dfu, 0, NO_ARGS);
 	
 }
 
@@ -40,6 +42,6 @@ void sam_load_dfu(void) {
 
 void sam_format(void) {
 	
-	host.invoke(_sam, _sam_format, 0, NO_ARGS);
+	device.invoke(_sam, _sam_format, 0, NO_ARGS);
 	
 }

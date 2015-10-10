@@ -4,9 +4,15 @@
 
 #include <fmr/fmr.h>
 
+#include <platform/fmr.h>
+
+#include <platform/fmr.h>
+
 struct _target host = {
 	
 	host_configure,
+	
+	host_call,
 	
 	host_invoke,
 	
@@ -21,6 +27,14 @@ void host_configure(const struct _bus *bus) {
 	/* ~ Configure the host's communication protocol. ~ */
 	
 	((struct _target *)(&host)) -> bus = bus;
+	
+	((struct _target *)(&host)) -> id = _host;
+	
+}
+
+uint32_t host_call(void) {
+	
+	return 0;
 	
 }
 

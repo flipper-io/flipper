@@ -2,6 +2,8 @@
 
 #include <fmr/fmr.h>
 
+#include <platform/fmr.h>
+
 void timer_configure(void) {
 	
 	
