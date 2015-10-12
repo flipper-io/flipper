@@ -40,9 +40,15 @@ uint32_t device_call(void) {
 	
 	device.bus -> push(&fmrpacket, fmrpacket.header.length);
 	
+	/* ~ Create a return value. ~ */
+	
+	uint32_t retval;
+	
 	/* ~ Get a response from the device. ~ */
 	
-	return 0;
+	device.bus -> pull(&retval, sizeof(uint32_t));
+	
+	return retval;
 	
 }
 

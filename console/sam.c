@@ -4,6 +4,8 @@
 
 #include <fs/crc.h>
 
+#include <unistd.h>
+
 #include "console.h"
 
 #define address(x)				((void *)(x))
