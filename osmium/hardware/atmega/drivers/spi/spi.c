@@ -90,7 +90,7 @@ void spi_put(uint8_t byte) {
 
 uint8_t spi_get(void) {
 	
-	spi.put(0x00);
+	spi_put(0x00);
 	
 	return SPDR;
 	

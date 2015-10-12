@@ -98,16 +98,6 @@ extern void usb_receive_interrupt(void);
 
 int main(void) {
 	
-	//enable_timer();
-	
-	flash_push("Welcome", 7, 0x1234);
-	
-	char derp[7];
-	
-	flash_pull(derp, 7, 0x1234);
-	
-	usart0_push(derp, 7);
-	
 	while (1) {
 		
 		while (!fmr_busy) {

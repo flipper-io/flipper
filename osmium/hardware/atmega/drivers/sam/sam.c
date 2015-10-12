@@ -120,7 +120,7 @@ void sam_load_dfu(void) {
 	
 	clear_bit_in_port(SAM_TEST_PIN, SAM_TEST_PORT);
 	
-	/* ~ Again, wait for the 7S to completely power down. ~ */
+	/* ~ Wait for the TST pin to disengage. ~ */
 	
 	delay_ms(50);
 	
@@ -162,13 +162,13 @@ void sam_format(void) {
 	
 	sam_set_power(false);
 	
-	/* ~ Put the 7S into erase mode by pulling its erase pin high. ~ */
-	
-	set_bit_in_port(SAM_ERASE_PIN, SAM_ERASE_PORT);
-	
 	/* ~ Wait for the 7S to power down. ~ */
 	
 	delay_ms(50);
+	
+	/* ~ Put the 7S into erase mode by pulling its erase pin high. ~ */
+	
+	set_bit_in_port(SAM_ERASE_PIN, SAM_ERASE_PORT);
 	
 	/* ~ Power the 7S back on. ~ */
 	
@@ -182,13 +182,13 @@ void sam_format(void) {
 	
 	clear_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
 	
-	/* ~ Wait for everything to settle. ~ */
-	
-	delay_ms(50);
-	
 	/* ~ Take the 7S out of erase mode by pulling its erase pin back low. ~ */
 	
 	clear_bit_in_port(SAM_ERASE_PIN, SAM_ERASE_PORT);
+	
+	/* ~ Wait for everything to settle. ~ */
+	
+	delay_ms(50);
 	
 	/* ~ Power the 7S back on. ~ */
 	

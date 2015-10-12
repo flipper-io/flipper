@@ -30,10 +30,6 @@ bool state = 1;
 
 void usart_interrupt(void) {
 	
-	state ^= 1;
-	
-	io.write(8, state);
-	
 	/* ~ Alert the system that the FMR is busy. ~ */
 	
 	fmr_busy = true;
@@ -42,21 +38,13 @@ void usart_interrupt(void) {
 	
 	fmr_associate_target(&device);
 	
-	/* ~ Disable interrupts to prevent alignment issues. ~ */
-	
-	
-	
 	/* ~ Load a packet from the bus. ~ */
 	
 	fmr_retrieve();
-	
+		
 	/* ~ Invoke the FMR. ~ */
 	
-	//fmr_invoke(&device);
-	
-	/* ~ Re-enable interrupts. ~ */
-	
-	
+	fmr_invoke(&device);
 	
 	/* ~ Free the FMR. ~ */
 	
@@ -78,21 +66,19 @@ void pio_interrupt() {
 
 int main(void) {
 	
-	io.configure();
-	
-	io.direction(8, OUTPUT);
-	
-	io.write(8, state);
-	
 	usart.configure((void *)(baudrate(115200)));
 	
 	usart1.configure((void *)(baudrate(115200)));
+	
+	flash_configure();
+	
+	spi_configure(0);
 	
 	/* ~ Configure the host for this platform. ~ */
 	
 	host_configure(&usart);
 	
-	/* ~ Configure the device for this platform. ~ */
+	/* ~ Configure the device for this platform. ~ */ 
 	
 	device_configure(&usart);
 	
@@ -116,10 +102,6 @@ int main(void) {
 	
 	/* ~ USART Interrupt ~ */
 	
-	AT91C_BASE_PIOA -> PIO_IER = (1 << 7);
-	
-	AT91C_BASE_AIC -> AIC_IECR = (1 << AT91C_ID_PIOA);
-	
 	AT91C_BASE_AIC -> AIC_IDCR = (1 << AT91C_ID_US0);
 	
 	AT91C_BASE_AIC -> AIC_SVR[AT91C_ID_US0] = (unsigned)(&usart_interrupt);
@@ -132,11 +114,21 @@ int main(void) {
 	
 	AT91C_BASE_US0 -> US_IER = AT91C_US_RXRDY;
 	
+	io.configure();
+	
+	io.direction(8, OUTPUT);
+	
+	io.write(8, true);
+	
 	while (true) {
+		
+		io.write(8, false);
 		
 		delay_ms(500);
 		
-		usart1.put('a');
+		io.write(8, true);
+		
+		delay_ms(500);
 		
 	}
 	
