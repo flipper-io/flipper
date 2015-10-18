@@ -74,6 +74,8 @@ fsp flash_alloc(uint32_t length) {
 		
 	}
 	
+	free(current);
+	
 	if (smallest_size) {
 		
 		if (smallest_size - length < sizeof(block)) {
@@ -142,6 +144,8 @@ fsp flash_alloc(uint32_t length) {
 		
 		flash_push(&_break_value, sizeof(fsp), _BREAK_VALUE);
 		
+		free(current);
+		
 		return block;
 		
 	}
@@ -186,11 +190,13 @@ void flash_free(fsp pointer) {
 			
 		}
 		
+		free(new);
+		
 		return;
 		
 	}
 	
-	for (_current = _free_list, current = flash_dereference(_free_list, sizeof(block)), _last = 0, last = 0; _current; _last = _current, last = current, _current = current -> next, current = flash_dereference(current -> next, sizeof(block))) {
+	for (_current = _free_list, current = flash_dereference(_free_list, sizeof(block)), _last = 0, last = 0; _current; _last = _current, last = current, _current = current -> next, free(current), current = flash_dereference(current -> next, sizeof(block))) {
 		
 		if (current < new) continue;
 		
@@ -212,6 +218,10 @@ void flash_free(fsp pointer) {
 			
 			flash_push(&_free_list, sizeof(fsp), _FREE_LIST);
 			
+			free(new);
+			
+			free(current);
+			
 			return;
 			
 		}
@@ -219,6 +229,8 @@ void flash_free(fsp pointer) {
 		break;
 		
 	}
+	
+	free(current);
 	
 	last -> next = _new;
 	
@@ -234,7 +246,9 @@ void flash_free(fsp pointer) {
 	
 	flash_push(last, sizeof(block), _last);
 	
-	for (_current = _free_list, current = flash_dereference(_free_list, sizeof(block)), _last = 0, last = 0; current -> next != 0; _last = _current, last = current, _current = current -> next, current = flash_dereference(current -> next, sizeof(block))) free(last);
+	for (_current = _free_list, current = flash_dereference(_free_list, sizeof(block)), _last = 0, last = 0; current -> next != 0; _last = _current, last = current, _current = current -> next, free(current), current = flash_dereference(current -> next, sizeof(block))) free(last);
+	
+	free(current);
 	
 	if ((_last + current -> size) == _break_value) {
 		
@@ -259,5 +273,7 @@ void flash_free(fsp pointer) {
 		flash_push(&_break_value, sizeof(fsp), _BREAK_VALUE);
 		
 	}
+	
+	free(new);
 	
 }

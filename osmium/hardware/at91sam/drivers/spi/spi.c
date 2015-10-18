@@ -34,11 +34,11 @@ void spi_configure(void *configuration) {
 	
 	/* ~ Configure the SPI as a master: fixed peripheral selection: no fault detection: deselect all peripherals.  ~ */
 	
-	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_MR, (AT91C_SPI_MSTR | AT91C_SPI_PS_FIXED | AT91C_SPI_CSAAT | (AT91C_SPI_PCS & (1 << 16)) | AT91C_SPI_MODFDIS));
+	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_MR, (AT91C_SPI_MSTR | AT91C_SPI_PS_FIXED | (AT91C_SPI_PCS & (1 << 16)) | AT91C_SPI_MODFDIS));
 	
 	/* ~ SPI_DATA_MODE_3: don't change CS after transfer: 8 bits per transfer: ~ */
 	
-	AT91C_SPI_CSR[1] = (AT91C_SPI_CPOL | AT91C_SPI_BITS_8 | (AT91C_SPI_SCBR & (8 << 8) | (AT91C_SPI_DLYBCT & (2 << 24))));
+	AT91C_SPI_CSR[1] = (AT91C_SPI_CPOL | AT91C_SPI_BITS_8 | AT91C_SPI_CSAAT | (AT91C_SPI_SCBR & (10 << 8) | (AT91C_SPI_DLYBCT & (1 << 24))));
 	
 	/* ~ Enable the SPI controller. ~ */
 	

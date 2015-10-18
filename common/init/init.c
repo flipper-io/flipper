@@ -36,7 +36,7 @@ void __attribute__ ((constructor)) libflipper_init() {
 	
 	sam_configure();
 	
-	//spi_configure(0);
+	spi_configure(0);
 	
 	timer_configure();
 	

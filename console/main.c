@@ -18,6 +18,8 @@ int main(int argc, char *argv[]) {
 	
 	flipper.attach(FLIPPER_SOURCE_USB); //FVM, "/Development/flipper-toolbox/fvm/hal.fvm");
 	
+	//fs_configure();
+	
 	if (argc < 2) { printf("Insufficient arguments.\n\n"); return 1; }
 	
 	else if (!strcmp(argv[1], "erase")) sam_erase_flash();
@@ -44,17 +46,71 @@ int main(int argc, char *argv[]) {
 	
 	else if (!strcmp(argv[1], "read")) {
 		
-		host.invoke(_spi, _spi_disable, 0);
+		size_t len = atoi(argv[2]);
 		
-		spi.enable();
+		char *mem = malloc(len);
 		
-		char buf[32];
+		bzero(mem, len);
 		
-		flash.pull(buf, 11, 0x1234);
+		fsp src = atoi(argv[3]);
 		
-		printf("\nRead: %s\n\n", buf);
+		flash.pull(mem, len, src);
 		
-		spi.disable();
+		//printf("\nRead %s\n\n", mem);
+		
+		printf("\nReading from 0x%08x\n\n", src);
+		
+		for (int i = 0; i < len; i ++) printf("0x%02x ", mem[i]);
+		
+		printf("\n\n");
+		
+	}
+	
+	else if (!strcmp(argv[1], "root")) {
+		
+		fs.configure();
+		
+		printf("\nRoot at 0x%08x, Brk at 0x%08x, Free at 0x%08x\n\n", _root_leaf, _break_value, _free_list);
+		
+	}
+	
+	else if (!strcmp(argv[1], "write")) {
+		
+		size_t len = strlen(argv[2]);
+		
+		fsp dest = atoi(argv[3]);
+		
+		flash.push(argv[2], len, dest);
+		
+	}
+	
+	else if (!strcmp(argv[1], "eraseflash")) {
+		
+		flash.format();
+		
+	}
+	
+	else if (!strcmp(argv[1], "alloc")) {
+		
+		fsp addr = flash.alloc(atoi(argv[2]));
+		
+		printf("\nAllocated at 0x%08X (%u)\n\n", addr, addr);
+		
+	}
+	
+	else if (!strcmp(argv[1], "free")) {
+		
+		fsp addr = atoi(argv[2]);
+		
+		flash.free(addr);
+		
+		printf("\nFree'd 0x%08X\n\n", addr);
+		
+	}
+	
+	else if (!strcmp(argv[1], "format")) {
+		
+		fs.format();
 		
 	}
 	

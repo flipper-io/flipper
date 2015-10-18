@@ -264,8 +264,6 @@ push:
 	
 }
 
-#warning Not portable to non-parallel busses.
-
 /* ~ This function moves data from the isolated address space of the device to the host using the FMR. ~ */
 
 void target_pull(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, va_list *argv) {

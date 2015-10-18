@@ -70,9 +70,9 @@ int main(void) {
 	
 	usart1.configure((void *)(baudrate(115200)));
 	
-	flash_configure();
+	//flash_configure();
 	
-	spi_configure(0);
+	//spi_configure(0);
 	
 	/* ~ Configure the host for this platform. ~ */
 	
