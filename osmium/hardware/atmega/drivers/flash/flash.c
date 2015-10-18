@@ -6,7 +6,13 @@
 
 #include <spi/spi.h>
 
+#include <led/led.h>
+
 void flash_configure(void) {
+	
+	/* Configure the external flash memory chip's CS pin as an output. */
+	
+	set_bit_in_port(FLASH_CS_PIN, FLASH_CS_DDR);
 
 	/* Configure the external flash memory chip's reset pin as an output. */
 	
@@ -76,6 +82,10 @@ void flash_format(void) {
 	
 	disable_interrupts();
 	
+	/* ~ Indicate that we are busy. ~ */
+	
+	led_set_rgb(LED_COLOR_BUSY);
+	
 	/* Wait until the flash chip is ready to recieve data. */
 	
 	flash_wait();
@@ -108,8 +118,6 @@ void flash_format(void) {
 	
 	delay_seconds(5);
 	
-	delay_seconds(5);
-	
 	/* Wait until the flash chip has been erased. */
 	
 	flash_wait();
@@ -117,6 +125,10 @@ void flash_format(void) {
 	/* ~ Disable the device so that no data can be recieved until the next opcode is sent. ~ */
 	
 	flash_disable();
+	
+	/* ~ Indicate that the operation was successful. ~ */
+	
+	led_set_rgb(LED_COLOR_SUCCESS);
 	
 	/* Enable interrupts again. */
 	

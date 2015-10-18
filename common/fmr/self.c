@@ -43,8 +43,10 @@ uint32_t self_call(void) {
 	/* ~ Invoke the recipient function with the appropriate arguments. ~ */
 	
 	internal_call(function, fmrpacket.recipient.argc, fmrpacket.body);
-		
-	return 0xDEADBEEF; // *(uint32_t *)(fmrpacket.body);
+	
+	/* ~ Return the value. ~ */
+	
+	return *(uint32_t *)(fmrpacket.body);
 	
 }
 
