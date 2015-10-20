@@ -8,7 +8,7 @@ all: clean
 
 	$(MAKE) -C libflipper all
 	
-	# ~ Build the console. ~ */
+	# ~ Build the Console. ~ */
 
 	$(MAKE) -C console all
 	
@@ -32,7 +32,7 @@ install:
 
 	$(MAKE) -C libflipper install
 	
-	# ~ Install the console. ~ */
+	# ~ Install the Console. ~ */
 
 	$(MAKE) -C console install
 	
@@ -50,4 +50,19 @@ install:
 
 clean:
 
-	rm -rf $(shell find . -follow -name "*.o" -or -name "*.elf" -or -name "*.bin" -or -name "*.so" -or -name "*.dylib")
+	# ~ Clean libflipper. ~ */
+
+	$(MAKE) -C libflipper clean
+	
+	# ~ Clean the Console. ~ */
+
+	$(MAKE) -C console clean
+	
+	# ~ Clean Osmium. ~ */
+
+	$(MAKE) -C osmium clean platform=atmega16u2
+	
+	# ~ Clean the Python module. ~ */
+	
+	$(MAKE) -C python clean
+
