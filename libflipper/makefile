@@ -1,10 +1,14 @@
 # ~ No sudo? ~ #
 
-sudo =
+sudo = sudo
+
+# ~ Determine the target. ~ #
+
+target = $(shell echo $(shell uname -s) | tr A-Z a-z)
 
 # ~ Set target specific macros. ~ */
 
-ifeq ($(target),osx)
+ifeq ($(target),darwin)
 
 	# ~ Specifiy the name of the output file. ~ #
 

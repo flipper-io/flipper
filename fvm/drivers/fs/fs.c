@@ -8,6 +8,6 @@
 
 void fs_format(void) {
 	
-	printf("FORMATTING FS!");
+	printf("FORMATTING FS!\n\n");
 	
 }

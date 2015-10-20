@@ -162,7 +162,7 @@ void fdb_push(void *source, uint32_t length) {
 	
 	memcpy(&fmrpacket, source, length);
 	
-	//fmr_invoke(&fvm);
+	fmr_invoke(&fvm);
 	
 }
 
