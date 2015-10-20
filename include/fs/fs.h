@@ -4,11 +4,11 @@
 
 #include <flipper/types.h>
 
-#define _FREE_LIST		32
+#define _FREE_LIST 32
 
 extern fsp _free_list;
 
-#define _BREAK_VALUE	64
+#define _BREAK_VALUE 64
 
 extern fsp _break_value;
 
@@ -37,8 +37,6 @@ typedef struct _file {
 	char name[];
 	
 } file;
-
-#define _ROOT 0
 
 /* A local copy of the root pointer. */
 

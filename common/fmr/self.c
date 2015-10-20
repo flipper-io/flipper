@@ -44,6 +44,8 @@ uint32_t self_call(void) {
 	
 	internal_call(function, fmrpacket.recipient.argc, fmrpacket.body);
 	
+	/* ~ Return the value. ~ */
+	
 	return *(uint32_t *)(fmrpacket.body);
 	
 }

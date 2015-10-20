@@ -26,7 +26,7 @@ libflipper:
         
 	$(MAKE) -C "../libflipper" all install
 
-all: libflipper
+all:
 
 	# ~ Link the object files together to produce an output file. ~ #
 

@@ -1,6 +1,10 @@
-# Components of the Flipper Toolbox
+# What is the Flipper Toolbox?
 
-The Flipper Toolbox is a repository of sofware components that enable hardware control of Flipper which can be compiled on a per-application basis. For example, the component `FlipperiOS.framework` enables hardware control of Flipper from Apple's iOS compatable devices.
+The Flipper Toolbox is a repository of sofware components that enable hardware control of Flipper which can be compiled on a per-application basis.
+
+Controlling embedded hardware requires a huge amount of overhead. This overhead distances the consumer from the hardware that they are working with, and, in turn, distances them from their projects. Flipper is an embedded electronics prototyping platform that enables developers to work at the bare metal, while simultaneously taking advantage of a highly sophistocated but lightweight control stack known as the Flipper Toolbox. The toolbox comes with a suite of development tools that can be used to interact with Flipper hardware from a wide range of platforms. For example, the component `FlipperiOS.framework` enables complete hardware control of Flipper from Apple's iOS devices. The toolbox also allows Flipper to be controlled from different programming environments such as Python, Java, Swift, Objective-C, and more.
+
+Flipper hardware is limited only by the Flipper Toolbox. Flipper works natively with USB, but backpacks exist that enable the toolbox to interact with Flipper over Wi-Fi and Bluetooth. The toolbox can be ported any platform with a standard C library and configured to communicate with Flipper over almost any bus architecture.
 
 This document provides a brief overview of the major components of the Flipper Toolbox. Specifics pertaining to each component can be found in the README of the respective component's root directory.
 
@@ -9,6 +13,10 @@ This document provides a brief overview of the major components of the Flipper T
 ### Flipper Console
 
 The Flipper Console is a powerful tool that can be used to access Flipper hardware without first writing or compiling code of any kind.
+
+Usage: `flipper object function [arguments ...]`
+
+Example: `flipper io write 0 true`
 
 ## 
 

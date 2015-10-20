@@ -1,14 +1,20 @@
-.equ AIC_IVR, (256)
-.equ AIC_FVR, (260)
-.equ AIC_EOICR, (304)
-.equ AT91C_BASE_AIC, (0xFFFFF000)
-.equ	IRQ_STACK_SIZE, (3*8*4)
-.equ	ARM_MODE_FIQ, 0x11
-.equ	ARM_MODE_IRQ, 0x12
-.equ	ARM_MODE_SVC, 0x13
-.equ	I_BIT, 0x80
-.equ	F_BIT, 0x40
-.equ   IRQ_Stack_Size,     0x00000060
+.equ AT91C_BASE_AIC, 0xFFFFF000
+
+.equ AIC_IVR, 256
+
+.equ AIC_EOICR, 304
+
+.equ ARM_MODE_FIQ, 0x11
+
+.equ ARM_MODE_IRQ, 0x12
+
+.equ ARM_MODE_SVC, 0x13
+
+.equ I_BIT, 0x80
+
+.equ F_BIT, 0x40
+
+.equ irq_stack_size, 0x00000060
 
 .code 32
 
@@ -40,7 +46,7 @@ begin:			ldr r13, =__int_ram_top__
 
 				bx r0
 
-				mov r0,r13
+				mov r0, r13
 
                 msr CPSR_c, #ARM_MODE_FIQ | I_BIT | F_BIT
 
@@ -50,7 +56,7 @@ begin:			ldr r13, =__int_ram_top__
 
                 mov r13, r0
 
-                sub r0, r0, #IRQ_Stack_Size
+                sub r0, r0, #irq_stack_size
 
                 msr CPSR_c, #ARM_MODE_SVC
 
@@ -120,7 +126,7 @@ irq_handler:	sub		lr, lr, #4
 
 				bx		r0
 
-				ldmia	sp!, { r1-r3, r12, r14}
+				ldmia	sp!, { r1-r3, r12, r14 }
 
 				msr		CPSR_c, #I_BIT | ARM_MODE_IRQ
 
@@ -135,3 +141,4 @@ irq_handler:	sub		lr, lr, #4
 				msr		SPSR_cxsf, r14
 
 				ldmia	sp!, { pc }^
+				
