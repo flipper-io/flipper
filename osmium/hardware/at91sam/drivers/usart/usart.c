@@ -46,7 +46,7 @@ void usart_put_byte(AT91S_USART *usart, uint8_t byte) {
 	
 	/* ~ Wait until the USART is ready to transmit. ~ */
 	
-	while (!((usart -> US_CSR) & AT91C_US_TXRDY));
+	while (!(usart -> US_CSR & AT91C_US_TXRDY));
 	
 	/* ~ Send the byte. ~ */
 	
@@ -55,6 +55,8 @@ void usart_put_byte(AT91S_USART *usart, uint8_t byte) {
 }
 
 uint8_t usart_get_byte(AT91S_USART *usart) {
+	
+	while (!(usart -> US_CSR & AT91C_US_RXRDY));
 	
 	/* ~ Read the byte. ~ */
 	

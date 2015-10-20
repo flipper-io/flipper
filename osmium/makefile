@@ -102,7 +102,7 @@ install:
 
 burn:
 
-	# Flash the connected device with the binary using 'flasher'.
+	# Flash the connected device with the binary using the appropriate flasher.
 
 	$(flasher) $(flasher_flags)
 

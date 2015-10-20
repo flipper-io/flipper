@@ -22,7 +22,7 @@ struct __attribute__((__packed__)) _fmr_header {
 	
 	/* ~ The length of the contents of the packet. ~ */
 	
-	uint16_t length;
+	uint8_t length;
 	
 	/* ~ A checksum of everything below. ~ */
 	

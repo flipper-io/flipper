@@ -2,41 +2,37 @@
 
 output = flipper
 
-ifeq ($(target),osx)
+version = 2.7
+
+# ~ Determine the target. ~ #
+
+target = $(shell echo $(shell uname -s) | tr A-Z a-z)
+
+# ~ Set target specific macros. ~ */
+
+ifeq ($(target),darwin)
 
 	python_install_directory = /Library/Python/2.7/site-packages/$(output)
 
+	include_directories = $(shell find '/System/Library/Frameworks/Python.framework/Versions/Current/include' -type d) $(FLIPPERSDK)/include
+
 else ifeq ($(target),linux)
+
+	python_install_directory = /usr/local/lib/python$(version)/site-packages
 
 	include_directories = $(shell find '/usr/include/python$(version)' -type d) $(FLIPPERSDK)/include
 
 else
 
-	$(error "Please specify a target.")
+$(error "Please specify a target.")
 
 endif
-
-version = 2.7
 
 cc = $(shell which 'gcc')
 
 rsync = $(shell which 'rsync')
 
 preprocess = -std=gnu99 -Os -fpic
-
-ifeq ($(target),osx)
-
-	include_directories = $(shell find '/System/Library/Frameworks/Python.framework/Versions/Current/include' -type d) $(FLIPPERSDK)/include
-
-else ifeq ($(target),linux)
-
-	include_directories = $(shell find '/usr/include/python$(version)' -type d) $(FLIPPERSDK)/include
-
-else
-
-	$(error "Please specify a target.")
-
-endif
 
 # ~ Include this file to recursively compile all supported file types and generate object files using the preprocessor statements above. ~ #
 

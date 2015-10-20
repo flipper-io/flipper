@@ -53,7 +53,7 @@ uint32_t fmr_invoke(const struct _target *sender) {
 	/* ~ If all is well, perform the function call. ~ */
 	
 	retval = target -> call();
-	
+		
 end:
 	
 	/* ~ Return whatever we received back to the device that sent us a message. ~ */
@@ -86,31 +86,21 @@ void fmr_retrieve(void) {
 	
 	else {
 		
-		usart.put('!');
-		
 		/* ~ Wait for synchronization. ~ */
 		
 		while (sender -> bus -> get() != 0xFE);
 		
-		usart.put('@');
-		
 		/* ~ Load the header of the packet. ~ */
 		
 		for (unsigned i = 1; i < sizeof(struct _fmr_header); i ++) ((uint8_t *)(&fmrpacket.header))[i] = sender -> bus -> get();
-		
-		usart.push(&fmrpacket, sizeof(struct _fmr_header));
-		
+				
 		/* ~ Load the body of the packet. ~ */
 		
 		for (unsigned i = 0; i < (fmrpacket.header.length - sizeof(struct _fmr_header)); i ++) ((uint8_t *)(&fmrpacket.recipient))[i] = sender -> bus -> get();
 		
-		usart.put('2');
-		
 		/* ~ Flush any remaining data. ~ */
 		
 		while (sender -> bus -> ready()) { (void) sender -> bus -> get(); }
-		
-		usart.put('3');
 		
 	}
 	
