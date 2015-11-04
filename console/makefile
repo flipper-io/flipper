@@ -10,7 +10,7 @@ rsync = $(shell which 'rsync')
 
 # ~ Declare the preprocessor statements to be used during object generation. ~ #
 
-preprocess = -std=c99
+preprocess = -std=c99 -m32
 
 include_directories = ../include ../libflipper/include/
 

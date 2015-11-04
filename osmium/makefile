@@ -40,11 +40,11 @@ else ifeq ($(platform),at91sam7s)
 
 	clock = 48054850
 
-	cc = $(shell which 'arm-elf-gcc-4.7')
+	cc = $(shell which 'arm-elf-gcc')
 
 	objcopy = $(shell which 'arm-elf-objcopy')
 
-	flasher = $(shell which 'flipper')
+ 	flasher = $(shell which 'flipper')
 
 	flasher_flags = flash $(output)
 

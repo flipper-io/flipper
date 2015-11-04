@@ -62,6 +62,10 @@ clean:
 
 	$(MAKE) -C osmium clean platform=atmega16u2
 	
+	# ~ Clean the FVM. ~ */
+	
+	$(MAKE) -C fvm clean
+	
 	# ~ Clean the Python module. ~ */
 	
 	$(MAKE) -C python clean
