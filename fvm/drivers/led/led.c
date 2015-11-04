@@ -16,6 +16,6 @@ void led_configure(void) {
 
 void led_set_rgb(uint8_t r, uint8_t g, uint8_t b) {
 	
-	printf("Setting LED color.\n\n");
+	printf("Setting LED with R: %u G: %u B: %u\n\n", r, g, b);
 	
 }

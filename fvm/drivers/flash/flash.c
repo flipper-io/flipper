@@ -8,9 +8,11 @@
 
 #include <platform/fmr.h>
 
+void *virtual_flash;
+
 void flash_configure(void) {
 
-	
+	virtual_flash = malloc(sizeof(uint8_t) * 1024 * 1024 * 2);
 	
 }
 
@@ -32,18 +34,6 @@ void flash_reset(void) {
 	
 }
 
-fsp flash_alloc(uint32_t length) {
-	
-	return 0;
-	
-}
-
-void flash_free(fsp pointer) {
-	
-	
-	
-}
-
 void flash_format(void) {
 	
 	
@@ -52,18 +42,22 @@ void flash_format(void) {
 
 void flash_push(void *source, uint32_t length, fsp destination) {
 	
-	
+	memcpy((void *)(virtual_flash + destination), source, length);
 	
 }
 
 void flash_pull(void *destination, uint32_t length, fsp source) {
 	
-	
+	memcpy(destination, (void *)(virtual_flash + source), length);
 	
 }
 
 void *flash_dereference(fsp source, uint32_t length) {
 	
-	return 0;
+	void *region = (void *) malloc(length);
+	
+	memcpy(region, (void *)(virtual_flash + source), length);
+	
+	return region;
 	
 }
