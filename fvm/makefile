@@ -16,7 +16,7 @@ ln = $(shell which 'ln')
 
 # ~ Declare the preprocessor statements to be used during object generation. ~ #
 
-preprocess = -std=c99 -fpic -D__verbose__
+preprocess = -std=c99 -fpic -D__verbose__ -m32
 
 # ~ Pass flags to find so that it only isolates files pertainant to the target platform. ~ #
 
