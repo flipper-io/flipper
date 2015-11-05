@@ -10,7 +10,7 @@
 
 #include <usart/usart.h>
 
-struct _target self = {
+struct _self self = {
 	
 	self_configure,
 	

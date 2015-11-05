@@ -86,9 +86,25 @@ struct _target {
 	
 };
 
+struct _self {
+	
+	void (* configure)(const struct _bus *bus);
+	
+	uint32_t (* call)(void);
+	
+	uint32_t (* invoke)(const struct _target *sender);
+	
+	uint32_t (* push)(uint8_t object, uint8_t index, uint8_t argc, uint32_t length);
+	
+	void (* pull)(uint8_t object, uint8_t index, uint8_t argc, uint32_t length);
+	
+};
+
 /* ~ Every FMR compliant target will have a host as well as a device. ~ */
 
-extern struct _target device, self, host;
+extern struct _target host, device;
+
+extern struct _self self;
 
 extern const void * const objects[];
 
