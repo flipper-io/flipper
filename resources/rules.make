@@ -34,9 +34,9 @@ $(patsubst %.c, %.o, $(filter %.c, $(targets))) : %.o : %.c
 
 # ~ Assembly source files with the '.s' extension. ~ #
 
-$(patsubst %.s, %.o, $(filter %.s, $(targets))) : %.o : %.S
+$(patsubst %.s, %.o, $(filter %.s, $(targets))) : %.o : %.s
 
-	$(cc) $(prefix) -c "$<" -o "$@"
+	$(cc) $(prefix) -x assembler-with-cpp -c "$<" -o "$@"
 
 # ~ Assembly source files with the '.S' extension. ~ #
 
