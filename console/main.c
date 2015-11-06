@@ -20,15 +20,13 @@ int main(int argc, char *argv[]) {
 
 	/* ~ Attatch this instance of libflipper to the first device present over USB. ~ */
 
-	flipper.attatch(FLIPPER_SOURCE_USB);
+	flipper.attach(FLIPPER_SOURCE_USB);
 
-	/* ~ Attatch this instance of libflipper to a hardware abstraction layer. ~ */
+	if (!strcmp(argv[1], "flash")) {
 
-	flipper.attach(FLIPPER_SOURCE_FVM, "/Development/flipper-toolbox/fvm/hal.fvm");
+		sam_load_firmware(argv[2]);
 
-	int args[] = { 1, 2, 3 };
-
-	internal_call(&whatnot, 3, args);
+	}
 
 	return 0;
 
