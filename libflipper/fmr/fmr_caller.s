@@ -2,9 +2,9 @@
 
 .text
 
-.globl _internal_call
+.globl internal_call
 
-_internal_call:	push ebp
+internal_call:	push ebp
 
 				mov ebp, esp
 

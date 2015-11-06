@@ -53,7 +53,7 @@ if [ x$1 != x ] ; then
   prefix=$1
   shift
 else
-  prefix=/home/nick/opt/cross-attempt4/arm-elf
+  prefix=/home/george/Documents/arm-elf/arm-elf
 fi
 
 # Allow for alternate isysroot in which to find headers
