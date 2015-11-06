@@ -96,13 +96,13 @@ install:
 
 	mkdir -p $(FLIPPERSDK)/osmium
 
-	# ~ Copy the binary into the SDK's firmware directory. ~
+	# ~ Copy the binary into the SDK's firmware directory. ~ #
 
 	$(rsync) -r $(output) $(FLIPPERSDK)/osmium/$(output)
 
 burn:
 
-	# Flash the connected device with the binary using the appropriate flasher.
+	# ~ Flash the connected device with the binary using the appropriate flasher. ~ #
 
 	$(flasher) $(flasher_flags)
 
