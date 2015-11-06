@@ -1,0 +1,7 @@
+This file contains any messages produced by compilers while
+running configure, to aid debugging if configure makes a mistake.
+
+configure:581: checking host system type
+configure:602: checking target system type
+configure:620: checking build system type
+configure:675: checking for a BSD compatible install
