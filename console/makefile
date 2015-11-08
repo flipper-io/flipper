@@ -10,7 +10,7 @@ rsync = $(shell which 'rsync')
 
 # ~ Declare the preprocessor statements to be used during object generation. ~ #
 
-preprocess = -std=c99 -m32
+preprocess = -std=c99
 
 include_directories = ../include ../libflipper/include/
 
@@ -23,7 +23,7 @@ libraries = -L "../libflipper" -lflipper -ldl
 include rules.make
 
 libflipper:
-        
+
 	$(MAKE) -C "../libflipper" all install
 
 all:

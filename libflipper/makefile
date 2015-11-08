@@ -10,27 +10,27 @@ target = $(shell echo $(shell uname -s) | tr A-Z a-z)
 
 ifeq ($(target),darwin)
 
-	# ~ Specifiy the name of the output file. ~ #
+# ~ Specifiy the name of the output file. ~ #
 
-	output = libflipper.dylib
+output = libflipper.dylib
 
-	# ~ Declare the library dependancies neededed for linking. ~ #
+# ~ Declare the library dependancies neededed for linking. ~ #
 
-	libraries = -framework CoreFoundation -framework IOKit
+libraries = -framework CoreFoundation -framework IOKit
 
 else ifeq ($(target),linux)
 
-	# ~ Do the same for the other targets. ~ #
+# ~ Do the same for the other targets. ~ #
 
-	output = libflipper.so
+output = libflipper.so
 
-	libraries = -lusb
+libraries = -lusb
 
 else
 
-	# ~ If we have no target, specify an error. ~ #
+# ~ If we have no target, specify an error. ~ #
 
-	$(error "Please specify a target.")
+$(error "Please specify a target.")
 
 endif
 
@@ -44,7 +44,7 @@ ln = $(shell which 'ln')
 
 # ~ Declare the preprocessor statements to be used during object generation. ~ #
 
-preprocess = -std=c99 -fpic -D__verbose__ -m32
+preprocess = -std=c99 -fpic -D__verbose__
 
 # ~ Pass flags to find so that it only isolates files pertainant to the target platform. ~ #
 
@@ -100,7 +100,7 @@ install:
 
 	# ~ Copy the resources into the SDK directory. ~ #
 
-	$(rsync) -r ../resources/* $(FLIPPERSDK)/resources
+	$(rsync) -r ../resources/*.applet $(FLIPPERSDK)/resources
 
 
 clean:

@@ -1,6 +1,6 @@
 #define __private_include__
 
-#include <flipper.h>
+#include <flipper/flipper.h>
 
 #include <fmr/fmr.h>
 
