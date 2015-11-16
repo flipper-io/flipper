@@ -14,6 +14,6 @@ void button_configure(void) {
 
 bool button_read(void) {
 	
-	return (bool)(device.invoke(_button, _button_read, NO_ARGS));
+	return (little32(device.invoke(0, 1, NO_ARGS)) & 1);
 	
 }

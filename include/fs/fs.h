@@ -16,28 +16,6 @@ extern fsp _break_value;
 
 extern fsp _root_leaf;
 
-/* A simple data structure used to represent files. */
-
-typedef struct _file {
-	
-	/* The amount of data held within the file. */
-	
-	uint32_t size;
-	
-	/* A pointer to the data held within the file. */
-	
-	fsp data;
-	
-	/* The length of the name of the file. */
-	
-	uint8_t namelen;
-	
-	/* The name of the file. */
-	
-	char name[];
-	
-} file;
-
 /* A local copy of the root pointer. */
 
 extern fsp root;
@@ -57,6 +35,12 @@ enum { _fs_configure, _fs_format };
 extern void fs_configure(void);
 
 extern void fs_format(void);
+
+extern void fs_print(fsp branch);
+
+void fs_transfer_file(char *path, char *name);
+
+void fs_download_file(char *name, char *path);
 
 #endif
 

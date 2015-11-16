@@ -12,8 +12,6 @@
 
 #define SPI_DATA_MODE_3				0x0C
 
-#define SPI_2X (1 << 0)
-
 void spi_configure(void *configuration) {
 	
 	/* ~ Set MOSI and SCK as outputs. ~ */
@@ -26,11 +24,11 @@ void spi_configure(void *configuration) {
 	
 	/* ~ Put the SPI bus into Master MODE3. ~ */
 	
-	set_bits_in_port_with_mask(SPCR, bit(MSTR) | SPI_DATA_MODE_3);
+	set_bits_in_port_with_mask(SPCR, bit(MSTR) | SPI_DATA_MODE_3 | bit(SPR1) | bit(SPR0));
 	
 	/* ~ Configure the SPI clock to be 1/2 of the system clock. This is the fastest SCK we can specify.  ~ */
 	
-	set_bits_in_port_with_mask(SPSR, SPI_2X);
+	//set_bits_in_port_with_mask(SPSR, bit(SPI2X));
 	
 	/* ~ ~ Enable the SPI bus and enter master mode. ~ ~ */
 	

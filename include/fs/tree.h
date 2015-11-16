@@ -16,9 +16,13 @@ typedef struct __attribute__((__packed__)) _leaf {
 	
 	uint16_t key;
 	
+	/* ~ The size of the data pointed to by the leaf. ~ */
+	
+	uint32_t size;
+	
 	/* The metadata pointed to by the leaf. */
 	
-	fsp metadata;
+	fsp data;
 	
 	/* A pointer that points to the child pointer of the parent that points to this leaf. :) */
 	
