@@ -343,6 +343,8 @@ void flash_reset_settings(void) {
 
 void flash_push(void *source, uint32_t length, fsp destination) {
 	
+	disable_interrupts();
+	
 	/* ~ Calculate the page of the address. ~ */
 	
 	uint16_t page = destination / 528;
@@ -407,9 +409,13 @@ void flash_push(void *source, uint32_t length, fsp destination) {
 	
 	flash_disable();
 	
+	enable_interrupts();
+	
 }
 
 void flash_pull(void *destination, uint32_t length, fsp source) {
+	
+	disable_interrupts();
 	
 	/* ~ Calculate the page of the address. ~ */
 	
@@ -430,6 +436,8 @@ void flash_pull(void *destination, uint32_t length, fsp source) {
 	/* ~ Close the connection. ~ */
 	
 	flash_disable();
+
+	enable_interrupts();
 	
 }
 
