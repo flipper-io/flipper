@@ -71,7 +71,7 @@ void usb_push(void *source, uint32_t length) {
 	hid_transmit_packet(packet);
 	
 	free(packet);
-	
+    
 }
 
 void usb_pull(void *destination, uint32_t length) {
@@ -83,5 +83,5 @@ void usb_pull(void *destination, uint32_t length) {
 	memcpy(destination, buffer, length);
 	
 	free(buffer);
-	
+    
 }

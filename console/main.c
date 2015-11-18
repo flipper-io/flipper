@@ -6,6 +6,10 @@
 
 int main(int argc, char *argv[]) {
 
+    flipper.attach(FLIPPER_SOURCE_USB);
+    
+    led.rgb(0, 10, 0);
+    
 #ifndef UPLOADER
 	
 	

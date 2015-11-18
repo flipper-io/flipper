@@ -84,7 +84,7 @@ uint32_t device_push(uint8_t object, uint8_t index, uint8_t argc, void *source, 
 	
 }
 
-void device_pull(uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...) {
+uint32_t device_pull(uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...) {
 	
 	/* ~ Construct a va_list to access variadic arguments. ~ */
 	
@@ -96,6 +96,6 @@ void device_pull(uint8_t object, uint8_t index, uint8_t argc, void *destination,
 		
 	/* ~ Invoke the function on the selected target. ~ */
 	
-	target_pull(&device, object, index, argc, destination, length, &argv);
+	return target_pull(&device, object, index, argc, destination, length, &argv);
 	
 }
