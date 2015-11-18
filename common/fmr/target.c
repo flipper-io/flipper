@@ -266,9 +266,9 @@ push:
 
 /* ~ This function moves data from the isolated address space of the device to the host using the FMR. ~ */
 
-void target_pull(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, va_list *argv) {
+uint32_t target_pull(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, va_list *argv) {
 	
-	if (!length) return;
+	if (!length) return 0;
 	
 	/* ~ Associate this request with the appropriate target. ~ */
 	
@@ -296,7 +296,7 @@ void target_pull(const struct _target *target, uint8_t object, uint8_t index, ui
 		
 		verbose("\tError. Too many arguments provided for the requested function call. Skipping.\n\n");
 		
-		return;
+		return 0;
 		
 	}
 	
@@ -349,7 +349,7 @@ void target_pull(const struct _target *target, uint8_t object, uint8_t index, ui
 	/* ~ Send the constructed packet to the target. ~ */
 	
 	fmr_broadcast();
-	
+    
 	/* ~ Retrieve a packet from the target containing the pulled data. ~ */
 	
 	fmr_retrieve();
@@ -383,7 +383,7 @@ pull:
 	/* ~ Check to see if we still have data to receive. ~ */
 	
 	if (length) {
-		
+        
 		/* ~ If we do, grab another packet. ~ */
 		
 		fmr_retrieve();
@@ -393,5 +393,17 @@ pull:
 		goto pull;
 		
 	}
+    
+    /* ~ Use a local variable to store the return value. ~ */
+    
+    uint32_t retval;
+    
+    /* ~ Load the value that the function returned from the target. ~ */
+    
+    target -> bus -> pull(&retval, sizeof(uint32_t));
+    
+    /* ~ Return this value back up the function chain. ~ */
+    
+    return retval;
 	
 }
