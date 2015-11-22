@@ -8,9 +8,13 @@ const struct _pwm pwm0 = {
 
 	pwm0_configure,
 
-	pwm0_set_enabled,
+	pwm0_enable,
 
-	pwm0_set_interrupt,
+	pwm0_disable,
+
+	pwm0_enable_interrupt,
+
+	pwm0_disable_interrupt,
 
 	pwm0_enabled,
 
@@ -26,9 +30,13 @@ const struct _pwm pwm1 = {
 
 	pwm1_configure,
 
-	pwm1_set_enabled,
+	pwm1_enable,
 
-	pwm1_set_interrupt,
+	pwm1_disable,
+
+	pwm1_enable_interrupt,
+
+	pwm1_disable_interrupt,
 
 	pwm1_enabled,
 
@@ -44,9 +52,13 @@ const struct _pwm pwm2 = {
 
 	pwm2_configure,
 
-	pwm2_set_enabled,
+	pwm2_enable,
 
-	pwm2_set_interrupt,
+	pwm2_disable,
+
+	pwm2_enable_interrupt,
+
+	pwm2_disable_interrupt,
 
 	pwm2_enabled,
 
@@ -62,9 +74,13 @@ const struct _pwm pwm3 = {
 
 	pwm3_configure,
 
-	pwm3_set_enabled,
+	pwm3_enable,
 
-	pwm3_set_interrupt,
+	pwm3_disable,
+
+	pwm3_enable_interrupt,
+
+	pwm3_disable_interrupt,
 
 	pwm3_enabled,
 

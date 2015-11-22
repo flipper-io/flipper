@@ -5,9 +5,9 @@
 #include <flipper/types.h>
 
 enum {
-	
+
 	RESERVED,	/* ~ Offset the enumerator by one so regular numbers can be used for pins IO1 through IO16. ~ */
-	
+
 	IO1,
 	IO2,
 	IO3,
@@ -24,28 +24,29 @@ enum {
 	IO14,
 	IO15,
 	IO016,
-	
+
 	A0,
 	A1,
 	A2,
 	A3,
 	A4,			/* ~ ANALOG IO ~ */
 	A5,
+	A6,
 	A7,
 	A8,
-	
+
 };
 
 extern const struct _io {
-	
+
 	void (* configure)(void);
-	
+
 	void (* direction)(uint8_t pin, uint8_t direction);
-	
+
 	void (* write)(uint8_t pin, uint16_t value);
-	
+
 	uint16_t (* read)(uint8_t pin);
-	
+
 } io;
 
 #ifdef __private_include__
