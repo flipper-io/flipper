@@ -78,6 +78,10 @@ extern void flash_wait(void);
 
 void flash_format(void) {
 	
+#if false
+    
+    /* !!!!!!!! THIS CODE APPEARS TO BE EVIL AND BRICKS THE FLASH CHIP! *cries* !!!!!!!! */
+    
 	/* Disable interrupts to prevent memory corruption. */
 	
 	disable_interrupts();
@@ -134,4 +138,6 @@ void flash_format(void) {
 	
 	enable_interrupts();
 	
+#endif
+    
 }

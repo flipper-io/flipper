@@ -2,13 +2,19 @@
 
 #include "console.h"
 
+#include <fmr/fmr.h>
+
+#include <platform/fmr.h>
+
 #define UPLOADER
 
 int main(int argc, char *argv[]) {
-
-    flipper.attach(FLIPPER_SOURCE_USB);
     
-    led.rgb(0, 10, 0);
+    flipper.attach(FLIPPER_SOURCE_USB);
+
+    printf("The value is: 0x%08x", device.invoke(0, 1, NO_ARGS));
+    
+    return 0;
     
 #ifndef UPLOADER
 	

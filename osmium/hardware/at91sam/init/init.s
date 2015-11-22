@@ -48,17 +48,17 @@ begin:			ldr r13, =__int_ram_top__
 
 				mov r0, r13
 
-                //msr CPSR_c, #(ARM_MODE_FIQ | I_BIT | F_BIT)
+                msr CPSR_c, #ARM_MODE_FIQ | I_BIT | F_BIT
 
             	ldr r8, =AT91C_BASE_AIC
 
-                //msr CPSR_c, #(ARM_MODE_IRQ | I_BIT | F_BIT)
+                msr CPSR_c, #ARM_MODE_IRQ | I_BIT | F_BIT
 
                 mov r13, r0
 
                 sub r0, r0, #irq_stack_size
 
-                msr CPSR_c, #(ARM_MODE_SVC)
+                msr CPSR_c, #ARM_MODE_SVC
 
                 mov r13, r0
 
@@ -128,7 +128,7 @@ irq_handler:	sub		lr, lr, #4
 
 				ldmia	sp!, { r1-r3, r12, r14 }
 
-				//msr		CPSR_c, #(I_BIT | ARM_MODE_IRQ)
+				msr		CPSR_c, #I_BIT | ARM_MODE_IRQ
 
 				ldr		r14, =AT91C_BASE_AIC
 
@@ -141,3 +141,4 @@ irq_handler:	sub		lr, lr, #4
 				msr		SPSR_cxsf, r14
 
 				ldmia	sp!, { pc }^
+				

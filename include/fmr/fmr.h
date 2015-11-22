@@ -79,7 +79,7 @@ struct _target {
 	uint32_t (* push)(uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, ...);
 	
 	uint32_t (* pull)(uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...);
-	
+    
 	const struct _bus *bus;
 	
 	uint8_t id;

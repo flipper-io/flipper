@@ -24,11 +24,11 @@ void spi_configure(void *configuration) {
 	
 	/* ~ Put the SPI bus into Master MODE3. ~ */
 	
-	set_bits_in_port_with_mask(SPCR, bit(MSTR) | SPI_DATA_MODE_3 | bit(SPR1) | bit(SPR0));
+	set_bits_in_port_with_mask(SPCR, bit(MSTR) | SPI_DATA_MODE_3);
 	
 	/* ~ Configure the SPI clock to be 1/2 of the system clock. This is the fastest SCK we can specify.  ~ */
 	
-	//set_bits_in_port_with_mask(SPSR, bit(SPI2X));
+	set_bits_in_port_with_mask(SPSR, bit(SPI2X));
 	
 	/* ~ ~ Enable the SPI bus and enter master mode. ~ ~ */
 	

@@ -40,9 +40,9 @@ clock = 48054850
 
 # ~ Specify a compiler and the binary utilities needed to deploy code to the target. ~ #
 
-cc = ../resources/osx/arm-elf/bin/arm-elf-gcc
+cc = /opt/local/bin/arm-elf-gcc-4.7
 
-objcopy = ../resources/osx/arm-elf/bin/arm-elf-objcopy
+objcopy = /opt/local/bin/arm-elf-objcopy
 
 uploader = $(shell which 'flipper')
 
