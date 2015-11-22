@@ -27,7 +27,7 @@ struct _target *sender;
 /* ~ Master invocation function. ~ */
 
 uint32_t fmr_invoke(const struct _target *sender) {
-	
+	    
 	/* ~ Compare the checksums of the packets to ensure the data was sent successfully. ~ */
 	
 	uint16_t cs = checksum((void *)(&fmrpacket.recipient), fmrpacket.header.length - sizeof(struct _fmr_header));
@@ -49,11 +49,11 @@ uint32_t fmr_invoke(const struct _target *sender) {
 	}
 	
 	struct _target *target = (void *)(fmr_access_array(fmrpacket.recipient.target));
-	
+    
 	/* ~ If all is well, perform the function call. ~ */
-	
+    
 	retval = target -> call();
-		
+    
 end:
 	
 	/* ~ Return whatever we received back to the device that sent us a message. ~ */
@@ -85,7 +85,7 @@ void fmr_retrieve(void) {
 	/* ~ If the bus is asynchronous, we have to load it in chunks. ~ */
 	
 	else {
-		
+        		
 		/* ~ Wait for synchronization. ~ */
 		
 		while (sender -> bus -> get() != 0xFE);
@@ -93,7 +93,7 @@ void fmr_retrieve(void) {
 		/* ~ Load the header of the packet. ~ */
 		
 		for (unsigned i = 1; i < sizeof(struct _fmr_header); i ++) ((uint8_t *)(&fmrpacket.header))[i] = sender -> bus -> get();
-				
+        
 		/* ~ Load the body of the packet. ~ */
 		
 		for (unsigned i = 0; i < (fmrpacket.header.length - sizeof(struct _fmr_header)); i ++) ((uint8_t *)(&fmrpacket.recipient))[i] = sender -> bus -> get();

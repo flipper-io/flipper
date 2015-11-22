@@ -203,20 +203,40 @@ int sam_load_firmware(char *firmware) {
 	/* First, we need to put the device into programming mode. Let the user know, then throw up a progress bar. */
 
 	printf("Entering programming mode.\n\n");
-
-	sam.dfu();
-
-	wait_with_progress(2);
-
+    
+//    sam.dfu();
+//    
+//    wait_with_progress(2);
+//    
+//    return 0;
+//    
+//    usart.disable();
+//    
+//    spi.disable();
+//    
+//    flash.enable();
+//    
+//    sam.power(OFF);
+//
+//    wait_with_progress(2);
+//    
+//    usart.enable();
+//    
+//    spi.enable();
+//    
+//    flash.disable();
+//
+//    sam.power(ON);
+//
+//    sam.reset();
+    
 	/* ~ Turn off the USART interrupt. ~ */
-
-//	usart.disable();
-
+    
 	/* Next, we need to verify that the device has properly entered programming mode. Send the handshake sequence. */
 
 	uint8_t connected = false;
 
-	for (int i = 0; (i < 100) && !connected; i ++) { usart.push((char []){ 0x80, 0x80, 0x23 }, 3); char exp[3] = { 0x0A, 0x0D, 0x3E }; char res[3]; usart.pull(res, 3); connected = !memcmp(exp, res, 3); }
+    for (int i = 0; (i < 100) && !connected; i ++) { usart.push((uint8_t []){ 0x80, 0x80, 0x23 }, 3); uint8_t exp[3] = { 0x0A, 0x0D, 0x3E }; uint8_t res[3]; usart.pull(res, 3); connected = !memcmp(exp, res, 3); printf("0x%02X 0x%02X 0x%02X\n", res[0], res[1], res[2]); }
 
 	if (!connected) {
 

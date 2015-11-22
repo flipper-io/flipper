@@ -10,7 +10,7 @@ fsp fs_empty_branch_for_key(fsp _branch, fsp current, uint16_t key) {
 	
 	/* ~ If our 'current' pointer is zero, then an empty branch pointer has been found; return it. ~ */
 	
-	if (current == -1) return _branch;
+	if (current == 0) return _branch;
 	
 	/* ~ Dereference the 'current' pointer to bring a copy of the leaf that it points to into local memory. ~ */
 	
@@ -19,11 +19,11 @@ fsp fs_empty_branch_for_key(fsp _branch, fsp current, uint16_t key) {
 	/* ~ Since we're here, we haven't yet found an empty branch pointer; walk the filesystem tree recursively until we do. ~ */
 	
 	if (_current -> key < key)
-		
+	
 		return fs_empty_branch_for_key(forward(current, leaf, left), _current -> left, key);
 	
 	else if (_current -> key > key)
-		
+	
 		return fs_empty_branch_for_key(forward(current, leaf, right), _current -> right, key);
 	
 	else {
@@ -42,7 +42,7 @@ fsp fs_add_leaf_with_key(fsp current, uint16_t key) {
 	
 	/* ~ Walk the filesystem tree until an empty branch pointer is found to match the key given. This will be where we will index the newly allocated leaf. ~ */
 	
-	fsp _branch = fs_empty_branch_for_key(-1, current, key);
+	fsp _branch = fs_empty_branch_for_key(0, current, key);
 	
 	/* ~ Check to ensure that the leaf we aim to create doesn't already exist. ~ */
 	
@@ -50,7 +50,21 @@ fsp fs_add_leaf_with_key(fsp current, uint16_t key) {
 		
 		/* ~ Allocate memory for the leaf. ~ */
 		
-		fsp region = (fsp) flash_alloc(sizeof(leaf));
+		fsp region = flash_alloc(sizeof(leaf));
+        
+        if (!region) {
+            
+            printf("External memory is full!\n\n");
+            
+        }
+        
+        /* ~ Create the new leaf. ~ */
+        
+        leaf *_leaf = malloc(sizeof(leaf));
+        
+        /* ~ Clear the new leaf. ~ */
+        
+        memset(_leaf, 0, sizeof(leaf));
 		
 		/* ~ Index the leaf in the tree by overwriting by writing the newly allocated memory region to the empty branch pointer we found earlier. ~ */
 		
@@ -58,11 +72,19 @@ fsp fs_add_leaf_with_key(fsp current, uint16_t key) {
 		
 		/* ~ Associate the given key with the new leaf by writing the key given into the key property of the new leaf. ~ */
 		
-		flash_push(&key, sizeof(uint16_t), forward(region, leaf, key));
+        _leaf -> key = key;
 		
 		/* ~ Write the empty branch pointer we found earlier into the branch pointer property of the new leaf. ~ */
 		
-		flash_push(&_branch, sizeof(fsp), forward(region, leaf, _branch));
+        _leaf -> _branch = _branch;
+        
+        /* ~ Send the new leaf to the filesystem. ~ */
+        
+        flash_push(_leaf, sizeof(leaf), region);
+        
+        /* ~ Free memory allocated for the leaf. ~ */
+        
+        free(_leaf);
 		
 		/* ~ Return a pointer to the newly created leaf. ~ */
 		
@@ -75,9 +97,7 @@ fsp fs_add_leaf_with_key(fsp current, uint16_t key) {
 		/* ~ This case catches an exception wherein the leaf we want to add already exists. ~ */
 		
 		verbose("An attempt was made to add a leaf that already exists.");
-		
-		return 0;
-		
+				
 	}
 	
 	return 0;
@@ -90,7 +110,7 @@ fsp fs_leaf_for_key(fsp current, uint16_t key) {
 	
 	/* ~ If we reach the end of the tree and have not yet found a matching key, then the leaf we are interested in finding does not exist. ~ */
 	
-	if (current == -1) {
+	if (current == 0) {
 		
 		verbose("No leaf was found to match the key given, 0x%04X.\n\n", key);
 		
@@ -103,15 +123,15 @@ fsp fs_leaf_for_key(fsp current, uint16_t key) {
 	leaf *_current = flash_dereference(current, sizeof(leaf));
 	
 	if (_current -> key == key)
-		
+	
 		return current;
 	
 	else if (_current -> key < key)
-		
+	
 		return fs_leaf_for_key(_current -> left, key);
 	
 	else if (_current -> key > key)
-		
+	
 		return fs_leaf_for_key(_current -> right, key);
 	
 	return 0;
@@ -126,7 +146,7 @@ void fs_remove_leaf_with_key(fsp parent, uint16_t key) {
 	
 	/* ~ If the leaf that we're trying to delete doesn't exist, laugh it off. ~ */
 	
-	if (match == -1) {
+	if (match == 0) {
 		
 		verbose("An attempt was made to remove a non-existent leaf.\n\n");
 		

@@ -39,14 +39,14 @@ uint32_t self_call(void) {
 	/* ~ Dereference a pointer to the recipient function. ~ */
 	
 	void *function = ((void **)(object))[fmrpacket.recipient.index];
-	
-	/* ~ Invoke the recipient function with the appropriate arguments. ~ */
+    
+    /* ~ Invoke the recipient function with the appropriate arguments. ~ */
 	
 	internal_call(function, fmrpacket.recipient.argc, fmrpacket.body);
-	
+    
 	/* ~ Return the value. ~ */
 	
-	return *(uint32_t *)(fmrpacket.body);
+    return 0; //*(uint32_t *)(fmrpacket.body);
 	
 }
 

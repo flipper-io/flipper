@@ -33,10 +33,8 @@ void flash_reset(void) {
 fsp flash_alloc(uint32_t length) {
 	
 	fsp address = device.invoke(_flash, _flash_alloc, 2, hi16(length), lo16(length));
-	
-	printf("\nAllocated at 0x%08x\n", little32(address));
-	
-	return little32(address);
+		
+	return address;
 	
 }
 
