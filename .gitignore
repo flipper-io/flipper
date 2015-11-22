@@ -6,3 +6,4 @@
 *.bin
 *.so
 *.dylib
+!resources/**/*.so

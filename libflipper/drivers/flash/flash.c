@@ -33,10 +33,8 @@ void flash_reset(void) {
 fsp flash_alloc(uint32_t length) {
 	
 	fsp address = device.invoke(_flash, _flash_alloc, 2, hi16(length), lo16(length));
-	
-	printf("\nAllocated at 0x%08x\n\n", little32(address));
-	
-	return little32(address);
+		
+	return address;
 	
 }
 
@@ -67,6 +65,8 @@ void flash_pull(void *destination, uint32_t length, fsp source) {
 void *flash_dereference(fsp source, uint32_t length) {
 	
 	void *local = malloc(length);
+	
+	if (!local) { printf("\nERROR. System declined memory allocation reuquest for flash dereference.\n\n"); }
 	
 	flash_pull(local, length, source);
 	

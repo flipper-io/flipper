@@ -2,7 +2,7 @@
 
 #define console_h
 
-#include <flipper.h>
+#include <flipper/flipper.h>
 
 void wait_with_progress(int seconds);
 

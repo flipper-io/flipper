@@ -39,14 +39,14 @@ uint32_t self_call(void) {
 	/* ~ Dereference a pointer to the recipient function. ~ */
 	
 	void *function = ((void **)(object))[fmrpacket.recipient.index];
-	
-	/* ~ Invoke the recipient function with the appropriate arguments. ~ */
+    
+    /* ~ Invoke the recipient function with the appropriate arguments. ~ */
 	
 	internal_call(function, fmrpacket.recipient.argc, fmrpacket.body);
-	
+    
 	/* ~ Return the value. ~ */
 	
-	return *(uint32_t *)(fmrpacket.body);
+    return 0; //*(uint32_t *)(fmrpacket.body);
 	
 }
 
@@ -186,7 +186,7 @@ pull:
 	
 }
 
-void self_pull(uint8_t object, uint8_t index, uint8_t argc, uint32_t length) {
+uint32_t self_pull(uint8_t object, uint8_t index, uint8_t argc, uint32_t length) {
 	
 	/* ~ Allocate the appropriate amount of memory in external memory to buffer the outgoing data. ~ */
 	
@@ -238,7 +238,7 @@ void self_pull(uint8_t object, uint8_t index, uint8_t argc, uint32_t length) {
 	
 	/* ~ Perform the function call. ~ */
 	
-	self_call();
+	uint32_t retval = self_call();
 	
 	/* ~ Calculate how much space we have left in the current packet. ~ */
 	
@@ -301,5 +301,7 @@ push:
 	/* ~ Free the memory we allocated to buffer the outgoing data. ~ */
 	
 	free(source);
+    
+    return retval;
 	
 }

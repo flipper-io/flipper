@@ -6,6 +6,18 @@
 
 #include <fs/tree.h>
 
+void fs_configure(void) {
+		
+    /* ~ We have to load the freelist and the _break_value in from memory! ~ */
+    
+    flash_pull(&_free_list, sizeof(fsp), _FREE_LIST);
+    
+    flash_pull(&_break_value, sizeof(fsp), _BREAK_VALUE);
+    
+    flash_pull(&_root_leaf, sizeof(fsp), _ROOT_LEAF);
+	
+}
+
 void fs_format(void) {
 	
 	/* ~ Reset the allocation table. ~ */
@@ -22,11 +34,9 @@ void fs_format(void) {
 	
 	leaf *root = (leaf *) malloc(sizeof(leaf));
 	
-	root -> key = 0x4321; //checksum(root_name, root_namelen);
-	
-	root -> left = 0;
-	
-	root -> right = 0;
+    memset(root, 0, sizeof(leaf));
+    
+	root -> key = 0x4321;
 	
 	/* ~ Allocate space for the root leaf. ~ */
 	

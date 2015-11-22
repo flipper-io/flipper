@@ -316,6 +316,8 @@ void flash_begin_reading_from_page_with_offset(uint16_t page, uint16_t offset) {
 }
 
 void flash_reset_settings(void) {
+    
+    disable_interrupts();
 	
 	/* Wait until the flash chip is ready to recieve data. */
 	
@@ -338,11 +340,15 @@ void flash_reset_settings(void) {
 	/* ~ Disable the device so that no data can be recieved until the next opcode is sent. ~ */
 	
 	flash_disable();
+    
+    enable_interrupts();
 	
 }
 
 void flash_push(void *source, uint32_t length, fsp destination) {
-	
+    
+    disable_interrupts();
+    
 	/* ~ Calculate the page of the address. ~ */
 	
 	uint16_t page = destination / 528;
@@ -406,11 +412,15 @@ void flash_push(void *source, uint32_t length, fsp destination) {
 	/* ~ Close the connection. ~ */
 	
 	flash_disable();
-	
+    
+    enable_interrupts();
+		
 }
 
 void flash_pull(void *destination, uint32_t length, fsp source) {
-	
+    
+    disable_interrupts();
+    
 	/* ~ Calculate the page of the address. ~ */
 	
 	uint16_t page = source / 528;
@@ -430,6 +440,8 @@ void flash_pull(void *destination, uint32_t length, fsp source) {
 	/* ~ Close the connection. ~ */
 	
 	flash_disable();
+    
+    enable_interrupts();
 	
 }
 

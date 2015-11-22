@@ -1,62 +1,66 @@
-# ~ Set platform specific macros. ~ */
+# ~ Determine which platform is being targeted and define its build macros. ~ */
 
 ifeq ($(platform),atmega16u2)
 
-	# ~ Specifiy the name of the output file. ~ #
+# ~ Specifiy the name of the output file. ~ #
 
-	output = osmium-atmega.bin
+output = osmium-atmega.bin
 
-	# ~ Specify the target clock frequency in MHz. ~ #
+# ~ Specify the target clock frequency in MHz. ~ #
 
-	clock = 16000000
+clock = 16000000
 
-	# ~ Specify a compiler and the other utilities needed to deploy for the target. ~ #
+# ~ Specify a compiler and the binary utilities needed to deploy code to the target. ~ #
 
-	cc = $(shell which 'avr-gcc')
+cc = $(shell which 'avr-gcc')
 
-	objcopy = $(shell which 'avr-objcopy')
+objcopy = $(shell which 'avr-objcopy')
 
-	flasher = $(shell which 'avrdude')
+uploader = $(shell which 'avrdude')
 
-	# ~ Specify platform specific preprocessor flags. ~ #
+# ~ Specify platform specific preprocessor flags. ~ #
 
-	platform_flags = -DARCH=ARCH_AVR8 -mmcu=$(platform) -D__AVR_$(shell echo $(platform) | tr a-z A-Z)__
+uploader_flags = -p $(platform) -c usbtiny -U lfuse:w:0xFF:m -U hfuse:w:0xD9:m -U flash:w:$(output)
 
-	flasher_flags = -p $(platform) -c usbtiny -V -U lfuse:w:0xFF:m -U hfuse:w:0xD9:m -U flash:w:$(output)
+platform_flags = -DARCH=ARCH_AVR8 -mmcu=$(platform) -D__AVR_$(shell echo $(platform) | tr a-z A-Z)__
 
-	# ~ Specify dependant libraries. ~ #
+# ~ Specify the platform's hardware directory. ~ #
 
-	libraries = 
-
-	# ~ Specify the platform's hardware directory. ~ #
-
-	hardware_directory = ./hardware/atmega
+hardware_directory = ./hardware/atmega
 
 else ifeq ($(platform),at91sam7s)
 
-	# ~ Do the same for the other platforms. ~ #
+# ~ Specifiy the name of the output file. ~ #
 
-	output = osmium-sam7s.bin
+output = osmium-sam7s.bin
 
-	clock = 48054850
+# ~ Specify the target clock frequency in MHz. ~ #
 
-	cc = ../resources/arm-elf/bin/arm-elf-gcc
+clock = 48054850
 
-	objcopy = ../resources/arm-elf/bin/arm-elf-objcopy
+# ~ Specify a compiler and the binary utilities needed to deploy code to the target. ~ #
 
- 	flasher = $(shell which 'flipper')
+cc = /opt/local/bin/arm-elf-gcc-4.7
 
-	flasher_flags = flash $(output)
+objcopy = /opt/local/bin/arm-elf-objcopy
 
-	platform_flags = -std=gnu99 -Os -mcpu=arm7tdmi -mtune=arm7tdmi -mthumb -mthumb-interwork -nostartfiles
+uploader = $(shell which 'flipper')
 
-	hardware_directory = ./hardware/at91sam
+# ~ Specify platform specific preprocessor flags. ~ #
+
+uploader_flags = flash $(output)
+
+platform_flags = -std=gnu99 -Os -mcpu=arm7tdmi -mtune=arm7tdmi -mthumb -mthumb-interwork -nostartfiles
+
+# ~ Specify the platform's hardware directory. ~ #
+
+hardware_directory = ./hardware/at91sam
 
 else
 
-	# ~ If we have no platform, specify an error. ~ #
+# ~ If we haven't been given a target platform, throw an error. ~ #
 
-	$(error "Please specify a platform.")
+$(error "ERROR. No target platform has been specified. See BUILD for more information.")
 
 endif
 
@@ -84,7 +88,7 @@ all: clean
 
 	# ~ Link the object files together to produce an output file. ~ #
 
-	$(cc) $(prefix) $(ldflags) $(sort $(objects)) -o $(basename $(output)).elf
+	$(cc) $(prefix) $(ldflags) -w $(sort $(objects)) -o $(basename $(output)).elf
 
 	# ~ Convert the 'elf' file into a raw binary. ~ #
 
@@ -102,10 +106,10 @@ install:
 
 burn:
 
-	# ~ Flash the connected device with the binary using the appropriate flasher. ~ #
+	# ~ Flash the connected device with the binary using the appropriate uploader. ~ #
 
-	$(flasher) $(flasher_flags)
+	$(uploader) $(uploader_flags)
 
 clean:
 
-	rm -rf $(shell find . -follow -name "*.o" -or -name "*.elf") $(output)
+	rm -rf $(shell find . -follow -name "*.o" -or -name "*.elf") *.bin

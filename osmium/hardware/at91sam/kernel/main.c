@@ -29,7 +29,7 @@ void makeitblink(void) {
 bool state = 1;
 
 void usart_interrupt(void) {
-	
+	    
 	/* ~ Alert the system that the FMR is busy. ~ */
 	
 	fmr_busy = true;
@@ -49,7 +49,7 @@ void usart_interrupt(void) {
 	/* ~ Free the FMR. ~ */
 	
 	fmr_busy = false;
-	
+    
 	AT91C_BASE_US0 -> US_CR = AT91C_US_RSTSTA;
 	
 }
@@ -82,9 +82,9 @@ int main(void) {
 	
 	usart1.configure((void *)(baudrate(115200)));
 	
-	//flash_configure();
-	
-	//spi_configure(0);
+//	flash_configure();
+//	
+//	spi_configure(0);
 	
 	/* ~ Configure the host for this platform. ~ */
 	
@@ -125,7 +125,7 @@ int main(void) {
 	AT91C_BASE_AIC -> AIC_IECR = (1 << AT91C_ID_US0); 
 	
 	AT91C_BASE_US0 -> US_IER = AT91C_US_RXRDY;
-	
+    
 	io.configure();
 	
 	io.direction(8, OUTPUT);

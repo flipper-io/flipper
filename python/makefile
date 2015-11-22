@@ -12,15 +12,15 @@ target = $(shell echo $(shell uname -s) | tr A-Z a-z)
 
 ifeq ($(target),darwin)
 
-	python_install_directory = /Library/Python/2.7/site-packages/$(output)
+python_install_directory = /Library/Python/2.7/site-packages/$(output)
 
-	include_directories = $(shell find '/System/Library/Frameworks/Python.framework/Versions/Current/include' -type d) $(FLIPPERSDK)/include
+include_directories = $(shell find '/System/Library/Frameworks/Python.framework/Versions/Current/include' -type d)
 
 else ifeq ($(target),linux)
 
-	python_install_directory = /usr/local/lib/python$(version)/site-packages
+python_install_directory = /usr/local/lib/python$(version)/site-packages
 
-	include_directories = $(shell find '/usr/include/python$(version)' -type d) $(FLIPPERSDK)/include
+include_directories = $(shell find '/usr/include/python$(version)' -type d)
 
 else
 
@@ -33,6 +33,8 @@ cc = $(shell which 'gcc')
 rsync = $(shell which 'rsync')
 
 preprocess = -std=gnu99 -Os -fpic
+
+include_directories += ../include
 
 # ~ Include this file to recursively compile all supported file types and generate object files using the preprocessor statements above. ~ #
 
@@ -59,7 +61,7 @@ all:
 install:
 
 	# ~ Fabricate the install directory if it doesn't already exist. ~ #
-	
+
 	mkdir -p $(FLIPPERSDK)/python
 
 	# ~ Copy the module into the SDK's python directory. ~ #

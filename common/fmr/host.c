@@ -70,7 +70,7 @@ uint32_t host_push(uint8_t object, uint8_t index, uint8_t argc, void *source, ui
 	
 }
 
-void host_pull(uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...) {
+uint32_t host_pull(uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...) {
 	
 	/* ~ Construct a va_list to access variadic arguments. ~ */
 	
@@ -82,6 +82,6 @@ void host_pull(uint8_t object, uint8_t index, uint8_t argc, void *destination, u
 	
 	/* ~ Invoke the function on the selected target. ~ */
 	
-	target_pull(&host, object, index, argc, destination, length, &argv);
+	return target_pull(&host, object, index, argc, destination, length, &argv);
 	
 }

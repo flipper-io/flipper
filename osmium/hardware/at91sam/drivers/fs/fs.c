@@ -2,6 +2,12 @@
 
 #include <fs/fs.h>
 
+void fs_configure(void) {
+	
+	
+	
+}
+
 void fs_format(void) {
 	
 	

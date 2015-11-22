@@ -66,18 +66,22 @@ void flash_reset(void) {
  
 */
 
-#define FLASH_OPCODE_CHIP_ERASE_0		0xC7
+#define FLASH_OPCODE_CHIP_ERASE_0 0xC7
 
-#define FLASH_OPCODE_CHIP_ERASE_1		0x94
+#define FLASH_OPCODE_CHIP_ERASE_1 0x94
 
-#define FLASH_OPCODE_CHIP_ERASE_2		0x80
+#define FLASH_OPCODE_CHIP_ERASE_2 0x80
 
-#define FLASH_OPCODE_CHIP_ERASE_3		0x9A
+#define FLASH_OPCODE_CHIP_ERASE_3 0x9A
 
 extern void flash_wait(void);
 
 void flash_format(void) {
 	
+#if false
+    
+    /* !!!!!!!! THIS CODE APPEARS TO BE EVIL AND BRICKS THE FLASH CHIP! *cries* !!!!!!!! */
+    
 	/* Disable interrupts to prevent memory corruption. */
 	
 	disable_interrupts();
@@ -134,4 +138,6 @@ void flash_format(void) {
 	
 	enable_interrupts();
 	
+#endif
+    
 }

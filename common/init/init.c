@@ -24,8 +24,6 @@ void __attribute__ ((constructor)) libflipper_init() {
 	
 	button_configure();
 	
-	flash_configure();
-	
 	i2c_configure();
 	
 	io_configure();
@@ -38,6 +36,8 @@ void __attribute__ ((constructor)) libflipper_init() {
 	
 	spi_configure(0);
 	
+	flash_configure();
+    
 	timer_configure();
 	
 }
