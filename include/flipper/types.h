@@ -76,6 +76,8 @@ typedef uint32_t fsp;
 
 #define get_bit_from_port(b, p)             ((p) & bit(b))
 
+#define get_bits_from_port_with_mask(p, m)	((p) & (m))
+
 #define set_bit_in_port(b, p)               ((p) |= bit(b))
 
 #define set_bits_in_port_with_mask(p, m)	((p) |= (m))

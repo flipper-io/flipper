@@ -66,6 +66,18 @@ void pio_interrupt() {
 
 int main(void) {
 	
+	io.direction(8, OUTPUT);
+	
+	while(true) {
+		io.write(8, ON);
+	
+		delay_ms(3000);
+	
+		io.write(8, OFF);
+	
+		delay_ms(500);
+	}
+
 	usart.configure((void *)(baudrate(115200)));
 	
 	usart1.configure((void *)(baudrate(115200)));
