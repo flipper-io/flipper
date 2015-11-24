@@ -10,9 +10,13 @@
 
 void flash_configure(void) {
 	
-	/* Configure the external flash memory chip's CS pin as an output. */
+	/* Configure the external flash memory chip's CS pin as an input. */
 	
-	set_bit_in_port(FLASH_CS_PIN, FLASH_CS_DDR);
+	clear_bit_in_port(FLASH_CS_PIN, FLASH_CS_DDR);
+    
+    /* ~ Enable the CS pin pull-up resistor. ~ */
+    
+    set_bit_in_port(FLASH_CS_PIN, FLASH_CS_PORT);
 
 	/* Configure the external flash memory chip's reset pin as an output. */
 	
@@ -34,21 +38,39 @@ void flash_configure(void) {
 
 void flash_enable(void) {
 	
+    spi_enable();
+    
+    /* Configure the external flash memory chip's CS pin as an output. */
+    
+    set_bit_in_port(FLASH_CS_PIN, FLASH_CS_DDR);
+    
 	/* Pull the CS pin low to enable the device. */
 	
-	clear_bit_in_port(FLASH_CS_PIN, PORTB);
+	clear_bit_in_port(FLASH_CS_PIN, FLASH_CS_PORT);
 	
 }
 
 void flash_disable(void) {
 	
-	/* Pull the CS pin high to disable the device. */
+    spi_disable();
+    
+    /* Configure the external flash memory chip's CS pin as an input. */
+    
+    clear_bit_in_port(FLASH_CS_PIN, FLASH_CS_DDR);
 	
-	set_bit_in_port(FLASH_CS_PIN, PORTB);
-	
+    /* ~ Enable the CS pin pull-up resistor. ~ */
+    
+    set_bit_in_port(FLASH_CS_PIN, FLASH_CS_PORT);
+    
 }
 
 void flash_reset(void) {
+    
+    spi_enable();
+    
+    /* Configure the external flash memory chip's CS pin as an output. */
+    
+    set_bit_in_port(FLASH_CS_PIN, FLASH_CS_DDR);
 	
 	/* Pull the CS pin high to disable the device. */
 	

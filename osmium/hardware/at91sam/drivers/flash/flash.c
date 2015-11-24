@@ -12,41 +12,59 @@ void flash_configure(void) {
 	
 	set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_PER);
 	
-	/* ~ Enable the CS pin as an output. ~ */
-	
-	set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_OER);
-	
-	/* ~ Turn the CS pin on. ~ */
-	
-	set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_SODR);
+    /* ~ Enable the CS pin as an input. ~ */
+    
+    set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_ODR);
+    
+    /* ~ Enable the CS pin pull-up. ~ */
+    
+    set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_PPUER);
 	
 }
 
 void flash_enable(void) {
 	
-	/* ~ Turn the CS pin off. ~ */
+    spi_enable();
+    
+    /* ~ Enable the CS pin as an output. ~ */
+    
+    set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_OER);
+    
+    /* Pull the CS pin low to enable the device. */
 	
 	set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_CODR);
 	
 }
 
 void flash_disable(void) {
+    
+    spi_disable();
 	
-	/* ~ Wait until the SPI has finished transmitting any data. ~ */
-	
-	while (!((AT91C_BASE_SPI -> SPI_SR) & AT91C_SPI_TXEMPTY));
-	
-	/* ~ Turn the CS pin on. ~ */
-	
-	set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_SODR);
+    /* Configure the external flash memory chip's CS pin as an input. */
+    
+    set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_ODR);
+    
+    /* ~ Enable the CS pin pull-up resistor. ~ */
+    
+    set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_PPUER);
 	
 }
 
 void flash_reset(void) {
 	
-	flash_disable();
-	
-	flash_enable();
+    spi_enable();
+    
+    /* ~ Enable the CS pin as an output. ~ */
+    
+    set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_OER);
+    
+    /* ~ Turn the CS pin on. ~ */
+    
+    set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_SODR);
+    
+    /* ~ Turn the CS pin off. ~ */
+    
+    set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_CODR);
 	
 }
 

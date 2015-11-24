@@ -207,7 +207,7 @@ int sam_load_firmware(char *firmware) {
 //    sam.dfu();
 //    
 //    wait_with_progress(2);
-//    
+//
 //    return 0;
 //    
 //    usart.disable();

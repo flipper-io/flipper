@@ -12,12 +12,6 @@
 
 #include <platform/fmr.h>
 
-fsp _root_leaf;
-
-fsp _free_list;
-
-fsp _break_value;
-
 void fs_configure(void) {
 	
     /* ~ We have to load the freelist and the _break_value in from memory! ~ */
@@ -74,15 +68,13 @@ void fs_transfer_file(char *path, char *name) {
 	
 	/* ~ Allocate space for the file in the filesystem. ~ */
 	
-	fsp _data = flash.alloc(size);
+	fsp _data = flash_alloc(size);
 	
 	flash_push(&size, sizeof(fsp), forward(_leaf, leaf, size));
 	
 	flash_push(&_data, sizeof(fsp), forward(_leaf, leaf, data));
 	
-    for (int i = 0; i < size / 64; i ++) { printf("Sending %f percent.\n", (float)((float)((i * 64) + (i % 64)) / size) * 100); flash_push(binary + (64 * i), 64, _data + (64 * i)); }
-    
-    flash_push(binary + (size - (size % 64)), (size % 64), _data + (size - (size % 64)));
+    flash_push(binary, size, _data);
 	
 	free(binary);
 	
@@ -116,7 +108,7 @@ void fs_download_file(char *name, char *path) {
     
     for (int i = 0; i < l -> size / 64; i ++) { printf("Receiving %f percent.\n", (float)((float)((i * 64) + (i % 64)) / l -> size) * 100); flash_pull(data + (64 * i), 64, l -> data + (64 * i)); }
     
-    flash_push(data + (l -> size - (l -> size % 64)), (l -> size % 64), l -> data + (l -> size - (l -> size % 64)));
+    flash_push(data, l -> size, l -> data);
 	
 	fwrite(data, l -> size, sizeof(uint8_t), file);
 	

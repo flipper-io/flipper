@@ -70,10 +70,12 @@ int main(void) {
 	
 	usart1.configure((void *)(baudrate(115200)));
 	
-//	flash_configure();
-//	
-//	spi_configure(0);
+    spi_configure(0);
+    
+	flash_configure();
 	
+    //fs_configure();
+    
 	/* ~ Configure the host for this platform. ~ */
 	
 	host_configure(&usart);
@@ -120,8 +122,14 @@ int main(void) {
 	
 	io.write(8, true);
 	
-	while (true) {
+	while (false) {
 		
+        spi_enable();
+        
+        spi_put(0xFE);
+        
+        spi_disable();
+        
 		io.write(8, false);
 		
 		delay_ms(500);
