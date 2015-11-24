@@ -4,7 +4,7 @@ $(shell find . -name '.DS_Store' -exec rm -rf {} \;)
 
 # ~ Use 'find' to isolate compilable files. Any file names denoted by $(exclude) will not be factored into the search. ~ #
 
-targets = $(shell find . -follow -type f $(findflags) -name '*.c' -or $(findflags) -name '*.s' -or $(findflags) -name '*.S')
+targets = $(shell find . -follow -type f $(findflags) -name '*.c' -or $(findflags) -name '*.s' -or $(findflags) -name '*.S' -or $(findflags) -name '*.asm')
 
 # ~ Convert the target file names into object file names ~ #
 
@@ -43,3 +43,9 @@ $(patsubst %.s, %.o, $(filter %.s, $(targets))) : %.o : %.s
 $(patsubst %.S, %.o, $(filter %.S, $(targets))) : %.o : %.S
 
 	$(cc) $(prefix) -c "$<" -o "$@"
+
+# ~ Assembly source files with the '.asm' extension. ~ #
+
+$(patsubst %.asm, %.o, $(filter %.asm, $(targets))) : %.o : %.asm
+
+	$(nasm) -f $(objformat) -o "$@" "$<"
