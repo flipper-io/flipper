@@ -14,15 +14,19 @@ void spi_configure(void *configuration) {
 	
 	set_bits_in_port_with_mask(AT91C_BASE_PIOA -> PIO_PDR, (AT91C_PA12_MISO | AT91C_PA13_MOSI | AT91C_PA14_SPCK));
 	
-	/* ~ Enable the SPI in the PCER (peripheral clock enable register). ~ */
+	/* ~ Enable the SPI in the Peripheral Clock Enable Register. ~ */
 	
 	set_bit_in_port(AT91C_ID_SPI, AT91C_BASE_PMC -> PMC_PCER);
 	
 	/* ~ Disable communications and reset the SPI. ~ */
 	
 	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SPIDIS);
+    
+    /* ~ Initalize the SPI in slave mode. ~ */
+    
+    clear_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_MR, AT91C_SPI_MSTR);
 	
-	/* ~ Execcute another software reset of the SPI in order to ensure that the SPI controller has been completely reset then enable it. ~ */
+	/* ~ Execute two consecutive software reset of the SPI in order to ensure that the SPI controller has been completely reset. ~ */
 	
 	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SWRST);
 	
@@ -34,26 +38,34 @@ void spi_configure(void *configuration) {
 	
 	/* ~ Configure the SPI as a master: fixed peripheral selection: no fault detection: deselect all peripherals.  ~ */
 	
-	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_MR, (AT91C_SPI_MSTR | AT91C_SPI_PS_FIXED | (AT91C_SPI_PCS & (1 << 16)) | AT91C_SPI_MODFDIS));
+	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_MR, (AT91C_SPI_PS_FIXED | (AT91C_SPI_PCS & (1 << 16)) | AT91C_SPI_MODFDIS));
 	
 	/* ~ SPI_DATA_MODE_3: don't change CS after transfer: 8 bits per transfer: ~ */
 	
 	AT91C_SPI_CSR[1] = (AT91C_SPI_CPOL | AT91C_SPI_BITS_8 | AT91C_SPI_CSAAT | (AT91C_SPI_SCBR & (10 << 8) | (AT91C_SPI_DLYBCT & (1 << 24))));
 	
-	/* ~ Enable the SPI controller. ~ */
-	
-	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SPIEN);
-	
 }
 
 void spi_enable(void){
+    
+    set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_MR, AT91C_SPI_MSTR);
 	
 	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SPIEN);
 	
+    /* ~ Wait for the SPI to boot. ~ */
+    
+    while (!((AT91C_BASE_SPI -> SPI_SR) & AT91C_SPI_SPIENS));
+    
 }
 
 void spi_disable(void) {
 	
+    /* ~ Wait until the SPI has finished transmitting any data. ~ */
+    
+    while (!((AT91C_BASE_SPI -> SPI_SR) & AT91C_SPI_TXEMPTY));
+    
+    clear_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_MR, AT91C_SPI_MSTR);
+    
 	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SPIDIS);
 	
 }
@@ -64,31 +76,27 @@ bool spi_ready(void) {
 	
 }
 
+uint8_t spi_put_get(uint8_t byte) {
+    
+    while (!((AT91C_BASE_SPI -> SPI_SR) & AT91C_SPI_TDRE));
+    
+    AT91C_BASE_SPI -> SPI_TDR = byte;
+    
+    while (!((AT91C_BASE_SPI -> SPI_SR) & AT91C_SPI_RDRF));
+    
+    return (uint8_t)(AT91C_BASE_SPI -> SPI_RDR);
+    
+}
+
 void spi_put(uint8_t byte) {
 	
-	/* ~ Send the byte to the peripheral connected to NPCS1. ~ */
-	
-	AT91C_BASE_SPI -> SPI_TDR = byte;
-	
-	/* ~ Wait until the byte has been sent. ~ */
-	
-	while (!((AT91C_BASE_SPI -> SPI_SR) & AT91C_SPI_TDRE));
+    spi_put_get(byte);
 	
 }
 
 uint8_t spi_get(void) {
 	
-	/* ~ Send a don't care byte. ~ */
-	
-	spi_put(0x00);
-	
-	/* ~ Wait until data has been received. ~ */
-	
-	while (!((AT91C_BASE_SPI -> SPI_SR) & AT91C_SPI_RDRF));
-	
-	/* ~ Return the received data. ~ */
-	
-	return (uint8_t)(AT91C_BASE_SPI -> SPI_RDR);
+    return spi_put_get(0x00);
 	
 }
 
