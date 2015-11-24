@@ -32,4 +32,4 @@
 
 #include <fs/crc.h>
 
-const void * const objects[] = { &button, &flash, &host, &self, &device, &fs, &i2c, &io, &led, &pwm, &sam, &spi, &timer, &usart, &usart1, &dbgu, &usb, &wifi };
+const void * const objects[] = { &button, &flash, &host, &self, &device, &fs, &i2c, &io, &led, &pwm0, &sam, &spi, &timer, &usart, &usart1, &dbgu, &usb, &wifi };

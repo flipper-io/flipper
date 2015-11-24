@@ -29,7 +29,7 @@ void pwm_configure(AT91S_PWMC_CH *pwm) {
 
 	/* ~ Configure the default duty cycle for each channel. ~ */
 
-	
+
 
 	/* ~ Configure the output waveform polarity.                 ~ */
 	/* ~ The default waveform polarity is positive, set using 0. ~ */
@@ -44,7 +44,7 @@ void pwm_configure(AT91S_PWMC_CH *pwm) {
  */
 void pwm_enable(uint8_t channel) {
 
-	set_bits_in_port_with_mask(AT91PS_PWMC -> PWMC_ENA, channel);
+	set_bits_in_port_with_mask(AT91C_BASE_PWMC -> PWMC_ENA, channel);
 
 }
 
@@ -54,7 +54,7 @@ void pwm_enable(uint8_t channel) {
  */
 void pwm_disable(uint8_t channel) {
 
-	set_bits_in_port_with_mask(AT91PS_PWMC -> PWMC_DIS, channel);
+	set_bits_in_port_with_mask(AT91C_BASE_PWMC -> PWMC_DIS, channel);
 
 }
 
@@ -64,7 +64,7 @@ void pwm_disable(uint8_t channel) {
  */
 void pwm_enable_interrupt(uint8_t channel) {
 
-	set_bits_in_port_with_mask(AT91PS_PWMC -> PWMC_IER, channel);
+	set_bits_in_port_with_mask(AT91C_BASE_PWMC -> PWMC_IER, channel);
 
 }
 
@@ -74,7 +74,7 @@ void pwm_enable_interrupt(uint8_t channel) {
  */
 void pwm_disable_interrupt(uint8_t channel) {
 
-	set_bits_in_port_with_mask(AT91PS_PWMC -> PWMC_IDR, channel);
+	set_bits_in_port_with_mask(AT91C_BASE_PWMC -> PWMC_IDR, channel);
 
 }
 
@@ -85,7 +85,7 @@ void pwm_disable_interrupt(uint8_t channel) {
  */
 bool pwm_enabled(uint8_t channel) {
 
-	return get_bits_from_port_with_mask(AT91PS_PWMC -> PWMC_SR, channel);
+	return get_bits_from_port_with_mask(AT91C_BASE_PWMC -> PWMC_SR, channel);
 
 }
 
@@ -96,7 +96,7 @@ bool pwm_enabled(uint8_t channel) {
  */
 bool pwm_interrupt_enabled(uint8_t channel) {
 
-	return get_bits_from_port_with_mask(AT91PS_PWMC -> PWMC_IMR, channel);
+	return get_bits_from_port_with_mask(AT91C_BASE_PWMC -> PWMC_IMR, channel);
 
 }
 
@@ -108,7 +108,7 @@ bool pwm_interrupt_enabled(uint8_t channel) {
  */
 bool pwm_finished_cycle(uint8_t channel) {
 
-	return get_bits_from_port_with_mask(AT91PS_PWMC -> PWMC_ISR, channel);
+	return get_bits_from_port_with_mask(AT91C_BASE_PWMC -> PWMC_ISR, channel);
 
 }
 
@@ -170,25 +170,25 @@ void pwm1_configure(void) {
 
 }
 
-void pwm0_enable() {
+void pwm1_enable() {
 
 	pwm_enable(AT91C_PWMC_CHID1);
 
 }
 
-void pwm0_disable() {
+void pwm1_disable() {
 
 	pwm_disable(AT91C_PWMC_CHID1);
 
 }
 
-void pwm0_enable_interrupt() {
+void pwm1_enable_interrupt() {
 
 	pwm_enable_interrupt(AT91C_PWMC_CHID1);
 
 }
 
-void pwm0_disable_interrupt() {
+void pwm1_disable_interrupt() {
 
 	pwm_disable_interrupt(AT91C_PWMC_CHID1);
 
@@ -220,25 +220,25 @@ void pwm2_configure(void) {
 
 }
 
-void pwm0_enable() {
+void pwm2_enable() {
 
 	pwm_enable(AT91C_PWMC_CHID2);
 
 }
 
-void pwm0_disable() {
+void pwm2_disable() {
 
 	pwm_disable(AT91C_PWMC_CHID2);
 
 }
 
-void pwm0_enable_interrupt() {
+void pwm2_enable_interrupt() {
 
 	pwm_enable_interrupt(AT91C_PWMC_CHID2);
 
 }
 
-void pwm0_disable_interrupt() {
+void pwm2_disable_interrupt() {
 
 	pwm_disable_interrupt(AT91C_PWMC_CHID2);
 
@@ -270,25 +270,25 @@ void pwm3_configure(void) {
 
 }
 
-void pwm0_enable() {
+void pwm3_enable() {
 
 	pwm_enable(AT91C_PWMC_CHID3);
 
 }
 
-void pwm0_disable() {
+void pwm3_disable() {
 
 	pwm_disable(AT91C_PWMC_CHID3);
 
 }
 
-void pwm0_enable_interrupt() {
+void pwm3_enable_interrupt() {
 
 	pwm_enable_interrupt(AT91C_PWMC_CHID3);
 
 }
 
-void pwm0_disable_interrupt() {
+void pwm3_disable_interrupt() {
 
 	pwm_disable_interrupt(AT91C_PWMC_CHID3);
 
