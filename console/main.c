@@ -6,17 +6,7 @@
 
 #include <platform/fmr.h>
 
-#define UPLOADER
-
 int main(int argc, char *argv[]) {
-    
-    flipper.attach(FLIPPER_SOURCE_USB);
-    
-#ifndef UPLOADER
-	
-	
-	
-#else
 	
 	/* ~ Attatch this instance of libflipper to the first device present over USB. ~ */
 
@@ -34,8 +24,18 @@ int main(int argc, char *argv[]) {
 		
 	}
 	
-#endif
-	
+    else if (!strcmp(argv[1], "io") && !strcmp("direction", argv[2])) {
+        
+        host.invoke(_io, _io_set_direction, 4, little(atoi(argv[3])), 0, little(OUTPUT), 0);
+        
+    }
+    
+    else if (!strcmp(argv[1], "io") && !strcmp("write", argv[2])) {
+        
+        host.invoke(_io, _io_write, 4, little(atoi(argv[3])), 0, little(atoi(argv[4])), 0);
+        
+    }
+    
 	return 0;
 
 }

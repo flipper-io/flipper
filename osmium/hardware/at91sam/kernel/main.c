@@ -122,13 +122,7 @@ int main(void) {
 	
 	io.write(8, true);
 	
-	while (false) {
-		
-        spi_enable();
-        
-        spi_put(0xFE);
-        
-        spi_disable();
+	while (true) {
         
 		io.write(8, false);
 		
