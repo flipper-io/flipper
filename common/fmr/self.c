@@ -30,6 +30,8 @@ void self_configure(const struct _bus *bus) {
 	
 }
 
+#warning RETURN TYPES DISABLED FOR THE SAM7S!!!!!
+
 uint32_t self_call(void) {
 	
 	/* ~ Dereference a pointer to the recipient object. ~ */

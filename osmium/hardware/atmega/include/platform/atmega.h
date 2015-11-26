@@ -77,7 +77,7 @@
 #define LED_DI				0x06
 
 
-#define SPI_PORT			DDRB
+#define SPI_DDR             DDRB
 
 #define SS					0x00
 
