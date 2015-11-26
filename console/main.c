@@ -7,11 +7,7 @@
 #include <platform/fmr.h>
 
 int main(int argc, char *argv[]) {
-<<<<<<< HEAD
-	
-=======
     
->>>>>>> fvm
 	/* ~ Attatch this instance of libflipper to the first device present over USB. ~ */
 
 	flipper.attach(FLIPPER_SOURCE_USB);
@@ -27,14 +23,8 @@ int main(int argc, char *argv[]) {
 		sam.format();
 		
 	}
-<<<<<<< HEAD
-	
-    else if (!strcmp(argv[1], "io") && !strcmp("direction", argv[2])) {
-=======
     
-    else     if (!strcmp(argv[1], "io") && !strcmp("direction", argv[2])) {
->>>>>>> fvm
-        
+    else if (!strcmp(argv[1], "io") && !strcmp("direction", argv[2])) {
         host.invoke(_io, _io_set_direction, 4, little(atoi(argv[3])), 0, little(OUTPUT), 0);
         
     }
@@ -44,11 +34,7 @@ int main(int argc, char *argv[]) {
         host.invoke(_io, _io_write, 4, little(atoi(argv[3])), 0, little(atoi(argv[4])), 0);
         
     }
-<<<<<<< HEAD
     
-=======
-		
->>>>>>> fvm
 	return 0;
 
 }
