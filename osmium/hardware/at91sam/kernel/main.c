@@ -65,7 +65,7 @@ void pio_interrupt() {
 }
 
 int main(void) {
-	
+    
 	usart.configure((void *)(baudrate(115200)));
 	
 	usart1.configure((void *)(baudrate(115200)));
@@ -74,7 +74,7 @@ int main(void) {
     
 	flash_configure();
 	
-    //fs_configure();
+    fs_configure();
     
 	/* ~ Configure the host for this platform. ~ */
 	
