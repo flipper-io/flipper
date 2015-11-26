@@ -16,10 +16,6 @@ extern fsp _break_value;
 
 extern fsp _root_leaf;
 
-/* A local copy of the root pointer. */
-
-extern fsp root;
-
 extern const struct _fs {
 	
 	void (* configure)(void);

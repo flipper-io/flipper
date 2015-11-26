@@ -11,10 +11,6 @@
 int main(int argc, char *argv[]) {
     
     flipper.attach(FLIPPER_SOURCE_USB);
-
-    printf("The value is: 0x%08x", device.invoke(0, 1, NO_ARGS));
-    
-    return 0;
     
 #ifndef UPLOADER
 	
