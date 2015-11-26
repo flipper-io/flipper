@@ -56,7 +56,7 @@ endif
 
 cc = $(shell which 'gcc')
 
-nasm = $(shell which 'nasm')
+nasm = /usr/local/bin/nasm
 
 rsync = $(shell which 'rsync')
 
