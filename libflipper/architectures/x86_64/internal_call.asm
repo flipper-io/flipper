@@ -1,5 +1,5 @@
 section .text
-	global internal_call:function
+	global _internal_call
 
 ; void internal_call(void *addr, uint8_t argc, uint16_t argv[argc])
 ; argv is assumed to point to a buffer with a capacity of at least
@@ -8,7 +8,7 @@ section .text
 ; addr -> rdi
 ; argc -> rsi
 ; argv -> rdx
-internal_call:	push rbp         ; Save caller base pointer.
+_internal_call:	push rbp         ; Save caller base pointer.
 		mov rbp, rsp     ; Caller's stack top is our base.
 		push rbx         ; Save caller's rbx;
 		push r12         ; Save caller's r12.
