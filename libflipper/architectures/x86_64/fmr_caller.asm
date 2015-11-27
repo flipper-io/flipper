@@ -1,5 +1,9 @@
 section .text
+%ifidn __OUTPUT_FORMAT__, macho64
 	global _internal_call
+%else
+	global internal_call
+%endif
 
 ; void internal_call(void *addr, uint8_t argc, uint16_t argv[argc])
 ; argv is assumed to point to a buffer with a capacity of at least
@@ -8,7 +12,12 @@ section .text
 ; addr -> rdi
 ; argc -> rsi
 ; argv -> rdx
-_internal_call:	push rbp         ; Save caller base pointer.
+%ifidn __OUTPUT_FORMAT__, macho64
+_internal_call:
+%else
+internal_call:
+%endif
+		push rbp         ; Save caller base pointer.
 		mov rbp, rsp     ; Caller's stack top is our base.
 		push rbx         ; Save caller's rbx;
 		push r12         ; Save caller's r12.
