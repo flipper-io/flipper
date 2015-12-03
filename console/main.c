@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
         
         /* ~ Load the data. ~ */
         
-        fdl.activate(key);
+        fdl.load(key);
         
         printf("\nLoading successful. Your program is now running.\n\n");
         

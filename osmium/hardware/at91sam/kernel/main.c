@@ -64,6 +64,8 @@ void pio_interrupt() {
 	
 }
 
+#define AT91C_EEPROM_I2C_ADDRESS (0x50 << 16)
+
 int main(void) {
     
 	usart.configure((void *)(baudrate(115200)));
@@ -122,8 +124,14 @@ int main(void) {
 	
 	io.write(8, true);
 	
+	i2c_configure();
+
+	uint8_t byte = 0xFE;
+	
 	while (true) {
-        
+
+		i2c_put(AT91C_EEPROM_I2C_ADDRESS | AT91C_TWI_IADRSZ_2_BYTE, 0x04, &byte, 1);
+		
 		io.write(8, false);
 		
 		delay_ms(500);

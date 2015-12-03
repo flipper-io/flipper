@@ -6,6 +6,8 @@ const struct _fdl fdl = {
     
     fdl_configure,
     
-    fdl_activate
+    fdl_load,
+	
+	fdl_resolve
     
 };
