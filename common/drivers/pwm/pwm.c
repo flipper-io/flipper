@@ -2,11 +2,29 @@
 
 #include <pwm/pwm.h>
 
+/* ~------------------ PWM Controller ------------------~ */
+
+const struct _pwm pwm_contoller = {
+
+	pwmc_configure_clockA,
+
+	pwmc_configure_clockB
+
+};
+
 /* ~----------------------- PWM0 -----------------------~ */
 
-const struct _pwm pwm0 = {
+const struct _pwm_ch pwm0 = {
 
 	pwm0_configure,
+
+	pwm0_set_clock,
+
+	pwm0_set_left_aligned,
+
+	pwm0_set_center_aligned,
+
+	pwm0_set_polarity,
 
 	pwm0_enable,
 
@@ -26,9 +44,17 @@ const struct _pwm pwm0 = {
 
 /* ~----------------------- PWM1 -----------------------~ */
 
-const struct _pwm pwm1 = {
+const struct _pwm_ch pwm1 = {
 
 	pwm1_configure,
+
+	pwm1_set_clock,
+
+	pwm1_set_left_aligned,
+
+	pwm1_set_center_aligned,
+
+	pwm1_set_polarity,
 
 	pwm1_enable,
 
@@ -48,9 +74,17 @@ const struct _pwm pwm1 = {
 
 /* ~----------------------- PWM2 -----------------------~ */
 
-const struct _pwm pwm2 = {
+const struct _pwm_ch pwm2 = {
 
 	pwm2_configure,
+
+	pwm2_set_clock,
+
+	pwm2_set_left_aligned,
+
+	pwm2_set_center_aligned,
+
+	pwm2_set_polarity,
 
 	pwm2_enable,
 
@@ -70,9 +104,17 @@ const struct _pwm pwm2 = {
 
 /* ~----------------------- PWM3 -----------------------~ */
 
-const struct _pwm pwm3 = {
+const struct _pwm_ch pwm3 = {
 
 	pwm3_configure,
+
+	pwm3_set_clock,
+
+	pwm3_set_left_aligned,
+
+	pwm3_set_center_aligned,
+
+	pwm3_set_polarity,
 
 	pwm3_enable,
 
