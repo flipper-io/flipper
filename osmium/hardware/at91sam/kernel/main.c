@@ -8,6 +8,8 @@
 
 #include <platform/at91sam.h>
 
+#include <modules/bme280/bme280.h>
+
 void _delay_ms(unsigned long time) {
 	
 	for (volatile unsigned int i = 0; (i < (F_CPU / 10250) * (time)); i ++);
@@ -63,8 +65,6 @@ void pio_interrupt() {
 	AT91C_BASE_PIOA -> PIO_ISR;
 	
 }
-
-#define AT91C_EEPROM_I2C_ADDRESS (0x50 << 16)
 
 int main(void) {
     
@@ -128,17 +128,43 @@ int main(void) {
 
 	uint8_t byte = 0xFE;
 	
+	bme280_configure();
+	
+//	char buf[64];
+	
 	while (true) {
-
-		i2c_put(AT91C_EEPROM_I2C_ADDRESS | AT91C_TWI_IADRSZ_2_BYTE, 0x04, &byte, 1);
+		
+//		memset(buf, 0, sizeof(buf));
+//		
+//		float temp = bme280_temperature();
+//		
+//		sprintf(buf, "Temperature: %f C\n", temp);
+//		
+//		usart1.push(&buf, strlen(buf));
+//		
+//		memset(buf, 0, sizeof(buf));
+//		
+//		float press = bme280_pressure();
+//		
+//		sprintf(buf, "Pressure: %f Pa\n", press);
+//		
+//		usart1.push(&buf, strlen(buf));
+//		
+//		memset(buf, 0, sizeof(buf));
+//		
+//		float hum = bme280_humidity();
+//		
+//		sprintf(buf, "Humidity: %f \%\n\n", hum);
+//		
+//		usart1.push(&buf, strlen(buf));
 		
 		io.write(8, false);
 		
-		delay_ms(500);
+		delay_ms(2000);
 		
 		io.write(8, true);
 		
-		delay_ms(500);
+		delay_ms(2000);
 		
 	}
 	

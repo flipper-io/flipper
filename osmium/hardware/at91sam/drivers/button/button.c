@@ -16,6 +16,6 @@ void button_configure(void) {
 
 bool button_read(void) {
 	
-	return false;
+	return 0xDEADBEEF;
 	
 }
