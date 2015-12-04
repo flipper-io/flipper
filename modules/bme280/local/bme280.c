@@ -1,12 +1,6 @@
 #define __private_include__
 
-#include <flipper/flipper.h>
-
-#include <modules/bme280/bme280.h>
-
-#include <fmr/fmr.h>
-
-#include <platform/fmr.h>
+#include <bme280/bme280.h>
 
 void bme280_configure(void) {
 	

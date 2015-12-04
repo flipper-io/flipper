@@ -1,10 +1,8 @@
 #define __private_include__
 
-#include <flipper/flipper.h>
+#include <bme280/bme280.h>
 
 #include <platform/at91sam.h>
-
-#include <modules/bme280/bme280.h>
 
 #define BME280_ADDRESS (0x77 << 16)
 
@@ -98,16 +96,18 @@ float bme280_temperature(void) {
 	
 	int32_t adc_T = bme280_read16(BME280_REGISTER_TEMPDATA);
 	
-	adc_T <<= 8;
+	adc_T  << = 8;
 	
 	adc_T |= bme280_read8(BME280_REGISTER_TEMPDATA + 2);
 	
-	adc_T >>= 4;
+	adc_T  >> = 4;
 	
-	var1  = ((((adc_T>>3) - ((int32_t)bme280_calibration.dig_T1 << 1))) * ((int32_t)bme280_calibration.dig_T2)) >> 11;
+	var1  = ((((adc_T >> 3) - ((int32_t)bme280_calibration.dig_T1 << 1))) * ((int32_t)bme280_calibration.dig_T2)) >> 11;
 	
-	var2  = (((((adc_T>>4) - ((int32_t)bme280_calibration.dig_T1)) * ((adc_T>>4) - ((int32_t)bme280_calibration.dig_T1))) >> 12) *
-			
+	var2  = (((((adc_T >> 4) - ((int32_t)bme280_calibration.dig_T1)) *
+			   
+			((adc_T >> 4) - ((int32_t)bme280_calibration.dig_T1))) >> 12) *
+			 
 			((int32_t)bme280_calibration.dig_T3)) >> 14;
 	
 	t_fine = var1 + var2;
@@ -124,11 +124,11 @@ float bme280_pressure(void) {
 	
 	int32_t adc_P = bme280_read16(BME280_REGISTER_PRESSUREDATA);
 	
-	adc_P <<= 8;
+	adc_P  << = 8;
 	
 	adc_P |= bme280_read8(BME280_REGISTER_PRESSUREDATA + 2);
 	
-	adc_P >>= 4;
+	adc_P  >> = 4;
 	
 	var1 = ((int64_t)t_fine) - 128000;
 	
@@ -136,27 +136,23 @@ float bme280_pressure(void) {
 	
 	var2 = var2 + ((var1*(int64_t)bme280_calibration.dig_P5) << 17);
 	
-	var2 = var2 + (((int64_t)bme280_calibration.dig_P4)<<35);
+	var2 = var2 + (((int64_t)bme280_calibration.dig_P4) << 35);
 	
-	var1 = ((var1 * var1 * (int64_t)bme280_calibration.dig_P3)>>8) + ((var1 * (int64_t)bme280_calibration.dig_P2)<<12);
+	var1 = ((var1 * var1 * (int64_t)bme280_calibration.dig_P3) >> 8) + ((var1 * (int64_t)bme280_calibration.dig_P2) << 12);
 	
-	var1 = (((((int64_t) 1) << 47)+var1))*((int64_t)bme280_calibration.dig_P1)>>33;
+	var1 = (((((int64_t) 1) << 47) + var1)) * ((int64_t)bme280_calibration.dig_P1) >> 33;
 	
-	if (var1 == 0) {
-		
-		return 0;  // avoid exception caused by division by zero
-		
-	}
+	if (var1 == 0) return 0;
 	
 	p = 1048576 - adc_P;
 	
-	p = (((p<<31) - var2)*3125) / var1;
+	p = (((p << 31) - var2) * 3125) / var1;
 	
-	var1 = (((int64_t)bme280_calibration.dig_P9) * (p>>13) * (p>>13)) >> 25;
+	var1 = (((int64_t)bme280_calibration.dig_P9) * (p >> 13) * (p >> 13)) >> 25;
 	
 	var2 = (((int64_t)bme280_calibration.dig_P8) * p) >> 19;
 	
-	p = ((p + var1 + var2) >> 8) + (((int64_t)bme280_calibration.dig_P7)<<4);
+	p = ((p + var1 + var2) >> 8) + (((int64_t)bme280_calibration.dig_P7) << 4);
 	
 	return (float)p / 256;
 }
