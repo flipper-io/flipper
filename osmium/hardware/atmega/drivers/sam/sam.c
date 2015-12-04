@@ -40,9 +40,21 @@ void sam_configure(void) {
 
 void sam_set_power(bool power) {
 
-	if (power) set_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
+    if (power) {
+     
+        usart0_enable();
+        
+        set_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
+        
+    }
 	
-	else clear_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
+    else {
+        
+        usart0_disable();
+     
+        clear_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
+        
+    }
 	
 }
 

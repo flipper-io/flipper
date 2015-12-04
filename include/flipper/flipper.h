@@ -10,6 +10,8 @@
 
 #include <button/button.h>
 
+#include <fdl/fdl.h>
+
 #include <flash/flash.h>
 
 #include <fs/fs.h>
