@@ -50,7 +50,7 @@ uploader = $(shell which 'flipper')
 
 uploader_flags = flash $(output)
 
-platform_flags = -std=gnu99 -Os -mcpu=arm7tdmi -mtune=arm7tdmi -mthumb -mthumb-interwork -nostartfiles
+platform_flags = -std=gnu99 -Os -mcpu=arm7tdmi -mtune=arm7tdmi -mthumb -mthumb-interwork -nostartfiles -fomit-frame-pointer
 
 # ~ Specify the platform's hardware directory. ~ #
 

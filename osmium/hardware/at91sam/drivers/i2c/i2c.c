@@ -46,7 +46,7 @@ void i2c_configure(void) {
 	
 }
 
-int i2c_put(int mode, int address, char *data, int length) {
+int i2c_put(int mode, int address, void *data, int length) {
 	
 	unsigned int status, counter = 0, error = 0;
 
@@ -58,7 +58,7 @@ int i2c_put(int mode, int address, char *data, int length) {
 		
 		AT91C_BASE_TWI -> TWI_CR = AT91C_TWI_START | AT91C_TWI_MSEN | AT91C_TWI_STOP;
 		
-		AT91C_BASE_TWI -> TWI_THR = *data;
+		AT91C_BASE_TWI -> TWI_THR = *(uint8_t *)(data);
 		
 	}
 
@@ -78,11 +78,11 @@ int i2c_put(int mode, int address, char *data, int length) {
 				
 				status = AT91C_BASE_TWI -> TWI_SR;
 				
-				if ((status & ERROR) == ERROR) error++;
+				if ((status & ERROR) == ERROR) error ++;
 				
 			}
 			
-			AT91C_BASE_TWI -> TWI_THR = *(data+counter);
+			AT91C_BASE_TWI -> TWI_THR = *(uint8_t *)(data + counter);
 			
 		}
 		
@@ -104,7 +104,7 @@ int i2c_put(int mode, int address, char *data, int length) {
 	
 }
 
-int i2c_get(int mode, int address, char *data, int length) {
+int i2c_get(int mode, int address, void *data, int length) {
 	
 	unsigned int status,counter=0,error=0;
 
@@ -128,7 +128,7 @@ int i2c_get(int mode, int address, char *data, int length) {
 			
 		}
 		
-		*(data) = AT91C_BASE_TWI -> TWI_RHR;
+		*(uint8_t *)(data) = AT91C_BASE_TWI -> TWI_RHR;
 		
 	}
 	
@@ -148,7 +148,7 @@ int i2c_get(int mode, int address, char *data, int length) {
 			
 			if (status & AT91C_TWI_RXRDY) {
 				
-				*(data + counter ++) = AT91C_BASE_TWI -> TWI_RHR;
+				*(uint8_t *)(data + counter ++) = AT91C_BASE_TWI -> TWI_RHR;
 					
 				if (counter == (length - 1)) AT91C_BASE_TWI -> TWI_CR = AT91C_TWI_STOP;
 			

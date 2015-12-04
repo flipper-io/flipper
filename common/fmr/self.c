@@ -30,8 +30,6 @@ void self_configure(const struct _bus *bus) {
 	
 }
 
-#warning RETURN TYPES DISABLED FOR THE SAM7S!!!!!
-
 uint32_t self_call(void) {
 	
 	/* ~ Dereference a pointer to the recipient object. ~ */
@@ -44,11 +42,11 @@ uint32_t self_call(void) {
     
     /* ~ Invoke the recipient function with the appropriate arguments. ~ */
 	
-	internal_call(function, fmrpacket.recipient.argc, fmrpacket.body);
+	uint32_t retval = internal_call(function, fmrpacket.recipient.argc, fmrpacket.body);
     
 	/* ~ Return the value. ~ */
 	
-    return 0; //*(uint32_t *)(fmrpacket.body);
+	return retval; //*(uint32_t *)(fmrpacket.body);
 	
 }
 
