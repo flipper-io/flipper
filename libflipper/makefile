@@ -2,6 +2,10 @@
 
 sudo = sudo
 
+# ~ Determine the architecture. ~ #
+
+architecture = $(shell echo $(shell uname -m) | tr A-Z a-z)
+
 # ~ Determine the target. ~ #
 
 target = $(shell echo $(shell uname -s) | tr A-Z a-z)
@@ -14,6 +18,10 @@ ifeq ($(target),darwin)
 
 output = libflipper.dylib
 
+# ~ Specify object file format for nasm. ~ #
+
+objformat = macho64
+
 # ~ Declare the library dependancies neededed for linking. ~ #
 
 libraries = -framework CoreFoundation -framework IOKit
@@ -23,6 +31,16 @@ else ifeq ($(target),linux)
 # ~ Do the same for the other targets. ~ #
 
 output = libflipper.so
+
+ifeq ($(architecture),x86_64)
+
+objformat = elf64
+
+else
+
+objformat = elf32
+
+endif
 
 libraries = -lusb
 
@@ -38,6 +56,8 @@ endif
 
 cc = $(shell which 'gcc')
 
+nasm = /usr/local/bin/nasm
+
 rsync = $(shell which 'rsync')
 
 ln = $(shell which 'ln')
@@ -48,7 +68,7 @@ preprocess = -std=c99 -fpic -D__verbose__
 
 # ~ Pass flags to find so that it only isolates files pertainant to the target platform. ~ #
 
-findflags = \( ! -wholename "./platforms/*" -or -wholename "./platforms/$(target)/*" \)
+findflags = \( \( ! -wholename "./platforms/*" -and ! -wholename "./architectures/*" \) -or \( -wholename "./platforms/$(target)/*" -or -wholename "./architectures/$(architecture)/*" \) \)
 
 # ~ Declare the include directories needed for compilation. ~ #
 

@@ -204,10 +204,16 @@ int sam_load_firmware(char *firmware) {
 
 	printf("Entering programming mode.\n\n");
     
-//    sam.dfu();
-//    
-//    wait_with_progress(2);
-//    
+    sam.dfu();
+    
+    wait_with_progress(2);
+    
+    printf("UNPLUG THE DEVICE!!\n\n");
+    
+    wait_with_progress(5);
+    
+    flipper.attach(FLIPPER_SOURCE_USB);
+//
 //    return 0;
 //    
 //    usart.disable();
