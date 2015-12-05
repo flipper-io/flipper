@@ -4,10 +4,10 @@
 
 const struct _fdl fdl = {
     
-    fdl_configure,
-    
-    fdl_load,
+//    fdl_configure,
+//    
+//    fdl_load,
+//	
+//	fdl_resolve
 	
-	fdl_resolve
-    
 };

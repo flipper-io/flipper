@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
     
 	/* ~ Attatch this instance of libflipper to the first device present over USB. ~ */
 
-	flipper.attach(FLIPPER_SOURCE_USB);
+	flipper.attach(FLIPPER_SOURCE_NETWORK, "129.21.80.21");
 
 	if (!strcmp(argv[1], "flash")) {
 
