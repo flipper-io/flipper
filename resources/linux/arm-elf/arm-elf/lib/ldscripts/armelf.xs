@@ -7,7 +7,7 @@ OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm",
 	      "elf32-littlearm")
 OUTPUT_ARCH(arm)
 ENTRY(_start)
-SEARCH_DIR("/home/nick/opt/cross-attempt4/arm-elf/arm-elf/lib");
+SEARCH_DIR("/home/george/Documents/arm-elf/arm-elf/arm-elf/lib");
 SECTIONS
 {
   /* Read-only sections, merged into text segment: */

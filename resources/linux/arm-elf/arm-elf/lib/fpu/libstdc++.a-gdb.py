@@ -19,8 +19,8 @@ import gdb
 import os
 import os.path
 
-pythondir = '/home/nick/opt/cross-attempt4/arm-elf/share/gcc-4.7.3/python'
-libdir = '/home/nick/opt/cross-attempt4/arm-elf/arm-elf/lib/fpu'
+pythondir = '/home/george/Documents/arm-elf/arm-elf/share/gcc-4.7.3/python'
+libdir = '/home/george/Documents/arm-elf/arm-elf/arm-elf/lib/fpu'
 
 # This file might be loaded when there is no current objfile.  This
 # can happen if the user loads it manually.  In this case we don't

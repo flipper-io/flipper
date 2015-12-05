@@ -1,4 +1,4 @@
-This is cpp.info, produced by makeinfo version 6.0 from cpp.texi.
+This is cpp.info, produced by makeinfo version 5.2 from cpp.texi.
 
 Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996, 1997,
 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
@@ -5247,7 +5247,7 @@ without any initial '-' or '--'.
 * D:                                     Invocation.          (line  40)
 * dD:                                    Invocation.          (line 592)
 * DEPENDENCIES_OUTPUT:                   Environment Variables.
-                                                              (line  45)
+                                                              (line  44)
 * dI:                                    Invocation.          (line 601)
 * dM:                                    Invocation.          (line 577)
 * dN:                                    Invocation.          (line 598)
@@ -5299,7 +5299,7 @@ without any initial '-' or '--'.
 * remap:                                 Invocation.          (line 650)
 * std=:                                  Invocation.          (line 311)
 * SUNPRO_DEPENDENCIES:                   Environment Variables.
-                                                              (line  61)
+                                                              (line  60)
 * target-help:                           Invocation.          (line 655)
 * traditional-cpp:                       Invocation.          (line 643)
 * trigraphs:                             Invocation.          (line 647)
@@ -5357,9 +5357,9 @@ Concept Index
 * controlling macro:                     Once-Only Headers.   (line  35)
 * 'defined':                             Defined.             (line   6)
 * dependencies for make as output:       Environment Variables.
-                                                              (line  46)
+                                                              (line  45)
 * dependencies for make as output <1>:   Environment Variables.
-                                                              (line  62)
+                                                              (line  61)
 * dependencies, 'make':                  Invocation.          (line 181)
 * diagnostic:                            Diagnostics.         (line   6)
 * differences from previous versions:    Differences from previous versions.

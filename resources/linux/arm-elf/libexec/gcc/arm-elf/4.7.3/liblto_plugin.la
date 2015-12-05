@@ -38,4 +38,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/home/nick/opt/cross-attempt4/arm-elf/libexec/gcc/arm-elf/4.7.3'
+libdir='/home/george/Documents/arm-elf/arm-elf/libexec/gcc/arm-elf/4.7.3'
