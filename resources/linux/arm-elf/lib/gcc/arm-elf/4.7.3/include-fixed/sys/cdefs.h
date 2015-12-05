@@ -2,7 +2,7 @@
 
     It has been auto-edited by fixincludes from:
 
-	"/home/nick/opt/cross-attempt4/arm-elf/arm-elf/sys-include/sys/cdefs.h"
+	"/home/george/Documents/arm-elf/arm-elf/arm-elf/sys-include/sys/cdefs.h"
 
     This had to be done to correct non-standard usages in the
     original, manufacturer supplied header file.  */

@@ -40,9 +40,23 @@ clock = 48054850
 
 # ~ Specify a compiler and the binary utilities needed to deploy code to the target. ~ #
 
+ifeq ($(host),darwin)
+
 cc = /opt/local/bin/arm-elf-gcc-4.7
 
 objcopy = /opt/local/bin/arm-elf-objcopy
+
+else ifeq ($(host),linux)
+
+cc = ../resources/linux/arm-elf/bin/arm-elf-gcc-4.7.3
+
+objcopy = ../resources/linux/arm-elf/bin/arm-elf-objcopy
+
+else
+
+$(error "ERROR. When building for at91sam7s, a host must be specified.")
+
+endif
 
 uploader = $(shell which 'flipper')
 
