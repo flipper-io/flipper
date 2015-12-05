@@ -48,11 +48,7 @@ void fdl_load(uint16_t key) {
 	
     /* ~ Configure the ABI. ~ */
 	
-	*(struct _fdl **)(init + 0x4) = (struct _fdl *)(&fdl);
-	
-	(*(struct _fdl **)(init + 0x4)) -> configure();
-	
-	//memcpy((void *)(init + 0x4), &fdl, sizeof(const struct _fdl));
+//	*(struct _fdl **)(init + 0x4) = (struct _fdl *)(&fdl);
 	
     /* ~ Call the initialization routine. ~ */
     
