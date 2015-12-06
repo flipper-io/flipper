@@ -4,8 +4,6 @@
 
 #include <fmr/fmr.h>
 
-#include <platform/fmr.h>
-
 /* ~ This function configures the main processor. ~ */
 
 void sam_configure(void) {
