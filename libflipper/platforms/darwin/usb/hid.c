@@ -2,8 +2,6 @@
 
 #include <fmr/fmr.h>
 
-#include <platform/fmr.h>
-
 #include <IOKit/IOKitLib.h>
 
 #include <IOKit/hid/IOHIDLib.h>

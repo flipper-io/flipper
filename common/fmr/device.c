@@ -6,8 +6,6 @@
 
 #include <platform/fmr.h>
 
-#include <platform/fmr.h>
-
 #include <usart/usart.h>
 
 struct _target device = {

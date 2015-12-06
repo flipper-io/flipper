@@ -10,8 +10,6 @@
 
 #include <fmr/fmr.h>
 
-#include <platform/fmr.h>
-
 void fs_configure(void) {
 	
     /* ~ We have to load the freelist and the _break_value in from memory! ~ */

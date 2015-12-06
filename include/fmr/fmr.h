@@ -114,6 +114,8 @@ extern struct _target *sender;
 
 #ifdef __private_include__
 
+enum { _zero, _one, _two, _button, _flash, _fs, _i2c, _io, _led, _pwm, _sam, _spi, _timer, _usart, _usart1, _dbgu, _usb, _wifi, _fdl, _bme280 };
+
 extern uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, va_list *argv);
 
 extern uint32_t target_push(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, va_list *argv);

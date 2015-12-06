@@ -4,8 +4,6 @@
 
 #include <fmr/fmr.h>
 
-#include <platform/fmr.h>
-
 /* ------------------------ USART0 ------------------------ */
 
 void usart0_configure(void *baud) {
