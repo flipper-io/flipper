@@ -1,6 +1,6 @@
 #define __private_include__
 
-#include <flash/flash.h>
+#include <at45/at45.h>
 
 #include <fs/fs.h>
 
@@ -14,7 +14,7 @@ typedef struct _block {
 
 /* There is a memory leak in this somewhere. 20 bytes of data is being allocated but not free'd each time it is executed. */
 
-fsp flash_alloc(uint32_t length) {
+fsp at45_alloc(uint32_t length) {
 	
 	/* Each of these variables are pointers that store the address of blocks that have been copied in from external memory. */
 	
@@ -28,7 +28,7 @@ fsp flash_alloc(uint32_t length) {
 	
 	if (length < sizeof(block) - sizeof(uint32_t)) length = sizeof(block) - sizeof(uint32_t);
 	
-	for (smallest_size = 0, _current = _free_list, current = flash_dereference(_free_list, sizeof(block)), _last = 0, last = 0; _current; _last = _current, last = current, _current = current -> next, free(current), current = flash_dereference(current -> next, sizeof(block))) {
+	for (smallest_size = 0, _current = _free_list, current = at45_dereference(_free_list, sizeof(block)), _last = 0, last = 0; _current; _last = _current, last = current, _current = current -> next, free(current), current = at45_dereference(current -> next, sizeof(block))) {
 		
 		if ((current -> size) < length) continue;
 		
@@ -38,7 +38,7 @@ fsp flash_alloc(uint32_t length) {
 				
 				last -> next = current -> next;
 				
-				flash_push(last, sizeof(block), _last);
+				at45_push(last, sizeof(block), _last);
 				
 			}
 			
@@ -46,7 +46,7 @@ fsp flash_alloc(uint32_t length) {
 				
 				_free_list = current -> next;
 				
-				flash_push(&_free_list, sizeof(fsp), _FREE_LIST);
+				at45_push(&_free_list, sizeof(fsp), _FREE_LIST);
 				
 			}
 			
@@ -84,7 +84,7 @@ fsp flash_alloc(uint32_t length) {
 				
 				last_smallest -> next = current_smallest -> next;
 				
-				flash_push(last_smallest, sizeof(block), _last_smallest);
+				at45_push(last_smallest, sizeof(block), _last_smallest);
 				
 				free(last_smallest);
 				
@@ -94,7 +94,7 @@ fsp flash_alloc(uint32_t length) {
 				
 				_free_list = current_smallest -> next;
 				
-				flash_push(&_free_list, sizeof(fsp), _FREE_LIST);
+				at45_push(&_free_list, sizeof(fsp), _FREE_LIST);
 				
 			}
 			
@@ -108,17 +108,17 @@ fsp flash_alloc(uint32_t length) {
 		
 		_current += smallest_size;
 		
-		last_smallest = (block *)(flash_dereference(_current, sizeof(block)));
+		last_smallest = (block *)(at45_dereference(_current, sizeof(block)));
 		
 		_last_smallest = _current;
 		
 		last_smallest -> size = length;
 		
-		flash_push(last_smallest, sizeof(block), _last_smallest);
+		at45_push(last_smallest, sizeof(block), _last_smallest);
 		
 		current_smallest -> size = smallest_size - sizeof(uint32_t);
 		
-		flash_push(current_smallest, sizeof(block), _current_smallest);
+		at45_push(current_smallest, sizeof(block), _current_smallest);
 		
 		free(last_smallest);
 		
@@ -130,19 +130,19 @@ fsp flash_alloc(uint32_t length) {
 	
 	if (available >= length && available >= length + sizeof(uint32_t)) {
 		
-		current = (block *)(flash_dereference(_break_value, sizeof(block)));
+		current = (block *)(at45_dereference(_break_value, sizeof(block)));
 		
 		_current = _break_value;
 		
 		current -> size = length;
 		
-		flash_push(current, sizeof(block), _current);
+		at45_push(current, sizeof(block), _current);
 		
 		fsp block = (_break_value + offsetof(struct _block, next));
 		
 		_break_value += length + sizeof(uint32_t);
 		
-		flash_push(&_break_value, sizeof(fsp), _BREAK_VALUE);
+		at45_push(&_break_value, sizeof(fsp), _BREAK_VALUE);
 		
 		free(current);
 		
@@ -154,7 +154,7 @@ fsp flash_alloc(uint32_t length) {
 	
 }
 
-void flash_free(fsp pointer) {
+void at45_free(fsp pointer) {
 	
 	block *current, *last, *new;
 	
@@ -166,11 +166,11 @@ void flash_free(fsp pointer) {
 	
 	_new -= sizeof(uint32_t);
 	
-	new = (block *)(flash_dereference(_new, sizeof(block)));
+	new = (block *)(at45_dereference(_new, sizeof(block)));
 	
 	new -> next = 0;
 	
-	flash_push(new, sizeof(block), _new);
+	at45_push(new, sizeof(block), _new);
 	
 	if (_free_list == 0) {
 		
@@ -178,7 +178,7 @@ void flash_free(fsp pointer) {
 			
 			_break_value = _new;
 			
-			flash_push(&_break_value, sizeof(fsp), _BREAK_VALUE);
+			at45_push(&_break_value, sizeof(fsp), _BREAK_VALUE);
 			
 		}
 		
@@ -186,7 +186,7 @@ void flash_free(fsp pointer) {
 			
 			_free_list = _new;
 			
-			flash_push(&_free_list, sizeof(fsp), _FREE_LIST);
+			at45_push(&_free_list, sizeof(fsp), _FREE_LIST);
 			
 		}
 		
@@ -196,7 +196,7 @@ void flash_free(fsp pointer) {
 		
 	}
 	
-	for (_current = _free_list, current = flash_dereference(_free_list, sizeof(block)), _last = 0, last = 0; _current; _last = _current, last = current, _current = current -> next, free(current), current = flash_dereference(current -> next, sizeof(block))) {
+	for (_current = _free_list, current = at45_dereference(_free_list, sizeof(block)), _last = 0, last = 0; _current; _last = _current, last = current, _current = current -> next, free(current), current = at45_dereference(current -> next, sizeof(block))) {
 		
 		if (current < new) continue;
 		
@@ -210,13 +210,13 @@ void flash_free(fsp pointer) {
 			
 		}
 		
-		flash_push(new, sizeof(block), _new);
+		at45_push(new, sizeof(block), _new);
 		
 		if (last == 0) {
 			
 			_free_list = _new;
 			
-			flash_push(&_free_list, sizeof(fsp), _FREE_LIST);
+			at45_push(&_free_list, sizeof(fsp), _FREE_LIST);
 			
 			free(new);
 			
@@ -244,9 +244,9 @@ void flash_free(fsp pointer) {
 		
 	}
 	
-	flash_push(last, sizeof(block), _last);
+	at45_push(last, sizeof(block), _last);
 	
-	for (_current = _free_list, current = flash_dereference(_free_list, sizeof(block)), _last = 0, last = 0; current -> next != 0; _last = _current, last = current, _current = current -> next, free(current), current = flash_dereference(current -> next, sizeof(block))) free(last);
+	for (_current = _free_list, current = at45_dereference(_free_list, sizeof(block)), _last = 0, last = 0; current -> next != 0; _last = _current, last = current, _current = current -> next, free(current), current = at45_dereference(current -> next, sizeof(block))) free(last);
 	
 	free(current);
 	
@@ -256,7 +256,7 @@ void flash_free(fsp pointer) {
 			
 			_free_list = 0;
 			
-			flash_push(&_free_list, sizeof(fsp), _FREE_LIST);
+			at45_push(&_free_list, sizeof(fsp), _FREE_LIST);
 			
 		}
 		
@@ -264,13 +264,13 @@ void flash_free(fsp pointer) {
 			
 			last -> next = 0;
 			
-			flash_push(last, sizeof(block), _last);
+			at45_push(last, sizeof(block), _last);
 			
 		}
 		
 		_break_value = _last - sizeof(uint32_t);
 		
-		flash_push(&_break_value, sizeof(fsp), _BREAK_VALUE);
+		at45_push(&_break_value, sizeof(fsp), _BREAK_VALUE);
 		
 	}
 	

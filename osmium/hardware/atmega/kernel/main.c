@@ -46,6 +46,8 @@ void __attribute__ ((naked)) __attribute__ ((section(".init8"))) atmega_init(voi
 	
 	usart0_configure((void *)(baudrate(115200)));
 	
+	usart0_disable();
+	
 	/* ~ Configure the host for this platform. ~ */
 	
 	host_configure(&usb);

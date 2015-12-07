@@ -6,7 +6,7 @@
 
 #include <platform/atmega.h>
 
-const void * const objects[] PROGMEM = { &button, &flash, &host, &device, &self, &fs, &i2c, &io, &led, &pwm, &sam, &spi, &timer, &usart, &usart, &usart, &usb, &wifi, &fdl };
+const void * const objects[] PROGMEM = { &host, &device, &self, &button, &at45, &fs, &i2c, &io, &led, &pwm, &sam, &spi, &timer, &usart, &usart, &usart, &usb, &wifi, &fdl };
 
 void usb_receive_interrupt(void) {
 	

@@ -50,7 +50,7 @@ void usart0_put(uint8_t byte) {
 
 uint8_t usart0_get(void) {
 	
-	while (!(UCSR1A & (1 << RXC1)));
+	//while (!(UCSR1A & (1 << RXC1)));
 	
 	return UDR1;
 	

@@ -8,7 +8,7 @@
 
 #include <platform/at91sam.h>
 
-#include <modules/bme280/bme280.h>
+#include <bme280/bme280.h>
 
 void _delay_ms(unsigned long time) {
 	
@@ -74,7 +74,7 @@ int main(void) {
 	
     spi_configure(0);
     
-	flash_configure();
+	at45_configure();
 	
     fs_configure();
     
