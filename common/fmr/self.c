@@ -46,7 +46,15 @@ uint32_t self_call(void) {
     
 	/* ~ Return the value. ~ */
 	
-	return retval; //*(uint32_t *)(fmrpacket.body);
+#ifdef __atmega_build__
+	
+	return *(uint32_t *)(fmrpacket.body);
+	
+#else
+	
+	return retval;
+	
+#endif
 	
 }
 

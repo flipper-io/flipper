@@ -2,7 +2,7 @@
 
 #include <fs/fs.h>
 
-#include <flash/flash.h>
+#include <at45/at45.h>
 
 #include <fs/tree.h>
 
@@ -14,11 +14,11 @@ void fs_configure(void) {
 	
     /* ~ We have to load the freelist and the _break_value in from memory! ~ */
     
-    flash_pull(&_free_list, sizeof(fsp), _FREE_LIST);
+    at45_pull(&_free_list, sizeof(fsp), _FREE_LIST);
     
-    flash_pull(&_break_value, sizeof(fsp), _BREAK_VALUE);
+    at45_pull(&_break_value, sizeof(fsp), _BREAK_VALUE);
     
-    flash_pull(&_root_leaf, sizeof(fsp), _ROOT_LEAF);
+    at45_pull(&_root_leaf, sizeof(fsp), _ROOT_LEAF);
 	
 }
 
@@ -34,7 +34,7 @@ void fs_format(void) {
 
 void fs_print(fsp branch) {
 	
-	leaf *l = flash_dereference(branch, sizeof(leaf));
+	leaf *l = at45_dereference(branch, sizeof(leaf));
 	
 	printf("Node @ 0x%08x, with name 0x%08x\n L: 0x%08x R: 0x%08x\n", branch, l -> key, l -> left, l -> right);
 	
@@ -66,13 +66,13 @@ void fs_transfer_file(char *path, char *name) {
 	
 	/* ~ Allocate space for the file in the filesystem. ~ */
 	
-	fsp _data = flash_alloc(size);
+	fsp _data = at45_alloc(size);
 	
-	flash_push(&size, sizeof(fsp), forward(_leaf, leaf, size));
+	at45_push(&size, sizeof(fsp), forward(_leaf, leaf, size));
 	
-	flash_push(&_data, sizeof(fsp), forward(_leaf, leaf, data));
+	at45_push(&_data, sizeof(fsp), forward(_leaf, leaf, data));
 	
-    flash_push(binary, size, _data);
+    at45_push(binary, size, _data);
 	
 	free(binary);
 	
@@ -98,15 +98,15 @@ void fs_download_file(char *name, char *path) {
 		
 	}
 	
-	leaf *l = flash_dereference(_leaf, sizeof(leaf));
+	leaf *l = at45_dereference(_leaf, sizeof(leaf));
 	
 	if (l -> size > 1000000) return;
 	
 	uint8_t *data = malloc(l -> size);
     
-    for (int i = 0; i < l -> size / 64; i ++) { printf("Receiving %f percent.\n", (float)((float)((i * 64) + (i % 64)) / l -> size) * 100); flash_pull(data + (64 * i), 64, l -> data + (64 * i)); }
+    for (int i = 0; i < l -> size / 64; i ++) { printf("Receiving %f percent.\n", (float)((float)((i * 64) + (i % 64)) / l -> size) * 100); at45_pull(data + (64 * i), 64, l -> data + (64 * i)); }
     
-    flash_push(data, l -> size, l -> data);
+    at45_push(data, l -> size, l -> data);
 	
 	fwrite(data, l -> size, sizeof(uint8_t), file);
 	

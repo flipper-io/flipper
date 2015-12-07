@@ -22,7 +22,7 @@ uploader = $(shell which 'avrdude')
 
 uploader_flags = -p $(platform) -c usbtiny -V -U lfuse:w:0xFF:m -U hfuse:w:0xD9:m -U flash:w:$(output)
 
-platform_flags = -DARCH=ARCH_AVR8 -mmcu=$(platform) -D__AVR_$(shell echo $(platform) | tr a-z A-Z)__
+platform_flags = -DARCH=ARCH_AVR8 -mmcu=$(platform) -D__AVR_$(shell echo $(platform) | tr a-z A-Z)__ -D__atmega_build__
 
 # ~ Specify the platform's hardware directory. ~ #
 
@@ -78,7 +78,7 @@ findflags = \( ! -wholename "./hardware/*" -or -wholename "$(hardware_directory)
 
 # ~ Specify the include directories. ~ #
 
-include_directories = $(hardware_directory)/include ./include
+include_directories = $(hardware_directory)/include ./include ./hardware/at91sam/modules
 
 # ~ Include this file to recursively compile all supported file types and generate object files using the preprocessor statements above. ~ #
 

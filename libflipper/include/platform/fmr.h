@@ -2,7 +2,7 @@
 
 #define fmr_platform_h
 
-enum { _self, _host, _device, };
+enum { _self, _host, _device };
 
 #define fmr_access_array(object) objects[object]
 
