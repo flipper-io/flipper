@@ -48,6 +48,8 @@ void __attribute__ ((naked)) __attribute__ ((section(".init8"))) atmega_init(voi
 	
 	usart0_disable();
 	
+	usart0_disable();
+	
 	/* ~ Configure the host for this platform. ~ */
 	
 	host_configure(&usb);

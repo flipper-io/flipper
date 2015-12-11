@@ -1,5 +1,0 @@
-libc6-dev-i386
-libusb-dev:i386
-python-dev
-
-When uploading the arm-elf to git, the lib symlink is missed.

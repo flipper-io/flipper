@@ -2,7 +2,7 @@
 
 #include <fs/fs.h>
 
-#include <flash/flash.h>
+#include <at45/at45.h>
 
 #include <fs/tree.h>
 
@@ -10,11 +10,11 @@ void fs_configure(void) {
 		
     /* ~ We have to load the freelist and the _break_value in from memory! ~ */
     
-    flash_pull(&_free_list, sizeof(fsp), _FREE_LIST);
+    at45_pull(&_free_list, sizeof(fsp), _FREE_LIST);
     
-    flash_pull(&_break_value, sizeof(fsp), _BREAK_VALUE);
+    at45_pull(&_break_value, sizeof(fsp), _BREAK_VALUE);
     
-    flash_pull(&_root_leaf, sizeof(fsp), _ROOT_LEAF);
+    at45_pull(&_root_leaf, sizeof(fsp), _ROOT_LEAF);
 	
 }
 
@@ -24,11 +24,11 @@ void fs_format(void) {
 
 	_free_list = 0;
 	
-	flash_push(&_free_list, sizeof(fsp), _FREE_LIST);
+	at45_push(&_free_list, sizeof(fsp), _FREE_LIST);
 	
 	_break_value = 528;
 	
-	flash_push(&_break_value, sizeof(fsp), _BREAK_VALUE);
+	at45_push(&_break_value, sizeof(fsp), _BREAK_VALUE);
 	
 	/* ~ Create the root leaf. ~ */
 	
@@ -40,15 +40,15 @@ void fs_format(void) {
 	
 	/* ~ Allocate space for the root leaf. ~ */
 	
-	_root_leaf = flash_alloc(sizeof(leaf));
+	_root_leaf = at45_alloc(sizeof(leaf));
 	
 	/* ~ Reset the root leaf pointer. ~ */
 	
-	flash_push(&_root_leaf, sizeof(fsp), _ROOT_LEAF);
+	at45_push(&_root_leaf, sizeof(fsp), _ROOT_LEAF);
 	
 	/* ~ Write the root leaf into memory. ~ */
 	
-	flash_push(root, sizeof(leaf), _root_leaf);
+	at45_push(root, sizeof(leaf), _root_leaf);
 	
 	/* ~ Free the memory allocated to hold the leaf. ~ */
 	

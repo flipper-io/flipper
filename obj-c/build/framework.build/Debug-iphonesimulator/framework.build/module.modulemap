@@ -1,0 +1,6 @@
+framework module FlipperiOS {
+  umbrella header "FlipperiOS.h"
+
+  export *
+  module * { export * }
+}

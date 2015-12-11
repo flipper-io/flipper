@@ -4,4 +4,4 @@
 
 #include <fmr/fmr.h>
 
-const void * const objects[] = { &button, &flash, &self, &host, &device, &fs, &i2c, &io, &led, &pwm, &sam, &spi, &timer, &usart, &usart1, &dbgu, &usb, &wifi, &fdl };
+const void * const objects[] = { &self, &host, &device, &button, &at45, &fs, &i2c, &io, &led, &pwm, &sam, &spi, &timer, &usart, &usart1, &dbgu, &usb, &wifi, &fdl };

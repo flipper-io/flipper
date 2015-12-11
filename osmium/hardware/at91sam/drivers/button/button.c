@@ -4,7 +4,7 @@
 
 #include <usart/usart.h>
 
-#include <flash/flash.h>
+#include <at45/at45.h>
 
 extern bool state;
 
@@ -16,6 +16,6 @@ void button_configure(void) {
 
 bool button_read(void) {
 	
-	return false;
+	return 0xDEADBEEF;
 	
 }

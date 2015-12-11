@@ -4,8 +4,6 @@
 
 #include <fmr/fmr.h>
 
-#include <platform/fmr.h>
-
 /* ~ This function configures the main processor. ~ */
 
 void sam_configure(void) {
@@ -38,7 +36,7 @@ void sam_load_dfu(void) {
 	
 }
 
-/* ~ This function completely erases the main processor's flash memory. ~ */
+/* ~ This function completely erases the main processor's at45 memory. ~ */
 
 void sam_format(void) {
 	
