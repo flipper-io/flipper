@@ -2,7 +2,7 @@
 
 #include <button/button.h>
 
-#include <flash/flash.h>
+#include <at45/at45.h>
 
 #include <fs/fs.h>
 
@@ -36,7 +36,7 @@ void __attribute__ ((constructor)) libflipper_init() {
 	
 	spi_configure(0);
 	
-	flash_configure();
+	at45_configure();
     
 	timer_configure();
 	

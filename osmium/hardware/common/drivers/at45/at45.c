@@ -1,6 +1,6 @@
 #define __private_include__
 
-#include <flash/flash.h>
+#include <at45/at45.h>
 
 #include <spi/spi.h>
 
@@ -38,15 +38,15 @@
 
 #define FLASH_OPCODE_PAGE_READ										0xD2
 
-#define flash_payload_hi(page) (page >> 6)
+#define at45_payload_hi(page) (page >> 6)
 
-#define flash_payload_lo(page) (page << 2)
+#define at45_payload_lo(page) (page << 2)
 
-uint8_t flash_get_status(void) {
+uint8_t at45_get_status(void) {
 	
 	/* ~ Reset the device to prepare it for the incoming opcode. ~ */
 	
-	flash_reset();
+	at45_reset();
 	
 	/* Send the read status register opcode. */
 	
@@ -58,37 +58,37 @@ uint8_t flash_get_status(void) {
 	
 	/* ~ Disable the device so that no data can be recieved until the next opcode is sent. ~ */
 	
-	flash_disable();
+	at45_disable();
 	
 	return status;
 	
 }
 
-void flash_wait(void) {
+void at45_wait(void) {
 	
 	/* Wait until the READY/BUSY bit of the status register is set. */
 	
-	while (!(get_bit_from_port(FLASH_READY_BUSY_BIT, flash_get_status())));
+	while (!(get_bit_from_port(FLASH_READY_BUSY_BIT, at45_get_status())));
 	
 }
 
-void flash_begin_continuous_read(uint16_t page, uint16_t offset) {
+void at45_begin_continuous_read(uint16_t page, uint16_t offset) {
 	
 	/* Wait until the flash chip is ready to recieve data. */
 	
-	flash_wait();
+	at45_wait();
 	
 	/* ~ Reset the device to prepare it for the incoming opcode. ~ */
 	
-	flash_reset();
+	at45_reset();
 	
 	/* Continuous memory read. */
 	
 	spi_put(FLASH_OPCODE_CONTINUOUS_READ);
 	
-	spi_put(flash_payload_hi(page));
+	spi_put(at45_payload_hi(page));
 	
-	spi_put(flash_payload_lo(page) | hi(offset));
+	spi_put(at45_payload_lo(page) | hi(offset));
 	
 	spi_put(lo(offset));
 	
@@ -98,15 +98,15 @@ void flash_begin_continuous_read(uint16_t page, uint16_t offset) {
 	
 }
 
-void flash_begin_continuous_buffer_read(uint8_t buffer, uint16_t offset) {
+void at45_begin_continuous_buffer_read(uint8_t buffer, uint16_t offset) {
 	
 	/* Wait until the flash chip is ready to recieve data. */
 	
-	flash_wait();
+	at45_wait();
 	
 	/* ~ Reset the device to prepare it for the incoming opcode. ~ */
 	
-	flash_reset();
+	at45_reset();
 	
 	/* Select the buffer. */
 	
@@ -140,15 +140,15 @@ void flash_begin_continuous_buffer_read(uint8_t buffer, uint16_t offset) {
 	
 }
 
-void flash_transfer_buffer_to_page_with_erase(uint8_t buffer, uint16_t page, bool erase) {
+void at45_transfer_buffer_to_page_with_erase(uint8_t buffer, uint16_t page, bool erase) {
 	
 	/* Wait until the flash chip is ready to recieve data. */
 	
-	flash_wait();
+	at45_wait();
 	
 	/* ~ Reset the device to prepare it for the incoming opcode. ~ */
 	
-	flash_reset();
+	at45_reset();
 	
 	/* Send the command. */
 	
@@ -182,9 +182,9 @@ void flash_transfer_buffer_to_page_with_erase(uint8_t buffer, uint16_t page, boo
 	
 	/* Followed by the payload. */
 	
-	spi_put(flash_payload_hi(page));
+	spi_put(at45_payload_hi(page));
 	
-	spi_put(flash_payload_lo(page));
+	spi_put(at45_payload_lo(page));
 	
 	/* Complete the transfer by sending 8 don't care bits. The device will remain busy until this operation has completed. */
 	
@@ -192,19 +192,19 @@ void flash_transfer_buffer_to_page_with_erase(uint8_t buffer, uint16_t page, boo
 	
 	/* ~ Disable the device so that no data can be recieved until the next opcode is sent. ~ */
 	
-	flash_disable();
+	at45_disable();
 	
 }
 
-void flash_transfer_page_to_buffer_with_erase(uint16_t page, uint8_t buffer) {
+void at45_transfer_page_to_buffer_with_erase(uint16_t page, uint8_t buffer) {
 	
 	/* Wait until the flash chip is ready to recieve data. */
 	
-	flash_wait();
+	at45_wait();
 	
 	/* ~ Reset the device to prepare it for the incoming opcode. ~ */
 	
-	flash_reset();
+	at45_reset();
 	
 	/* Send the appropriate opcode. */
 	
@@ -225,9 +225,9 @@ void flash_transfer_page_to_buffer_with_erase(uint16_t page, uint8_t buffer) {
 	
 	/* Followed by the payload. */
 	
-	spi_put(flash_payload_hi(page));
+	spi_put(at45_payload_hi(page));
 	
-	spi_put(flash_payload_lo(page));
+	spi_put(at45_payload_lo(page));
 	
 	/* Complete the opcode by sending 8 don't care bits. The device will remain busy until this operation has completed. */
 	
@@ -235,19 +235,19 @@ void flash_transfer_page_to_buffer_with_erase(uint16_t page, uint8_t buffer) {
 	
 	/* ~ Disable the device so that no data can be recieved until the next opcode is sent. ~ */
 	
-	flash_disable();
+	at45_disable();
 	
 }
 
-void flash_begin_writing_to_buffer_with_offset(uint8_t buffer, uint16_t offset) {
+void at45_begin_writing_to_buffer_with_offset(uint8_t buffer, uint16_t offset) {
 	
 	/* Wait until the flash chip is ready to recieve data. */
 	
-	flash_wait();
+	at45_wait();
 	
 	/* ~ Reset the device to prepare it for the incoming opcode. ~ */
 	
-	flash_reset();
+	at45_reset();
 	
 	/* Send the appropriate opcode. */
 	
@@ -281,15 +281,15 @@ void flash_begin_writing_to_buffer_with_offset(uint8_t buffer, uint16_t offset) 
 	
 }
 
-void flash_begin_reading_from_page_with_offset(uint16_t page, uint16_t offset) {
+void at45_begin_reading_from_page_with_offset(uint16_t page, uint16_t offset) {
 	
 	/* Wait until the flash chip is ready to transmit data. */
 	
-	flash_wait();
+	at45_wait();
 	
 	/* ~ Reset the device to prepare it for the incoming opcode. ~ */
 	
-	flash_reset();
+	at45_reset();
 	
 	/* Send the page read opcode to the device. */
 	
@@ -297,9 +297,9 @@ void flash_begin_reading_from_page_with_offset(uint16_t page, uint16_t offset) {
 	
 	/* Send the page and offset. */
 	
-	spi_put(flash_payload_hi(page));
+	spi_put(at45_payload_hi(page));
 	
-	spi_put(flash_payload_lo(page) | hi(offset));
+	spi_put(at45_payload_lo(page) | hi(offset));
 	
 	spi_put(lo(offset));
 	
@@ -315,17 +315,17 @@ void flash_begin_reading_from_page_with_offset(uint16_t page, uint16_t offset) {
 	
 }
 
-void flash_reset_settings(void) {
+void at45_reset_settings(void) {
     
     disable_interrupts();
 	
 	/* Wait until the flash chip is ready to recieve data. */
 	
-	flash_wait();
+	at45_wait();
 	
 	/* ~ Reset the device to prepare it for the incoming opcode. ~ */
 	
-	flash_reset();
+	at45_reset();
 	
 	/* Send the appropriate opcodes to configure the page size. */
 	
@@ -339,13 +339,13 @@ void flash_reset_settings(void) {
 	
 	/* ~ Disable the device so that no data can be recieved until the next opcode is sent. ~ */
 	
-	flash_disable();
+	at45_disable();
     
     enable_interrupts();
 	
 }
 
-void flash_push(void *source, uint32_t length, fsp destination) {
+void at45_push(void *source, uint32_t length, fsp destination) {
     
     disable_interrupts();
     
@@ -359,11 +359,11 @@ void flash_push(void *source, uint32_t length, fsp destination) {
 	
 	/* ~ Move the data from the page into the buffer. ~ */
 	
-	flash_transfer_page_to_buffer_with_erase(page, 0);
+	at45_transfer_page_to_buffer_with_erase(page, 0);
 	
 	/* ~ Select the buffer to begin the write operation. ~ */
 	
-	flash_begin_writing_to_buffer_with_offset(0, offset);
+	at45_begin_writing_to_buffer_with_offset(0, offset);
 	
 	/* ~ Transfer the data into flash memory. ~ */
 	
@@ -387,7 +387,7 @@ void flash_push(void *source, uint32_t length, fsp destination) {
 			
 			/* ~ Write the data into the completed page. ~ */
 			
-			flash_transfer_buffer_to_page_with_erase(0, page, true);
+			at45_transfer_buffer_to_page_with_erase(0, page, true);
 			
 			/* ~ Increment the page. ~ */
 			
@@ -395,11 +395,11 @@ void flash_push(void *source, uint32_t length, fsp destination) {
 			
 			/* ~ Move the data from the next page into the buffer. ~ */
 			
-			flash_transfer_page_to_buffer_with_erase(page, 0);
+			at45_transfer_page_to_buffer_with_erase(page, 0);
 			
 			/* ~ Select the new buffer. Toggling them like this makes the write process go faster? ~ */
 			
-			flash_begin_writing_to_buffer_with_offset(0, offset);
+			at45_begin_writing_to_buffer_with_offset(0, offset);
 			
 		}
 		
@@ -407,17 +407,17 @@ void flash_push(void *source, uint32_t length, fsp destination) {
 	
 	/* ~ Transfer the buffer into the final page. ~ */
 	
-	flash_transfer_buffer_to_page_with_erase(0, page, true);
+	at45_transfer_buffer_to_page_with_erase(0, page, true);
 	
 	/* ~ Close the connection. ~ */
 	
-	flash_disable();
+	at45_disable();
     
     enable_interrupts();
 		
 }
 
-void flash_pull(void *destination, uint32_t length, fsp source) {
+void at45_pull(void *destination, uint32_t length, fsp source) {
     
     disable_interrupts();
     
@@ -431,7 +431,7 @@ void flash_pull(void *destination, uint32_t length, fsp source) {
 	
 	/* ~ Begin a continuous memory array read. ~ */
 	
-	flash_begin_continuous_read(page, offset);
+	at45_begin_continuous_read(page, offset);
 	
 	/* ~ Read the data in from memory. ~ */
 	
@@ -439,13 +439,13 @@ void flash_pull(void *destination, uint32_t length, fsp source) {
 	
 	/* ~ Close the connection. ~ */
 	
-	flash_disable();
+	at45_disable();
     
     enable_interrupts();
 	
 }
 
-void *flash_dereference(fsp source, uint32_t length) {
+void *at45_dereference(fsp source, uint32_t length) {
 	
 	/* ~ Allocate local memory to service the request. ~ */
 	
@@ -453,7 +453,7 @@ void *flash_dereference(fsp source, uint32_t length) {
 	
 	/* ~ Move the data from external memory to internal memory. ~ */
 	
-	flash_pull(destination, length, source);
+	at45_pull(destination, length, source);
 	
 	/* ~ Return a pointer to the local memory region. ~ */
 	

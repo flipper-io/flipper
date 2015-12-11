@@ -12,7 +12,7 @@
 
 #include <fdl/fdl.h>
 
-#include <flash/flash.h>
+#include <at45/at45.h>
 
 #include <fs/fs.h>
 

@@ -10,12 +10,18 @@
 
 #include <fs/crc.h>
 
+#include <unistd.h>
+
 int main(int argc, char *argv[]) {
     
 	/* ~ Attatch this instance of libflipper to the first device present over USB. ~ */
-
+	
 	flipper.attach(FLIPPER_SOURCE_NETWORK, "129.21.80.21");
 
+//	flipper.attach(FLIPPER_SOURCE_USB);
+	
+//	usart.enable();
+	
 	if (!strcmp(argv[1], "flash")) {
 
 		sam_load_firmware(argv[2]);
@@ -64,23 +70,23 @@ int main(int argc, char *argv[]) {
         
         /* ~ Allocate space for the data. ~ */
         
-        fsp _data = flash_alloc(size);
+        fsp _data = at45_alloc(size);
         
-        /* ~ Move the data into flash. ~ */
+        /* ~ Move the data into at45. ~ */
         
         for (int i = 0; i < (size / 64); i ++) {
             
-            flash_push((void *)(data + (64 * i)), 64, (fsp)(_data + (64 * i)));
+            at45_push((void *)(data + (64 * i)), 64, (fsp)(_data + (64 * i)));
             
         }
         
-        flash_push((void *)(data + (64 * (size / 64))), (size % 64), (fsp)(_data + (64 * (size / 64))));
+        at45_push((void *)(data + (64 * (size / 64))), (size % 64), (fsp)(_data + (64 * (size / 64))));
         
         /* ~ Rewrite the pointers. ~ */
         
-        flash_push(&_data, sizeof(fsp), forward(_leaf, leaf, data));
+        at45_push(&_data, sizeof(fsp), forward(_leaf, leaf, data));
 
-        flash_push(&size, sizeof(uint32_t), forward(_leaf, leaf, size));
+        at45_push(&size, sizeof(uint32_t), forward(_leaf, leaf, size));
         
         sam.power(ON);
         
@@ -110,6 +116,8 @@ int main(int argc, char *argv[]) {
         host.invoke(_io, _io_write, 4, little(atoi(argv[3])), 0, little(atoi(argv[4])), 0);
         
     }
+	
+	usart.disable();
     
 	return 0;
 

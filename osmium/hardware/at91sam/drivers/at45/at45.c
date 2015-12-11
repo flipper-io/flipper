@@ -1,12 +1,12 @@
 #define __private_include__
 
-#include <flash/flash.h>
+#include <at45/at45.h>
 
 #include <spi/spi.h>
 
 #include <platform/at91sam.h>
 
-void flash_configure(void) {
+void at45_configure(void) {
 	
 	/* ~ Configure the CS pin. ~ */
 	
@@ -22,7 +22,7 @@ void flash_configure(void) {
 	
 }
 
-void flash_enable(void) {
+void at45_enable(void) {
 	
     spi_enable();
     
@@ -36,11 +36,11 @@ void flash_enable(void) {
 	
 }
 
-void flash_disable(void) {
+void at45_disable(void) {
     
     spi_disable();
 	
-    /* Configure the external flash memory chip's CS pin as an input. */
+    /* Configure the external at45 memory chip's CS pin as an input. */
     
     set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_ODR);
     
@@ -50,7 +50,7 @@ void flash_disable(void) {
 	
 }
 
-void flash_reset(void) {
+void at45_reset(void) {
 	
     spi_enable();
     
@@ -70,7 +70,7 @@ void flash_reset(void) {
 
 /*
  
- Note that flash_alloc() and flash_free() are defined in the common 'alloc.c' for organizational purposes.
+ Note that at45_alloc() and at45_free() are defined in the common 'alloc.c' for organizational purposes.
  
 */
 
@@ -82,9 +82,9 @@ void flash_reset(void) {
 
 #define FLASH_OPCODE_CHIP_ERASE_3		0x9A
 
-extern void flash_wait(void);
+extern void at45_wait(void);
 
-void flash_format(void) {
+void at45_format(void) {
 	
 	/* Disable interrupts to prevent memory corruption. */
 	
@@ -92,11 +92,11 @@ void flash_format(void) {
 	
 	/* Wait until the flash chip is ready to recieve data. */
 	
-	flash_wait();
+	at45_wait();
 	
 	/* ~ Reset the device to prepare it for the incoming opcode. ~ */
 	
-	flash_reset();
+	at45_reset();
 	
 	/* Send the appropriate opcodes to initialize a chip erase. */
 	
@@ -126,11 +126,11 @@ void flash_format(void) {
 	
 	/* Wait until the flash chip has been erased. */
 	
-	flash_wait();
+	at45_wait();
 	
 	/* ~ Disable the device so that no data can be recieved until the next opcode is sent. ~ */
 	
-	flash_disable();
+	at45_disable();
 	
 	/* Enable interrupts again. */
 	

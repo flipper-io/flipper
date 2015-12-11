@@ -4,7 +4,7 @@
 
 #include <fs/fs.h>
 
-#include <flash/flash.h>
+#include <at45/at45.h>
 
 #include <fs/tree.h>
 
@@ -34,11 +34,11 @@ void fdl_load(uint16_t key) {
     
     /* ~ Dereference the metadata contained by the leaf. ~ */
     
-    leaf *l = flash_dereference(_leaf, sizeof(leaf));
+    leaf *l = at45_dereference(_leaf, sizeof(leaf));
     
     /* ~ Move the loadable from external memory into internal memory. ~ */
     
-    void *init = flash_dereference(l -> data, l -> size);
+    void *init = at45_dereference(l -> data, l -> size);
 	
 	/* ~ Release the memory allocated to dereference the leaf. ~ */
 	

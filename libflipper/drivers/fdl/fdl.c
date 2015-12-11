@@ -4,8 +4,6 @@
 
 #include <fmr/fmr.h>
 
-#include <platform/fmr.h>
-
 void fdl_configure(void) {
     
     
