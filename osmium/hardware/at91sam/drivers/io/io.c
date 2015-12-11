@@ -18,7 +18,7 @@ void io_set_direction(uint8_t pin, uint8_t direction) {
 	
 	/* ~ If the pin is less than or equal to IO16, the pin is digital. ~ */
 	
-	if (pin <= IO016)
+	if (pin <= IO16)
 	
 		digital_set_direction(pin, direction);
 	
@@ -34,7 +34,7 @@ void io_write(uint8_t pin, uint16_t value) {
 	
 	/* ~ If the pin is less than or equal to IO16, the pin is digital. ~ */
 	
-	if (pin <= IO016)
+	if (pin <= IO16)
 	
 		digital_write(pin, value);
 	
@@ -50,7 +50,7 @@ uint16_t io_read(uint8_t pin) {
 	
 	/* ~ If the pin is less than or equal to IO16, the pin is digital. ~ */
 	
-	if (pin <= IO016)
+	if (pin <= IO16)
 	
 		return digital_read(pin);
 	

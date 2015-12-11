@@ -128,6 +128,8 @@ int main(void) {
 
 	uint8_t byte = 0xFE;
 	
+	delay_ms(2000);
+	
 	bme280_configure();
 	
 //	char buf[64];

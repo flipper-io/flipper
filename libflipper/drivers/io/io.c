@@ -24,6 +24,6 @@ void io_write(uint8_t pin, uint16_t value) {
 
 uint16_t io_read(uint8_t pin) {
 	
-	return (uint16_t)(device.invoke(_io, _io_read, 1, pin));
+	return (uint16_t)(host.invoke(_io, _io_read, 2, little(pin), 0));
 	
 }
