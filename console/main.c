@@ -14,13 +14,17 @@
 
 int main(int argc, char *argv[]) {
     
+	if (argc < 2) {
+
+		printf("\nUsage: flipper [load | io | flash]\n\n");
+
+		return EXIT_SUCCESS;
+
+	}
+
 	/* ~ Attatch this instance of libflipper to the first device present over USB. ~ */
 	
-//	flipper.attach(FLIPPER_SOURCE_NETWORK, "129.21.80.21");
-
 	flipper.attach(FLIPPER_SOURCE_USB);
-	
-	usart.enable();
 	
 	if (!strcmp(argv[1], "flash")) {
 
