@@ -96,8 +96,6 @@ void fdl_load(uint16_t key) {
 			
 		}
 		
-		*EFC0_FCR = ((EFC_KEY << 24) | ((LOAD_PAGE + i) << 8) | EFC_FCMD_CLB);
-		
 		/* ~ Write the page into main memory. ~ */
 		
 		*EFC0_FCR = ((EFC_KEY << 24) | ((LOAD_PAGE + i) << 8) | EFC_FCMD_WP);
