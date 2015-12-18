@@ -1,3 +1,7 @@
+# ~ Determine the target. ~ #
+
+target = $(shell echo $(shell uname -s) | tr A-Z a-z)
+
 # ~ Determine which platform is being targeted and define its build macros. ~ */
 
 ifeq ($(platform),atmega16u2)
@@ -40,9 +44,25 @@ clock = 48054850
 
 # ~ Specify a compiler and the binary utilities needed to deploy code to the target. ~ #
 
+ifeq ($(target),darwin)
+
 cc = /opt/local/bin/arm-elf-gcc-4.7
 
 objcopy = /opt/local/bin/arm-elf-objcopy
+
+else ifeq ($(target),linux)
+
+cc = ../resources/linux/arm-elf/bin/arm-elf-gcc
+
+objcopy = ../resources/linux/arm-elf/bin/arm-elf-objcopy
+
+else
+
+# ~ If we have no target, specify an error. ~ #
+
+$(error "Please specify a target.")
+
+endif
 
 uploader = $(shell which 'flipper')
 
