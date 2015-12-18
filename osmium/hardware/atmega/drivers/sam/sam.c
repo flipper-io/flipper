@@ -197,3 +197,9 @@ void sam_format(void) {
 	enable_interrupts();
 	
 }
+
+uint32_t sam_read_word(void *address) {
+	
+	
+	
+}
