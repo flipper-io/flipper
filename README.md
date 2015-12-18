@@ -1,8 +1,10 @@
 # What is the Flipper Toolbox?
 
-The Flipper Toolbox is a repository of sofware components that enable hardware control of Flipper which can be compiled on a per-application basis.
+The Flipper Toolbox is a repository of sofware components that work together enable control of Flipper hardware from a variety of different host platforms and programming environments.
 
-Controlling embedded hardware requires a huge amount of overhead. This overhead distances the consumer from the hardware that they are working with, and, in turn, distances them from their projects. Flipper is an embedded electronics prototyping platform that enables developers to work at the bare metal, while simultaneously taking advantage of a highly sophistocated but lightweight control stack known as the Flipper Toolbox. The toolbox comes with a suite of development tools that can be used to interact with Flipper hardware from a wide range of platforms. For example, the component `FlipperiOS.framework` enables complete hardware control of Flipper from Apple's iOS devices. The toolbox also allows Flipper to be controlled from different programming environments such as Python, Java, Swift, Objective-C, and more.
+Interfacing with embedded hardware generally requires a substantial amount of overhead. Simple control schemas that deliver data from dedicated hardware to a host for processing are difficult to implement reliably and are often extremely limited in scope.
+
+This overhead distances the consumer from the hardware that they are working with, and, in turn, distances them from their projects. Flipper is an embedded electronics prototyping platform that enables developers to work at the bare metal, while simultaneously taking advantage of a highly sophistocated but lightweight control stack known as the Flipper Toolbox. The toolbox comes with a suite of development tools that can be used to interact with Flipper hardware from a wide range of platforms. For example, the component `FlipperiOS.framework` enables complete hardware control of Flipper from Apple's iOS devices. The toolbox also allows Flipper to be controlled from different programming environments such as Python, Java, Swift, Objective-C, and more.
 
 Flipper hardware is limited only by the Flipper Toolbox. Flipper works natively with USB, but backpacks exist that enable the toolbox to interact with Flipper over Wi-Fi and Bluetooth. The toolbox can be ported any platform with a standard C library and configured to communicate with Flipper over almost any bus architecture.
 

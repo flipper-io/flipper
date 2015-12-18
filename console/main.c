@@ -16,18 +16,26 @@ int main(int argc, char *argv[]) {
     
 	/* ~ Attatch this instance of libflipper to the first device present over USB. ~ */
 	
-	flipper.attach(FLIPPER_SOURCE_NETWORK, "129.21.80.21");
+//	flipper.attach(FLIPPER_SOURCE_NETWORK, "129.21.80.21");
 
-//	flipper.attach(FLIPPER_SOURCE_USB);
+	flipper.attach(FLIPPER_SOURCE_USB);
 	
-//	usart.enable();
+	usart.enable();
 	
 	if (!strcmp(argv[1], "flash")) {
 
 		sam_load_firmware(argv[2]);
 
 	}
-    
+	
+	if (!strcmp(argv[1], "word")) {
+		
+		void *address = (void *)(strtol(argv[2], NULL, 16));
+		
+		printf("\nRead from address 0x%08x: 0x%08x\n\n", (uint32_t)address, host.invoke(_sam, _sam_word, 2, little(lo16(address)), little(hi16(address))));
+		
+	}
+	
     else if (!strcmp(argv[1], "load")) {
         
         sam.power(OFF);

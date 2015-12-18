@@ -8,6 +8,8 @@
 
 #include <platform/power.h>
 
+#include <sam/sam.h>
+
 #define DEBOUNCE 25
 
 #define WAIT 50
@@ -58,7 +60,7 @@ void u2_total_reset(void) {
 	
 	/* ~ When the power button is pressed, a reset is triggered. The 7S is reset first, followed by the U2. ~ */
 	
-	//sam_reset();
+	sam_reset();
 	
 	delay_ms(WAIT);
 	
@@ -96,7 +98,13 @@ void flipper_power_off(void) {
 
 void button_pressed(void) {
 	
-	u2_total_reset();
+	/* ~ Reset only the ARM processor. ~ */
+	
+	sam_set_power(OFF);
+
+	delay_ms(100);
+	
+	sam_set_power(ON);
 	
 }
 
@@ -108,6 +116,8 @@ bool u2_power_on = false;
 
 void button_held(int seconds) {
 	
+#if false
+	
 	/* ~ If the power is on, begin the power down sequence. ~ */
 	
 	if (u2_power_on)
@@ -118,7 +128,9 @@ void button_held(int seconds) {
 	
 	else
 		
-		u2_total_reset();
+#endif
+		
+	u2_total_reset();
 	
 }
 
@@ -142,9 +154,9 @@ ISR (INT0_vect) {
  
 	else {
 		
-		/* ~ If the button has been held for 1 or more seconds, then trigger a button hold. ~ */
+		/* ~ If the button has been held for 500 or more milliseconds, then trigger a button hold. ~ */
 		
-		if (button_held_time >= 1000) {
+		if (button_held_time >= 500) {
 			
 			/* ~ Zero the total time the button has been held for the next button press. ~ */
 			

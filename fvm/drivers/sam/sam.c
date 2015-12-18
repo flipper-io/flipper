@@ -40,7 +40,7 @@ void sam_load_dfu(void) {
 	
 }
 
-/* ~ This function completely erases the main processor's flash memory. ~ */
+/* ~ This function completely erases the main processor's at45 memory. ~ */
 
 void sam_format(void) {
 	
