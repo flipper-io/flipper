@@ -75,6 +75,8 @@ int main(int argc, char *argv[]) {
         /* ~ Checksum the name to obtain a key. ~ */
         
         uint16_t key = checksum(name, strlen(name));
+		
+		printf("\nLoading with key 0x%04x\n", key);
         
         /* ~ Create an entry in the filesystem. ~ */
         

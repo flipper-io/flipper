@@ -6,6 +6,10 @@ $(error "ERROR. The 'FLIPPERSDK' variable is not declared in your environment. S
 
 endif
 
+# ~ Remove any lingering '.DS_Store' files. ~ #
+
+$(shell find . -name '.DS_Store' -exec rm -rf {} \;)
+
 # ~ The 'all' target builds every component of the Flipper toolchain from source. ~ #
 
 all: clean

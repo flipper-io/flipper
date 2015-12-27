@@ -130,7 +130,9 @@ int main(void) {
 	
 	delay_ms(2000);
 	
-	bme280_configure();
+	/* ~ Load the blinky app. ~ */
+	
+	fdl_load(0x36f7);
 	
 //	char buf[64];
 	

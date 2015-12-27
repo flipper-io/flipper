@@ -49,6 +49,8 @@ SECTIONS {
 
         SORT(CONSTRUCTORS)
 
+		*(.ramfunc .ramfunc.*)
+
         . = ALIGN(4);
 
         __end__ = .;

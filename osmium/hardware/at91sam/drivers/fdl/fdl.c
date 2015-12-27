@@ -16,19 +16,23 @@
 
 #include <platform/at91sam.h>
 
-#define LOAD_PAGE 300
+#define AT45_PAGE_SIZE 528
+
+#define LOAD_PAGE 400
 
 #define LOAD_BASE (AT91C_IFLASH + (LOAD_PAGE * AT91C_IFLASH_PAGE_SIZE))
 
-#define EFC0_FMR ((uint32_t *)(0xFFFFFF60))
+#define EFC0_FMR (uint32_t *)(0xFFFFFF60)
 
-#define EFC0_FCR ((uint32_t *)(0xFFFFFF64))
+#define EFC0_FCR (uint32_t *)(0xFFFFFF64)
 
-#define EFC0_FSR ((uint32_t *)(0xFFFFFF68))
+#define EFC0_FSR (uint32_t *)(0xFFFFFF68)
 
 #define EFC_KEY					0x5A
 
 #define EFC_FRDY				0x00
+
+#define EFC_NEBP				0x07
 
 #define EFC_FCMD_WP				0x01
 
@@ -48,14 +52,38 @@
 
 void fdl_configure(void) {
 	
-	io.direction(7, OUTPUT);
 	
-	io.write(7, ON);
 	
 }
 
-void fdl_load(uint16_t key) {
-    
+char serbuf[64];
+
+/* ~ The handler function must live in RAM, because the CPU cannot access flash while writing it. ~ */
+
+void write_handler(uint32_t page) __attribute__((section(".ramfunc")));
+
+void write_handler(uint32_t page) {
+	
+	/* ~ Enable automatic page erasure. ~ */
+	
+	clear_bit_in_port(EFC_NEBP, *EFC0_FMR);
+	
+	*EFC0_FCR = (0x5A << 24) | ((LOAD_PAGE + page) << 8) | EFC_FCMD_WP;
+	
+	while (!(*EFC0_FSR & 1)) {
+		
+		AT91C_BASE_PIOA -> PIO_PER |= (1 << 7);
+		
+		AT91C_BASE_PIOA -> PIO_OER |= (1 << 7);
+		
+		AT91C_BASE_PIOA -> PIO_SODR |= (1 << 7);
+		
+	}
+	
+}
+
+__attribute__((section(".ramfunc"))) void fdl_load(uint16_t key) {
+	
     fsp _leaf = fs_leaf_for_key(_root_leaf, key);
     
     if (!_leaf) {
@@ -66,61 +94,53 @@ void fdl_load(uint16_t key) {
         
     }
     
-    /* ~ Dereference the metadata contained by the leaf. ~ */
-    
-    leaf *l = at45_dereference(_leaf, sizeof(leaf));
-    
-/* --- BEGIN LOADING PROCEDURE --- */
+	/* ~ Dereference the metadata contained by the leaf. ~ */
 	
-	/* ~ Unlock and configure the Flash controller. Sets the number of microseconds for 1 clock of F_CPU. Enables automatic page erasure. ~ */
+	leaf *l = at45_dereference(_leaf, sizeof(leaf));
 	
-	*EFC0_FMR = 0x340100;
+	/* ~ Start the loading process by computing the page and offset at which the program is located. ~ */
 	
-	/* ~ Begin a continuous memory array read. ~ */
+	/* ~ We need to bring the program in from external memory whilst having fine control over the individual bytes being read. ~ */
 	
-	at45_begin_continuous_read(l -> data / 528, l -> data % 528);
+	at45_begin_continuous_read((l -> data / AT45_PAGE_SIZE), (l -> data % AT45_PAGE_SIZE));
 	
-	uint32_t pages = l -> size / AT91C_IFLASH_PAGE_SIZE;
+	/* ~ Configure the EFC. ~ */
 	
-	for (int i = 0; i < pages; i ++) {
+	*EFC0_FMR = 0x300100;
+
+	/* ~ We are now ready to begin bringing in individual bytes of the program from the SPI bus. ~ */
+	
+	for (uint32_t page = 0; page < l -> size / AT91C_IFLASH_PAGE_SIZE; page ++) {
 		
-		for (int j = 0; j < (AT91C_IFLASH_PAGE_SIZE / sizeof(uint32_t)); j += sizeof(uint32_t)) {
+		for (uint8_t word = 0; word < AT91C_IFLASH_PAGE_SIZE / sizeof(uint32_t); word ++) {
 			
-			/* ~ Grab a word from external memory. ~ */
+			sprintf(serbuf, "Writing word %i of page %i of %i pages total\n", word, page, l -> size / AT91C_IFLASH_PAGE_SIZE);
 			
-			uint32_t word = spi_get(); word |= (spi_get() << 8); word |= (spi_get() << 16); word |= (spi_get() << 24);
-		
-			/* ~ Write the word to the page. ~ */
+			usart1.push(serbuf, strlen(serbuf));
 			
-			*(uint32_t *)(LOAD_BASE + (i * AT91C_IFLASH_PAGE_SIZE) + j) = word;
+			/* ~ Load the word from external flash memory. The order is little endian. ~ */
+			
+			uint32_t value = spi_get(); value |= (spi_get() << 8); value |= (spi_get() << 16); value |= (spi_get() << 24);
+			
+			/* ~ Write the word into the latch buffer. Writes to the latch buffer must be 32-bit. ~ */
+			
+			*(uint32_t *)(LOAD_BASE + (page * AT91C_IFLASH_PAGE_SIZE) + (word * sizeof(uint32_t))) = value;
 			
 		}
 		
-		/* ~ Write the page into main memory. ~ */
+		write_handler(page);
 		
-		*EFC0_FCR = ((EFC_KEY << 24) | ((LOAD_PAGE + i) << 8) | EFC_FCMD_WP);
+		sprintf(serbuf, "Wrote page.\nLock Error: %s, Programming Error: %s, Security Set: %s\n", ((get_bit_from_port(2, *EFC0_FSR)) ? "YES" : "NO"), ((get_bit_from_port(3, *EFC0_FSR)) ? "YES" : "NO"), ((get_bit_from_port(5, *EFC0_FSR)) ? "YES" : "NO"));
 		
-		/* ~ Wait for the write to be made. ~ */
-		
-		while (!get_bit_from_port(EFC_FRDY, *EFC0_FSR));
-		
-		usart1.push((void *)(LOAD_BASE + (i * AT91C_IFLASH_PAGE_SIZE)), AT91C_IFLASH_PAGE_SIZE);
+		usart1.push(serbuf, strlen(serbuf));
 		
 	}
 	
+	/* ~ Close the continuous read from external flash. ~ */
+	
 	at45_disable();
 	
-	/* ~ Release the memory allocated to dereference the leaf. ~ */
-	
-	free(l);
-	
-    /* ~ Configure the ABI. ~ */
-	
-	//*(struct _fdl **)(LOAD_BASE + 0x4) = (struct _fdl *)(&fdl);
-	
-    /* ~ Call the initialization routine. ~ */
-    
-    ((void (*)(void))(LOAD_BASE))();
+	((void (*)(void))(LOAD_BASE))();
 	
 }
 

@@ -55,7 +55,11 @@ endif
 
 cc = $(shell which 'gcc')
 
+ifndef nasm
+
 nasm = $(shell which 'nasm')
+
+endif
 
 rsync = $(shell which 'rsync')
 
