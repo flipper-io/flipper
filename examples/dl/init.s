@@ -1,4 +1,4 @@
-.arm
+.thumb
 
 .section ".start"
 

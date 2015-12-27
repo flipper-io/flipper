@@ -2,6 +2,18 @@
 
 target = $(shell echo $(shell uname -s) | tr A-Z a-z)
 
+# ~ Shortcuts for the platform names. ~ #
+
+ifeq ($(p),u2)
+
+platform = atmega16u2
+
+else ifeq ($(p),7s)
+
+platform = at91sam7s
+
+endif
+
 # ~ Determine which platform is being targeted and define its build macros. ~ */
 
 ifeq ($(platform),atmega16u2)
@@ -24,7 +36,7 @@ uploader = $(shell which 'avrdude')
 
 # ~ Specify platform specific preprocessor flags. ~ #
 
-uploader_flags = -p $(platform) -c usbtiny -V -U lfuse:w:0xFF:m -U hfuse:w:0xD9:m -U flash:w:$(output)
+uploader_flags = -p $(platform) -c usbtiny -U lfuse:w:0xFF:m -U hfuse:w:0xD9:m -U flash:w:$(output)
 
 platform_flags = -DARCH=ARCH_AVR8 -mmcu=$(platform) -D__AVR_$(shell echo $(platform) | tr a-z A-Z)__ -D__atmega_build__
 
@@ -70,7 +82,7 @@ uploader = $(shell which 'flipper')
 
 uploader_flags = flash $(output)
 
-platform_flags = -std=gnu99 -Os -mcpu=arm7tdmi -mtune=arm7tdmi -mthumb -mthumb-interwork -nostartfiles -fomit-frame-pointer
+platform_flags = -mcpu=arm7tdmi -mtune=arm7tdmi -mthumb -mthumb-interwork -nostartfiles -ffreestanding -fdata-sections -ffunction-sections -fomit-frame-pointer
 
 # ~ Specify the platform's hardware directory. ~ #
 
@@ -108,7 +120,7 @@ all: clean
 
 	# ~ Link the object files together to produce an output file. ~ #
 
-	$(cc) $(prefix) $(ldflags) -w $(sort $(objects)) -o $(basename $(output)).elf
+	$(cc) $(prefix) $(ldflags) $(sort $(objects)) -o $(basename $(output)).elf
 
 	# ~ Convert the 'elf' file into a raw binary. ~ #
 
