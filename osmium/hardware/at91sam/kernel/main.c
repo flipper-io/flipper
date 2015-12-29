@@ -132,7 +132,7 @@ int main(void) {
 	
 	/* ~ Load the blinky app. ~ */
 	
-	fdl_load(0x36f7);
+//	fdl_load(0x36f7);
 	
 //	char buf[64];
 	
