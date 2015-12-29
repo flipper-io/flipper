@@ -1,8 +1,8 @@
-llvm_flags = -target armv7-none-elf -march=arm7tdmi -mfloat-abi=soft -Os -fPIC -nostdlib -ffreestanding -Os -std=c99
+llvm_flags = -std=c99 -Os -target armv7-none-elf -march=arm7tdmi -mfloat-abi=soft -fPIC -nostdlib -ffreestanding -fomit-frame-pointer -mthumb
 
 all:
 	
-	clang $(llvm_flags) -c led.c init.s glue.c -I /usr/local/include -I /usr/local/include/flipper --sysroot "/Development/flipper-toolbox/resources/osx/arm-elf/arm-elf" -I "/Development/flipper-toolbox/resources/osx/arm-elf/arm-elf/include"  -fomit-frame-pointer
+	clang $(llvm_flags) -c led.c init.s glue.c -I /usr/local/include -I /usr/local/include/flipper --sysroot "/Development/flipper-toolbox/resources/osx/arm-elf/arm-elf" -I "/Development/flipper-toolbox/resources/osx/arm-elf/arm-elf/include"
 
 	arm-elf-gcc-4.7 -fPIC -nostdlib -ffreestanding -Wl,-T dl.ld *.o -o led.elf
 

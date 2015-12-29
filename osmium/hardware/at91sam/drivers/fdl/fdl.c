@@ -83,6 +83,32 @@ void write_handler(uint32_t page) {
 }
 
 __attribute__((section(".ramfunc"))) void fdl_load(uint16_t key) {
+
+	sprintf(serbuf, "Starting loading process.\n\n");
+	
+	usart1.push(serbuf, strlen(serbuf));
+
+	/* ~ Configure the EFC. 48 clocks per ns. 1 FWS. Erase before program. ~ */
+	
+	*EFC0_FMR = 0x300200;
+	
+	/* ~ Fill the internal latch buffer. ~ */
+	
+	for (int i = 0; i < 128; i += 4) *(uint32_t *)(AT91C_IFLASH + i) = i;
+	
+	/* ~ Dump the latch buffer into the destination page: 400 ~ */
+	
+	*EFC0_FCR = (0x5A << 24) | (400 << 8) | EFC_FCMD_WP;
+	
+	/* ~ Wait for the write to succeed. ~ */
+	
+	//while ((*EFC0_FSR & 1) == 0);
+	
+	sprintf(serbuf, "Wrote page.\nLock Error: %s, Programming Error: %s, Security Set: %s\n", ((get_bit_from_port(2, *EFC0_FSR)) ? "YES" : "NO"), ((get_bit_from_port(3, *EFC0_FSR)) ? "YES" : "NO"), ((get_bit_from_port(5, *EFC0_FSR)) ? "YES" : "NO"));
+	
+	usart1.push(serbuf, strlen(serbuf));
+	
+#if 0
 	
     fsp _leaf = fs_leaf_for_key(_root_leaf, key);
     
@@ -141,6 +167,8 @@ __attribute__((section(".ramfunc"))) void fdl_load(uint16_t key) {
 	at45_disable();
 	
 	((void (*)(void))(LOAD_BASE))();
+	
+#endif
 	
 }
 
