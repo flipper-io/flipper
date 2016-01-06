@@ -12,7 +12,7 @@ target = $(shell echo $(shell uname -s) | tr A-Z a-z)
 
 ifeq ($(target),darwin)
 
-python_install_directory = /Library/Python/2.7/site-packages/$(output)
+python_install_directory = /Library/Python/2.7/site-packages
 
 include_directories = $(shell find '/System/Library/Frameworks/Python.framework/Versions/Current/include' -type d)
 

@@ -22,33 +22,7 @@
 
 #define LOAD_BASE (AT91C_IFLASH + (LOAD_PAGE * AT91C_IFLASH_PAGE_SIZE))
 
-#define EFC0_FMR (uint32_t *)(0xFFFFFF60)
-
-#define EFC0_FCR (uint32_t *)(0xFFFFFF64)
-
-#define EFC0_FSR (uint32_t *)(0xFFFFFF68)
-
-#define EFC_KEY					0x5A
-
-#define EFC_FRDY				0x00
-
-#define EFC_NEBP				0x07
-
-#define EFC_FCMD_WP				0x01
-
-#define EFC_FCMD_SLB			0x02
-
-#define EFC_FCMD_WPL			0x03
-
-#define EFC_FCMD_CLB			0x04
-
-#define EFC_FCMD_EA				0x08
-
-#define EFC_FCMD_SGPB			0x0B
-
-#define EFC_FCMD_CGPB			0x0D
-
-#define EFC_FCMD_SSB			0x0F
+#define EFC_KEY 0x5A
 
 void fdl_configure(void) {
 	
@@ -58,57 +32,25 @@ void fdl_configure(void) {
 
 char serbuf[64];
 
-/* ~ The handler function must live in RAM, because the CPU cannot access flash while writing it. ~ */
-
-void write_handler(uint32_t page) __attribute__((section(".ramfunc")));
-
-void write_handler(uint32_t page) {
+__attribute__((section(".ramfunc"))) void my_delay_ms(unsigned long time) {
 	
-	/* ~ Enable automatic page erasure. ~ */
-	
-	clear_bit_in_port(EFC_NEBP, *EFC0_FMR);
-	
-	*EFC0_FCR = (0x5A << 24) | ((LOAD_PAGE + page) << 8) | EFC_FCMD_WP;
-	
-	while (!(*EFC0_FSR & 1)) {
-		
-		AT91C_BASE_PIOA -> PIO_PER |= (1 << 7);
-		
-		AT91C_BASE_PIOA -> PIO_OER |= (1 << 7);
-		
-		AT91C_BASE_PIOA -> PIO_SODR |= (1 << 7);
-		
-	}
+	for (volatile unsigned int i = 0; (i < (F_CPU / 10250) * (time)); i ++);
 	
 }
 
-__attribute__((section(".ramfunc"))) void fdl_load(uint16_t key) {
+/* ~ The handler function must live in RAM, because the CPU cannot access flash while writing it. ~ */
 
-	sprintf(serbuf, "Starting loading process.\n\n");
+__attribute__((section(".ramfunc"))) void write_page(uint16_t page) {
 	
-	usart1.push(serbuf, strlen(serbuf));
+	set_bits_in_port_with_mask(AT91C_BASE_MC -> MC_FCR, ((EFC_KEY << 24) & AT91C_MC_KEY) | ((page << 8) & AT91C_MC_PAGEN) | AT91C_MC_FCMD_START_PROG);
+	
+	while (!(AT91C_BASE_MC -> MC_FSR & AT91C_MC_FRDY));
+	
+	my_delay_ms(1);
+	
+}
 
-	/* ~ Configure the EFC. 48 clocks per ns. 1 FWS. Erase before program. ~ */
-	
-	*EFC0_FMR = 0x300200;
-	
-	/* ~ Fill the internal latch buffer. ~ */
-	
-	for (int i = 0; i < 128; i += 4) *(uint32_t *)(AT91C_IFLASH + i) = i;
-	
-	/* ~ Dump the latch buffer into the destination page: 400 ~ */
-	
-	*EFC0_FCR = (0x5A << 24) | (400 << 8) | EFC_FCMD_WP;
-	
-	/* ~ Wait for the write to succeed. ~ */
-	
-	//while ((*EFC0_FSR & 1) == 0);
-	
-	sprintf(serbuf, "Wrote page.\nLock Error: %s, Programming Error: %s, Security Set: %s\n", ((get_bit_from_port(2, *EFC0_FSR)) ? "YES" : "NO"), ((get_bit_from_port(3, *EFC0_FSR)) ? "YES" : "NO"), ((get_bit_from_port(5, *EFC0_FSR)) ? "YES" : "NO"));
-	
-	usart1.push(serbuf, strlen(serbuf));
-	
-#if 0
+void fdl_load(uint16_t key) {
 	
     fsp _leaf = fs_leaf_for_key(_root_leaf, key);
     
@@ -130,19 +72,17 @@ __attribute__((section(".ramfunc"))) void fdl_load(uint16_t key) {
 	
 	at45_begin_continuous_read((l -> data / AT45_PAGE_SIZE), (l -> data % AT45_PAGE_SIZE));
 	
-	/* ~ Configure the EFC. ~ */
+	/* ~ Configure the EFC. 48 clocks per ns. 1 FWS. Erase before program. ~ */
 	
-	*EFC0_FMR = 0x300100;
-
+	set_bits_in_port_with_mask(AT91C_BASE_MC -> MC_FMR, ((0x30 << 16) & AT91C_MC_FMCN) | AT91C_MC_FWS_1FWS);
+	
+	clear_bits_in_port_with_mask(AT91C_BASE_MC -> MC_FMR, AT91C_MC_NEBP);
+	
 	/* ~ We are now ready to begin bringing in individual bytes of the program from the SPI bus. ~ */
 	
 	for (uint32_t page = 0; page < l -> size / AT91C_IFLASH_PAGE_SIZE; page ++) {
 		
 		for (uint8_t word = 0; word < AT91C_IFLASH_PAGE_SIZE / sizeof(uint32_t); word ++) {
-			
-			sprintf(serbuf, "Writing word %i of page %i of %i pages total\n", word, page, l -> size / AT91C_IFLASH_PAGE_SIZE);
-			
-			usart1.push(serbuf, strlen(serbuf));
 			
 			/* ~ Load the word from external flash memory. The order is little endian. ~ */
 			
@@ -154,11 +94,21 @@ __attribute__((section(".ramfunc"))) void fdl_load(uint16_t key) {
 			
 		}
 		
-		write_handler(page);
+		write_page(LOAD_PAGE + page);
 		
-		sprintf(serbuf, "Wrote page.\nLock Error: %s, Programming Error: %s, Security Set: %s\n", ((get_bit_from_port(2, *EFC0_FSR)) ? "YES" : "NO"), ((get_bit_from_port(3, *EFC0_FSR)) ? "YES" : "NO"), ((get_bit_from_port(5, *EFC0_FSR)) ? "YES" : "NO"));
+		sprintf(serbuf, "Wrote page.\nLock Error: %s, Programming Error: %s, Security Set: %s\n", ((AT91C_BASE_MC -> MC_FSR & AT91C_MC_LOCKE) ? "YES" : "NO"), ((AT91C_BASE_MC -> MC_FSR & AT91C_MC_SECURITY) ? "YES" : "NO"), ((AT91C_BASE_MC -> MC_FSR & AT91C_MC_PROGE) ? "YES" : "NO"));
 		
 		usart1.push(serbuf, strlen(serbuf));
+		
+		for (uint8_t word = 0; word < AT91C_IFLASH_PAGE_SIZE / sizeof(uint32_t); word ++) {
+			
+			uint32_t value = *(uint32_t *)(LOAD_BASE + (page * AT91C_IFLASH_PAGE_SIZE) + (word * sizeof(uint32_t)));
+			
+			sprintf(serbuf, "Reading word: 0x%08x\n", value);
+			
+			usart1.push(serbuf, strlen(serbuf));
+			
+		}
 		
 	}
 	
@@ -167,8 +117,6 @@ __attribute__((section(".ramfunc"))) void fdl_load(uint16_t key) {
 	at45_disable();
 	
 	((void (*)(void))(LOAD_BASE))();
-	
-#endif
 	
 }
 

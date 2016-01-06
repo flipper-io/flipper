@@ -43,13 +43,13 @@ SECTIONS {
 
         __data_start__ = .;
 
-        *(.data .data.*)
+		*(.ramfunc .ramfunc.*)
+
+		*(.data .data.*)
 
         *(.gnu.linkonce.d*)
 
         SORT(CONSTRUCTORS)
-
-		*(.ramfunc .ramfunc.*)
 
         . = ALIGN(4);
 
