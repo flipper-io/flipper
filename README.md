@@ -1,6 +1,6 @@
-# Flipper: Toolbox
+# Flipper Toolbox
 
-The Flipper Toolbox is a repository of sofware components that work together enable dynamic control of Flipper hardware across a variety of different host platforms and programming environments.
+The **Flipper Toolbox** is a repository of sofware components that work together enable dynamic control of Flipper hardware across a variety of different host platforms and programming environments.
 
 The process of interfacing with embedded hardware generally requires a substantial amount of overhead. Simple control schemas that deliver data from dedicated hardware to a host for processing are difficult to implement reliably and are often extremely limited in scope.
 
