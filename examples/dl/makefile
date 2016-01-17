@@ -4,7 +4,7 @@ all:
 	
 	clang $(llvm_flags) -c led.c init.s glue.c -I /usr/local/include -I /usr/local/include/flipper --sysroot "/Development/flipper-toolbox/resources/osx/arm-elf/arm-elf" -I "/Development/flipper-toolbox/resources/osx/arm-elf/arm-elf/include"
 
-	arm-elf-gcc-4.7 -fPIC -nostdlib -ffreestanding -Wl,-T dl.ld *.o -o led.elf
+	arm-elf-gcc-4.7 -fPIC -nostdlib -ffreestanding -fomit-frame-pointer -Wl,-T dl.ld *.o -o led.elf
 
 	arm-elf-objcopy -O binary led.elf led.bin
 
