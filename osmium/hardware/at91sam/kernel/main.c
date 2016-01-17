@@ -10,6 +10,8 @@
 
 #include <bme280/bme280.h>
 
+void (* task_to_execute)(void);
+
 void _delay_ms(unsigned long time) {
 	
 	for (volatile unsigned int i = 0; (i < (F_CPU / 10250) * (time)); i ++);
@@ -125,50 +127,16 @@ int main(void) {
 	io.write(8, true);
 	
 	i2c_configure();
-
-	uint8_t byte = 0xFE;
 	
-	delay_ms(2000);
+	/* ~ Load the address of the startup task. ~ */
 	
-	/* ~ Load the blinky app. ~ */
-	
-//	fdl_load(0x36f7);
-	
-//	char buf[64];
+	at45_pull(&task_to_execute, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_STARTUP_PROGRAM));
 	
 	while (true) {
 		
-//		memset(buf, 0, sizeof(buf));
-//		
-//		float temp = bme280_temperature();
-//		
-//		sprintf(buf, "Temperature: %f C\n", temp);
-//		
-//		usart1.push(&buf, strlen(buf));
-//		
-//		memset(buf, 0, sizeof(buf));
-//		
-//		float press = bme280_pressure();
-//		
-//		sprintf(buf, "Pressure: %f Pa\n", press);
-//		
-//		usart1.push(&buf, strlen(buf));
-//		
-//		memset(buf, 0, sizeof(buf));
-//		
-//		float hum = bme280_humidity();
-//		
-//		sprintf(buf, "Humidity: %f \%\n\n", hum);
-//		
-//		usart1.push(&buf, strlen(buf));
+		/* ~ Ensure the task is at a valid flash address. ~ */
 		
-		io.write(8, false);
-		
-		delay_ms(2000);
-		
-		io.write(8, true);
-		
-		delay_ms(2000);
+		if ((uint32_t)(task_to_execute) > AT91C_IFLASH && (uint32_t)(task_to_execute) < (AT91C_IFLASH + AT91C_IFLASH_SIZE)) task_to_execute();
 		
 	}
 	

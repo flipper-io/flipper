@@ -30,8 +30,6 @@ void fdl_configure(void) {
 	
 }
 
-char serbuf[64];
-
 __attribute__((section(".ramfunc"))) void my_delay_ms(unsigned long time) {
 	
 	for (volatile unsigned int i = 0; (i < (F_CPU / 10250) * (time)); i ++);
@@ -50,37 +48,39 @@ __attribute__((section(".ramfunc"))) void write_page(uint16_t page) {
 	
 }
 
+/* ~ Performs dynamic loading. ~ */
+
+extern void (* task_to_execute)(void);
+
 void fdl_load(uint16_t key) {
 	
+	/* ~ Obtain the filesystem object for the given key. ~ */
+	
     fsp _leaf = fs_leaf_for_key(_root_leaf, key);
-    
-    if (!_leaf) {
-        
-        /* ~ There is no leaf to match the key provided. ~ */
-        
-        return;
-        
-    }
+	
+	/* ~ Ensure that we're loading a valid filesystem object. ~ */
+	
+    if (!_leaf) return;
     
 	/* ~ Dereference the metadata contained by the leaf. ~ */
 	
 	leaf *l = at45_dereference(_leaf, sizeof(leaf));
 	
-	/* ~ Start the loading process by computing the page and offset at which the program is located. ~ */
-	
-	/* ~ We need to bring the program in from external memory whilst having fine control over the individual bytes being read. ~ */
+	/* ~ Start the loading process by opening a continuous read from external flash given the page and offset at which the program is located. ~ */
 	
 	at45_begin_continuous_read((l -> data / AT45_PAGE_SIZE), (l -> data % AT45_PAGE_SIZE));
 	
-	/* ~ Configure the EFC. 48 clocks per ns. 1 FWS. Erase before program. ~ */
+	/* ~ Configure the EFC. 48 clocks per ns. 1 FWS. ~ */
 	
 	set_bits_in_port_with_mask(AT91C_BASE_MC -> MC_FMR, ((0x30 << 16) & AT91C_MC_FMCN) | AT91C_MC_FWS_1FWS);
+	
+	/* ~ Enable erase before programming. ~ */
 	
 	clear_bits_in_port_with_mask(AT91C_BASE_MC -> MC_FMR, AT91C_MC_NEBP);
 	
 	/* ~ We are now ready to begin bringing in individual bytes of the program from the SPI bus. ~ */
 	
-	for (uint32_t page = 0; page < l -> size / AT91C_IFLASH_PAGE_SIZE; page ++) {
+	for (uint32_t page = 0; page < ceiling(l -> size, AT91C_IFLASH_PAGE_SIZE); page ++) {
 		
 		for (uint8_t word = 0; word < AT91C_IFLASH_PAGE_SIZE / sizeof(uint32_t); word ++) {
 			
@@ -94,21 +94,9 @@ void fdl_load(uint16_t key) {
 			
 		}
 		
+		if (page == 0) *(struct _fdl **)(LOAD_BASE + 4) = &fdl;
+		
 		write_page(LOAD_PAGE + page);
-		
-		sprintf(serbuf, "Wrote page.\nLock Error: %s, Programming Error: %s, Security Set: %s\n", ((AT91C_BASE_MC -> MC_FSR & AT91C_MC_LOCKE) ? "YES" : "NO"), ((AT91C_BASE_MC -> MC_FSR & AT91C_MC_SECURITY) ? "YES" : "NO"), ((AT91C_BASE_MC -> MC_FSR & AT91C_MC_PROGE) ? "YES" : "NO"));
-		
-		usart1.push(serbuf, strlen(serbuf));
-		
-		for (uint8_t word = 0; word < AT91C_IFLASH_PAGE_SIZE / sizeof(uint32_t); word ++) {
-			
-			uint32_t value = *(uint32_t *)(LOAD_BASE + (page * AT91C_IFLASH_PAGE_SIZE) + (word * sizeof(uint32_t)));
-			
-			sprintf(serbuf, "Reading word: 0x%08x\n", value);
-			
-			usart1.push(serbuf, strlen(serbuf));
-			
-		}
 		
 	}
 	
@@ -116,7 +104,31 @@ void fdl_load(uint16_t key) {
 	
 	at45_disable();
 	
-	((void (*)(void))(LOAD_BASE))();
+	/* ~ CLOSE THE INTERRUPT ~ */
+	
+	/* ~ Schedule the application launch. ~ */
+	
+	task_to_execute = LOAD_BASE;
+	
+	/* ~ Write the loaded program address into the configuration for the startup program. ~ */
+	
+	at45_push(&task_to_execute, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_STARTUP_PROGRAM));
+	
+}
+
+/* ~ Terminates the actively running program. ~ */
+
+void fdl_terminate() {
+	
+	
+	
+}
+
+/* ~ Loads a program, and saves it into the OS configuration to be loaded on startup. ~ */
+
+void fdl_boot(uint16_t key) {
+	
+	
 	
 }
 

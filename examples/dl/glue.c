@@ -2,7 +2,7 @@
 
 /* ~ Dynamically loaded object references. ~ */
 
-struct _fdl __attribute__((section(".fdl"))) *_fdl;
+__attribute__((section(".fdl"))) struct _fdl *_fdl;
 
 const struct _io io;
 
@@ -10,9 +10,7 @@ const struct _io io;
 
 /* ~ Program initialization function. ~ */
 
-void __init() __attribute__((section(".init")));
-
-void __init() {
+__attribute__((section(".init"))) void __init() {
 	
 	//_fdl -> configure();
 	

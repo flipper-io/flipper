@@ -114,6 +114,20 @@ int main(int argc, char *argv[]) {
         
     }
 	
+	else if (!strcmp(argv[1], "unload")) {
+		
+		uint32_t zero = 0;
+		
+		at45_push(&zero, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_STARTUP_PROGRAM));
+		
+	}
+	
+	else if (!strcmp(argv[1], "reset")) {
+		
+		sam_reset();
+		
+	}
+	
 	else if (!strcmp(argv[1], "format")) {
 		
         fs_format();

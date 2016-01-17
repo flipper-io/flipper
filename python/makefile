@@ -1,4 +1,4 @@
-.PHONY: install
+.PHONY: install fix
 
 output = flipper
 
@@ -15,6 +15,8 @@ ifeq ($(target),darwin)
 python_install_directory = /Library/Python/2.7/site-packages
 
 include_directories = $(shell find '/System/Library/Frameworks/Python.framework/Versions/Current/include' -type d)
+
+fixup = install_name_tool -change libflipper.dylib $(FLIPPERSDK)/lib/libflipper.dylib
 
 else ifeq ($(target),linux)
 
@@ -57,6 +59,10 @@ all:
 	# ~ Generate the __init__.py file. ~ #
 
 	$(shell echo "$(subst CLASSES,$(foreach object, $(objects),'$(patsubst %.o,%,$(notdir $(object)))', ),$(init))" > $(output)/__init__.py)
+
+fix:
+
+	$(foreach object, $(objects), $(shell $(fixup) $(output)/$(notdir $(patsubst %.o,%,$(object)).so)))
 
 install:
 

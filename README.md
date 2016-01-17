@@ -6,6 +6,8 @@ The process of interfacing with embedded hardware generally requires a substanti
 
 The Flipper Toolbox abstracts away from the user the infrastructure required to fascilitate meaningful interactions with real hardware. The provided API can be used to seamlessly integrate dynamic control of hardware deployed over a variety of communications (USB, Wi-Fi, Bluetooth, RF) across a variety of platforms (iOS, Mac OS X, Linux, Windows) and programming languages. (C, C++, Objective-C, Swift, Python, Java, and Haskell)
 
+Flipper is a product that packages a hardware device and software library designed around each other with the end goal of making it easy to interface the real world with the digital world. The toolbox provides a throughput that enables users to control hardware with zero overhead, out of the box, on any platform (iOS, Mac, Linux, Windows) and with a wide number of languages. (Python, C, Objective-C, Java, Swift, Haskell)
+
 ### What can it do?
 
 Flipper removes the intermediary steps required to build and debug code that works 
