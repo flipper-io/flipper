@@ -20,7 +20,7 @@ void usb_receive_interrupt(void) {
 	
 	/* ~ Invoke the FMR. ~ */
 	
-	fmr_invoke(&host);
+	fmr_parse(&host);
 	
 	/* ~ Free the FMR. ~ */
 	
@@ -50,7 +50,7 @@ ISR(USART1_RX_vect) {
 	
 	/* ~ Invoke the FMR. ~ */
 	
-	fmr_invoke(&device);
+	fmr_parse(&device);
 	
 	/* ~ Re-enable interrupts. ~ */
 	

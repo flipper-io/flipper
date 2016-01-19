@@ -60,11 +60,11 @@ void usb_push(void *source, uint32_t length) {
 	
 	/* ~ Allocate a buffer to store a USB packet. ~ */
 	
-	void *packet = malloc(FLIPPER_DATAGRAM_SIZE);
+	void *packet = malloc(FMR_PACKET_SIZE);
 	
 	/* ~ Clear the buffer. ~ */
 	
-	memset(packet, 0x00, FLIPPER_DATAGRAM_SIZE);
+	memset(packet, 0x00, FMR_PACKET_SIZE);
 	
 	/* ~ Copy the data into the buffer. ~ */
 	
@@ -84,7 +84,7 @@ void usb_pull(void *destination, uint32_t length) {
 	
 #ifndef __disable_usb__
 	
-	uint8_t *buffer = (uint8_t *)(malloc(sizeof(uint8_t) * FLIPPER_DATAGRAM_SIZE));
+	uint8_t *buffer = (uint8_t *)(malloc(sizeof(uint8_t) * FMR_PACKET_SIZE));
 	
 	hid_receive_packet(buffer);
 	

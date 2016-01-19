@@ -48,7 +48,7 @@ void usart_interrupt(void) {
 		
 	/* ~ Invoke the FMR. ~ */
 	
-	fmr_invoke(&device);
+	fmr_parse(&device);
 	
 	/* ~ Free the FMR. ~ */
 	
