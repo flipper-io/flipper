@@ -20,11 +20,11 @@ void _delay_ms(unsigned long time) {
 
 void makeitblink(void) {
 	
-	io.write(8, ON);
+	io.write(8, true);
 	
 	delay_ms(50);
 	
-	io.write(8, OFF);
+	io.write(8, false);
 	
 	delay_ms(50);
 	

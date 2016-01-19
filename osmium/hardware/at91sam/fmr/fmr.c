@@ -30,6 +30,12 @@ uint32_t fmr_invoke(fmr_handle handle, uint8_t index, uint8_t argc, ...) {
 	
 	if (!module) { error.raise(0); return NULL; }
 	
+	void *configure = module + *(uint32_t *)(module);
+	
+	/* ~ Configure the module. ~ */
+	
+	((void (*)(void))(configure))();
+	
 	/* ~ Get the address of the function. ~ */
 	
 	void *function = module + *(uint32_t *)(module + (index * sizeof(void *)));

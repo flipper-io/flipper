@@ -14,8 +14,6 @@ void fmr_configure(void) {
 
 void fmr_bind(fmr_handle *handle, uint16_t id) {
 	
-	printf("Binding module instance with handler.\n");
-	
 	*(uint32_t *)(handle) = id;
 	
 }
