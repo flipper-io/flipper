@@ -6,6 +6,8 @@ void __attribute__ ((constructor)) libflipper_init() {
 	
 	button_configure();
 	
+	error_configure();
+	
 	i2c_configure();
 	
 	io_configure();

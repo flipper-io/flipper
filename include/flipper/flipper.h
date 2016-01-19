@@ -8,11 +8,15 @@
 
 /* ~ Include the header files for user-accessible drivers. ~ */
 
+#include <at45/at45.h>
+
 #include <button/button.h>
+
+#include <error/error.h>
 
 #include <fdl/fdl.h>
 
-#include <at45/at45.h>
+#include <fmr/fmr.h>
 
 #include <fs/fs.h>
 
