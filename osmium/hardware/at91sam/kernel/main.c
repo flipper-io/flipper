@@ -126,11 +126,11 @@ int main(void) {
 	
 	io.write(8, true);
 	
-	i2c_configure();
+	//i2c_configure();
 	
 	/* ~ Load the address of the startup task. ~ */
 	
-	at45_pull(&task_to_execute, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_STARTUP_PROGRAM));
+	//at45_pull(&task_to_execute, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_STARTUP_PROGRAM));
 	
 	while (true) {
 		

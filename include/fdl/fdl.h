@@ -8,7 +8,7 @@
 
 #define FDL_CONFIG_BASE 256
 
-enum { FDL_STARTUP_PROGRAM };
+enum { FDL_STARTUP_PROGRAM, FDL_LOADED_KEY };
 
 #define config_offset(base, entity) (base + (entity * sizeof(uint32_t)))
 

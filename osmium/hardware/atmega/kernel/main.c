@@ -58,6 +58,12 @@ void __attribute__ ((naked)) __attribute__ ((section(".init8"))) atmega_init(voi
 	
 	fs_configure();
 	
+	/* ~ Wait for the computer to attach. ~ */
+	
+	delay_ms(250);
+	
+	led.rgb(0, 0, 16);
+	
 	/* ~ Configure USB. ~ */
 	
 	usb_configure(0);

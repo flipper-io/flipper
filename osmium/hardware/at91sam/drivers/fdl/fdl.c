@@ -18,7 +18,7 @@
 
 #define AT45_PAGE_SIZE 528
 
-#define LOAD_PAGE 400
+#define LOAD_PAGE 350
 
 #define LOAD_BASE (AT91C_IFLASH + (LOAD_PAGE * AT91C_IFLASH_PAGE_SIZE))
 
@@ -53,6 +53,20 @@ __attribute__((section(".ramfunc"))) void write_page(uint16_t page) {
 extern void (* task_to_execute)(void);
 
 void *fdl_load(uint16_t key) {
+	
+	uint32_t _key;
+	
+	at45_pull(&_key, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_LOADED_KEY));
+	
+	char serbuf[64];
+	
+	/* ~ See if we've already loaded the program. ~ */
+	
+	if (_key == key) { sprintf(serbuf, "Module already loaded. Returning.\n"); usart1.push(serbuf, strlen(serbuf)); return LOAD_BASE; }
+	
+	sprintf(serbuf, "Module not loaded. Pulling from external memory.\n");
+	
+	usart1.push(serbuf, strlen(serbuf));
 	
 	/* ~ Obtain the filesystem object for the given key. ~ */
 	
@@ -106,7 +120,13 @@ void *fdl_load(uint16_t key) {
 	
 	/* ~ Write the loaded program address into the configuration for the startup program. ~ */
 	
-	at45_push(&task_to_execute, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_STARTUP_PROGRAM));
+//	_key = key;
+//	
+//	at45_push(&_key, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_LOADED_KEY));
+	
+	((void (*)(void))(LOAD_BASE))();
+	
+	//at45_push(&task_to_execute, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_STARTUP_PROGRAM));
 	
 	/* ~ Return the address at which the code has been loaded. ~ */
 	
