@@ -30,8 +30,6 @@ void self_configure(const struct _bus *bus) {
 	
 }
 
-#warning RETURN TYPES DISABLED FOR THE SAM7S!!!!!
-
 uint32_t self_call(void) {
 	
 	/* ~ Dereference a pointer to the recipient object. ~ */
@@ -44,11 +42,19 @@ uint32_t self_call(void) {
     
     /* ~ Invoke the recipient function with the appropriate arguments. ~ */
 	
-	internal_call(function, fmrpacket.recipient.argc, fmrpacket.body);
+	uint32_t retval = internal_call(function, fmrpacket.recipient.argc, fmrpacket.body);
     
 	/* ~ Return the value. ~ */
 	
-    return 0; //*(uint32_t *)(fmrpacket.body);
+#ifdef __atmega_build__
+	
+	return *(uint32_t *)(fmrpacket.body);
+	
+#else
+	
+	return retval;
+	
+#endif
 	
 }
 
@@ -98,7 +104,7 @@ uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, uint32_t length)
 	
 	/* ~ Calculate the amount of space we have left in the packet after the parameters have been loaded. ~ */
 	
-	size_t remaining = FLIPPER_DATAGRAM_SIZE - (sizeof(struct _fmr_header) + sizeof(struct _fmr_recipient) + FMR_PUSH_PARAMETER_SIZE + argc);
+	size_t remaining = FMR_PACKET_SIZE - (sizeof(struct _fmr_header) + sizeof(struct _fmr_recipient) + FMR_PUSH_PARAMETER_SIZE + argc);
 	
 	/* ~ Save the destination in a local variable we can modify. ~ */
 	
@@ -134,7 +140,7 @@ pull:
 		
 		/* ~ Reset how much space we have left to read from in the current packet. ~ */
 		
-		remaining = FLIPPER_DATAGRAM_SIZE - sizeof(struct _fmr_header);
+		remaining = FMR_PACKET_SIZE - sizeof(struct _fmr_header);
 		
 		/* ~ Jump back to the beginning of the loading sequence. ~ */
 		
@@ -258,9 +264,9 @@ uint32_t self_pull(uint8_t object, uint8_t index, uint8_t argc, uint32_t length)
 	
 push:
 	
-	/* ~ Okay, we've now consumed quite a bit of the maximum FLIPPER_DATAGRAM_SIZE. How much do we have left? ~ */
+	/* ~ Okay, we've now consumed quite a bit of the maximum FMR_PACKET_SIZE. How much do we have left? ~ */
 	
-	remaining = FLIPPER_DATAGRAM_SIZE - sizeof(struct _fmr_header);
+	remaining = FMR_PACKET_SIZE - sizeof(struct _fmr_header);
 	
 	offset = (uint8_t *)(&fmrpacket.recipient);
 	

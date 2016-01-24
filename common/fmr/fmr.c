@@ -24,9 +24,23 @@ fmr_packet fmrpacket;
 
 struct _target *sender;
 
+/* ~ The implementation of the virtual interface for the FMR driver. ~ */
+
+const struct _fmr fmr = {
+	
+	fmr_configure,
+	
+	fmr_bind,
+	
+	fmr_invoke,
+	
+	fmr_resolve
+	
+};
+
 /* ~ Master invocation function. ~ */
 
-uint32_t fmr_invoke(const struct _target *sender) {
+uint32_t fmr_parse(const struct _target *sender) {
 	    
 	/* ~ Compare the checksums of the packets to ensure the data was sent successfully. ~ */
 	

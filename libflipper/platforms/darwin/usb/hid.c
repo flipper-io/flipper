@@ -2,8 +2,6 @@
 
 #include <fmr/fmr.h>
 
-#include <platform/fmr.h>
-
 #include <IOKit/IOKitLib.h>
 
 #include <IOKit/hid/IOHIDLib.h>
@@ -25,7 +23,7 @@ static hid_t *last_hid = NULL;
 struct hid_struct {
 	IOHIDDeviceRef ref;
 	int open;
-	uint8_t buffer[FLIPPER_DATAGRAM_SIZE];
+	uint8_t buffer[FMR_PACKET_SIZE];
 	buffer_t *first_buffer;
 	buffer_t *last_buffer;
 	struct hid_struct *prev;
@@ -34,7 +32,7 @@ struct hid_struct {
 struct buffer_struct {
 	struct buffer_struct *next;
 	uint32_t len;
-	uint8_t buf[FLIPPER_DATAGRAM_SIZE];
+	uint8_t buf[FMR_PACKET_SIZE];
 };
 
 // private functions, not intended to be used from outside this file
@@ -62,7 +60,7 @@ static void input_callback(void *, IOReturn, void *, IOHIDReportType,
 int8_t hid_receive_packet(uint8_t *buffer) {
 	hid_t *hid;
 	buffer_t *b;
-	uint16_t len = FLIPPER_DATAGRAM_SIZE;
+	uint16_t len = FMR_PACKET_SIZE;
 	CFRunLoopTimerRef timer=NULL;
 	CFRunLoopTimerContext context;
 	int ret=0, timeout_occurred=0;
@@ -117,7 +115,7 @@ static void input_callback(void *context, IOReturn ret, void *sender,
 	if (!hid || hid->ref != sender) return;
 	n = (buffer_t *)malloc(sizeof(buffer_t));
 	if (!n) return;
-	if (len > FLIPPER_DATAGRAM_SIZE) len = FLIPPER_DATAGRAM_SIZE;
+	if (len > FMR_PACKET_SIZE) len = FMR_PACKET_SIZE;
 	memcpy(n->buf, data, len);
 	n->len = len;
 	n->next = NULL;
@@ -163,7 +161,7 @@ void output_callback(void *context, IOReturn ret, void *sender,
 //
 int8_t hid_transmit_packet(uint8_t *buffer) {
 	hid_t *hid;
-	uint16_t len = FLIPPER_DATAGRAM_SIZE;
+	uint16_t len = FMR_PACKET_SIZE;
 	int result=-100;
 	
 	hid = get_hid(SELECTED_DEVICE);

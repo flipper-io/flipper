@@ -42,22 +42,6 @@ typedef uint32_t fsp;
 
 #define ceiling(x, y) ((x + y - 1) / y)
 
-#define ON			true
-
-#define on			true
-
-#define OFF			false
-
-#define off			false
-
-#define YES			true
-
-#define yes			true
-
-#define NO			false
-
-#define no			false
-
 #define HIGH		true
 
 #define LOW			false

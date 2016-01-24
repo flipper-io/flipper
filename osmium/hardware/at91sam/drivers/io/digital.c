@@ -44,7 +44,7 @@ void digital_write(uint8_t pin, uint16_t value) {
 	
 	switch (value) {
 			
-		case ON:
+		case true:
 			
 			/* ~ Clear the current off state of the pin. ~ */
 			
@@ -56,7 +56,7 @@ void digital_write(uint8_t pin, uint16_t value) {
 			
 			break;
 			
-		case OFF:
+		case false:
 			
 			/* ~ Clear the current on state of the pin. ~ */
 			

@@ -1,28 +1,12 @@
 #define __private_include__
 
-#include <button/button.h>
-
-#include <flash/flash.h>
-
-#include <fs/fs.h>
-
-#include <i2c/i2c.h>
-
-#include <io/io.h>
-
-#include <led/led.h>
-
-#include <pwm/pwm.h>
-
-#include <sam/sam.h>
-
-#include <spi/spi.h>
-
-#include <timer/timer.h>
+#include <flipper/flipper.h>
 
 void __attribute__ ((constructor)) libflipper_init() {
 	
 	button_configure();
+	
+	error_configure();
 	
 	i2c_configure();
 	
@@ -36,7 +20,7 @@ void __attribute__ ((constructor)) libflipper_init() {
 	
 	spi_configure(0);
 	
-	flash_configure();
+	at45_configure();
     
 	timer_configure();
 	

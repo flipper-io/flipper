@@ -3,9 +3,15 @@
 #include <fdl/fdl.h>
 
 const struct _fdl fdl = {
-    
-    fdl_configure,
-    
-    fdl_activate
-    
+	
+#ifndef __atmega_build__
+	
+	fdl_configure,
+	
+	fdl_load,
+	
+	fdl_resolve
+	
+#endif
+	
 };
