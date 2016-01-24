@@ -42,10 +42,14 @@ int main(int argc, char *argv[]) {
 	
     else if (!strcmp(argv[1], "load")) {
         
-        sam.power(OFF);
-        
+        sam.power(false);
+		
+		uint32_t _key = 0;
+		
         fs_format();
-        
+		
+		at45_push(&_key, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_LOADED_KEY));
+		
         /* ~ Get user input. ~ */
         
         char *name = argv[2];
@@ -102,7 +106,7 @@ int main(int argc, char *argv[]) {
 
         at45_push(&size, sizeof(uint32_t), forward(_leaf, leaf, size));
         
-        sam.power(ON);
+        sam.power(true);
         
         usleep(10000);
         
@@ -110,15 +114,21 @@ int main(int argc, char *argv[]) {
         
         fdl.load(key);
         
-        printf("\nLoading successful. Your program is now running.\n\n");
+        printf("\nDynamic loading complete.\n\n");
         
     }
 	
 	else if (!strcmp(argv[1], "unload")) {
 		
-		uint32_t zero = 0;
+		uint32_t _key = 0;
 		
-		at45_push(&zero, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_STARTUP_PROGRAM));
+		/* ~ Clear the loaded key. ~ */
+		
+		at45_push(&_key, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_LOADED_KEY));
+		
+		/* ~ Clear the loaded key. ~ */
+		
+		at45_push(&_key, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_STARTUP_PROGRAM));
 		
 	}
 	

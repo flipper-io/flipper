@@ -11,42 +11,38 @@ void at45_configure(void) {
 	/* ~ Configure the CS pin. ~ */
 	
 	set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_PER);
+
+	/* ~ Configure the CS pin as an output. ~ */
 	
-    /* ~ Enable the CS pin as an input. ~ */
-    
-    set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_ODR);
-    
-    /* ~ Enable the CS pin pull-up. ~ */
-    
-    set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_PPUER);
+	set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_OER);
+	
+	/* ~ Configure the CS pin for single write access. ~ */
+	
+	set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_OWER);
 	
 }
 
 void at45_enable(void) {
 	
+	/* ~ Enable the SPI. ~ */
+	
     spi_enable();
     
-    /* ~ Enable the CS pin as an output. ~ */
-    
-    set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_OER);
-    
-    /* Pull the CS pin low to enable the device. */
+	/* ~ Pull the CS pin low to enable the device. ~ */
 	
-	set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_CODR);
+	clear_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_ODSR);
 	
 }
 
 void at45_disable(void) {
-    
-    spi_disable();
 	
-    /* Configure the external at45 memory chip's CS pin as an input. */
-    
-    set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_ODR);
-    
-    /* ~ Enable the CS pin pull-up resistor. ~ */
-    
-    set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_PPUER);
+	/* ~ Pull the CS pin high to disable the device. ~ */
+	
+	set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_ODSR);
+	
+	/* ~ Disable the SPI. ~ */
+	
+	spi_disable();
 	
 }
 
@@ -74,66 +70,8 @@ void at45_reset(void) {
  
 */
 
-#define FLASH_OPCODE_CHIP_ERASE_0		0xC7
-
-#define FLASH_OPCODE_CHIP_ERASE_1		0x94
-
-#define FLASH_OPCODE_CHIP_ERASE_2		0x80
-
-#define FLASH_OPCODE_CHIP_ERASE_3		0x9A
-
-extern void at45_wait(void);
-
 void at45_format(void) {
 	
-	/* Disable interrupts to prevent memory corruption. */
 	
-	disable_interrupts();
-	
-	/* Wait until the flash chip is ready to recieve data. */
-	
-	at45_wait();
-	
-	/* ~ Reset the device to prepare it for the incoming opcode. ~ */
-	
-	at45_reset();
-	
-	/* Send the appropriate opcodes to initialize a chip erase. */
-	
-	spi_put(FLASH_OPCODE_CHIP_ERASE_0);
-	
-	spi_put(FLASH_OPCODE_CHIP_ERASE_1);
-	
-	spi_put(FLASH_OPCODE_CHIP_ERASE_2);
-	
-	spi_put(FLASH_OPCODE_CHIP_ERASE_3);
-	
-	/* Wait the bulk of the erase cycle period so as to not overload the SPI. */
-	
-	delay_seconds(5);
-	
-	delay_seconds(5);
-	
-	delay_seconds(5);
-	
-	delay_seconds(5);
-	
-	delay_seconds(5);
-	
-	delay_seconds(5);
-	
-	delay_seconds(5);
-	
-	/* Wait until the flash chip has been erased. */
-	
-	at45_wait();
-	
-	/* ~ Disable the device so that no data can be recieved until the next opcode is sent. ~ */
-	
-	at45_disable();
-	
-	/* Enable interrupts again. */
-	
-	enable_interrupts();
 	
 }

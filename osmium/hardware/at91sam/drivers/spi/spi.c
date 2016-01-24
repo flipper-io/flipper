@@ -21,7 +21,7 @@ void spi_configure(void *configuration) {
 	/* ~ Disable communications and reset the SPI. ~ */
 	
 	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SPIDIS);
-    
+	
     /* ~ Initalize the SPI in slave mode. ~ */
     
     clear_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_MR, AT91C_SPI_MSTR);
@@ -46,7 +46,7 @@ void spi_configure(void *configuration) {
 	
 }
 
-void spi_enable(void){
+void spi_enable(void) {
     
     set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_MR, AT91C_SPI_MSTR);
 	

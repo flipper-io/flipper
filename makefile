@@ -10,53 +10,27 @@ endif
 
 $(shell find . -name '.DS_Store' -exec rm -rf {} \;)
 
-# ~ The 'all' target builds every component of the Flipper toolchain from source. ~ #
-
-all: clean
-
-	# ~ Build libflipper. ~ */
-
-	$(MAKE) -C libflipper all
-
-	# ~ Build the Console. ~ */
-
-	$(MAKE) -C console all
-
-	# ~ Build Osmium for the AVR. ~ */
-
-	$(MAKE) -C osmium all platform=atmega16u2
-
-	# ~ Build Osmium for the ARM. ~ */
-
-	$(MAKE) -C osmium all platform=at91sam7s
-
-	# ~ Build the Python module. ~ */
-
-	$(MAKE) -C python all
-
-# ~ The 'install' target installs the built components of the Flipper toolchain into the Flipper SDK. ~ #
-
 install: all
 
-	# ~ Install libflipper. ~ */
+	# ~ Build and install libflipper. ~ */
 
-	$(MAKE) -C libflipper install
+	$(MAKE) -C libflipper all install
 
-	# ~ Install the Console. ~ */
+	# ~ Build and install the console. ~ */
 
-	$(MAKE) -C console install
+	$(MAKE) -C console all install
 
-	# ~ Install Osmium for the AVR. ~ */
+	# ~ Build and install osmium for the AVR. ~ */
 
-	$(MAKE) -C osmium install platform=atmega16u2
+	$(MAKE) -C osmium all install platform=atmega16u2
 
-	# ~ Install Osmium for the ARM. ~ */
+	# ~ Build and install osmium for the ARM. ~ */
 
-	$(MAKE) -C osmium install platform=at91sam7s
+	$(MAKE) -C osmium all install platform=at91sam7s
 
-	# ~ Install the Python module. ~ */
+	# ~ Build and install the Python module. ~ */
 
-	$(MAKE) -C python install
+	$(MAKE) -C python all install
 
 uninstall:
 
@@ -76,11 +50,11 @@ clean:
 
 	$(MAKE) -C libflipper clean
 
-	# ~ Clean the Console. ~ */
+	# ~ Clean the console. ~ */
 
 	$(MAKE) -C console clean
 
-	# ~ Clean Osmium. ~ */
+	# ~ Clean osmium. ~ */
 
 	$(MAKE) -C osmium clean platform=atmega16u2
 

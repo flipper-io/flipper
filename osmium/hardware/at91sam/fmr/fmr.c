@@ -38,7 +38,7 @@ uint32_t fmr_invoke(fmr_handle handle, uint8_t index, uint8_t argc, ...) {
 	
 	/* ~ Get the address of the function. ~ */
 	
-	void *function = module + *(uint32_t *)(module + (index * sizeof(void *)));
+	void *function = module + *(uint32_t *)(module + (index * sizeof(uint32_t)));
 	
 	/* ~ The address of the variadic argument list is the address of the packet's body plus the 6 bytes needed for this function call. ~ */
 	
