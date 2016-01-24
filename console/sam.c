@@ -207,11 +207,7 @@ int sam_load_firmware(char *firmware) {
     sam.dfu();
     
     wait_with_progress(2);
-    
-    printf("UNPLUG THE DEVICE!!\n\n");
-    
-    wait_with_progress(5);
-    
+	
     flipper.attach(FLIPPER_SOURCE_USB);
 //
 //    return 0;
@@ -242,7 +238,7 @@ int sam_load_firmware(char *firmware) {
 
 	uint8_t connected = false;
 
-    for (int i = 0; (i < 100) && !connected; i ++) { usart.push((uint8_t []){ 0x80, 0x80, 0x23 }, 3); uint8_t exp[3] = { 0x0A, 0x0D, 0x3E }; uint8_t res[3]; usart.pull(res, 3); connected = !memcmp(exp, res, 3); printf("0x%02X 0x%02X 0x%02X\n", res[0], res[1], res[2]); }
+    for (int i = 0; (i < 100) && !connected; i ++) { usart.push((uint8_t []){ 0x80, 0x80, 0x23 }, 3); uint8_t exp[3] = { 0x0A, 0x0D, 0x3E }; uint8_t res[3]; usart.pull(res, 3); connected = !memcmp(exp, res, 3); }
 
 	if (!connected) {
 

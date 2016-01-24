@@ -6,7 +6,31 @@
 
 #include <platform/atmega.h>
 
-const void * const objects[] PROGMEM = { &host, &device, &self, &button, &at45, &fs, &i2c, &io, &led, &pwm, &sam, &spi, &timer, &usart, &usart, &usart, &usb, &wifi, &fdl };
+const void * const objects[] PROGMEM = { &host, &device, &self, &button, &at45, &fs, &i2c, &io, &led, &pwm, &sam, &spi, &timer, &usart, &usart, &usart, &usb, &wifi, &fdl, &fmr };
+
+void fmr_configure(void) {
+	
+	
+	
+}
+
+void fmr_bind(fmr_handle *handle, uint16_t id) {
+	
+	
+	
+}
+
+uint32_t fmr_invoke(fmr_handle handle, uint8_t index, uint8_t argc, ...) {
+	
+	return 0;
+	
+}
+
+void *fmr_resolve(void *source, uint32_t length) {
+	
+	return NULL;
+	
+}
 
 void usb_receive_interrupt(void) {
 	
