@@ -12,3 +12,4 @@ obj-c/build
 *.dylib
 !resources/**/*.so
 python/flipper
+console/flipper
