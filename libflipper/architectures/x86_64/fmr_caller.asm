@@ -1,5 +1,5 @@
 section .text
-%ifidn __OUTPUT_FORMAT__, macho64
+%ifidni __OUTPUT_FORMAT__, macho64
 	global _internal_call
 %else
 	global internal_call
@@ -12,7 +12,7 @@ section .text
 ; addr -> rdi
 ; argc -> rsi
 ; argv -> rdx
-%ifidn __OUTPUT_FORMAT__, macho64
+%ifidni __OUTPUT_FORMAT__, macho64
 _internal_call:
 %else
 internal_call:
