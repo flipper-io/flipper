@@ -6,9 +6,9 @@
 
 #include <fmr/fmr.h>
 
-#include <platform/fmr.h>
-
 void usb_configure(void *configuration) {
+	
+#ifndef __disable_usb__
 	
 	uint8_t devices = hid_enumerate(1, CARBON_VENDOR_ID, CARBON_PRODUCT_ID, CARBON_USAGE_PAGE, CARBON_USAGE);
 	
@@ -19,6 +19,8 @@ void usb_configure(void *configuration) {
 		exit(EXIT_FAILURE);
 		
 	}
+	
+#endif
 	
 }
 
@@ -53,14 +55,16 @@ uint8_t usb_get(void) {
 }
 
 void usb_push(void *source, uint32_t length) {
+
+#ifndef __disable_usb__
 	
 	/* ~ Allocate a buffer to store a USB packet. ~ */
 	
-	void *packet = malloc(FLIPPER_DATAGRAM_SIZE);
+	void *packet = malloc(FMR_PACKET_SIZE);
 	
 	/* ~ Clear the buffer. ~ */
 	
-	memset(packet, 0x00, FLIPPER_DATAGRAM_SIZE);
+	memset(packet, 0x00, FMR_PACKET_SIZE);
 	
 	/* ~ Copy the data into the buffer. ~ */
 	
@@ -71,17 +75,23 @@ void usb_push(void *source, uint32_t length) {
 	hid_transmit_packet(packet);
 	
 	free(packet);
-    
+	
+#endif
+	
 }
 
 void usb_pull(void *destination, uint32_t length) {
 	
-	uint8_t *buffer = (uint8_t *)(malloc(sizeof(uint8_t) * FLIPPER_DATAGRAM_SIZE));
+#ifndef __disable_usb__
+	
+	uint8_t *buffer = (uint8_t *)(malloc(sizeof(uint8_t) * FMR_PACKET_SIZE));
 	
 	hid_receive_packet(buffer);
 	
 	memcpy(destination, buffer, length);
 	
 	free(buffer);
-    
+
+#endif
+	
 }

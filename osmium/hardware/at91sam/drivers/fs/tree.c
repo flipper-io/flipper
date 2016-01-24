@@ -2,7 +2,7 @@
 
 #include <fs/tree.h>
 
-#include <flash/flash.h>
+#include <at45/at45.h>
 
 /* ~ This function traverses the filesystem tree starting at a leaf pointed to by the 'current' argument until an empty branch pointer corresponding to the given key is found. ~ */
 
@@ -14,7 +14,7 @@ fsp fs_empty_branch_for_key(fsp _branch, fsp current, uint16_t key) {
 	
 	/* ~ Dereference the 'current' pointer to bring a copy of the leaf that it points to into local memory. ~ */
 	
-	leaf *_current = flash_dereference(current, sizeof(leaf));
+	leaf *_current = at45_dereference(current, sizeof(leaf));
 	
 	/* ~ Since we're here, we haven't yet found an empty branch pointer; walk the filesystem tree recursively until we do. ~ */
 	
@@ -50,7 +50,7 @@ fsp fs_add_leaf_with_key(fsp current, uint16_t key) {
 		
 		/* ~ Allocate memory for the leaf. ~ */
 		
-		fsp region = flash_alloc(sizeof(leaf));
+		fsp region = at45_alloc(sizeof(leaf));
         
         if (!region) {
             
@@ -68,7 +68,7 @@ fsp fs_add_leaf_with_key(fsp current, uint16_t key) {
 		
 		/* ~ Index the leaf in the tree by overwriting by writing the newly allocated memory region to the empty branch pointer we found earlier. ~ */
 		
-		flash_push(&region, sizeof(fsp), _branch);
+		at45_push(&region, sizeof(fsp), _branch);
 		
 		/* ~ Associate the given key with the new leaf by writing the key given into the key property of the new leaf. ~ */
 		
@@ -80,7 +80,7 @@ fsp fs_add_leaf_with_key(fsp current, uint16_t key) {
         
         /* ~ Send the new leaf to the filesystem. ~ */
         
-        flash_push(_leaf, sizeof(leaf), region);
+        at45_push(_leaf, sizeof(leaf), region);
         
         /* ~ Free memory allocated for the leaf. ~ */
         
@@ -120,7 +120,7 @@ fsp fs_leaf_for_key(fsp current, uint16_t key) {
 	
 	/* ~ However, if we have not yet reached the end of the tree, dereference the 'current' leaf pointer to bring a copy of it into local memory. ~ */
 	
-	leaf *_current = flash_dereference(current, sizeof(leaf));
+	leaf *_current = at45_dereference(current, sizeof(leaf));
 	
 	if (_current -> key == key)
 	
@@ -156,7 +156,7 @@ void fs_remove_leaf_with_key(fsp parent, uint16_t key) {
 	
 	/* ~ Otherwise, dereference it to bring a copy of it into local memory. ~ */
 	
-	leaf *_match = flash_dereference(match, sizeof(leaf));
+	leaf *_match = at45_dereference(match, sizeof(leaf));
 	
 	/* ~ Check the worst case scenario first; the leaf we want to delete has two children. Ugh. ~ */
 	
@@ -166,27 +166,27 @@ void fs_remove_leaf_with_key(fsp parent, uint16_t key) {
 		
 		/* ~ De-index the leaf by replacing its branch pointer with a pointer to its left child. ~ */
 		
-		flash_push(&(_match -> left), sizeof(fsp), _match -> _branch);
+		at45_push(&(_match -> left), sizeof(fsp), _match -> _branch);
 		
 		/* ~ Change the branch pointer of the leaf's left child to match its new index in the filesystem tree. ~ */
 		
-		flash_push(&(_match -> _branch), sizeof(fsp), forward(_match -> left, leaf, _branch));
+		at45_push(&(_match -> _branch), sizeof(fsp), forward(_match -> left, leaf, _branch));
 		
 		/* ~ Walk the left child of the leaf to find an empty branch pointer to which the leaf's orphaned right child can be appended. ~ */
 		
-		uint16_t *key = (uint16_t *) flash_dereference(forward(_match -> right, leaf, key), sizeof(uint16_t));
+		uint16_t *key = (uint16_t *) at45_dereference(forward(_match -> right, leaf, key), sizeof(uint16_t));
 		
-		fsp *right = (fsp *) flash_dereference(forward(_match -> left, leaf, right), sizeof(fsp));
+		fsp *right = (fsp *) at45_dereference(forward(_match -> left, leaf, right), sizeof(fsp));
 		
 		fsp empty = fs_empty_branch_for_key(forward(_match -> left, leaf, right), *right, *key);
 		
 		/* ~ Re-index the orphaned right child by writing its address into the empty branch pointer we found. ~ */
 		
-		flash_push(&(_match -> right), sizeof(fsp), empty);
+		at45_push(&(_match -> right), sizeof(fsp), empty);
 		
 		/* ~ Overwrite the branch pointer of the leaf's right child to reflect its new index in the filesystem tree. ~ */
 		
-		flash_push(&empty, sizeof(fsp), forward(_match -> right, leaf, _branch));
+		at45_push(&empty, sizeof(fsp), forward(_match -> right, leaf, _branch));
 		
 	}
 	
@@ -198,11 +198,11 @@ void fs_remove_leaf_with_key(fsp parent, uint16_t key) {
 		
 		/* ~ De-index the leaf by replacing its branch pointer with a pointer to its left child. ~ */
 		
-		flash_push(&(_match -> left), sizeof(fsp), _match -> _branch);
+		at45_push(&(_match -> left), sizeof(fsp), _match -> _branch);
 		
 		/* ~ Change the branch pointer of the leaf's left child to match its new index in the filesystem tree. ~ */
 		
-		flash_push(&(_match -> _branch), sizeof(fsp), forward(_match -> left, leaf, _branch));
+		at45_push(&(_match -> _branch), sizeof(fsp), forward(_match -> left, leaf, _branch));
 		
 	}
 	
@@ -214,11 +214,11 @@ void fs_remove_leaf_with_key(fsp parent, uint16_t key) {
 		
 		/* ~ De-index the leaf by replacing its branch pointer with a pointer to its right child. ~ */
 		
-		flash_push(&(_match -> right), sizeof(fsp), _match -> _branch);
+		at45_push(&(_match -> right), sizeof(fsp), _match -> _branch);
 		
 		/* ~ Change the branch pointer of the leaf's right child to match its new index in the filesystem tree. ~ */
 		
-		flash_push(&(_match -> _branch), sizeof(fsp), forward(_match -> right, leaf, _branch));
+		at45_push(&(_match -> _branch), sizeof(fsp), forward(_match -> right, leaf, _branch));
 		
 	}
 	
@@ -232,13 +232,13 @@ void fs_remove_leaf_with_key(fsp parent, uint16_t key) {
 		
 		fsp zero = 0;
 		
-		flash_push(&zero, sizeof(fsp), _match -> _branch);
+		at45_push(&zero, sizeof(fsp), _match -> _branch);
 		
 	}
 	
 	/* ~ Free any memory allocated to index the leaf. ~ */
 	
-	flash_free(match);
+	at45_free(match);
 	
 	/* ~ Free the memory allocated to store the local copy of the match. ~ */
 	

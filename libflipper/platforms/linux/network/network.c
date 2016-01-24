@@ -111,6 +111,6 @@ void network_push(void *source, uint32_t length) {
 
 void network_pull(void *destination, uint32_t length) {
 	
-	
+	recv(network_socket, destination, length, 0);
 	
 }

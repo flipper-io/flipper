@@ -30,6 +30,8 @@ void __attribute__ ((naked)) __attribute__ ((section(".init8"))) atmega_init(voi
 	
 	enable_interrupts();
 
+	u2_power_on = true; 
+	
 #if false
 	
 	/* If the U2 is scheduled to power on after a reset, continue initialization. */

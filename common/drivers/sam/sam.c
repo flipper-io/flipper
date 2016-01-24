@@ -12,6 +12,8 @@ const struct _sam sam = {
 	
 	sam_load_dfu,
 	
-	sam_format
+	sam_format,
+	
+	sam_read_word
 	
 };

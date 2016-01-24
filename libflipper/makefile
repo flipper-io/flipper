@@ -1,4 +1,3 @@
-# ~ No sudo? ~ #
 
 sudo = sudo
 
@@ -56,7 +55,11 @@ endif
 
 cc = $(shell which 'gcc')
 
-nasm = /usr/local/bin/nasm
+ifndef nasm
+
+nasm = $(shell which 'nasm')
+
+endif
 
 rsync = $(shell which 'rsync')
 

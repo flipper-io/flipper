@@ -8,6 +8,10 @@
 
 #include <platform/at91sam.h>
 
+#include <bme280/bme280.h>
+
+void (* task_to_execute)(void);
+
 void _delay_ms(unsigned long time) {
 	
 	for (volatile unsigned int i = 0; (i < (F_CPU / 10250) * (time)); i ++);
@@ -16,11 +20,11 @@ void _delay_ms(unsigned long time) {
 
 void makeitblink(void) {
 	
-	io.write(8, ON);
+	io.write(8, true);
 	
 	delay_ms(50);
 	
-	io.write(8, OFF);
+	io.write(8, false);
 	
 	delay_ms(50);
 	
@@ -44,7 +48,7 @@ void usart_interrupt(void) {
 		
 	/* ~ Invoke the FMR. ~ */
 	
-	fmr_invoke(&device);
+	fmr_parse(&device);
 	
 	/* ~ Free the FMR. ~ */
 	
@@ -72,7 +76,7 @@ int main(void) {
 	
     spi_configure(0);
     
-	flash_configure();
+	at45_configure();
 	
     fs_configure();
     
@@ -122,15 +126,17 @@ int main(void) {
 	
 	io.write(8, true);
 	
+	i2c_configure();
+	
+	/* ~ Load the address of the startup task. ~ */
+	
+	at45_pull(&task_to_execute, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_STARTUP_PROGRAM));
+	
 	while (true) {
-        
-		io.write(8, false);
 		
-		delay_ms(500);
+		/* ~ Ensure the task is at a valid flash address. ~ */
 		
-		io.write(8, true);
-		
-		delay_ms(500);
+		if ((uint32_t)(task_to_execute) > AT91C_IFLASH && (uint32_t)(task_to_execute) < (AT91C_IFLASH + AT91C_IFLASH_SIZE)) task_to_execute();
 		
 	}
 	

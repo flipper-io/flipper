@@ -56,7 +56,7 @@ uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t ind
 	
 	/* ~ Ensure the arguments will fit into one packet. ~ */
 	
-	if (fmrpacket.header.length > FLIPPER_DATAGRAM_SIZE) {
+	if (fmrpacket.header.length > FMR_PACKET_SIZE) {
 		
 		verbose("\tError. Too many arguments provided for the requested function call. Skipping.\n\n");
 		
@@ -146,7 +146,7 @@ uint32_t target_push(const struct _target *target, uint8_t object, uint8_t index
 	
 	/* ~ Ensure the arguments will fit into one packet. ~ */
 	
-	if (fmrpacket.header.length > FLIPPER_DATAGRAM_SIZE) {
+	if (fmrpacket.header.length > FMR_PACKET_SIZE) {
 		
 		verbose("\tError. Too many arguments provided for the requested function call. Skipping.\n\n");
 		
@@ -208,7 +208,7 @@ push:
 	
 	/* ~ Calculate how much space we have left in the current packet. ~ */
 	
-	remaining = FLIPPER_DATAGRAM_SIZE - fmrpacket.header.length;
+	remaining = FMR_PACKET_SIZE - fmrpacket.header.length;
 	
 	/* ~ Load the next chunk of data into the packet while we still have data to send and we still have space in the current packet. ~ */
 	
@@ -292,7 +292,7 @@ uint32_t target_pull(const struct _target *target, uint8_t object, uint8_t index
 	
 	/* ~ Ensure the arguments will fit into one packet. ~ */
 	
-	if (fmrpacket.header.length > FLIPPER_DATAGRAM_SIZE) {
+	if (fmrpacket.header.length > FMR_PACKET_SIZE) {
 		
 		verbose("\tError. Too many arguments provided for the requested function call. Skipping.\n\n");
 		
@@ -366,7 +366,7 @@ pull:
 	
 	/* ~ Calculate how much space we have left in the current packet. ~ */
 	
-	remaining = FLIPPER_DATAGRAM_SIZE - sizeof(struct _fmr_header);
+	remaining = FMR_PACKET_SIZE - sizeof(struct _fmr_header);
 	
 	offset = (uint8_t *)(&fmrpacket.recipient);
 	

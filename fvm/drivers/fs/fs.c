@@ -4,7 +4,7 @@
 
 #include <fs/tree.h>
 
-#include <flash/flash.h>
+#include <at45/at45.h>
 
 void fs_format(void) {
 	
@@ -12,11 +12,11 @@ void fs_format(void) {
 	
 	_free_list = 0;
 	
-	flash_push(&_free_list, sizeof(fsp), _FREE_LIST);
+	at45_push(&_free_list, sizeof(fsp), _FREE_LIST);
 	
 	_break_value = 528;
 	
-	flash_push(&_break_value, sizeof(fsp), _BREAK_VALUE);
+	at45_push(&_break_value, sizeof(fsp), _BREAK_VALUE);
 	
 	/* ~ Create the root leaf. ~ */
 	
@@ -30,15 +30,15 @@ void fs_format(void) {
 	
 	/* ~ Allocate space for the root leaf. ~ */
 	
-	_root_leaf = flash_alloc(sizeof(leaf));
+	_root_leaf = at45_alloc(sizeof(leaf));
 	
 	/* ~ Reset the root leaf pointer. ~ */
 	
-	flash_push(&_root_leaf, sizeof(fsp), _ROOT_LEAF);
+	at45_push(&_root_leaf, sizeof(fsp), _ROOT_LEAF);
 	
 	/* ~ Write the root leaf into memory. ~ */
 	
-	flash_push(root, sizeof(leaf), _root_leaf);
+	at45_push(root, sizeof(leaf), _root_leaf);
 	
 	/* ~ Free the memory allocated to hold the leaf. ~ */
 	

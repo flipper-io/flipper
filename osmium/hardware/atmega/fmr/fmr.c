@@ -4,7 +4,9 @@
 
 #include <fmr/fmr.h>
 
-const void * const objects[] PROGMEM = { &button, &flash, &host, &device, &self, &fs, &i2c, &io, &led, &pwm, &sam, &spi, &timer, &usart, &usart, &usart, &usb, &wifi, &fdl };
+#include <platform/atmega.h>
+
+const void * const objects[] PROGMEM = { &host, &device, &self, &button, &at45, &fs, &i2c, &io, &led, &pwm, &sam, &spi, &timer, &usart, &usart, &usart, &usb, &wifi, &fdl };
 
 void usb_receive_interrupt(void) {
 	
@@ -18,7 +20,7 @@ void usb_receive_interrupt(void) {
 	
 	/* ~ Invoke the FMR. ~ */
 	
-	fmr_invoke(&host);
+	fmr_parse(&host);
 	
 	/* ~ Free the FMR. ~ */
 	
@@ -48,7 +50,7 @@ ISR(USART1_RX_vect) {
 	
 	/* ~ Invoke the FMR. ~ */
 	
-	fmr_invoke(&device);
+	fmr_parse(&device);
 	
 	/* ~ Re-enable interrupts. ~ */
 	

@@ -41,3 +41,9 @@ void sam_format(void) {
 	
 	
 }
+
+uint32_t sam_read_word(void *address) {
+	
+	return *(uint32_t *)(address);
+	
+}
