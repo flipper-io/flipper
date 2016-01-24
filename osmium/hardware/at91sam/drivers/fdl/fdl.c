@@ -120,13 +120,15 @@ void *fdl_load(uint16_t key) {
 	
 	/* ~ Write the loaded program address into the configuration for the startup program. ~ */
 	
-//	_key = key;
-//	
-//	at45_push(&_key, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_LOADED_KEY));
+	_key = key;
 	
-	((void (*)(void))(LOAD_BASE))();
+	at45_push(&_key, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_LOADED_KEY));
+
+	task_to_execute = LOAD_BASE;
 	
-	//at45_push(&task_to_execute, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_STARTUP_PROGRAM));
+	// ((void (*)(void))(LOAD_BASE))();
+	
+	at45_push(&task_to_execute, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_STARTUP_PROGRAM));
 	
 	/* ~ Return the address at which the code has been loaded. ~ */
 	

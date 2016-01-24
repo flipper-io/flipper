@@ -16,8 +16,10 @@
 
 #include <platform/power.h>
 
-void __attribute__ ((naked)) __attribute__ ((section(".init8"))) atmega_init(void) {
+extern void libflipper_init(void);
 
+void __attribute__ ((naked)) __attribute__ ((section(".init8"))) atmega_init(void) {
+	
 	/* ~ Clear the WDT reset flag. ~ */
 	
 	MCUSR &= ~(1 << WDRF);
@@ -28,21 +30,11 @@ void __attribute__ ((naked)) __attribute__ ((section(".init8"))) atmega_init(voi
 	
 	/* ~ Enable global interrupts. ~ */
 	
-	enable_interrupts();
-
-	u2_power_on = true; 
+	disable_interrupts();
 	
-#if false
+	/* ~ Initialize the drivers. ~ */
 	
-	/* If the U2 is scheduled to power on after a reset, continue initialization. */
-	
-	if (power_on_scheduled()) { u2_power_on = true; u2_power_on_after_reset(false); }
-	
-	/* Otherwise, send the U2 into sleep mode until the power button is pressed. */
-	
-	else { u2_power_on = false; flipper_sleep(); }
-
-#endif
+	libflipper_init();
 	
 	/* ~ Configure the USART bus. ~ */
 	
@@ -56,13 +48,19 @@ void __attribute__ ((naked)) __attribute__ ((section(".init8"))) atmega_init(voi
 	
 	device_configure(&usart);
 	
+	/* ~ Configure the filesystem. ~ */
+	
 	fs_configure();
 	
 	/* ~ Wait for the computer to attach. ~ */
 	
 	delay_ms(250);
 	
+	/* ~ Throw on the blue LED to indicate that we are waiting for a host PC to attach. ~ */
+	
 	led.rgb(0, 0, 16);
+	
+	enable_interrupts();
 	
 	/* ~ Configure USB. ~ */
 	
@@ -71,30 +69,6 @@ void __attribute__ ((naked)) __attribute__ ((section(".init8"))) atmega_init(voi
 	/* ~ Light the status LED to indicate successful configuration. ~ */
 	
 	led.rgb(0, 16, 0);
-	
-}
-
-uint8_t colors = 21;
-
-ISR(TIMER1_COMPA_vect) {
-	
-	led_set_rgb((colors & bit(2)), (colors & bit(3)), (colors & bit(4)));
-	
-	colors <<= 1;
-	
-	if (colors == 168) colors = 21;
-	
-}
-
-void enable_timer(void) {
-	
-	TCCR1B |= (1 << WGM12);
-	
-	TIMSK1 |= (1 << OCIE1A);
-	
-	OCR1A = 20833;
-	
-	TCCR1B |= ((1 << CS10) | (1 << CS11));
 	
 }
 
