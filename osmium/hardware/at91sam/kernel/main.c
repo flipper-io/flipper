@@ -134,6 +134,14 @@ int main(void) {
 	
 	while (true) {
 		
+		io.write(8, true);
+
+		delay_seconds(1);
+		
+		io.write(8, false);
+
+		delay_seconds(1);
+		
 		/* ~ Ensure the task is at a valid flash address. ~ */
 		
 		if ((uint32_t)(task_to_execute) > AT91C_IFLASH && (uint32_t)(task_to_execute) < (AT91C_IFLASH + AT91C_IFLASH_SIZE)) task_to_execute();

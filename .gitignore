@@ -2,6 +2,8 @@
 *.xcworkspace
 *.xcodeproj
 !obj-c/*.xcodeproj
+obj-c/*.framework
+obj-c/build
 *.o
 *.pyc
 *.elf
@@ -9,3 +11,4 @@
 *.so
 *.dylib
 !resources/**/*.so
+python/flipper
