@@ -38,27 +38,15 @@ void usb_receive_interrupt(void) {
 	
 	fmr_associate_target(&host);
 	
-	/*  ~ Alert the system that the FMR is busy. ~ */
-	
-	fmr_busy = true;
-	
 	/* ~ Invoke the FMR. ~ */
 	
 	fmr_parse(&host);
-	
-	/* ~ Free the FMR. ~ */
-	
-	fmr_busy = false;
 	
 }
 
 /* ~ USART recieve interrupt. ~ */
 
 ISR(USART1_RX_vect) {
-	
-	/* ~ Alert the system that the FMR is busy. ~ */
-	
-	fmr_busy = true;
 	
 	/* ~ Associate this interrupt with the host target. ~ */
 	
@@ -79,10 +67,5 @@ ISR(USART1_RX_vect) {
 	/* ~ Re-enable interrupts. ~ */
 	
 	enable_interrupts();
-	
-	/* ~ Free the FMR. ~ */
-	
-	fmr_busy = false;
-
 	
 }

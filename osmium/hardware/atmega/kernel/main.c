@@ -2,23 +2,21 @@
 
 #include <flipper/flipper.h>
 
+/* ~ Platform specific include directives. ~ */
+
 #include <platform/atmega.h>
-
-#include <fmr/fmr.h>
-
-#include <platform/fmr.h>
-
-#include <fs/crc.h>
 
 #include <platform/hid.h>
 
-#include <usart/usart.h>
+extern void usb_receive_interrupt(void);
 
-#include <platform/power.h>
-
-extern void libflipper_init(void);
-
-void __attribute__ ((naked)) __attribute__ ((section(".init8"))) atmega_init(void) {
+int main(void) {
+	
+	
+	/* -- PLATFORM SPECIFIC INITIALIZATION -- */
+	
+	
+#pragma message("Perhaps engaging the WDT would be a good idea. In the event of a timeout, the device can reset, throw a warning, and continue.")
 	
 	/* ~ Clear the WDT reset flag. ~ */
 	
@@ -28,17 +26,55 @@ void __attribute__ ((naked)) __attribute__ ((section(".init8"))) atmega_init(voi
 	
 	wdt_disable();
 	
-	/* ~ Enable global interrupts. ~ */
 	
-	disable_interrupts();
+	/* -- PLATFORM INSPECIFIC INITIALIZATION -- */
 	
-	/* ~ Initialize the drivers. ~ */
 	
-	libflipper_init();
+	/* ~ Configure the filesystem and its dependencies. The order to this is important. ~ */
 	
-	/* ~ Configure the USART bus. ~ */
+	at45_configure();
+	
+	spi_configure(0);
+	
+	fs_configure();
+	
+	/* ~ Configure the peripherals. ~ */
+	
+	button_configure();
+	
+	led_configure();
+	
+	io_configure();
+	
+	sam_configure();
+	
+	wifi_configure();
+	
+	i2c_configure();
+	
+#pragma message("Both of these are initialized here for legacy reasons. They should be converted to passthroughs.")
+	
+	timer_configure();
+	
+	pwm_configure();
+	
+	/* ~ Configure the builtins. ~ */
+	
+	error_configure();
+	
+	// fdl_configure();
+	
+	fmr_configure();
+	
+	/* ~ Configure the busses. ~ */
 	
 	usart0_configure((void *)(baudrate(115200)));
+	
+	usb_configure(0);
+	
+	
+	/* -- FLIPPER MESSAGE RUNTIME INITIALIZATION -- */
+	
 	
 	/* ~ Configure the host for this platform. ~ */
 	
@@ -48,43 +84,29 @@ void __attribute__ ((naked)) __attribute__ ((section(".init8"))) atmega_init(voi
 	
 	device_configure(&usart);
 	
-	/* ~ Configure the filesystem. ~ */
 	
-	fs_configure();
+	/* -- USER INTERFACE -- */
+	
 	
 	/* ~ Wait for the computer to attach. ~ */
 	
 	delay_ms(250);
 	
-	/* ~ Throw on the blue LED to indicate that we are waiting for a host PC to attach. ~ */
-	
-	led.rgb(0, 0, 16);
-	
-	enable_interrupts();
-	
-	/* ~ Configure USB. ~ */
-	
-	usb_configure(0);
-	
 	/* ~ Light the status LED to indicate successful configuration. ~ */
 	
 	led.rgb(0, 16, 0);
 	
-}
-
-extern void usb_receive_interrupt(void);
-
-int main(void) {
+	
+	/* -- SCHEDULER -- */
+	
 	
 	while (1) {
 		
-		while (!fmr_busy) {
-			
-			uint8_t packet = usb_receive_packet((void *)(&fmrpacket));
-			
-			if (packet) { usb_receive_interrupt(); }
-			
-		}
+#pragma message("This approach is trash. Register a callback in vect10, the USB communication interrupt. ~ */")
+		
+		uint8_t packet = usb_receive_packet((void *)(&fmrpacket));
+		
+		if (packet) { usb_receive_interrupt(); }
 		
 	}
 	

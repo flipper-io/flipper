@@ -166,8 +166,6 @@ extern uint32_t fmr_parse(const struct _target *sender);
 
 extern uint32_t internal_call(void *function, uint8_t argc, void *argv);
 
-extern bool fmr_busy;
-
 extern void fmr_broadcast(void);
 
 extern void fmr_retrieve(void);
