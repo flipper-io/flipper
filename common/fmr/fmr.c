@@ -14,8 +14,6 @@
 
 #include <usart/usart.h>
 
-bool fmr_busy = false;
-
 /* ~ Global scratch space for FMR processing. ~ */
 
 fmr_packet fmrpacket;

@@ -4,13 +4,13 @@
 
 #include <fmr/fmr.h>
 
-#include <platform/fmr.h>
-
 #include <platform/at91sam.h>
 
-#include <bme280/bme280.h>
-
 void (* task_to_execute)(void);
+
+/* ~ Garbage delay function. ~ */
+
+/* ~ PLEASE MOVE ME AND REPLACE ME! ~ */
 
 void _delay_ms(unsigned long time) {
 	
@@ -18,25 +18,11 @@ void _delay_ms(unsigned long time) {
 	
 }
 
-void makeitblink(void) {
-	
-	io.write(8, true);
-	
-	delay_ms(50);
-	
-	io.write(8, false);
-	
-	delay_ms(50);
-	
-}
+/* ~ This function is the interrupt service routine that is called when a character is received over USART. ~ */
 
-bool state = 1;
+/* ~ MOVE ME! ~ */
 
 void usart_interrupt(void) {
-	    
-	/* ~ Alert the system that the FMR is busy. ~ */
-	
-	fmr_busy = true;
 	
 	/* ~ Associate this interrupt with the host target. ~ */
 	
@@ -50,63 +36,69 @@ void usart_interrupt(void) {
 	
 	fmr_parse(&device);
 	
-	/* ~ Free the FMR. ~ */
-	
-	fmr_busy = false;
+	/* ~ Reset the USART hardware to prepare for the next incoming FMR packet. ~ */
     
 	AT91C_BASE_US0 -> US_CR = AT91C_US_RSTSTA;
 	
 }
 
-void pio_interrupt() {
-	
-	state ^= 1;
-	
-	io.write(8, state);
-	
-	AT91C_BASE_PIOA -> PIO_ISR;
-	
-}
+/* ~ This is the entry point of the operating system kernel. ~ */
 
 int main(void) {
-    
-	usart.configure((void *)(baudrate(115200)));
 	
-	usart1.configure((void *)(baudrate(115200)));
 	
-    spi_configure(0);
-    
+	/* -- PLATFORM INSPECIFIC INITIALIZATION -- */
+	
+	
+	/* ~ Configure all the things! ~ */
+	
 	at45_configure();
 	
-    fs_configure();
-    
-	/* ~ Configure the host for this platform. ~ */
+	button_configure();
+	
+	error_configure();
+	
+	fdl_configure();
+	
+	fmr_configure();
+	
+	fs_configure();
+	
+	i2c_configure();
+	
+	io_configure();
+	
+	led_configure();
+	
+	pwm_configure();
+	
+	sam_configure();
+	
+	spi_configure(0);
+	
+	timer_configure();
+	
+	usart0_configure((void *)(baudrate(115200)));
+	
+	usart1_configure((void *)(baudrate(115200)));
+	
+	usb_configure(0);
+	
+	wifi_configure();
+	
+
+	/* -- FLIPPER MESSAGE RUNTIME INITIALIZATION -- */
+	
+	
+	/* ~ Perform platform specific initializations that pertain to the Flipper Message Runtime. ~ */
 	
 	host_configure(&usart);
 	
-	/* ~ Configure the device for this platform. ~ */ 
-	
 	device_configure(&usart);
 	
-	/* ~ IO16 PC Interrupt ~ */
+	/* ~ Register the USART interrupt with a callback to the appropriate handler. ~ */
 	
-	AT91C_BASE_PIOA -> PIO_PER = (1 << 0);
-	
-	AT91C_BASE_PIOA -> PIO_ODR = (1 << 0);
-	
-	AT91C_BASE_AIC -> AIC_IDCR = (1 << AT91C_ID_PIOA);
-	
-	AT91C_BASE_AIC -> AIC_SVR[AT91C_ID_PIOA] = (unsigned)(&pio_interrupt);
-	
-	AT91C_BASE_AIC -> AIC_SMR[AT91C_ID_PIOA] = AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL | 6;
-	
-	AT91C_BASE_AIC -> AIC_ICCR = (1 << AT91C_ID_PIOA);
-	
-	AT91C_BASE_PIOA -> PIO_IER = (1 << 0);
-	
-	AT91C_BASE_AIC -> AIC_IECR = (1 << AT91C_ID_PIOA);
-	
-	/* ~ USART Interrupt ~ */
+#pragma message("The behavior of this callback is unknown when multiple characters are received during the interrupt event.")
 	
 	AT91C_BASE_AIC -> AIC_IDCR = (1 << AT91C_ID_US0);
 	
@@ -119,35 +111,43 @@ int main(void) {
 	AT91C_BASE_AIC -> AIC_IECR = (1 << AT91C_ID_US0); 
 	
 	AT91C_BASE_US0 -> US_IER = AT91C_US_RXRDY;
-    
-	io.configure();
 	
-	io.direction(8, OUTPUT);
 	
-	io.write(8, true);
+	/* -- SCHEDULER -- */
 	
-	//i2c_configure();
 	
-	/* ~ Load the address of the startup task. ~ */
-	
-	//at45_pull(&task_to_execute, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_STARTUP_PROGRAM));
+	/* ~ Rudimentary scheduling system. Check to see if we have a recently loaded task to execute; if we do, execute it. ~ */
 	
 	while (true) {
 		
-		io.write(8, true);
-
-		delay_seconds(1);
+		/* ~ Ensure the function pointer lies within valid executable address space. ~ */
 		
-		io.write(8, false);
-
-		delay_seconds(1);
-		
-		/* ~ Ensure the task is at a valid flash address. ~ */
-		
-		if ((uint32_t)(task_to_execute) > AT91C_IFLASH && (uint32_t)(task_to_execute) < (AT91C_IFLASH + AT91C_IFLASH_SIZE)) task_to_execute();
+		if ((void *)(task_to_execute) > (void *)(AT91C_IFLASH) && (void *)(task_to_execute) < (void *)(AT91C_IFLASH + AT91C_IFLASH_SIZE)) { task_to_execute(); }
 		
 	}
 	
 	return 0;
 	
 }
+
+/*
+
+	~ UNIMPLEMENTED CODE ~
+
+	AT91C_BASE_PIOA -> PIO_PER = (1 << 0);
+
+	AT91C_BASE_PIOA -> PIO_ODR = (1 << 0);
+
+	AT91C_BASE_AIC -> AIC_IDCR = (1 << AT91C_ID_PIOA);
+
+	AT91C_BASE_AIC -> AIC_SVR[AT91C_ID_PIOA] = (unsigned)(&pio_interrupt);
+
+	AT91C_BASE_AIC -> AIC_SMR[AT91C_ID_PIOA] = AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL | 6;
+
+	AT91C_BASE_AIC -> AIC_ICCR = (1 << AT91C_ID_PIOA);
+
+	AT91C_BASE_PIOA -> PIO_IER = (1 << 0);
+
+	AT91C_BASE_AIC -> AIC_IECR = (1 << AT91C_ID_PIOA);
+
+*/

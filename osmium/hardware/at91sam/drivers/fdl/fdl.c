@@ -124,7 +124,7 @@ void *fdl_load(uint16_t key) {
 	
 	at45_push(&_key, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_LOADED_KEY));
 
-	task_to_execute = LOAD_BASE;
+	task_to_execute = (void *)(LOAD_BASE);
 	
 	// ((void (*)(void))(LOAD_BASE))();
 	

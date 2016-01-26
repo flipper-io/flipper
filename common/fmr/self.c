@@ -160,9 +160,9 @@ pull:
 	
 	/* ~ Manually load the default parameters expected by a push compliant function. ~ */
 	
-	fmrpacket.body[0] = hi((uint16_t)(destination));
+	fmrpacket.body[0] = hi((uintptr_t)(destination));
 	
-	fmrpacket.body[1] = lo((uint16_t)(destination));
+	fmrpacket.body[1] = lo((uintptr_t)(destination));
 	
 	fmrpacket.body[2] = hi(hi16(length));
 	
@@ -228,9 +228,9 @@ uint32_t self_pull(uint8_t object, uint8_t index, uint8_t argc, uint32_t length)
 	
 	/* ~ Manually load the default parameters expected by a pull compliant function. ~ */
 	
-	fmrpacket.body[0] = hi((uint16_t)(source));
+	fmrpacket.body[0] = hi((uintptr_t)(source));
 	
-	fmrpacket.body[1] = lo((uint16_t)(source));
+	fmrpacket.body[1] = lo((uintptr_t)(source));
 	
 	fmrpacket.body[2] = hi(hi16(length));
 	

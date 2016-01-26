@@ -41,24 +41,16 @@ int main(int argc, char *argv[]) {
 	}
 	
     else if (!strcmp(argv[1], "load")) {
+		
+        /* ~ Parse user input from the variadic argument list. ~ */
         
-        sam.power(false);
-		
-		uint32_t _key = 0;
-		
-        fs_format();
-		
-		at45_push(&_key, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_LOADED_KEY));
-		
-        /* ~ Get user input. ~ */
-        
-        char *name = argv[2];
-        
-        char *path = argv[3];
+        char *bid = argv[2], *path = argv[3];
         
         /* ~ Open the file. ~ */
         
         FILE *file = fopen (path, "r");
+		
+		/* ~ Ensure the file opening process was error free. ~ */
         
         if (!file) { printf("\nCould not open the file: %s\n\n", path); exit(EXIT_FAILURE); }
         
@@ -70,33 +62,29 @@ int main(int argc, char *argv[]) {
         
         fseek(file, 0L, SEEK_SET);
         
-        /* ~ Load the file into memory. ~ */
+        /* ~ Load the file into local memory. ~ */
         
         uint8_t *data = (uint8_t *) malloc (sizeof(uint8_t) * size);
         
         fread(data, size, sizeof(uint8_t), file);
         
-        /* ~ Checksum the name to obtain a key. ~ */
+        /* ~ Checksum the bundle identifier to obtain a key. ~ */
         
-        uint16_t key = checksum(name, strlen(name));
+        uint16_t key = checksum(bid, strlen(bid));
 		
 		printf("\nLoading with key 0x%04x\n", key);
         
-        /* ~ Create an entry in the filesystem. ~ */
+        /* ~ Create an new entry in the filesystem. ~ */
         
         fsp _leaf = fs_add_leaf_with_key(_root_leaf, key);
         
-        /* ~ Allocate space for the data. ~ */
+        /* ~ Allocate space in external memory for the data. ~ */
         
         fsp _data = at45_alloc(size);
         
-        /* ~ Move the data into at45. ~ */
+        /* ~ Move the data into external flash. ~ */
         
-        for (int i = 0; i < (size / 64); i ++) {
-            
-            at45_push((void *)(data + (64 * i)), 64, (fsp)(_data + (64 * i)));
-            
-        }
+        for (int i = 0; i < (size / 64); i ++) at45_push((void *)(data + (64 * i)), 64, (fsp)(_data + (64 * i)));
         
         at45_push((void *)(data + (64 * (size / 64))), (size % 64), (fsp)(_data + (64 * (size / 64))));
         
@@ -105,16 +93,14 @@ int main(int argc, char *argv[]) {
         at45_push(&_data, sizeof(fsp), forward(_leaf, leaf, data));
 
         at45_push(&size, sizeof(uint32_t), forward(_leaf, leaf, size));
-        
-        sam.power(true);
-        
-        usleep(10000);
-        
-        /* ~ Load the data. ~ */
+		
+        /* ~ Call the the Flipper Dynamic Loader to begin the dynamic loading process. ~ */
         
         fdl.load(key);
+		
+		/* ~ Display a message indicating that the loading process was completed successfuly. ~ */
         
-        printf("\nDynamic loading complete.\n\n");
+        printf("\nDynamic loading completed successfully.\n\n");
         
     }
 	

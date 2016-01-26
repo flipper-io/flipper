@@ -8,7 +8,7 @@
  
  This driver oversees error handling across the heirarchy of targets connected to the active instance of the toolbox.
  
- */
+*/
 
 #include <flipper/types.h>
 

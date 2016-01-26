@@ -2,11 +2,7 @@
 
 #include <flipper/flipper.h>
 
-#include <fmr/fmr.h>
-
-#include <bme280/bme280.h>
-
-const void * const objects[] = { &host, &self, &device, &button, &at45, &fs, &i2c, &io, &led, &pwm, &sam, &spi, &timer, &usart, &usart1, &dbgu, &usb, &wifi, &fdl, &fmr, &bme280 };
+const void * const objects[] = { &host, &self, &device, &button, &at45, &fs, &i2c, &io, &led, &pwm, &sam, &spi, &timer, &usart, &usart1, &dbgu, &usb, &wifi, &fdl, &fmr };
 
 void fmr_configure(void) {
 	
@@ -28,7 +24,7 @@ uint32_t fmr_invoke(fmr_handle handle, uint8_t index, uint8_t argc, ...) {
 	
 	/* ~ Ensure the module was successfully loaded. ~ */
 	
-	if (!module) { error.raise(0); return NULL; }
+	if (!module) { error.raise(0); return -1; }
 	
 	void *configure = module + *(uint32_t *)(module);
 	
