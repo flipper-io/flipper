@@ -50,11 +50,33 @@ int main(void) {
 	/* -- PLATFORM INSPECIFIC INITIALIZATION -- */
 	
 	
-	/* ~ Configure all the things! ~ */
+	/* ~ Configure the filesystem and its dependencies. The order to this is important. ~ */
 	
 	at45_configure();
 	
+	spi_configure(0);
+	
+	fs_configure();
+	
+	/* ~ Configure the peripherals. ~ */
+	
 	button_configure();
+	
+	led_configure();
+	
+	io_configure();
+	
+	timer_configure();
+	
+	pwm_configure();
+	
+	sam_configure();
+	
+	wifi_configure();
+	
+	i2c_configure();
+	
+	/* ~ Configure the builtins. ~ */
 	
 	error_configure();
 	
@@ -62,29 +84,13 @@ int main(void) {
 	
 	fmr_configure();
 	
-	fs_configure();
-	
-	i2c_configure();
-	
-	io_configure();
-	
-	led_configure();
-	
-	pwm_configure();
-	
-	sam_configure();
-	
-	spi_configure(0);
-	
-	timer_configure();
+	/* ~ Configure the busses. ~ */
 	
 	usart0_configure((void *)(baudrate(115200)));
-	
+
 	usart1_configure((void *)(baudrate(115200)));
 	
 	usb_configure(0);
-	
-	wifi_configure();
 	
 
 	/* -- FLIPPER MESSAGE RUNTIME INITIALIZATION -- */

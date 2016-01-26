@@ -36,7 +36,7 @@ uploader = $(shell which 'avrdude')
 
 # ~ Specify platform specific preprocessor flags. ~ #
 
-uploader_flags = -p $(platform) -c usbtiny -U lfuse:w:0xFF:m -U hfuse:w:0xD9:m -U flash:w:$(output)
+uploader_flags = -p $(platform) -V -c usbtiny -U lfuse:w:0xFF:m -U hfuse:w:0xD9:m -U flash:w:$(output)
 
 platform_flags = -DARCH=ARCH_AVR8 -mmcu=$(platform) -D__AVR_$(shell echo $(platform) | tr a-z A-Z)__ -D__atmega_build__
 

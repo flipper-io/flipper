@@ -30,7 +30,7 @@ install: all
 
 	# ~ Build and install the Python module. ~ */
 
-	$(MAKE) -C python all install
+	$(MAKE) -C python all fix install
 
 uninstall:
 
