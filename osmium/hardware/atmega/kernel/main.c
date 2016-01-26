@@ -44,9 +44,7 @@ int main(void) {
 	
 	led_configure();
 	
-	io_configure();
-	
-	sam_configure();
+//	sam_configure();
 	
 	wifi_configure();
 	
@@ -54,6 +52,8 @@ int main(void) {
 	
 #pragma message("Both of these are initialized here for legacy reasons. They should be converted to passthroughs.")
 	
+	io_configure();
+
 	timer_configure();
 	
 	pwm_configure();
