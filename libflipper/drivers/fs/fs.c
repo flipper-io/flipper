@@ -68,6 +68,8 @@ void fs_transfer_file(char *path, char *name) {
 	
 	fsp _data = at45_alloc(size);
 	
+	if (!_data) { printf("Request for memory failed.\n"); return; }
+	
 	at45_push(&size, sizeof(fsp), forward(_leaf, leaf, size));
 	
 	at45_push(&_data, sizeof(fsp), forward(_leaf, leaf, data));
