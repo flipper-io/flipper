@@ -52,8 +52,8 @@ int main(int argc, char *argv[]) {
 		
 		/* ~ Ensure the file opening process was error free. ~ */
         
-        if (!file) { printf("\nCould not open the file: %s\n\n", path); exit(EXIT_FAILURE); }
-        
+		if (!file) { printf("\nCould not open the file: %s\n\n", path); return 0; }
+		
         /* ~ Obtain the size of the file. ~ */
         
         fseek(file, 0L, SEEK_END);
@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
         
         /* ~ Load the file into local memory. ~ */
         
-        uint8_t *data = (uint8_t *) malloc (sizeof(uint8_t) * size);
+        uint8_t *data = (uint8_t *) malloc(sizeof(uint8_t) * size);
         
         fread(data, size, sizeof(uint8_t), file);
         
@@ -72,8 +72,6 @@ int main(int argc, char *argv[]) {
         
         uint16_t key = checksum(bid, strlen(bid));
 		
-		printf("\nLoading with key 0x%04x\n", key);
-        
         /* ~ Create an new entry in the filesystem. ~ */
         
         fsp _leaf = fs_add_leaf_with_key(_root_leaf, key);
@@ -96,25 +94,47 @@ int main(int argc, char *argv[]) {
 		
         /* ~ Call the the Flipper Dynamic Loader to begin the dynamic loading process. ~ */
         
-        fdl.load(key);
+        void *address = fdl.load(key);
 		
-		/* ~ Display a message indicating that the loading process was completed successfuly. ~ */
-        
-        printf("\nDynamic loading completed successfully.\n\n");
-        
+		if (address) {
+			
+			/* ~ Display a message indicating that the loading process was completed successfuly. ~ */
+			
+			printf("\nDynamic loading completed successfully. %p.\n\n", address);
+			
+		}
+		
+		else {
+			
+			printf("\nDynamic loading failed.\n\n");
+			
+		}
+		
     }
+	
+	else if (!strcmp(argv[1], "boot")) {
+
+		char *bid = argv[2];
+		
+		uint16_t key = checksum(bid, strlen(bid));
+
+		/* ~ Launch the program. ~ */
+		
+		fdl.launch(key);
+		
+	}
 	
 	else if (!strcmp(argv[1], "unload")) {
 		
-		uint32_t _key = 0;
+		uint16_t zero = 0;
 		
-		/* ~ Clear the loaded key. ~ */
+		/* ~ Zero the FDL break value. ~ */
 		
-		at45_push(&_key, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_LOADED_KEY));
+		fdl_write_config(zero, fdl_config_brk);
 		
-		/* ~ Clear the loaded key. ~ */
+		/* ~ Reconfigure the FDL. ~ */
 		
-		at45_push(&_key, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_STARTUP_PROGRAM));
+		fdl.configure();
 		
 	}
 	

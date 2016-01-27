@@ -54,8 +54,10 @@ fsp fs_add_leaf_with_key(fsp current, uint16_t key) {
         
         if (!region) {
             
-            printf("External memory is full!\n\n");
-            
+            printf("A request for external memory could not be satisfied.\n\n");
+			
+			return 0;
+			
         }
         
         /* ~ Create the new leaf. ~ */

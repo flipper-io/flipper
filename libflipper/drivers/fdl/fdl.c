@@ -16,6 +16,12 @@ void *fdl_load(uint16_t key) {
     
 }
 
+void fdl_launch(uint16_t key) {
+	
+	host.invoke(_fdl, _fdl_launch, 2, little(key), 0);
+	
+}
+
 void fdl_resolve(uint16_t key, const void *address) {
 	
 	

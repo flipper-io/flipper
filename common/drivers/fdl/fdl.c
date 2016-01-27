@@ -10,6 +10,8 @@ const struct _fdl fdl = {
 	
 	fdl_load,
 	
+	fdl_launch,
+	
 	fdl_resolve
 	
 #endif
