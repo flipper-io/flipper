@@ -20,13 +20,25 @@
 
 #define LOAD_PAGE 350
 
-#define LOAD_BASE (AT91C_IFLASH + (LOAD_PAGE * AT91C_IFLASH_PAGE_SIZE))
-
 #define EFC_KEY 0x5A
+
+#define fdl_load_address(page) (AT91C_IFLASH + (page * AT91C_IFLASH_PAGE_SIZE))
+
+/* ~ This variable will contain information that relates to the next available page into which content can be loaded. ~ */
+
+uint16_t __fdl_brk;
 
 void fdl_configure(void) {
 	
+	/* ~ Read the break value in from configuration memory. ~ */
 	
+	fdl_read_config(__fdl_brk, fdl_config_brk);
+	
+	/* ~ If the break value has been reset, reset it and write it to the configuration. ~ */
+	
+	if (!__fdl_brk) __fdl_brk = LOAD_PAGE;
+	
+	fdl_write_config(__fdl_brk, fdl_config_brk);
 	
 }
 
@@ -52,21 +64,11 @@ __attribute__((section(".ramfunc"))) void write_page(uint16_t page) {
 
 extern void (* task_to_execute)(void);
 
+char serial[64];
+
+#define printf(...) usart1.push(serial, sprintf(serial, __VA_ARGS__));
+
 void *fdl_load(uint16_t key) {
-	
-	uint32_t _key;
-	
-	at45_pull(&_key, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_LOADED_KEY));
-	
-	char serbuf[64];
-	
-	/* ~ See if we've already loaded the program. ~ */
-	
-	if (_key == key) { sprintf(serbuf, "Module already loaded. Returning.\n"); usart1.push(serbuf, strlen(serbuf)); return LOAD_BASE; }
-	
-	sprintf(serbuf, "Module not loaded. Pulling from external memory.\n");
-	
-	usart1.push(serbuf, strlen(serbuf));
 	
 	/* ~ Obtain the filesystem object for the given key. ~ */
 	
@@ -74,11 +76,23 @@ void *fdl_load(uint16_t key) {
 	
 	/* ~ Ensure that we're loading a valid filesystem object. ~ */
 	
-    if (!_leaf) return NULL;
+	if (!_leaf) { printf("No valid filesystem entry for loadable. Brk: %i\n", __fdl_brk); return NULL; }
     
 	/* ~ Dereference the metadata contained by the leaf. ~ */
 	
 	leaf *l = at45_dereference(_leaf, sizeof(leaf));
+	
+	/* ~ If the loadable has already been loaded, return the address. ~ */
+	
+	if (l -> address) { printf("Loadable already loaded. %p\n", l -> address); return l -> address; }
+	
+	/* ~ Calculate the total number of pages required for the load. ~ */
+	
+	uint32_t total = ceiling(l -> size, AT91C_IFLASH_PAGE_SIZE);
+	
+	/* ~ Ensure we have enough available flash to satisfy the request. ~ */
+	
+	if (__fdl_brk + total > AT91C_IFLASH_NB_OF_PAGES) { printf("Not enough internal memory to satisfy load request.\n"); return NULL; }
 	
 	/* ~ Start the loading process by opening a continuous read from external flash given the page and offset at which the program is located. ~ */
 	
@@ -94,7 +108,7 @@ void *fdl_load(uint16_t key) {
 	
 	/* ~ We are now ready to begin bringing in individual bytes of the program from the SPI bus. ~ */
 	
-	for (uint32_t page = 0; page < ceiling(l -> size, AT91C_IFLASH_PAGE_SIZE); page ++) {
+	for (uint32_t page = 0; page < total; page ++) {
 		
 		for (uint8_t word = 0; word < AT91C_IFLASH_PAGE_SIZE / sizeof(uint32_t); word ++) {
 			
@@ -104,7 +118,7 @@ void *fdl_load(uint16_t key) {
 			
 			/* ~ Write the word into the latch buffer. Writes to the latch buffer must be 32-bit. ~ */
 			
-			*(uint32_t *)(LOAD_BASE + (page * AT91C_IFLASH_PAGE_SIZE) + (word * sizeof(uint32_t))) = value;
+			*(uint32_t *)((AT91C_IFLASH + (__fdl_brk * AT91C_IFLASH_PAGE_SIZE)) + (page * AT91C_IFLASH_PAGE_SIZE) + (word * sizeof(uint32_t))) = value;
 			
 		}
 		
@@ -118,21 +132,27 @@ void *fdl_load(uint16_t key) {
 	
 	at45_disable();
 	
-	/* ~ Write the loaded program address into the configuration for the startup program. ~ */
+	/* ~ Calculate the load address of the code. ~ */
 	
-	_key = key;
+	void *load_address = fdl_load_address(__fdl_brk);
 	
-	at45_push(&_key, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_LOADED_KEY));
-
-	task_to_execute = (void *)(LOAD_BASE);
+	/* ~ Rewrite filesystem memory. ~ */
 	
-	// ((void (*)(void))(LOAD_BASE))();
+	at45_push(&load_address, sizeof(uintptr_t), forward(_leaf, leaf, address));
 	
-	at45_push(&task_to_execute, sizeof(uint32_t), config_offset(FDL_CONFIG_BASE, FDL_STARTUP_PROGRAM));
+	/* ~ Increment the FDL break value by the number of pages allocated by this loadable. ~ */
+	
+	__fdl_brk += total;
+	
+	/* ~ Rewrite configuration memory. ~ */
+	
+	fdl_write_config(__fdl_brk, fdl_config_brk);
+	
+	printf("Load success. %p\n", load_address);
 	
 	/* ~ Return the address at which the code has been loaded. ~ */
 	
-	return LOAD_BASE;
+	return load_address;
 	
 }
 
@@ -146,9 +166,11 @@ void fdl_terminate() {
 
 /* ~ Loads a program, and saves it into the OS configuration to be loaded on startup. ~ */
 
-void fdl_boot(uint16_t key) {
+void fdl_launch(uint16_t key) {
 	
+	/* ~ Resolve a load address for the application and add it to the scheduling system. ~ */
 	
+	task_to_execute = fdl_load(key);
 	
 }
 

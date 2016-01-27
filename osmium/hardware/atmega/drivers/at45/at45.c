@@ -74,11 +74,11 @@ void at45_reset(void) {
 	
 	/* Pull the CS pin high to disable the device. */
 	
-	set_bit_in_port(FLASH_CS_PIN, PORTB);
+	set_bit_in_port(FLASH_CS_PIN, FLASH_CS_PORT);
 	
 	/* Pull the CS pin low. This issues a command decoder reset and puts the device into an idle state. */
 	
-	clear_bit_in_port(FLASH_CS_PIN, PORTB);
+	clear_bit_in_port(FLASH_CS_PIN, FLASH_CS_PORT);
 	
 }
 
@@ -100,66 +100,6 @@ extern void at45_wait(void);
 
 void at45_format(void) {
 	
-#if false
-    
-    /* !!!!!!!! THIS CODE APPEARS TO BE EVIL AND BRICKS THE FLASH CHIP! *cries* !!!!!!!! */
-    
-	/* Disable interrupts to prevent memory corruption. */
 	
-	disable_interrupts();
-	
-	/* ~ Indicate that we are busy. ~ */
-	
-	led_set_rgb(LED_COLOR_BUSY);
-	
-	/* Wait until the flash chip is ready to recieve data. */
-	
-	at45_wait();
-	
-	/* ~ Reset the device to prepare it for the incoming opcode. ~ */
-	
-	at45_reset();
-	
-	/* Send the appropriate opcodes to initialize a chip erase. */
-	
-	spi_put(FLASH_OPCODE_CHIP_ERASE_0);
-	
-	spi_put(FLASH_OPCODE_CHIP_ERASE_1);
-	
-	spi_put(FLASH_OPCODE_CHIP_ERASE_2);
-	
-	spi_put(FLASH_OPCODE_CHIP_ERASE_3);
-	
-	/* Wait the bulk of the erase cycle period so as to not overload the SPI. */
-	
-	delay_seconds(5);
-	
-	delay_seconds(5);
-	
-	delay_seconds(5);
-	
-	delay_seconds(5);
-	
-	delay_seconds(5);
-	
-	delay_seconds(5);
-	
-	/* Wait until the flash chip has been erased. */
-	
-	at45_wait();
-	
-	/* ~ Disable the device so that no data can be recieved until the next opcode is sent. ~ */
-	
-	at45_disable();
-	
-	/* ~ Indicate that the operation was successful. ~ */
-	
-	led_set_rgb(LED_COLOR_SUCCESS);
-	
-	/* Enable interrupts again. */
-	
-	enable_interrupts();
-	
-#endif
     
 }

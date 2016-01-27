@@ -50,6 +50,8 @@ void spi_enable(void) {
     
     set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_MR, AT91C_SPI_MSTR);
 	
+	clear_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SPIDIS);
+	
 	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SPIEN);
 	
     /* ~ Wait for the SPI to boot. ~ */
@@ -65,7 +67,9 @@ void spi_disable(void) {
     while (!((AT91C_BASE_SPI -> SPI_SR) & AT91C_SPI_TXEMPTY));
     
     clear_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_MR, AT91C_SPI_MSTR);
-    
+	
+	clear_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SPIEN);
+	
 	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SPIDIS);
 	
 }
