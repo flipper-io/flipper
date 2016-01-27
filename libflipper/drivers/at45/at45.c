@@ -64,7 +64,7 @@ void *at45_dereference(fsp source, uint32_t length) {
 	
 	void *local = malloc(length);
 	
-	if (!local) { printf("\nERROR. System declined memory allocation reuquest for at45 dereference.\n\n"); }
+	if (!local) { printf("\nERROR. System declined memory allocation request for at45 dereference.\n\n"); return 0; }
 	
 	at45_pull(local, length, source);
 	

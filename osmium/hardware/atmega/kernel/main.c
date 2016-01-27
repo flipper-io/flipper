@@ -92,6 +92,12 @@ int main(void) {
 	
 	delay_ms(250);
 	
+	
+	/* ~ Deassert the reset pin. ~ */
+	
+	sam_set_reset(false);
+	
+	
 	/* ~ Light the status LED to indicate successful configuration. ~ */
 	
 	led.rgb(0, 16, 0);

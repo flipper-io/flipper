@@ -26,6 +26,10 @@ void sam_configure(void) {
 	
 	set_bit_in_port(SAM_TEST_PIN, SAM_TEST_DDR);
 	
+	/* ~ Turn the reset transistor off to assert the reset pin. ~ */
+	
+	clear_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
+	
 	/* ~ Configure the 7S' reset pin as an output. ~ */
 	
 	set_bit_in_port(SAM_RESET_PIN, SAM_RESET_DDR);
@@ -40,6 +44,10 @@ void sam_configure(void) {
 
 void sam_set_power(bool power) {
 
+	sam_set_reset(power);
+
+	return;
+	
     if (power) {
      
         usart0_enable();
@@ -55,6 +63,14 @@ void sam_set_power(bool power) {
         clear_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
         
     }
+	
+}
+
+void sam_set_reset(bool reset) {
+	
+	if (reset) 	set_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
+	
+	else clear_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
 	
 }
 

@@ -100,11 +100,11 @@ void button_pressed(void) {
 	
 	/* ~ Reset only the ARM processor. ~ */
 	
-	sam_set_power(true);
+	sam_set_power(false);
 
 	delay_ms(100);
 	
-	sam_set_power(false);
+	sam_set_power(true);
 	
 }
 
