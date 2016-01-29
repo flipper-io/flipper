@@ -56,7 +56,7 @@ int main(void) {
 	
 	spi_configure(0);
 	
-	fs_configure();
+//	fs_configure();
 	
 	/* ~ Configure the peripherals. ~ */
 	
@@ -80,7 +80,7 @@ int main(void) {
 	
 	error_configure();
 	
-	fdl_configure();
+	// fdl_configure();
 	
 	fmr_configure();
 	
@@ -118,6 +118,30 @@ int main(void) {
 	
 	AT91C_BASE_US0 -> US_IER = AT91C_US_RXRDY;
 	
+	
+//	size_t size = 32;
+//	
+//	char *in = malloc(size);
+//	
+//	at45.pull(in, size, 0xABCD);
+//	
+//	usart1.push(in, size);
+	
+	
+	
+	io.direction(7, 1);
+	
+	uint8_t state = 0;
+	
+	while (true) {
+		
+		delay_ms(250);
+		
+		io.write(7, state);
+		
+		state ^= 1;
+		
+	}
 	
 	/* -- SCHEDULER -- */
 	

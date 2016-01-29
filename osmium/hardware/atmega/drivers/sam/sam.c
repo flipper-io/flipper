@@ -25,6 +25,10 @@ void sam_configure(void) {
 	/* ~ Configure the 7S' test pin as an output. ~ */
 	
 	set_bit_in_port(SAM_TEST_PIN, SAM_TEST_DDR);
+
+	/* ~ Dessert the 7S' reset pin. ~ */
+	
+	clear_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
 	
 	/* ~ Configure the 7S' reset pin as an output. ~ */
 	
@@ -33,6 +37,22 @@ void sam_configure(void) {
 	/* ~ Configure the 7S' erase pin as an output. ~ */
 	
 	set_bit_in_port(SAM_ERASE_PIN, SAM_ERASE_DDR);
+	
+}
+
+void sam_suspend(void) {
+	
+	/* ~ Assert the 7S' reset pin. ~ */
+	
+	set_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
+	
+}
+
+void sam_engage(void) {
+	
+	/* ~ Deassert the 7S' reset pin. ~ */
+	
+	clear_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
 	
 }
 

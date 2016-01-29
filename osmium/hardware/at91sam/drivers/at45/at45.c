@@ -8,29 +8,31 @@
 
 void at45_configure(void) {
 	
-	/* ~ Configure the CS pin. ~ */
+	/* ~ Enable the CS pin. ~ */
 	
 	set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_PER);
 
-	/* ~ Configure the CS pin as an output. ~ */
+	/* ~ Configure the CS pin as an input. ~ */
 	
-	set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_OER);
+	clear_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_OER);
 	
-	/* ~ Configure the CS pin for single write access. ~ */
-	
-	set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_OWER);
+	set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_ODR);
 	
 }
 
 void at45_enable(void) {
 	
-	/* ~ Enable the SPI. ~ */
+	/* ~ Configure the CS pin as an output. ~ */
 	
-    spi_enable();
-    
+	clear_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_ODR);
+	
+	set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_OER);
+	
 	/* ~ Pull the CS pin low to enable the device. ~ */
 	
-	clear_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_ODSR);
+	clear_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_SODR);
+
+	set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_CODR);
 	
 }
 
@@ -38,29 +40,37 @@ void at45_disable(void) {
 	
 	/* ~ Pull the CS pin high to disable the device. ~ */
 	
-	set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_ODSR);
+	clear_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_CODR);
 	
-	/* ~ Disable the SPI. ~ */
+	set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_SODR);
 	
-	spi_disable();
+	/* ~ Configure the CS pin as an input. ~ */
+	
+	clear_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_OER);
+	
+	set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_ODR);
 	
 }
 
 void at45_reset(void) {
 	
-    spi_enable();
+	/* ~ Configure the CS pin as an output. ~ */
+	
+	clear_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_ODR);
+	
+	set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_OER);
     
-    /* ~ Enable the CS pin as an output. ~ */
+	/* ~ Pull the CS pin high to disable the device. ~ */
+	
+	clear_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_CODR);
+	
+	set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_SODR);
     
-    set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_OER);
-    
-    /* ~ Turn the CS pin on. ~ */
-    
-    set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_SODR);
-    
-    /* ~ Turn the CS pin off. ~ */
-    
-    set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_CODR);
+	/* ~ Pull the CS pin low to enable the device. ~ */
+	
+	clear_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_SODR);
+	
+	set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_CODR);
 	
 }
 

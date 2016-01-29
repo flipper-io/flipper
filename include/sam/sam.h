@@ -16,13 +16,15 @@ extern const struct _sam {
 	
 	void (* format)(void);
 	
-	uint32_t (* word)(void *address);
+	void (* suspend)(void);
+
+	void (* engage)(void);
 	
 } sam;
 
 #ifdef __private_include__
 
-enum { _sam_configure, _sam_set_power, _sam_reset, _sam_load_dfu, _sam_format, _sam_word };
+enum { _sam_configure, _sam_set_power, _sam_reset, _sam_load_dfu, _sam_format, _sam_suspend, _sam_engage };
 
 extern void sam_configure(void);
 
@@ -34,7 +36,9 @@ extern void sam_load_dfu(void);
 
 extern void sam_format(void);
 
-extern uint32_t sam_read_word(void *address);
+extern void sam_suspend(void);
+
+extern void sam_engage(void);
 
 #endif
 

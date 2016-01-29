@@ -200,10 +200,6 @@ uint32_t self_pull(uint8_t object, uint8_t index, uint8_t argc, uint32_t length)
 	
 	void *source = malloc(length);
 	
-	/* ~ Save the source in a local variable we can modify. ~ */
-	
-	void *src = source;
-	
 	/* ~ If malloc failed to satisfy our request, panic. ~ */
 	
 	if (!source) {
@@ -216,7 +212,13 @@ uint32_t self_pull(uint8_t object, uint8_t index, uint8_t argc, uint32_t length)
 		
 		sender -> bus -> push(&source, sizeof(uint32_t));
 		
+		return 0;
+		
 	}
+	
+	/* ~ Save the source in a local variable we can modify. ~ */
+	
+	void *src = source;
 	
 	/* ~ Load the recipient information into the packet. This information describes to the FMR which function to invoke. ~ */
 	
