@@ -35,8 +35,8 @@ int main(void) {
 	at45_configure();
 	
 	spi_configure(0);
-	
-	fs_configure();
+
+//	fs_configure();
 	
 	/* ~ Configure the peripherals. ~ */
 	

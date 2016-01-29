@@ -44,8 +44,14 @@ void sam_format(void) {
 	
 }
 
-uint32_t sam_read_word(void *address) {
+void sam_suspend(void) {
 	
-	return host.invoke(_sam, _sam_word, 2, little(lo16(address)), little(hi16(address)));
+	device.invoke(_sam, _sam_suspend, 0, NO_ARGS);
+	
+}
+
+void sam_engage(void) {
+	
+	device.invoke(_sam, _sam_engage, 0, NO_ARGS);
 	
 }

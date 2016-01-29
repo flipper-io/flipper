@@ -32,15 +32,7 @@ int main(int argc, char *argv[]) {
 
 	}
 	
-	if (!strcmp(argv[1], "word")) {
-		
-		void *address = (void *)(strtol(argv[2], NULL, 16));
-		
-		printf("\nRead from address 0x%08x: 0x%08x\n\n", (uint32_t)address, sam.word(address));
-		
-	}
-	
-    else if (!strcmp(argv[1], "load")) {
+	if (!strcmp(argv[1], "load")) {
 		
         /* ~ Parse user input from the variadic argument list. ~ */
         
@@ -140,7 +132,21 @@ int main(int argc, char *argv[]) {
 	
 	else if (!strcmp(argv[1], "reset")) {
 		
-		sam_reset();
+		sam.suspend();
+		
+		sam.engage();
+		
+	}
+	
+	else if (!strcmp(argv[1], "suspend")) {
+		
+		sam.suspend();
+		
+	}
+	
+	else if (!strcmp(argv[1], "engage")) {
+		
+		sam.engage();
 		
 	}
 	

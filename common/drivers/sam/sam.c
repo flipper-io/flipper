@@ -14,6 +14,8 @@ const struct _sam sam = {
 	
 	sam_format,
 	
-	sam_read_word
+	sam_suspend,
+	
+	sam_engage
 	
 };

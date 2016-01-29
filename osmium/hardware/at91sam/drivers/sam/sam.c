@@ -42,8 +42,14 @@ void sam_format(void) {
 	
 }
 
-uint32_t sam_read_word(void *address) {
+void sam_suspend(void) {
 	
-	return *(uint32_t *)(address);
+	
+	
+}
+
+void sam_engage(void) {
+	
+	
 	
 }
