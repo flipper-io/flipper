@@ -38,6 +38,8 @@ void at45_configure(void) {
 
 void at45_enable(void) {
 	
+	spi_enable();
+	
 	/* ~ Configure the external flash memory chip's CS pin as an output. ~ */
 	
 	set_bit_in_port(FLASH_CS_PIN, FLASH_CS_DDR);

@@ -12,7 +12,19 @@ void spi_configure(void *configuration) {
 	
 	/* ~ Disable use of the SPI pins by the PIO. They are now in use by the SPI controller. ~ */
 	
+	clear_bits_in_port_with_mask(AT91C_BASE_PIOA -> PIO_PER, (AT91C_PA12_MISO | AT91C_PA13_MOSI | AT91C_PA14_SPCK));
+	
 	set_bits_in_port_with_mask(AT91C_BASE_PIOA -> PIO_PDR, (AT91C_PA12_MISO | AT91C_PA13_MOSI | AT91C_PA14_SPCK));
+	
+	/* ~ Execute two consecutive software reset of the SPI in order to ensure that the SPI controller has been completely reset. ~ */
+	
+	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SWRST);
+	
+	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SWRST);
+	
+	/* ~ Initalize the SPI in master mode. ~ */
+	
+	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_MR, AT91C_SPI_MSTR);
 	
 	/* ~ Enable the SPI in the Peripheral Clock Enable Register. ~ */
 	
@@ -21,16 +33,6 @@ void spi_configure(void *configuration) {
 	/* ~ Disable communications and reset the SPI. ~ */
 	
 	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SPIDIS);
-	
-    /* ~ Initalize the SPI in slave mode. ~ */
-    
-    clear_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_MR, AT91C_SPI_MSTR);
-	
-	/* ~ Execute two consecutive software reset of the SPI in order to ensure that the SPI controller has been completely reset. ~ */
-	
-	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SWRST);
-	
-	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SWRST);
 	
 	/* ~ Disable the PDMAC for now. ~ */
 	
@@ -47,8 +49,8 @@ void spi_configure(void *configuration) {
 }
 
 void spi_enable(void) {
-    
-    set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_MR, AT91C_SPI_MSTR);
+	
+	/* ~ Enable the SPI. ~ */
 	
 	clear_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SPIDIS);
 	
@@ -65,8 +67,8 @@ void spi_disable(void) {
     /* ~ Wait until the SPI has finished transmitting any data. ~ */
     
     while (!((AT91C_BASE_SPI -> SPI_SR) & AT91C_SPI_TXEMPTY));
-    
-    clear_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_MR, AT91C_SPI_MSTR);
+	
+	/* ~ Disable the SPI. ~ */
 	
 	clear_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SPIEN);
 	
@@ -76,18 +78,18 @@ void spi_disable(void) {
 
 bool spi_ready(void) {
 	
-	return ((AT91C_BASE_SPI -> SPI_SR) & AT91C_SPI_RDRF);
+	return (AT91C_BASE_SPI -> SPI_SR & AT91C_SPI_RDRF);
 	
 }
 
 uint8_t spi_put_get(uint8_t byte) {
     
-    while (!((AT91C_BASE_SPI -> SPI_SR) & AT91C_SPI_TDRE));
+    while (!(AT91C_BASE_SPI -> SPI_SR & AT91C_SPI_TDRE));
     
     AT91C_BASE_SPI -> SPI_TDR = byte;
-    
-    while (!((AT91C_BASE_SPI -> SPI_SR) & AT91C_SPI_RDRF));
-    
+		
+    while (!(AT91C_BASE_SPI -> SPI_SR & AT91C_SPI_RDRF));
+	
     return (uint8_t)(AT91C_BASE_SPI -> SPI_RDR);
     
 }
