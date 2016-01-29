@@ -13,7 +13,13 @@
 #define SPI_DATA_MODE_3				0x0C
 
 void spi_configure(void *configuration) {
-    
+	
+	/* ~ Configure MOSI and SCK as inputs. ~ */
+	
+	clear_bits_in_port_with_mask(PORTB, (bit(MOSI) | bit(SCK)));
+	
+	clear_bits_in_port_with_mask(SPI_DDR, (bit(MOSI) | bit(SCK)));
+	
 	/* ~ Put the SPI bus into MODE3. ~ */
 	
 	set_bits_in_port_with_mask(SPCR, SPI_DATA_MODE_3);
@@ -47,6 +53,8 @@ void spi_disable(void) {
     clear_bit_in_port(SPE, SPCR);
 	
 	/* ~ Configure MOSI and SCK as inputs. ~ */
+	
+	clear_bits_in_port_with_mask(PORTB, (bit(MOSI) | bit(SCK)));
 	
 	clear_bits_in_port_with_mask(SPI_DDR, (bit(MOSI) | bit(SCK)));
 	
