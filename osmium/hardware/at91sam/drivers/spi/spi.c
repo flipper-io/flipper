@@ -4,7 +4,15 @@
 
 #include "platform/at91sam.h"
 
+#include <usart/usart.h>
+
+extern char serial[64];
+
+#define printf(...) usart1.push(serial, sprintf(serial, __VA_ARGS__));
+
 void spi_configure(void *configuration) {
+	
+	printf("Configuring the SPI!\n");
 	
 	/* ~ Select PIO A. ~ */
 	
@@ -26,10 +34,6 @@ void spi_configure(void *configuration) {
 	
 	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_MR, AT91C_SPI_MSTR);
 	
-	/* ~ Enable the SPI in the Peripheral Clock Enable Register. ~ */
-	
-	set_bit_in_port(AT91C_ID_SPI, AT91C_BASE_PMC -> PMC_PCER);
-	
 	/* ~ Disable communications and reset the SPI. ~ */
 	
 	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SPIDIS);
@@ -50,6 +54,12 @@ void spi_configure(void *configuration) {
 
 void spi_enable(void) {
 	
+	printf("Enabling the SPI!\n");
+	
+	/* ~ Enable the SPI in the Peripheral Clock Enable Register. ~ */
+	
+	set_bit_in_port(AT91C_ID_SPI, AT91C_BASE_PMC -> PMC_PCER);
+	
 	/* ~ Enable the SPI. ~ */
 	
 	clear_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SPIDIS);
@@ -64,6 +74,8 @@ void spi_enable(void) {
 
 void spi_disable(void) {
 	
+	printf("Disabling the SPI!\n");
+	
     /* ~ Wait until the SPI has finished transmitting any data. ~ */
     
     while (!((AT91C_BASE_SPI -> SPI_SR) & AT91C_SPI_TXEMPTY));
@@ -73,6 +85,10 @@ void spi_disable(void) {
 	clear_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SPIEN);
 	
 	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SPIDIS);
+	
+	/* ~ Disable the SPI in the Peripheral Clock Disable Register. ~ */
+	
+	set_bit_in_port(AT91C_ID_SPI, AT91C_BASE_PMC -> PMC_PCDR);
 	
 }
 

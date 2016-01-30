@@ -9,6 +9,13 @@
 #include <fs/crc.h>
 
 #include <fmr/fmr.h>
+#include <unistd.h>
+#include <progressbar.h>
+
+#define FLIPPER_WANT_PROGRESS 2
+#define FLIPPER_PUSH 1
+#define FLIPPER_PULL 0
+#define AT45_CHUNK_SIZE 32
 
 void fs_configure(void) {
 	
@@ -46,9 +53,41 @@ void fs_print(fsp branch) {
 	
 }
 
+void chunky_transfer(uint8_t *buffer, size_t size, fsp data, int flags)
+{
+	unsigned int remaining_bytes = size;
+	unsigned int read_idx = 0;
+	
+	while (remaining_bytes > 0)
+	{
+		int chunk_size = (remaining_bytes > AT45_CHUNK_SIZE) ? (AT45_CHUNK_SIZE) : (remaining_bytes);
+		
+		if (flags & FLIPPER_PUSH)
+		{
+			at45_push(buffer + read_idx, chunk_size, data + read_idx);
+		}
+		else
+		{
+			at45_pull(buffer + read_idx, chunk_size, data + read_idx);
+		}
+		
+		if (flags & FLIPPER_WANT_PROGRESS)
+		{
+			print_progress(read_idx, size, 60);
+		}
+		
+		read_idx += AT45_CHUNK_SIZE;
+		remaining_bytes -= chunk_size;
+	}
+}
+
 void fs_transfer_file(char *path, char *name) {
 	
-	FILE *file = fopen (path, "r");
+	/* ~ Open the file for reading. ~ */
+	
+	FILE *file = fopen (path, "rb");
+	
+	/* ~ Obtain the size of the file. ~ */
 	
 	fseek(file, 0L, SEEK_END);
 	
@@ -56,25 +95,39 @@ void fs_transfer_file(char *path, char *name) {
 	
 	fseek(file, 0L, SEEK_SET);
 	
-	uint8_t *binary = (uint8_t *) malloc (sizeof(uint8_t) * size);
+	/* ~ Load the file into RAM. ~ */
+	
+	uint8_t *binary = (uint8_t *) malloc(sizeof(uint8_t) * size);
 	
 	fread(binary, size, sizeof(uint8_t), file);
 	
+	/* ~ Generate a key for the file by checksumming its name. ~ */
+	
 	uint16_t key = checksum(name, strlen(name));
+	
+	/* ~ Create a new leaf to hold the file metadata. ~ */
 	
 	fsp _leaf = fs_add_leaf_with_key(_root_leaf, key);
 	
-	/* ~ Allocate space for the file in the filesystem. ~ */
+	if (!_leaf) { printf("Error.\n"); goto cleanup; }
+	
+	/* ~ Allocate space for the file in external memory. ~ */
 	
 	fsp _data = at45_alloc(size);
 	
-	if (!_data) { printf("Request for memory failed.\n"); return; }
+	/* ~ Save the file size and pointer to the file data into the leaf. ~ */
 	
 	at45_push(&size, sizeof(fsp), forward(_leaf, leaf, size));
 	
 	at45_push(&_data, sizeof(fsp), forward(_leaf, leaf, data));
 	
-    at45_push(binary, size, _data);
+	/* ~ Move the data into external flash. ~ */
+	
+	chunky_transfer(binary, size, _data, FLIPPER_PUSH | FLIPPER_WANT_PROGRESS);
+
+cleanup:
+	
+	/* ~ Clean up and close the file. ~ */
 	
 	free(binary);
 	
@@ -84,37 +137,47 @@ void fs_transfer_file(char *path, char *name) {
 
 void fs_download_file(char *name, char *path) {
 	
-	FILE *file = fopen (path, "w");
+	/* ~ Open the file for writing. ~ */
 	
-	/* For simplicity's sake, load the file into memory. The file won't be more than a few kilobytes, which isn't going to hurt anyone. */
+	FILE *file = fopen (path, "wb");
+	
+	if (!file)
+	{
+		fprintf(stderr, "Error: Couldn't open %s for writing\n", path);
+		return;
+	}
+	
+	/* ~ Obtain the key for the file by checksumming its name. ~ */
 	
 	uint16_t key = checksum(name, strlen(name));
 	
+	/* ~ Locate the metadata for the file in the filesystem. ~ */
+	
 	fsp _leaf = fs_leaf_for_key(_root_leaf, key);
 	
-	if (!_leaf) {
-		
-		printf("No file found on the device with name %s.", name);
-
-		return;
-		
-	}
+	if (!_leaf) { printf("\nError. The file '%s' does not exist on the device.\n", name); return; }
+	
+	/* ~ Load the metadata. ~ */
 	
 	leaf *l = at45_dereference(_leaf, sizeof(leaf));
 	
-	if (l -> size > 1000000) return;
+	/* ~ Create a buffer to hold the data. ~ */
 	
-	uint8_t *data = malloc(l -> size);
-    
-    for (int i = 0; i < l -> size / 64; i ++) { printf("Receiving %f percent.\n", (float)((float)((i * 64) + (i % 64)) / l -> size) * 100); at45_pull(data + (64 * i), 64, l -> data + (64 * i)); }
-    
-    at45_push(data, l -> size, l -> data);
+	uint8_t *binary = malloc(l -> size);
 	
-	fwrite(data, l -> size, sizeof(uint8_t), file);
+	/* ~ Retrieve the file in chunks. ~ */
 	
-	free(data);
+	chunky_transfer(binary, l->size, l->data, FLIPPER_PULL | FLIPPER_WANT_PROGRESS);
+	
+	/* ~ Write the data to disk. ~ */
+	
+	fwrite(binary, l -> size, sizeof(uint8_t), file);
+	
+	/* ~ Clean up and close the file. ~ */
 	
 	free(l);
+	
+	free(binary);
 	
 	fclose(file);
 	

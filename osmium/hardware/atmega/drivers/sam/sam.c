@@ -6,8 +6,6 @@
 
 #include <usart/usart.h>
 
-#include <spi/spi.h>
-
 #include <led/led.h>
 
 /* ~ This function configures the main processor. ~ */

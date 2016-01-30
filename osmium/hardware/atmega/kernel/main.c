@@ -36,7 +36,7 @@ int main(void) {
 	
 	spi_configure(0);
 
-//	fs_configure();
+	fs_configure();
 	
 	/* ~ Configure the peripherals. ~ */
 	
@@ -44,7 +44,7 @@ int main(void) {
 	
 	led_configure();
 	
-	sam_configure();
+//	sam_configure();
 	
 	wifi_configure();
 	

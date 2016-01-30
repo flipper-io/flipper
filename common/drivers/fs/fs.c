@@ -2,11 +2,11 @@
 
 #include <fs/fs.h>
 
-fsp _root_leaf;
-
 fsp _free_list;
 
 fsp _break_value;
+
+fsp _root_leaf;
 
 const struct _fs fs = {
 	
