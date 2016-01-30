@@ -26,7 +26,7 @@ typedef struct __attribute__((__packed__)) _leaf {
 	
 	/* ~ The in-system address at which the data has been loaded. ~ */
 	
-	void *address;
+	//uint32_t address;
 	
 	/* A pointer that points to the child pointer of the parent that points to this leaf. :) */
 	

@@ -16,23 +16,27 @@ fsp fs_empty_branch_for_key(fsp _branch, fsp current, uint16_t key) {
 	
 	leaf *_current = at45_dereference(current, sizeof(leaf));
 	
+	/* ~ Get the left and right references. ~ */
+	
+	fsp _l = _current -> left, _r = _current -> right;
+	
+	/* ~ Free the dereferenced memory. ~ */
+	
+	free(_current);
+	
 	/* ~ Since we're here, we haven't yet found an empty branch pointer; walk the filesystem tree recursively until we do. ~ */
 	
 	if (_current -> key < key)
 	
-		return fs_empty_branch_for_key(forward(current, leaf, left), _current -> left, key);
+		return fs_empty_branch_for_key(forward(current, leaf, left), _l, key);
 	
 	else if (_current -> key > key)
 	
-		return fs_empty_branch_for_key(forward(current, leaf, right), _current -> right, key);
+		return fs_empty_branch_for_key(forward(current, leaf, right), _r, key);
 	
-	else {
-		
-		/* ~ This case catches an exception wherein the key we want to be empty is not. i.e. A leaf with the given key already exists. ~ */
-		
-		return -1;
-		
-	}
+	/* ~ This case catches an exception wherein the key we want to be empty is not. i.e. A leaf with the given key already exists. ~ */
+	
+	else return -1;
 	
 }
 
@@ -52,12 +56,8 @@ fsp fs_add_leaf_with_key(fsp current, uint16_t key) {
 		
 		fsp region = at45_alloc(sizeof(leaf));
         
-        if (!region) {
-            
-            printf("External memory is full!\n\n");
-            
-        }
-        
+        if (!region) { printf("\nError. Request for external memory was rejected.\n"); return 0; }
+		
         /* ~ Create the new leaf. ~ */
         
         leaf *_leaf = malloc(sizeof(leaf));
@@ -96,7 +96,7 @@ fsp fs_add_leaf_with_key(fsp current, uint16_t key) {
 		
 		/* ~ This case catches an exception wherein the leaf we want to add already exists. ~ */
 		
-		verbose("An attempt was made to add a leaf that already exists.");
+		verbose("\nAn attempt was made to add a leaf that already exists.\n");
 				
 	}
 	

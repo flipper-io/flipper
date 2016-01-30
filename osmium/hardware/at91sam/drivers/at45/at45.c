@@ -22,7 +22,9 @@ void at45_configure(void) {
 
 void at45_enable(void) {
 	
-	spi_enable();
+	/* ~ Wait until SPI is ready. ~ */
+	
+	while (!((AT91C_BASE_SPI -> SPI_SR) & AT91C_SPI_SPIENS));
 	
 	/* ~ Configure the CS pin as an output. ~ */
 	
@@ -40,8 +42,6 @@ void at45_enable(void) {
 
 void at45_disable(void) {
 	
-	spi_disable();
-	
 	/* ~ Pull the CS pin high to disable the device. ~ */
 	
 	clear_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_CODR);
@@ -58,8 +58,10 @@ void at45_disable(void) {
 
 void at45_reset(void) {
 	
-	spi_enable();
+	/* ~ Wait until SPI is ready. ~ */
 	
+	while (!((AT91C_BASE_SPI -> SPI_SR) & AT91C_SPI_SPIENS));
+
 	/* ~ Configure the CS pin as an output. ~ */
 	
 	clear_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_ODR);

@@ -8,11 +8,11 @@
 
 extern fsp _free_list;
 
-#define _BREAK_VALUE 64
+#define _BREAK_VALUE 36
 
 extern fsp _break_value;
 
-#define _ROOT_LEAF 128
+#define _ROOT_LEAF 40
 
 extern fsp _root_leaf;
 
