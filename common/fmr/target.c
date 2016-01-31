@@ -8,6 +8,8 @@
 
 #include <platform/fmr.h>
 
+uint8_t fmr_padding;
+
 /* ~ This function ensures that the target still has a heartbeat. ~ */
 
 void validate_target(const struct _target *target) {
@@ -52,7 +54,11 @@ uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t ind
 	
 	/* ~ Set the header's length equal to the size of the full packet after the parameters have been loaded. ~ */
 	
-	fmrpacket.header.length = sizeof(struct _fmr_header) + sizeof(struct _fmr_recipient) + argc;
+	fmrpacket.header.length = sizeof(struct _fmr_header) + sizeof(struct _fmr_recipient) + argc + fmr_padding;
+	
+	/* ~ Zero the padding. ~ */
+	
+	fmr_padding = 0;
 	
 	/* ~ Ensure the arguments will fit into one packet. ~ */
 	
