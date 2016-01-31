@@ -52,13 +52,13 @@ void at45_enable(void) {
 
 void at45_disable(void) {
 	
-	/* ~ Configure the external flash memory chip's CS pin as an output. ~ */
-	
-	set_bit_in_port(FLASH_CS_PIN, FLASH_CS_DDR);
-	
 	/* ~ Pull the CS pin high to disable the device. ~ */
 	
 	set_bit_in_port(FLASH_CS_PIN, FLASH_CS_PORT);
+	
+	/* ~ Configure the external flash memory chip's CS pin as an input. ~ */
+	
+	clear_bit_in_port(FLASH_CS_PIN, FLASH_CS_DDR);
 	
 	spi_disable();
     

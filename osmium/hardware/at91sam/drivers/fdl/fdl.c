@@ -20,6 +20,8 @@
 
 #define LOAD_PAGE 350
 
+#define TOTAL_PAGES 512
+
 #define EFC_KEY 0x5A
 
 #define fdl_load_address(page) (AT91C_IFLASH + (page * AT91C_IFLASH_PAGE_SIZE))
@@ -76,15 +78,15 @@ void *fdl_load(uint16_t key) {
 	
 	/* ~ Ensure that we're loading a valid filesystem object. ~ */
 	
-	if (!_leaf) { printf("No valid filesystem entry for loadable. Brk: %i\n", __fdl_brk); return NULL; }
-    
+	if (!_leaf) { printf("No valid filesystem entry for loadable. 0x%04x\n", key); return NULL; }
+	
 	/* ~ Dereference the metadata contained by the leaf. ~ */
 	
 	leaf *l = at45_dereference(_leaf, sizeof(leaf));
 	
 	/* ~ If the loadable has already been loaded, return the address. ~ */
 	
-	if (l -> address) { printf("Loadable already loaded. %p\n", l -> address); return l -> address; }
+	if (l -> address) { printf("Loadable already loaded. %p\n", l -> address); return (void *)(l -> address); }
 	
 	/* ~ Calculate the total number of pages required for the load. ~ */
 	
@@ -92,7 +94,7 @@ void *fdl_load(uint16_t key) {
 	
 	/* ~ Ensure we have enough available flash to satisfy the request. ~ */
 	
-	if (__fdl_brk + total > AT91C_IFLASH_NB_OF_PAGES) { printf("Not enough internal memory to satisfy load request.\n"); return NULL; }
+	if (__fdl_brk + total > TOTAL_PAGES) { printf("Not enough internal memory to satisfy load request.\n"); return NULL; }
 	
 	/* ~ Start the loading process by opening a continuous read from external flash given the page and offset at which the program is located. ~ */
 	
@@ -138,7 +140,7 @@ void *fdl_load(uint16_t key) {
 	
 	/* ~ Rewrite filesystem memory. ~ */
 	
-	at45_push(&load_address, sizeof(uintptr_t), forward(_leaf, leaf, address));
+	at45_push(load_address, sizeof(uint32_t), forward(_leaf, leaf, address));
 	
 	/* ~ Increment the FDL break value by the number of pages allocated by this loadable. ~ */
 	
@@ -171,7 +173,7 @@ void fdl_launch(uint16_t key) {
 	/* ~ Resolve a load address for the application and add it to the scheduling system. ~ */
 	
 	task_to_execute = fdl_load(key);
-	
+		
 }
 
 void fdl_resolve(uint16_t key, const void *address) {
