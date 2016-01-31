@@ -20,13 +20,13 @@ void main(void) {
 		
 		AT91C_BASE_PIOA -> PIO_SODR |= (1 << PIN);
 		
-		_delay_ms(100);
+		_delay_ms(10);
 		
 //		AT91C_BASE_PIOA -> PIO_SODR &= ~(1 << PIN);
 		
 		AT91C_BASE_PIOA -> PIO_CODR |= (1 << PIN);
 		
-		_delay_ms(100);
+		_delay_ms(10);
     }
     
 }

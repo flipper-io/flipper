@@ -18,7 +18,7 @@
 
 #define AT45_PAGE_SIZE 528
 
-#define LOAD_PAGE 350
+#define LOAD_PAGE 320
 
 #define TOTAL_PAGES 512
 
@@ -28,7 +28,7 @@
 
 /* ~ This variable will contain information that relates to the next available page into which content can be loaded. ~ */
 
-uint16_t __fdl_brk;
+uint32_t __fdl_brk;
 
 void fdl_configure(void) {
 	
@@ -40,7 +40,8 @@ void fdl_configure(void) {
 	
 	if (!__fdl_brk) __fdl_brk = LOAD_PAGE;
 	
-	fdl_write_config(__fdl_brk, fdl_config_brk);
+	serprintf("Break loaded at %i\n", __fdl_brk);
+	
 	
 }
 
@@ -66,11 +67,9 @@ __attribute__((section(".ramfunc"))) void write_page(uint16_t page) {
 
 extern void (* task_to_execute)(void);
 
-char serial[64];
-
-#define printf(...) usart1.push(serial, sprintf(serial, __VA_ARGS__));
-
 void *fdl_load(uint16_t key) {
+	
+	void *load_address;
 	
 	/* ~ Obtain the filesystem object for the given key. ~ */
 	
@@ -78,7 +77,7 @@ void *fdl_load(uint16_t key) {
 	
 	/* ~ Ensure that we're loading a valid filesystem object. ~ */
 	
-	if (!_leaf) { printf("No valid filesystem entry for loadable. 0x%04x\n", key); return NULL; }
+	if (!_leaf) { serprintf("No valid filesystem entry for loadable. 0x%04x\n", key); return NULL; }
 	
 	/* ~ Dereference the metadata contained by the leaf. ~ */
 	
@@ -86,7 +85,7 @@ void *fdl_load(uint16_t key) {
 	
 	/* ~ If the loadable has already been loaded, return the address. ~ */
 	
-	if (l -> address) { printf("Loadable already loaded. %p\n", l -> address); return (void *)(l -> address); }
+	if (l -> address) { serprintf("Loadable already loaded. %p\n", l -> address); load_address = (void *)(l -> address); goto cleanup; }
 	
 	/* ~ Calculate the total number of pages required for the load. ~ */
 	
@@ -94,7 +93,7 @@ void *fdl_load(uint16_t key) {
 	
 	/* ~ Ensure we have enough available flash to satisfy the request. ~ */
 	
-	if (__fdl_brk + total > TOTAL_PAGES) { printf("Not enough internal memory to satisfy load request.\n"); return NULL; }
+	if (__fdl_brk + total > TOTAL_PAGES) { serprintf("Not enough internal memory to satisfy load request.\n"); return NULL; }
 	
 	/* ~ Start the loading process by opening a continuous read from external flash given the page and offset at which the program is located. ~ */
 	
@@ -136,21 +135,25 @@ void *fdl_load(uint16_t key) {
 	
 	/* ~ Calculate the load address of the code. ~ */
 	
-	void *load_address = fdl_load_address(__fdl_brk);
+	load_address = fdl_load_address(__fdl_brk);
 	
 	/* ~ Rewrite filesystem memory. ~ */
 	
-	at45_push(load_address, sizeof(uint32_t), forward(_leaf, leaf, address));
+	at45_push(&load_address, sizeof(uint32_t), forward(_leaf, leaf, address));
 	
 	/* ~ Increment the FDL break value by the number of pages allocated by this loadable. ~ */
 	
-	__fdl_brk += total;
+	__fdl_brk += total + 1;
 	
 	/* ~ Rewrite configuration memory. ~ */
 	
 	fdl_write_config(__fdl_brk, fdl_config_brk);
 	
-	printf("Load success. %p\n", load_address);
+	serprintf("Load success. %p\n", load_address);
+	
+cleanup:
+	
+	free(l);
 	
 	/* ~ Return the address at which the code has been loaded. ~ */
 	

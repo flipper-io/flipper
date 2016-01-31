@@ -58,25 +58,25 @@ int main(int argc, char *argv[]) {
 		
         /* ~ Call the the Flipper Dynamic Loader to begin the dynamic loading process. ~ */
         
-        fdl.launch(key);
+        void *address = fdl.load(key);
 		
-//		if (address) {
-//			
-//			/* ~ Display a message indicating that the loading process was completed successfuly. ~ */
-//			
-//			printf("\nDynamic loading completed successfully. %p.\n\n", address);
-//			
-//		}
-//		
-//		else {
-//			
-//			printf("\nDynamic loading failed.\n\n");
-//			
-//		}
+		if (address) {
+			
+			/* ~ Display a message indicating that the loading process was completed successfuly. ~ */
+			
+			printf("\nDynamic loading completed successfully. %p.\n\n", address);
+			
+		}
+		
+		else {
+			
+			printf("\nDynamic loading failed.\n\n");
+			
+		}
 		
     }
 	
-	else if (!strcmp(argv[1], "boot")) {
+	else if (!strcmp(argv[1], "launch")) {
 
 		char *bid = argv[2];
 		
@@ -90,15 +90,15 @@ int main(int argc, char *argv[]) {
 	
 	else if (!strcmp(argv[1], "unload")) {
 		
+		sam.power(0);
+		
 		uint16_t zero = 0;
 		
 		/* ~ Zero the FDL break value. ~ */
 		
 		fdl_write_config(zero, fdl_config_brk);
 		
-		/* ~ Reconfigure the FDL. ~ */
-		
-		fdl.configure();
+		sam.power(1);
 		
 	}
 	
