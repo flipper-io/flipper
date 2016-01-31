@@ -18,6 +18,12 @@ void fmr_bind(fmr_handle *handle, uint16_t id) {
 	
 }
 
+void test(uint32_t a, uint32_t b, uint32_t c, uint32_t d) {
+	
+	serprintf("Called with: 0x%08x, 0x%08x, 0x%08x, 0x%08x\n", a, b, c, d);
+	
+}
+
 uint32_t fmr_invoke(fmr_handle handle, uint8_t index, uint8_t argc, ...) {
 	
 	/* ~ When we get here, we need to use the handler information to perform an internal call to a module loaded by FDL. ~ */
@@ -42,15 +48,9 @@ uint32_t fmr_invoke(fmr_handle handle, uint8_t index, uint8_t argc, ...) {
 	
 	void *argv = fmrpacket.body + 6 * 2;
 	
-	char buf[128];
-	
-	serprintf("Calling function at %p. Base at %p.", function, module);
-	
-	uint32_t retval = internal_call(function, 0, argv);
-	
-	serprintf("Got BACK!\n");
-	
 	/* ~ Call the module function and return what we get back. ~ */
+	
+	uint32_t retval = internal_call(function, argc, argv);
 	
 	return retval;
 	

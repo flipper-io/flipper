@@ -12,6 +12,8 @@ typedef uint32_t fmr_handle;
 
 #define fmr_bundle_id_from_string(string) checksum(string, strlen(string))
 
+#define fmr_argument(value) little(lo16(value)), hi16(value)
+
 /* ~ Define the virtual interface for this driver. ~ */
 
 extern const struct _fmr {
