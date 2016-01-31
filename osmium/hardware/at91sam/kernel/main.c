@@ -45,10 +45,6 @@ void usart_interrupt(void) {
 /* ~ This is the entry point of the operating system kernel. ~ */
 
 int main(void) {
-
-	
-	usart1_configure((void *)(baudrate(115200)));
-	
 	
 	/* -- PLATFORM INSPECIFIC INITIALIZATION -- */
 	
@@ -61,7 +57,7 @@ int main(void) {
 	
 	spi_enable();
 	
-//	fs_configure();
+	fs_configure();
 	
 	/* ~ Configure the peripherals. ~ */
 	
@@ -85,13 +81,15 @@ int main(void) {
 	
 	error_configure();
 	
-	// fdl_configure();
+	fdl_configure();
 	
 	fmr_configure();
 	
 	/* ~ Configure the busses. ~ */
 	
 	usart0_configure((void *)(baudrate(115200)));
+	
+	usart1_configure((void *)(baudrate(115200)));
 	
 	usb_configure(0);
 	
@@ -120,38 +118,7 @@ int main(void) {
 	AT91C_BASE_AIC -> AIC_IECR = (1 << AT91C_ID_US0); 
 	
 	AT91C_BASE_US0 -> US_IER = AT91C_US_RXRDY;
-	
-	
-	while (false) {
-		
-		size_t size = 32;
-		
-		char *in = malloc(size);
-		
-		at45.pull(in, size, 0xBEEF);
-		
-		usart1.push(in, size);
-		
-		free(in);
-		
-		delay_seconds(1);
-		
-	}
 
-	
-	io.direction(7, 1);
-	
-	uint8_t state = 0;
-	
-	while (true) {
-		
-		delay_ms(250);
-		
-		io.write(7, state);
-		
-		state ^= 1;
-		
-	}
 	
 	/* -- SCHEDULER -- */
 	
@@ -163,6 +130,8 @@ int main(void) {
 		/* ~ Ensure the function pointer lies within valid executable address space. ~ */
 		
 		if ((void *)(task_to_execute) > (void *)(AT91C_IFLASH) && (void *)(task_to_execute) < (void *)(AT91C_IFLASH + AT91C_IFLASH_SIZE)) { task_to_execute(); }
+		
+		__asm("nop");
 		
 	}
 	

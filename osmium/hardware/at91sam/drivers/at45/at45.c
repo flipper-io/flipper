@@ -73,7 +73,7 @@ void at45_reset(void) {
 	clear_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_CODR);
 	
 	set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_SODR);
-    
+	
 	/* ~ Pull the CS pin low to enable the device. ~ */
 	
 	clear_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_SODR);

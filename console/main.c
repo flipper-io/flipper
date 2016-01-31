@@ -37,70 +37,42 @@ int main(int argc, char *argv[]) {
         /* ~ Parse user input from the variadic argument list. ~ */
         
         char *bid = argv[2], *path = argv[3];
-        
-        /* ~ Open the file. ~ */
-        
-        FILE *file = fopen (path, "r");
 		
-		/* ~ Ensure the file opening process was error free. ~ */
-        
-		if (!file) { printf("\nCould not open the file: %s\n\n", path); return 0; }
+		sam.power(0);
 		
-        /* ~ Obtain the size of the file. ~ */
-        
-        fseek(file, 0L, SEEK_END);
-        
-        uint32_t size = (uint32_t)(ftell(file));
-        
-        fseek(file, 0L, SEEK_SET);
-        
-        /* ~ Load the file into local memory. ~ */
-        
-        uint8_t *data = (uint8_t *) malloc(sizeof(uint8_t) * size);
-        
-        fread(data, size, sizeof(uint8_t), file);
-        
-        /* ~ Checksum the bundle identifier to obtain a key. ~ */
-        
-        uint16_t key = checksum(bid, strlen(bid));
+		fs_format();
 		
-        /* ~ Create an new entry in the filesystem. ~ */
-        
-        fsp _leaf = fs_add_leaf_with_key(_root_leaf, key);
-        
-        /* ~ Allocate space in external memory for the data. ~ */
-        
-        fsp _data = at45_alloc(size);
-        
-        /* ~ Move the data into external flash. ~ */
-        
-        for (int i = 0; i < (size / 64); i ++) at45_push((void *)(data + (64 * i)), 64, (fsp)(_data + (64 * i)));
-        
-        at45_push((void *)(data + (64 * (size / 64))), (size % 64), (fsp)(_data + (64 * (size / 64))));
-        
-        /* ~ Rewrite the pointers. ~ */
-        
-        at45_push(&_data, sizeof(fsp), forward(_leaf, leaf, data));
-
-        at45_push(&size, sizeof(uint32_t), forward(_leaf, leaf, size));
+		/* ~ Send the file to the device. ~ */
+		
+		fs_transfer_file(path, bid);
+		
+		sam.power(1);
+		
+		/* ~ Let the operating system boot. ~ */
+		
+		usleep(10000);
+		
+		uint16_t key = checksum(bid, strlen(bid));
+		
+		printf("\nKey: 0x%04x", key);
 		
         /* ~ Call the the Flipper Dynamic Loader to begin the dynamic loading process. ~ */
         
-        void *address = fdl.load(key);
+        fdl.launch(key);
 		
-		if (address) {
-			
-			/* ~ Display a message indicating that the loading process was completed successfuly. ~ */
-			
-			printf("\nDynamic loading completed successfully. %p.\n\n", address);
-			
-		}
-		
-		else {
-			
-			printf("\nDynamic loading failed.\n\n");
-			
-		}
+//		if (address) {
+//			
+//			/* ~ Display a message indicating that the loading process was completed successfuly. ~ */
+//			
+//			printf("\nDynamic loading completed successfully. %p.\n\n", address);
+//			
+//		}
+//		
+//		else {
+//			
+//			printf("\nDynamic loading failed.\n\n");
+//			
+//		}
 		
     }
 	

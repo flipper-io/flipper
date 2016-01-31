@@ -15,14 +15,18 @@ void main(void) {
     AT91C_BASE_PIOA -> PIO_OER |= (1 << PIN);
 	
     while (1) {
-        
+
+//		AT91C_BASE_PIOA -> PIO_CODR &= ~(1 << PIN);
+		
 		AT91C_BASE_PIOA -> PIO_SODR |= (1 << PIN);
 		
-		_delay_ms(10);
+		_delay_ms(100);
+		
+//		AT91C_BASE_PIOA -> PIO_SODR &= ~(1 << PIN);
 		
 		AT91C_BASE_PIOA -> PIO_CODR |= (1 << PIN);
 		
-		_delay_ms(10);
+		_delay_ms(100);
     }
     
 }

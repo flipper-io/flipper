@@ -20,8 +20,6 @@ void spi_configure(void *configuration) {
 	
 	/* ~ Configure MOSI and SCK as inputs. ~ */
 	
-	clear_bits_in_port_with_mask(PORTB, (bit(MOSI) | bit(SCK)));
-	
 	clear_bits_in_port_with_mask(SPI_DDR, (bit(MOSI) | bit(SCK)));
 	
 	/* ~ Put the SPI bus into MODE3. ~ */
@@ -40,9 +38,9 @@ void spi_enable(void) {
 	
 	//device.invoke(_spi, _spi_disable, 0, NO_ARGS);
 	
-    /* ~ Configure MOSI and SCK as outputs. ~ */
-    
-    set_bits_in_port_with_mask(SPI_DDR, (bit(MOSI) | bit(SCK)));
+	/* ~ Configure MOSI and SCK as outputs. ~ */
+	
+	set_bits_in_port_with_mask(SPI_DDR, (bit(MOSI) | bit(SCK)));
 	
     /* ~ Put the SPI into master mode by setting the master bit. ~ */
     
@@ -55,14 +53,16 @@ void spi_enable(void) {
 }
 
 void spi_disable(void) {
-    
-    /* ~ Disable the SPI bus by setting the SPI enable bit in the SPCR. ~ */
-    
+	
+    /* ~ Disable the SPI bus by clearing the SPI enable bit in the SPCR. ~ */
+	
     clear_bit_in_port(SPE, SPCR);
 	
-	/* ~ Configure MOSI and SCK as inputs. ~ */
+	/* ~ Enter slave mode. ~ */
 	
-	clear_bits_in_port_with_mask(PORTB, (bit(MOSI) | bit(SCK)));
+	clear_bit_in_port(MSTR, SPCR);
+	
+	/* ~ Configure MOSI and SCK as inputs. ~ */
 	
 	clear_bits_in_port_with_mask(SPI_DDR, (bit(MOSI) | bit(SCK)));
 	

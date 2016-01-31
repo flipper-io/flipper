@@ -44,7 +44,7 @@ int main(void) {
 	
 	led_configure();
 	
-//	sam_configure();
+	sam_configure();
 	
 	wifi_configure();
 	

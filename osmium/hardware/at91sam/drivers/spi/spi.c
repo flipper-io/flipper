@@ -12,23 +12,13 @@ extern char serial[64];
 
 void spi_configure(void *configuration) {
 	
-	printf("Configuring the SPI!\n");
+	/* ~ Enable the SPI in the Peripheral Clock Enable Register. ~ */
+	
+	set_bit_in_port(AT91C_ID_SPI, AT91C_BASE_PMC -> PMC_PCER);
 	
 	/* ~ Select PIO A. ~ */
 	
 	set_bits_in_port_with_mask(AT91C_BASE_PIOA -> PIO_ASR, (AT91C_PA12_MISO | AT91C_PA13_MOSI | AT91C_PA14_SPCK));
-	
-	/* ~ Disable use of the SPI pins by the PIO. They are now in use by the SPI controller. ~ */
-	
-	clear_bits_in_port_with_mask(AT91C_BASE_PIOA -> PIO_PER, (AT91C_PA12_MISO | AT91C_PA13_MOSI | AT91C_PA14_SPCK));
-	
-	set_bits_in_port_with_mask(AT91C_BASE_PIOA -> PIO_PDR, (AT91C_PA12_MISO | AT91C_PA13_MOSI | AT91C_PA14_SPCK));
-	
-	/* ~ Execute two consecutive software reset of the SPI in order to ensure that the SPI controller has been completely reset. ~ */
-	
-	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SWRST);
-	
-	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SWRST);
 	
 	/* ~ Initalize the SPI in master mode. ~ */
 	
@@ -48,17 +38,17 @@ void spi_configure(void *configuration) {
 	
 	/* ~ SPI_DATA_MODE_3: don't change CS after transfer: 8 bits per transfer: ~ */
 	
-	AT91C_SPI_CSR[1] = (AT91C_SPI_CPOL | AT91C_SPI_BITS_8 | AT91C_SPI_CSAAT | (AT91C_SPI_SCBR & (10 << 8) | (AT91C_SPI_DLYBCT & (1 << 24))));
+	AT91C_SPI_CSR[1] = (AT91C_SPI_CPOL | AT91C_SPI_BITS_8 | AT91C_SPI_CSAAT | (AT91C_SPI_SCBR & (128 << 8) | (AT91C_SPI_DLYBCT & (1 << 24))));
 	
 }
 
 void spi_enable(void) {
 	
-	printf("Enabling the SPI!\n");
+	/* ~ Disable use of the SPI pins by the PIO. They are now in use by the SPI controller. ~ */
 	
-	/* ~ Enable the SPI in the Peripheral Clock Enable Register. ~ */
+	clear_bits_in_port_with_mask(AT91C_BASE_PIOA -> PIO_PER, (AT91C_PA12_MISO | AT91C_PA13_MOSI | AT91C_PA14_SPCK));
 	
-	set_bit_in_port(AT91C_ID_SPI, AT91C_BASE_PMC -> PMC_PCER);
+	set_bits_in_port_with_mask(AT91C_BASE_PIOA -> PIO_PDR, (AT91C_PA12_MISO | AT91C_PA13_MOSI | AT91C_PA14_SPCK));
 	
 	/* ~ Enable the SPI. ~ */
 	
@@ -74,8 +64,6 @@ void spi_enable(void) {
 
 void spi_disable(void) {
 	
-	printf("Disabling the SPI!\n");
-	
     /* ~ Wait until the SPI has finished transmitting any data. ~ */
     
     while (!((AT91C_BASE_SPI -> SPI_SR) & AT91C_SPI_TXEMPTY));
@@ -85,10 +73,12 @@ void spi_disable(void) {
 	clear_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SPIEN);
 	
 	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SPIDIS);
+
+	/* ~ Disable use of the SPI pins by the PIO. They are now in use by the SPI controller. ~ */
 	
-	/* ~ Disable the SPI in the Peripheral Clock Disable Register. ~ */
+	clear_bits_in_port_with_mask(AT91C_BASE_PIOA -> PIO_PDR, (AT91C_PA12_MISO | AT91C_PA13_MOSI | AT91C_PA14_SPCK));
 	
-	set_bit_in_port(AT91C_ID_SPI, AT91C_BASE_PMC -> PMC_PCDR);
+	set_bits_in_port_with_mask(AT91C_BASE_PIOA -> PIO_PER, (AT91C_PA12_MISO | AT91C_PA13_MOSI | AT91C_PA14_SPCK));
 	
 }
 

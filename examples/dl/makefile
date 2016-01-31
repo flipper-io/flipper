@@ -12,7 +12,7 @@ all:
 
 run: all
 
-	flipper load led led.bin
+	flipper load io.flipper.led led.bin
 
 clean:
 
