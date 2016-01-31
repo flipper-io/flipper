@@ -2,6 +2,8 @@
 
 #include <flipper/flipper.h>
 
+#include <platform/at91sam.h>
+
 const void * const objects[] = { &host, &self, &device, &button, &at45, &fs, &i2c, &io, &led, &pwm, &sam, &spi, &timer, &usart, &usart1, &dbgu, &usb, &wifi, &fdl, &fmr };
 
 void fmr_configure(void) {
@@ -42,15 +44,11 @@ uint32_t fmr_invoke(fmr_handle handle, uint8_t index, uint8_t argc, ...) {
 	
 	char buf[128];
 	
-	sprintf(buf, "Calling function at %p. Base at %p.", function, module);
+	serprintf("Calling function at %p. Base at %p.", function, module);
 	
-	usart1.push(buf, strlen(buf));
+	uint32_t retval = internal_call(function, 0, argv);
 	
-	uint32_t retval = internal_call(function, argc * 2, argv);
-	
-	sprintf(buf, "Got BACK!\n");
-	
-	usart1.push(buf, strlen(buf));
+	serprintf("Got BACK!\n");
 	
 	/* ~ Call the module function and return what we get back. ~ */
 	

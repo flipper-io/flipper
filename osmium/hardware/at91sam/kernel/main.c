@@ -6,7 +6,7 @@
 
 #include <platform/at91sam.h>
 
-void (* task_to_execute)(void);
+#include <platform/scheduler.h>
 
 /* ~ Garbage delay function. ~ */
 
@@ -45,6 +45,10 @@ void usart_interrupt(void) {
 /* ~ This is the entry point of the operating system kernel. ~ */
 
 int main(void) {
+	
+	
+	usart1_configure((void *)(baudrate(115200)));
+	
 	
 	/* -- PLATFORM INSPECIFIC INITIALIZATION -- */
 	
@@ -89,8 +93,6 @@ int main(void) {
 	
 	usart0_configure((void *)(baudrate(115200)));
 	
-	usart1_configure((void *)(baudrate(115200)));
-	
 	usb_configure(0);
 	
 
@@ -120,20 +122,19 @@ int main(void) {
 	AT91C_BASE_US0 -> US_IER = AT91C_US_RXRDY;
 
 	
+//	while (false) {
+//		
+//		delay_ms(250);
+//		
+//		io.write(7, state);
+//		
+//		state ^= 1;
+//		
+//	}
+	
 	/* -- SCHEDULER -- */
 	
-	
-	/* ~ Rudimentary scheduling system. Check to see if we have a recently loaded task to execute; if we do, execute it. ~ */
-	
-	while (true) {
-		
-		/* ~ Ensure the function pointer lies within valid executable address space. ~ */
-		
-		if ((void *)(task_to_execute) > (void *)(AT91C_IFLASH) && (void *)(task_to_execute) < (void *)(AT91C_IFLASH + AT91C_IFLASH_SIZE)) { task_to_execute(); }
-		
-		__asm("nop");
-		
-	}
+	begin_scheduling();
 	
 	return 0;
 	

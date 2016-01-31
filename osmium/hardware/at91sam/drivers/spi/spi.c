@@ -6,10 +6,6 @@
 
 #include <usart/usart.h>
 
-extern char serial[64];
-
-#define printf(...) usart1.push(serial, sprintf(serial, __VA_ARGS__));
-
 void spi_configure(void *configuration) {
 	
 	/* ~ Enable the SPI in the Peripheral Clock Enable Register. ~ */

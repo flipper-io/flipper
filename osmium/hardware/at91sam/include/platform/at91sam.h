@@ -19,4 +19,9 @@ void _delay_ms(unsigned long time);
 #define FLASH_CS_PIN 31
 
 
+char serial[64];
+
+#define serprintf(...) usart1.push(serial, sprintf(serial, __VA_ARGS__));
+
+
 #endif

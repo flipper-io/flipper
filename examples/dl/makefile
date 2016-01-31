@@ -10,7 +10,7 @@ all:
 
 	arm-elf-objdump -D led.elf
 
-run: all
+load: all
 
 	flipper load io.flipper.led led.bin
 
