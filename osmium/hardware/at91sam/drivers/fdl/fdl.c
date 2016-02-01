@@ -18,7 +18,7 @@
 
 #define AT45_PAGE_SIZE 528
 
-#define LOAD_PAGE 320
+#define LOAD_PAGE 400
 
 #define TOTAL_PAGES 512
 
