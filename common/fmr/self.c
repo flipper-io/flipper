@@ -112,7 +112,7 @@ uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, uint32_t length)
 	
 	/* ~ For the first iteration of this loop, specify that the data has been loaded after the layered parameter list and parameters. ~ */
 	
-	uint8_t *offset = (uint8_t *)(fmrpacket.body) + FMR_PUSH_PARAMETER_SIZE + argc;
+	uint8_t *offset = (uint8_t *)(fmrpacket.body + FMR_PUSH_PARAMETER_SIZE + argc);
 	
 pull:
 	
@@ -122,7 +122,7 @@ pull:
 		
 		/* ~ Load a byte from the packet. ~ */
 		
-		*((uint8_t *)(dest ++)) = *((uint8_t *)(offset ++));
+		*(uint8_t *)(dest ++) = *(uint8_t *)(offset ++);
 		
 	} while ((-- len) && (-- remaining));
 	

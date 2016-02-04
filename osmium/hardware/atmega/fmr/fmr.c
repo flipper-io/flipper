@@ -14,7 +14,7 @@ void fmr_configure(void) {
 	
 }
 
-void fmr_bind(fmr_handle *handle, uint16_t id) {
+fmr_handle fmr_bind(uint16_t bundle) {
 	
 	
 	

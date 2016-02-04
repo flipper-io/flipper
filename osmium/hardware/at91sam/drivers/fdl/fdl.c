@@ -40,9 +40,6 @@ void fdl_configure(void) {
 	
 	if (!__fdl_brk) __fdl_brk = LOAD_PAGE;
 	
-	serprintf("Break loaded at %i\n", __fdl_brk);
-	
-	
 }
 
 __attribute__((section(".ramfunc"))) void my_delay_ms(unsigned long time) {
@@ -148,8 +145,6 @@ void *fdl_load(uint16_t key) {
 	/* ~ Rewrite configuration memory. ~ */
 	
 	fdl_write_config(__fdl_brk, fdl_config_brk);
-	
-	serprintf("Load success. %p\n", load_address);
 	
 cleanup:
 	

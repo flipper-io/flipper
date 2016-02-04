@@ -12,9 +12,17 @@ void fmr_configure(void) {
 	
 }
 
-void fmr_bind(fmr_handle *handle, uint16_t id) {
+fmr_handle fmr_bind(uint16_t bundle) {
 	
-	*(uint32_t *)(handle) = id;
+	/* ~ Invoke the remote bind function and obtain the bound handle. ~ */
+	
+	host.invoke(_fmr, _fmr_bind, 2, fmr_argument(bundle));
+	
+	fmr_handle handle = bundle;
+	
+	/* ~ Provide the user with the loaded handle. ~ */
+	
+	return (fmr_handle)(handle);
 	
 }
 
@@ -40,11 +48,13 @@ uint32_t fmr_invoke(fmr_handle handle, uint8_t index, uint8_t argc, ...) {
 		
 		unsigned arg = va_arg(argv, unsigned);
 		
-		/* ~ Load it into the packet. ~ */
+		/* ~ Load the argument into the outgoing packet buffer. ~ */
 		
 		fmrpacket.body[i + FMR_INVOKE_OFFSET] = hi(arg); fmrpacket.body[i + FMR_INVOKE_OFFSET + 1] = lo(arg);
 		
 	}
+	
+	/* ~ Release the variadic argument list. ~ */
 	
 	va_end(argv);
 	
@@ -54,7 +64,7 @@ uint32_t fmr_invoke(fmr_handle handle, uint8_t index, uint8_t argc, ...) {
 	
 	/* ~ Call the remote function and return. ~ */
 	
-	return host.invoke(_fmr, _fmr_invoke, 6, little(lo16(handle)), little(hi16(handle)), little(index), 0, little(argc), 0);
+	return host.invoke(_fmr, _fmr_invoke, 6, fmr_argument(handle), fmr_argument(index), fmr_argument(argc));
 	
 }
 

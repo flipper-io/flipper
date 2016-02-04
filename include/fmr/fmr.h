@@ -20,7 +20,7 @@ extern const struct _fmr {
 	
 	void (* configure)(void);
 	
-	void (* bind)(fmr_handle *handle, uint16_t id);
+	fmr_handle (* bind)(uint16_t bundle);
 	
 	uint32_t (* invoke)(fmr_handle handle, uint8_t index, uint8_t argc, ...);
 	
@@ -38,7 +38,7 @@ enum { _fmr_configure, _fmr_bind, _fmr_invoke, _fmr_resolve };
 
 extern void fmr_configure(void);
 
-extern void fmr_bind(fmr_handle *handle, uint16_t id);
+extern fmr_handle fmr_bind(uint16_t bundle);
 
 extern uint32_t fmr_invoke(fmr_handle handle, uint8_t index, uint8_t argc, ...);
 

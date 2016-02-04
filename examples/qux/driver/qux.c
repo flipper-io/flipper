@@ -10,7 +10,9 @@ void qux_configure(void) {
 	
 	/* ~ Registers this module with the Flipper Message Runtime. Also calls the remote configure function. ~ */
 	
-	fmr.bind(&handle, fmr_bundle_id_from_string("io.flipper.qux"));
+	handle = fmr.bind(fmr_bundle_id_from_string("io.flipper.qux"));
+	
+	printf("\nBound to address 0x%08x\n\n", handle);
 	
 }
 
