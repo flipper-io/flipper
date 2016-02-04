@@ -14,6 +14,22 @@ typedef uint32_t fmr_handle;
 
 #define fmr_argument(value) little(lo16(value)), little(hi16(value))
 
+/* ~ FMR API Abstraction ~ */
+
+#define __fmr_count_implicit(_0, _1, _2, _3, _4, _5, _6, n, ...) n
+
+#define __fmr_count(...) __fmr_count_implicit(__VA_ARGS__, 6, 5, 4, 3, 2, 1, 0)
+
+#define __six_args(x, ...) fmr_argument(x), __five_args(__VA_ARGS__)
+#define __five_args(x, ...) fmr_argument(x), __four_args(__VA_ARGS__)
+#define __four_args(x, ...) fmr_argument(x), __three_args(__VA_ARGS__)
+#define __three_args(x, ...) fmr_argument(x), __two_args(__VA_ARGS__)
+#define __two_args(x, ...) fmr_argument(x), __one_arg(__VA_ARGS__)
+#define __one_arg(x) fmr_argument(x)
+#define __zero_args() NO_ARGS
+
+#define fmr_args(...) (__fmr_count(0, ##__VA_ARGS__) * 2), __fmr_count(0, ##__VA_ARGS__, __six_args, __five_args, __four_args, __three_args, __two_args, __one_arg, __zero_args)(__VA_ARGS__)
+
 /* ~ Define the virtual interface for this driver. ~ */
 
 extern const struct _fmr {
