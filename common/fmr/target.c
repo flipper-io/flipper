@@ -106,21 +106,9 @@ uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t ind
 	
 	fmr_broadcast();
 	
-	/* ~ We will now expect the FMR to send us a packet in return, acknowledging that the packet has been received successfully. ~ */
+	/* ~ Validate and return the result back up the function chain. ~ */
 	
-	/* ~-- TO BE IMPLEMENTED --~ */
-	
-	/* ~ Use a local variable to store the return value. ~ */
-	
-	uint32_t retval;
-	
-	/* ~ Load the value that the function returned from the target. ~ */
-	
-	target -> bus -> pull(&retval, sizeof(uint32_t));
-	
-	/* ~ Return this value back up the function chain. ~ */
-	
-	return retval;
+	return fmr_obtain_response(target);
 	
 }
 

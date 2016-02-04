@@ -15,7 +15,7 @@
 #define FLIPPER_WANT_PROGRESS 2
 #define FLIPPER_PUSH 1
 #define FLIPPER_PULL 0
-#define AT45_CHUNK_SIZE 32
+#define AT45_CHUNK_SIZE (64-22)
 
 void fs_configure(void) {
 	
@@ -76,7 +76,7 @@ void chunky_transfer(uint8_t *buffer, size_t size, fsp data, int flags)
 			print_progress(read_idx, size, 60);
 		}
 		
-		read_idx += AT45_CHUNK_SIZE;
+		read_idx += chunk_size;
 		remaining_bytes -= chunk_size;
 	}
 }

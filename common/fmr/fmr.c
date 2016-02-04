@@ -60,6 +60,8 @@ uint32_t fmr_parse(const struct _target *sender) {
 		
 	}
 	
+	/* ~ Obtain the appropriate target. ~ */
+	
 	struct _target *target = (void *)(fmr_access_array(fmrpacket.recipient.target));
     
 	/* ~ If all is well, perform the function call. ~ */
@@ -68,11 +70,43 @@ uint32_t fmr_parse(const struct _target *sender) {
     
 end:
 	
+	/* ~ Empty statement to make the compiler happy. ~ */
+	
+	;
+	
+	/* ~ Create the response packet. ~ */
+	
+	struct _fmr_response response = { 0xFE, checksum(&retval, sizeof(uint32_t)), retval };
+	
 	/* ~ Return whatever we received back to the device that sent us a message. ~ */
 	
-	sender -> bus -> push(&retval, sizeof(uint32_t));
+	sender -> bus -> push(&response, sizeof(struct _fmr_response));
 	
 	return 0;
+	
+}
+
+uintres_t fmr_obtain_response(const struct _target *target) {
+	
+	/* ~ Create a response packet. ~ */
+	
+	struct _fmr_response response;
+	
+	/* ~ Load the value that the function returned from the target. ~ */
+	
+	target -> bus -> pull(&response, sizeof(response));
+	
+	/* ~ Ensure the response is valid. ~ */
+	
+	if (checksum(&response.response, sizeof(uintres_t)) != response.checksum) {
+		
+		verbose("\nWarning. Mangled response checksum.\n");
+		
+	}
+	
+	/* ~ If the response is valid, return it. ~ */
+	
+	return response.response;
 	
 }
 

@@ -12,13 +12,13 @@ void io_configure(void) {
 
 void io_set_direction(uint8_t pin, uint8_t direction) {
 	
-	host.invoke(_io, _io_set_direction, 4, little(pin), 0, little(direction), 0);
+	host.invoke(_io, _io_set_direction, 4, fmr_argument(pin), fmr_argument(direction));
 	
 }
 
 void io_write(uint8_t pin, uint16_t value) {
 	
-	host.invoke(_io, _io_write, 4, little(pin), 0, little(value), 0);
+	host.invoke(_io, _io_write, 4, fmr_argument(pin), fmr_argument(value));
 	
 }
 

@@ -10,6 +10,8 @@
 
 #define fmr_associate_target(target) sender = (struct _target *)(target);
 
+typedef uint32_t uintres_t;
+
 /* ~ It is very important that this structure be packed. ~ */
 
 struct __attribute__((__packed__)) _fmr_header {
@@ -64,6 +66,22 @@ typedef struct __attribute__((__packed__)) _fmr_packet {
 	
 } fmr_packet;
 
+struct __attribute__((__packed__)) _fmr_response {
+	
+	/* ~ Fixed packet header to ensure sync. ~ */
+	
+	uint8_t fe;
+	
+	/* ~ A checksum of the response. ~ */
+	
+	uint16_t checksum;
+	
+	/* ~ The return value of the call. ~ */
+	
+	uintres_t response;
+	
+};
+
 /* ~ Declare the object prototype for a generic target: a device that responds to the Flipper Message Runtime. ~ */
 
 struct _target {
@@ -83,6 +101,8 @@ struct _target {
 	uint8_t id;
 	
 };
+
+/* ~ Declare the object prototype for the self target: the device that implements the Flipper Message Runtime. ~ */
 
 struct _self {
 	
@@ -162,9 +182,11 @@ extern uint32_t device_pull(uint8_t object, uint8_t index, uint8_t argc, void *d
 
 extern uint32_t fmr_call(void);
 
-extern uint32_t fmr_parse(const struct _target *sender);
+extern uint32_t fmr_parse(const struct _target *target);
 
 extern uint32_t internal_call(void *function, uint8_t argc, void *argv);
+
+extern uintres_t fmr_obtain_response(const struct _target *target);
 
 extern void fmr_broadcast(void);
 
