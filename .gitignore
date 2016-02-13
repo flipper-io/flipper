@@ -13,3 +13,4 @@ obj-c/build
 !resources/**/*.so
 python/flipper
 console/flipper
+*.swp
