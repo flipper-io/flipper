@@ -2,9 +2,9 @@
 
 /* ~ Dynamically loaded object references. ~ */
 
-__attribute__((section(".fdl"))) struct _fdl *_fdl;
+__attribute__((section(".fdl"))) const struct _fdl *_fdl;
 
-const struct _io io;
+__attribute__((section(".modules"))) const struct _io io;
 
 #define IO_KEY 0xf01d
 
@@ -12,9 +12,7 @@ const struct _io io;
 
 __attribute__((section(".init"))) void __init() {
 	
-	//_fdl -> configure();
-	
-	//_fdl -> resolve(IO_KEY, &io);
+	_fdl -> resolve(IO_KEY, &io);
 	
 	/* ~ Call the main function. ~ */
 	

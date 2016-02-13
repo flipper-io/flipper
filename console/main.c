@@ -39,6 +39,8 @@ int main(int argc, char *argv[]) {
         char *bid = argv[2], *path = argv[3];
 		
 		sam.power(0);
+
+		usleep(10000);
 		
 		fs_format();
 		
@@ -50,7 +52,7 @@ int main(int argc, char *argv[]) {
 		
 		/* ~ Let the operating system boot. ~ */
 		
-		usleep(10000);
+		usleep(100000);
 		
 		uint16_t key = checksum(bid, strlen(bid));
 		

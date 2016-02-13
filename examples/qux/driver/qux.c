@@ -12,8 +12,6 @@ void qux_configure(void) {
 	
 	handle = fmr.bind(fmr_bundle_id_from_string("io.flipper.qux"));
 	
-	printf("\nBound to address 0x%08x\n\n", handle);
-	
 }
 
 void qux_on(void) {

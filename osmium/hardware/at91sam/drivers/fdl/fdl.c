@@ -34,11 +34,13 @@ void fdl_configure(void) {
 	
 	/* ~ Read the break value in from configuration memory. ~ */
 	
-	fdl_read_config(__fdl_brk, fdl_config_brk);
+//	fdl_read_config(__fdl_brk, fdl_config_brk);
 	
 	/* ~ If the break value has been reset, reset it and write it to the configuration. ~ */
 	
-	if (!__fdl_brk) __fdl_brk = LOAD_PAGE;
+//	if (!__fdl_brk) __fdl_brk = LOAD_PAGE;
+
+	__fdl_brk = LOAD_PAGE;
 	
 }
 
@@ -90,7 +92,7 @@ void *fdl_load(uint16_t key) {
 	
 	/* ~ Ensure we have enough available flash to satisfy the request. ~ */
 	
-	if (__fdl_brk + total > TOTAL_PAGES) { serprintf("Not enough internal memory to satisfy load request.\n"); return NULL; }
+	//if (__fdl_brk + total > TOTAL_PAGES) { serprintf("Not enough internal memory to satisfy load request. Have %i and %i was requested.\n", TOTAL_PAGES - __fdl_brk, total); return NULL; }
 	
 	/* ~ Start the loading process by opening a continuous read from external flash given the page and offset at which the program is located. ~ */
 	
@@ -144,7 +146,7 @@ void *fdl_load(uint16_t key) {
 	
 	/* ~ Rewrite configuration memory. ~ */
 	
-	fdl_write_config(__fdl_brk, fdl_config_brk);
+//	fdl_write_config(__fdl_brk, fdl_config_brk);
 	
 cleanup:
 	
