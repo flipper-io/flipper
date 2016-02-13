@@ -2,7 +2,7 @@
 
 #include "atmel.h"
 
-#define PIN 8
+#define PIN 7
 
 void qux_configure(void) {
 	
@@ -23,25 +23,3 @@ void qux_off(void) {
 	AT91C_BASE_PIOA -> PIO_CODR |= (1 << PIN);
 	
 }
-
-/*
-
- void qux_configure(void) {
-	
-	AT91C_BASE_PIOA -> PIO_OWSR |= (1 << PIN);
-	
- }
- 
- void qux_on(void) {
-	
-	AT91C_BASE_PIOA -> PIO_ODSR |= (1 << PIN);
-	
- }
- 
- void qux_off(void) {
-	
-	AT91C_BASE_PIOA -> PIO_ODSR &= ~(1 << PIN);
-	
- }
-
-*/

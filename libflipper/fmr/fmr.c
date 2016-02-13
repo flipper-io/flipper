@@ -64,7 +64,7 @@ uint32_t fmr_invoke(fmr_handle handle, uint8_t index, uint8_t argc, ...) {
 	
 	/* ~ Call the remote function and return. ~ */
 	
-	return host.invoke(_fmr, _fmr_invoke, 6, fmr_argument(handle), fmr_argument(index), fmr_argument(argc));
+	return host.invoke(_fmr, _fmr_invoke, fmr_args(handle, index, argc));
 	
 }
 
