@@ -1,67 +1,71 @@
-.PHONY: all install clean
+PREFIX = /usr/local
 
-ifndef FLIPPERSDK
+.SILENT: all install uninstall clean
+.PHONY: install clean
 
-$(error "ERROR. The 'FLIPPERSDK' variable is not declared in your environment. Set it to specify where you would like the SDK installed.")
-
+ifndef PREFIX
+$(error "Error. Please specify the environment variable 'PREFIX'. The 'PREFIX' variable will direct this install script to the install location appropriate for your system.")
 endif
 
-# ~ Remove any lingering '.DS_Store' files. ~ #
-
+# ~ Remove all of the pesky '.DS_Store' files. ~ #
 $(shell find . -name '.DS_Store' -exec rm -rf {} \;)
 
-install: all
+all:
 
-	# ~ Build and install libflipper. ~ */
+	# ~ Build libflipper. ~ #
+	@echo Building 'libflipper.' 📦
+	$(MAKE) -C libflipper all -s
 
-	$(MAKE) -C libflipper all install
+	# ~ Build the console. ~ #
+	@echo Building the Flipper Console. 🖥
+	$(MAKE) -C console all -s
 
-	# ~ Build and install the console. ~ */
+	# ~ Build Osmium for the AVR. ~ #
+	@echo Building the first stage of Osmium. 💾
+	$(MAKE) -C osmium all platform=atmega16u2 -s 
 
-	$(MAKE) -C console all install
+	# ~ Build Osmium for the ARM. ~ #
+	@echo Building the second stage of Osmium. 💾
+	$(MAKE) -C osmium all platform=at91sam7s -s
 
-	# ~ Build and install osmium for the AVR. ~ */
+	@echo The Flipper Toolbox was built successfully. 🎉
 
-	$(MAKE) -C osmium all install platform=atmega16u2
+install:
 
-	# ~ Build and install osmium for the ARM. ~ */
+	# ~ Install libflipper. ~ #
+	@echo Installing 'libflipper'. 📦
+	$(MAKE) -C libflipper install -s
 
-	$(MAKE) -C osmium all install platform=at91sam7s
+	# ~ Install the console. ~ #
+	@echo Installing the Flipper Console. 🖥
+	$(MAKE) -C console install -s
 
-	# ~ Build and install the Python module. ~ */
-
-	$(MAKE) -C python all fix install
+	@echo The Flipper Toolbox was installed successfully. 🎉
 
 uninstall:
 
-	rm -rf /usr/local/lib/libflipper.*
+	rm -rf $(PREFIX)/flipper
+	rm -rf $(PREFIX)/include/flipper
+	rm -rf $(PREFIX)/include/flipper.h
 
-	rm -rf /usr/local/include/flipper
-
-	rm -rf /usr/local/include/flipper.h
-
-	rm -rf $(FLIPPERSDK)
-
-	$(MAKE) clean
+	@echo The Flipper Toolbox was uninstalled successfully. 💔
 
 clean:
 
-	# ~ Clean libflipper. ~ */
+	# ~ Clean libflipper. ~ #
+	@echo Cleaning 'libflipper'. 📦
+	$(MAKE) -C libflipper clean -s
 
-	$(MAKE) -C libflipper clean
+	# ~ Clean the console. ~ #
+	@echo Cleaning the Flipper Console. 🖥
+	$(MAKE) -C console clean -s
 
-	# ~ Clean the console. ~ */
+	# ~ Clean Osmium. ~ #
+	@echo Cleaning Osmium. 💾
+	$(MAKE) -C osmium clean -s
 
-	$(MAKE) -C console clean
+	# ~ Clean FVM. ~ #
+	@echo Cleaning FVM. 💽
+	$(MAKE) -C fvm clean -s
 
-	# ~ Clean osmium. ~ */
-
-	$(MAKE) -C osmium clean platform=atmega16u2
-
-	# ~ Clean the FVM. ~ */
-
-	$(MAKE) -C fvm clean
-
-	# ~ Clean the Python module. ~ */
-
-	$(MAKE) -C python clean
+	@echo The Flipper Toolbox was cleaned successfully. 🚰
