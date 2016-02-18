@@ -1,131 +1,91 @@
-
-sudo = sudo
+ifndef PREFIX
+$(error "Error. Please specify the environment variable 'PREFIX'. The 'PREFIX' variable will direct this install script to the install location appropriate for your system.")
+endif
 
 # ~ Determine the architecture. ~ #
-
 architecture = $(shell echo $(shell uname -m) | tr A-Z a-z)
 
 # ~ Determine the target. ~ #
-
 target = $(shell echo $(shell uname -s) | tr A-Z a-z)
 
 # ~ Set target specific macros. ~ */
-
 ifeq ($(target),darwin)
 
 # ~ Specifiy the name of the output file. ~ #
-
 output = libflipper.dylib
 
 # ~ Specify object file format for nasm. ~ #
-
 objformat = macho64
 
 # ~ Declare the library dependancies neededed for linking. ~ #
-
 libraries = -framework CoreFoundation -framework IOKit
 
 else ifeq ($(target),linux)
 
-# ~ Do the same for the other targets. ~ #
-
 output = libflipper.so
 
 ifeq ($(architecture),x86_64)
-
 objformat = elf64
-
 else
-
 objformat = elf32
-
 endif
 
 libraries = -lusb
 
 else
-
-# ~ If we have no target, specify an error. ~ #
-
-$(error "Please specify a target.")
-
+$(error "The operating system you are running is not supported by this build script.")
 endif
 
 # ~ Specify a compiler and the other utilities needed to deploy for the target. ~ #
-
-cc = $(shell which 'gcc')
-
-ifndef nasm
-
+cc = $(shell which 'clang')
 nasm = $(shell which 'nasm')
-
-endif
-
 rsync = $(shell which 'rsync')
-
 ln = $(shell which 'ln')
 
 # ~ Declare the preprocessor statements to be used during object generation. ~ #
-
-preprocess = -std=c99 -fpic -D__verbose__
+preprocess = -std=c99 -fpic -D__verbose__ -Wno-\#pragma-messages
 
 # ~ Pass flags to find so that it only isolates files pertainant to the target platform. ~ #
-
 findflags = \( \( ! -wholename "./platforms/*" -and ! -wholename "./architectures/*" \) -or \( -wholename "./platforms/$(target)/*" -or -wholename "./architectures/$(architecture)/*" \) \)
 
 # ~ Declare the include directories needed for compilation. ~ #
-
 include_directories = ../include include
 
 # ~ Include this file to recursively compile all supported file types and generate object files using the preprocessor statements above. ~ #
-
 include rules.make
 
 all: clean
 
 	# ~ Link the object files together to produce an output file. ~ #
-
 	$(cc) -shared -rdynamic $(prefix) $(sort $(objects)) -o $(output) $(libraries)
 
 install:
 
 	# ~ Create the SDK and its subdirectories if they do not already exist. ~ #
-
-	$(sudo) mkdir -p $(FLIPPERSDK)/lib $(FLIPPERSDK)/include $(FLIPPERSDK)/resources
-
-	# ~ Give the user the ability to read from and write to these directories. ~ #
-
-	$(sudo) chown -R $(shell 'whoami') $(FLIPPERSDK)
+	mkdir -p $(PREFIX)/flipper/lib $(PREFIX)/flipper/include $(PREFIX)/flipper/resources
 
 	# ~ Copy the library into the SDK's library directory. ~ #
-
-	$(rsync) -r $(output) $(FLIPPERSDK)/lib/$(output)
+	$(rsync) -r $(output) $(PREFIX)/flipper/lib/$(output)
 
 	# ~ Symlink the library into the system's library directory. ~ #
-
 	$(sudo) $(ln) -sf $(FLIPPERSDK)/lib/$(output) /usr/local/lib/$(output)
 
 	# ~ Symlink the include directory into the system's include directory. ~ #
-
-	$(sudo) $(ln) -sfn $(FLIPPERSDK)/include /usr/local/include/flipper
+	$(sudo) $(ln) -sfn $(PREFIX)/flipper/include $(PREFIX)/include/flipper
 
 	# ~ Symlink the master header file into the system's include directory. ~ #
-
-	$(sudo) $(ln) -sf $(FLIPPERSDK)/include/flipper.h /usr/local/include
+	$(sudo) $(ln) -sf $(PREFIX)/flipper/include/flipper.h $(PREFIX)/include
 
 	# ~ Copy the header files into the SDK's include directory. ~ #
-
-	$(rsync) -r ../include/* $(FLIPPERSDK)/include --exclude 'flipper'
+	$(rsync) -r ../include/* $(PREFIX)/flipper/include --exclude 'flipper'
 
 	# ~ Copy the special header files into the SDK's include directory. ~ */
-
-	$(rsync) -r ../include/flipper/* $(FLIPPERSDK)/include
+	$(rsync) -r ../include/flipper/* $(PREFIX)/flipper/include
 
 	# ~ Copy the resources into the SDK directory. ~ #
-
-	$(rsync) -r ../resources/*.applet $(FLIPPERSDK)/resources
+	$(rsync) -r ../resources/*.applet $(PREFIX)/flipper/resources
 
 
 clean:
 
-	rm -rf $(shell find . -follow -name "*.o" -or -name "*.elf") $(output)
+	rm -rf $(shell find . -follow -name "*.o") $(output)

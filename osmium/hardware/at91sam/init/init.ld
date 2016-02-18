@@ -1,5 +1,3 @@
-ENTRY(_startup)
-
 MEMORY {
 
   TEXT (rx)  : ORIGIN = 0x00100000, LENGTH = 0x00010000
