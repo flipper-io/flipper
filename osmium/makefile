@@ -1,7 +1,9 @@
 .PHONY: clean
 
 ifndef PREFIX
+ifeq ($(MAKECMDGOALS),install)
 $(error "Error. Please specify the environment variable 'PREFIX'. The 'PREFIX' variable will direct this install script to the install location appropriate for your system.")
+endif
 endif
 
 PREFIX = /usr/local
@@ -59,7 +61,7 @@ uploader = $(shell which 'flipper')
 
 # ~ Specify platform specific preprocessor flags. ~ #
 uploader_flags = flash $(output)
-platform_flags = -mcpu=arm7tdmi -mtune=arm7tdmi -mthumb -nostartfiles -ffreestanding -fdata-sections -ffunction-sections -fomit-frame-pointer
+platform_flags = -mcpu=arm7tdmi -mtune=arm7tdmi -mthumb -mthumb-interwork -nostartfiles -ffreestanding -fdata-sections -ffunction-sections -fomit-frame-pointer
 
 # ~ Specify the platform's hardware directory. ~ #
 hardware_directory = ./hardware/at91sam
