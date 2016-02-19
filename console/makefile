@@ -1,3 +1,9 @@
+ifndef PREFIX
+ifeq ($(MAKECMDGOALS),install)
+$(error "Error. Please specify the environment variable 'PREFIX'. The 'PREFIX' variable will direct this install script to the install location appropriate for your system.")
+endif
+endif
+
 # ~ Specifiy the name of the output file. ~ #
 output = flipper
 
