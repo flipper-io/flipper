@@ -70,7 +70,7 @@ install:
 	$(rsync) -r $(output) $(PREFIX)/flipper/lib/$(output)
 
 	# ~ Symlink the library into the system's library directory. ~ #
-	$(sudo) $(ln) -sf $(FLIPPERSDK)/lib/$(output) /usr/local/lib/$(output)
+	$(sudo) $(ln) -sf $(PREFIX)/flipper/lib/$(output) $(PREFIX)/lib/$(output)
 
 	# ~ Symlink the include directory into the system's include directory. ~ #
 	$(sudo) $(ln) -sfn $(PREFIX)/flipper/include $(PREFIX)/include/flipper
