@@ -2,9 +2,7 @@
 
 #define F_CPU 48000000
 
-#define PIN 8
-
-const static unsigned int dengis = 46;
+#define PIN 7
 
 void _delay_ms(unsigned long time);
 
@@ -15,14 +13,10 @@ void main(void) {
     AT91C_BASE_PIOA -> PIO_OER |= (1 << PIN);
 	
     while (1) {
-
-//		AT91C_BASE_PIOA -> PIO_CODR &= ~(1 << PIN);
 		
 		AT91C_BASE_PIOA -> PIO_SODR |= (1 << PIN);
 		
 		_delay_ms(10);
-		
-//		AT91C_BASE_PIOA -> PIO_SODR &= ~(1 << PIN);
 		
 		AT91C_BASE_PIOA -> PIO_CODR |= (1 << PIN);
 		

@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
 		char *bid = argv[2];
 		
 		uint16_t key = checksum(bid, strlen(bid));
-
+		
 		/* ~ Launch the program. ~ */
 		
 		fdl.launch(key);

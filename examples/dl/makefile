@@ -1,18 +1,33 @@
-llvm_flags = -std=c99 -Os -target armv7-none-elf -march=arm7tdmi -mfloat-abi=soft -fPIC -nostdlib -ffreestanding -fomit-frame-pointer -fPIC
+cflags = -std=c99 -Os -mcpu=arm7tdmi -nostdlib -ffreestanding -fomit-frame-pointer -fpic
+
+flags = $(cflags) -D__device_compilation__
+
+targets = *.c *.s
+
+includes = -I .. -I .
 
 all:
-	
-	clang $(llvm_flags) -c led.c init.s glue.c -I /usr/local/include -I /usr/local/include/flipper --sysroot "/Development/flipper-toolbox/resources/osx/arm-elf/arm-elf" -I "/Development/flipper-toolbox/resources/osx/arm-elf/arm-elf/include"
 
-	arm-elf-gcc-4.7 -fPIC -nostdlib -ffreestanding -fomit-frame-pointer -Wl,-T dl.ld *.o -o led.elf
+	# ~ Compile individual targets. ~ #
+	arm-elf-gcc-4.7 $(flags) $(includes) -c $(targets)
 
-	arm-elf-objcopy -O binary led.elf led.bin
+	# ~ Link objects. ~ * #
+	arm-elf-gcc-4.7 $(cflags) -Wl,-T dl.ld *.o -o dl.elf
 
-	arm-elf-objdump -D led.elf
+	# ~ Dump loadable. ~ #
+	arm-elf-objcopy -O binary dl.elf dl.bin
 
-load: all
+dump:
 
-	flipper load io.flipper.led led.bin
+	arm-elf-objdump -D dl.elf
+
+load:
+
+	flipper load io.flipper.dl dl.bin
+
+launch:
+
+	flipper launch io.flipper.dl
 
 clean:
 

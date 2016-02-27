@@ -152,6 +152,8 @@ cleanup:
 	
 	free(l);
 	
+	serprintf("Loadable loaded successfully.\n");
+	
 	/* ~ Return the address at which the code has been loaded. ~ */
 	
 	return load_address;
