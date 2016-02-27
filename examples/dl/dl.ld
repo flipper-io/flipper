@@ -7,13 +7,11 @@ MEMORY {
 
 SECTIONS {
 
-    . = ORIGIN(LOADABLE);
+	. = ORIGIN(LOADABLE);
 
-	.fdl : { * (.start) * (.fdl) }
+	.init : { * (.init) }
 
-    .init : { * (.init) }
-
-    .text : { * (.text .text.*) }
+	.text : { * (.text .text.*) }
 
 	.data : { * (.data .data.*) * (.got) }
 
