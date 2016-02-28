@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
 
 	}
 	
-	if (!strcmp(argv[1], "load")) {
+	if (!strcmp(argv[1], "load") || !strcmp(argv[1], "debug")) {
 		
         /* ~ Parse user input from the variadic argument list. ~ */
         
@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
 		
 		sam.power(0);
 
-		usleep(10000);
+		usleep(1000);
 		
 		fs_format();
 		
@@ -56,25 +56,9 @@ int main(int argc, char *argv[]) {
 		
 		uint16_t key = checksum(bid, strlen(bid));
 		
-		printf("\nKey: 0x%04x", key);
-		
         /* ~ Call the the Flipper Dynamic Loader to begin the dynamic loading process. ~ */
         
-        void *address = fdl.load(key);
-		
-		if (address) {
-			
-			/* ~ Display a message indicating that the loading process was completed successfuly. ~ */
-			
-			printf("\nDynamic loading completed successfully. %p.\n\n", address);
-			
-		}
-		
-		else {
-			
-			printf("\nDynamic loading failed.\n\n");
-			
-		}
+		if (!strcmp(argv[1], "load")) fdl.load(key); else fdl.launch(key);
 		
     }
 	
