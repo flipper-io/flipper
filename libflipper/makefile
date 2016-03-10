@@ -1,9 +1,3 @@
-ifndef PREFIX
-ifeq ($(MAKECMDGOALS),install)
-$(error "Error. Please specify the environment variable 'PREFIX'. The 'PREFIX' variable will direct this install script to the install location appropriate for your system.")
-endif
-endif
-
 # ~ Determine the architecture. ~ #
 architecture = $(shell echo $(shell uname -m) | tr A-Z a-z)
 
@@ -48,10 +42,10 @@ ln = $(shell which 'ln')
 preprocess = -std=c99 -fpic -D__verbose__ -Wno-\#pragma-messages
 
 # ~ Pass flags to find so that it only isolates files pertainant to the target platform. ~ #
-findflags = \( \( ! -wholename "./platforms/*" -and ! -wholename "./architectures/*" \) -or \( -wholename "./platforms/$(target)/*" -or -wholename "./architectures/$(architecture)/*" \) \)
+findflags = \( \( ! -wholename "./targets/*" -and ! -wholename "./architectures/*" \) -or \( -wholename "./targets/$(target)/*" -or -wholename "./architectures/$(architecture)/*" \) \)
 
 # ~ Declare the include directories needed for compilation. ~ #
-include_directories = ../include include
+include_directories = ../include ./include
 
 # ~ Include this file to recursively compile all supported file types and generate object files using the preprocessor statements above. ~ #
 include rules.make
@@ -84,10 +78,7 @@ install:
 	# ~ Copy the special header files into the SDK's include directory. ~ */
 	$(rsync) -r ../include/flipper/* $(PREFIX)/flipper/include
 
-	# ~ Copy the resources into the SDK directory. ~ #
-	$(rsync) -r ../resources/*.applet $(PREFIX)/flipper/resources
-
 
 clean:
 
-	rm -rf $(shell find . -follow -name "*.o") $(output)
+	rm -rf $(shell find . -follow -name '*.o' -or -name '$(output)')

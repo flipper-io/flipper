@@ -1,0 +1,1 @@
+../../../../drivers/rtc/common/rtc.c
