@@ -1,0 +1,16 @@
+.DS_Store
+*.xcworkspace
+*.xcodeproj
+!obj-c/*.xcodeproj
+obj-c/*.framework
+obj-c/build
+*.o
+*.pyc
+*.elf
+*.bin
+*.so
+*.dylib
+!resources/**/*.so
+python/flipper
+console/flipper
+*.swp
