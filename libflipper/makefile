@@ -73,7 +73,7 @@ install:
 	$(sudo) $(ln) -sf $(PREFIX)/flipper/include/flipper.h $(PREFIX)/include
 
 	# ~ Copy the header files into the SDK's include directory. ~ #
-	$(rsync) -r ../include/* $(PREFIX)/flipper/include --exclude 'flipper'
+	$(rsync) -r --copy-links ../include/* $(PREFIX)/flipper/include --exclude 'flipper'
 
 	# ~ Copy the special header files into the SDK's include directory. ~ */
 	$(rsync) -r ../include/flipper/* $(PREFIX)/flipper/include
