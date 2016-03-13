@@ -2,7 +2,7 @@
 #define __flipper_h__
 
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
-#include <flipper/core.h>
+#include "core.h"
 
 /* ~ Include the header files for user-accessible drivers. ~ */
 #include <at45/at45.h>
