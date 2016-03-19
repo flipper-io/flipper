@@ -99,6 +99,11 @@ def rebuild_symtree():
             link_driver(driver, '', 'include', os.path.join(path, 'include'))
     return
 
+def collapse():
+    for driver in os.listdir('drivers'):
+        if os.path.isdir(os.path.join('drivers', driver)):
+            unlink_module(driver)
+
 def main():
 
     # Ensure we have the proper number of command line arguments.
@@ -117,10 +122,9 @@ def main():
     elif sys.argv[1] == 'unlink':
         unlink_module(sys.argv[2])
     elif sys.argv[1] == 'collapse':
-        for driver in os.listdir('drivers'):
-            if os.path.isdir(os.path.join('drivers', driver)):
-                unlink_module(driver)
+        collapse()
     elif sys.argv[1] == 'rebuild':
+        collapse()
         rebuild_symtree()
     else:
         print('\nYou have specified an invalid command.\n')

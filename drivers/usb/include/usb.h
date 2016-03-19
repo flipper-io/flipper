@@ -13,7 +13,7 @@ extern const struct _bus usb;
 enum { _usb_configure, _usb_enable, _usb_disable, _usb_ready, _usb_put, _usb_get, _usb_push, _usb_pull };
 
 /* ~ Declare all function prototypes for this driver. ~ */
-extern void usb_configure(void);
+extern void usb_configure();
 extern void usb_enable(void);
 extern void usb_disable(void);
 extern bool usb_ready(void);

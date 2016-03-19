@@ -1,0 +1,7 @@
+~ TODO ~
+
+The U2 has the ability to enumerate multiple endpoints using its USB hardware.
+One of these endpoints can be configured as a debug endpoint and used to send
+and receive debug messages to and from the hardware without blocking the FMR
+endpoint. A module should be implemented that enables serial-like debugging using
+this USB endpoint using a friendly print interface.
