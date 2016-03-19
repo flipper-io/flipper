@@ -4,14 +4,17 @@
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
 #include <flipper/core.h>
 
+/* ~ Expose a defined type for the size of an error code. ~ */
+typedef uint16_t uinterror_t;
+
 /* ~ Declare the virtual driver object. ~ */
 extern const struct _error {
 
 	void (* configure)(void);
-	void (* raise)(uint16_t id);
+	void (* raise)(uinterror_t id);
 	char *(* message)(void);
 
-	uint16_t error;
+	uinterror_t code;
 
 } error;
 
