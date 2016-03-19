@@ -7,7 +7,7 @@
 #ifdef __private_include__
 
 /* ~ Declare all function prototypes. ~ */
-extern uint16_t checksum(const void *source, uint16_t length);
+extern uint16_t checksum(void *source, uint16_t length);
 
 #endif
 #endif

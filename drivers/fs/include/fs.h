@@ -4,6 +4,9 @@
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
 #include <flipper/core.h>
 
+/* ~ Include header dependancies for the filesystem. ~ */
+#include "crc.h"
+
 /* ~ Declare the virtual driver object. ~ */
 extern const struct _fs {
 

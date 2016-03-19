@@ -23,6 +23,7 @@ uint32_t fmr_parse(const struct _target *sender) {
 
 	/* ~ Compare the checksums of the packets to ensure the data was sent successfully. ~ */
 	uint16_t cs = checksum((void *)(&fmrpacket.recipient), fmrpacket.header.length - sizeof(struct _fmr_header));
+	
 	uint32_t retval = 0;
 
 	/* ~ If the checksums are different, then we have a problem. ~ */
@@ -48,11 +49,14 @@ end:
 	;
 
 	/* ~ Create the response packet. ~ */
-	//struct _fmr_response response = { 0xFE, checksum(&retval, sizeof(uint32_t)), retval };
+	struct _fmr_response response;
+	response.body.retval = retval;
+	response.body.error = error.code;
+	
+	response.checksum = checksum(&response.body, sizeof(response.body));
 
 	/* ~ Return whatever we received back to the device that sent us a message. ~ */
-	//sender -> bus -> push(&response, sizeof(struct _fmr_response));
-	sender -> bus -> push(&retval, sizeof(uintres_t));
+	sender -> bus -> push(&response, sizeof(struct _fmr_response));
 
 	return 0;
 
@@ -61,23 +65,23 @@ end:
 uintres_t fmr_obtain_response(const struct _target *target) {
 
 	/* ~ Create a response packet. ~ */
-	//struct _fmr_response response;
+	struct _fmr_response response;
 
 	/* ~ Load the value that the function returned from the target. ~ */
-	//target -> bus -> pull(&response, sizeof(response));
-	uintres_t response;
-	target -> bus -> pull(&response, sizeof(uintres_t));
+	target -> bus -> pull(&response, sizeof(struct _fmr_response));
 
 	/* ~ Ensure the response is valid. ~ */
-//	if (checksum(&response.response, sizeof(uintres_t)) != response.checksum) {
-//
-//		verbose("\nWarning. Mangled response checksum.\n");
-//
-//	}
+	if (checksum(&response.body, sizeof(response.body)) != response.checksum) {
+
+		verbose("\nWarning. Mangled response checksum.\n");
+
+	}
+	
+	/* ~ Raise the error. ~ */
+	error.raise(response.body.error);
 
 	/* ~ If the response is valid, return it. ~ */
-	//return response.response;
-	return response;
+	return response.body.retval;
 }
 
 /* ~ Send a constructed packet to its target. ~ */

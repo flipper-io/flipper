@@ -1,6 +1,8 @@
 #ifndef __target_h__
 #define __target_h__
 
+#include <error/error.h>
+
 #define FMR_PACKET_SIZE 64
 #define FMR_BODY_SIZE (FMR_PACKET_SIZE - sizeof(struct _fmr_header) - sizeof(struct _fmr_recipient))
 #define FMR_PUSH_PARAMETER_SIZE (5 * 2)
@@ -54,14 +56,18 @@ typedef struct __attribute__((__packed__)) _fmr_packet {
 
 struct __attribute__((__packed__)) _fmr_response {
 	
-	/* ~ Fixed packet header to ensure sync. ~ */
-	uint8_t fe;
-	
 	/* ~ A checksum of the response. ~ */
 	uint16_t checksum;
 	
-	/* ~ The return value of the call. ~ */
-	uintres_t response;
+	struct __attribute__((__packed__)) _body {
+		
+		/* ~ The return value of the call. ~ */
+		uintres_t retval;
+		
+		/* ~ The error code of the call. ~ */
+		uinterror_t error;
+		
+	} body;
 	
 };
 
