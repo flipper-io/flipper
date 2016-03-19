@@ -2,7 +2,7 @@
 #include <usb/usb.h>
 #include <platform.h>
 
-void usb_configure(void) {
+void usb_configure() {
 
 }
 
@@ -15,9 +15,9 @@ void usb_disable(void) {
 }
 
 bool usb_ready(void) {
-	
+
 	return 0;
-	
+
 }
 
 void usb_put(uint8_t byte) {
@@ -25,9 +25,9 @@ void usb_put(uint8_t byte) {
 }
 
 uint8_t usb_get(void) {
-	
+
 	return 0;
-	
+
 }
 
 void usb_push(void *source, uint32_t length) {

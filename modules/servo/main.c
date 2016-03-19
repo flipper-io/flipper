@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
 	
 	/* ~ Attach to a Flipper device over USB. ~ */
 	
-	flipper.attach(FLIPPER_SOURCE_USB);
+	flipper.attach(FLIPPER_SOURCE_NETWORK, "129.21.82.243");
 	
 	/* ~ Configure the 'servo' module. ~ */
 	

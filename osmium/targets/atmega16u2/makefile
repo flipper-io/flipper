@@ -13,7 +13,7 @@ clock = 16000000
 cc = $(shell which 'avr-gcc')
 objcopy = $(shell which 'avr-objcopy')
 
-# ~ Specify uploader and flags. ~ #
+# ~ Specify the uploader and its flags. ~ #
 uploader = $(shell which 'avrdude')
 uploader_flags = -p $(platform) -V -c usbtiny -U lfuse:w:0xFF:m -U hfuse:w:0xD9:m -U flash:w:$(output)
 

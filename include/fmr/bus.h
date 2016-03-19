@@ -6,7 +6,7 @@
 
 struct _bus {
 
-	void (* configure)(void);
+	void (* configure)(void *);
 	void (* enable)(void);
 	void (* disable)(void);
 	bool (* ready)(void);
