@@ -1,6 +1,5 @@
-#ifndef fmr_platform_h
-
-#define fmr_platform_h
+#ifndef __fmr_platform_h__
+#define __fmr_platform_h__
 
 enum { _host, _self, _device };
 

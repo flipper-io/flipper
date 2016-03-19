@@ -3,7 +3,7 @@
 #include <platform.h>
 #include <flipper/flipper.h>
 
-const void * const objects[] PROGMEM = { &host, &device, &self };
+const void * const objects[] PROGMEM = { &host, &device, &self, &led, &button, &error, &usart, &spi, &sam, &at45, &fs, &usb, &wifi };
 
 void fmr_configure(void) {
 
