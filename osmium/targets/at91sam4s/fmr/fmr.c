@@ -3,7 +3,7 @@
 #include <platform.h>
 #include <flipper/flipper.h>
 
-const void * const objects[] = { &host, &device, &self };
+const void * const objects[] = { &host, &self, &device, &led, &button, &error, &usart, &spi, 0, &at45, &fs, &usb, &wifi, &io, &dbgu, &usart1, &fdl, &fmr };
 
 /* ~ RAM cache of the last bound module. ~ */
 struct _fmr_cache { uint16_t bundle; void *handle; } fmr_cache;

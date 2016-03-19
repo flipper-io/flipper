@@ -87,7 +87,7 @@ struct _self {
 	uint32_t (* invoke)(const struct _target *sender);
 	uint32_t (* push)(uint8_t object, uint8_t index, uint8_t argc, uint32_t length);
 	uint32_t (* pull)(uint8_t object, uint8_t index, uint8_t argc, uint32_t length);
-	
+
 };
 
 /* ~ Every FMR compliant target will have a host as well as a device. ~ */
@@ -100,7 +100,7 @@ extern struct _target *sender;
 
 #ifdef __private_include__
 
-enum { _zero, _one, _two, _button, _at45, _fs, _i2c, _io, _led, _pwm, _sam, _spi, _timer, _usart, _usart1, _dbgu, _usb, _wifi, _fdl, _fmr, _bme280 };
+enum { _zero, _one, _two, _led, _button, _error, _usart, _spi, _sam, _at45, _fs, _usb, _wifi, _io, _dbgu, _usart1, _fdl, _fmr };
 
 extern uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, va_list *argv);
 extern uint32_t target_push(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, va_list *argv);

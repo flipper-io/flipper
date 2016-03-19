@@ -4,6 +4,8 @@
 #include <led/led.h>
 #include <fs/crc.h>
 
+#include <usart/usart.h>
+
 struct _self self = {
 	self_configure,
 	self_call,

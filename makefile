@@ -20,13 +20,9 @@ all:
 	@echo Building the Flipper Console. 🖥
 	# $(MAKE) -C console all -s
 
-	# ~ Build Osmium for the AVR. ~ #
-	@echo Building the first stage of Osmium. 💾
-	$(MAKE) -C osmium all platform=atmega16u2 -s 
-
-	# ~ Build Osmium for the ARM. ~ #
-	@echo Building the second stage of Osmium. 💾
-	$(MAKE) -C osmium all platform=at91sam7s -s
+	# ~ Build Osmium. ~ #
+	@echo Building Osmium. 💾
+	$(MAKE) -C osmium all -s
 
 	@echo The Flipper Toolbox was built successfully. 🎉
 
