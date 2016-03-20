@@ -14,8 +14,10 @@ int main(int argc, char *argv[]) {
 	flipper.attach(FLIPPER_SOURCE_USB);
 
 	/* ~ Send a trivial string over USART. ~ */
-	char *hello = "Hello world!";
+	char *hello = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789ABCDEFGHIJKLM";
 	usart1.push(hello, strlen(hello));
+
+	//printf("\n\nGot character: '%c'\n\n", usart1.get());
 
 	return 0;
 
