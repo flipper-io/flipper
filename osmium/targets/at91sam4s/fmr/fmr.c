@@ -21,7 +21,10 @@ fmr_handle fmr_bind(uint16_t bundle) {
 	void *base = fdl_load(bundle);
 
 	/* ~ Ensure the module was successfully loaded. ~ */
-	if (!base) { error.raise(0); return -1; }
+	if (!base) {
+		error.raise(E_DL_LOAD, "Unable to load bundle.\n");
+		return -1;
+	}
 
 	/* ~ Obtain the address of the module's configure function. ~ */
 	void *configure = base + *(uintptr_t *)(base);
@@ -61,7 +64,7 @@ uint32_t fmr_invoke(fmr_handle handle, uint8_t index, uint8_t argc, ...) {
 }
 
 void *fmr_resolve(void *source, uint32_t length) {
-	
+
 	return NULL;
-	
+
 }

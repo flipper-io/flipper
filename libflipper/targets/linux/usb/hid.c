@@ -28,17 +28,18 @@
  * Version 1.0: Initial Release
  */
 
-#define SELECTED_DEVICE			0
+#define SELECTED_DEVICE                 0
 
-#define FLIPPER_PACKET_SIZE 	64
+#define FLIPPER_PACKET_SIZE             64
 
-#define DEFAULT_TIMEOUT			250
+#define DEFAULT_TIMEOUT                 250
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <usb.h>
 
+#include <error/error.h>
 #include <usb/usb.h>
 
 // On Linux there are several options to access HID devices.
@@ -124,7 +125,10 @@ int hid_receive_packet(uint8_t *buf)
 	int r;
 	
 	hid = get_hid(SELECTED_DEVICE);
-	if (!hid || !hid->open) return -1;
+	if (!hid || !hid->open) {
+		error.raise(E_HID_OPEN_DEV, "HID/linux: device not open\n");
+		return -1;
+	}
 	r = usb_interrupt_read(hid->usb, hid->ep_in, buf, FLIPPER_PACKET_SIZE, DEFAULT_TIMEOUT);
 	if (r >= 0) return r;
 	if (r == -110) return 0;  // timeout
@@ -145,7 +149,10 @@ int hid_transmit_packet(uint8_t *buf)
 	hid_t *hid;
 	
 	hid = get_hid(SELECTED_DEVICE);
-	if (!hid || !hid->open) return -1;
+	if (!hid || !hid->open) {
+		error.raise(E_HID_OPEN_DEV, "HID/linux: device not open\n");
+		return -1;
+	}
 	if (hid->ep_out) {
 		return usb_interrupt_write(hid->usb, hid->ep_out, buf, FLIPPER_PACKET_SIZE, DEFAULT_TIMEOUT);
 	} else {

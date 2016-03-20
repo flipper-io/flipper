@@ -5,7 +5,11 @@
 const struct _error error = {
 
 	error_configure,
+	error_withold,
+	error_disclose,
 	error_raise,
-	error_message
+	error_clear,
+	0,
+	E_OK
 
 };

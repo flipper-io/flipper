@@ -26,10 +26,10 @@
 enum { FLIPPER_SOURCE_USB, FLIPPER_SOURCE_NETWORK, FLIPPER_SOURCE_FVM };
 
 extern const struct _flipper {
-	
+
 	void (* configure)(void);
 	void (* attach)(uint8_t source, ...);
-	
+
 } flipper;
 
 #ifdef __private_include__

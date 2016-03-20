@@ -12,5 +12,5 @@ void analog_write(uint8_t pin, uint16_t value) {
 uint16_t analog_read(uint8_t pin) {
 
 	return 0;
-	
+
 }

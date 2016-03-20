@@ -12,7 +12,7 @@ const struct _bus usb = {
 	usb_get,
 	usb_push,
 	usb_pull,
-	
+
 	true
 
 };

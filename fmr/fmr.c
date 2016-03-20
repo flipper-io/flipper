@@ -31,6 +31,7 @@ uint32_t fmr_parse(const struct _target *sender) {
 
 		/* ~ Set the status led to its error color to alert the user of a problem. ~ */
 		led_set_rgb(LED_COLOR_ERROR);
+		error.raise(E_FMR_PACKET_CRC, "FMR Packet failed CRC checksum.\n");
 
 		/* ~ Skip the call. ~ */
 		goto end;
@@ -58,6 +59,9 @@ end:
 	/* ~ Return whatever we received back to the device that sent us a message. ~ */
 	sender -> bus -> push(&response, sizeof(struct _fmr_response));
 
+	/* ~ Clear the error code, since we just informed the calling device. ~*/
+	error.clear();
+
 	return 0;
 
 }
@@ -78,7 +82,7 @@ uintres_t fmr_obtain_response(const struct _target *target) {
 	}
 	
 	/* ~ Raise the error. ~ */
-	error.raise(response.body.error);
+	error.raise(response.body.error, "");
 
 	/* ~ If the response is valid, return it. ~ */
 	return response.body.retval;
@@ -117,5 +121,3 @@ void fmr_retrieve(void) {
 	}
 
 }
-
-

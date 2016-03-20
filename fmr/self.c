@@ -58,6 +58,7 @@ uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, uint32_t length)
 
 		/* ~ Set the status led to its error color to alert the user of a problem. ~ */
 		led_set_rgb(LED_COLOR_ERROR);
+		error.raise(E_NO_MEM, "Out of memory.\n");
 
 		/* ~ Our host will expect a return value, so send a response with the appropriate error code. ~ */
 		sender -> bus -> push(&retval, sizeof(uint32_t));
@@ -149,6 +150,7 @@ uint32_t self_pull(uint8_t object, uint8_t index, uint8_t argc, uint32_t length)
 
 		/* ~ Set the status led to its error color to alert the user of a problem. ~ */
 		led_set_rgb(LED_COLOR_ERROR);
+		error.raise(E_NO_MEM, "Out of memory.\n");
 
 		/* ~ Our host will expect a return value, so send a response with the appropriate error code. ~ */
 		sender -> bus -> push(&source, sizeof(uint32_t));
@@ -226,6 +228,6 @@ push:
 	/* ~ Free the memory we allocated to buffer the outgoing data. ~ */
 	free(source);
 
-    return retval;
+	return retval;
 
 }

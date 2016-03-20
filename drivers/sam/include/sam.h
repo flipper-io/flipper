@@ -14,7 +14,7 @@ extern const struct _sam {
 	void (* format)(void);
 	void (* suspend)(void);
 	void (* engage)(void);
-	
+
 } sam;
 
 #ifdef __private_include__

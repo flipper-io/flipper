@@ -14,7 +14,7 @@ const struct _bus usart = {
 	usart0_get,
 	usart0_push,
 	usart0_pull,
-	
+
 	false
 
 };
@@ -25,7 +25,7 @@ const struct _bus usart = {
 
 /* ~ Define the virtual driver object. ~ */
 const struct _bus usart1 = {
-	
+
 	usart1_configure,
 	usart1_enable,
 	usart1_disable,
@@ -34,16 +34,16 @@ const struct _bus usart1 = {
 	usart1_get,
 	usart1_push,
 	usart1_pull,
-	
+
 	false
-	
+
 };
 
 /* ~ ----------------------- DBGU ----------------------- ~ */
 
 /* ~ Define the virtual driver object. ~ */
 const struct _bus dbgu = {
-	
+
 	dbgu_configure,
 	dbgu_enable,
 	dbgu_disable,
@@ -52,9 +52,9 @@ const struct _bus dbgu = {
 	dbgu_get,
 	dbgu_push,
 	dbgu_pull,
-	
+
 	false
-	
+
 };
 
 #endif

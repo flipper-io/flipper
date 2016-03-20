@@ -1,6 +1,7 @@
 #define __private_include__
 #include <at45/at45.h>
 #include <fmr/fmr.h>
+#include <error/error.h>
 
 void at45_configure(void) {
 
@@ -59,8 +60,11 @@ void at45_pull(void *destination, uint32_t length, fsp source) {
 void *at45_dereference(fsp source, uint32_t length) {
 
 	void *local = malloc(length);
-	
-	if (!local) { printf("\nERROR. System declined memory allocation request for at45 dereference.\n\n"); return 0; }
+
+	if (!local) {
+		error.raise(E_NO_MEM, "\nERROR. System declined memory allocation request for at45 dereference.\n\n");
+		return 0;
+	}
 
 	at45_pull(local, length, source);
 
