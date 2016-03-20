@@ -68,19 +68,19 @@ uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, uint32_t length)
 	}
 
 	/* ~ If all is well, cache the variadic argument list. ~ */
-	memcpy(argv, (void *)(fmrpacket.body) + FMR_PUSH_PARAMETER_SIZE, argc);
+	memcpy(argv, (void *)(fmrpacket.body) + fmrpacket.recipient.argc, argc);
 
 	/* ~ Save the length in a local variable we can modify. ~ */
 	uint32_t len = length;
 
 	/* ~ Calculate the amount of space we have left in the packet after the parameters have been loaded. ~ */
-	size_t remaining = FMR_PACKET_SIZE - (sizeof(struct _fmr_header) + sizeof(struct _fmr_recipient) + FMR_PUSH_PARAMETER_SIZE + argc);
+	size_t remaining = FMR_PACKET_SIZE - (sizeof(struct _fmr_header) + sizeof(struct _fmr_recipient) + fmrpacket.recipient.argc + argc);
 
 	/* ~ Save the destination in a local variable we can modify. ~ */
 	void *dest = destination;
 
 	/* ~ For the first iteration of this loop, specify that the data has been loaded after the layered parameter list and parameters. ~ */
-	uint8_t *offset = (uint8_t *)(fmrpacket.body + FMR_PUSH_PARAMETER_SIZE + argc);
+	uint8_t *offset = (uint8_t *)(fmrpacket.body + fmrpacket.recipient.argc + argc);
 
 pull:
 
@@ -113,18 +113,14 @@ pull:
 	fmrpacket.recipient.target = _self;
 	fmrpacket.recipient.object = object;
 	fmrpacket.recipient.index = index;
-	fmrpacket.recipient.argc = argc + 6;
+	fmrpacket.recipient.argc = argc;
 
 	/* ~ Manually load the default parameters expected by a push compliant function. ~ */
-	fmrpacket.body[0] = hi((uintptr_t)(destination));
-	fmrpacket.body[1] = lo((uintptr_t)(destination));
-	fmrpacket.body[2] = hi(hi16(length));
-	fmrpacket.body[3] = lo(hi16(length));
-	fmrpacket.body[4] = hi(lo16(length));
-	fmrpacket.body[5] = lo(lo16(length));
+	uint8_t _argc = build_args(self_args(destination, self_arg32(length)));
+	fmrpacket.recipient.argc += _argc;
 
 	/* ~ Move the earlier cached variadic argument list into the new packet. ~ */
-	memmove((void *)(fmrpacket.body) + 6, argv, argc);
+	memmove((void *)(fmrpacket.body) + _argc, argv, argc);
 
 	/* ~ Relase the memory allocated to cache the above list. ~ */
 	free(argv);
