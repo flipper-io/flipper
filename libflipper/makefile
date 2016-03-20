@@ -34,7 +34,7 @@ endif
 
 # ~ Specify a compiler and the other utilities needed to deploy for the target. ~ #
 cc = $(shell which 'clang')
-nasm = $(shell which 'nasm')
+nasm = /usr/local/bin/nasm #$(shell which 'nasm')
 rsync = $(shell which 'rsync')
 ln = $(shell which 'ln')
 
