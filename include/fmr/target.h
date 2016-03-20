@@ -108,6 +108,7 @@ extern struct _target *sender;
 
 enum { _zero, _one, _two, _led, _button, _error, _usart, _spi, _sam, _at45, _fs, _usb, _wifi, _io, _dbgu, _usart1, _fdl, _fmr };
 
+extern uint8_t build_args(uint8_t argc, ...);
 extern uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, va_list *argv);
 extern uint32_t target_push(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, va_list *argv);
 extern uint32_t target_pull(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, va_list *argv);
