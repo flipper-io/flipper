@@ -47,8 +47,18 @@ uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, uint32_t length)
 	/* ~ Allocate the appropriate amount of memory in external memory to buffer the incoming data. ~ */
 	void *destination = malloc(length);
 
+	if(!destination) {
+		error.raise(E_NO_MEM, "Out of memory.\n");
+		return 0;
+	}
+
 	/* ~ Allocate the appropriate amount of memory to store the variadic argument array until it is needed later. ~ */
 	uint8_t *argv = malloc(argc);
+
+	if(!argv) {
+		error.raise(E_NO_MEM, "Out of memory.\n");
+		return 0;
+	}
 
 	/* ~ Create the return value. ~ */
 	uint32_t retval;
@@ -140,6 +150,11 @@ uint32_t self_pull(uint8_t object, uint8_t index, uint8_t argc, uint32_t length)
 
 	/* ~ Allocate the appropriate amount of memory in external memory to buffer the outgoing data. ~ */
 	void *source = malloc(length);
+
+	if(!source) {
+		error.raise(E_NO_MEM, "Out of memory.\n");
+		return 0;
+	}
 
 	/* ~ If malloc failed to satisfy our request, panic. ~ */
 	if (!source) {
