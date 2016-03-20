@@ -15,7 +15,7 @@ void io_set_direction(uint8_t pin, uint8_t direction) {
 void io_write(uint8_t pin, uint16_t value) {
 	
 	host.invoke(_io, _io_write, fmr_args(pin, value));
-	
+
 }
 
 uint16_t io_read(uint8_t pin) {
