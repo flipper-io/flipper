@@ -1,5 +1,6 @@
 #define __private_include__
 #include <fmr/fmr.h>
+#include <platform.h>
 #include <fs/crc.h>
 
 uint8_t fmr_padding;
@@ -19,6 +20,27 @@ void validate_target(const struct _target *target) {
 
 	}
 
+}
+
+/* ~ Used to construct a packet body based on an arbitrary set of variadic arguments. ~ */
+uint8_t build_args(uint8_t argc, ...) {
+
+	/* ~ Construct a va_list to access variadic arguments. ~ */
+	va_list argv;
+
+	/* ~ Initialize the va_list that we created above. ~ */
+	va_start(argv, argc);
+
+	for (int i = 0; i < (argc * sizeof(uint16_t)); i += 2) {
+		unsigned arg = va_arg(argv, unsigned);
+		fmrpacket.body[i] = hi(arg); fmrpacket.body[i + 1] = lo(arg);
+	}
+
+	/* ~ Release the variadic argument list. ~ */
+	va_end(argv);
+
+	return argc;
+	
 }
 
 /* ~ This function wraps up a message needed to perform a remote procedure call and sends it off to its target. ~ */
@@ -99,7 +121,7 @@ uint32_t target_push(const struct _target *target, uint8_t object, uint8_t index
 	fmrpacket.header.fe = 0xFE;
 
 	/* ~ Set the header's length equal to the size of the full packet after the parameters have been loaded. ~ */
-	fmrpacket.header.length = sizeof(struct _fmr_header) + sizeof(struct _fmr_recipient) + FMR_PUSH_PARAMETER_SIZE + argc;
+	fmrpacket.header.length = sizeof(struct _fmr_header) + sizeof(struct _fmr_recipient) + argc;
 
 	/* ~ Ensure the arguments will fit into one packet. ~ */
 	if (fmrpacket.header.length > FMR_PACKET_SIZE) {
@@ -113,30 +135,26 @@ uint32_t target_push(const struct _target *target, uint8_t object, uint8_t index
 	fmrpacket.recipient.target = target -> id;
 	fmrpacket.recipient.object = target -> id;
 	fmrpacket.recipient.index = _self_push;
-	fmrpacket.recipient.argc = FMR_PUSH_PARAMETER_SIZE;
 
 	/* ~ The packet's body will contain layered information regarding the recipient function that will be processed by the helper function. ~ */
-	fmrpacket.body[0] = hi(object);
-	fmrpacket.body[1] = lo(object);
-	fmrpacket.body[2] = hi(index);
-	fmrpacket.body[3] = lo(index);
-	fmrpacket.body[4] = hi(argc);
-	fmrpacket.body[5] = lo(argc);
-	fmrpacket.body[6] = hi(hi16(length));
-	fmrpacket.body[7] = lo(hi16(length));
-	fmrpacket.body[8] = hi(lo16(length));
-	fmrpacket.body[9] = lo(lo16(length));
+	if (target -> id == _device)
+		fmrpacket.recipient.argc = build_args(device_args(object, index, argc, device_arg32(length)));
+	else
+		fmrpacket.recipient.argc = build_args(host_args(object, index, argc, host_arg32(length)));
+
+	/* ~ Increment the length by the argument count. ~ */
+	fmrpacket.header.length += fmrpacket.recipient.argc;
 
 	/* ~ If they fit, the parameters which will be passed to the function are loaded into the packet. ~ */
 	for (int i = 0; i < argc; i += 2) {
 
 		unsigned arg = va_arg(*argv, unsigned);
-		fmrpacket.body[i + FMR_PUSH_PARAMETER_SIZE] = hi(arg); fmrpacket.body[i + FMR_PUSH_PARAMETER_SIZE + 1] = lo(arg);
+		fmrpacket.body[i + fmrpacket.recipient.argc] = hi(arg); fmrpacket.body[i + fmrpacket.recipient.argc + 1] = lo(arg);
 
 	}
 
 	/* ~ For the first iteration of this loop, specify that the data has been loaded after the layered parameter list and parameters. ~ */
-	uint8_t *offset = (uint8_t *)(fmrpacket.body + FMR_PUSH_PARAMETER_SIZE + argc);
+	uint8_t *offset = (uint8_t *)(fmrpacket.body + fmrpacket.recipient.argc + argc);
 
 	/* ~ Create a local variable to keep track of how much data still needs to be sent. ~ */
 	uint32_t remaining;
