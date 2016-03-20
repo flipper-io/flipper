@@ -25,8 +25,7 @@ void network_configure(void *ip) {
 	network_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 
 	if (network_socket < 0) {
-		printf("Failed to open a new socket. Abort.\n\n");
-		exit(EXIT_FAILURE);
+		error.raise(E_OPEN_SOCK, "Failed to open a new socket. Abort.\n\n");
 	}
 
 	/* ~ Clear the network address. ~ */
@@ -36,9 +35,10 @@ void network_configure(void *ip) {
 	network_address.sin_port = htons(FLIPPER_NETWORK_PORT);
 
 	if (connect(network_socket, (struct sockaddr *) &network_address, sizeof(network_address)) < 0)
-		printf("Got socket but failed to connect. Abort.\n\n");
+		error.raise(E_CONN_SOCK, "Got socket but failed to connect. Abort.\n\n");
 
-	verbose("Successfully connected to 'Elroy' at '%s'.\n\n", ip);
+	// Don't think this should be here...
+	//verbose("Successfully connected to 'Elroy' at '%s'.\n\n", ip);
 
 }
 
@@ -65,12 +65,8 @@ uint8_t network_get(void) {
 void network_push(void *source, uint32_t length) {
 
 	if (network_socket < 0) {
-
-		printf("This instance of libflipper has not been bound to any Flipper device on the current network.\n\n");
-		exit(EXIT_FAILURE);
-
+		error.raise(E_FLIPPER_UNBOUND, "This instance of libflipper has not been bound to any Flipper device on the current network.\n\n");
 	}
-
 	send(network_socket, source, length, 0);
 
 }
@@ -80,5 +76,3 @@ void network_pull(void *destination, uint32_t length) {
 	recv(network_socket, destination, length, 0);
 
 }
-
-

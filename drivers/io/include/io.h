@@ -6,9 +6,9 @@
 
 /* ~ Decare a global enumerator to expose the IO namespace. ~ */
 enum {
-	
+
 	RESERVED,	/* ~ Offset the enumerator by one so regular numbers can be used for pins IO1 through IO16. ~ */
-	
+
 	IO1,
 	IO2,
 	IO3,
@@ -25,7 +25,7 @@ enum {
 	IO14,
 	IO15,
 	IO16,
-	
+
 	A0,
 	A1,
 	A2,
@@ -34,7 +34,7 @@ enum {
 	A5,
 	A7,
 	A8,
-	
+
 };
 
 /* ~ Declare the virtual driver object. ~ */
@@ -44,7 +44,7 @@ extern const struct _io {
 	void (* direction)(uint8_t pin, uint8_t direction);
 	void (* write)(uint8_t pin, uint16_t value);
 	uint16_t (* read)(uint8_t pin);
-	
+
 } io;
 
 #ifdef __private_include__

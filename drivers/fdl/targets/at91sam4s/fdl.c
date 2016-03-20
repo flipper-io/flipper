@@ -66,7 +66,10 @@ void *fdl_load(uint16_t key) {
 	
 	/* ~ Ensure that we're loading a valid filesystem object. ~ */
 	
-	if (!_leaf) { serprintf("No valid filesystem entry for loadable. 0x%04x\n", key); return NULL; }
+	if (!_leaf) {
+		error.raise(E_DL_NOT_FOUND, "No valid filesystem entry for loadable.")
+		return NULL;
+	}
 	
 	/* ~ Dereference the metadata contained by the leaf. ~ */
 	
@@ -74,7 +77,11 @@ void *fdl_load(uint16_t key) {
 	
 	/* ~ If the loadable has already been loaded, return the address. ~ */
 	
-	if (l -> address) { serprintf("Loadable already loaded. %p\n", l -> address); load_address = (void *)(l -> address); goto cleanup; }
+	if (l -> address) {
+		error.raise(E_DL_LOADED, "Loadable already loaded.");
+		load_address = (void *)(l -> address);
+		goto cleanup;
+	}
 	
 	/* ~ Calculate the total number of pages required for the load. ~ */
 	
@@ -142,7 +149,7 @@ cleanup:
 	
 	free(l);
 	
-	serprintf("Loadable loaded successfully.\n");
+	//serprintf("Loadable loaded successfully.\n");
 	
 	/* ~ Return the address at which the code has been loaded. ~ */
 	

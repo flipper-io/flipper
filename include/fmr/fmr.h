@@ -28,7 +28,7 @@ typedef uint32_t fmr_handle;
 
 /* ~ Declare the virtual driver object. ~ */
 extern const struct _fmr {
-	
+
 	void (* configure)(void);
 	fmr_handle (* bind)(uint16_t bundle);
 	uint32_t (* invoke)(fmr_handle handle, uint8_t index, uint8_t argc, ...);

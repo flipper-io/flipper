@@ -27,23 +27,23 @@ typedef uint32_t fsp;
 
 #define ceiling(x, y) ((x + y - 1) / y)
 
-#define HIGH	true
-#define LOW		false
+#define HIGH    true
+#define LOW     false
 
-#define pull_up	true
+#define pull_up true
 
-#define INPUT	false
-#define OUTPUT	true
+#define INPUT   false
+#define OUTPUT  true
 
 /* ~ Define bit manipulation macros. ~ */
-#define bit(b)								(0x01 << (b))
-#define get_bit_from_port(b, p)				((p) & bit(b))
-#define set_bit_in_port(b, p)				((p) |= bit(b))
-#define set_bits_in_port_with_mask(p, m)	((p) |= (m))
-#define clear_bit_in_port(b, p)				((p) &= ~(bit(b)))
-#define clear_bits_in_port_with_mask(p, m)	((p) &= ~(m))
-#define flip_bit_in_port(b, p)				((p) ^= bit(b))
-#define flip_bits_in_port_with_mask(p, m)	((p) ^= (m))
+#define bit(b)                                          (0x01 << (b))
+#define get_bit_from_port(b, p)                         ((p) & bit(b))
+#define set_bit_in_port(b, p)                           ((p) |= bit(b))
+#define set_bits_in_port_with_mask(p, m)                ((p) |= (m))
+#define clear_bit_in_port(b, p)                         ((p) &= ~(bit(b)))
+#define clear_bits_in_port_with_mask(p, m)              ((p) &= ~(m))
+#define flip_bit_in_port(b, p)                          ((p) ^= bit(b))
+#define flip_bits_in_port_with_mask(p, m)               ((p) ^= (m))
 
 #define lo(x) ((uint8_t)(x))
 #define hi(x) ((uint8_t)(x >> 8))
@@ -58,9 +58,9 @@ typedef uint32_t fsp;
 #define enable_interrupts()
 #define disable_interrupts()
 
-#define CARBON_VENDOR_ID	0x16C0
-#define CARBON_PRODUCT_ID	0x0480
-#define CARBON_USAGE_PAGE	0xFFAB
-#define CARBON_USAGE		0x0200
+#define CARBON_VENDOR_ID        0x16C0
+#define CARBON_PRODUCT_ID       0x0480
+#define CARBON_USAGE_PAGE       0xFFAB
+#define CARBON_USAGE            0x0200
 
 #endif

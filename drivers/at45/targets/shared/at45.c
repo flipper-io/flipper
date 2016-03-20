@@ -4,22 +4,22 @@
 
 /* ~ Define the opcodes for the flash device. ~ */
 
-#define FLASH_OPCODE_GET_STATUS_REGISTER							0xD7
-#define FLASH_READY_BUSY_BIT										0x07
-#define FLASH_OPCODE_CONFIGURE_512_BYTE_PAGE_0 						0x3D
-#define FLASH_OPCODE_CONFIGURE_512_BYTE_PAGE_1 						0x2A
-#define FLASH_OPCODE_CONFIGURE_512_BYTE_PAGE_2 						0x80
-#define FLASH_OPCODE_CONFIGURE_512_BYTE_PAGE_3 						0xA6
-#define FLASH_OPCODE_BUFFER_1_WRITE									0x84
-#define	FLASH_DATA_DIRECTON_OPCODE_BUFFER_1_TO_PAGE					0x88
-#define FLASH_DATA_DIRECTON_OPCODE_BUFFER_1_TO_PAGE_WITH_ERASE		0x83
-#define FLASH_OPCODE_BUFFER_2_WRITE									0x87
-#define FLASH_DATA_DIRECTON_OPCODE_BUFFER_2_TO_PAGE					0x89
-#define FLASH_DATA_DIRECTON_OPCODE_BUFFER_2_TO_PAGE_WITH_ERASE		0x86
-#define FLASH_OPCODE_TRANSFER_PAGE_TO_BUFFER_1						0x53
-#define FLASH_OPCODE_TRANSFER_PAGE_TO_BUFFER_2						0x55
-#define FLASH_OPCODE_CONTINUOUS_READ								0x0B
-#define FLASH_OPCODE_PAGE_READ										0xD2
+#define FLASH_OPCODE_GET_STATUS_REGISTER                                0xD7
+#define FLASH_READY_BUSY_BIT                                            0x07
+#define FLASH_OPCODE_CONFIGURE_512_BYTE_PAGE_0                          0x3D
+#define FLASH_OPCODE_CONFIGURE_512_BYTE_PAGE_1                          0x2A
+#define FLASH_OPCODE_CONFIGURE_512_BYTE_PAGE_2                          0x80
+#define FLASH_OPCODE_CONFIGURE_512_BYTE_PAGE_3                          0xA6
+#define FLASH_OPCODE_BUFFER_1_WRITE                                     0x84
+#define FLASH_DATA_DIRECTON_OPCODE_BUFFER_1_TO_PAGE                     0x88
+#define FLASH_DATA_DIRECTON_OPCODE_BUFFER_1_TO_PAGE_WITH_ERASE          0x83
+#define FLASH_OPCODE_BUFFER_2_WRITE                                     0x87
+#define FLASH_DATA_DIRECTON_OPCODE_BUFFER_2_TO_PAGE                     0x89
+#define FLASH_DATA_DIRECTON_OPCODE_BUFFER_2_TO_PAGE_WITH_ERASE          0x86
+#define FLASH_OPCODE_TRANSFER_PAGE_TO_BUFFER_1                          0x53
+#define FLASH_OPCODE_TRANSFER_PAGE_TO_BUFFER_2                          0x55
+#define FLASH_OPCODE_CONTINUOUS_READ                                    0x0B
+#define FLASH_OPCODE_PAGE_READ                                          0xD2
 
 #define at45_payload_hi(page) (page >> 6)
 #define at45_payload_lo(page) (page << 2)

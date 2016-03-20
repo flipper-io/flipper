@@ -13,67 +13,67 @@ typedef uint32_t uintres_t;
 
 /* ~ It is very important that this structure be packed. ~ */
 struct __attribute__((__packed__)) _fmr_header {
-	
+
 	/* ~ Fixed packet header to ensure sync. ~ */
 	uint8_t fe;
-	
+
 	/* ~ The length of the contents of the packet. ~ */
 	uint8_t length;
-	
+
 	/* ~ A checksum of everything below. ~ */
 	uint16_t checksum;
-	
+
 };
 
 struct __attribute__((__packed__)) _fmr_recipient {
-	
+
 	/* ~ The target device. ~ */
 	uint8_t target;
-	
+
 	/* ~ The destination object. ~ */
 	uint8_t object;
-	
+
 	/* ~ The index of the target method within the destination object. ~ */
 	uint8_t index;
-	
+
 	/* ~ The number of arguments expected by the target method multiplied by sizeof(uint32_t). ~ */
 	uint8_t argc;
-	
+
 };
 
 typedef struct __attribute__((__packed__)) _fmr_packet {
-	
+
 	/* ~ The packet header. ~ */
 	struct _fmr_header header;
-	
+
 	/* ~ The packet destination. ~ */
 	struct _fmr_recipient recipient;
-	
+
 	/* ~ The body of the packet. ~ */
 	uint8_t body[FMR_BODY_SIZE];
-	
+
 } fmr_packet;
 
 struct __attribute__((__packed__)) _fmr_response {
-	
+
 	/* ~ A checksum of the response. ~ */
 	uint16_t checksum;
-	
+
 	struct __attribute__((__packed__)) _body {
-		
+
 		/* ~ The return value of the call. ~ */
 		uintres_t retval;
-		
+
 		/* ~ The error code of the call. ~ */
 		uinterror_t error;
-		
+
 	} body;
-	
+
 };
 
 /* ~ Declare the object prototype for a generic target: a device that responds to the Flipper Message Runtime. ~ */
 struct _target {
-	
+
 	void (* configure)(const struct _bus *bus);
 	uint32_t (* call)(void);
 	uint32_t (* invoke)(uint8_t object, uint8_t index, uint8_t argc, ...);
@@ -82,12 +82,12 @@ struct _target {
 
 	const struct _bus *bus;
 	uint8_t id;
-	
+
 };
 
 /* ~ Declare the object prototype for the self target: the device that implements the Flipper Message Runtime. ~ */
 struct _self {
-	
+
 	void (* configure)(const struct _bus *bus);
 	uint32_t (* call)(void);
 	uint32_t (* invoke)(const struct _target *sender);

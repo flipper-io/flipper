@@ -5,19 +5,18 @@
 uint8_t fmr_padding;
 
 /* ~ This function ensures that the target still has a heartbeat. ~ */
-void validate_target(const struct _target *target) {
+uint8_t validate_target(const struct _target *target) {
 
 	/* ~ If we've been asked to send a packet but have no target, this is a dangling instance of libflipper. ~ */
 	if (!(target -> bus)) {
 
-		/* ~ Report the issue to the user and panic. ~ */
-		error("Oops. No device has been attached to this instance of libflipper.\n\n"
-			  "Make sure you specify how your Flipper device is connected before talking to it: USB, Wi-Fi, and Bluetooth are currently supported.\n\n"
-			  "See http://api.flipper.io/attatch for more information.\n\n");
-
-		exit(EXIT_FAILURE);
-
+		error.raise(E_FLIPPER_UNBOUND, "Oops. No device has been attached to this instance of libflipper.\n\n"
+		                               "Make sure you specify how your Flipper device is connected before talking to it:"
+		                               "USB, Wi-Fi, and Bluetooth are currently supported.\n\n"
+		                               "See http://api.flipper.io/attatch for more information.\n\n");
+		return 0;
 	}
+	return 1;
 
 }
 
@@ -28,7 +27,9 @@ uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t ind
 	fmr_associate_target(target);
 
 	/* ~ Ensure we are talking to a valid target. ~ */
-	validate_target(target);
+	if(!validate_target(target)) {
+		return 0;
+	}
 
 	/* ~ Since our target has 32-bit registers, we package each argument in a 32-bit container. ~ */
 	argc = argc * sizeof(uint16_t);
@@ -44,10 +45,8 @@ uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t ind
 
 	/* ~ Ensure the arguments will fit into one packet. ~ */
 	if (fmrpacket.header.length > FMR_PACKET_SIZE) {
-
-		verbose("\tError. Too many arguments provided for the requested function call. Skipping.\n\n");
+		error.raise(E_TOO_BIG, "Error. Too many arguments provided for the requested function call. Skipping.\n\n");
 		return 0;
-
 	}
 
 	/* ~ Load the recipient information into the packet. This information describes to the FMR which function to invoke. ~ */
@@ -90,7 +89,9 @@ uint32_t target_push(const struct _target *target, uint8_t object, uint8_t index
 	fmr_associate_target(target);
 
 	/* ~ Ensure we are talking to a valid target. ~ */
-	validate_target(target);
+	if(!validate_target(target)) {
+		return 0;
+	}
 
 	/* ~ Since our target has 32-bit registers, we package each argument in a 32-bit container. ~ */
 	argc = argc * sizeof(uint16_t);
@@ -103,10 +104,8 @@ uint32_t target_push(const struct _target *target, uint8_t object, uint8_t index
 
 	/* ~ Ensure the arguments will fit into one packet. ~ */
 	if (fmrpacket.header.length > FMR_PACKET_SIZE) {
-
-		verbose("\tError. Too many arguments provided for the requested function call. Skipping.\n\n");
+		error.raise(E_TOO_BIG, "Error. Too many arguments provided for the requested function call. Skipping.\n\n");
 		return 0;
-
 	}
 
 	/* ~ Load the recipient information into the packet. This information describes to the FMR which function to invoke. ~ */
@@ -197,7 +196,9 @@ uint32_t target_pull(const struct _target *target, uint8_t object, uint8_t index
 	fmr_associate_target(target);
 
 	/* ~ Ensure we are talking to a valid target. ~ */
-	validate_target(target);
+	if(!validate_target(target)) {
+		return 0;
+	}
 
 	/* ~ Since our target has 32-bit registers, we package each argument in a 32-bit container. ~ */
 	argc = argc * sizeof(uint16_t);
@@ -210,10 +211,8 @@ uint32_t target_pull(const struct _target *target, uint8_t object, uint8_t index
 
 	/* ~ Ensure the arguments will fit into one packet. ~ */
 	if (fmrpacket.header.length > FMR_PACKET_SIZE) {
-
-		verbose("\tError. Too many arguments provided for the requested function call. Skipping.\n\n");
+		error.raise(E_TOO_BIG, "Error. Too many arguments provided for the requested function call. Skipping.\n\n");
 		return 0;
-
 	}
 
 	/* ~ Load the recipient information into the packet. This information describes to the FMR which function to invoke. ~ */
