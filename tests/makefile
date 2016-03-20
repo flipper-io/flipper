@@ -7,7 +7,7 @@ cc = $(shell which 'gcc')
 # ~ Declare the preprocessor statements to be used during object generation. ~ #
 preprocess = -std=c99
 
-include_directories = $(FLIPPERSDK)/include
+include_directories = $(FLIPPERSDK)/include ../../libflipper/include
 
 # ~ Declare the library dependancies neededed for linking. ~ #
 libraries = -lflipper
