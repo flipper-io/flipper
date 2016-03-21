@@ -34,7 +34,7 @@ install:
 
 	# ~ Install the console. ~ #
 	@echo Installing the Flipper Console. 🖥
-	# $(MAKE) -C console install -s
+	$(MAKE) -C console install -s
 
 	@echo The Flipper Toolbox was installed successfully. 🎉
 
@@ -54,7 +54,7 @@ clean:
 
 	# ~ Clean the console. ~ #
 	@echo Cleaning the Flipper Console. 🖥
-	# $(MAKE) -C console clean -s
+	$(MAKE) -C console clean -s
 
 	# ~ Clean Osmium. ~ #
 	@echo Cleaning Osmium. 💾

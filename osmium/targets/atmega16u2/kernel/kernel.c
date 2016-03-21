@@ -32,7 +32,6 @@ int main(void) {
 
 	/* ~ Configure the builtins. ~ */
 	error_configure();
-	fmr_configure();
 
 	/* ~ Configure the busses. ~ */
 	usb_configure();

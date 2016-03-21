@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
 	flipper.attach(FLIPPER_SOURCE_USB);
 
 	/* ~ Change the LED color. ~ */
-	led.rgb(0, 25, 0);
+	led.rgb(0, 0, 25);
 
 	return 0;
 

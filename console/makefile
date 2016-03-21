@@ -8,7 +8,7 @@ rsync = $(shell which 'rsync')
 # ~ Declare the preprocessor statements to be used during object generation. ~ #
 preprocess = -std=c99
 
-include_directories = ../include ./include
+include_directories = ../include ./include ../libflipper/include
 
 # ~ Declare the library dependancies neededed for linking. ~ #
 libraries = -lflipper

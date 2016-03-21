@@ -22,7 +22,7 @@ void error_raise(uinterror_t code, unsigned char *string) {
 		*((uinterror_t *)(&error.code)) = code;
 	}
 	else {
-		error(string);
+		fprintf(stderr, string);
 		exit(EXIT_FAILURE);
 	}
 	return;

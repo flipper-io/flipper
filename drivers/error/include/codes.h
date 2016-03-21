@@ -16,12 +16,13 @@
 #define E_HID_OPEN_DEV        12
 #define E_HID_DISCONN_DEV     13
 #define E_HID_WRITE           14
-#define E_IOKIT_DICT          15
-#define E_DL_NOT_FOUND        16
-#define E_DL_LOAD             17
-#define E_DL_LOADED           18
-#define E_FS_OPEN             19
-#define E_FS_ADD_LEAF         20
-#define E_FS_NO_LEAF          21
+#define E_HID_TIMEOUT         15
+#define E_IOKIT_DICT          16
+#define E_DL_NOT_FOUND        17
+#define E_DL_LOAD             18
+#define E_DL_LOADED           19
+#define E_FS_OPEN             20
+#define E_FS_ADD_LEAF         21
+#define E_FS_NO_LEAF          22
 
 #endif

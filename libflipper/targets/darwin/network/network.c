@@ -4,6 +4,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#include <error/error.h>
+
 const struct _bus network = {
 	network_configure,
 	network_enable,
