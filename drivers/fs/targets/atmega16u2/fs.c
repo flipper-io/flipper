@@ -1,5 +1,6 @@
 #define __private_include__
 #include <fs/fs.h>
+#include <error/error.h>
 #include <platform.h>
 #include <at45/at45.h>
 #include <fs/tree.h>
@@ -25,9 +26,10 @@ void fs_format(void) {
 	leaf *root = (leaf *) malloc(sizeof(leaf));
 
 	if(!root) {
-		error.raise(E_NO_MEM, "Out of memory.\n");
+		error.raise(E_NO_MEM, "");
 		// TODO: not sure what sort of cleanup is necessary here.
 		return;
+	}
 
 	memset(root, 0, sizeof(leaf));
 	root -> key = 0x4321;

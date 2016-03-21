@@ -10,6 +10,7 @@ fmr_packet fmrpacket;
 /* ~ The target with whom we are currently communicating. ~ */
 struct _target *sender;
 
+#ifndef __atmega_build__
 /* ~ The implementation of the virtual interface for the FMR driver. ~ */
 const struct _fmr fmr = {
 	fmr_configure,
@@ -17,6 +18,7 @@ const struct _fmr fmr = {
 	fmr_invoke,
 	fmr_resolve
 };
+#endif
 
 /* ~ Master invocation function. ~ */
 uint32_t fmr_parse(const struct _target *sender) {
@@ -31,7 +33,7 @@ uint32_t fmr_parse(const struct _target *sender) {
 
 		/* ~ Set the status led to its error color to alert the user of a problem. ~ */
 		led_set_rgb(LED_COLOR_ERROR);
-		error.raise(E_FMR_PACKET_CRC, "FMR Packet failed CRC checksum.\n");
+		error.raise(E_FMR_PACKET_CRC, "");
 
 		/* ~ Skip the call. ~ */
 		goto end;
@@ -53,7 +55,7 @@ end:
 	struct _fmr_response response;
 	response.body.retval = retval;
 	response.body.error = error.code;
-	
+
 	response.checksum = checksum(&response.body, sizeof(response.body));
 
 	/* ~ Return whatever we received back to the device that sent us a message. ~ */
@@ -77,12 +79,12 @@ uintres_t fmr_obtain_response(const struct _target *target) {
 	/* ~ Ensure the response is valid. ~ */
 	if (checksum(&response.body, sizeof(response.body)) != response.checksum) {
 
-		verbose("\nWarning. Mangled response checksum.\n");
+		verbose("");
 
 	}
-	
-	/* ~ Raise the error. ~ */
-	error.raise(response.body.error, "");
+
+	/* ~ If there is an error, raise it. ~ */
+	if (response.body.error != E_OK) error.raise(response.body.error, "");
 
 	/* ~ If the response is valid, return it. ~ */
 	return response.body.retval;

@@ -5,22 +5,6 @@
 
 const void * const objects[] PROGMEM = { &host, &device, &self, &led, &button, &error, &usart, &spi, &sam, &at45, &fs, &usb, &wifi };
 
-void fmr_configure(void) {
-
-}
-
-fmr_handle fmr_bind(uint16_t bundle) {
-
-}
-
-uint32_t fmr_invoke(fmr_handle handle, uint8_t index, uint8_t argc, ...) {
-	return 0;
-}
-
-void *fmr_resolve(void *source, uint32_t length) {
-	return NULL;
-}
-
 void usb_receive_interrupt(void) {
 
 	/* ~ Associate this interrupt with the device target. ~ */

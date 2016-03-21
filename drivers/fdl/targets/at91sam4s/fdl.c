@@ -1,5 +1,6 @@
 #define __private_include__
 #include <fdl/fdl.h>
+#include <error/error.h>
 #include <platform.h>
 
 #include <fs/fs.h>
@@ -67,7 +68,7 @@ void *fdl_load(uint16_t key) {
 	/* ~ Ensure that we're loading a valid filesystem object. ~ */
 	
 	if (!_leaf) {
-		error.raise(E_DL_NOT_FOUND, "No valid filesystem entry for loadable.")
+		error.raise(E_DL_NOT_FOUND, "");
 		return NULL;
 	}
 	
@@ -78,7 +79,7 @@ void *fdl_load(uint16_t key) {
 	/* ~ If the loadable has already been loaded, return the address. ~ */
 	
 	if (l -> address) {
-		error.raise(E_DL_LOADED, "Loadable already loaded.");
+		error.raise(E_DL_LOADED, "");
 		load_address = (void *)(l -> address);
 		goto cleanup;
 	}

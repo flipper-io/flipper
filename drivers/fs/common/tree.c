@@ -51,7 +51,7 @@ fsp fs_add_leaf_with_key(fsp current, uint16_t key) {
 
 		fsp region = at45_alloc(sizeof(leaf));
 		if (!region) {
-			error.raise(E_NO_MEM, "A request for external memory could not be satisfied.\n\n");
+			error.raise(E_NO_MEM, "");
 			return 0;
 		}
 
@@ -59,7 +59,7 @@ fsp fs_add_leaf_with_key(fsp current, uint16_t key) {
 
 		leaf *_leaf = malloc(sizeof(leaf));
 		if(!_leaf) {
-			error.raise(E_NO_MEM, "Out of memory.\n");
+			error.raise(E_NO_MEM, "");
 			return 0;
 		}
 
@@ -96,7 +96,7 @@ fsp fs_add_leaf_with_key(fsp current, uint16_t key) {
 
 		/* ~ This case catches an exception wherein the leaf we want to add already exists. ~ */
 
-		verbose("An attempt was made to add a leaf that already exists.");
+		verbose("");
 
 	}
 
@@ -111,7 +111,7 @@ fsp fs_leaf_for_key(fsp current, uint16_t key) {
 
 	if (current == 0) {
 
-		verbose("No leaf was found to match the key given, 0x%04X.\n\n", key);
+		verbose("", key);
 
 		return 0;
 
@@ -147,7 +147,7 @@ void fs_remove_leaf_with_key(fsp parent, uint16_t key) {
 
 	if (match == 0) {
 
-		verbose("An attempt was made to remove a non-existent leaf.\n\n");
+		verbose("");
 
 		return;
 
@@ -161,7 +161,7 @@ void fs_remove_leaf_with_key(fsp parent, uint16_t key) {
 
 	if (_match -> left && _match -> right) {
 
-		verbose("Deleting a leaf with two children.\n\n");
+		verbose("");
 
 		/* ~ De-index the leaf by replacing its branch pointer with a pointer to its left child. ~ */
 
@@ -193,7 +193,7 @@ void fs_remove_leaf_with_key(fsp parent, uint16_t key) {
 
 	else if (_match -> left) {
 
-		verbose("Deleting a leaf with a left child.\n\n");
+		verbose("");
 
 		/* ~ De-index the leaf by replacing its branch pointer with a pointer to its left child. ~ */
 
@@ -209,7 +209,7 @@ void fs_remove_leaf_with_key(fsp parent, uint16_t key) {
 
 	else if (_match -> right) {
 
-		verbose("Deleting a leaf with a right child.\n\n");
+		verbose("");
 
 		/* ~ De-index the leaf by replacing its branch pointer with a pointer to its right child. ~ */
 
@@ -225,7 +225,7 @@ void fs_remove_leaf_with_key(fsp parent, uint16_t key) {
 
 		/* ~ Best case scenario, the leaf to be deleted has no children. ~ */
 
-		verbose("Deleting a leaf with no children.\n\n");
+		verbose("");
 
 		/* ~ De-index the leaf from the tree by clearing its branch pointer. ~ */
 

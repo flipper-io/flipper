@@ -11,10 +11,7 @@ uint8_t validate_target(const struct _target *target) {
 	/* ~ If we've been asked to send a packet but have no target, this is a dangling instance of libflipper. ~ */
 	if (!(target -> bus)) {
 
-		error.raise(E_FLIPPER_UNBOUND, "Oops. No device has been attached to this instance of libflipper.\n\n"
-		                               "Make sure you specify how your Flipper device is connected before talking to it:"
-		                               "USB, Wi-Fi, and Bluetooth are currently supported.\n\n"
-		                               "See http://api.flipper.io/attatch for more information.\n\n");
+		error.raise(E_FLIPPER_UNBOUND, "");
 		return 0;
 	}
 	return 1;
@@ -67,7 +64,7 @@ uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t ind
 
 	/* ~ Ensure the arguments will fit into one packet. ~ */
 	if (fmrpacket.header.length > FMR_PACKET_SIZE) {
-		error.raise(E_TOO_BIG, "Error. Too many arguments provided for the requested function call. Skipping.\n\n");
+		error.raise(E_TOO_BIG, "");
 		return 0;
 	}
 
@@ -126,7 +123,7 @@ uint32_t target_push(const struct _target *target, uint8_t object, uint8_t index
 
 	/* ~ Ensure the arguments will fit into one packet. ~ */
 	if (fmrpacket.header.length > FMR_PACKET_SIZE) {
-		error.raise(E_TOO_BIG, "Error. Too many arguments provided for the requested function call. Skipping.\n\n");
+		error.raise(E_TOO_BIG, "");
 		return 0;
 	}
 
@@ -229,7 +226,7 @@ uint32_t target_pull(const struct _target *target, uint8_t object, uint8_t index
 
 	/* ~ Ensure the arguments will fit into one packet. ~ */
 	if (fmrpacket.header.length > FMR_PACKET_SIZE) {
-		error.raise(E_TOO_BIG, "Error. Too many arguments provided for the requested function call. Skipping.\n\n");
+		error.raise(E_TOO_BIG, "");
 		return 0;
 	}
 
