@@ -14,6 +14,8 @@ int main(int argc, char *argv[]) {
 	/* ~ Attatch this instance of libflipper to the first device present over USB. ~ */
 	flipper.attach(FLIPPER_SOURCE_USB);
 
+	error.disclose();
+
 	if (!strcmp(argv[1], "flash")) {
 		sam_load_firmware(argv[2]);
 	}
