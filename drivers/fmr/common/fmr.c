@@ -4,6 +4,8 @@
 #include <fs/crc.h>
 #include <led/led.h>
 
+#include <usart/usart.h>
+
 /* ~ Global scratch space for FMR processing. ~ */
 fmr_packet fmrpacket;
 
@@ -77,11 +79,11 @@ uintres_t fmr_obtain_response(const struct _target *target) {
 	target -> bus -> pull(&response, sizeof(struct _fmr_response));
 
 	/* ~ Ensure the response is valid. ~ */
-	if (checksum(&response.body, sizeof(response.body)) != response.checksum) {
-
-		verbose("");
-
-	}
+//	if (checksum(&response.body, sizeof(response.body)) != response.checksum) {
+//
+//		verbose("");
+//
+//	}
 
 	/* ~ If there is an error, raise it. ~ */
 	if (response.body.error != E_OK) error.raise(response.body.error, "");
