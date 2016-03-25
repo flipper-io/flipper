@@ -22,7 +22,7 @@ fmr_handle fmr_bind(uint16_t bundle) {
 
 	/* ~ Ensure the module was successfully loaded. ~ */
 	if (!base) {
-		error.raise(E_DL_LOAD, "Unable to load bundle.\n");
+		error.raise(E_DL_LOAD, ERROR_STRING(E_DL_LOAD_S));
 		return -1;
 	}
 

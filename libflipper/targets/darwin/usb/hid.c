@@ -66,11 +66,11 @@ int8_t hid_receive_packet(uint8_t *buffer) {
 	CFRunLoopTimerRef timer=NULL;
 	CFRunLoopTimerContext context;
 	int ret=0, timeout_occurred=0;
-	
+
 	if (len < 1) return 0;
 	hid = get_hid(SELECTED_DEVICE);
 	if (!hid || !hid->open) {
-		error.raise(E_HID_OPEN_DEV, "HID: unable to open device\n");
+		error.raise(E_HID_OPEN_DEV, ERROR_STRING(E_HID_OPEN_DEV_S));
 		return -1;
 	}
 	if ((b = hid->first_buffer) != NULL) {
@@ -96,7 +96,7 @@ int8_t hid_receive_packet(uint8_t *buffer) {
 			break;
 		}
 		if (!hid->open) {
-			error.raise(E_HID_OPEN_DEV, "rawhid_recv, device not open\n");
+			error.raise(E_HID_OPEN_DEV, ERROR_STRING(E_HID_OPEN_DEV_S));
 			ret = -1;
 			break;
 		}
@@ -167,10 +167,10 @@ int8_t hid_transmit_packet(uint8_t *buffer) {
 	hid_t *hid;
 	uint16_t len = FMR_PACKET_SIZE;
 	int result=-100;
-	
+
 	hid = get_hid(SELECTED_DEVICE);
 	if (!hid || !hid->open) {
-		error.raise(E_HID_OPEN_DEV, "HID: device not open\n");
+		error.raise(E_HID_OPEN_DEV, ERROR_STRING(E_HID_OPEN_DEV_S));
 		return -1;
 	}
 #if 1
@@ -187,7 +187,7 @@ int8_t hid_transmit_packet(uint8_t *buffer) {
 	IOHIDDeviceScheduleWithRunLoop(hid->ref, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
 	// should already be scheduled with run loop by attach_callback,
 	// sadly this doesn't make any difference either way
-	
+
 	// could this be related?
 	// http://lists.apple.com/archives/usb/2008/Aug/msg00021.html
 	//
@@ -227,7 +227,7 @@ int hid_enumerate(int max, int vid, int pid, int usage_page, int usage)
 	IOReturn ret;
 	hid_t *p;
 	int count=0;
-	
+
 	if (first_hid) free_all_hid();
 	//printf("configure_usb, max=%d\n", max);
 	if (max < 1) return 0;
@@ -371,12 +371,12 @@ static void detach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDevic
 static void attach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDeviceRef dev)
 {
 	struct hid_struct *h;
-	
+
 	//printf("attach callback\n");
 	if (IOHIDDeviceOpen(dev, kIOHIDOptionsTypeNone) != kIOReturnSuccess) return;
 	h = (hid_t *)malloc(sizeof(hid_t));
 	if (!h) {
-		error.raise(E_NO_MEM, "Out of memory.\n");
+		error.raise(E_NO_MEM, ERROR_STRING(E_NO_MEM_S));
 	}
 	memset(h, 0, sizeof(hid_t));
 	IOHIDDeviceScheduleWithRunLoop(dev, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
