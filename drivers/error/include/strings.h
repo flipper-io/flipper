@@ -19,7 +19,7 @@
 #define E_FVM_SYM_S              "FVM symbol not found."
 #define E_OPEN_SOCK_S            "Unable to open socket."
 #define E_CONN_SOCK_S            "Unable to connect socket."
-#define E_FLIPPER_UNBOUND_S      "Flipper is not attached."
+#define E_FLIPPER_UNBOUND_S      "No device appears to be connected to this computer.\nPlease ensure that Flipper is properly connected and try again."
 #define E_HID_MANAGER_S          "HID manager could not be loaded."
 #define E_HID_NO_DEV_S           "HID manager could not find the device."
 #define E_HID_TOO_MANY_S         "There are too many HID devices attached."

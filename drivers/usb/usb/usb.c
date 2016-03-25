@@ -11,7 +11,7 @@ void usb_configure() {
 	uint8_t devices = hid_enumerate(1, CARBON_VENDOR_ID, CARBON_PRODUCT_ID, CARBON_USAGE_PAGE, CARBON_USAGE);
 
 	if (!devices) {
-		error.raise(E_FLIPPER_UNBOUND, "No device appears to be connected to this computer.\n\nPlease ensure that Flipper is properly connected and try again.\n\n");
+		error.raise(E_FLIPPER_UNBOUND, ERROR_STRING(E_FLIPPER_UNBOUND_S));
 	}
 
 #endif
@@ -57,7 +57,7 @@ void usb_push(void *source, uint32_t length) {
 	void *packet = malloc(FMR_PACKET_SIZE);
 
 	if(!packet) {
-		error.raise(E_NO_MEM, "Out of memory.\n");
+		error.raise(E_NO_MEM, ERROR_STRING(E_NO_MEM_S));
 		return;
 	}
 
@@ -86,7 +86,7 @@ void usb_pull(void *destination, uint32_t length) {
 	uint8_t *buffer = (uint8_t *)(malloc(sizeof(uint8_t) * FMR_PACKET_SIZE));
 
 	if(!buffer) {
-		error.raise(E_NO_MEM, "Out of memory.\n");
+		error.raise(E_NO_MEM, ERROR_STRING(E_NO_MEM_S));
 	}
 
 	hid_receive_packet(buffer);
