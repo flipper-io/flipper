@@ -20,8 +20,6 @@ void usb_configure() {
 
 void usb_enable(void) {
 
-
-
 }
 
 void usb_disable(void) {

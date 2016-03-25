@@ -25,10 +25,12 @@
 /* ~ Define the flipper control type. ~ */
 enum { FLIPPER_SOURCE_USB, FLIPPER_SOURCE_NETWORK, FLIPPER_SOURCE_FVM };
 
-extern const struct _flipper {
+extern struct _flipper {
 
 	void (* configure)(void);
 	void (* attach)(uint8_t source, ...);
+
+	flipper_device *device_list;
 
 } flipper;
 
