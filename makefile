@@ -18,7 +18,7 @@ all:
 
 	# ~ Build the console. ~ #
 	@echo Building the Flipper Console. 🖥
-	# $(MAKE) -C console all -s
+	$(MAKE) -C console all -s
 
 	# ~ Build Osmium. ~ #
 	@echo Building Osmium. 💾
