@@ -8,8 +8,6 @@ const void * const objects[] = { &host, &device, &self, &button, &at45, &fs, &io
 
 void fmr_configure(void) {
 
-
-
 }
 
 fmr_handle fmr_bind(uint16_t bundle) {

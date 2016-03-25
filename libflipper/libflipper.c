@@ -22,8 +22,6 @@ const struct _flipper flipper = {
 
 void flipper_configure(void) {
 
-
-
 }
 
 void flipper_attach(uint8_t source, ...) {
@@ -93,7 +91,7 @@ void flipper_attach(uint8_t source, ...) {
 			/* ~ Ensure that the VM was loaded successfully. ~ */
 
 			if (!vm) {
-				error.raise(E_FVM_LOAD, "Could not load the Flipper Virtual Machine.");
+				error.raise(E_FVM_LOAD, ERROR_STRING(E_FVM_LOAD_S));
 				break;
 			}
 
@@ -102,7 +100,7 @@ void flipper_attach(uint8_t source, ...) {
 			const struct _bus *fdb = dlsym(vm, "fdb");
 
 			if (dlerror() != NULL) {
-				error.raise(E_FVM_SYM, "Could not find 'fdb' in the symbol table.");
+				error.raise(E_FVM_SYM, ERROR_STRING(E_FVM_SYM_S));
 				break;
 			}
 
@@ -111,7 +109,7 @@ void flipper_attach(uint8_t source, ...) {
 			void (* fvm_configure)(const struct _bus *) = dlsym(vm, "fvm_configure");
 
 			if (dlerror() != NULL) {
-				error.raise(E_FVM_SYM, "Could not find 'fvm_configure()' in the symbol table.");
+				error.raise(E_FVM_SYM, ERROR_STRING(E_FVM_SYM_S));
 				break;
 			}
 
@@ -124,7 +122,7 @@ void flipper_attach(uint8_t source, ...) {
 			const struct _target *fvm = dlsym(vm, "fvm");
 
 			if (dlerror() != NULL) {
-				error.raise(E_FVM_SYM, "Could not find 'fdb' in the symbol table.");
+				error.raise(E_FVM_SYM, ERROR_STRING(E_FVM_SYM_S));
 				break;
 			}
 

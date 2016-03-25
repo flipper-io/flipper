@@ -27,7 +27,7 @@ uint32_t fmr_parse(const struct _target *sender) {
 
 	/* ~ Compare the checksums of the packets to ensure the data was sent successfully. ~ */
 	uint16_t cs = checksum((void *)(&fmrpacket.recipient), fmrpacket.header.length - sizeof(struct _fmr_header));
-	
+
 	uint32_t retval = 0;
 
 	/* ~ If the checksums are different, then we have a problem. ~ */
@@ -35,7 +35,7 @@ uint32_t fmr_parse(const struct _target *sender) {
 
 		/* ~ Set the status led to its error color to alert the user of a problem. ~ */
 		led_set_rgb(LED_COLOR_ERROR);
-		error.raise(E_FMR_PACKET_CRC, "");
+		error.raise(E_FMR_PACKET_CRC, ERROR_STRING(E_FMR_PACKET_CRC_S));
 
 		/* ~ Skip the call. ~ */
 		goto end;
@@ -86,7 +86,7 @@ uintres_t fmr_obtain_response(const struct _target *target) {
 //	}
 
 	/* ~ If there is an error, raise it. ~ */
-	if (response.body.error != E_OK) error.raise(response.body.error, "");
+	if (response.body.error != E_OK) error.raise(response.body.error, ERROR_STRING("Error raised on remote target."));
 
 	/* ~ If the response is valid, return it. ~ */
 	return response.body.retval;

@@ -4,6 +4,7 @@
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
 #include <flipper/core.h>
 #include <error/codes.h>
+#include <error/stringss.h>
 
 /* ~ Expose a defined type for the size of an error code. ~ */
 typedef uint16_t uinterror_t;

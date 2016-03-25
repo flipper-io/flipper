@@ -62,7 +62,7 @@ void *at45_dereference(fsp source, uint32_t length) {
 	void *local = malloc(length);
 
 	if (!local) {
-		error.raise(E_NO_MEM, "\nERROR. System declined memory allocation request for at45 dereference.\n\n");
+		error.raise(E_NO_MEM, ERROR_STRING(E_NO_MEM_S));
 		return 0;
 	}
 

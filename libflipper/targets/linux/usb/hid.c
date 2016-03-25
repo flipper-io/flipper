@@ -123,10 +123,10 @@ int hid_receive_packet(uint8_t *buf)
 {
 	hid_t *hid;
 	int r;
-	
+
 	hid = get_hid(SELECTED_DEVICE);
 	if (!hid || !hid->open) {
-		error.raise(E_HID_OPEN_DEV, "HID/linux: device not open\n");
+		error.raise(E_HID_OPEN_DEV, ERROR_STRING(E_HID_OPEN_DEV_S));
 		return -1;
 	}
 	r = usb_interrupt_read(hid->usb, hid->ep_in, buf, FLIPPER_PACKET_SIZE, DEFAULT_TIMEOUT);
@@ -147,10 +147,10 @@ int hid_receive_packet(uint8_t *buf)
 int hid_transmit_packet(uint8_t *buf)
 {
 	hid_t *hid;
-	
+
 	hid = get_hid(SELECTED_DEVICE);
 	if (!hid || !hid->open) {
-		error.raise(E_HID_OPEN_DEV, "HID/linux: device not open\n");
+		error.raise(E_HID_OPEN_DEV, ERROR_STRING(E_HID_OPEN_DEV_S));
 		return -1;
 	}
 	if (hid->ep_out) {
@@ -183,7 +183,7 @@ int hid_enumerate(int max, int vid, int pid, int usage_page, int usage)
 	int i, n, len, tag, ep_in, ep_out, count=0, claimed;
 	uint32_t val=0, parsed_usage, parsed_usage_page;
 	hid_t *hid;
-	
+
 	if (first_hid) free_all_hid();
 	printf("rawhid_open, max=%d\n", max);
 	if (max < 1) return 0;
@@ -294,7 +294,7 @@ int hid_enumerate(int max, int vid, int pid, int usage_page, int usage)
 void rawhid_close(int num)
 {
 	hid_t *hid;
-	
+
 	hid = get_hid(num);
 	if (!hid || !hid->open) return;
 	hid_close(hid);
@@ -312,7 +312,7 @@ static int hid_parse_item(uint32_t *val, uint8_t **data, const uint8_t *end)
 	uint8_t tag;
 	int table[4] = {0, 1, 2, 4};
 	int len;
-	
+
 	if (p >= end) return -1;
 	if (p[0] == 0xFE) {
 		// long item, HID 1.11, 6.2.2.3, page 27
@@ -362,7 +362,7 @@ static hid_t * get_hid(int num)
 static void free_all_hid(void)
 {
 	hid_t *p, *q;
-	
+
 	for (p = first_hid; p; p = p->next) {
 		hid_close(p);
 	}
@@ -380,7 +380,7 @@ static void hid_close(hid_t *hid)
 {
 	hid_t *p;
 	int others=0;
-	
+
 	usb_release_interface(hid->usb, hid->iface);
 	for (p = first_hid; p; p = p->next) {
 		if (p->open && p->usb == hid->usb) others++;
