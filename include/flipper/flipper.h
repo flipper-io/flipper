@@ -30,8 +30,6 @@ extern struct _flipper {
 	void (* configure)(void);
 	void (* attach)(uint8_t source, ...);
 
-	flipper_device *device_list;
-
 } flipper;
 
 #ifdef __private_include__
