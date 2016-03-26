@@ -15,7 +15,7 @@ extern const struct _error {
 	void (* configure)(void);
 	void (* withold)(void);
 	void (* disclose)(void);
-	void (* raise)(uinterror_t code, unsigned char *string);
+	void (* raise)(uinterror_t code, char *string);
 	void (* clear)(void);
 	uint8_t disclosed;
 	uinterror_t code;
@@ -31,7 +31,7 @@ enum { _error_configure, _error_withold, _error_disclose, _error_raise, _error_c
 extern void error_configure(void);
 extern void error_withold(void);
 extern void error_disclose(void);
-extern void error_raise(uinterror_t code, unsigned char *string);
+extern void error_raise(uinterror_t code, char *string);
 extern void error_clear(void);
 extern uint8_t error_disclosed;
 extern uinterror_t error_code;

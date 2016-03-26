@@ -1,20 +1,24 @@
 #define __private_include__
 #include <usb/usb.h>
+#include <flipper/flipper.h>
 #include <platform.h>
-#include <usb/usb.h>
 #include <fmr/fmr.h>
+
+extern int hid_enumerate(int max, int vid, int pid, int usage_page, int usage);
+extern int8_t hid_transmit_packet(uint8_t device, uint8_t *buffer);
+extern int8_t hid_receive_packet(uint8_t device, uint8_t *buffer);
 
 void usb_configure() {
 
-#ifndef __disable_usb__
+	uint8_t device = hid_enumerate(1, CARBON_VENDOR_ID, CARBON_PRODUCT_ID, CARBON_USAGE_PAGE, CARBON_USAGE);
 
-	uint8_t devices = hid_enumerate(1, CARBON_VENDOR_ID, CARBON_PRODUCT_ID, CARBON_USAGE_PAGE, CARBON_USAGE);
+	if (!device) {
 
-	if (!devices) {
 		error.raise(E_FLIPPER_UNBOUND, ERROR_STRING(E_FLIPPER_UNBOUND_S));
+
 	}
 
-#endif
+	flipper.device -> handle = 0;
 
 }
 
@@ -48,51 +52,29 @@ uint8_t usb_get(void) {
 
 void usb_push(void *source, uint32_t length) {
 
-#ifndef __disable_usb__
+	/* ~ Ensure the push request can fit into a single packet. TODO: serialize packets ~ */
+	if (length > FMR_PACKET_SIZE) { error.raise(E_TOO_BIG, ERROR_STRING("A request was made to send more information than can fit in a single USB packet.")); return; }
 
-	/* ~ Allocate a buffer to store a USB packet. ~ */
-
-	void *packet = malloc(FMR_PACKET_SIZE);
-
-	if(!packet) {
-		error.raise(E_NO_MEM, ERROR_STRING(E_NO_MEM_S));
-		return;
-	}
-
-	/* ~ Clear the buffer. ~ */
-
-	memset(packet, 0x00, FMR_PACKET_SIZE);
-
-	/* ~ Copy the data into the buffer. ~ */
-
-	memcpy(packet, source, length);
-
-	/* ~ Send the packet. ~ */
-
-	hid_transmit_packet(packet);
-
-	free(packet);
-
-#endif
+	/* ~ Send a usb packet to the active device. ~ */
+	hid_transmit_packet((uint8_t)(flipper.device -> handle), source);
 
 }
 
 void usb_pull(void *destination, uint32_t length) {
 
-#ifndef __disable_usb__
+	/* ~ Create a buffer into which an entire USB packet can be received. ~ */
+	void *buffer = malloc(FMR_PACKET_SIZE);
 
-	uint8_t *buffer = (uint8_t *)(malloc(sizeof(uint8_t) * FMR_PACKET_SIZE));
+	/* ~ Ensure the request for memory was granted. ~ */
+	if (!buffer) error.raise(E_NO_MEM, ERROR_STRING(E_NO_MEM_S));
 
-	if(!buffer) {
-		error.raise(E_NO_MEM, ERROR_STRING(E_NO_MEM_S));
-	}
+	/* ~ Receive a usb packet from the active device. ~ */
+	hid_receive_packet((uint8_t)(flipper.device -> handle), buffer);
 
-	hid_receive_packet(buffer);
-
+	/* ~ Copy the appropriate amount of information from the buffer to the destination. ~ */
 	memcpy(destination, buffer, length);
 
+	/* ~ Free the buffer. ~ */
 	free(buffer);
-
-#endif
 
 }

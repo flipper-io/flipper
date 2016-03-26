@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	/* ~ Attatch this instance of libflipper to the first device present over USB. ~ */
-	flipper.attach(FLIPPER_SOURCE_USB);
+	flipper.attach(FLIPPER_USB, "elroy");
 
 	error.disclose();
 
