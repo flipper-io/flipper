@@ -22,6 +22,8 @@
 #include <usb/usb.h>
 #include <wifi/wifi.h>
 
+#include <pthread.h>
+
 /* ~ Define the flipper control type. ~ */
 typedef enum { FLIPPER_USB, FLIPPER_NETWORK, FLIPPER_FVM } lf_endpoint;
 
@@ -43,7 +45,9 @@ struct _lf_device {
 
 extern struct _flipper {
 
-	void (* attach)(lf_endpoint endpoint, char *name);
+	int (* attach)(lf_endpoint endpoint, char *name);
+
+	int (* select)(char *name);
 
 	/* ~ Points to the device to which the current instance of libflipper is attached. ~ */
 	struct _lf_device *device;
@@ -51,11 +55,15 @@ extern struct _flipper {
 	/* ~ Points to a head of a linked list representing the attached devices. ~ */
 	struct _lf_device *devices;
 
+	/* ~ All libflipper API calls are serialized with this mutex. ~ */
+	pthread_mutex_t lock;
+
 } flipper;
 
 #ifdef __private_include__
 
-extern void flipper_attach(lf_endpoint endpoint, char *name);
+extern int flipper_select(char *name);
+extern int flipper_attach(lf_endpoint endpoint, char *name);
 
 #endif
 #endif

@@ -10,19 +10,21 @@
 #define E_OPEN_SOCK            6
 #define E_CONN_SOCK            7
 #define E_FLIPPER_UNBOUND      8
-#define E_HID_MANAGER          9
-#define E_HID_NO_DEV          10
-#define E_HID_TOO_MANY        11
-#define E_HID_OPEN_DEV        12
-#define E_HID_DISCONN_DEV     13
-#define E_HID_WRITE           14
-#define E_HID_TIMEOUT         15
-#define E_IOKIT_DICT          16
-#define E_DL_NOT_FOUND        17
-#define E_DL_LOAD             18
-#define E_DL_LOADED           19
-#define E_FS_OPEN             20
-#define E_FS_ADD_LEAF         21
-#define E_FS_NO_LEAF          22
+#define E_FLIPPER_NOT_FOUND    9
+#define E_HID_MANAGER         10
+#define E_HID_NO_DEV          11
+#define E_HID_TOO_MANY        12
+#define E_HID_OPEN_DEV        13
+#define E_HID_DISCONN_DEV     14
+#define E_HID_WRITE           15
+#define E_HID_TIMEOUT         16
+#define E_IOKIT_DICT          17
+#define E_DL_NOT_FOUND        18
+#define E_DL_LOAD             19
+#define E_DL_LOADED           20
+#define E_FS_OPEN             21
+#define E_FS_ADD_LEAF         22
+#define E_FS_NO_LEAF          23
+#define E_UNIMPLEMENTED       24
 
 #endif

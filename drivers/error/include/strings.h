@@ -20,6 +20,7 @@
 #define E_OPEN_SOCK_S            "Unable to open socket."
 #define E_CONN_SOCK_S            "Unable to connect socket."
 #define E_FLIPPER_UNBOUND_S      "No device appears to be connected to this computer.\nPlease ensure that Flipper is properly connected and try again."
+#define E_FLIPPER_NOT_FOUND_S    "No device with that identifier is connected to this computer.\n"
 #define E_HID_MANAGER_S          "HID manager could not be loaded."
 #define E_HID_NO_DEV_S           "HID manager could not find the device."
 #define E_HID_TOO_MANY_S         "There are too many HID devices attached."
@@ -34,5 +35,6 @@
 #define E_FS_OPEN_S              "Failed to open file."
 #define E_FS_ADD_LEAF_S          "Failed to create file."
 #define E_FS_NO_LEAF_S           "File doesn't exist."
+#define E_UNIMPLEMENTED_S        "Feature not yet implemented."
 
 #endif
