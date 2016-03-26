@@ -34,12 +34,12 @@ endif
 
 # ~ Specify a compiler and the other utilities needed to deploy for the target. ~ #
 cc = $(shell which 'clang')
-nasm = /usr/local/bin/nasm #$(shell which 'nasm')
+nasm = $(shell which 'nasm')
 rsync = $(shell which 'rsync')
 ln = $(shell which 'ln')
 
 # ~ Declare the preprocessor statements to be used during object generation. ~ #
-preprocess = -std=c99 -g -fpic -D__verbose__ -Wno-\#pragma-messages
+preprocess = -std=c99 -fpic -D__verbose__ -Wno-\#pragma-messages
 
 # ~ Pass flags to find so that it only isolates files pertainant to the target platform. ~ #
 findflags = \( \( ! -wholename "./targets/*" -and ! -wholename "./architectures/*" \) -or \( -wholename "./targets/$(target)/*" -or -wholename "./architectures/$(architecture)/*" \) \)
