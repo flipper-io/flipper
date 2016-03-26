@@ -9,6 +9,7 @@
 
 struct _flipper flipper = {
 	flipper_attach,
+	flipper_select,
 	NULL,
 	NULL,
 	PTHREAD_MUTEX_INITIALIZER
@@ -158,8 +159,8 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 		flipper.devices = device;
 		flipper.device = device;
 
-		return 0;
-
 	}
+
+	return 0;
 
 }
