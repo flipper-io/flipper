@@ -7,111 +7,120 @@
 #include <network.h>
 
 struct _flipper flipper = {
-	flipper_configure,
 	flipper_attach
 };
 
-void flipper_configure(void) {
+/* ~ Obtain a device and endpoint for a given device name. ~ */
+struct _lf_device *lf_obtain_device(char *name) {
 
-}
+	struct _lf_device *current = flipper.devices;
 
-void flipper_attach(uint8_t source, ...) {
+	while (current) {
 
-	/* ~ Construct a va_list to access variadic arguments. ~ */
-	va_list argv;
+		/* ~ See if we have a match. ~ */
+		if (!strcmp(current -> name, name)) return current;
 
-	/* ~ Initialize the va_list that we created above. ~ */
-	va_start(argv, source);
-
-	/* ~ Create a pointer to store loaded variadic arguments. ~ */
-	char *arg;
-
-	/* ~ Select the source. ~ */
-	switch (source) {
-
-		case FLIPPER_SOURCE_USB:
-
-			/* ~ Configure the USB. ~ */
-			usb_configure();
-
-			/* ~ Set up the FMR host to accept incoming USB connections. ~ */
-			host_configure(&usb);
-
-			/* ~ Set up the FMR device to accept incoming USB connections. ~ */
-			device_configure(&usb);
-
-			break;
-
-		case FLIPPER_SOURCE_NETWORK:
-
-			/* ~ Get the IP address. ~ */
-			arg = va_arg(argv, char *);
-
-			/* ~ Configure the network. ~ */
-			network_configure(arg);
-
-			/* ~ Set up the FMR host to accept incoming network connections. ~ */
-			host_configure(&network);
-
-			/* ~ Set up the FMR device to accept incoming network connections. ~ */
-			device_configure(&network);
-
-			break;
-
-		case FLIPPER_SOURCE_FVM:
-
-			/* ~ Get the FVM path from the va_list. ~ */
-			arg = va_arg(argv, char *);
-
-			/* ~ Load the FVM. ~ */
-			void *vm = dlopen(arg, RTLD_LAZY);
-
-			/* ~ Ensure that the VM was loaded successfully. ~ */
-			if (!vm) {
-				error.raise(E_FVM_LOAD, ERROR_STRING(E_FVM_LOAD_S));
-				break;
-			}
-
-			/* ~ Get the address of the debug bus. ~ */
-			const struct _bus *fdb = dlsym(vm, "fdb");
-
-			if (dlerror() != NULL) {
-				error.raise(E_FVM_SYM, ERROR_STRING(E_FVM_SYM_S));
-				break;
-			}
-
-			/* ~ Get the address of the configuration function. ~ */
-			void (* fvm_configure)(const struct _bus *) = dlsym(vm, "fvm_configure");
-
-			if (dlerror() != NULL) {
-				error.raise(E_FVM_SYM, ERROR_STRING(E_FVM_SYM_S));
-				break;
-			}
-
-			/* ~ Configure FVM to use the FDB communications channel. ~ */
-			fvm_configure(fdb);
-
-			/* ~ Get the address of the virtual target. ~ */
-			const struct _target *fvm = dlsym(vm, "fvm");
-
-			if (dlerror() != NULL) {
-				error.raise(E_FVM_SYM, ERROR_STRING(E_FVM_SYM_S));
-				break;
-			}
-
-			/* Redirect the host and the device to FVM. */
-			memcpy((void *)(&host), (void *)(fvm), sizeof(struct _target));
-			memcpy((void *)(&device), (void *)(fvm), sizeof(struct _target));
-
-			break;
-
-		default:
-
-			break;
+		/* ~ If we don't, advance to the next attached device. ~ */
+		current = current -> next;
 
 	}
 
-	/* ~ Release the va_list. ~ */
-	va_end(argv);
+	return NULL;
+	
+}
+
+/* ~ Attach a Flipper device given an endpoint and name. ~ */
+void flipper_attach(lf_endpoint endpoint, char *name) {
+
+	/* ~ Cache a copy of the last device we were attached to. ~ */
+	struct _lf_device *last = flipper.device;
+
+	/* ~ See if we have already attached a device by the name given. ~ */
+	struct _lf_device *device = lf_obtain_device(name);
+
+	/* ~ If we haven't yet attached a device, we must create one. ~ */
+	if (!device) {
+
+		/* ~ Allocate memory to contain a new device object. ~ */
+		device = malloc(sizeof(struct _lf_device));
+
+		/* ~ Ensure we have been granted the memory. ~*/
+		if (!device) error.raise(E_NO_MEM, ERROR_STRING(E_NO_MEM_S));
+
+		/* ~ Associate the name, the identifier, and the default handler. ~ */
+		device -> name = name;
+		device -> identifier = checksum(name, strlen(name));
+		device -> handle = (void *)(-1);
+
+		/* ~ Set the global device pointer equal to the newly allocated device. ~ */
+		flipper.device = device;
+
+		/* ~ Select the source. ~ */
+		switch (endpoint) {
+
+			case FLIPPER_USB:
+
+				/* ~ Configure the USB. ~ */
+				usb_configure();
+
+				/* ~ Set up the FMR host to accept incoming USB connections. ~ */
+				host_configure(&usb);
+
+				/* ~ Set up the FMR device to accept incoming USB connections. ~ */
+				device_configure(&usb);
+
+				break;
+
+			case FLIPPER_NETWORK:
+
+				/* ~ Configure the network. ~ */
+				network_configure(name);
+
+				/* ~ Set up the FMR host to accept incoming network connections. ~ */
+				host_configure(&network);
+
+				/* ~ Set up the FMR device to accept incoming network connections. ~ */
+				device_configure(&network);
+
+				break;
+
+			case FLIPPER_FVM:
+				break;
+
+			default:
+				break;
+
+		}
+
+		if (flipper.device -> identifier < 0) {
+
+			/* ~ Raise the appropriate error. ~ */
+			error.raise(E_HID_NO_DEV, ERROR_STRING("Failed to attach the requested device."));
+
+			/* ~ If we get here, we've failed to attach a valid device. ~ */
+			free(device);
+
+			/* ~ Restore the last device that we were attached to. ~ */
+			flipper.device = last;
+
+			return;
+
+		}
+
+		/* ~ Store the new device in the linked list of attached devices. ~ */
+		struct _lf_device *current = flipper.devices;
+
+		/* ~ If the device list is not empty, walk it until we can append the new device. ~ */
+		if (current) {
+			while (current -> next) current = current -> next;
+			current -> next = device;
+		}
+
+		else {
+			/* ~ If we haven't yet attached a device, make it the head of the device list. ~ */
+			flipper.devices = device;
+		}
+
+	}
 
 }

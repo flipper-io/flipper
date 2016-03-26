@@ -16,7 +16,7 @@ void error_disclose(void) {
 	return;
 }
 
-void error_raise(uinterror_t code, unsigned char *string) {
+void error_raise(uinterror_t code, char *string) {
 	if(error.disclosed) {
 		/* ~ Save the error code into the global error state. ~ */
 		*((uinterror_t *)(&error.code)) = code;

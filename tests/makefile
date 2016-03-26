@@ -5,7 +5,7 @@ output = $(notdir $(shell 'pwd'))
 cc = $(shell which 'gcc')
 
 # ~ Declare the preprocessor statements to be used during object generation. ~ #
-preprocess = -std=c99
+preprocess = -std=c99 -g
 
 include_directories = $(FLIPPERSDK)/include ../../libflipper/include
 

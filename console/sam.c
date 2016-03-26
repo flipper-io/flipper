@@ -136,7 +136,6 @@ int sam_load_firmware(char *firmware) {
     sam.dfu();
 
     wait_with_progress(2);
-    flipper.attach(FLIPPER_SOURCE_USB);
 
 	/* Next, we need to verify that the device has properly entered programming mode. Send the handshake sequence. */
 	uint8_t connected = false;

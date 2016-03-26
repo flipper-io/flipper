@@ -23,19 +23,39 @@
 #include <wifi/wifi.h>
 
 /* ~ Define the flipper control type. ~ */
-enum { FLIPPER_SOURCE_USB, FLIPPER_SOURCE_NETWORK, FLIPPER_SOURCE_FVM };
+typedef enum { FLIPPER_USB, FLIPPER_NETWORK, FLIPPER_FVM } lf_endpoint;
+
+struct _lf_device {
+
+	/* ~ The name of the attached device. ~ */
+	char *name;
+
+	/* ~ The hardware identifier for the device. ~ */
+	uintcrc_t identifier;
+
+	/* ~ References the endpoint specific descriptor from which the device can be accessed. ~ */
+	void *handle;
+
+	/* ~ The next attached device. ~ */
+	struct _lf_device *next;
+	
+};
 
 extern struct _flipper {
 
-	void (* configure)(void);
-	void (* attach)(uint8_t source, ...);
+	void (* attach)(lf_endpoint endpoint, char *name);
+
+	/* ~ Points to the device to which the current instance of libflipper is attached. ~ */
+	struct _lf_device *device;
+
+	/* ~ Points to a head of a linked list representing the attached devices. ~ */
+	struct _lf_device *devices;
 
 } flipper;
 
 #ifdef __private_include__
 
-extern void flipper_configure(void);
-extern void flipper_attach(uint8_t source, ...);
+extern void flipper_attach(lf_endpoint endpoint, char *name);
 
 #endif
 #endif

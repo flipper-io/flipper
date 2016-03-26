@@ -111,7 +111,7 @@ fsp fs_leaf_for_key(fsp current, uint16_t key) {
 
 	if (current == 0) {
 
-		verbose("", key);
+		error.raise(E_FS_NO_LEAF, ERROR_STRING(E_FS_NO_LEAF_S));
 
 		return 0;
 

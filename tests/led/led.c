@@ -12,7 +12,7 @@
 int main(int argc, char *argv[]) {
 
 	/* ~ Attach a Flipper device over USB. ~ */
-	flipper.attach(FLIPPER_SOURCE_USB);
+	flipper.attach(FLIPPER_USB, "elroy");
 
 	/* ~ Change the LED color. ~ */
 	led.rgb(0, 0, 25);

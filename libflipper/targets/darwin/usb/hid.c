@@ -8,8 +8,6 @@
 
 #include <IOKit/hid/IOHIDLib.h>
 
-#define SELECTED_DEVICE			0
-
 #define DEFAULT_TIMEOUT			50
 
 #define printf(...)
@@ -59,7 +57,7 @@ static void input_callback(void *, IOReturn, void *, IOHIDReportType,
 //    Output:
 //	number of bytes received, or -1 on error
 //
-int8_t hid_receive_packet(uint8_t *buffer) {
+int8_t hid_receive_packet(uint8_t device, uint8_t *buffer) {
 	hid_t *hid;
 	buffer_t *b;
 	uint16_t len = FMR_PACKET_SIZE;
@@ -67,8 +65,12 @@ int8_t hid_receive_packet(uint8_t *buffer) {
 	CFRunLoopTimerContext context;
 	int ret=0, timeout_occurred=0;
 
+	printf("Opening device %i\n", device);
+	fflush(stdout);
+
 	if (len < 1) return 0;
-	hid = get_hid(SELECTED_DEVICE);
+
+	hid = get_hid(device);
 	if (!hid || !hid->open) {
 		error.raise(E_HID_OPEN_DEV, ERROR_STRING(E_HID_OPEN_DEV_S));
 		return -1;
@@ -163,12 +165,12 @@ void output_callback(void *context, IOReturn ret, void *sender,
 //    Output:
 //	number of bytes sent, or -1 on error
 //
-int8_t hid_transmit_packet(uint8_t *buffer) {
+int8_t hid_transmit_packet(uint8_t device, uint8_t *buffer) {
 	hid_t *hid;
 	uint16_t len = FMR_PACKET_SIZE;
 	int result=-100;
 
-	hid = get_hid(SELECTED_DEVICE);
+	hid = get_hid(device);
 	if (!hid || !hid->open) {
 		error.raise(E_HID_OPEN_DEV, ERROR_STRING(E_HID_OPEN_DEV_S));
 		return -1;
