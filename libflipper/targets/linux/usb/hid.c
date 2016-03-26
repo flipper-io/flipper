@@ -28,8 +28,6 @@
  * Version 1.0: Initial Release
  */
 
-#define SELECTED_DEVICE                 0
-
 #define FLIPPER_PACKET_SIZE             64
 
 #define DEFAULT_TIMEOUT                 250
@@ -119,12 +117,12 @@ static int hid_parse_item(uint32_t *val, uint8_t **data, const uint8_t *end);
 //    Output:
 //	number of bytes received, or -1 on error
 //
-int hid_receive_packet(uint8_t *buf)
+int hid_receive_packet(uint8_t device, uint8_t *buf)
 {
 	hid_t *hid;
 	int r;
 
-	hid = get_hid(SELECTED_DEVICE);
+	hid = get_hid(device);
 	if (!hid || !hid->open) {
 		error.raise(E_HID_OPEN_DEV, ERROR_STRING(E_HID_OPEN_DEV_S));
 		return -1;
@@ -144,11 +142,11 @@ int hid_receive_packet(uint8_t *buf)
 //    Output:
 //	number of bytes sent, or -1 on error
 //
-int hid_transmit_packet(uint8_t *buf)
+int hid_transmit_packet(uint8_t device, uint8_t *buf)
 {
 	hid_t *hid;
 
-	hid = get_hid(SELECTED_DEVICE);
+	hid = get_hid(device);
 	if (!hid || !hid->open) {
 		error.raise(E_HID_OPEN_DEV, ERROR_STRING(E_HID_OPEN_DEV_S));
 		return -1;
