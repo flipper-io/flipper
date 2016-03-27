@@ -3,7 +3,6 @@
 
 /* ~ Include Flipper Message Runtime specific definitions for this platform. ~ */
 #include "fmr.h"
-#include "lock.h"
 
 #define crc_attributes
 #define crc_access(dereference) dereference

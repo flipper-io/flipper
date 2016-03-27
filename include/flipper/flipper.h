@@ -4,9 +4,6 @@
 /* ~ Include the header file that exposes the API for user-accessible drivers. ~ */
 #include "drivers.h"
 
-/* ~ Include definitions needed for thread locking. ~ */
-#include <pthread.h>
-
 /* ~ Define the flipper control type. ~ */
 typedef enum { FLIPPER_USB, FLIPPER_NETWORK, FLIPPER_FVM } lf_endpoint;
 
@@ -37,9 +34,6 @@ extern struct _flipper {
 
 	/* ~ Points to a head of a linked list representing the attached devices. ~ */
 	struct _lf_device *devices;
-
-	/* ~ All libflipper API calls are serialized with this mutex. ~ */
-	pthread_mutex_t lock;
 
 } flipper;
 
