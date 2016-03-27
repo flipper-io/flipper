@@ -65,13 +65,13 @@ all: clean
 install: all
 
 	# This part sucks, figure out a better way to do it later:
-	$(sudo) cp $(output) $(PREFIX)/lib/
+	$(sudo) cp -L $(output) $(PREFIX)/lib/
 	$(sudo) chown -R $(chown_args) $(PREFIX)/lib/$(output)
 	$(sudo) chmod -R 0755 $(PREFIX)/lib/$(output)
 
 	$(sudo) mkdir -p $(PREFIX)/include/flipper
 
-	$(sudo) cp -r ../include/* $(PREFIX)/include/
+	$(sudo) cp -L -r ../include/* $(PREFIX)/include/
 
 	$(sudo) chown -R $(chown_args) $(PREFIX)/include/flipper
 	$(sudo) chmod -R 0755 $(PREFIX)/include/flipper
