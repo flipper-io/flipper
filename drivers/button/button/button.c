@@ -1,6 +1,6 @@
 #define __private_include__
-#include <button/button.h>
-#include <fmr/fmr.h>
+#include <flipper/button/button.h>
+#include <flipper/fmr/fmr.h>
 
 void button_configure(void) {
 

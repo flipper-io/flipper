@@ -1,10 +1,10 @@
 #define __private_include__
-#include <fmr/fmr.h>
-#include <platform.h>
-#include <fs/crc.h>
-#include <led/led.h>
+#include <flipper/fmr/fmr.h>
+#include <flipper/fs/crc.h>
+#include <flipper/led/led.h>
+#include <flipper/usart/usart.h>
 
-#include <usart/usart.h>
+#include <platform.h>
 
 /* ~ Global scratch space for FMR processing. ~ */
 fmr_packet fmrpacket;

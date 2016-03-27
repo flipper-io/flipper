@@ -1,5 +1,6 @@
 #define __private_include__
-#include <flipper/drivers.h>
+#include <flipper/flipper/drivers.h>
+
 #include <platform.h>
 #include <hid.h>
 

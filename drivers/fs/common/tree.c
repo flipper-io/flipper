@@ -1,7 +1,7 @@
 #define __private_include__
-#include <error/error.h>
-#include <fs/tree.h>
-#include <at45/at45.h>
+#include <flipper/error/error.h>
+#include <flipper/fs/tree.h>
+#include <flipper/at45/at45.h>
 
 /* ~ This function traverses the filesystem tree starting at a leaf pointed to by the 'current' argument until an empty branch pointer corresponding to the given key is found. ~ */
 

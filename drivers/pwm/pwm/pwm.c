@@ -1,6 +1,6 @@
 #define __private_include__
-#include <pwm/pwm.h>
-#include <fmr/fmr.h>
+#include <flipper/pwm/pwm.h>
+#include <flipper/fmr/fmr.h>
 
 void pwm_configure(void) {
 

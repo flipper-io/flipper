@@ -1,5 +1,6 @@
 #define __private_include__
-#include <led/led.h>
+#include <flipper/led/led.h>
+
 #include <platform.h>
 
 void led_configure(void) {

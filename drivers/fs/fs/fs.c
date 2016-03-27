@@ -1,10 +1,10 @@
 #define __private_include__
-#include <fs/fs.h>
-#include <fmr/fmr.h>
-#include <error/error.h>
-#include <at45/at45.h>
-#include <fs/crc.h>
-#include <fs/tree.h>
+#include <flipper/fs/fs.h>
+#include <flipper/fmr/fmr.h>
+#include <flipper/error/error.h>
+#include <flipper/at45/at45.h>
+#include <flipper/fs/crc.h>
+#include <flipper/fs/tree.h>
 
 #define FLIPPER_WANT_PROGRESS 2
 #define FLIPPER_PUSH 1

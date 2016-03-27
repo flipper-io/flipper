@@ -1,6 +1,6 @@
 #define __private_include__
-#include <wifi/wifi.h>
-#include <fmr/fmr.h>
+#include <flipper/wifi/wifi.h>
+#include <flipper/fmr/fmr.h>
 
 void wifi_configure(void) {
 

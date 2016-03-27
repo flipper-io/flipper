@@ -1,9 +1,10 @@
 #define __private_include__
-#include <flipper/flipper.h>
-#include <fmr/fmr.h>
-#include <platform.h>
-#include <usb/usb.h>
+#include <flipper/flipper/flipper.h>
+#include <flipper/fmr/fmr.h>
+#include <flipper/usb/usb.h>
+
 #include <network.h>
+#include <platform.h>
 
 struct _flipper flipper = {
 	flipper_attach,

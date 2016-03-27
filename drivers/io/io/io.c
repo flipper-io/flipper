@@ -1,6 +1,6 @@
 #define __private_include__
-#include <io/io.h>
-#include <fmr/fmr.h>
+#include <flipper/io/io.h>
+#include <flipper/fmr/fmr.h>
 
 void io_configure(void) {
 

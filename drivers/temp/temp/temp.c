@@ -1,6 +1,6 @@
 #define __private_include__
-#include <temp/temp.h>
-#include <fmr/fmr.h>
+#include <flipper/temp/temp.h>
+#include <flipper/fmr/fmr.h>
 
 void temp_configure(void) {
 

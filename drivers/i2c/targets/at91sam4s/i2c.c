@@ -1,5 +1,6 @@
 #define __private_include__
-#include <i2c/i2c.h>
+#include <fliper/i2c/i2c.h>
+
 #include <platform.h>
 
 #define AT91C_TWI_CLOCK 8000
