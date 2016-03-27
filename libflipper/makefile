@@ -32,11 +32,14 @@ else
 $(error "The operating system you are running is not supported by this build script.")
 endif
 
+PREFIX ?= /usr/local
+
 # ~ Specify a compiler and the other utilities needed to deploy for the target. ~ #
 cc = $(shell which 'clang')
 nasm = $(shell which 'nasm')
-rsync = $(shell which 'rsync')
+install = $(shell which 'install')
 ln = $(shell which 'ln')
+sudo = $(shell which 'sudo')
 
 # ~ Declare the preprocessor statements to be used during object generation. ~ #
 preprocess = -std=c99 -fpic -D__verbose__ -Wno-\#pragma-messages
@@ -55,29 +58,18 @@ all: clean
 	# ~ Link the object files together to produce an output file. ~ #
 	$(cc) -shared -rdynamic $(prefix) $(sort $(objects)) -o $(output) $(libraries)
 
-install:
-
-	# ~ Create the SDK and its subdirectories if they do not already exist. ~ #
-	mkdir -p $(PREFIX)/flipper/lib $(PREFIX)/flipper/include $(PREFIX)/flipper/resources
+install: all
 
 	# ~ Copy the library into the SDK's library directory. ~ #
-	$(rsync) -r $(output) $(PREFIX)/flipper/lib/$(output)
+	$(sudo) $(install) -g root -m 0755 -o root -T $(output) $(PREFIX)/lib/$(output)
 
-	# ~ Symlink the library into the system's library directory. ~ #
-	$(sudo) $(ln) -sf $(PREFIX)/flipper/lib/$(output) $(PREFIX)/lib/$(output)
+	# This part sucks, figure out a better way to do it later:
+	$(sudo) mkdir -p $(PREFIX)/include/flipper
 
-	# ~ Symlink the include directory into the system's include directory. ~ #
-	$(sudo) $(ln) -sfn $(PREFIX)/flipper/include $(PREFIX)/include/flipper
+	$(sudo) cp -r ../include/* $(PREFIX)/include/flipper
 
-	# ~ Symlink the master header file into the system's include directory. ~ #
-	$(sudo) $(ln) -sf $(PREFIX)/flipper/include/flipper.h $(PREFIX)/include
-
-	# ~ Copy the header files into the SDK's include directory. ~ #
-	$(rsync) -r --copy-links ../include/* $(PREFIX)/flipper/include --exclude 'flipper'
-
-	# ~ Copy the special header files into the SDK's include directory. ~ */
-	$(rsync) -r ../include/flipper/* $(PREFIX)/flipper/include
-
+	$(sudo) chown -R root:root $(PREFIX)/include/flipper
+	$(sudo) chmod -R 0755 $(PREFIX)/include/flipper
 
 clean:
 
