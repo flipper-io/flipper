@@ -1,5 +1,6 @@
 #define __private_include__
-#include <usart/usart.h>
+#include <flipper/usart/usart.h>
+
 #include <platform.h>
 
 void usart_configure(AT91S_USART *usart, uint16_t baud) {

@@ -1,7 +1,7 @@
 #ifndef __network_h__
 #define __network_h__
 
-#include <flipper/core.h>
+#include <flipper/flipper/core.h>
 
 #define FLIPPER_NETWORK_PORT 7777
 

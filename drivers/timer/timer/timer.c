@@ -1,6 +1,6 @@
 #define __private_include__
-#include <timer/timer.h>
-#include <fmr/fmr.h>
+#include <flipper/timer/timer.h>
+#include <flipper/fmr/fmr.h>
 
 void timer_configure(void) {
 

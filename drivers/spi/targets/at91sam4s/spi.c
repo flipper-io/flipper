@@ -1,5 +1,6 @@
 #define __private_include__
-#include <spi/spi.h>
+#include <flipper/spi/spi.h>
+
 #include <platform.h>
 
 void spi_configure() {

@@ -2,7 +2,7 @@
 #define __at45_h__
 
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
-#include <flipper/core.h>
+#include <flipper/flipper/core.h>
 
 /* ~ Declare the virtual driver object. ~ */
 extern const struct _at45 {

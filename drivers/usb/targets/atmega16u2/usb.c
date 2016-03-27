@@ -1,7 +1,8 @@
 #define __private_include__
-#include <usb/usb.h>
-#include <platform.h>
+#include <flipper/usb/usb.h>
+
 #include <hid.h>
+#include <platform.h>
 
 void usb_configure() {
 

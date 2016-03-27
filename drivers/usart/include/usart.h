@@ -2,7 +2,7 @@
 #define __usart_h__
 
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
-#include <flipper/core.h>
+#include <flipper/flipper/core.h>
 
 /* ~ Declare the virtual driver objects. ~ */
 extern const struct _bus usart, usart1, dbgu;

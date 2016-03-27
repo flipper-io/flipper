@@ -1,6 +1,6 @@
 #define __private_include__
-#include <fdl/fdl.h>
-#include <fmr/fmr.h>
+#include <flipper/fdl/fdl.h>
+#include <flipper/fmr/fmr.h>
 
 void fdl_configure(void) {
 

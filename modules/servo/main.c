@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-#include <flipper/flipper.h>
+#include <flipper/flipper/flipper.h>
 
 #include <servo.h>
 

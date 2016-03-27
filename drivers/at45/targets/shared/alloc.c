@@ -1,6 +1,6 @@
 #define __private_include__
-#include <at45/at45.h>
-#include <fs/fs.h>
+#include <flipper/at45/at45.h>
+#include <flipper/fs/fs.h>
 
 typedef struct _block {
 

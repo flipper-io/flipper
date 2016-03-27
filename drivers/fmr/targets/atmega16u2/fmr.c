@@ -1,7 +1,8 @@
 #define __private_include__
-#include <fmr/fmr.h>
+#include <flipper/fmr/fmr.h>
+#include <flipper/flipper/drivers.h>
+
 #include <platform.h>
-#include <flipper/drivers.h>
 
 const void * const objects[] PROGMEM = { &host, &device, &self, &led, &button, &error, &usart, &spi, &sam, &at45, &fs, &usb, &wifi };
 

@@ -1,6 +1,6 @@
 #define __private_include__
-#include <spi/spi.h>
-#include <fmr/fmr.h>
+#include <flipper/spi/spi.h>
+#include <flipper/fmr/fmr.h>
 
 void spi_configure() {
 

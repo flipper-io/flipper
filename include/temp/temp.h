@@ -1,1 +1,0 @@
-../../drivers/temp/include/temp.h

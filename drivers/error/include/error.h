@@ -2,9 +2,9 @@
 #define __error_h__
 
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
-#include <flipper/core.h>
-#include <error/codes.h>
-#include <error/strings.h>
+#include <flipper/flipper/core.h>
+#include <flipper/error/codes.h>
+#include <flipper/error/strings.h>
 
 /* ~ Expose a defined type for the size of an error code. ~ */
 typedef uint16_t uinterror_t;

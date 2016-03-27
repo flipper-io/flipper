@@ -1,5 +1,5 @@
 #define __private_include__
-#include <fs/fs.h>
+#include <flipper/fs/fs.h>
 
 /* ~ Declare all global variables. ~ */
 fsp _free_list;

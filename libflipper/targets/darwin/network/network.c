@@ -4,7 +4,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include <error/error.h>
+#include <flipper/error/error.h>
 
 const struct _bus network = {
 	network_configure,

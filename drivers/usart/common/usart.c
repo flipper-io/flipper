@@ -1,5 +1,5 @@
 #define __private_include__
-#include <usart/usart.h>
+#include <flipper/usart/usart.h>
 
 /* ~ ----------------------- USART0 ----------------------- ~ */
 

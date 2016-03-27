@@ -1,5 +1,5 @@
 #define __private_include__
-#include <error/error.h>
+#include <flipper/error/error.h>
 
 /* ~ Define the virtual driver object. ~ */
 const struct _error error = {

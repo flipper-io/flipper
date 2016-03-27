@@ -1,9 +1,10 @@
 #define __private_include__
-#include <fs/fs.h>
-#include <error/error.h>
+#include <flipper/fs/fs.h>
+#include <flipper/error/error.h>
+#include <flipper/at45/at45.h>
+#include <flipper/fs/tree.h>
+
 #include <platform.h>
-#include <at45/at45.h>
-#include <fs/tree.h>
 
 void fs_configure(void) {
 

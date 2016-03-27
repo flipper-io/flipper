@@ -1,7 +1,7 @@
 #define __private_include__
-#include <at45/at45.h>
-#include <fmr/fmr.h>
-#include <error/error.h>
+#include <flipper/at45/at45.h>
+#include <flipper/fmr/fmr.h>
+#include <flipper/error/error.h>
 
 void at45_configure(void) {
 

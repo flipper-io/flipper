@@ -1,11 +1,8 @@
-#include <usb/usb.h>
-
-#include <fmr/fmr.h>
-
-#include <error/error.h>
+#include <flipper/usb/usb.h>
+#include <flipper/fmr/fmr.h>
+#include <flipper/error/error.h>
 
 #include <IOKit/IOKitLib.h>
-
 #include <IOKit/hid/IOHIDLib.h>
 
 #define DEFAULT_TIMEOUT			50

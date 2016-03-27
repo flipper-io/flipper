@@ -1,5 +1,6 @@
 #define __private_include__
-#include <fs/fs.h>
+#include <flipper/fs/fs.h>
+
 #include <platform.h>
 
 void fs_configure(void) {

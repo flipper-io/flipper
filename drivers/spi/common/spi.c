@@ -1,5 +1,5 @@
 #define __private_include__
-#include <spi/spi.h>
+#include <flipper/spi/spi.h>
 
 /* ~ Define the virtual driver object. ~ */
 const struct _bus spi = {
