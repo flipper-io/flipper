@@ -3,16 +3,13 @@
 #include <fmr/fmr.h>
 #include <platform.h>
 #include <usb/usb.h>
-#include <dlfcn.h>
 #include <network.h>
-#include <pthread.h>
 
 struct _flipper flipper = {
 	flipper_attach,
 	flipper_select,
 	NULL,
 	NULL,
-	PTHREAD_MUTEX_INITIALIZER
 };
 
 /* ~ Obtain a device and endpoint for a given device name. ~ */
