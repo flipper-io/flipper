@@ -16,9 +16,13 @@ objformat = macho64
 # ~ Declare the library dependancies neededed for linking. ~ #
 libraries = -framework CoreFoundation -framework IOKit
 
+install_opts = -g root -m 0755 -o root
+
 else ifeq ($(target),linux)
 
 output = libflipper.so
+
+install_opts = -g root -m 0755 -o root -T
 
 ifeq ($(architecture),x86_64)
 objformat = elf64
@@ -61,7 +65,7 @@ all: clean
 install: all
 
 	# ~ Copy the library into the SDK's library directory. ~ #
-	$(sudo) $(install) -g root -m 0755 -o root -T $(output) $(PREFIX)/lib/$(output)
+	$(sudo) $(install) $(install_opts) $(output) $(PREFIX)/lib/$(output)
 
 	# This part sucks, figure out a better way to do it later:
 	$(sudo) mkdir -p $(PREFIX)/include/flipper
