@@ -1,5 +1,5 @@
 #define __private_include__
-#include <fliper/i2c/i2c.h>
+#include <flipper/i2c/i2c.h>
 
 #include <platform.h>
 
