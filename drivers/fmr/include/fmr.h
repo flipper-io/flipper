@@ -5,10 +5,10 @@
 #include <flipper/flipper/core.h>
 
 /* ~ Include all target related definitions exposed by the Flipper Message Runtime. ~ */
-#include "target.h"
+#include <flipper/fmr/target.h>
 
 /* ~ Include platform specific definitions related to the FMR. ~ */
-#include <platform.h>
+#include <flipper/platform/platform.h>
 
 typedef uint32_t fmr_handle;
 

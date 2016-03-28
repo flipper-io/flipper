@@ -2,9 +2,8 @@
 #include <flipper/flipper/flipper.h>
 #include <flipper/fmr/fmr.h>
 #include <flipper/usb/usb.h>
-
-#include <network.h>
-#include <platform.h>
+#include <flipper/platform/network.h>
+#include <flipper/platform/platform.h>
 
 struct _flipper flipper = {
 	flipper_attach,
