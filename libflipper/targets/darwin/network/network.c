@@ -1,10 +1,10 @@
 #define __private_include__
-#include <network.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
 #include <flipper/error/error.h>
+#include <flipper/platform/network.h>
 
 const struct _bus network = {
 	network_configure,
