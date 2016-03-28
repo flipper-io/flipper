@@ -28,8 +28,8 @@ attach e n = do
           enumEndpoint Network = 1
           enumEndpoint FVM     = 2
 
-foreign import ccall safe "flipper/flipper.h flipper_select"
+foreign import ccall safe "flipper/flipper/flipper.h flipper_select"
     c_flipper_select :: CString -> IO CInt
 
-foreign import ccall safe "flipper/flipper.h flipper_attach"
+foreign import ccall safe "flipper/flipper/flipper.h flipper_attach"
     c_flipper_attach :: CInt -> CString -> IO CInt
