@@ -1,7 +1,6 @@
 #define __private_include__
 #include <flipper/spi/spi.h>
-
-#include <platform.h>
+#include <flipper/platform/platform.h>
 
 #define SPI_DATA_MODE_0 0x00
 #define SPI_DATA_MODE_1 0x04

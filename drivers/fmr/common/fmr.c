@@ -3,8 +3,7 @@
 #include <flipper/fs/crc.h>
 #include <flipper/led/led.h>
 #include <flipper/usart/usart.h>
-
-#include <platform.h>
+#include <flipper/platform/platform.h>
 
 /* ~ Global scratch space for FMR processing. ~ */
 fmr_packet fmrpacket;
