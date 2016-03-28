@@ -2,6 +2,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <strings.h>
 
 #include <flipper/error/error.h>
 #include <flipper/platform/network.h>
