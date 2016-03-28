@@ -1,8 +1,7 @@
 #define __private_include__
 #include <flipper/fdl/fdl.h>
 #include <flipper/error/error.h>
-#include <platform.h>
-
+#include <flipper/platform/platform.h>
 #include <flipper/fs/fs.h>
 #include <flipper/at45/at45.h>
 #include <flipper/fs/tree.h>

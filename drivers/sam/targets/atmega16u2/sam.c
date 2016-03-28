@@ -2,8 +2,7 @@
 #include <flipper/sam/sam.h>
 #include <flipper/usart/usart.h>
 #include <flipper/led/led.h>
-
-#include <platform.h>
+#include <flipper/platform/platform.h>
 
 void sam_configure(void) {
 
