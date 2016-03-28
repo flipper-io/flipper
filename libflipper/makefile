@@ -57,7 +57,7 @@ include_directories = ../include ./include
 # ~ Include this file to recursively compile all supported file types and generate object files using the preprocessor statements above. ~ #
 include rules.make
 
-all: clean
+all:
 
 	# ~ Link the object files together to produce an output file. ~ #
 	$(cc) -shared -rdynamic $(prefix) $(sort $(objects)) -o $(output) $(libraries)
