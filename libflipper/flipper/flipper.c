@@ -70,6 +70,9 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 		device -> endpoint = endpoint;
 		device -> handle = (void *)(-1);
 
+		struct _lf_device *last = flipper.device;
+		flipper.device = device;
+
 		/* ~ Select the source. ~ */
 		switch (endpoint) {
 
@@ -81,6 +84,8 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 				usb_configure();
 
 				if(error.code != E_OK) {
+					flipper.device = last;
+					free(device);
 					return -1;
 				}
 
@@ -88,6 +93,8 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 				host_configure(&usb);
 
 				if(error.code != E_OK) {
+					flipper.device = last;
+					free(device);
 					return -1;
 				}
 
@@ -95,6 +102,8 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 				device_configure(&usb);
 
 				if(error.code != E_OK) {
+					flipper.device = last;
+					free(device);
 					return -1;
 				}
 
@@ -108,6 +117,8 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 				network_configure(name);
 
 				if(error.code != E_OK) {
+					flipper.device = last;
+					free(device);
 					return -1;
 				}
 
@@ -115,6 +126,8 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 				host_configure(&network);
 
 				if(error.code != E_OK) {
+					flipper.device = last;
+					free(device);
 					return -1;
 				}
 
@@ -122,6 +135,8 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 				device_configure(&network);
 
 				if(error.code != E_OK) {
+					flipper.device = last;
+					free(device);
 					return -1;
 				}
 
@@ -129,6 +144,7 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 
 			case FLIPPER_FVM:
 
+				flipper.device = last;
 				free(device);
 				error.raise(E_UNIMPLEMENTED, ERROR_STRING(E_UNIMPLEMENTED_S));
 				return -1;
@@ -143,6 +159,7 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 
 			/* ~ If we get here, we've failed to attach a valid device. ~ */
 			free(device);
+			flipper.device = last;
 
 			/* ~ Raise the appropriate error. ~ */
 			error.raise(E_HID_NO_DEV, ERROR_STRING("Failed to attach the requested device."));
@@ -151,12 +168,8 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 
 		}
 
-		/* ~ Store the new device in the linked list of attached devices. ~ */
-		struct _lf_device *current = flipper.devices;
-
 		device->next = flipper.devices;
 		flipper.devices = device;
-		flipper.device = device;
 
 	}
 
