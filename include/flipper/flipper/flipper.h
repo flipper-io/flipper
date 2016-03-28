@@ -15,6 +15,10 @@ struct _lf_device {
 	/* ~ The hardware identifier for the device. ~ */
 	uintcrc_t identifier;
 
+	/* ~ The endpoint via which this device is attached. This also provides
+	 *   the appropriate interpretation for the handle field. ~ */
+	lf_endpoint endpoint;
+
 	/* ~ References the endpoint specific descriptor from which the device can be accessed. ~ */
 	void *handle;
 
@@ -25,9 +29,11 @@ struct _lf_device {
 
 extern struct _flipper {
 
-	int (* attach)(lf_endpoint endpoint, char *name);
+	const int (* attach)(lf_endpoint endpoint, char *name);
 
-	int (* select)(char *name);
+	const int (* detach)(char *name);
+
+	const int (* select)(char *name);
 
 	/* ~ Points to the device to which the current instance of libflipper is attached. ~ */
 	struct _lf_device *device;
@@ -41,6 +47,7 @@ extern struct _flipper {
 
 extern int flipper_select(char *name);
 extern int flipper_attach(lf_endpoint endpoint, char *name);
+extern int flipper_detach(char *name);
 
 #endif
 #endif

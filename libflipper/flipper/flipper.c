@@ -6,8 +6,9 @@
 #include <flipper/platform/platform.h>
 
 struct _flipper flipper = {
-	flipper_attach,
-	flipper_select,
+	(const int (*)(lf_endpoint endpoint, char *name))flipper_attach,
+	(const int (*)(char *name))flipper_detach,
+	(const int (*)(char *name))flipper_select,
 	NULL,
 	NULL,
 };
@@ -66,6 +67,7 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 		/* ~ Associate the name, the identifier, and the default handler. ~ */
 		device -> name = name;
 		device -> identifier = checksum(name, strlen(name));
+		device -> endpoint = endpoint;
 		device -> handle = (void *)(-1);
 
 		/* ~ Select the source. ~ */
@@ -157,6 +159,62 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 		flipper.device = device;
 
 	}
+
+	return 0;
+
+}
+
+/* ~ Detach a Flipper device given the device name. Returns zero on success. ~ */
+int flipper_detach(char *name) {
+
+	// Cursors for current and last devices.
+	struct _lf_device *c = flipper.devices;
+	struct _lf_device *l = NULL;
+
+	while(c)
+	{
+		// Check name.
+		if(!strcmp(c->name, name))
+		{
+			break;
+		}
+		l = c;
+		c = c->next;
+	}
+
+	// Did we find a device with the provided name?
+	if(!c)
+	{
+		error.raise(E_FLIPPER_NOT_FOUND, ERROR_STRING(E_FLIPPER_NOT_FOUND_S));
+		return -1;
+	}
+
+	// Detach appropriately.
+	switch(c->endpoint)
+	{
+	case FLIPPER_USB:
+		//TODO: actually detach.
+		break;
+	case FLIPPER_NETWORK:
+		//TODO: actually detach.
+		break;
+	case FLIPPER_FVM:
+		//TODO: actually detach.
+		break;
+	}
+
+	// Detached device wasn't at the head of the list:
+	if(l)
+	{
+		l->next = c->next;
+	}
+	// Detached device was at the head of the list:
+	else
+	{
+		flipper.devices = c->next;
+	}
+
+	free(c);
 
 	return 0;
 
