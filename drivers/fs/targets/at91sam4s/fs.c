@@ -1,8 +1,7 @@
 #define __private_include__
 #include <flipper/fs/fs.h>
 #include <flipper/at45/at45.h>
-
-#include <platform.h>
+#include <flipper/platform/platform.h>
 
 void fs_configure(void) {
 	

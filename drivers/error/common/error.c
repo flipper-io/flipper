@@ -2,7 +2,7 @@
 #include <flipper/error/error.h>
 
 /* ~ Define the virtual driver object. ~ */
-const struct _error error = {
+struct _error error = {
 
 	error_configure,
 	error_withold,

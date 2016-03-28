@@ -3,8 +3,7 @@
 #include <flipper/led/led.h>
 #include <flipper/fs/crc.h>
 #include <flipper/usart/usart.h>
-
-#include <platform.h>
+#include <flipper/platform/platform.h>
 
 struct _self self = {
 	self_configure,

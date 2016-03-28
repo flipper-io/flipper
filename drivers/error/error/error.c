@@ -29,6 +29,6 @@ void error_raise(uinterror_t code, char *string) {
 }
 
 void error_clear(void) {
-	*((uinterror_t *)(&error.code)) = E_OK;
+	error.code = E_OK;
 	return;
 }

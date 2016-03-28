@@ -72,6 +72,7 @@ install: all
 	$(sudo) mkdir -p $(PREFIX)/include/flipper
 
 	$(sudo) cp -L -r ../include/* $(PREFIX)/include/
+	$(sudo) cp -L -r ./include/* $(PREFIX)/include/
 
 	$(sudo) chown -R $(chown_args) $(PREFIX)/include/flipper
 	$(sudo) chmod -R 0755 $(PREFIX)/include/flipper

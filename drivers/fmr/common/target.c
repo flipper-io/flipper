@@ -1,8 +1,7 @@
 #define __private_include__
 #include <flipper/fmr/fmr.h>
 #include <flipper/fs/crc.h>
-
-#include <platform.h>
+#include <flipper/platform/platform.h>
 
 uint8_t fmr_padding;
 
