@@ -1,6 +1,6 @@
 #define __private_include__
-#include <hid.h>
-#include <platform.h>
+#include <flipper/platform/hid.h>
+#include <flipper/platform/platform.h>
 
 const uint8_t PROGMEM endpoint[] = {
 

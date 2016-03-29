@@ -1,8 +1,7 @@
 #define __private_include__
 #include <flipper/flipper/drivers.h>
-
-#include <platform.h>
-#include <hid.h>
+#include <flipper/platform/platform.h>
+#include <flipper/platform/hid.h>
 
 extern void usb_receive_interrupt(void);
 

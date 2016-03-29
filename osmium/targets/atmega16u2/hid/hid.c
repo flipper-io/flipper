@@ -1,6 +1,6 @@
 #define __private_include__
 
-#include <hid.h>
+#include <flipper/platform/hid.h>
 
 static volatile uint8_t usb_configuration=0;
 

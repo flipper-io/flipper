@@ -1,8 +1,7 @@
 #define __private_include__
 #include <flipper/flipper/drivers.h>
-
-#include <platform.h>
-#include <scheduler.h>
+#include <flipper/platform/platform.h>
+#include <flipper/platform/scheduler.h>
 
 /* ~ Garbage delay function. ~ */
 /* ~ PLEASE MOVE ME AND REPLACE ME! ~ */
