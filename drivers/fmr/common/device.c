@@ -13,8 +13,8 @@ struct _target device = {
 void device_configure(const struct _bus *bus) {
 
 	/* ~ Configure the device's communication protocol. ~ */
-	((struct _target *)(&device)) -> bus = bus;
-	((struct _target *)(&device)) -> id = _device;
+	device.bus = bus;
+	device.id = _device;
 
 }
 
