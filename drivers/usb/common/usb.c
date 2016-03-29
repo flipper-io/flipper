@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/usb/usb.h>
+#include <flipper/usb.h>
 
 /* ~ Define the virtual driver object. ~ */
 const struct _bus usb = {

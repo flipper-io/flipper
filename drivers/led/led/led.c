@@ -1,6 +1,6 @@
 #define __private_include__
-#include <flipper/led/led.h>
-#include <flipper/fmr/fmr.h>
+#include <flipper/led.h>
+#include <flipper/fmr.h>
 
 void led_configure(void) {
 

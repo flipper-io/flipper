@@ -5,21 +5,21 @@
 #include <flipper/flipper/core.h>
 
 /* ~ Include the header files for user-accessible drivers. ~ */
-#include <flipper/at45/at45.h>
-#include <flipper/button/button.h>
-#include <flipper/error/error.h>
-#include <flipper/fdl/fdl.h>
-#include <flipper/fmr/fmr.h>
-#include <flipper/fs/fs.h>
-#include <flipper/i2c/i2c.h>
-#include <flipper/io/io.h>
-#include <flipper/led/led.h>
-#include <flipper/pwm/pwm.h>
-#include <flipper/sam/sam.h>
-#include <flipper/spi/spi.h>
-#include <flipper/timer/timer.h>
-#include <flipper/usart/usart.h>
-#include <flipper/usb/usb.h>
-#include <flipper/wifi/wifi.h>
+#include <flipper/at45.h>
+#include <flipper/button.h>
+#include <flipper/error.h>
+#include <flipper/fdl.h>
+#include <flipper/fmr.h>
+#include <flipper/fs.h>
+#include <flipper/i2c.h>
+#include <flipper/io.h>
+#include <flipper/led.h>
+#include <flipper/pwm.h>
+#include <flipper/sam.h>
+#include <flipper/spi.h>
+#include <flipper/timer.h>
+#include <flipper/usart.h>
+#include <flipper/usb.h>
+#include <flipper/wifi.h>
 
 #endif

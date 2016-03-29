@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/rtc/rtc.h>
+#include <flipper/rtc.h>
 
 /* ~ Define the virtual driver object. ~ */
 const struct _rtc rtc = {

@@ -37,8 +37,8 @@
 #include <stdint.h>
 #include <usb.h>
 
-#include <flipper/error/error.h>
-#include <flipper/usb/usb.h>
+#include <flipper/error.h>
+#include <flipper/usb.h>
 
 // On Linux there are several options to access HID devices.
 //

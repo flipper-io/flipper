@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/fs/fs.h>
+#include <flipper/fs.h>
 #include <flipper/platform/platform.h>
 
 static const uint16_t crc_table[256] crc_attributes = {

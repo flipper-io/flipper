@@ -1,13 +1,13 @@
 #define __private_include__
-#include <flipper/fdl/fdl.h>
-#include <flipper/error/error.h>
+#include <flipper/fdl.h>
+#include <flipper/error.h>
 #include <flipper/platform/platform.h>
-#include <flipper/fs/fs.h>
-#include <flipper/at45/at45.h>
+#include <flipper/fs.h>
+#include <flipper/at45.h>
 #include <flipper/fs/tree.h>
-#include <flipper/usart/usart.h>
-#include <flipper/io/io.h>
-#include <flipper/spi/spi.h>
+#include <flipper/usart.h>
+#include <flipper/io.h>
+#include <flipper/spi.h>
 
 #define AT45_PAGE_SIZE 528
 #define LOAD_PAGE 400

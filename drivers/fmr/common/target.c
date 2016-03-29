@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/fmr/fmr.h>
+#include <flipper/fmr.h>
 #include <flipper/fs/crc.h>
 #include <flipper/platform/platform.h>
 

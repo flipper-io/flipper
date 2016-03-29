@@ -1,8 +1,8 @@
 #define __private_include__
-#include <flipper/fmr/fmr.h>
-#include <flipper/led/led.h>
+#include <flipper/fmr.h>
+#include <flipper/led.h>
 #include <flipper/fs/crc.h>
-#include <flipper/usart/usart.h>
+#include <flipper/usart.h>
 #include <flipper/platform/platform.h>
 
 struct _self self = {

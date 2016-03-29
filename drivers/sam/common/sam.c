@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/sam/sam.h>
+#include <flipper/sam.h>
 
 /* ~ Define the virtual driver object. ~ */
 const struct _sam sam = {

@@ -1,7 +1,7 @@
 #ifndef __target_h__
 #define __target_h__
 
-#include <flipper/error/error.h>
+#include <flipper/error.h>
 
 #define FMR_PACKET_SIZE 64
 #define FMR_BODY_SIZE (FMR_PACKET_SIZE - sizeof(struct _fmr_header) - sizeof(struct _fmr_recipient))

@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/io/io.h>
+#include <flipper/io.h>
 #include <flipper/platform/platform.h>
 
 void io_configure(void) {

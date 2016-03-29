@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/usb/usb.h>
+#include <flipper/usb.h>
 #include <flipper/platform/hid.h>
 #include <flipper/platform/platform.h>
 

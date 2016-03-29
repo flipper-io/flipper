@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/io/io.h>
+#include <flipper/io.h>
 
 void analog_set_direction(uint8_t pin, uint8_t direction) {
 

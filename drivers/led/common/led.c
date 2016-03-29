@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/led/led.h>
+#include <flipper/led.h>
 
 /* ~ Define the virtual driver object. ~ */
 const struct _led led = {

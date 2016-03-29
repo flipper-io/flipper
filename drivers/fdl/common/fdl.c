@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/fdl/fdl.h>
+#include <flipper/fdl.h>
 
 /* ~ Define the virtual driver object. ~ */
 const struct _fdl fdl = {

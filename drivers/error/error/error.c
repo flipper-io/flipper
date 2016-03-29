@@ -1,6 +1,6 @@
 #define __private_include__
-#include <flipper/error/error.h>
-#include <flipper/fmr/fmr.h>
+#include <flipper/error.h>
+#include <flipper/fmr.h>
 
 void error_configure(void) {
 	return;
