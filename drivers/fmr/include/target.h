@@ -74,11 +74,11 @@ struct __attribute__((__packed__)) _fmr_response {
 /* ~ Declare the object prototype for a generic target: a device that responds to the Flipper Message Runtime. ~ */
 struct _target {
 
-	void (* configure)(const struct _bus *bus);
-	uint32_t (* call)(void);
-	uint32_t (* invoke)(uint8_t object, uint8_t index, uint8_t argc, ...);
-	uint32_t (* push)(uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, ...);
-	uint32_t (* pull)(uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...);
+	void (* const configure)(const struct _bus *bus);
+	uint32_t (* const call)(void);
+	uint32_t (* const invoke)(uint8_t object, uint8_t index, uint8_t argc, ...);
+	uint32_t (* const push)(uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, ...);
+	uint32_t (* const pull)(uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...);
 
 	const struct _bus *bus;
 	uint8_t id;
@@ -88,11 +88,11 @@ struct _target {
 /* ~ Declare the object prototype for the self target: the device that implements the Flipper Message Runtime. ~ */
 struct _self {
 
-	void (* configure)(const struct _bus *bus);
-	uint32_t (* call)(void);
-	uint32_t (* invoke)(const struct _target *sender);
-	uint32_t (* push)(uint8_t object, uint8_t index, uint8_t argc, uint32_t length);
-	uint32_t (* pull)(uint8_t object, uint8_t index, uint8_t argc, uint32_t length);
+	void (* const configure)(const struct _bus *bus);
+	uint32_t (* const call)(void);
+	uint32_t (* const invoke)(const struct _target *sender);
+	uint32_t (* const push)(uint8_t object, uint8_t index, uint8_t argc, uint32_t length);
+	uint32_t (* const pull)(uint8_t object, uint8_t index, uint8_t argc, uint32_t length);
 
 };
 
