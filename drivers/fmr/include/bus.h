@@ -6,14 +6,14 @@
 
 struct _bus {
 
-	void (* configure)(void *);
-	void (* enable)(void);
-	void (* disable)(void);
-	bool (* ready)(void);
-	void (* put)(uint8_t byte);
-	uint8_t (* get)(void);
-	void (* push)(void *source, uint32_t length);
-	void (* pull)(void *destination, uint32_t length);
+	void (* const configure)(void *);
+	void (* const enable)(void);
+	void (* const disable)(void);
+	bool (* const ready)(void);
+	void (* const put)(uint8_t byte);
+	uint8_t (* const get)(void);
+	void (* const push)(void *source, uint32_t length);
+	void (* const pull)(void *destination, uint32_t length);
 
 	bool synchronous;
 

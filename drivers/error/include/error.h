@@ -12,11 +12,11 @@ typedef uint16_t uinterror_t;
 /* ~ Declare the virtual driver object. ~ */
 extern struct _error {
 
-	const void (* configure)(void);
-	const void (* withold)(void);
-	const void (* disclose)(void);
-	const void (* raise)(uinterror_t code, char *string);
-	const void (* clear)(void);
+	void (* const configure)(void);
+	void (* const withold)(void);
+	void (* const disclose)(void);
+	void (* const raise)(uinterror_t code, char *string);
+	void (* const clear)(void);
 	uint8_t disclosed;
 	uinterror_t code;
 
