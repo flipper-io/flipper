@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/i2c/i2c.h>
-#include <flipper/flipper/platform.h>
+#include <flipper/platform/platform.h>
 
 #define AT91C_TWI_CLOCK 8000
 #define ERROR 0

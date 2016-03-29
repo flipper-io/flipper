@@ -1,4 +1,4 @@
-#include <platform.h>
+#include <flipper/platform/platform.h>
 
 void fiq_handler(void) {
 
