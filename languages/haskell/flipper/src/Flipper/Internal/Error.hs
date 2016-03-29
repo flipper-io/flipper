@@ -1,5 +1,9 @@
 module Flipper.Internal.Error where
 
+import Foreign.C.String
+import Foreign.Marshal.Utils
+import Foreign.Ptr
+
 import Data.Word
 
 data FlipperError = OK
@@ -71,7 +75,7 @@ codeError 8  = FlipperUnbound
 codeError 9  = FlipperNotFound
 codeError 10 = HIDManagerFailed
 codeError 11 = HIDManagerNoDevice
-codeError 12 = HIDManagerTooManyDevices
+codeError 12 = HIDTooManyDevices
 codeError 13 = HIDOpenDeviceFailed
 codeError 14 = HIDDeviceDisconnected
 codeError 15 = HIDWriteFailed
@@ -93,16 +97,16 @@ disclose :: IO ()
 disclose = c_error_disclose
 
 raise :: FlipperError -> IO ()
-raise e = c_error_raise (errorCode e) NULL
+raise e = c_error_raise (errorCode e) nullPtr
 
 clear :: IO ()
 clear = c_error_clear
 
-disclosed :: IO Bool
-disclosed = (not . toBool) <$> c_error_disclosed
+--disclosed :: IO Bool
+--disclosed = (not . toBool) <$> c_error_disclosed
 
-code :: IO FlipperError
-code = codeError <$> c_error_code
+--code :: IO FlipperError
+--code = codeError <$> c_error_code
 
 foreign import ccall safe "flipper/error/error.h error_withold"
     c_error_withold :: IO ()
@@ -117,8 +121,8 @@ foreign import ccall safe "flipper/error/error.h error_clear"
     c_error_clear :: IO ()
 
 -- Figure out how this works:
-foreign import ccall safe "flipper/error/error.h error_disclosed"
-    c_error_disclosed :: IO Word8
+--foreign import ccall safe "flipper/error/error.h error_disclosed"
+--    c_error_disclosed :: IO Word8
 
-foreign import ccall safe "flipper/error/error.h error_code"
-    c_error_code :: IO Word16
+--foreign import ccall safe "flipper/error/error.h error_code"
+--    c_error_code :: IO Word16
