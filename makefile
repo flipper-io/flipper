@@ -1,11 +1,7 @@
 .SILENT: all install uninstall clean
 .PHONY: install clean
 
-ifndef PREFIX
-ifeq ($(MAKECMDGOALS),$(filter $(MAKECMDGOALS), install uninstall))
-$(error "Error. Please specify the environment variable 'PREFIX'. The 'PREFIX' variable will direct this install script to the install location appropriate for your system.")
-endif
-endif
+PREFIX ?= /usr/local/
 
 # ~ Remove all of the pesky '.DS_Store' files. ~ #
 $(shell find . -name '.DS_Store' -exec rm -rf {} \;)
