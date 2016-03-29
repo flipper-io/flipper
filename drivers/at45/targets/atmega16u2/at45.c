@@ -1,6 +1,6 @@
 #define __private_include__
-#include <flipper/at45/at45.h>
-#include <flipper/spi/spi.h>
+#include <flipper/at45.h>
+#include <flipper/spi.h>
 #include <flipper/platform/platform.h>
 
 void at45_configure(void) {

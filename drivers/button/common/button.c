@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/button/button.h>
+#include <flipper/button.h>
 
 /* ~ Define the virtual driver object. ~ */
 const struct _button button = {

@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/error/error.h>
+#include <flipper/error.h>
 #include <flipper/platform/platform.h>
 
 void error_configure(void) {

@@ -1,6 +1,6 @@
-#include <flipper/usb/usb.h>
-#include <flipper/fmr/fmr.h>
-#include <flipper/error/error.h>
+#include <flipper/usb.h>
+#include <flipper/fmr.h>
+#include <flipper/error.h>
 
 #include <IOKit/IOKitLib.h>
 #include <IOKit/hid/IOHIDLib.h>

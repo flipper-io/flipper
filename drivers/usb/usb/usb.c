@@ -1,7 +1,7 @@
 #define __private_include__
-#include <flipper/usb/usb.h>
+#include <flipper/usb.h>
 #include <flipper/flipper/flipper.h>
-#include <flipper/fmr/fmr.h>
+#include <flipper/fmr.h>
 #include <flipper/platform/platform.h>
 
 extern int hid_enumerate(int max, int vid, int pid, int usage_page, int usage);

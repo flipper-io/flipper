@@ -1,7 +1,7 @@
 #define __private_include__
-#include <flipper/sam/sam.h>
-#include <flipper/usart/usart.h>
-#include <flipper/led/led.h>
+#include <flipper/sam.h>
+#include <flipper/usart.h>
+#include <flipper/led.h>
 #include <flipper/platform/platform.h>
 
 void sam_configure(void) {

@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/at45/at45.h>
+#include <flipper/at45.h>
 
 /* ~ Define the virtual driver object. ~ */
 const struct _at45 at45 = {

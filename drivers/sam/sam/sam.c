@@ -1,6 +1,6 @@
 #define __private_include__
-#include <flipper/sam/sam.h>
-#include <flipper/fmr/fmr.h>
+#include <flipper/sam.h>
+#include <flipper/fmr.h>
 
 void sam_configure(void) {
 

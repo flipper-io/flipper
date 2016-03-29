@@ -1,7 +1,7 @@
 #define __private_include__
 #include <flipper/flipper/flipper.h>
-#include <flipper/fmr/fmr.h>
-#include <flipper/usb/usb.h>
+#include <flipper/fmr.h>
+#include <flipper/usb.h>
 #include <flipper/platform/network.h>
 #include <flipper/platform/platform.h>
 
