@@ -13,8 +13,8 @@ struct _target host = {
 void host_configure(const struct _bus *bus) {
 
 	/* ~ Configure the host's communication protocol. ~ */
-	((struct _target *)(&host)) -> bus = bus;
-	((struct _target *)(&host)) -> id = _host;
+	host.bus = bus;
+	host.id = _host;
 
 }
 
