@@ -5,7 +5,7 @@
 #include <flipper/core.h>
 
 /* ~ Include header dependancies for the filesystem. ~ */
-#include "crc.h"
+#include <flipper/fs/crc.h>
 
 /* ~ Declare the virtual driver object. ~ */
 extern const struct _fs {
