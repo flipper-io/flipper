@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/fmr.h>
-#include <flipper/flipper/drivers.h>
+#include <flipper/drivers.h>
 #include <flipper/platform/platform.h>
 
 const void * const objects[] = { &host, &self, &device, &led, &button, &error, &usart, &spi, 0, &at45, &fs, &usb, &wifi, &io, &dbgu, &usart1, &fdl, &fmr };

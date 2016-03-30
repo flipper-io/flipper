@@ -1,4 +1,4 @@
-#include <flipper/flipper/flipper.h>
+#include <flipper/flipper.h>
 
 #include <unistd.h>
 

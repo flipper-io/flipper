@@ -2,7 +2,7 @@
 #define __flipper_h__
 
 /* ~ Include the header file that exposes the API for user-accessible drivers. ~ */
-#include <flipper/flipper/drivers.h>
+#include <flipper/drivers.h>
 
 /* ~ Define the flipper control type. ~ */
 typedef enum { FLIPPER_USB, FLIPPER_NETWORK, FLIPPER_FVM } lf_endpoint;

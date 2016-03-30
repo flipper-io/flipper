@@ -25,11 +25,11 @@ attach e n = withCString n (((not . toBool) <$>) . c_flipper_attach (enumEndpoin
 detach :: String -> IO Bool
 detach n = withCString n (((not . toBool) <$>) . c_flipper_detach)
 
-foreign import ccall safe "flipper/flipper/flipper.h flipper_select"
+foreign import ccall safe "flipper/flipper.h flipper_select"
     c_flipper_select :: CString -> IO CInt
 
-foreign import ccall safe "flipper/flipper/flipper.h flipper_attach"
+foreign import ccall safe "flipper/flipper.h flipper_attach"
     c_flipper_attach :: CInt -> CString -> IO CInt
 
-foreign import ccall safe "flipper/flipper/flipper.h flipper_detach"
+foreign import ccall safe "flipper/flipper.h flipper_detach"
     c_flipper_detach :: CString -> IO CInt

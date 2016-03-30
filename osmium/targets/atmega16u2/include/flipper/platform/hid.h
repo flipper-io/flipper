@@ -2,7 +2,7 @@
 
 #define __hid_h__
 
-#include <flipper/flipper/core.h>
+#include <flipper/core.h>
 
 #include "platform.h"
 

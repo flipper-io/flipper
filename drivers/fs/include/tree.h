@@ -2,7 +2,7 @@
 #define __tree_h__
 
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
-#include <flipper/flipper/core.h>
+#include <flipper/core.h>
 
 /* ~ This macro is used to compute the offset of a member of a leaf located at a given fsp. ~ */
 #define forward(pointer, structure, member) ((fsp)(pointer + offsetof(structure, member)))

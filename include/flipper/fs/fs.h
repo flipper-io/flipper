@@ -2,7 +2,7 @@
 #define __fs_h__
 
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
-#include <flipper/flipper/core.h>
+#include <flipper/core.h>
 
 /* ~ Include header dependancies for the filesystem. ~ */
 #include "crc.h"

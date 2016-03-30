@@ -2,7 +2,7 @@
 #define __fdl_h__
 
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
-#include <flipper/flipper/core.h>
+#include <flipper/core.h>
 
 /* ~ The base address of the FDL configuration in NVM. ~ */
 #define FDL_CONFIG_BASE 256

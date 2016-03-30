@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/flipper/drivers.h>
+#include <flipper/drivers.h>
 #include <flipper/platform/platform.h>
 #include <flipper/platform/scheduler.h>
 

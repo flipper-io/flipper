@@ -1,4 +1,4 @@
-#include <flipper/flipper/flipper.h>
+#include <flipper/flipper.h>
 #include <flipper/error.h>
 
 #include <IOKit/IOKitLib.h>
