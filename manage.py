@@ -41,9 +41,12 @@ def create_module(name):
     return
 
 def unlink_module(name):
-    p = os.path.join('include', name)
+    p = os.path.join('include/flipper', name)
+    print('Checking file ' + p + ".h")
     if os.path.exists(p):
         shutil.rmtree(p)
+    if os.path.isfile(p + ".h"):
+		os.remove(p + ".h")
     p = os.path.join('libflipper', 'drivers', name)
     if os.path.exists(p):
         shutil.rmtree(p)
@@ -63,10 +66,14 @@ def force_symlink(source, dest):
 def link_driver(driver, common, dest, intermediate):
     wd = os.getcwd()
     os.chdir(dest)
-    base = os.path.join(('..' + os.path.sep) * (dest.count(os.path.sep) + 1), '..')
-    if not os.path.exists(driver):
-        os.mkdir(driver)
-    os.chdir(driver)
+    base = os.path.join(('..' + os.path.sep) * (dest.count(os.path.sep)), '..')
+    count = len([name for name in os.listdir(os.path.join(base, intermediate)) if os.path.isfile(os.path.join(base, intermediate, name))])
+    if 'include' not in dest or count > 1:
+		print('Creating folder ' + driver + ' in ' + dest)
+		base = os.path.join(base, '..')
+		if not os.path.exists(driver):
+			os.mkdir(driver)
+		os.chdir(driver)
     if common != '':
         if not os.path.exists('common'):
             os.mkdir('common')
@@ -76,7 +83,10 @@ def link_driver(driver, common, dest, intermediate):
         os.chdir('..')
     for f in os.listdir(os.path.join(base, intermediate)):
         src = os.path.join(base, intermediate, f)
-        force_symlink(src, f)
+        if 'include' in intermediate and driver in f and count > 1:
+			force_symlink(os.path.join(('..' + os.path.sep) * (dest.count(os.path.sep)), '..', intermediate, f), os.path.join('..', f))
+        else:
+			force_symlink(src, f)
     os.chdir(wd)
 
 def rebuild_symtree():
@@ -96,7 +106,8 @@ def rebuild_symtree():
                         link_driver('shared', '', dest, os.path.join(path, 'targets', 'shared'))
             dest = os.path.join('libflipper', 'drivers')
             link_driver(driver, common, dest, os.path.join(path, driver))
-            link_driver(driver, '', 'include', os.path.join(path, 'include'))
+            dest = os.path.join('include', 'flipper')
+            link_driver(driver, '', dest, os.path.join(path, 'include'))
     return
 
 def collapse():
