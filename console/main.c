@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/flipper/flipper.h>
+#include <flipper/flipper.h>
 #include "console.h"
 #include <flipper/fs/crc.h>
 #include <unistd.h>

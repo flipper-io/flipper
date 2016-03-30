@@ -2,7 +2,7 @@
 #define __crc_h__
 
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
-#include <flipper/flipper/core.h>
+#include <flipper/core.h>
 
 typedef uint16_t uintcrc_t;
 

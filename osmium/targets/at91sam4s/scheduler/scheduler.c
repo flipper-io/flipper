@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/flipper/core.h>
+#include <flipper/core.h>
 #include <flipper/platform/platform.h>
 
 void (* task_to_execute)(void);
