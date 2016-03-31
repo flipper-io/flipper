@@ -1,10 +1,11 @@
 module Flipper.Internal.Error where
 
-import Foreign.C.String
-import Foreign.Marshal.Utils
-import Foreign.Ptr
-
 import Data.Word
+
+import Flipper.Internal.Utils
+
+import Foreign.C.String
+import Foreign.Ptr
 
 data FlipperError = OK
                   | FMRChecksumWrong

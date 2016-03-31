@@ -1,9 +1,10 @@
 module Flipper.Internal.Flipper where
 
+import Flipper.Internal.Utils
+
 import Foreign.C.String
 import Foreign.C.Types
 import Foreign.Marshal.Alloc
-import Foreign.Marshal.Utils
 
 
 -- | An endpoint via which a Flipper device may be attached.
@@ -17,13 +18,13 @@ enumEndpoint Network = 1
 enumEndpoint FVM     = 2
 
 select :: String -> IO Bool
-select n = withCString n (((not . toBool) <$>) . c_flipper_select)
+select n = withCString n ((retSuc <$>) . c_flipper_select)
 
 attach :: Endpoint -> String -> IO Bool
-attach e n = withCString n (((not . toBool) <$>) . c_flipper_attach (enumEndpoint e))
+attach e n = withCString n ((retSuc <$>) . c_flipper_attach (enumEndpoint e))
 
 detach :: String -> IO Bool
-detach n = withCString n (((not . toBool) <$>) . c_flipper_detach)
+detach n = withCString n ((retSuc <$>) . c_flipper_detach)
 
 foreign import ccall safe "flipper/flipper.h flipper_select"
     c_flipper_select :: CString -> IO CInt
