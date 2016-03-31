@@ -53,7 +53,7 @@ void network_disable(void) {
 
 }
 
-bool network_ready(void) {
+uint8_t network_ready(void) {
 	return 0;
 }
 

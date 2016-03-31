@@ -64,7 +64,7 @@ uint16_t analog_read(uint8_t pin);
 
 void digital_set_direction(uint8_t pin, uint8_t direction);
 void digital_write(uint8_t pin, uint16_t value);
-bool digital_read(uint8_t pin);
+uint8_t digital_read(uint8_t pin);
 void digital_pulse(uint8_t pin, uint16_t cycle);
 
 #endif

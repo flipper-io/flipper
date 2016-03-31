@@ -52,7 +52,7 @@ void spi_disable(void) {
 
 }
 
-bool spi_ready(void) {
+uint8_t spi_ready(void) {
 
 	/* ~ The ready state of the SPI can be determined by reading its interrupt flag. ~ */
 	return (SPSR) & (1 << SPIF);

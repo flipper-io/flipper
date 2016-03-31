@@ -30,7 +30,7 @@ void usart_disable(AT91S_USART *usart) {
 
 }
 
-bool usart_ready(AT91S_USART *usart) {
+uint8_t usart_ready(AT91S_USART *usart) {
 
 	return (usart -> US_CSR & AT91C_US_RXRDY);
 
@@ -96,7 +96,7 @@ void usart0_disable(void) {
 
 }
 
-bool usart0_ready(void) {
+uint8_t usart0_ready(void) {
 
 	return usart_ready(AT91C_BASE_US0);
 
@@ -153,7 +153,7 @@ void usart1_disable(void) {
 
 }
 
-bool usart1_ready(void) {
+uint8_t usart1_ready(void) {
 
 	return usart_ready(AT91C_BASE_US1);
 
@@ -197,7 +197,7 @@ void dbgu_disable(void) {
 
 }
 
-bool dbgu_ready(void) {
+uint8_t dbgu_ready(void) {
 
 	return 0;
 

@@ -35,7 +35,7 @@ void usb_disable(void) {
 
 }
 
-bool usb_ready(void) {
+uint8_t usb_ready(void) {
 
 	return 0;
 

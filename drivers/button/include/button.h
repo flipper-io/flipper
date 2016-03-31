@@ -8,7 +8,7 @@
 extern const struct _button {
 
 	void (* configure)(void);
-	bool (* read)(void);
+	uint8_t (* read)(void);
 
 } button;
 
@@ -19,7 +19,7 @@ enum { _button_configure, _button_read };
 
 /* ~ Declare all function prototypes for this driver. ~ */
 void button_configure(void);
-bool button_read(void);
+uint8_t button_read(void);
 
 #endif
 #endif

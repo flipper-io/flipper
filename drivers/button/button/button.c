@@ -6,8 +6,8 @@ void button_configure(void) {
 
 }
 
-bool button_read(void) {
+uint8_t button_read(void) {
 
-	return (bool)(device.invoke(_button, _button_read, NO_ARGS) & 1);
+	return (uint8_t)(device.invoke(_button, _button_read, NO_ARGS) & 1);
 
 }

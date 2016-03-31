@@ -43,7 +43,7 @@ void *at45_dereference(fsp source, uint32_t length);
 
 /* ~ Declare all necessary private driver functions. ~ */
 void at45_transfer_page_to_buffer_with_erase(uint16_t page, uint8_t buffer);
-void at45_transfer_buffer_to_page_with_erase(uint8_t buffer, uint16_t page, bool erase);
+void at45_transfer_buffer_to_page_with_erase(uint8_t buffer, uint16_t page, uint8_t erase);
 void at45_begin_writing_to_buffer_with_offset(uint8_t buffer, uint16_t offset);
 void at45_begin_continuous_read(uint16_t page, uint16_t offset);
 
