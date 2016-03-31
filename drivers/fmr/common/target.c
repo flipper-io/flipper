@@ -10,7 +10,6 @@ uint8_t validate_target(const struct _target *target) {
 
 	/* ~ If we've been asked to send a packet but have no target, this is a dangling instance of libflipper. ~ */
 	if (!(target -> bus)) {
-
 		error.raise(E_FLIPPER_UNBOUND, ERROR_STRING(E_FLIPPER_UNBOUND_S));
 		return 0;
 	}

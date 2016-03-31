@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
 	char *hello = "ABCDEFGHIJK";
 	usart1.push(hello, strlen(hello));
 
-	printf("Error code: %i\n", error.code);
+	printf("Error code: %i\n", error.get());
 
 	//printf("\n\nGot character: '%c'\n\n", usart1.get());
 

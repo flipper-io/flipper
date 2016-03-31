@@ -31,6 +31,12 @@ void error_raise(uinterror_t code, char *string) {
 	return;
 }
 
+uinterror_t error_get(void) {
+
+	return error_code;
+
+}
+
 void error_clear(void) {
 	error_code = E_OK;
 	return;

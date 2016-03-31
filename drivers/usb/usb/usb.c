@@ -13,9 +13,7 @@ void usb_configure() {
 	uint8_t device = hid_enumerate(1, CARBON_VENDOR_ID, CARBON_PRODUCT_ID, CARBON_USAGE_PAGE, CARBON_USAGE);
 
 	if (!device) {
-
 		error.raise(E_FLIPPER_UNBOUND, ERROR_STRING(E_FLIPPER_UNBOUND_S));
-
 	}
 
 	flipper_device -> handle = 0;
