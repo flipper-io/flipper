@@ -99,14 +99,14 @@ disclose = c_error_disclose
 raise :: FlipperError -> IO ()
 raise e = c_error_raise (errorCode e) nullPtr
 
+get :: IO FlipperError
+get = codeError <$> c_error_get
+
 clear :: IO ()
 clear = c_error_clear
 
 --disclosed :: IO Bool
 --disclosed = (not . toBool) <$> c_error_disclosed
-
---code :: IO FlipperError
---code = codeError <$> c_error_code
 
 foreign import ccall safe "flipper/error/error.h error_withold"
     c_error_withold :: IO ()
@@ -116,6 +116,9 @@ foreign import ccall safe "flipper/error/error.h error_disclose"
 
 foreign import ccall safe "flipper/error/error.h error_raise"
     c_error_raise :: Word16 -> CString -> IO ()
+
+foreign import ccall safe "flipper/error/error.h error_get"
+    c_error_get :: IO Word16
 
 foreign import ccall safe "flipper/error/error.h error_clear"
     c_error_clear :: IO ()
