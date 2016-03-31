@@ -3,7 +3,7 @@
 #include <flipper/drivers.h>
 #include <flipper/platform/platform.h>
 
-const void * const objects[] PROGMEM = { &host, &device, &self, &led, &button, &error, &usart, &spi, &sam, &at45, &fs, &usb, &wifi };
+const void * const objects[] PROGMEM = { &host, &device, &self, &led, &button, &config, &error, &usart, &spi, &sam, &at45, &fs, &usb, &wifi };
 
 void usb_receive_interrupt(void) {
 

@@ -1,6 +1,6 @@
 #define __private_include__
-#include <template/template.h>
-#include <fmr/fmr.h>
+#include <flipper/template.h>
+#include <flipper/fmr.h>
 
 void template_configure(void) {
 
