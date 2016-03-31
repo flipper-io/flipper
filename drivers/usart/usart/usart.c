@@ -22,9 +22,9 @@ void usart0_disable(void) {
 
 }
 
-bool usart0_ready(void) {
+uint8_t usart0_ready(void) {
 
-	return (bool)(device.invoke(_usart, _usart_ready, NO_ARGS));
+	return (uint8_t)(device.invoke(_usart, _usart_ready, NO_ARGS));
 
 }
 
@@ -72,9 +72,9 @@ void usart1_disable(void) {
 
 }
 
-bool usart1_ready(void) {
+uint8_t usart1_ready(void) {
 
-	return (bool)(host.invoke(_usart1, _usart_ready, NO_ARGS));
+	return (uint8_t)(host.invoke(_usart1, _usart_ready, NO_ARGS));
 
 }
 
@@ -122,9 +122,9 @@ void dbgu_disable(void) {
 
 }
 
-bool dbgu_ready(void) {
+uint8_t dbgu_ready(void) {
 
-	return (bool)(host.invoke(_dbgu, _usart_ready, NO_ARGS));
+	return (uint8_t)(host.invoke(_dbgu, _usart_ready, NO_ARGS));
 
 }
 

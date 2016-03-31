@@ -12,7 +12,7 @@ static PyObject *py_sam_reset(PyObject *self, PyObject *arguments) {
 
 static PyObject *py_sam_set_power(PyObject *self, PyObject *arguments) {
 	
-	bool power;
+	uint8_t power;
 	
 	PyArg_ParseTuple(arguments, "b", &power);
 	

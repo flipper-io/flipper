@@ -16,7 +16,7 @@ enum { _spi_configure, _spi_enable, _spi_disable, _spi_ready, _spi_put, _spi_get
 void spi_configure();
 void spi_enable(void);
 void spi_disable(void);
-bool spi_ready(void);
+uint8_t spi_ready(void);
 void spi_put(uint8_t byte);
 uint8_t spi_get(void);
 void spi_push(void *source, uint32_t length);

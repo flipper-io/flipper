@@ -30,7 +30,7 @@ void usart0_disable(void) {
 
 }
 
-bool usart0_ready(void) {
+uint8_t usart0_ready(void) {
 
 	return (UCSR1A & (1 << RXC1));
 

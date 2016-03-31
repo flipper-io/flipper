@@ -42,7 +42,7 @@ void sam_engage(void) {
 
 /* ~ This function turns the power to the main processor on or off. ~ */
 
-void sam_set_power(bool power) {
+void sam_set_power(uint8_t power) {
 
 	if (power) {
 

@@ -9,13 +9,13 @@ struct _bus {
 	void (* const configure)(void *);
 	void (* const enable)(void);
 	void (* const disable)(void);
-	bool (* const ready)(void);
+	uint8_t (* const ready)(void);
 	void (* const put)(uint8_t byte);
 	uint8_t (* const get)(void);
 	void (* const push)(void *source, uint32_t length);
 	void (* const pull)(void *destination, uint32_t length);
 
-	bool synchronous;
+	uint8_t synchronous;
 
 };
 

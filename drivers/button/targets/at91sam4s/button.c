@@ -6,7 +6,7 @@ void button_configure(void) {
 
 }
 
-bool button_read(void) {
+uint8_t button_read(void) {
 
 	return false;
 

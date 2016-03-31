@@ -18,9 +18,9 @@ void spi_disable(void) {
 
 }
 
-bool spi_ready(void) {
+uint8_t spi_ready(void) {
 
-	return (bool)(device.invoke(_spi, _spi_enable, NO_ARGS));
+	return (uint8_t)(device.invoke(_spi, _spi_enable, NO_ARGS));
 
 }
 
