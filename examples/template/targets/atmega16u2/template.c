@@ -1,6 +1,6 @@
 #define __private_include__
-#include <template/template.h>
-#include <platform.h>
+#include <flipper/template.h>
+#include <flipper/platform/platform.h>
 
 void template_configure(void) {
 
