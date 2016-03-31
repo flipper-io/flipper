@@ -1,7 +1,7 @@
 #ifndef __qux_h__
 #define __qux_h__
 
-#include <flipper/flipper.h>
+#include <flipper.h>
 
 /* ~ Declare the virtual interface for the qux driver. ~ */
 extern const struct _qux {

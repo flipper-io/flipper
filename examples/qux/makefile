@@ -1,7 +1,7 @@
 all:
 	$(MAKE) -C driver/device
 
-	gcc main.c driver/common.c driver/qux.c -I driver -I $(FLIPPERSDK)/include -lflipper -o qux
+	gcc main.c driver/common.c driver/qux.c -I driver -I /usr/local/include -lflipper -o qux
 
 load:
 
@@ -10,4 +10,5 @@ load:
 	$(MAKE) -C driver/device load
 
 clean:
+	$(MAKE) -C driver/device clean
 	rm -rf qux
