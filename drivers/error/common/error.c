@@ -7,7 +7,6 @@ const struct _error error = {
 	error_withold,
 	error_disclose,
 	error_raise,
+	error_get,
 	error_clear,
-	&error_disclosed,
-	&error_code
 };

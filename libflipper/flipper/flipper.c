@@ -84,7 +84,7 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 				/* ~ Configure the USB. ~ */
 				usb_configure();
 
-				if(error.code != E_OK) {
+				if(error.get() != E_OK) {
 					flipper_device = last;
 					free(device);
 					return -1;
@@ -93,20 +93,8 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 				/* ~ Set up the FMR host to accept incoming USB connections. ~ */
 				host_configure(&usb);
 
-				if(error.code != E_OK) {
-					flipper_device = last;
-					free(device);
-					return -1;
-				}
-
 				/* ~ Set up the FMR device to accept incoming USB connections. ~ */
 				device_configure(&usb);
-
-				if(error.code != E_OK) {
-					flipper_device = last;
-					free(device);
-					return -1;
-				}
 
 				break;
 
@@ -117,7 +105,7 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 				/* ~ Configure the network. ~ */
 				network_configure(name);
 
-				if(error.code != E_OK) {
+				if(error.get() != E_OK) {
 					flipper_device = last;
 					free(device);
 					return -1;
@@ -126,7 +114,7 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 				/* ~ Set up the FMR host to accept incoming network connections. ~ */
 				host_configure(&network);
 
-				if(error.code != E_OK) {
+				if(error.get() != E_OK) {
 					flipper_device = last;
 					free(device);
 					return -1;
@@ -135,7 +123,7 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 				/* ~ Set up the FMR device to accept incoming network connections. ~ */
 				device_configure(&network);
 
-				if(error.code != E_OK) {
+				if(error.get() != E_OK) {
 					flipper_device = last;
 					free(device);
 					return -1;

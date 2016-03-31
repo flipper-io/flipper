@@ -16,9 +16,8 @@ extern const struct _error {
 	void (*withold)(void);
 	void (*disclose)(void);
 	void (*raise)(uinterror_t code, char *string);
+	uinterror_t (* get)(void);
 	void (*clear)(void);
-	uint8_t *disclosed;
-	uinterror_t *code;
 
 } error;
 
@@ -32,6 +31,7 @@ extern void error_configure(void);
 extern void error_withold(void);
 extern void error_disclose(void);
 extern void error_raise(uinterror_t code, char *string);
+extern uinterror_t error_get(void);
 extern void error_clear(void);
 
 extern uint8_t error_disclosed;
