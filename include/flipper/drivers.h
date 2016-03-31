@@ -7,6 +7,7 @@
 /* ~ Include the header files for user-accessible drivers. ~ */
 #include <flipper/at45.h>
 #include <flipper/button.h>
+#include <flipper/config.h>
 #include <flipper/error.h>
 #include <flipper/fdl.h>
 #include <flipper/fmr.h>

@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
 	}
 	
 	/* ~ Attach to a Flipper device over USB. ~ */
-	flipper.attach(FLIPPER_SOURCE_USB);
+	flipper.attach(FLIPPER_USB, "");
 	
 	/* ~ Configure the 'qux' module. ~ */
 	qux.configure();

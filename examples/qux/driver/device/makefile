@@ -1,18 +1,37 @@
-llvm_flags = -std=c99 -Os -target armv7-none-elf -march=arm7tdmi -mfloat-abi=soft -fPIC -nostdlib -ffreestanding -fomit-frame-pointer -fPIC
+cflags = -std=c99 -Os -mcpu=arm7tdmi -nostdlib -ffreestanding -fomit-frame-pointer -fpic
+
+flags = $(cflags) -D__device_compilation__
+
+targets = *.c ../common.c
+
+includes = -I .. -I . -I /usr/local/include
+
+cc = arm-elf-gcc
+
+objcopy = arm-elf-objcopy
 
 all:
-	
-	clang $(llvm_flags) -D__device_compilation__ -c qux.c ../common.c -I .. -I /usr/local/include -I /usr/local/include/flipper --sysroot "/Development/flipper-toolbox/resources/osx/arm-elf/arm-elf" -I "/Development/flipper-toolbox/resources/osx/arm-elf/arm-elf/include"
 
-	arm-elf-gcc-4.7 -fPIC -nostdlib -ffreestanding -fomit-frame-pointer -Wl,-T dl.ld *.o -o qux.elf
+	# ~ Compile individual targets. ~ #
+	$(cc) $(flags) $(includes) -c $(targets)
 
-	arm-elf-objcopy -O binary qux.elf qux.bin
+	# ~ Link objects. ~ * #
+	$(cc) $(cflags) -Wl,-T dl.ld *.o -o dl.elf
 
-	arm-elf-objdump -D qux.elf
+	# ~ Dump loadable. ~ #
+	$(objcopy) -O binary dl.elf dl.bin
 
-load: all
+dump:
 
-	flipper load io.flipper.qux qux.bin
+	arm-elf-objdump -D dl.elf
+
+load:
+
+	flipper load io.flipper.dl dl.bin
+
+launch:
+
+	flipper launch io.flipper.dl
 
 clean:
 
