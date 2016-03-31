@@ -4,9 +4,9 @@
 #include <flipper/fmr.h>
 #include <flipper/platform/platform.h>
 
-extern int hid_enumerate(int max, int vid, int pid, int usage_page, int usage);
-extern int8_t hid_transmit_packet(uint8_t device, uint8_t *buffer);
-extern int8_t hid_receive_packet(uint8_t device, uint8_t *buffer);
+int hid_enumerate(int max, int vid, int pid, int usage_page, int usage);
+int8_t hid_transmit_packet(uint8_t device, uint8_t *buffer);
+int8_t hid_receive_packet(uint8_t device, uint8_t *buffer);
 
 void usb_configure() {
 

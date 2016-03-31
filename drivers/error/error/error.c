@@ -20,7 +20,7 @@ void error_disclose(void) {
 }
 
 void error_raise(uinterror_t code, char *string) {
-	if(error.disclosed) {
+	if(error_disclosed) {
 		/* ~ Save the error code into the global error state. ~ */
 		error_code = code;
 	}
