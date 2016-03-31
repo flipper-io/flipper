@@ -17,7 +17,7 @@ extern const struct _timer {
 enum { _timer_configure };
 
 /* ~ Declare all function prototypes for this driver. ~ */
-extern void timer_configure(void);
+void timer_configure(void);
 
 #endif
 #endif

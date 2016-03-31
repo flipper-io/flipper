@@ -24,8 +24,8 @@ extern const struct _led {
 enum { _led_configure, _led_set_rgb };
 
 /* ~ Declare all function prototypes for this driver. ~ */
-extern void led_configure(void);
-extern void led_set_rgb(uint8_t r, uint8_t g, uint8_t b);
+void led_configure(void);
+void led_set_rgb(uint8_t r, uint8_t g, uint8_t b);
 
 #endif
 #endif

@@ -70,10 +70,10 @@ extern const struct _fmr {
 enum { _fmr_configure, _fmr_bind, _fmr_invoke, _fmr_resolve };
 
 /* ~ Declare all function prototypes for this driver. ~ */
-extern void fmr_configure(void);
-extern fmr_handle fmr_bind(uint16_t bundle);
-extern uint32_t fmr_invoke(fmr_handle handle, uint8_t index, uint8_t argc, ...);
-extern void *fmr_resolve(void *source, uint32_t length);
+void fmr_configure(void);
+fmr_handle fmr_bind(uint16_t bundle);
+uint32_t fmr_invoke(fmr_handle handle, uint8_t index, uint8_t argc, ...);
+void *fmr_resolve(void *source, uint32_t length);
 
 #endif
 #endif

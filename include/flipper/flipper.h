@@ -27,27 +27,24 @@ struct _lf_device {
 	
 };
 
-extern struct _flipper {
+const extern struct _flipper {
 
-	const int (* attach)(lf_endpoint endpoint, char *name);
+	int (* attach)(lf_endpoint endpoint, char *name);
 
-	const int (* detach)(char *name);
+	int (* detach)(char *name);
 
-	const int (* select)(char *name);
-
-	/* ~ Points to the device to which the current instance of libflipper is attached. ~ */
-	struct _lf_device *device;
-
-	/* ~ Points to a head of a linked list representing the attached devices. ~ */
-	struct _lf_device *devices;
+	int (* select)(char *name);
 
 } flipper;
 
 #ifdef __private_include__
 
-extern int flipper_select(char *name);
-extern int flipper_attach(lf_endpoint endpoint, char *name);
-extern int flipper_detach(char *name);
+int flipper_select(char *name);
+int flipper_attach(lf_endpoint endpoint, char *name);
+int flipper_detach(char *name);
+
+extern struct _lf_device *flipper_device;
+extern struct _lf_device *flipper_devices;
 
 #endif
 #endif

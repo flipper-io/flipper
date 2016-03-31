@@ -2,14 +2,12 @@
 #include <flipper/error.h>
 
 /* ~ Define the virtual driver object. ~ */
-struct _error error = {
-
+const struct _error error = {
 	error_configure,
 	error_withold,
 	error_disclose,
 	error_raise,
 	error_clear,
-	0,
-	E_OK
-
+	&error_disclosed,
+	&error_code
 };

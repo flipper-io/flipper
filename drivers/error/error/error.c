@@ -2,24 +2,27 @@
 #include <flipper/error.h>
 #include <flipper/fmr.h>
 
+uint8_t error_disclosed = 0;
+uinterror_t error_code = E_OK;
+
 void error_configure(void) {
 	return;
 }
 
 void error_withold(void) {
-	error.disclosed = 0;
+	error_disclosed = 0;
 	return;
 }
 
 void error_disclose(void) {
-	error.disclosed = 1;
+	error_disclosed = 1;
 	return;
 }
 
 void error_raise(uinterror_t code, char *string) {
 	if(error.disclosed) {
 		/* ~ Save the error code into the global error state. ~ */
-		error.code = code;
+		error_code = code;
 	}
 	else {
 		fprintf(stderr, "%s\n", string);
@@ -29,6 +32,6 @@ void error_raise(uinterror_t code, char *string) {
 }
 
 void error_clear(void) {
-	error.code = E_OK;
+	error_code = E_OK;
 	return;
 }

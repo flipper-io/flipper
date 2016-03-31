@@ -18,7 +18,7 @@ void usb_configure() {
 
 	}
 
-	flipper.device -> handle = 0;
+	flipper_device -> handle = 0;
 
 }
 
@@ -56,7 +56,7 @@ void usb_push(void *source, uint32_t length) {
 	if (length > FMR_PACKET_SIZE) { error.raise(E_TOO_BIG, ERROR_STRING("A request was made to send more information than can fit in a single USB packet.")); return; }
 
 	/* ~ Send a usb packet to the active device. ~ */
-	hid_transmit_packet((uint8_t)(flipper.device -> handle), source);
+	hid_transmit_packet((uint8_t)(flipper_device -> handle), source);
 
 }
 
@@ -69,7 +69,7 @@ void usb_pull(void *destination, uint32_t length) {
 	if (!buffer) error.raise(E_NO_MEM, ERROR_STRING(E_NO_MEM_S));
 
 	/* ~ Receive a usb packet from the active device. ~ */
-	hid_receive_packet((uint8_t)(flipper.device -> handle), buffer);
+	hid_receive_packet((uint8_t)(flipper_device -> handle), buffer);
 
 	/* ~ Copy the appropriate amount of information from the buffer to the destination. ~ */
 	memcpy(destination, buffer, length);

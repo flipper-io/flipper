@@ -5,18 +5,19 @@
 #include <flipper/platform/network.h>
 #include <flipper/platform/platform.h>
 
-struct _flipper flipper = {
-	(const int (*)(lf_endpoint endpoint, char *name))flipper_attach,
-	(const int (*)(char *name))flipper_detach,
-	(const int (*)(char *name))flipper_select,
-	NULL,
-	NULL,
+const struct _flipper flipper = {
+	flipper_attach,
+	flipper_detach,
+	flipper_select,
 };
+
+struct _lf_device *flipper_device = NULL;
+struct _lf_device *flipper_devices = NULL;
 
 /* ~ Obtain a device and endpoint for a given device name. ~ */
 struct _lf_device *lf_obtain_device(char *name) {
 
-	struct _lf_device *current = flipper.devices;
+	struct _lf_device *current = flipper_devices;
 
 	while (current) {
 
@@ -42,7 +43,7 @@ int flipper_select(char *name) {
 		error.raise(E_FLIPPER_NOT_FOUND, ERROR_STRING(E_FLIPPER_NOT_FOUND_S));
 		return -1;
 	}
-	flipper.device = device;
+	flipper_device = device;
 	return 0;
 }
 
@@ -70,8 +71,8 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 		device -> endpoint = endpoint;
 		device -> handle = (void *)(-1);
 
-		struct _lf_device *last = flipper.device;
-		flipper.device = device;
+		struct _lf_device *last = flipper_device;
+		flipper_device = device;
 
 		/* ~ Select the source. ~ */
 		switch (endpoint) {
@@ -84,7 +85,7 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 				usb_configure();
 
 				if(error.code != E_OK) {
-					flipper.device = last;
+					flipper_device = last;
 					free(device);
 					return -1;
 				}
@@ -93,7 +94,7 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 				host_configure(&usb);
 
 				if(error.code != E_OK) {
-					flipper.device = last;
+					flipper_device = last;
 					free(device);
 					return -1;
 				}
@@ -102,7 +103,7 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 				device_configure(&usb);
 
 				if(error.code != E_OK) {
-					flipper.device = last;
+					flipper_device = last;
 					free(device);
 					return -1;
 				}
@@ -117,7 +118,7 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 				network_configure(name);
 
 				if(error.code != E_OK) {
-					flipper.device = last;
+					flipper_device = last;
 					free(device);
 					return -1;
 				}
@@ -126,7 +127,7 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 				host_configure(&network);
 
 				if(error.code != E_OK) {
-					flipper.device = last;
+					flipper_device = last;
 					free(device);
 					return -1;
 				}
@@ -135,7 +136,7 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 				device_configure(&network);
 
 				if(error.code != E_OK) {
-					flipper.device = last;
+					flipper_device = last;
 					free(device);
 					return -1;
 				}
@@ -144,7 +145,7 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 
 			case FLIPPER_FVM:
 
-				flipper.device = last;
+				flipper_device = last;
 				free(device);
 				error.raise(E_UNIMPLEMENTED, ERROR_STRING(E_UNIMPLEMENTED_S));
 				return -1;
@@ -159,7 +160,7 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 
 			/* ~ If we get here, we've failed to attach a valid device. ~ */
 			free(device);
-			flipper.device = last;
+			flipper_device = last;
 
 			/* ~ Raise the appropriate error. ~ */
 			error.raise(E_HID_NO_DEV, ERROR_STRING("Failed to attach the requested device."));
@@ -168,8 +169,8 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 
 		}
 
-		device->next = flipper.devices;
-		flipper.devices = device;
+		device->next = flipper_devices;
+		flipper_devices = device;
 
 	}
 
@@ -181,7 +182,7 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 int flipper_detach(char *name) {
 
 	// Cursors for current and last devices.
-	struct _lf_device *c = flipper.devices;
+	struct _lf_device *c = flipper_devices;
 	struct _lf_device *l = NULL;
 
 	while(c)
@@ -224,7 +225,7 @@ int flipper_detach(char *name) {
 	// Detached device was at the head of the list:
 	else
 	{
-		flipper.devices = c->next;
+		flipper_devices = c->next;
 	}
 
 	free(c);

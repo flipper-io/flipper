@@ -23,13 +23,13 @@ extern const struct _sam {
 enum { _sam_configure, _sam_set_power, _sam_reset, _sam_load_dfu, _sam_format, _sam_suspend, _sam_engage };
 
 /* ~ Declare all function prototypes for this driver. ~ */
-extern void sam_configure(void);
-extern void sam_set_power(bool power);
-extern void sam_reset(void);
-extern void sam_load_dfu(void);
-extern void sam_format(void);
-extern void sam_suspend(void);
-extern void sam_engage(void);
+void sam_configure(void);
+void sam_set_power(bool power);
+void sam_reset(void);
+void sam_load_dfu(void);
+void sam_format(void);
+void sam_suspend(void);
+void sam_engage(void);
 
 #endif
 #endif

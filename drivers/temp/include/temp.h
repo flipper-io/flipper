@@ -17,7 +17,7 @@ extern const struct _temp {
 enum { _temp_configure };
 
 /* ~ Declare all function prototypes for this driver. ~ */
-extern void temp_configure(void);
+void temp_configure(void);
 
 #endif
 #endif

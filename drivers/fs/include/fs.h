@@ -32,14 +32,14 @@ extern fsp _root_leaf;
 enum { _fs_configure, _fs_format };
 
 /* ~ Declare all function prototypes for this driver. ~ */
-extern void fs_configure(void);
-extern void fs_format(void);
+void fs_configure(void);
+void fs_format(void);
 
 /* ~ Returns a filesystem pointer to the data of the specified file. ~ */
-extern fsp fs_data(char *name);
+fsp fs_data(char *name);
 
-extern void fs_transfer_file(char *path, char *name);
-extern void fs_download_file(char *name, char *path);
+void fs_transfer_file(char *path, char *name);
+void fs_download_file(char *name, char *path);
 
 #endif
 #endif

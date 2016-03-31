@@ -17,7 +17,7 @@ extern const struct _rtc {
 enum { _rtc_configure };
 
 /* ~ Declare all function prototypes for this driver. ~ */
-extern void rtc_configure(void);
+void rtc_configure(void);
 
 #endif
 #endif
