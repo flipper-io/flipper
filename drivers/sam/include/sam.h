@@ -8,7 +8,7 @@
 extern const struct _sam {
 
 	void (* configure)(void);
-	void (* power)(bool power);
+	void (* power)(uint8_t power);
 	void (* reset)(void);
 	void (* dfu)(void);
 	void (* format)(void);
@@ -24,7 +24,7 @@ enum { _sam_configure, _sam_set_power, _sam_reset, _sam_load_dfu, _sam_format, _
 
 /* ~ Declare all function prototypes for this driver. ~ */
 void sam_configure(void);
-void sam_set_power(bool power);
+void sam_set_power(uint8_t power);
 void sam_reset(void);
 void sam_load_dfu(void);
 void sam_format(void);

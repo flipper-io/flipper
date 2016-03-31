@@ -16,7 +16,7 @@ enum { _usb_configure, _usb_enable, _usb_disable, _usb_ready, _usb_put, _usb_get
 void usb_configure();
 void usb_enable(void);
 void usb_disable(void);
-bool usb_ready(void);
+uint8_t usb_ready(void);
 void usb_put(uint8_t byte);
 uint8_t usb_get(void);
 void usb_push(void *source, uint32_t length);

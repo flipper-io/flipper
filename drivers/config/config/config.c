@@ -6,14 +6,14 @@ void config_configure(void) {
 
 }
 
-void config_write(lf_config key, uintconfig_t value) {
+void config_write(uint8_t key, uint16_t value) {
 
-	device_invoke(_config, _config_read, device_args(key, value));
+	device.invoke(_config, _config_write, 2, key, value);
 
 }
 
-uintconfig_t config_read(lf_config key) {
+uint16_t config_read(uint8_t key) {
 
-	return (uintconfig_t)(device_invoke(_config, _config_read, device_args(key)));
+	return device.invoke(_config, _config_read, 1, key);
 
 }

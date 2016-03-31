@@ -6,7 +6,7 @@ void sam_configure(void) {
 
 }
 
-void sam_set_power(bool power) {
+void sam_set_power(uint8_t power) {
 
 	device.invoke(_sam, _sam_set_power, 1, power);
 

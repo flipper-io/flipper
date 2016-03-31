@@ -14,7 +14,7 @@ enum { _network_configure, _network_enable, _network_disable, _network_ready, _n
 void network_configure(void *ip);
 void network_enable(void);
 void network_disable(void);
-bool network_ready(void);
+uint8_t network_ready(void);
 void network_put(uint8_t byte);
 uint8_t network_get(void);
 void network_push(void *source, uint32_t length);

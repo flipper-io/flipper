@@ -70,7 +70,7 @@ void digital_write(uint8_t pin, uint16_t value) {
 
 }
 
-bool digital_read(uint8_t pin) {
+uint8_t digital_read(uint8_t pin) {
 
 	/* ~ Read the ON/OFF state of the digital IO pin from the PIOA. ~ */
 
