@@ -4,6 +4,8 @@
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
 #include <flipper/core.h>
 
+#define AT45_PAGE_SIZE 528
+
 /* ~ Declare the virtual driver object. ~ */
 extern const struct _at45 {
 
@@ -11,6 +13,7 @@ extern const struct _at45 {
 	void (* enable)(void);
 	void (* disable)(void);
 	void (* reset)(void);
+	void (* read)(fsp address);
 	fsp (* alloc)(uint32_t length);
 	void (* free)(fsp pointer);
 	void (* format)(void);
@@ -30,6 +33,7 @@ extern void at45_configure(void);
 extern void at45_enable(void);
 extern void at45_disable(void);
 extern void at45_reset(void);
+extern void read(fsp address);
 extern fsp at45_alloc(uint32_t length);
 extern void at45_free(fsp pointer);
 extern void at45_format(void);

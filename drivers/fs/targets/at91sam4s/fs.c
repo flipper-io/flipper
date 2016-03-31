@@ -15,3 +15,9 @@ void fs_configure(void) {
 void fs_format(void) {
 
 }
+
+fsp fs_data(char *name) {
+
+	return 0;
+
+}

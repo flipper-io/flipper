@@ -3,7 +3,7 @@ output = example
 cc = gcc
 
 all:
-	$(cc) *.c -lflipper -I $(FLIPPERSDK)/include -o $(output)
+	$(cc) *.c -lflipper -o $(output)
 
 clean:
 	rm -rf $(output)

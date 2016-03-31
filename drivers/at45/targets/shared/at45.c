@@ -278,10 +278,10 @@ void at45_push(void *source, uint32_t length, fsp destination) {
     disable_interrupts();
     
 	/* ~ Calculate the page of the address. ~ */
-	uint16_t page = destination / 528;
+	uint16_t page = destination / AT45_PAGE_SIZE;
 
 	/* ~ Calculate the destination of the address. ~ */
-	uint16_t offset = destination % 528;
+	uint16_t offset = destination % AT45_PAGE_SIZE;
 
 	/* ~ Move the data from the page into the buffer. ~ */
 	at45_transfer_page_to_buffer_with_erase(page, 0);
@@ -299,7 +299,7 @@ void at45_push(void *source, uint32_t length, fsp destination) {
 		offset ++;
 
 		/* ~ If we've reached the end of the page, move to the next one. ~ */
-		if (offset % 528 == 0) {
+		if (offset % AT45_PAGE_SIZE == 0) {
 
 			/* ~ Reset the offset. ~ */
 			offset = 0;
@@ -330,15 +330,21 @@ void at45_push(void *source, uint32_t length, fsp destination) {
 
 }
 
+void at45_read(fsp address) {
+
+	at45_begin_continuous_read(address / AT45_PAGE_SIZE, address % AT45_PAGE_SIZE);
+
+}
+
 void at45_pull(void *destination, uint32_t length, fsp source) {
     
     disable_interrupts();
     
 	/* ~ Calculate the page of the address. ~ */
-	uint16_t page = source / 528;
+	uint16_t page = source / AT45_PAGE_SIZE;
 
 	/* ~ Calculate the offset of the address. ~ */
-	uint16_t offset = source % 528;
+	uint16_t offset = source % AT45_PAGE_SIZE;
 
 	/* ~ Begin a continuous memory array read. ~ */
 	at45_begin_continuous_read(page, offset);
