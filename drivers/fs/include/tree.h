@@ -34,8 +34,8 @@ typedef struct __attribute__((__packed__)) _leaf {
 } leaf;
 
 /* ~ Declare all necessary private driver functions. ~ */
-extern fsp fs_add_leaf_with_key(fsp current, uint16_t key);
-extern fsp fs_leaf_for_key(fsp current, uint16_t key);
-extern void fs_remove_leaf_with_key(fsp parent, uint16_t key);
+fsp fs_add_leaf_with_key(fsp current, uint16_t key);
+fsp fs_leaf_for_key(fsp current, uint16_t key);
+void fs_remove_leaf_with_key(fsp parent, uint16_t key);
 
 #endif

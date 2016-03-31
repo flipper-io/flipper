@@ -17,7 +17,7 @@ extern const struct _pwm {
 enum { _pwm_configure };
 
 /* ~ Declare all function prototypes for this driver. ~ */
-extern void pwm_configure(void);
+void pwm_configure(void);
 
 #endif
 #endif

@@ -11,14 +11,14 @@ extern const struct _bus network;
 
 enum { _network_configure, _network_enable, _network_disable, _network_ready, _network_put, _network_get, _network_push, _network_pull };
 
-extern void network_configure(void *ip);
-extern void network_enable(void);
-extern void network_disable(void);
-extern bool network_ready(void);
-extern void network_put(uint8_t byte);
-extern uint8_t network_get(void);
-extern void network_push(void *source, uint32_t length);
-extern void network_pull(void *source, uint32_t length);
+void network_configure(void *ip);
+void network_enable(void);
+void network_disable(void);
+bool network_ready(void);
+void network_put(uint8_t byte);
+uint8_t network_get(void);
+void network_push(void *source, uint32_t length);
+void network_pull(void *source, uint32_t length);
 
 #endif
 #endif

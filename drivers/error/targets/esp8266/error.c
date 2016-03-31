@@ -2,29 +2,32 @@
 #include <flipper/error.h>
 #include <flipper/platform/platform.h>
 
+uint8_t error_disclosed;
+uinterror_t error_code;
+
 void error_configure(void) {
 	return;
 }
 
 void error_withold(void) {
-	*((uint8_t *)(&error.disclosed)) = 0;
+	error_disclosed = 0;
 	return;
 }
 
 void error_disclose(void) {
-	*((uint8_t *)(&error.disclosed)) = 1;
+	error_disclosed = 1;
 	return;
 }
 
 void error_raise(uinterror_t code, char *string) {
 	/* ~ Save the error code into the global error state. ~ */
-	*((uinterror_t *)(&error.code)) = code;
+	error_code = code;
 	//TODO: Use serial or something:
 	(void)string;
 	return;
 }
 
 void error_clear(void) {
-	*((uinterror_t *)(&error.code)) = E_OK;
+	error_code = E_OK;
 	return;
 }

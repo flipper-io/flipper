@@ -53,19 +53,19 @@ extern const struct _io {
 enum { _io_configure, _io_set_direction, _io_write, _io_read };
 
 /* ~ Declare all function prototypes for this driver. ~ */
-extern void io_configure(void);
-extern void io_set_direction(uint8_t pin, uint8_t direction);
-extern void io_write(uint8_t pin, uint16_t value);
-extern uint16_t io_read(uint8_t pin);
+void io_configure(void);
+void io_set_direction(uint8_t pin, uint8_t direction);
+void io_write(uint8_t pin, uint16_t value);
+uint16_t io_read(uint8_t pin);
 
-extern void analog_set_direction(uint8_t pin, uint8_t direction);
-extern void analog_write(uint8_t pin, uint16_t value);
+void analog_set_direction(uint8_t pin, uint8_t direction);
+void analog_write(uint8_t pin, uint16_t value);
 uint16_t analog_read(uint8_t pin);
 
-extern void digital_set_direction(uint8_t pin, uint8_t direction);
-extern void digital_write(uint8_t pin, uint16_t value);
+void digital_set_direction(uint8_t pin, uint8_t direction);
+void digital_write(uint8_t pin, uint16_t value);
 bool digital_read(uint8_t pin);
-extern void digital_pulse(uint8_t pin, uint16_t cycle);
+void digital_pulse(uint8_t pin, uint16_t cycle);
 
 #endif
 #endif

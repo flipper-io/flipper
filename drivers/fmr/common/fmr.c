@@ -55,7 +55,7 @@ end:
 	/* ~ Create the response packet. ~ */
 	struct _fmr_response response;
 	response.body.retval = retval;
-	response.body.error = error.code;
+	response.body.error = *error.code;
 
 	response.checksum = checksum(&response.body, sizeof(response.body));
 

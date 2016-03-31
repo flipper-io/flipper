@@ -108,45 +108,42 @@ extern struct _target *sender;
 
 enum { _zero, _one, _two, _led, _button, _error, _usart, _spi, _sam, _at45, _fs, _usb, _wifi, _io, _dbgu, _usart1, _fdl, _fmr };
 
-extern uint8_t build_args(uint8_t argc, ...);
-extern uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, va_list *argv);
-extern uint32_t target_push(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, va_list *argv);
-extern uint32_t target_pull(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, va_list *argv);
-
+uint8_t build_args(uint8_t argc, ...);
+uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, va_list *argv);
+uint32_t target_push(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, va_list *argv);
+uint32_t target_pull(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, va_list *argv);
 
 enum { _host_configure, _host_call, _host_invoke, _host_push, _host_pull };
 
-extern void host_configure(const struct _bus *bus);
-extern uint32_t host_call(void);
-extern uint32_t host_invoke(uint8_t object, uint8_t index, uint8_t argc, ...);
-extern uint32_t host_push(uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, ...);
-extern uint32_t host_pull(uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...);
-
+void host_configure(const struct _bus *bus);
+uint32_t host_call(void);
+uint32_t host_invoke(uint8_t object, uint8_t index, uint8_t argc, ...);
+uint32_t host_push(uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, ...);
+uint32_t host_pull(uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...);
 
 enum { _self_configure, _self_call, _self_invoke, _self_push, _self_pull };
 
-extern void self_configure(const struct _bus *bus);
-extern uint32_t self_call(void);
-extern uint32_t self_invoke(const struct _target *sender);
-extern uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, uint32_t length);
-extern uint32_t self_pull(uint8_t object, uint8_t index, uint8_t argc, uint32_t length);
+void self_configure(const struct _bus *bus);
+uint32_t self_call(void);
+uint32_t self_invoke(const struct _target *sender);
+uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, uint32_t length);
+uint32_t self_pull(uint8_t object, uint8_t index, uint8_t argc, uint32_t length);
 
 
 enum { _device_configure, _device_call, _device_invoke, _device_push, _device_pull };
 
-extern void device_configure(const struct _bus *bus);
-extern uint32_t device_call(void);
-extern uint32_t device_invoke(uint8_t object, uint8_t index, uint8_t argc, ...);
-extern uint32_t device_push(uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, ...);
-extern uint32_t device_pull(uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...);
+void device_configure(const struct _bus *bus);
+uint32_t device_call(void);
+uint32_t device_invoke(uint8_t object, uint8_t index, uint8_t argc, ...);
+uint32_t device_push(uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, ...);
+uint32_t device_pull(uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...);
 
-
-extern uint32_t fmr_call(void);
-extern uint32_t fmr_parse(const struct _target *target);
-extern uint32_t internal_call(void *function, uint8_t argc, void *argv);
-extern uintres_t fmr_obtain_response(const struct _target *target);
-extern void fmr_broadcast(void);
-extern void fmr_retrieve(void);
+uint32_t fmr_call(void);
+uint32_t fmr_parse(const struct _target *target);
+uint32_t internal_call(void *function, uint8_t argc, void *argv);
+uintres_t fmr_obtain_response(const struct _target *target);
+void fmr_broadcast(void);
+void fmr_retrieve(void);
 
 #endif
 #endif

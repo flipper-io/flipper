@@ -18,8 +18,8 @@ extern const struct _button {
 enum { _button_configure, _button_read };
 
 /* ~ Declare all function prototypes for this driver. ~ */
-extern void button_configure(void);
-extern bool button_read(void);
+void button_configure(void);
+bool button_read(void);
 
 #endif
 #endif

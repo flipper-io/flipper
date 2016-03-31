@@ -17,7 +17,7 @@ extern const struct _i2c {
 enum { _i2c_configure };
 
 /* ~ Declare all function prototypes for this driver. ~ */
-extern void i2c_configure(void);
+void i2c_configure(void);
 int i2c_put(int mode, int address, void *data, int length);
 int i2c_get(int mode, int address, void *data, int length);
 

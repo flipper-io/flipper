@@ -17,7 +17,7 @@ extern const struct _wifi {
 enum { _wifi_configure };
 
 /* ~ Declare all function prototypes for this driver. ~ */
-extern void wifi_configure(void);
+void wifi_configure(void);
 
 #endif
 #endif

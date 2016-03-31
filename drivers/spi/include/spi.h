@@ -13,14 +13,14 @@ extern const struct _bus spi;
 enum { _spi_configure, _spi_enable, _spi_disable, _spi_ready, _spi_put, _spi_get, _spi_push, _spi_pull };
 
 /* ~ Declare all function prototypes for this driver. ~ */
-extern void spi_configure();
-extern void spi_enable(void);
-extern void spi_disable(void);
-extern bool spi_ready(void);
-extern void spi_put(uint8_t byte);
-extern uint8_t spi_get(void);
-extern void spi_push(void *source, uint32_t length);
-extern void spi_pull(void *source, uint32_t length);
+void spi_configure();
+void spi_enable(void);
+void spi_disable(void);
+bool spi_ready(void);
+void spi_put(uint8_t byte);
+uint8_t spi_get(void);
+void spi_push(void *source, uint32_t length);
+void spi_pull(void *source, uint32_t length);
 
 #endif
 #endif
