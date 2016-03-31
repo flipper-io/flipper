@@ -15,7 +15,7 @@ objcopy = $(shell which 'avr-objcopy')
 
 # ~ Specify the uploader and its flags. ~ #
 uploader = $(shell which 'avrdude')
-uploader_flags = -p $(platform) -V -c usbtiny -U lfuse:w:0xFF:m -U hfuse:w:0xD9:m -U flash:w:$(output)
+uploader_flags = -p $(platform) -B0.666 -c usbtiny -U lfuse:w:0xFF:m -U hfuse:w:0xD9:m -U flash:w:$(output)
 
 # ~ Specify platform specific preprocessor flags. ~ #
 cpu_flags = -DARCH=ARCH_AVR8 -mmcu=$(platform) -D__AVR_$(shell echo $(platform) | tr a-z A-Z)__ -D__atmega_build__

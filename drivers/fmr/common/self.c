@@ -6,14 +6,14 @@
 #include <flipper/platform/platform.h>
 
 struct _self self = {
-	self_configure,
+	seuint8_ture,
 	self_call,
 	self_invoke,
 	self_push,
 	self_pull
 };
 
-void self_configure(const struct _bus *bus) {
+void seuint8_ture(const struct _bus *bus) {
 
 }
 
