@@ -8,6 +8,8 @@
 extern const struct _i2c {
 
 	void (* configure)(void);
+	int (* put)(int mode, int adddress, void *data, int length);
+	int (* get)(int mode, int adddress, void *data, int length);
 
 } i2c;
 
