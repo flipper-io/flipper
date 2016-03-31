@@ -2,8 +2,8 @@
 #include <flipper/error.h>
 #include <flipper/platform/platform.h>
 
-uint8_t error_disclosed;
-uinterror_t error_code;
+uint8_t error_disclosed = 0;
+uinterror_t error_code = E_OK;
 
 void error_configure(void) {
 	return;
