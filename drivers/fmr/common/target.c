@@ -10,7 +10,7 @@ uint8_t validate_target(const struct _target *target) {
 
 	/* ~ If we've been asked to send a packet but have no target, this is a dangling instance of libflipper. ~ */
 	if (!(target -> bus)) {
-		error.raise(E_FLIPPER_UNBOUND, ERROR_STRING(E_FLIPPER_UNBOUND_S));
+		error_raise(E_FLIPPER_UNBOUND, ERROR_STRING(E_FLIPPER_UNBOUND_S));
 		return 0;
 	}
 	return 1;
@@ -63,7 +63,7 @@ uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t ind
 
 	/* ~ Ensure the arguments will fit into one packet. ~ */
 	if (fmrpacket.header.length > FMR_PACKET_SIZE) {
-		error.raise(E_TOO_BIG, ERROR_STRING(E_TOO_BIG_S));
+		error_raise(E_TOO_BIG, ERROR_STRING(E_TOO_BIG_S));
 		return 0;
 	}
 
@@ -122,7 +122,7 @@ uint32_t target_push(const struct _target *target, uint8_t object, uint8_t index
 
 	/* ~ Ensure the arguments will fit into one packet. ~ */
 	if (fmrpacket.header.length > FMR_PACKET_SIZE) {
-		error.raise(E_TOO_BIG, ERROR_STRING(E_TOO_BIG_S));
+		error_raise(E_TOO_BIG, ERROR_STRING(E_TOO_BIG_S));
 		return 0;
 	}
 
@@ -225,7 +225,7 @@ uint32_t target_pull(const struct _target *target, uint8_t object, uint8_t index
 
 	/* ~ Ensure the arguments will fit into one packet. ~ */
 	if (fmrpacket.header.length > FMR_PACKET_SIZE) {
-		error.raise(E_TOO_BIG, ERROR_STRING(E_TOO_BIG_S));
+		error_raise(E_TOO_BIG, ERROR_STRING(E_TOO_BIG_S));
 		return 0;
 	}
 

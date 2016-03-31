@@ -37,6 +37,7 @@
 #include <stdint.h>
 #include <usb.h>
 
+#define __private_include__
 #include <flipper/error.h>
 #include <flipper/usb.h>
 
@@ -124,7 +125,7 @@ int hid_receive_packet(uint8_t device, uint8_t *buf)
 
 	hid = get_hid(device);
 	if (!hid || !hid->open) {
-		error.raise(E_HID_OPEN_DEV, ERROR_STRING(E_HID_OPEN_DEV_S));
+		error_raise(E_HID_OPEN_DEV, ERROR_STRING(E_HID_OPEN_DEV_S));
 		return -1;
 	}
 	r = usb_interrupt_read(hid->usb, hid->ep_in, (char *)buf, FLIPPER_PACKET_SIZE, DEFAULT_TIMEOUT);
@@ -148,7 +149,7 @@ int hid_transmit_packet(uint8_t device, uint8_t *buf)
 
 	hid = get_hid(device);
 	if (!hid || !hid->open) {
-		error.raise(E_HID_OPEN_DEV, ERROR_STRING(E_HID_OPEN_DEV_S));
+		error_raise(E_HID_OPEN_DEV, ERROR_STRING(E_HID_OPEN_DEV_S));
 		return -1;
 	}
 	if (hid->ep_out) {
