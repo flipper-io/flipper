@@ -60,13 +60,13 @@ void * rawhid_open_only1(int vid, int pid, int usage_page, int usage)
 	// get access to the HID Manager
 	hid_manager = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
 	if (hid_manager == NULL || CFGetTypeID(hid_manager) != IOHIDManagerGetTypeID()) {
-		error.raise(E_HID_MANAGER, ERROR_STRING(E_HID_MANAGER_S));
+		error_raise(E_HID_MANAGER, ERROR_STRING(E_HID_MANAGER_S));
 		return NULL;
 	}
 	// configure it to look for our type of device
 	dict = IOServiceMatching(kIOHIDDeviceKey);
 	if (dict == NULL) {
-		error.raise(E_IOKIT_DICT, ERROR_STRING(E_IOKIT_DICT_S));
+		error_raise(E_IOKIT_DICT, ERROR_STRING(E_IOKIT_DICT_S));
 		return NULL;
 	}
 	if (vid > 0) {
@@ -90,25 +90,25 @@ void * rawhid_open_only1(int vid, int pid, int usage_page, int usage)
 	// now open the HID manager
 	ret = IOHIDManagerOpen(hid_manager, kIOHIDOptionsTypeNone);
 	if (ret != kIOReturnSuccess) {
-		error.raise(E_HID_MANAGER, ERROR_STRING(E_HID_MANAGER_S));
+		error_raise(E_HID_MANAGER, ERROR_STRING(E_HID_MANAGER_S));
 		return NULL;
 	}
 	// get a list of devices that match our requirements
 	device_set = IOHIDManagerCopyDevices(hid_manager);
 	if (device_set == NULL) {
-		error.raise(E_HID_NO_DEV, ERROR_STRING(E_HID_NO_DEV_S));
+		error_raise(E_HID_NO_DEV, ERROR_STRING(E_HID_NO_DEV_S));
 		return NULL;
 	}
 	num_devices = (int)CFSetGetCount(device_set);
 	//printf("number of devices found = %d\n", num_devices);
 	if (num_devices < 1) {
 		CFRelease(device_set);
-		error.raise(E_HID_NO_DEV, ERROR_STRING(E_HID_NO_DEV_S));
+		error_raise(E_HID_NO_DEV, ERROR_STRING(E_HID_NO_DEV_S));
 		return NULL;
 	}
 	if (num_devices > 256) {
 		CFRelease(device_set);
-		error.raise(E_HID_TOO_MANY, ERROR_STRING(E_HID_TOO_MANY_S));
+		error_raise(E_HID_TOO_MANY, ERROR_STRING(E_HID_TOO_MANY_S));
 		return NULL;
 	}
 	CFSetGetValues(device_set, (const void **)&device_list);
@@ -116,7 +116,7 @@ void * rawhid_open_only1(int vid, int pid, int usage_page, int usage)
 	// open the first device in the list
 	ret = IOHIDDeviceOpen(device_list[0], kIOHIDOptionsTypeNone);
 	if (ret != kIOReturnSuccess) {
-		error.raise(E_HID_OPEN_DEV, ERROR_STRING(E_HID_OPEN_DEV_S));
+		error_raise(E_HID_OPEN_DEV, ERROR_STRING(E_HID_OPEN_DEV_S));
 		return NULL;
 	}
 	// return this device
@@ -125,7 +125,7 @@ void * rawhid_open_only1(int vid, int pid, int usage_page, int usage)
 	if (hid == NULL || buf == NULL) {
 		IOHIDDeviceRegisterRemovalCallback(device_list[0], NULL, NULL);
 		IOHIDDeviceClose(device_list[0], kIOHIDOptionsTypeNone);
-		error.raise(E_NO_MEM, ERROR_STRING(E_NO_MEM_S));
+		error_raise(E_NO_MEM, ERROR_STRING(E_NO_MEM_S));
 		return NULL;
 	}
 	hid->ref = device_list[0];
@@ -151,7 +151,7 @@ int rawhid_status(void *hid)
 	// there's no need to run the run loop here!
 	while (CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, true) == kCFRunLoopRunHandledSource) ;
 	if (((struct rawhid_struct *)hid)->disconnected) {
-		error.raise(E_HID_DISCONN_DEV, ERROR_STRING(E_HID_DISCONN_DEV_S));
+		error_raise(E_HID_DISCONN_DEV, ERROR_STRING(E_HID_DISCONN_DEV_S));
 		return -1;
 	}
 	//printf("HID/macos: status: ok\n");
@@ -177,7 +177,7 @@ int rawhid_read(void *h, void *buf, int bufsize, int timeout_ms)
 	//printf("begin read\n");
 	hid = (struct rawhid_struct *)h;
 	if (!hid || hid->disconnected) {
-		error.raise(E_HID_DISCONN_DEV, ERROR_STRING(E_HID_DISCONN_DEV_S));
+		error_raise(E_HID_DISCONN_DEV, ERROR_STRING(E_HID_DISCONN_DEV_S));
 		return -1;
 	}
 	while (CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, true) == kCFRunLoopRunHandledSource) {
@@ -189,13 +189,13 @@ int rawhid_read(void *h, void *buf, int bufsize, int timeout_ms)
 			return len;
 		}
 		if (hid->disconnected) {
-			error.raise(E_HID_DISCONN_DEV, ERROR_STRING(E_HID_DISCONN_DEV_S));
+			error_raise(E_HID_DISCONN_DEV, ERROR_STRING(E_HID_DISCONN_DEV_S));
 			return -1;
 		}
 	}
 	r = CFRunLoopRunInMode(kCFRunLoopDefaultMode, (double)timeout_ms / 1000.0, true);
 	if (r == kCFRunLoopRunTimedOut) {
-		error.raise(E_HID_TIMEOUT, ERROR_STRING(E_HID_TIMEOUT_S));
+		error_raise(E_HID_TIMEOUT, ERROR_STRING(E_HID_TIMEOUT_S));
 		return 0;
 	}
 	if (hid->buffer_used) {
@@ -206,7 +206,7 @@ int rawhid_read(void *h, void *buf, int bufsize, int timeout_ms)
 		return len;
 	}
 	if (hid->disconnected) {
-		error.raise(E_HID_DISCONN_DEV, ERROR_STRING(E_HID_DISCONN_DEV_S));
+		error_raise(E_HID_DISCONN_DEV, ERROR_STRING(E_HID_DISCONN_DEV_S));
 		return -1;
 	}
 	return 0;
@@ -221,13 +221,13 @@ int rawhid_write(void *hid, const void *buf, int len, int timeout_ms)
 	IOReturn ret;
 
 	if (((struct rawhid_struct *)hid)->disconnected) {
-		error.raise(E_HID_DISCONN_DEV, ERROR_STRING(E_HID_DISCONN_DEV_S));
+		error_raise(E_HID_DISCONN_DEV, ERROR_STRING(E_HID_DISCONN_DEV_S));
 		return -1;
 	}
 	ret = IOHIDDeviceSetReport(((struct rawhid_struct *)hid)->ref,
 	                          kIOHIDReportTypeOutput, 0, buf, len);
 	if (ret != kIOReturnSuccess) {
-		error.raise(E_HID_WRITE, ERROR_STRING(E_HID_WRITE_S));
+		error_raise(E_HID_WRITE, ERROR_STRING(E_HID_WRITE_S));
 		return -1;
 	}
 	return 0;
