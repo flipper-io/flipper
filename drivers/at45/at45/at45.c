@@ -25,6 +25,12 @@ void at45_reset(void) {
 
 }
 
+void at45_read(fsp address) {
+
+	device.invoke(_at45, _at45_read, 2, hi16(address), lo16(address));
+
+}
+
 fsp at45_alloc(uint32_t length) {
 
 	fsp address = device.invoke(_at45, _at45_alloc, 2, hi16(length), lo16(length));
