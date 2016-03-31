@@ -26,14 +26,14 @@ extern const struct _at45 {
 #ifdef __private_include__
 
 /* ~ Declare the FMR overlay for this driver object. ~ */
-enum { _at45_configure, _at45_enable, _at45_disable, _at45_reset, _at45_alloc, _at45_free, _at45_format, _at45_push, _at45_pull, _at45_dereference };
+enum { _at45_configure, _at45_enable, _at45_disable, _at45_reset, _at45_read, _at45_alloc, _at45_free, _at45_format, _at45_push, _at45_pull, _at45_dereference };
 
 /* ~ Declare all function prototypes for this driver. ~ */
 extern void at45_configure(void);
 extern void at45_enable(void);
 extern void at45_disable(void);
 extern void at45_reset(void);
-extern void read(fsp address);
+extern void at45_read(fsp address);
 extern fsp at45_alloc(uint32_t length);
 extern void at45_free(fsp pointer);
 extern void at45_format(void);
