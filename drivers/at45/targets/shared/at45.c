@@ -104,7 +104,7 @@ void at45_begin_continuous_buffer_read(uint8_t buffer, uint16_t offset) {
 
 }
 
-void at45_transfer_buffer_to_page_with_erase(uint8_t buffer, uint16_t page, bool erase) {
+void at45_transfer_buffer_to_page_with_erase(uint8_t buffer, uint16_t page, uint8_t erase) {
 
 	/* ~ Wait until the flash chip is ready to recieve data. ~ */
 	at45_wait();

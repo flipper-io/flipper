@@ -88,7 +88,7 @@ uintres_t fmr_obtain_response(const struct _target *target) {
 	if (response.body.error != E_OK) error_raise(response.body.error, ERROR_STRING("Error raised on remote target."));
 
 	/* ~ If the response is valid, return it. ~ */
-	return response.body.retval;
+	return little32(response.body.retval);
 }
 
 /* ~ Send a constructed packet to its target. ~ */

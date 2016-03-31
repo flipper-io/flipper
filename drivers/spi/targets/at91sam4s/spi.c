@@ -57,7 +57,7 @@ void spi_disable(void) {
 
 }
 
-bool spi_ready(void) {
+uint8_t spi_ready(void) {
 
 	return (AT91C_BASE_SPI -> SPI_SR & AT91C_SPI_RDRF);
 

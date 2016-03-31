@@ -883,7 +883,7 @@ int8_t usb_send_packet(uint8_t *buffer) {
 
 }
 
-bool something = false;
+uint8_t something = false;
 
 int previntbits = 0;
 

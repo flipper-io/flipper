@@ -74,13 +74,18 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 		struct _lf_device *last = flipper_device;
 		flipper_device = device;
 
+		error_clear();
+
 		/* ~ Select the source. ~ */
 		switch (endpoint) {
 
 			case FLIPPER_USB:
 
-				printf("%p\n", &error);
-				error_clear();
+				/* ~ Set up the FMR host to accept incoming USB connections. ~ */
+				host_configure(&usb);
+
+				/* ~ Set up the FMR device to accept incoming USB connections. ~ */
+				device_configure(&usb);
 
 				/* ~ Configure the USB. ~ */
 				usb_configure();
@@ -91,40 +96,20 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 					return -1;
 				}
 
-				/* ~ Set up the FMR host to accept incoming USB connections. ~ */
-				host_configure(&usb);
-
-				/* ~ Set up the FMR device to accept incoming USB connections. ~ */
-				device_configure(&usb);
-
 				break;
 
 			case FLIPPER_NETWORK:
 
-				error_clear();
-
-				/* ~ Configure the network. ~ */
-				network_configure(name);
-
-				if(error_get() != E_OK) {
-					flipper_device = last;
-					free(device);
-					return -1;
-				}
-
 				/* ~ Set up the FMR host to accept incoming network connections. ~ */
 				host_configure(&network);
-
-				if(error_get() != E_OK) {
-					flipper_device = last;
-					free(device);
-					return -1;
-				}
 
 				/* ~ Set up the FMR device to accept incoming network connections. ~ */
 				device_configure(&network);
 
-				if(error_get() != E_OK) {
+				/* ~ Configure the network. ~ */
+				network_configure(name);
+
+				if(error.get() != E_OK) {
 					flipper_device = last;
 					free(device);
 					return -1;
