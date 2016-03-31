@@ -10,6 +10,7 @@ fsp _root_leaf;
 const struct _fs fs = {
 
 	fs_configure,
-	fs_format
+	fs_format,
+	fs_data
 
 };

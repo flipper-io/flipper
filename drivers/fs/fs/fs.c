@@ -28,6 +28,12 @@ void fs_format(void) {
 
 }
 
+fsp fs_data(char *name) {
+
+	return 0;
+
+}
+
 void chunky_transfer(uint8_t *buffer, size_t size, fsp data, int flags) {
 
 	unsigned int remaining_bytes = size;

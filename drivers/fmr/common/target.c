@@ -30,7 +30,7 @@ uint8_t build_args(uint8_t argc, ...) {
 	for (int i = 0; i < (argc * sizeof(uint16_t)); i += 2) {
 		unsigned arg = va_arg(argv, unsigned);
 		fmrpacket.body[i] = hi(arg); fmrpacket.body[i + 1] = lo(arg);
-	}
+	}    
 
 	/* ~ Release the variadic argument list. ~ */
 	va_end(argv);

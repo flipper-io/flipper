@@ -9,7 +9,6 @@
 #include <flipper/io.h>
 #include <flipper/spi.h>
 
-#define AT45_PAGE_SIZE 528
 #define LOAD_PAGE 400
 #define TOTAL_PAGES 512
 #define EFC_KEY 0x5A

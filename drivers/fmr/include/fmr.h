@@ -10,6 +10,8 @@
 /* ~ Include platform specific definitions related to the FMR. ~ */
 #include <flipper/platform/platform.h>
 
+#include <flipper/fs.h>
+
 typedef uint32_t fmr_handle;
 
 #define fmr_bundle_id_from_string(string) checksum(string, strlen(string))
