@@ -13,7 +13,7 @@ void usb_configure() {
 	uint8_t devices = hid_enumerate(1, CARBON_VENDOR_ID, CARBON_PRODUCT_ID, CARBON_USAGE_PAGE, CARBON_USAGE);
 
 	if (!devices) {
-		error.raise(E_FLIPPER_UNBOUND, ERROR_STRING(E_FLIPPER_UNBOUND_S));
+		error_raise(E_FLIPPER_UNBOUND, ERROR_STRING(E_FLIPPER_UNBOUND_S));
 	}
 
 	for (uintptr_t i = 0; i < devices; i ++) {
@@ -21,7 +21,7 @@ void usb_configure() {
 		if (config.read(CONFIG_NAME) == flipper_device -> identifier) return;
 	}
 
-	error.raise(E_FLIPPER_NOT_FOUND, ERROR_STRING(E_FLIPPER_NOT_FOUND_S));
+	error_raise(E_FLIPPER_NOT_FOUND, ERROR_STRING(E_FLIPPER_NOT_FOUND_S));
 
 }
 
@@ -56,7 +56,7 @@ uint8_t usb_get(void) {
 void usb_push(void *source, uint32_t length) {
 
 	/* ~ Ensure the push request can fit into a single packet. TODO: serialize packets ~ */
-	if (length > FMR_PACKET_SIZE) { error.raise(E_TOO_BIG, ERROR_STRING("A request was made to send more information than can fit in a single USB packet.")); return; }
+	if (length > FMR_PACKET_SIZE) { error_raise(E_TOO_BIG, ERROR_STRING("A request was made to send more information than can fit in a single USB packet.")); return; }
 
 	/* ~ Send a usb packet to the active device. ~ */
 	hid_transmit_packet((uint8_t)(flipper_device -> handle), source);
@@ -69,7 +69,7 @@ void usb_pull(void *destination, uint32_t length) {
 	void *buffer = malloc(FMR_PACKET_SIZE);
 
 	/* ~ Ensure the request for memory was granted. ~ */
-	if (!buffer) error.raise(E_NO_MEM, ERROR_STRING(E_NO_MEM_S));
+	if (!buffer) error_raise(E_NO_MEM, ERROR_STRING(E_NO_MEM_S));
 
 	/* ~ Receive a usb packet from the active device. ~ */
 	hid_receive_packet((uint8_t)(flipper_device -> handle), buffer);

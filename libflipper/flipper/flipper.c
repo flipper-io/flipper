@@ -40,7 +40,7 @@ int flipper_select(char *name) {
 
 	struct _lf_device *device = lf_obtain_device(name);
 	if(!device) {
-		error.raise(E_FLIPPER_NOT_FOUND, ERROR_STRING(E_FLIPPER_NOT_FOUND_S));
+		error_raise(E_FLIPPER_NOT_FOUND, ERROR_STRING(E_FLIPPER_NOT_FOUND_S));
 		return -1;
 	}
 	flipper_device = device;
@@ -61,7 +61,7 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 
 		/* ~ Ensure we have been granted the memory. ~*/
 		if (!device) {
-			error.raise(E_NO_MEM, ERROR_STRING(E_NO_MEM_S));
+			error_raise(E_NO_MEM, ERROR_STRING(E_NO_MEM_S));
 			return -1;
 		}
 
@@ -74,7 +74,7 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 		struct _lf_device *last = flipper_device;
 		flipper_device = device;
 
-		error.clear();
+		error_clear();
 
 		/* ~ Select the source. ~ */
 		switch (endpoint) {
@@ -90,7 +90,7 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 				/* ~ Configure the USB. ~ */
 				usb_configure();
 
-				if(error.get() != E_OK) {
+				if(error_get() != E_OK) {
 					flipper_device = last;
 					free(device);
 					return -1;
@@ -121,7 +121,7 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 
 				flipper_device = last;
 				free(device);
-				error.raise(E_UNIMPLEMENTED, ERROR_STRING(E_UNIMPLEMENTED_S));
+				error_raise(E_UNIMPLEMENTED, ERROR_STRING(E_UNIMPLEMENTED_S));
 				return -1;
 				break;
 
@@ -137,7 +137,7 @@ int flipper_attach(lf_endpoint endpoint, char *name) {
 			flipper_device = last;
 
 			/* ~ Raise the appropriate error. ~ */
-			error.raise(E_HID_NO_DEV, ERROR_STRING("Failed to attach the requested device."));
+			error_raise(E_HID_NO_DEV, ERROR_STRING("Failed to attach the requested device."));
 
 			return -1;
 
@@ -173,7 +173,7 @@ int flipper_detach(char *name) {
 	// Did we find a device with the provided name?
 	if(!c)
 	{
-		error.raise(E_FLIPPER_NOT_FOUND, ERROR_STRING(E_FLIPPER_NOT_FOUND_S));
+		error_raise(E_FLIPPER_NOT_FOUND, ERROR_STRING(E_FLIPPER_NOT_FOUND_S));
 		return -1;
 	}
 
