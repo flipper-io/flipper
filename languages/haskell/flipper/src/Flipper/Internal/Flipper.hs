@@ -1,5 +1,6 @@
 module Flipper.Internal.Flipper where
 
+import Flipper.Internal.Error
 import Flipper.Internal.Utils
 
 import Foreign.C.String
@@ -8,20 +9,23 @@ import Foreign.Marshal.Alloc
 
 
 -- | An endpoint via which a Flipper device may be attached.
-data Endpoint = USB     -- ^ Local connection via USB.
-              | Network -- ^ Remote connection via TCP/UDP.
-              | FVM     -- ^ Flipper simulation via FVM.
+data Endpoint = USB (Maybe String) -- ^ Local connection via USB.
+              | Network String     -- ^ Remote connection via TCP/UDP.
+              | FVM                -- ^ Flipper simulation via FVM.
 
 enumEndpoint :: Endpoint -> CInt
-enumEndpoint USB     = 0
-enumEndpoint Network = 1
-enumEndpoint FVM     = 2
+enumEndpoint (USB _ )    = 0
+enumEndpoint (Network _) = 1
+enumEndpoint FVM         = 2
 
 select :: String -> IO Bool
 select n = withCString n ((retSuc <$>) . c_flipper_select)
 
-attach :: Endpoint -> String -> IO Bool
-attach e n = withCString n ((retSuc <$>) . c_flipper_attach (enumEndpoint e))
+attach :: Endpoint -> IO Bool
+attach   (USB Nothing)  = disclose >> retSuc <$> c_flipper_attach
+attach e@(USB (Just n)) = disclose >> withCString n ((retSuc <$>) . c_flipper_attach_name (enumEndpoint e))
+attach e@(Network h)    = disclose >> withCString h ((retSuc <$>) . c_flipper_attach_name (enumEndpoint e))
+attach FVM              = disclose >> return False
 
 detach :: String -> IO Bool
 detach n = withCString n ((retSuc <$>) . c_flipper_detach)
@@ -30,7 +34,10 @@ foreign import ccall safe "flipper/flipper.h flipper_select"
     c_flipper_select :: CString -> IO CInt
 
 foreign import ccall safe "flipper/flipper.h flipper_attach"
-    c_flipper_attach :: CInt -> CString -> IO CInt
+    c_flipper_attach :: IO CInt
+
+foreign import ccall safe "flipper/flipper.h flipper_attach_name"
+    c_flipper_attach_name :: CInt -> CString -> IO CInt
 
 foreign import ccall safe "flipper/flipper.h flipper_detach"
     c_flipper_detach :: CString -> IO CInt
