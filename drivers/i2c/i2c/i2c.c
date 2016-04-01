@@ -5,3 +5,15 @@
 void i2c_configure(void) {
 
 }
+
+int i2c_put() {
+
+	return 0;
+
+}
+
+int i2c_get() {
+
+	return 0;
+
+}
