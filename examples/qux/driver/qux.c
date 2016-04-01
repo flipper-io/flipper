@@ -2,7 +2,7 @@
 #include "qux.h"
 
 /* ~ Create a handle for the module. ~ */
-static fmr_handle handle;
+static fmr_module handle;
 
 void qux_configure(void) {
 	

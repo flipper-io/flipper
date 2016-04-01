@@ -7,7 +7,7 @@
 
 /* ~ Create a handle for the module. ~ */
 
-static fmr_handle handle;
+static fmr_module handle;
 
 void servo_configure(void) {
 	
