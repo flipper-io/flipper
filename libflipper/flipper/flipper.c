@@ -7,6 +7,7 @@
 
 const struct _flipper flipper = {
 	flipper_attach,
+	flipper_attach_name,
 	flipper_detach,
 	flipper_select,
 };
@@ -47,8 +48,15 @@ int flipper_select(char *name) {
 	return 0;
 }
 
+int flipper_attach(void) {
+
+	/* ~ Attach an out-of-the-box Flipper device over USB. ~ */
+	return flipper_attach_name(FLIPPER_USB, "flipper");
+
+}
+
 /* ~ Attach a Flipper device given an endpoint and name. Returns zero on success. ~ */
-int flipper_attach(lf_endpoint endpoint, char *name) {
+int flipper_attach_name(lf_endpoint endpoint, char *name) {
 
 	/* ~ See if we have already attached a device by the name given. ~ */
 	struct _lf_device *device = lf_obtain_device(name);
