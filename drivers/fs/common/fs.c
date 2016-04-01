@@ -11,6 +11,11 @@ const struct _fs fs = {
 
 	fs_configure,
 	fs_format,
-	fs_data
+	fs_data,
+
+#ifndef __osmium__
+	fs_upload,
+	fs_download
+#endif
 
 };

@@ -9,17 +9,16 @@ void fmr_configure(void) {
 
 }
 
-fmr_handle fmr_bind(uint16_t bundle) {
+fmr_module fmr_bind(char *bundle) {
+
+	/* ~ Generate a handle for the given bundle identifier. ~ */
+	fmr_module handle = checksum(bundle, strlen(bundle));
 
 	/* ~ Invoke the remote bind function and obtain the bound handle. ~ */
+	host.invoke(_fmr, _fmr_bind, fmr_args(handle));
 
-	host.invoke(_fmr, _fmr_bind, 2, fmr_argument(bundle));
-
-	fmr_handle handle = bundle;
-
-	/* ~ Provide the user with the loaded handle. ~ */
-
-	return (fmr_handle)(handle);
+	/* ~ Return the handle back to the user. ~ */
+	return (fmr_module)(handle);
 
 }
 
@@ -27,7 +26,7 @@ extern uint8_t fmr_padding;
 
 #define FMR_INVOKE_OFFSET 6 * 2
 
-uint32_t fmr_invoke(fmr_handle handle, uint8_t index, uint8_t argc, ...) {
+uint32_t fmr_invoke(fmr_module handle, uint8_t index, uint8_t argc, ...) {
 
 	/* ~ Construct a va_list to access variadic arguments. ~ */
 

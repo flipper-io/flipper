@@ -28,10 +28,10 @@ int main(int argc, char *argv[]) {
 		sam.power(0);
 		usleep(1000);
 
-		fs_format();
+		fs.format();
 
 		/* ~ Send the file to the device. ~ */
-		fs_transfer_file(path, bid);
+		fs.upload(path, bid);
 
 		sam.power(1);
 
