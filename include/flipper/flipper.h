@@ -29,7 +29,9 @@ struct _lf_device {
 
 const extern struct _flipper {
 
-	int (* attach)(lf_endpoint endpoint, char *name);
+	int (* attach)(void);
+
+	int (* attach_name)(lf_endpoint endpoint, char *name);
 
 	int (* detach)(char *name);
 
@@ -39,8 +41,9 @@ const extern struct _flipper {
 
 #ifdef __private_include__
 
+int flipper_attach(void);
+int flipper_attach_name(lf_endpoint endpoint, char *name);
 int flipper_select(char *name);
-int flipper_attach(lf_endpoint endpoint, char *name);
 int flipper_detach(char *name);
 
 extern struct _lf_device *flipper_device;
