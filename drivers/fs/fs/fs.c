@@ -67,14 +67,14 @@ void chunky_transfer(uint8_t *buffer, size_t size, fsp data, int flags) {
 	}
 }
 
-void fs_transfer_file(char *path, char *name) {
+fsp fs_upload(char *path, char *name) {
 
 	/* ~ Open the file for reading. ~ */
 	FILE *file = fopen (path, "rb");
 
 	if(!file) {
 		error_raise(E_FS_OPEN, ERROR_STRING(E_FS_OPEN_S));
-		return;
+		return 0;
 	}
 
 	/* ~ Obtain the size of the file. ~ */
@@ -116,9 +116,12 @@ cleanup:
 	/* ~ Clean up and close the file. ~ */
 	free(binary);
 	fclose(file);
+
+	return _leaf;
+
 }
 
-void fs_download_file(char *name, char *path) {
+void fs_download(char *name, char *path) {
 
 	/* ~ Open the file for writing. ~ */
 	FILE *file = fopen (path, "wb");

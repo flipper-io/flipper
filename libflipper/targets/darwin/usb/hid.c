@@ -1,3 +1,4 @@
+#define __private_include__
 #include <flipper/usb.h>
 #include <flipper/fmr.h>
 #include <flipper/error.h>

@@ -1,7 +1,11 @@
-.SILENT: all install uninstall clean
-.PHONY: install clean
+.SILENT: all clean install uninstall
+.PHONY: all clean install uninstall
+.NOTPARALLEL: clean install
 
-PREFIX ?= /usr/local/
+# ~ Specify a default value for PREFIX if one is not given. ~ # 
+ifndef PREFIX
+export PREFIX = /usr/local
+endif
 
 # ~ Remove all of the pesky '.DS_Store' files. ~ #
 $(shell find . -name '.DS_Store' -exec rm -rf {} \;)

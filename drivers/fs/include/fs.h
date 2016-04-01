@@ -12,7 +12,18 @@ extern const struct _fs {
 
 	void (* configure)(void);
 	void (* format)(void);
+//	void (* create)(char *name, void *data, uint32_t length);
+//	void (* delete)(char *name);
+//  void (* rename)(char *name, char *new);
+//  void (* append)(char *name, void *data, uint32_t length);
+//  void (* put)(void);
+//  void (* get)(void);
 	fsp (* data)(char *name);
+
+#ifndef __osmium__
+	fsp (* upload)(char *path, char *name);
+	void (* download)(char *name, char *path);
+#endif
 
 } fs;
 
@@ -38,8 +49,8 @@ void fs_format(void);
 /* ~ Returns a filesystem pointer to the data of the specified file. ~ */
 fsp fs_data(char *name);
 
-void fs_transfer_file(char *path, char *name);
-void fs_download_file(char *name, char *path);
+fsp fs_upload(char *path, char *name);
+void fs_download(char *name, char *path);
 
 #endif
 #endif

@@ -12,7 +12,7 @@
 
 #include <flipper/fs.h>
 
-typedef uint32_t fmr_handle;
+typedef uint32_t fmr_module;
 
 #define fmr_bundle_id_from_string(string) checksum(string, strlen(string))
 
@@ -58,8 +58,8 @@ typedef uint32_t fmr_handle;
 extern const struct _fmr {
 
 	void (* configure)(void);
-	fmr_handle (* bind)(uint16_t bundle);
-	uint32_t (* invoke)(fmr_handle handle, uint8_t index, uint8_t argc, ...);
+	fmr_module (* bind)(char *bundle);
+	uint32_t (* invoke)(fmr_module handle, uint8_t index, uint8_t argc, ...);
 	void *(* resolve)(void *source, uint32_t length);
 
 } fmr;
@@ -71,8 +71,8 @@ enum { _fmr_configure, _fmr_bind, _fmr_invoke, _fmr_resolve };
 
 /* ~ Declare all function prototypes for this driver. ~ */
 void fmr_configure(void);
-fmr_handle fmr_bind(uint16_t bundle);
-uint32_t fmr_invoke(fmr_handle handle, uint8_t index, uint8_t argc, ...);
+fmr_module fmr_bind(char *bundle);
+uint32_t fmr_invoke(fmr_module handle, uint8_t index, uint8_t argc, ...);
 void *fmr_resolve(void *source, uint32_t length);
 
 #endif
