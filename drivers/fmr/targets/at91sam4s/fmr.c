@@ -12,13 +12,16 @@ void fmr_configure(void) {
 
 }
 
-fmr_handle fmr_bind(uint16_t bundle) {
+fmr_module fmr_bind(char *bundle) {
+
+	/* ~ Obtain the CRC of the bundle identifier. ~ */
+	uintcrc_t id = checksum(bundle, strlen(bundle));
 
 	/* ~ If the bundle requesting bind is cached, return its load address. ~ */
-	if (fmr_cache.bundle == bundle) return (fmr_handle)(fmr_cache.handle);
+	if (fmr_cache.bundle == id) return (fmr_module)(fmr_cache.handle);
 
 	/* ~ Obtain the base address of the module. ~ */
-	void *base = fdl_load(bundle);
+	void *base = fdl_load(id);
 
 	/* ~ Ensure the module was successfully loaded. ~ */
 	if (!base) {
@@ -33,21 +36,24 @@ fmr_handle fmr_bind(uint16_t bundle) {
 	((void (*)(void))(configure))();
 
 	/* ~ Cache the module. ~ */
-	fmr_cache.bundle = bundle; fmr_cache.handle = base;
+	fmr_cache.bundle = id; fmr_cache.handle = base;
 
 	/* ~ Return the base address as the module's handle. ~ */
 	return (uintptr_t)(base);
 
 }
 
-uint32_t fmr_invoke(fmr_handle handle, uint8_t index, uint8_t argc, ...) {
+uint32_t fmr_invoke(fmr_module handle, uint8_t index, uint8_t argc, ...) {
 
-	/* ~ Mask the handle to obtain the base address of the module. ~ */
 	void *base;
 
-	//void *base = (void *)(handle & 0x1FFFFF);
+	if (fmr_cache.bundle == handle) base = fmr_cache.handle;
 
-	if (fmr_cache.bundle == handle) base = fmr_cache.handle; else fmr_bind(handle);
+	else {
+
+		error.raise(E_DL_LOADED, ERROR_STRING(E_DL_LOADED_S));
+
+	}
 
 	/* ~ Obtain the address of the target function. ~ */
 	void *function = base + *(uintptr_t *)(base + (index * sizeof(uintptr_t)));
