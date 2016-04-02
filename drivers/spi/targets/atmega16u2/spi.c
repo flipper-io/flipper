@@ -1,6 +1,7 @@
 #define __private_include__
 #include <flipper/spi.h>
 #include <flipper/platform/platform.h>
+#include <flipper/fmr.h>
 
 #define SPI_DATA_MODE_0 0x00
 #define SPI_DATA_MODE_1 0x04
@@ -21,9 +22,6 @@ void spi_configure() {
 }
 
 void spi_enable(void) {
-
-	/* ~ Disable SPI on the device. ~ */
-	//device.invoke(_spi, _spi_disable, 0, NO_ARGS);
 
 	/* ~ Configure MOSI and SCK as outputs. ~ */
 	set_bits_in_port_with_mask(SPI_DDR, (bit(MOSI) | bit(SCK)));
@@ -46,9 +44,6 @@ void spi_disable(void) {
 
 	/* ~ Configure MOSI and SCK as inputs. ~ */
 	clear_bits_in_port_with_mask(SPI_DDR, (bit(MOSI) | bit(SCK)));
-
-	/* ~ Enable SPI on the device. ~ */
-	//device.invoke(_spi, _spi_enable, 0, NO_ARGS);
 
 }
 
