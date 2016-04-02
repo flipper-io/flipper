@@ -1,14 +1,16 @@
+output = qux_test
+module = qux
+
+cc = gcc
+
 all:
-	$(MAKE) -C driver/device
 
-	gcc main.c driver/common.c driver/qux.c -I driver -I /usr/local/include -lflipper -o qux
+	# ~ Build the module. ~ #
+	$(MAKE) -C $(module)
 
-load:
-
-	flipper unload
-
-	$(MAKE) -C driver/device load
+	# ~ Compile the interface application. ~ #
+	$(cc) *.c -I $(module)/include $(module)/$(module).a -lflipper -o $(output)
 
 clean:
-	$(MAKE) -C driver/device clean
-	rm -rf qux
+	$(MAKE) -C $(module) clean
+	rm -rf *.o $(output)
