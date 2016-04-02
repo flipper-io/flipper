@@ -11,6 +11,9 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
+	/* ~ Disclose errors. ~ */
+	error.disclose();
+
 	/* ~ Attach to the first available Flipper device over USB. ~ */
 	flipper.attach();
 
