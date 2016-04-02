@@ -16,6 +16,8 @@ void at45_configure(void) {
 
 void at45_enable(void) {
 
+//	spi_enable();
+
 	/* ~ Wait until SPI is ready. ~ */
 	while (!((AT91C_BASE_SPI -> SPI_SR) & AT91C_SPI_SPIENS));
 
@@ -38,6 +40,8 @@ void at45_disable(void) {
 	/* ~ Configure the CS pin as an input. ~ */
 	clear_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_OER);
 	set_bit_in_port(FLASH_CS_PIN, AT91C_BASE_PIOA -> PIO_ODR);
+
+//	spi_disable();
 
 }
 
