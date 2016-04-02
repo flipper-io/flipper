@@ -3,8 +3,35 @@
 
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
 #include <flipper/core.h>
-#include <flipper/error/codes.h>
 #include <flipper/error/strings.h>
+
+enum { E_OK
+     , E_FMR_PACKET_CRC
+     , E_NO_MEM
+     , E_TOO_BIG
+     , E_FVM_LOAD
+     , E_FVM_SYM
+     , E_OPEN_SOCK
+     , E_CONN_SOCK
+     , E_FLIPPER_UNBOUND
+     , E_FLIPPER_NOT_FOUND
+     , E_HID_MANAGER
+     , E_HID_NO_DEV
+     , E_HID_TOO_MANY
+     , E_HID_OPEN_DEV
+     , E_HID_DISCONN_DEV
+     , E_HID_WRITE
+     , E_HID_TIMEOUT
+     , E_IOKIT_DICT
+     , E_DL_NOT_FOUND
+     , E_DL_LOAD
+     , E_DL_LOADED
+     , E_FS_OPEN
+     , E_FS_ADD_LEAF
+     , E_FS_NO_LEAF
+     , E_UNIMPLEMENTED
+     , E_GREATEST
+     };
 
 /* ~ Expose a defined type for the size of an error code. ~ */
 typedef uint16_t uinterror_t;
