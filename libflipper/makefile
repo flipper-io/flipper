@@ -1,3 +1,5 @@
+.PHONY: all install clean
+
 # ~ Determine the architecture. ~ #
 architecture = $(shell echo $(shell uname -m) | tr A-Z a-z)
 
@@ -36,8 +38,6 @@ chown_args = $(shell whoami)
 else
 $(error "The operating system you are running is not supported by this build script.")
 endif
-
-PREFIX ?= /usr/local
 
 # ~ Specify a compiler and the other utilities needed to deploy for the target. ~ #
 cc = $(shell which 'clang')

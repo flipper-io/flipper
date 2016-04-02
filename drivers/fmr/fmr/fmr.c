@@ -15,7 +15,7 @@ fmr_module fmr_bind(char *bundle) {
 	fmr_module handle = checksum(bundle, strlen(bundle));
 
 	/* ~ Invoke the remote bind function and obtain the bound handle. ~ */
-	host.invoke(_fmr, _fmr_bind, fmr_args(handle));
+	host.invoke(_fmr, _fmr_bind, host_args(handle));
 
 	/* ~ Return the handle back to the user. ~ */
 	return (fmr_module)(handle);

@@ -1,4 +1,4 @@
-.PHONY: all install burn clean
+.PHONY: all install clean
 
 # ~ Specifiy the name of the output file. ~ #
 output = osmium-sam4s.bin
@@ -10,9 +10,9 @@ clock = 48054850
 cc = $(shell which 'arm-elf-gcc')
 objcopy = $(shell which 'arm-elf-objcopy')
 
-# ~ Specify uploader and flags. ~ #
-uploader = $(shell which 'flipper')
-uploader_flags = flash $(output)
+# ~ Specify installer and flags. ~ #
+installer = $(shell which 'flipper')
+installer_flags = flash $(output)
 
 # ~ Specify platform specific preprocessor flags. ~ #
 cpu_flags = -mcpu=arm7tdmi -mtune=arm7tdmi -mthumb -mthumb-interwork -nostartfiles -ffreestanding -fdata-sections -ffunction-sections
@@ -34,18 +34,10 @@ all:
 	# ~ Convert the 'elf' file into a raw binary. ~ #
 	$(objcopy) -O binary $(basename $(output)).elf $(output)
 
-install:
+install: all
 
-	# ~ Create the install directory if it doesn't exist. ~ #
-	mkdir -p $(PREFIX)/flipper/osmium
-
-	# ~ Copy the binary into the SDK's firmware directory. ~ #
-	$(rsync) -r $(output) $(PREFIX)/flipper/osmium/$(output)
-
-burn:
-
-	# ~ Flash the connected device with the binary using the appropriate uploader. ~ #
-	$(uploader) $(uploader_flags)
+	# ~ Flash the connected device with the binary using the appropriate installer. ~ #
+	$(installer) $(installer_flags)
 
 clean:
 

@@ -2,6 +2,8 @@
 #include <flipper/error.h>
 #include <flipper/fmr.h>
 
+char *error_messages[] = { ERROR_STRING_ARRAY };
+
 uint8_t error_disclosed = 0;
 uinterror_t error_code = E_OK;
 
@@ -19,16 +21,35 @@ void error_disclose(void) {
 	return;
 }
 
-void error_raise(uinterror_t code, char *string) {
+void error_raise(uinterror_t code, char *format, ...) {
+
+	/* ~ Construct a va_list to access variadic arguments. ~ */
+	va_list argv;
+
+	/* ~ Initialize the va_list that we created above. ~ */
+	va_start(argv, format);
+
 	if(error_disclosed) {
+
 		/* ~ Save the error code into the global error state. ~ */
 		error_code = code;
+
 	}
+
 	else {
-		fprintf(stderr, "%s\n", string);
+
+		/* ~ Print the error message to stderror. ~ */
+		vfprintf(stderr, format, argv);
+		fprintf(stderr, "\nError code (%i): %s", code, error_messages[code]);
+
+		/* ~ Exit the instance of libflipper. ~ */
 		exit(EXIT_FAILURE);
+
 	}
-	return;
+
+	/* ~ Release the variadic argument list. ~ */
+	va_end(argv);
+
 }
 
 uinterror_t error_get(void) {
