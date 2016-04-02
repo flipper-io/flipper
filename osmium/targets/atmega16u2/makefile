@@ -1,4 +1,4 @@
-.PHONY: all install burn clean
+.PHONY: all install clean
 
 # ~ Specifiy the name of the output file. ~ #
 output = osmium-atmega.bin
@@ -37,15 +37,7 @@ all:
 	# ~ Convert the 'elf' file into a raw binary. ~ #
 	$(objcopy) -O binary $(basename $(output)).elf $(output)
 
-install:
-
-	# ~ Create the install directory if it doesn't exist. ~ #
-	mkdir -p $(PREFIX)/flipper/osmium
-
-	# ~ Copy the binary into the SDK's firmware directory. ~ #
-	$(rsync) -r $(output) $(PREFIX)/flipper/osmium/$(output)
-
-burn:
+install: all
 
 	# ~ Flash the connected device with the binary using the appropriate uploader. ~ #
 	$(uploader) $(uploader_flags)

@@ -73,7 +73,7 @@ fsp fs_upload(char *path, char *name) {
 	FILE *file = fopen (path, "rb");
 
 	if(!file) {
-		error_raise(E_FS_OPEN, ERROR_STRING(E_FS_OPEN_S));
+		error_raise(E_FS_OPEN, "");
 		return 0;
 	}
 
@@ -86,7 +86,7 @@ fsp fs_upload(char *path, char *name) {
 	uint8_t *binary = (uint8_t *) malloc(sizeof(uint8_t) * size);
 
 	if(!binary) {
-		error_raise(E_NO_MEM, ERROR_STRING(E_NO_MEM_S));
+		error_raise(E_NO_MEM, "");
 	}
 
 	fread(binary, size, sizeof(uint8_t), file);
@@ -97,7 +97,7 @@ fsp fs_upload(char *path, char *name) {
 	/* ~ Create a new leaf to hold the file metadata. ~ */
 	fsp _leaf = fs_add_leaf_with_key(_root_leaf, key);
 	if (!_leaf) {
-		error_raise(E_FS_ADD_LEAF, ERROR_STRING(E_FS_ADD_LEAF_S));
+		error_raise(E_FS_ADD_LEAF, "");
 		goto cleanup;
 	}
 
@@ -127,7 +127,7 @@ void fs_download(char *name, char *path) {
 	FILE *file = fopen (path, "wb");
 
 	if (!file) {
-		error_raise(E_FS_OPEN, ERROR_STRING(E_FS_OPEN_S));
+		error_raise(E_FS_OPEN, "");
 		return;
 	}
 
@@ -137,7 +137,7 @@ void fs_download(char *name, char *path) {
 	/* ~ Locate the metadata for the file in the filesystem. ~ */
 	fsp _leaf = fs_leaf_for_key(_root_leaf, key);
 	if (!_leaf) {
-		error_raise(E_FS_NO_LEAF, ERROR_STRING(E_FS_NO_LEAF_S));
+		error_raise(E_FS_NO_LEAF, "");
 		return;
 	}
 

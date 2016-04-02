@@ -51,7 +51,7 @@ fsp fs_add_leaf_with_key(fsp current, uint16_t key) {
 
 		fsp region = at45_alloc(sizeof(leaf));
 		if (!region) {
-			error_raise(E_NO_MEM, ERROR_STRING(E_NO_MEM_S));
+			error_raise(E_NO_MEM, "");
 			return 0;
 		}
 
@@ -59,7 +59,7 @@ fsp fs_add_leaf_with_key(fsp current, uint16_t key) {
 
 		leaf *_leaf = malloc(sizeof(leaf));
 		if(!_leaf) {
-			error_raise(E_NO_MEM, ERROR_STRING(E_NO_MEM_S));
+			error_raise(E_NO_MEM, "");
 			return 0;
 		}
 
@@ -111,7 +111,7 @@ fsp fs_leaf_for_key(fsp current, uint16_t key) {
 
 	if (current == 0) {
 
-		error_raise(E_FS_NO_LEAF, ERROR_STRING(E_FS_NO_LEAF_S));
+		error_raise(E_FS_NO_LEAF, "");
 
 		return 0;
 

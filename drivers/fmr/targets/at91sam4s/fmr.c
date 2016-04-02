@@ -15,7 +15,7 @@ void fmr_configure(void) {
 fmr_module fmr_bind(char *bundle) {
 
 	/* ~ Obtain the CRC of the bundle identifier. ~ */
-	uintcrc_t id = checksum(bundle, strlen(bundle));
+	uintcrc_t id = bundle;
 
 	/* ~ If the bundle requesting bind is cached, return its load address. ~ */
 	if (fmr_cache.bundle == id) return (fmr_module)(fmr_cache.handle);
@@ -25,7 +25,7 @@ fmr_module fmr_bind(char *bundle) {
 
 	/* ~ Ensure the module was successfully loaded. ~ */
 	if (!base) {
-		error.raise(E_DL_LOAD, ERROR_STRING(E_DL_LOAD_S));
+		error_raise(E_DL_LOAD, "");
 		return -1;
 	}
 
@@ -51,7 +51,7 @@ uint32_t fmr_invoke(fmr_module handle, uint8_t index, uint8_t argc, ...) {
 
 	else {
 
-		error.raise(E_DL_LOADED, ERROR_STRING(E_DL_LOADED_S));
+		error_raise(E_DL_LOADED, "");
 
 	}
 

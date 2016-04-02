@@ -26,7 +26,7 @@ void fs_format(void) {
 	leaf *root = (leaf *) malloc(sizeof(leaf));
 
 	if(!root) {
-		error.raise(E_NO_MEM, "");
+		error_raise(E_NO_MEM, "");
 		// TODO: not sure what sort of cleanup is necessary here.
 		return;
 	}
