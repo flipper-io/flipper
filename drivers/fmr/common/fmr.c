@@ -85,10 +85,10 @@ uintres_t fmr_obtain_response(const struct _target *target) {
 //	}
 
 	/* ~ If there is an error, raise it. ~ */
-	if (response.body.error != E_OK) error_raise(response.body.error, "");
+	if (response.body.error != E_OK) error_raise(response.body.error, "The device encountered an error.\n");
 
 	/* ~ If the response is valid, return it. ~ */
-	return little32(response.body.retval);
+	return response.body.retval;
 }
 
 /* ~ Send a constructed packet to its target. ~ */
