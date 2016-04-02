@@ -1,7 +1,7 @@
 #define __private_include__
 #include "qux.h"
 
-#ifdef __device_compilation__
+#ifdef __device__
 __attribute__((section(".fdl")))
 #endif
 
