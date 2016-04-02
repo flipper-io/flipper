@@ -6,7 +6,7 @@
 /* ~ This function traverses the filesystem tree starting at a leaf pointed to by the 'current' argument until an empty branch pointer corresponding to the given key is found. ~ */
 
 fsp fs_empty_branch_for_key(fsp _branch, fsp current, uint16_t key) {
-
+	
 	/* ~ If our 'current' pointer is zero, then an empty branch pointer has been found; return it. ~ */
 	if (current == 0) return _branch;
 
