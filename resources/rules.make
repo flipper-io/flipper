@@ -1,8 +1,4 @@
-ifndef PREFIX
-ifneq (,$(findstring install,$(MAKECMDGOALS)))
-$(error "Error. Please specify the environment variable 'PREFIX'. The 'PREFIX' variable will direct this install script to the install location appropriate for your system.")
-endif
-endif
+PREFIX ?= /usr/local
 
 # ~ Specify platform-inspecific utilities needed to deploy to any target. ~ #
 rsync = $(shell which 'rsync')
