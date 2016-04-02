@@ -68,7 +68,7 @@ void *at45_dereference(fsp source, uint32_t length) {
 	void *local = malloc(length);
 
 	if (!local) {
-		error_raise(E_NO_MEM, ERROR_STRING(E_NO_MEM_S));
+		error_raise(E_NO_MEM, "");
 		return 0;
 	}
 

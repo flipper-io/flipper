@@ -41,7 +41,7 @@ int flipper_select(char *name) {
 
 	struct _lf_device *device = lf_obtain_device(name);
 	if(!device) {
-		error_raise(E_FLIPPER_NOT_FOUND, ERROR_STRING(E_FLIPPER_NOT_FOUND_S));
+		error_raise(E_FLIPPER_NOT_FOUND, "");
 		return -1;
 	}
 	flipper_device = device;
@@ -69,7 +69,7 @@ int flipper_attach_name(lf_endpoint endpoint, char *name) {
 
 		/* ~ Ensure we have been granted the memory. ~*/
 		if (!device) {
-			error_raise(E_NO_MEM, ERROR_STRING(E_NO_MEM_S));
+			error_raise(E_NO_MEM, "");
 			return -1;
 		}
 
@@ -129,7 +129,7 @@ int flipper_attach_name(lf_endpoint endpoint, char *name) {
 
 				flipper_device = last;
 				free(device);
-				error_raise(E_UNIMPLEMENTED, ERROR_STRING(E_UNIMPLEMENTED_S));
+				error_raise(E_UNIMPLEMENTED, "");
 				return -1;
 				break;
 
@@ -145,7 +145,7 @@ int flipper_attach_name(lf_endpoint endpoint, char *name) {
 			flipper_device = last;
 
 			/* ~ Raise the appropriate error. ~ */
-			error_raise(E_HID_NO_DEV, ERROR_STRING("Failed to attach the requested device."));
+			error_raise(E_HID_NO_DEV, "");
 
 			return -1;
 
@@ -181,7 +181,7 @@ int flipper_detach(char *name) {
 	// Did we find a device with the provided name?
 	if(!c)
 	{
-		error_raise(E_FLIPPER_NOT_FOUND, ERROR_STRING(E_FLIPPER_NOT_FOUND_S));
+		error_raise(E_FLIPPER_NOT_FOUND, "");
 		return -1;
 	}
 
