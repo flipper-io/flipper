@@ -7,48 +7,53 @@
 int main(int argc, char *argv[]) {
 
 	if (argc < 2) {
-		printf("\nUsage: flipper [load | io | flash]\n\n");
+		printf("\nUsage: flipper [install | io | direction | flash]\n\n");
 		return EXIT_SUCCESS;
 	}
 
 	/* ~ Attatch this instance of libflipper to the first device present over USB. ~ */
 	flipper.attach();
 
-	error.disclose();
-
 	if (!strcmp(argv[1], "flash")) {
 		sam_load_firmware(argv[2]);
 	}
 
-	if (!strcmp(argv[1], "load") || !strcmp(argv[1], "debug")) {
+	if (!strcmp(argv[1], "install")) {
+
+		if (argc < 4) { printf("\nPlease specify a bundle identifer ('io.flipper.module') as well as the name of the module.\n\n"); return EXIT_FAILURE; }
 
 		/* ~ Parse user input from the variadic argument list. ~ */
-		char *bid = argv[2], *path = argv[3];
+		char *bundle = argv[2], *path = argv[3];
 
 		sam.power(0);
-		usleep(1000);
+
+		usleep(10000);
 
 		fs.format();
 
+		usleep(10000);
+
 		/* ~ Send the file to the device. ~ */
-		fs.upload(path, bid);
+		fs.upload(path, bundle);
+
+		usleep(10000);
 
 		sam.power(1);
 
 		/* ~ Let the operating system boot. ~ */
 		usleep(100000);
 
-		uint16_t key = checksum(bid, strlen(bid));
+		uint16_t key = checksum(bundle, strlen(bundle));
 
-		/* ~ Call the the Flipper Dynamic Loader to begin the dynamic loading process. ~ */
-		if (!strcmp(argv[1], "load")) fdl.load(key); else fdl.launch(key);
+		/* ~ Instruct the dynamic loader to load the file. ~ */
+		fdl.load(key);
 
 	}
 
 	else if (!strcmp(argv[1], "launch")) {
 
-		char *bid = argv[2];
-		uint16_t key = checksum(bid, strlen(bid));
+		char *bundle = argv[2];
+		uint16_t key = checksum(bundle, strlen(bundle));
 
 		/* ~ Launch the program. ~ */
 		fdl.launch(key);
