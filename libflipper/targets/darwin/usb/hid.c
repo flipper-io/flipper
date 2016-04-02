@@ -70,7 +70,7 @@ int8_t hid_receive_packet(uint8_t device, uint8_t *buffer) {
 
 	hid = get_hid(device);
 	if (!hid || !hid->open) {
-		error_raise(E_HID_OPEN_DEV, ERROR_STRING(E_HID_OPEN_DEV_S));
+		error_raise(E_HID_OPEN_DEV, "");
 		return -1;
 	}
 	if ((b = hid->first_buffer) != NULL) {
@@ -96,7 +96,7 @@ int8_t hid_receive_packet(uint8_t device, uint8_t *buffer) {
 			break;
 		}
 		if (!hid->open) {
-			error_raise(E_HID_OPEN_DEV, ERROR_STRING(E_HID_OPEN_DEV_S));
+			error_raise(E_HID_OPEN_DEV, "");
 			ret = -1;
 			break;
 		}
@@ -170,7 +170,7 @@ int8_t hid_transmit_packet(uint8_t device, uint8_t *buffer) {
 
 	hid = get_hid(device);
 	if (!hid || !hid->open) {
-		error_raise(E_HID_OPEN_DEV, ERROR_STRING(E_HID_OPEN_DEV_S));
+		error_raise(E_HID_OPEN_DEV, "");
 		return -1;
 	}
 #if 1
@@ -376,7 +376,7 @@ static void attach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDevic
 	if (IOHIDDeviceOpen(dev, kIOHIDOptionsTypeNone) != kIOReturnSuccess) return;
 	h = (hid_t *)malloc(sizeof(hid_t));
 	if (!h) {
-		error_raise(E_NO_MEM, ERROR_STRING(E_NO_MEM_S));
+		error_raise(E_NO_MEM, "");
 	}
 	memset(h, 0, sizeof(hid_t));
 	IOHIDDeviceScheduleWithRunLoop(dev, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);

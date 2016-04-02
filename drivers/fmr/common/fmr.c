@@ -34,7 +34,7 @@ uint32_t fmr_parse(const struct _target *sender) {
 
 		/* ~ Set the status led to its error color to alert the user of a problem. ~ */
 		led_set_rgb(LED_COLOR_ERROR);
-		error_raise(E_FMR_PACKET_CRC, ERROR_STRING(E_FMR_PACKET_CRC_S));
+		error_raise(E_FMR_PACKET_CRC, "");
 
 		/* ~ Skip the call. ~ */
 		goto end;
@@ -85,7 +85,7 @@ uintres_t fmr_obtain_response(const struct _target *target) {
 //	}
 
 	/* ~ If there is an error, raise it. ~ */
-	if (response.body.error != E_OK) error_raise(response.body.error, ERROR_STRING("Error raised on remote target."));
+	if (response.body.error != E_OK) error_raise(response.body.error, "");
 
 	/* ~ If the response is valid, return it. ~ */
 	return little32(response.body.retval);
