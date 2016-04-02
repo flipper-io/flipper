@@ -1,8 +1,8 @@
 .SILENT: all clean install uninstall
 .PHONY: all clean install uninstall
-.NOTPARALLEL: clean install
+.NOTPARALLEL:
 
-# ~ Specify a default value for PREFIX if one is not given. ~ # 
+# ~ Specify a default value for PREFIX if one is not given. ~ #
 ifndef PREFIX
 export PREFIX = /usr/local
 endif
@@ -10,7 +10,7 @@ endif
 # ~ Remove all of the pesky '.DS_Store' files. ~ #
 $(shell find . -name '.DS_Store' -exec rm -rf {} \;)
 
-all:
+all: clean
 
 	# ~ Build libflipper. ~ #
 	@echo Building 'libflipper.'
@@ -26,7 +26,7 @@ all:
 
 	@echo The Flipper Toolbox was built successfully.
 
-install:
+install: all
 
 	# ~ Install libflipper. ~ #
 	@echo Installing 'libflipper'.

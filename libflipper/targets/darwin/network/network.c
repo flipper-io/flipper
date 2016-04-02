@@ -28,7 +28,7 @@ void network_configure(void *ip) {
 	network_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 
 	if (network_socket < 0) {
-		error_raise(E_OPEN_SOCK, ERROR_STRING(E_OPEN_SOCK_S));
+		error_raise(E_OPEN_SOCK, "");
 	}
 
 	/* ~ Clear the network address. ~ */
@@ -38,7 +38,7 @@ void network_configure(void *ip) {
 	network_address.sin_port = htons(FLIPPER_NETWORK_PORT);
 
 	if (connect(network_socket, (struct sockaddr *) &network_address, sizeof(network_address)) < 0)
-		error_raise(E_CONN_SOCK, ERROR_STRING(E_CONN_SOCK_S));
+		error_raise(E_CONN_SOCK, "");
 
 	// Don't think this should be here...
 	//verbose("Successfully connected to 'Elroy' at '%s'.\n\n", ip);
@@ -68,7 +68,7 @@ uint8_t network_get(void) {
 void network_push(void *source, uint32_t length) {
 
 	if (network_socket < 0) {
-		error_raise(E_FLIPPER_UNBOUND, ERROR_STRING(E_FLIPPER_UNBOUND_S));
+		error_raise(E_FLIPPER_UNBOUND, "");
 	}
 	send(network_socket, source, length, 0);
 

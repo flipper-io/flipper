@@ -23,7 +23,6 @@ void error_raise(uinterror_t code, char *string) {
 	/* ~ Save the error code into the global error state. ~ */
 	error_code = code;
 	//TODO: Use serial or something:
-	(void)string;
 	return;
 }
 

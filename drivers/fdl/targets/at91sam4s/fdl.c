@@ -66,7 +66,7 @@ void *fdl_load(uint16_t key) {
 	/* ~ Ensure that we're loading a valid filesystem object. ~ */
 
 	if (!_leaf) {
-		error.raise(E_DL_NOT_FOUND, ERROR_STRING(E_DL_NOT_FOUND_S));
+		error_raise(E_DL_NOT_FOUND, "");
 		return NULL;
 	}
 
@@ -77,7 +77,7 @@ void *fdl_load(uint16_t key) {
 	/* ~ If the loadable has already been loaded, return the address. ~ */
 
 	if (l -> address) {
-		error.raise(E_DL_LOADED, ERROR_STRING(E_DL_LOADED_S));
+		error_raise(E_DL_LOADED, "");
 		load_address = (void *)(l -> address);
 		goto cleanup;
 	}
