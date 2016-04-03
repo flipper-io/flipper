@@ -44,6 +44,7 @@ void error_raise(uinterror_t code, char *format, ...) {
 		if(code < E_GREATEST) {
 			fprintf(stderr, "\n\nError code (%i): %s\n\n", code, error_messages[code]);
 		}
+
 		else {
 			fprintf(stderr, "\n\nUser defined error occured.\n\n");
 		}

@@ -15,11 +15,8 @@ void fs_configure(void) {
 
 	/* ~ In order to syncronize filesystem references, we have to load the freelist, break_value, and root_leaf references from external memory! ~ */
 	at45_pull(&_free_list, sizeof(fsp), _FREE_LIST);
-	printf("free is 0x%08x\n", _free_list);
 	at45_pull(&_break_value, sizeof(fsp), _BREAK_VALUE);
-	printf("break is 0x%08x\n", _break_value);
 	at45_pull(&_root_leaf, sizeof(fsp), _ROOT_LEAF);
-	printf("root is 0x%08x\n", _root_leaf);
 
 }
 
