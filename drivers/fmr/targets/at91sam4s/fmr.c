@@ -15,7 +15,7 @@ void fmr_configure(void) {
 fmr_module fmr_bind(char *bundle) {
 
 	/* ~ Obtain the CRC of the bundle identifier. ~ */
-	uintcrc_t id = bundle;
+	uintcrc_t id = (uintcrc_t)bundle;
 
 	/* ~ If the bundle requesting bind is cached, return its load address. ~ */
 	if (fmr_cache.bundle == id) return (fmr_module)(fmr_cache.handle);
