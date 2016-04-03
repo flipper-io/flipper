@@ -106,9 +106,6 @@ get = codeError <$> c_error_get
 clear :: IO ()
 clear = c_error_clear
 
---disclosed :: IO Bool
---disclosed = (not . toBool) <$> c_error_disclosed
-
 foreign import ccall safe "flipper/error/error.h error_withold"
     c_error_withold :: IO ()
 
@@ -123,10 +120,3 @@ foreign import ccall safe "flipper/error/error.h error_get"
 
 foreign import ccall safe "flipper/error/error.h error_clear"
     c_error_clear :: IO ()
-
--- Figure out how this works:
---foreign import ccall safe "flipper/error/error.h error_disclosed"
---    c_error_disclosed :: IO Word8
-
---foreign import ccall safe "flipper/error/error.h error_code"
---    c_error_code :: IO Word16
