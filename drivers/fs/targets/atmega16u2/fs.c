@@ -19,7 +19,7 @@ void fs_format(void) {
 	/* ~ Reset the allocation table. ~ */
 	_free_list = 0;
 	at45_push(&_free_list, sizeof(fsp), _FREE_LIST);
-	_break_value = AT45_PAGE_SIZE;
+	_break_value = DEFAULT_BREAK_VALUE;
 	at45_push(&_break_value, sizeof(fsp), _BREAK_VALUE);
 
 	/* ~ Create the root leaf. ~ */

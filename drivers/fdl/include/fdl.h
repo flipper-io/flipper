@@ -13,6 +13,11 @@ enum { fdl_config_base, fdl_config_brk };
 #define fdl_write_config(object, config) at45_push(&object, sizeof(uint32_t), fdl_config_offset(FDL_CONFIG_BASE, config));
 #define fdl_read_config(object, config) at45_pull(&object, sizeof(uint32_t), fdl_config_offset(FDL_CONFIG_BASE, config));
 
+#define RW_SIZE_OFFSET  0x0004
+#define GOT_ADDR_OFFSET 0x0008
+#define DATA_ADDR       0x0010
+#define DRIVER_OFFSET   0x0014
+
 /* ~ Declare the virtual driver object. ~ */
 extern const struct _fdl {
 

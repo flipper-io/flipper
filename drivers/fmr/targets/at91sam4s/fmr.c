@@ -15,7 +15,7 @@ void fmr_configure(void) {
 fmr_module fmr_bind(char *bundle) {
 
 	/* ~ Obtain the CRC of the bundle identifier. ~ */
-	uintcrc_t id = (uintcrc_t)bundle;
+	uintcrc_t id = (uintcrc_t)((uintptr_t)(bundle));
 
 	/* ~ If the bundle requesting bind is cached, return its load address. ~ */
 	if (fmr_cache.bundle == id) return (fmr_module)(fmr_cache.handle);
@@ -30,7 +30,7 @@ fmr_module fmr_bind(char *bundle) {
 	}
 
 	/* ~ Obtain the address of the module's configure function. ~ */
-	void *configure = base + *(uintptr_t *)(base);
+	void *configure = base + *(uintptr_t *)(base) - DRIVER_OFFSET;
 
 	/* ~ Hand control to the module to perform necessary configurations. ~ */
 	((void (*)(void))(configure))();
@@ -56,7 +56,7 @@ uint32_t fmr_invoke(fmr_module handle, uint8_t index, uint8_t argc, ...) {
 	}
 
 	/* ~ Obtain the address of the target function. ~ */
-	void *function = base + *(uintptr_t *)(base + (index * sizeof(uintptr_t)));
+	void *function = base + *(uintptr_t *)(base + (index * sizeof(uintptr_t))) - DRIVER_OFFSET;
 
 	/* ~ The address of the variadic argument list is the address of the packet's body plus the 6 bytes needed for this function call. ~ */
 	void *argv = fmrpacket.body + 6 * 2;

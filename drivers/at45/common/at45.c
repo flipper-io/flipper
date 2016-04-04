@@ -9,6 +9,7 @@ const struct _at45 at45 = {
 	at45_disable,
 	at45_reset,
 	at45_read,
+	at45_get,
 	at45_alloc,
 	at45_free,
 	at45_format,
