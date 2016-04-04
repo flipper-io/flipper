@@ -70,20 +70,20 @@ directionCode :: Direction -> Word8
 directionCode Input  = 0
 directionCode Output = 1
 
-setDigitalPinDirection :: Direction -> DigitalPin -> IO ()
-setDigitalPinDirection d p = c_io_set_direction (directionCode d) (digPinCode p)
+digitalDirection :: DigitalPin -> Direction -> IO ()
+digitalDirection p d = c_io_set_direction (digPinCode p) (directionCode d)
 
-setAnalogPinDirection :: Direction -> AnalogPin -> IO ()
-setAnalogPinDirection d p = c_io_set_direction (directionCode d) (anPinCode p)
+analogDirection :: AnalogPin -> Direction -> IO ()
+analogDirection p d = c_io_set_direction (anPinCode p) (directionCode d)
 
-digitalPinWrite :: DigitalPin -> Bool -> IO ()
-digitalPinWrite p v = c_io_write (digPinCode p) (fromBool v)
+digitalWrite :: DigitalPin -> Bool -> IO ()
+digitalWrite p v = c_io_write (digPinCode p) (fromBool v)
 
 --digitalPinPulse :: DigitalPin -> Word16 -> IO ()
 --digitalPinPulse p d = c_digital_pulse (digPinCode p) d
 
-analogPinWrite :: AnalogPin -> Word16 -> IO ()
-analogPinWrite p v = c_io_write (anPinCode p) v
+analogWrite :: AnalogPin -> Word16 -> IO ()
+analogWrite p v = c_io_write (anPinCode p) v
 
 foreign import ccall safe "flipper/io.h io_set_direction"
     c_io_set_direction :: Word8 -> Word8 -> IO ()

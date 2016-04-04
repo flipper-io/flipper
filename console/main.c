@@ -27,16 +27,16 @@ int main(int argc, char *argv[]) {
 
 		sam.power(0);
 
-		usleep(10000);
+		usleep(1000);
 
 		fs.format();
 
-		usleep(10000);
+		usleep(1000);
 
 		/* ~ Send the file to the device. ~ */
 		fs.upload(path, bundle);
 
-		usleep(10000);
+		usleep(1000);
 
 		sam.power(1);
 

@@ -336,6 +336,12 @@ void at45_read(fsp address) {
 
 }
 
+uint8_t at45_get(void) {
+
+	return spi_get();
+
+}
+
 void at45_pull(void *destination, uint32_t length, fsp source) {
     
     disable_interrupts();
