@@ -40,7 +40,14 @@ void error_raise(uinterror_t code, char *format, ...) {
 
 		/* ~ Print the error message to stderror. ~ */
 		vfprintf(stderr, format, argv);
-		fprintf(stderr, "\nError code (%i): %s", code, error_messages[code]);
+
+		if(code < E_GREATEST) {
+			fprintf(stderr, "\n\nError code (%i): %s\n\n", code, error_messages[code]);
+		}
+
+		else {
+			fprintf(stderr, "\n\nUser defined error occured.\n\n");
+		}
 
 		/* ~ Exit the instance of libflipper. ~ */
 		exit(EXIT_FAILURE);

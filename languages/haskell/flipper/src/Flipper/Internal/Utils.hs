@@ -1,6 +1,6 @@
 module Flipper.Internal.Utils where
 
-import qualified Foreign.Marshal.Util as U
+import qualified Foreign.Marshal.Utils as U
 
-retSuc :: Num a => a -> Bool
+retSuc :: (Eq a, Num a) => a -> Bool
 retSuc = not . U.toBool

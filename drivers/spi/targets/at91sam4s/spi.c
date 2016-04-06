@@ -51,7 +51,7 @@ void spi_disable(void) {
 	clear_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SPIEN);
 	set_bits_in_port_with_mask(AT91C_BASE_SPI -> SPI_CR, AT91C_SPI_SPIDIS);
 
-	/* ~ Disable use of the SPI pins by the PIO. They are now in use by the SPI controller. ~ */
+	/* ~ Disable use of the SPI pins by the SPI. They are now in use by the PIO controller. ~ */
 	clear_bits_in_port_with_mask(AT91C_BASE_PIOA -> PIO_PDR, (AT91C_PA12_MISO | AT91C_PA13_MOSI | AT91C_PA14_SPCK));
 	set_bits_in_port_with_mask(AT91C_BASE_PIOA -> PIO_PER, (AT91C_PA12_MISO | AT91C_PA13_MOSI | AT91C_PA14_SPCK));
 

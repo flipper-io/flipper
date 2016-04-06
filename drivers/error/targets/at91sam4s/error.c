@@ -19,7 +19,7 @@ void error_disclose(void) {
 	return;
 }
 
-void error_raise(uinterror_t code, char *format, "") {
+void error_raise(uinterror_t code, char *format, ...) {
 	/* ~ Save the error code into the global error state. ~ */
 	error_code = code;
 	//TODO: Use serial or something:
