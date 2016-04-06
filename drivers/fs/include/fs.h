@@ -34,6 +34,8 @@ extern const struct _fs {
 #define _BREAK_VALUE 36
 #define _ROOT_LEAF	 40
 
+#define DEFAULT_BREAK_VALUE 0x1234
+
 /* ~ Declare all global variables. ~ */
 extern fsp _free_list;
 extern fsp _break_value;
