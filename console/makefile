@@ -23,11 +23,8 @@ all:
 
 install:
 
-	# ~ Create the SDK's binary directory if it does not already exist. ~ #
-	mkdir -p $(PREFIX)/flipper/bin
-
 	# ~ Copy the executable into the SDK's binary directory. ~ #
-	$(rsync) -r $(output) $(PREFIX)/flipper/bin
+	cp $(output) $(PREFIX)/bin
 
 clean:
 

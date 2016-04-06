@@ -13,7 +13,7 @@ void usb_configure() {
 	uint8_t devices = hid_enumerate(1, CARBON_VENDOR_ID, CARBON_PRODUCT_ID, CARBON_USAGE_PAGE, CARBON_USAGE);
 
 	if (!devices) {
-		error_raise(E_FLIPPER_UNBOUND, "");
+		error_raise(E_FLIPPER_UNBOUND, "No device appears to be connected to this computer.\nPlease ensure that Flipper is properly connected and try again.\n");
 	}
 
 	for (uintptr_t i = 0; i < devices; i ++) {
@@ -21,7 +21,7 @@ void usb_configure() {
 		if (config.read(CONFIG_NAME) == flipper_device -> identifier) return;
 	}
 
-	error_raise(E_FLIPPER_NOT_FOUND, "");
+	error_raise(E_FLIPPER_NOT_FOUND, "Could not find device named '%s'.\n", flipper_device -> name);
 
 }
 
