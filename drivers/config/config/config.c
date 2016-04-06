@@ -14,6 +14,7 @@ void config_write(uint8_t key, uint16_t value) {
 
 uint16_t config_read(uint8_t key) {
 
-	return device.invoke(_config, _config_read, 1, key);
+	/* ~ WEIRD LITTLE ENDIAN RETURN ANOMOLY! ~ */
+	return little32(device.invoke(_config, _config_read, 1, key));
 
 }

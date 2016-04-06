@@ -30,8 +30,42 @@ void fs_format(void) {
 
 fsp fs_data(char *name) {
 
-	return 0;
+	uintcrc_t id = checksum(name, strlen(name));
 
+	/* ~ Obtain a pointer to the file. ~ */
+	fsp _leaf = fs_leaf_for_key(_root_leaf, id);
+
+	/* ~ Ensure we have a valid file. ~ */
+	if (!_leaf) return 0;
+
+	/* ~ Pull in the address of the file's data. ~ */
+	fsp data;
+	at45_pull(&data, sizeof(fsp), forward(_leaf, leaf, data));
+
+	return data;
+
+}
+
+void print_progress(int progress, int total_len, int char_width)
+{
+	if (total_len == 0)
+	{
+		return;
+	}
+	float ratio = (progress / ((float)total_len));
+
+	int bar_width_calculated = ratio * char_width;
+
+	printf("%3d%% | ", (int)(ratio * 100));
+
+	for (int i = 0; i < char_width; i++)
+	{
+		printf((i < bar_width_calculated) ? "#" : " ");
+	}
+
+	printf(" |\n");
+
+	if (ratio < 0.9999f) printf("\033[F\033[J");
 }
 
 void chunky_transfer(uint8_t *buffer, size_t size, fsp data, int flags) {
@@ -57,7 +91,7 @@ void chunky_transfer(uint8_t *buffer, size_t size, fsp data, int flags) {
 
 		if (flags & FLIPPER_WANT_PROGRESS) {
 
-			// print_progress(read_idx, size, 60);
+			print_progress(read_idx, size, 60);
 
 		}
 
@@ -69,12 +103,15 @@ void chunky_transfer(uint8_t *buffer, size_t size, fsp data, int flags) {
 
 fsp fs_upload(char *path, char *name) {
 
-	/* ~ Open the file for reading. ~ */
-	FILE *file = fopen (path, "rb");
+	fs.configure();
 
-	if(!file) {
-		error_raise(E_FS_OPEN, "");
-		return 0;
+	fsp _leaf;
+
+	/* ~ Open the file for reading. ~ */
+	FILE *file = fopen(path, "rb");
+	if (!file) {
+		error_raise(E_FS_OPEN, "Could not open file '%s'.", path);
+		goto cleanup;
 	}
 
 	/* ~ Obtain the size of the file. ~ */
@@ -84,9 +121,8 @@ fsp fs_upload(char *path, char *name) {
 
 	/* ~ Load the file into RAM. ~ */
 	uint8_t *binary = (uint8_t *) malloc(sizeof(uint8_t) * size);
-
 	if(!binary) {
-		error_raise(E_NO_MEM, "");
+		error_raise(E_NO_MEM, "Failed to obtain the memory required to upload the file '%s'.", name);
 	}
 
 	fread(binary, size, sizeof(uint8_t), file);
@@ -95,9 +131,8 @@ fsp fs_upload(char *path, char *name) {
 	uint16_t key = checksum(name, strlen(name));
 
 	/* ~ Create a new leaf to hold the file metadata. ~ */
-	fsp _leaf = fs_add_leaf_with_key(_root_leaf, key);
+	_leaf = fs_add_leaf_with_key(_root_leaf, key);
 	if (!_leaf) {
-		error_raise(E_FS_ADD_LEAF, "");
 		goto cleanup;
 	}
 
@@ -114,8 +149,8 @@ fsp fs_upload(char *path, char *name) {
 cleanup:
 
 	/* ~ Clean up and close the file. ~ */
-	free(binary);
-	fclose(file);
+	if (binary) free(binary);
+	if (file) fclose(file);
 
 	return _leaf;
 
@@ -125,9 +160,8 @@ void fs_download(char *name, char *path) {
 
 	/* ~ Open the file for writing. ~ */
 	FILE *file = fopen (path, "wb");
-
 	if (!file) {
-		error_raise(E_FS_OPEN, "");
+		error_raise(E_FS_OPEN, "Could not open file '%s' for writing.", path);
 		return;
 	}
 
@@ -137,7 +171,6 @@ void fs_download(char *name, char *path) {
 	/* ~ Locate the metadata for the file in the filesystem. ~ */
 	fsp _leaf = fs_leaf_for_key(_root_leaf, key);
 	if (!_leaf) {
-		error_raise(E_FS_NO_LEAF, "");
 		return;
 	}
 

@@ -31,6 +31,12 @@ void at45_read(fsp address) {
 
 }
 
+uint8_t at45_get(void) {
+
+	return device_invoke(_at45, _at45_get, NO_ARGS);
+
+}
+
 fsp at45_alloc(uint32_t length) {
 
 	fsp address = device_invoke(_at45, _at45_alloc, 2, hi16(length), lo16(length));
