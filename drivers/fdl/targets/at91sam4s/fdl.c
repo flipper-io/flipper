@@ -110,8 +110,6 @@ void *fdl_load(uint16_t key) {
 	uint32_t rw_size;
 	at45_pull(&rw_size, sizeof(uint32_t), (l -> data + RW_SIZE_OFFSET));
 
-	serprintf("RW size is 0x%08x\n", rw_size);
-
 	/* ~ Allocate memory for the read/write segment. ~ */
 	uint32_t *_data = malloc(rw_size);
 	if (!_data) {
@@ -119,54 +117,21 @@ void *fdl_load(uint16_t key) {
 		goto cleanup;
 	}
 
-	serprintf("GOT data is at %p\n", _data);
-
-	uint32_t buncha_data[64];
-	at45_pull(&buncha_data[0], sizeof(uint32_t) * 64, l->data);
-
-	serprintf("First 64 words:\n");
-	for (int i = 0; i < 64; i++)
-	{
-		serprintf("%08X ", buncha_data[i]);
-		if (i % 8 == 7)
-		{
-			serprintf("\n");
-		}
-	}
-	serprintf("-------------------------------------\n");
-
 	/* ~ Obtain the address of the global offset table. ~ */
 	uint32_t _got_offset;
 	at45_pull(&_got_offset, sizeof(uint32_t), (l -> data + GOT_ADDR_OFFSET));
-	serprintf("GOT offset is at 0x%08x\n", _got_offset);
 	fsp _got = l -> data + _got_offset;
 
 	/* ~ Obtain the base address of the data and bss sections. ~ */
 	uint32_t data_base;
-	serprintf("data_base = %X\n", data_base);
 	at45_pull(&data_base, sizeof(uint32_t), l -> data + DATA_ADDR);
 
 	uint32_t *got_temp = at45_dereference(_got, rw_size);
-	serprintf("got_temp table:\n\n");
-	for (int i = 0; i < rw_size/sizeof(uint32_t); i++)
-	{
-		serprintf("[%d] %X\n", i, got_temp[i]);
-	}
-	serprintf("\n\ngot_temp = %X\n", (uint32_t)got_temp);
 	for (int i = 0; i < rw_size/sizeof(uint32_t); i ++) {
-		got_temp[i] += _data - data_base;
-		serprintf("got_temp[%d] += %X - %X\n  got_temp[%d] == %X\n", i, _data, data_base, i, got_temp[i]);
+		got_temp[i] += (uintptr_t)(_data) - data_base;
 	}
 	at45_push(got_temp, rw_size, _got);
 	free(got_temp);
-
-	got_temp = at45_dereference(_got, rw_size);
-	for (int i = 0; i < rw_size/sizeof(uint32_t); i ++) {
-		serprintf("Got entry %i is 0x%08x\n", i, got_temp[i]);
-	}
-	free(got_temp);
-
-	serprintf("REWROTE GOT!\n");
 
 	/* ~ Calculate the total number of pages required for the load. ~ */
 	uint32_t total = ceiling(l -> size, AT91C_IFLASH_PAGE_SIZE);
