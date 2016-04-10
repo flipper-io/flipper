@@ -4,7 +4,6 @@
 #include <flipper/at45.h>
 
 /* ~ This function traverses the filesystem tree starting at a leaf pointed to by the 'current' argument until an empty branch pointer corresponding to the given key is found. ~ */
-
 fsp fs_empty_branch_for_key(fsp _branch, fsp current, uint16_t key) {
 	
 	/* ~ If our 'current' pointer is zero, then an empty branch pointer has been found; return it. ~ */
@@ -32,7 +31,6 @@ fsp fs_empty_branch_for_key(fsp _branch, fsp current, uint16_t key) {
 }
 
 /* ~ This function indexes a leaf into the filesystem tree by allocating memory for it and setting its key. ~ */
-
 fsp fs_add_leaf_with_key(fsp current, uint16_t key) {
 
 	/* ~ Walk the filesystem tree until an empty branch pointer is found to match the key given. This will be where we will index the newly allocated leaf. ~ */
@@ -81,7 +79,7 @@ fsp fs_add_leaf_with_key(fsp current, uint16_t key) {
 	else {
 
 		/* ~ This case catches an exception wherein the leaf we want to add already exists. ~ */
-		error.raise(E_FS_ADD_LEAF, ERROR_STRING("A filesystem entry for the key '0x%04x' already exists on the device.", key));
+		error_raise(E_FS_ADD_LEAF, ERROR_STRING("A filesystem entry for the key '0x%04x' already exists on the device.", key));
 
 	}
 
@@ -93,24 +91,24 @@ fsp fs_leaf_for_key(fsp current, uint16_t key) {
 
 	/* ~ If we reach the end of the tree and have not yet found a matching key, then the leaf we are interested in finding does not exist. ~ */
 	if (current == 0) {
-
 		error_raise(E_FS_NO_LEAF, ERROR_STRING("There is no filesystem entry for the key '0x%04x'.", key));
-
 		return 0;
-
 	}
 
 	/* ~ However, if we have not yet reached the end of the tree, dereference the 'current' leaf pointer to bring a copy of it into local memory. ~ */
 	leaf *_current = at45_dereference(current, sizeof(leaf));
 
-	if (_current -> key == key)
+	if (_current -> key == key) {
 		return current;
+	}
 
-	else if (_current -> key < key)
+	else if (_current -> key < key) {
 		return fs_leaf_for_key(_current -> left, key);
+	}
 
-	else if (_current -> key > key)
+	else if (_current -> key > key) {
 		return fs_leaf_for_key(_current -> right, key);
+	}
 
 	return 0;
 
