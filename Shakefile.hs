@@ -61,7 +61,7 @@ native_prep :: [String]
 native_prep = [ "-std=gnu99"
               , "-fpic"
               , "-D__verbose__"
-              , "-Wno-pragma-messages"
+              , "-Wno-#pragma-messages"
               ]
 
 driver_includes :: Action [FilePath]
@@ -164,13 +164,21 @@ cRule comp inc prec o = do
 main :: IO ()
 main = shakeArgs shakeOptions $ do
     -- Top-level targets:
-    action $ do
+    phony "libflipper" $ do
         dyn <- dynLibName
-        need [ "libflipper" </> dyn
-             , "console/flipper"
-             , "osmium/targets/at91sam4s/osmium-sam4s.bin"
-             , "osmium/targets/atmega16u2/osmium-atmega.bin"
-             ]
+        need ["libflipper" </> dyn]
+
+    phony "library" $ need ["libflipper"]
+
+    phony "console" $ need ["console/flipper"]
+
+    phony "osmium" $ need ["osmium/targets/at91sam4s/osmium-sam4s.bin", "osmium/targets/atmega16u2/osmium-atmega.bin"]
+
+    phony "native" $ need ["library", "console"]
+
+    phony "clean" $ removeFilesAfter "." ["//*.o", "//*.so", "//*.dylib", "//*.m", "//*.bin"]
+
+    want ["libflipper", "consolve", "osmium"]
 
     "libflipper/libflipper.so" %> \o -> do
         a  <- arch
@@ -197,9 +205,8 @@ main = shakeArgs shakeOptions $ do
 
     "console/flipper" %> \o -> do
         ss  <- getDirectoryFiles "" ["console/*.c"]
-        dyn <- dynLibName
         let os = map (<.> ".native.o") ss
-        need $ dyn:os
+        need $ "libflipper":os
         unit $ command [] "clang" $ os ++ ["-o", o, "-lflipper"]
 
     "osmium/targets/at91sam4s/osmium-sam4s.bin" %> \o -> do
