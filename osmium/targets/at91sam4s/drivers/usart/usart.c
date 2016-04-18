@@ -1,1 +1,0 @@
-../../../../../drivers/usart/targets/at91sam4s/usart.c
