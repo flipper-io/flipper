@@ -176,7 +176,7 @@ main = shakeArgs shakeOptions $ do
 
     phony "native" $ need ["library", "console"]
 
-    phony "clean" $ removeFilesAfter "." ["//*.o", "//*.so", "//*.dylib", "//*.m", "//*.bin"]
+    phony "clean" $ removeFilesAfter "." ["//*.o", "//*.so", "//*.dylib", "//*.m", "//*.bin", "console/flipper"]
 
     want ["libflipper", "consolve", "osmium"]
 
