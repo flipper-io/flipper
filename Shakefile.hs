@@ -206,7 +206,7 @@ objformat = do
 dynlib :: Action String
 dynlib = do
     t <- target
-    case t of "darwin" -> return "libflipper.dynlib"
+    case t of "darwin" -> return "libflipper.dylib"
               "linux"  -> return "libflipper.so"
               _        -> error ("dynlib: unknown target " ++ t)
 
