@@ -132,6 +132,11 @@ libs = do
               "linux"  -> return ["-lusb"]
               _        -> error "libs: unknown target"
 
+whoami :: Action String
+whoami = do
+    (Stdout a) <- command [EchoStdout False, EchoStderr False, Traced ""] "sudo" ["whoami"]
+    return (filter (/= '\n') a)
+
 dropObjExts :: FilePath -> FilePath
 dropObjExts = dropExtension . dropExtension
 
@@ -163,6 +168,9 @@ cRule comp inc prec o = do
 
 main :: IO ()
 main = shakeArgs shakeOptions $ do
+
+    want ["libflipper", "console", "osmium"]
+
     -- Top-level targets:
     phony "libflipper" $ do
         dyn <- dynLibName
@@ -172,13 +180,77 @@ main = shakeArgs shakeOptions $ do
 
     phony "console" $ need ["console/flipper"]
 
-    phony "osmium" $ need ["osmium/targets/at91sam4s/osmium-sam4s.bin", "osmium/targets/atmega16u2/osmium-atmega.bin"]
+    phony "osmium" $ need [ "osmium/targets/at91sam4s/osmium-sam4s.bin"
+                          , "osmium/targets/atmega16u2/osmium-atmega.bin"
+                          ]
 
-    phony "native" $ need ["library", "console"]
+    phony "native" $ need ["libflipper", "console"]
 
-    phony "clean" $ removeFilesAfter "." ["//*.o", "//*.so", "//*.dylib", "//*.m", "//*.bin", "console/flipper"]
+    phony "clean" $ removeFilesAfter "." [ "//*.o"
+                                         , "//*.so"
+                                         , "//*.dylib"
+                                         , "//*.m"
+                                         , "//*.elf"
+                                         , "//*.bin"
+                                         , "console/flipper"
+                                         ]
 
-    want ["libflipper", "consolve", "osmium"]
+
+    phony "install" $ need ["install-flipper", "install-console"]
+
+    phony "uninstall" $ do
+        p   <- getPrefix
+        dyn <- dynLibName
+
+        unit $ command [] "sudo" ["rm", "-f", p </> "lib" </> dyn]
+        unit $ command [] "sudo" ["rm", "-f", p </> "include/flipper"]
+        unit $ command [] "sudo" ["rm", "-f", p </> "include/flipper.h"]
+
+    phony "install-libflipper" $ do
+        p   <- getPrefix
+        w   <- whoami
+        dyn <- dynLibName
+
+        need ["libflipper"]
+
+        -- Install shared library:
+        unit $ command [] "sudo" ["cp", "libflipper" </> dyn, p </> "lib"]
+
+        -- Install headers:
+        let insth hp = do
+            hs <- (map (hp </>)) <$> getDirectoryContents hp
+            mapM (\h -> unit $ command [] "sudo" ["cp", "-R", h, p </> "include/"]) hs
+
+        unit $ command [] "sudo" ["mkdir", "-p", p </> "include/flipper"]
+        ((["libflipper/include", "include"] ++) <$> driver_includes) >>= mapM_ insth
+
+    phony "install-console" $ do
+        p <- getPrefix
+        w <- whoami
+
+        need ["console", "install-libflipper"]
+        unit $ command [] "sudo" ["cp", "console/flipper", p </> "bin/"]
+
+    phony "burn-at91sam4s" $ do
+        need ["install-console", "osmium/targets/at91sam4s/osmium-sam4s.bin"]
+        unit $ command [] "flipper" ["flash", "osmium/targets/at91sam4s/osmium-sam4s.bin"]
+
+    phony "burn-atmega16u2" $ do
+        need ["osmium/targets/atmega16u2/osmium-atmega.bin"]
+        unit $ command [] "avrdude" [ "-p"
+                                    , "atmega16u2"
+                                    , "-B0.666"
+                                    , "-c"
+                                    , "usbtiny"
+                                    , "-U"
+                                    , "lfuse:w:0xFF:m"
+                                    , "-U"
+                                    , "hfuse:w:0xD9:m"
+                                    , "-U"
+                                    , "flash:w:osmium/targets/atmega16u2/osmium-atmega.bin"
+                                    , "-U"
+                                    , "eeprom:w:eeprom.hex"
+                                    ]
 
     "libflipper/libflipper.so" %> \o -> do
         a  <- arch
