@@ -358,7 +358,7 @@ main = shakeArgs shakeOptions $ do
         need os
         unit $ command [] "clang" $ ["-shared", "-rdynamic"] ++ os ++ ["-o", o] ++ ls
 
-    "libflipper.dylib" %> \o -> do
+    "libflipper/libflipper.dylib" %> \o -> do
         ss <- getDirectoryFiles "" $
                 concat [ ["drivers" </> d </> "*/*.c" | d <- libflipper_drivers]
                        , [ "libflipper/architectures/x86_64/*.asm"
