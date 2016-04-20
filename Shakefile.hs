@@ -195,7 +195,7 @@ target = do
 objformat :: Action String
 objformat = do
     t <- target
-    case t of "darwin" -> return "mahcho64"
+    case t of "darwin" -> return "macho64"
               "linux"  -> do a <- arch
                              case a of "x86_64" -> return "elf64"
                                        _        -> return "elf32"
