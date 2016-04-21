@@ -1,1 +1,0 @@
-../../../../../drivers/config/targets/at91sam4s/config.c
