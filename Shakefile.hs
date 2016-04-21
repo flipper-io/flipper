@@ -158,6 +158,7 @@ arm_gcc = (fromMaybe (error "ARM gcc isn't available in $PATH") . msum)
                      , which "arm-elf-eabi-gcc"
                      , which "arm-eabi-newlib-gcc"
                      , which "arm-none-eabi-gcc"
+                     , which "/opt/local/bin/arm-elf-gcc"
                      ]
 
 -- | Determine under which name arm objcopy is installed.
@@ -167,17 +168,29 @@ arm_objcopy = (fromMaybe (error "ARM objcopy isn't available in $PATH") . msum)
                      , which "arm-elf-eabi-objcopy"
                      , which "arm-eabi-newlib-objcopy"
                      , which "arm-none-eabi-objcopy"
+                     , which "/opt/local/bin/arm-elf-objcopy"
                      ]
 
 -- | Determine under which name avr gcc is installed.
 avr_gcc :: Action FilePath
 avr_gcc = (fromMaybe (error "AVR gcc isn't available in $PATH") . msum)
-        <$> sequence [which "avr-gcc"]
+        <$> sequence [ which "avr-gcc"
+                     , which "/usr/local/bin/avr-gcc"
+                     ]
 
 -- | Determine under which name avr objcopy is installed.
 avr_objcopy :: Action FilePath
 avr_objcopy = (fromMaybe (error "AVR objcopy isn't available in $PATH") . msum)
-        <$> sequence [which "avr-objcopy"]
+        <$> sequence [ which "avr-objcopy"
+                     , which "/usr/local/bin/arv-objcopy"
+                     ]
+
+-- | Determine under which name nasm is installed.
+nasm :: Action FilePath
+nasm = (fromMaybe (error "nasm isn't available in $PATH") . msum)
+    <$> sequence [ which "/usr/local/bin/nasm"
+                 , which "nasm"
+                 ]
 
 -- | Determine the native architecture.
 arch :: Action String
@@ -451,15 +464,16 @@ main = shakeArgs shakeOptions $ do
         cRule (return "clang") includes native_prep o
 
     "//*.asm.native.o" %> \o -> do
+        as <- nasm
         let s = dropObjExts o
             m = s -<.> "m"
         objfmt <- objformat
-        unit $ command [] "nasm" [ "-f"
-                                 , objfmt
-                                 , "-o"
-                                 , o
-                                 , s
-                                 , "-MD"
-                                 , m
-                                 ]
+        unit $ command [] as [ "-f"
+                             , objfmt
+                             , "-o"
+                             , o
+                             , s
+                             , "-MD"
+                             , m
+                             ]
         needMakefileDependencies m
