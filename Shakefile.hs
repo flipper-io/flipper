@@ -347,7 +347,7 @@ main = shakeArgs shakeOptions $ do
                                     , "-U"
                                     , "flash:w:osmium/targets/atmega16u2/osmium-atmega.bin"
                                     , "-U"
-                                    , "eeprom:w:eeprom.hex"
+                                    , "eeprom:w:osmium/targets/atmega16u2/eeprom.hex"
                                     ]
 
     "libflipper/libflipper.so" %> \o -> do
