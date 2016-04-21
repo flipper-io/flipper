@@ -235,7 +235,7 @@ libs = do
 -- | Who am I?
 whoami :: Action String
 whoami = do
-    (Stdout a) <- command [EchoStdout False, EchoStderr False, Traced ""] "sudo" ["whoami"]
+    (Stdout a) <- instCmd [EchoStdout False, EchoStderr False, Traced ""] ["whoami"]
     return (filter (/= '\n') a)
 
 -- | Drop the fully qualified object file extension from a file name.
@@ -271,8 +271,16 @@ cRule comp inc prec o = do
                                              ])
     needMakefileDependencies m
 
+-- | Combinator for installation commands. Use @sudo@ when appropriate for the
+--   platform, i.e. not on Mac OS X.
+instCmd :: CmdResult r => [CmdOption] -> [String] -> Action r
+instCmd os (c:cs) = do
+    t <- target
+    case t of "darwin" -> command os c cs
+              _        -> command os "sudo" (c:cs)
+
 main :: IO ()
-main = shakeArgs shakeOptions $ do
+main = shakeArgs (shakeOptions { shakeThreads = 0, shakeLineBuffering = False }) $ do
 
     want ["flipper-library", "flipper-console", "flipper-osmium"]
 
@@ -305,9 +313,9 @@ main = shakeArgs shakeOptions $ do
         p   <- prefix
         dyn <- dynlib
 
-        unit $ command [] "sudo" ["rm", "-f", p </> "lib" </> dyn]
-        unit $ command [] "sudo" ["rm", "-f", p </> "include/flipper"]
-        unit $ command [] "sudo" ["rm", "-f", p </> "include/flipper.h"]
+        unit $ instCmd [] ["rm", "-f", p </> "lib" </> dyn]
+        unit $ instCmd [] ["rm", "-f", p </> "include/flipper"]
+        unit $ instCmd [] ["rm", "-f", p </> "include/flipper.h"]
 
     phony "install-libflipper" $ do
         p   <- prefix
@@ -317,14 +325,14 @@ main = shakeArgs shakeOptions $ do
         need ["flipper-library"]
 
         -- Install shared library:
-        unit $ command [] "sudo" ["cp", "libflipper" </> dyn, p </> "lib"]
+        unit $ instCmd [] ["cp", "libflipper" </> dyn, p </> "lib"]
 
         -- Install headers:
         let insth hp = do
             hs <- (map (hp </>)) <$> getDirectoryContents hp
-            mapM (\h -> unit $ command [] "sudo" ["cp", "-R", h, p </> "include/"]) hs
+            mapM (\h -> unit $ instCmd [] ["cp", "-R", h, p </> "include/"]) hs
 
-        unit $ command [] "sudo" ["mkdir", "-p", p </> "include/flipper"]
+        unit $ instCmd [] ["mkdir", "-p", p </> "include/flipper"]
         ((["libflipper/include", "include"] ++) <$> driver_includes) >>= mapM_ insth
 
     phony "install-console" $ do
@@ -332,7 +340,7 @@ main = shakeArgs shakeOptions $ do
         w <- whoami
 
         need ["flipper-console", "install-libflipper"]
-        unit $ command [] "sudo" ["cp", "console/flipper", p </> "bin/"]
+        unit $ instCmd [] ["cp", "console/flipper", p </> "bin/"]
 
     phony "burn-at91sam4s" $ do
         need ["install-console", "osmium/targets/at91sam4s/osmium-sam4s.bin"]
@@ -352,7 +360,7 @@ main = shakeArgs shakeOptions $ do
                                     , "-U"
                                     , "flash:w:osmium/targets/atmega16u2/osmium-atmega.bin"
                                     , "-U"
-                                    , "eeprom:w:eeprom.hex"
+                                    , "eeprom:w:osmium/targets/atmega16u2/eeprom.hex"
                                     ]
 
     "libflipper/libflipper.so" %> \o -> do

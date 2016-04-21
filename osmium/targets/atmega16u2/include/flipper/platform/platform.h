@@ -35,9 +35,9 @@
 #define FLASH_RESET_PIN         0x04
 
 
-#define LED_DDR                 DDRB
-#define LED_PORT                PORTB
-#define LED_DI                  0x06
+#define LED_DDR                 DDRC
+#define LED_PORT                PORTC
+#define LED_DI                  0x05
 
 #define SPI_DDR                 DDRB
 #define SS                      0x00
