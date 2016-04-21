@@ -5,6 +5,7 @@
 obj-c/*.framework
 obj-c/build
 *.o
+*.m
 *.pyc
 *.elf
 *.bin
@@ -14,4 +15,5 @@ obj-c/build
 python/flipper
 console/flipper
 *.swp
+.shake
 .stack-work
