@@ -261,22 +261,20 @@ cRule comp inc prec o = do
 main :: IO ()
 main = shakeArgs shakeOptions $ do
 
-    want ["libflipper", "console", "osmium"]
+    want ["flipper-library", "flipper-console", "flipper-osmium"]
 
     -- Top-level targets:
-    phony "libflipper" $ do
+    phony "flipper-library" $ do
         dyn <- dynlib
         need ["libflipper" </> dyn]
 
-    phony "library" $ need ["libflipper"]
+    phony "flipper-console" $ need ["console/flipper"]
 
-    phony "console" $ need ["console/flipper"]
+    phony "flipper-osmium" $ need [ "osmium/targets/at91sam4s/osmium-sam4s.bin"
+                                  , "osmium/targets/atmega16u2/osmium-atmega.bin"
+                                  ]
 
-    phony "osmium" $ need [ "osmium/targets/at91sam4s/osmium-sam4s.bin"
-                          , "osmium/targets/atmega16u2/osmium-atmega.bin"
-                          ]
-
-    phony "native" $ need ["libflipper", "console"]
+    phony "native" $ need ["flipper-library", "flipper-console"]
 
     phony "clean" $ removeFilesAfter "." [ "//*.o"
                                          , "//*.so"
@@ -303,7 +301,7 @@ main = shakeArgs shakeOptions $ do
         w   <- whoami
         dyn <- dynlib
 
-        need ["libflipper"]
+        need ["flipper-library"]
 
         -- Install shared library:
         unit $ command [] "sudo" ["cp", "libflipper" </> dyn, p </> "lib"]
@@ -320,7 +318,7 @@ main = shakeArgs shakeOptions $ do
         p <- prefix
         w <- whoami
 
-        need ["console", "install-libflipper"]
+        need ["flipper-console", "install-libflipper"]
         unit $ command [] "sudo" ["cp", "console/flipper", p </> "bin/"]
 
     phony "burn-at91sam4s" $ do
@@ -373,7 +371,7 @@ main = shakeArgs shakeOptions $ do
     "console/flipper" %> \o -> do
         ss  <- getDirectoryFiles "" ["console/*.c"]
         let os = map (<.> ".native.o") ss
-        need $ "libflipper":os
+        need $ "flipper-library":os
         unit $ command [] "clang" $ os ++ ["-o", o, "-lflipper"]
 
     "osmium/targets/at91sam4s/osmium-sam4s.bin" %> \o -> do
