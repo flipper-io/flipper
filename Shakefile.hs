@@ -280,7 +280,7 @@ instCmd os (c:cs) = do
               _        -> command os "sudo" (c:cs)
 
 main :: IO ()
-main = shakeArgs (shakeOptions { shakeThreads = 0, shakeLineBuffering = False }) $ do
+main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
 
     want ["flipper-library", "flipper-console", "flipper-osmium"]
 
