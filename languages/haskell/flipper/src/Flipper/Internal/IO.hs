@@ -22,8 +22,7 @@ data DigitalPin = IO1
                 | IO16
                 deriving (Eq, Ord, Show)
 
-data AnalogPin = A0
-               | A1
+data AnalogPin = A1
                | A2
                | A3
                | A4
@@ -56,15 +55,14 @@ digPinCode IO15 = 15
 digPinCode IO16 = 16
 
 anPinCode :: AnalogPin -> Word8
-anPinCode A0 = 17
-anPinCode A1 = 18
-anPinCode A2 = 19
-anPinCode A3 = 20
-anPinCode A4 = 21
-anPinCode A5 = 22
-anPinCode A6 = 23
-anPinCode A7 = 24
-anPinCode A8 = 25
+anPinCode A1 = 17
+anPinCode A2 = 18
+anPinCode A3 = 19
+anPinCode A4 = 20
+anPinCode A5 = 21
+anPinCode A6 = 22
+anPinCode A7 = 23
+anPinCode A8 = 24
 
 directionCode :: Direction -> Word8
 directionCode Input  = 0

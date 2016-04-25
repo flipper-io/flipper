@@ -26,4 +26,4 @@ getStorable :: Storable a => Get a
 getStorable = Get g
     where g (Buffer p o l) = unsafeDupablePerformIO $ withForeignPtr p
             (\p' -> (\v -> Done (Buffer p (o + sizeOf v) (l - sizeOf v)) v)
-                   <$> peek (castPtr p'))
+                   <$> peek (plusPtr (castPtr p') (fromIntegral o)))
