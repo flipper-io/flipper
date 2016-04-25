@@ -27,9 +27,20 @@ library
                        Flipper.Internal.Error
                        Flipper.Internal.FDL
                        Flipper.Internal.Flipper
-                       Flipper.Internal.LED
+                       Flipper.Internal.FMR
+                       Flipper.Internal.FS
+                       Flipper.Internal.I2C
                        Flipper.Internal.IO
+                       Flipper.Internal.LED
+                       Flipper.Internal.PWM
+                       Flipper.Internal.RTC
                        Flipper.Internal.SAM
+                       Flipper.Internal.SPI
+                       Flipper.Internal.Temperature
+                       Flipper.Internal.Timer
+                       Flipper.Internal.USART
+                       Flipper.Internal.USB
+                       Flipper.Internal.WiFi
                        Flipper.Internal.Utils
   build-depends:       base >= 4.7 && < 5
                      , bytestring
