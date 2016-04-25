@@ -143,7 +143,7 @@ driver_includes = (map (\d -> "drivers" </> d </> "include"))
 prefix :: Action FilePath
 prefix = liftIO $ fromMaybe "/usr/local" <$> lookupEnv "PREFIX"
 
--- | Return 'Nothing' if the provided string is in the @PATH@, 'Just' the
+-- | Return 'Nothing' if the provided string isn't in the @PATH@, 'Just' the
 --   relative path if it is.
 which :: String -> Action (Maybe String)
 which s = do
@@ -392,7 +392,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     "console/flipper" %> \o -> do
         ss  <- getDirectoryFiles "" ["console/*.c"]
         let os = map (<.> ".native.o") ss
-        need $ "flipper-library":os
+        need os
         unit $ command [] "clang" $ os ++ ["-o", o, "-lflipper"]
 
     "osmium/targets/at91sam4s/osmium-sam4s.bin" %> \o -> do
