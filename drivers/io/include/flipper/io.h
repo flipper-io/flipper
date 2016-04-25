@@ -26,13 +26,12 @@ enum {
 	IO15,
 	IO16,
 
-	A0,
 	A1,
 	A2,
 	A3,
-	A4,			/* ~ ANALOG IO ~ */
-	A5,
-	A7,
+	A4,
+	A5,			/* ~ ANALOG IO ~ */
+	A6,
 	A8,
 
 };

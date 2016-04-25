@@ -40,13 +40,13 @@ uint8_t usart0_get(void) {
 
 }
 
-void usart0_push(void *source, uint32_t length) {
+void usart0_push(void *source, size_t length) {
 
 	device.push(_usart, _usart_push, NO_ARGS, source, length);
 
 }
 
-void usart0_pull(void *destination, uint32_t length) {
+void usart0_pull(void *destination, size_t length) {
 
 	device.pull(_usart, _usart_pull, NO_ARGS, destination, length);
 
@@ -90,13 +90,13 @@ uint8_t usart1_get(void) {
 
 }
 
-void usart1_push(void *source, uint32_t length) {
+void usart1_push(void *source, size_t length) {
 
 	host.push(_usart1, _usart_push, NO_ARGS, source, length);
 
 }
 
-void usart1_pull(void *destination, uint32_t length) {
+void usart1_pull(void *destination, size_t length) {
 
 	host.pull(_usart1, _usart_pull, NO_ARGS, destination, length);
 
@@ -140,13 +140,13 @@ uint8_t dbgu_get(void) {
 
 }
 
-void dbgu_push(void *source, uint32_t length) {
+void dbgu_push(void *source, size_t length) {
 
 	host.push(_dbgu, _usart_push, NO_ARGS, source, length);
 
 }
 
-void dbgu_pull(void *destination, uint32_t length) {
+void dbgu_pull(void *destination, size_t length) {
 
 	host.pull(_dbgu, _usart_pull, NO_ARGS, destination, length);
 

@@ -37,7 +37,7 @@ uint32_t host_invoke(uint8_t object, uint8_t index, uint8_t argc, ...) {
 
 }
 
-uint32_t host_push(uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, ...) {
+uint32_t host_push(uint8_t object, uint8_t index, uint8_t argc, void *source, size_t length, ...) {
 
 	/* ~ Construct a va_list to access variadic arguments. ~ */
 	va_list argv;
@@ -50,7 +50,7 @@ uint32_t host_push(uint8_t object, uint8_t index, uint8_t argc, void *source, ui
 
 }
 
-uint32_t host_pull(uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, ...) {
+uint32_t host_pull(uint8_t object, uint8_t index, uint8_t argc, void *destination, size_t length, ...) {
 
 	/* ~ Construct a va_list to access variadic arguments. ~ */
 	va_list argv;

@@ -17,6 +17,7 @@ const struct _fmr fmr = {
 	fmr_configure,
 	fmr_bind,
 	fmr_invoke,
+	fmr_invoke_list,
 	fmr_resolve
 };
 #endif

@@ -54,14 +54,18 @@ typedef uint32_t fmr_module;
 
 #define NO_ARGS 0
 
+typedef struct _fmr_list {
+	uint32_t arg;
+	struct _fmr_list *next;
+} fmr_list;
+
 /* ~ Declare the virtual driver object. ~ */
 extern const struct _fmr {
-
 	void (* configure)(void);
 	fmr_module (* bind)(char *bundle);
 	uint32_t (* invoke)(fmr_module handle, uint8_t index, uint8_t argc, ...);
-	void *(* resolve)(void *source, uint32_t length);
-
+	uint32_t (* invoke_list)(fmr_module handle, uint8_t index, fmr_list *args);
+	void *(* resolve)(void *source, size_t length);
 } fmr;
 
 #ifdef __private_include__
@@ -73,7 +77,8 @@ enum { _fmr_configure, _fmr_bind, _fmr_invoke, _fmr_resolve };
 void fmr_configure(void);
 fmr_module fmr_bind(char *bundle);
 uint32_t fmr_invoke(fmr_module handle, uint8_t index, uint8_t argc, ...);
-void *fmr_resolve(void *source, uint32_t length);
+uint32_t fmr_invoke_list(fmr_module handle, uint8_t index, fmr_list *args);
+void *fmr_resolve(void *source, size_t length);
 
 #endif
 #endif

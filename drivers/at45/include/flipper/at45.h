@@ -18,9 +18,9 @@ extern const struct _at45 {
 	fsp (* alloc)(uint32_t length);
 	void (* free)(fsp pointer);
 	void (* format)(void);
-	void (* push)(void *source, uint32_t length, fsp destination);
-	void (* pull)(void *destination, uint32_t length, fsp source);
-	void *(* dereference)(fsp source, uint32_t length);
+	void (* push)(void *source, size_t length, fsp destination);
+	void (* pull)(void *destination, size_t length, fsp source);
+	void *(* dereference)(fsp source, size_t length);
 
 } at45;
 
@@ -39,9 +39,9 @@ uint8_t at45_get(void);
 fsp at45_alloc(uint32_t length);
 void at45_free(fsp pointer);
 void at45_format(void);
-void at45_push(void *source, uint32_t length, fsp destination);
-void at45_pull(void *destination, uint32_t length, fsp source);
-void *at45_dereference(fsp source, uint32_t length);
+void at45_push(void *source, size_t length, fsp destination);
+void at45_pull(void *destination, size_t length, fsp source);
+void *at45_dereference(fsp source, size_t length);
 
 /* ~ Declare all necessary private driver functions. ~ */
 void at45_transfer_page_to_buffer_with_erase(uint16_t page, uint8_t buffer);

@@ -29,29 +29,23 @@ extern uint8_t fmr_padding;
 uint32_t fmr_invoke(fmr_module handle, uint8_t index, uint8_t argc, ...) {
 
 	/* ~ Construct a va_list to access variadic arguments. ~ */
-
 	va_list argv;
 
 	/* ~ Initialize the va_list that we created above. ~ */
-
 	va_start(argv, argc);
 
 	/* ~ Load the variadic arguments into the outgoing packet. ~ */
-
-	for (unsigned i = 0; i < (argc * 2); i += 2) {
+	for (unsigned int i = 0; i < (argc * 2); i += 2) {
 
 		/* ~ Unstage an argument from the variadic argument list. ~ */
-
-		unsigned arg = va_arg(argv, unsigned);
+		unsigned int arg = va_arg(argv, unsigned int);
 
 		/* ~ Load the argument into the outgoing packet buffer. ~ */
-
 		fmrpacket.body[i + FMR_INVOKE_OFFSET] = hi(arg); fmrpacket.body[i + FMR_INVOKE_OFFSET + 1] = lo(arg);
 
 	}
 
 	/* ~ Release the variadic argument list. ~ */
-
 	va_end(argv);
 
 #pragma message("It would be better to find a way to implement the fmr_padding to not be global.")
@@ -59,13 +53,34 @@ uint32_t fmr_invoke(fmr_module handle, uint8_t index, uint8_t argc, ...) {
 	fmr_padding = argc * 2;
 
 	/* ~ Call the remote function and return. ~ */
-
 	return host.invoke(_fmr, _fmr_invoke, fmr_args(handle, index, argc));
-
 }
 
-void *fmr_resolve(void *source, uint32_t length) {
+uint32_t fmr_invoke_list(fmr_module handle, uint8_t index, fmr_list *args)
+{
 
+	uint8_t argc = 0;
+	fmr_list *c = args;
+	unsigned int a;
+	unsigned int i = 0;
+
+	while(c != NULL)
+	{
+		a = c->arg;
+
+		fmrpacket.body[i + FMR_INVOKE_OFFSET]     = hi(a);
+		fmrpacket.body[i + FMR_INVOKE_OFFSET + 1] = lo(a);
+
+		c = c->next;
+		argc++;
+		i += 2;
+	}
+
+	fmr_padding = argc * 2;
+
+	return host.invoke(_fmr, _fmr_invoke, fmr_args(handle, index, argc));
+}
+
+void *fmr_resolve(void *source, size_t length) {
 	return NULL;
-
 }
