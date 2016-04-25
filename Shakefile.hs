@@ -391,9 +391,10 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
 
     "console/flipper" %> \o -> do
         ss  <- getDirectoryFiles "" ["console/*.c"]
+        dyn <- dynlib
         let os = map (<.> ".native.o") ss
-        need os
-        unit $ command [] "clang" $ os ++ ["-o", o, "-lflipper"]
+        need $ ("libflipper" </> dyn):os
+        unit $ command [] "clang" $ os ++ ["-o", o, "-Llibflipper", "-lflipper"]
 
     "osmium/targets/at91sam4s/osmium-sam4s.bin" %> \o -> do
         cc <- arm_gcc
