@@ -65,7 +65,7 @@ uint8_t network_get(void) {
 	return 0;
 }
 
-void network_push(void *source, uint32_t length) {
+void network_push(void *source, size_t length) {
 
 	if (network_socket < 0) {
 		error_raise(E_FLIPPER_UNBOUND, "");
@@ -74,7 +74,7 @@ void network_push(void *source, uint32_t length) {
 
 }
 
-void network_pull(void *destination, uint32_t length) {
+void network_pull(void *destination, size_t length) {
 
 	recv(network_socket, destination, length, 0);
 

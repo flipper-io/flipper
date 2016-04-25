@@ -99,7 +99,7 @@ uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t ind
 }
 
 /* ~ This function moves data from the isolated address space of the host to the device using the FMR. ~ */
-uint32_t target_push(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *source, uint32_t length, va_list *argv) {
+uint32_t target_push(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *source, size_t length, va_list *argv) {
 
 	if (!length) return 0;
 
@@ -202,7 +202,7 @@ push:
 }
 
 /* ~ This function moves data from the isolated address space of the device to the host using the FMR. ~ */
-uint32_t target_pull(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *destination, uint32_t length, va_list *argv) {
+uint32_t target_pull(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, void *destination, size_t length, va_list *argv) {
 
 	if (!length) return 0;
 

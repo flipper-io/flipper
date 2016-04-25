@@ -19,8 +19,8 @@ void spi_disable(void);
 uint8_t spi_ready(void);
 void spi_put(uint8_t byte);
 uint8_t spi_get(void);
-void spi_push(void *source, uint32_t length);
-void spi_pull(void *source, uint32_t length);
+void spi_push(void *source, size_t length);
+void spi_pull(void *source, size_t length);
 
 #endif
 #endif

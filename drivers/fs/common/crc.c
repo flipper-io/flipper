@@ -39,7 +39,7 @@ static const uint16_t crc_table[256] crc_attributes = {
 
 };
 
-uint16_t checksum(void *data, uint16_t size) {
+uint16_t checksum(void *data, size_t size) {
 
 	uint16_t checksum = 0;
 

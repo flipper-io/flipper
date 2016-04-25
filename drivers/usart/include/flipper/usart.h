@@ -21,8 +21,8 @@ void usart0_disable(void);
 uint8_t usart0_ready(void);
 void usart0_put(uint8_t byte);
 uint8_t usart0_get();
-void usart0_push(void *source, uint32_t length);
-void usart0_pull(void *destination, uint32_t length);
+void usart0_push(void *source, size_t length);
+void usart0_pull(void *destination, size_t length);
 
 /* ~ ----------------------- USART1 ----------------------- ~ */
 
@@ -36,8 +36,8 @@ enum { _usart1_configure, _usart1_enable, _usart1_disable, _usart1_ready, _usart
  uint8_t usart1_ready(void);
  void usart1_put(uint8_t byte);
  uint8_t usart1_get();
- void usart1_push(void *source, uint32_t length);
- void usart1_pull(void *destination, uint32_t length);
+ void usart1_push(void *source, size_t length);
+ void usart1_pull(void *destination, size_t length);
 
 /* ~ ----------------------- DBGU ----------------------- ~ */
 
@@ -51,8 +51,8 @@ void dbgu_disable(void);
 uint8_t dbgu_ready(void);
 void dbgu_put(uint8_t byte);
 uint8_t dbgu_get();
-void dbgu_push(void *source, uint32_t length);
-void dbgu_pull(void *destination, uint32_t length);
+void dbgu_push(void *source, size_t length);
+void dbgu_pull(void *destination, size_t length);
 
 #endif
 #endif

@@ -8,8 +8,8 @@
 extern const struct _i2c {
 
 	void (* configure)(void);
-	int (* put)(int mode, int adddress, void *data, int length);
-	int (* get)(int mode, int adddress, void *data, int length);
+	int (* put)(int mode, int adddress, void *data, size_t length);
+	int (* get)(int mode, int adddress, void *data, size_t length);
 
 } i2c;
 
@@ -20,8 +20,8 @@ enum { _i2c_configure };
 
 /* ~ Declare all function prototypes for this driver. ~ */
 void i2c_configure(void);
-int i2c_put(int mode, int address, void *data, int length);
-int i2c_get(int mode, int address, void *data, int length);
+int i2c_put(int mode, int address, void *data, size_t length);
+int i2c_get(int mode, int address, void *data, size_t length);
 
 #endif
 #endif

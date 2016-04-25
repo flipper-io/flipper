@@ -53,7 +53,7 @@ uint8_t usb_get(void) {
 
 }
 
-void usb_push(void *source, uint32_t length) {
+void usb_push(void *source, size_t length) {
 
 	/* ~ Ensure the push request can fit into a single packet. TODO: serialize packets ~ */
 	if (length > FMR_PACKET_SIZE) { error_raise(E_TOO_BIG, ""); return; }
@@ -63,7 +63,7 @@ void usb_push(void *source, uint32_t length) {
 
 }
 
-void usb_pull(void *destination, uint32_t length) {
+void usb_pull(void *destination, size_t length) {
 
 	/* ~ Create a buffer into which an entire USB packet can be received. ~ */
 	void *buffer = malloc(FMR_PACKET_SIZE);

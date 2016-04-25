@@ -41,7 +41,7 @@ uint32_t self_invoke(const struct _target *sender) {
 	return 0;
 }
 
-uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, uint32_t length) {
+uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, size_t length) {
 
 	/* ~ Allocate the appropriate amount of memory in external memory to buffer the incoming data. ~ */
 	void *destination = malloc(length);
@@ -145,7 +145,7 @@ pull:
 
 }
 
-uint32_t self_pull(uint8_t object, uint8_t index, uint8_t argc, uint32_t length) {
+uint32_t self_pull(uint8_t object, uint8_t index, uint8_t argc, size_t length) {
 
 	/* ~ Allocate the appropriate amount of memory in external memory to buffer the outgoing data. ~ */
 	void *source = malloc(length);

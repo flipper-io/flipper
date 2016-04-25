@@ -36,13 +36,13 @@ uint8_t spi_get(void) {
 
 }
 
-void spi_push(void *source, uint32_t length) {
+void spi_push(void *source, size_t length) {
 
 	device.push(_spi, _spi_push, NO_ARGS, source, length);
 
 }
 
-void spi_pull(void *destination, uint32_t length) {
+void spi_pull(void *destination, size_t length) {
 
 	device.push(_spi, _spi_pull, NO_ARGS, destination, length);
 
