@@ -6,6 +6,8 @@ import qualified Data.ByteString.Char8 as C
 import qualified Data.Text             as T
 import qualified Data.Text.Encoding    as T
 
+import Data.Monoid
+
 import Data.Word
 
 import Flipper.Buffer
