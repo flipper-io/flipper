@@ -31,7 +31,7 @@ usbPush (Buffer p o l) = withForeignPtr p $ \p' ->
 usbPull :: Int -> IO Buffer
 usbPull l
     | l <= 0    = error "usbPull: length must be greater than zero."
-    | otherwise = do b@(Buffer p _ _) <- allocBuffer l
+    | otherwise = do b@(Buffer p _ _) <- allocBufferSafe l
                      withForeignPtr p (\p' -> c_usb_pull (castPtr p') (fromIntegral l))
                      return b
 

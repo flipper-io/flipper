@@ -41,7 +41,7 @@ push (Buffer p o l) (FSHandle h) = withForeignPtr p $ \p' ->
 pull :: FSHandle -> Int -> IO Buffer
 pull (FSHandle h) l
     | l <= 0    = error "pull: length must be greater than zero."
-    | otherwise = do b@(Buffer p _ _) <- allocBuffer l
+    | otherwise = do b@(Buffer p _ _) <- allocBufferSafe l
                      withForeignPtr p (\p' -> c_at45_pull (castPtr p') (fromIntegral l) h)
                      return b
 

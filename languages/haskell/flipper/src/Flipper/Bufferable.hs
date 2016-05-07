@@ -1,3 +1,16 @@
+{-|
+Module      : Flipper.Bufferable
+Description : Serialization/Deserialization typeclass.
+Copyright   : George Morgan, Travis Whitaker 2016
+License     : All rights reserved.
+Maintainer  : travis@flipper.io
+Stability   : Provisional
+Portability : Windows, POSIX
+
+This module provides the 'Bufferable' typeclass, representing any data that may
+be sent to or received from the device over an arbitrary bus.
+-}
+
 {-# LANGUAGE FlexibleInstances #-}
 
 module Flipper.Bufferable where
@@ -18,8 +31,8 @@ import Foreign.Storable
 import System.Posix.Types
 
 class Bufferable a where
-    put :: a -> Put
-    get :: Get a
+    put :: a -> Put -- ^ Serializer.
+    get :: Get a    -- ^ Deserializer.
 
 instance Bufferable Bool where
     put = putStorable
