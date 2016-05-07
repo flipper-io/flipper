@@ -31,7 +31,7 @@ usart0Push (Buffer p o l) = withForeignPtr p $ \p' ->
 usart0Pull :: Int -> IO Buffer
 usart0Pull l
     | l <= 0    = error "usart0Pull: length must be greater than zero."
-    | otherwise = do b@(Buffer p _ _) <- allocBuffer l
+    | otherwise = do b@(Buffer p _ _) <- allocBufferSafe l
                      withForeignPtr p (\p' -> c_usart0_pull (castPtr p') (fromIntegral l))
                      return b
 
@@ -57,7 +57,7 @@ usart1Push (Buffer p o l) = withForeignPtr p $ \p' ->
 usart1Pull :: Int -> IO Buffer
 usart1Pull l
     | l <= 0    = error "usart1Pull: length must be greater than zero."
-    | otherwise = do b@(Buffer p _ _) <- allocBuffer l
+    | otherwise = do b@(Buffer p _ _) <- allocBufferSafe l
                      withForeignPtr p (\p' -> c_usart1_pull (castPtr p') (fromIntegral l))
                      return b
 
@@ -83,7 +83,7 @@ dbguPush (Buffer p o l) = withForeignPtr p $ \p' ->
 dbguPull :: Int -> IO Buffer
 dbguPull l
     | l <= 0    = error "dbguPull: length must be greater than zero."
-    | otherwise = do b@(Buffer p _ _) <- allocBuffer l
+    | otherwise = do b@(Buffer p _ _) <- allocBufferSafe l
                      withForeignPtr p (\p' -> c_dbgu_pull (castPtr p') (fromIntegral l))
                      return b
 

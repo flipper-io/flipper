@@ -31,7 +31,7 @@ push (Buffer p o l) = withForeignPtr p $ \p' ->
 pull :: Int -> IO Buffer
 pull l
     | l <= 0    = error "pull: length must be greater than zero."
-    | otherwise = do b@(Buffer p _ _) <- allocBuffer (fromIntegral l)
+    | otherwise = do b@(Buffer p _ _) <- allocBufferSafe (fromIntegral l)
                      withForeignPtr p (\p' -> c_spi_pull (castPtr p') (fromIntegral l))
                      return b
 
