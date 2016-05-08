@@ -16,7 +16,7 @@ newtype FSHandle = FSHandle { unFSHandle :: Word32 }
 
 checksum :: Buffer -> Word16
 checksum (Buffer fp o l) = unsafeDupablePerformIO $
-    withForeignPtr fp (\p -> return (c_fs_checksum (plusPtr p (fromIntegral o)) (fromIntegral l)))
+    withForeignPtr fp (\p -> return (c_fs_checksum (plusPtr p o) (fromIntegral l)))
 
 foreign import ccall safe "flipper/fs/crc.h checksum"
     c_fs_checksum :: Ptr Word8 -> CSize -> Word16

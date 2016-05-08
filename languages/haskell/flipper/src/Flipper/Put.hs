@@ -86,7 +86,7 @@ runPut (Put w l) = unsafePerformIO run
 
 putBuffer :: Buffer -> Put
 putBuffer (Buffer p o l) = Put w l
-    where w d = withForeignPtr p $ \p' -> copyBytes (castPtr d) (castPtr p') l
+    where w d = withForeignPtr p $ \p' -> copyBytes d p' l
 
 -- | 'Put' a 'Buffer' like C would, with a null terminator.
 putBufferC :: Buffer -> Put
