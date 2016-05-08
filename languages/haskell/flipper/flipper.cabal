@@ -19,8 +19,11 @@ library
   exposed-modules:     Flipper
                        Flipper.Buffer
                        Flipper.Bufferable
+                       Flipper.Error
                        Flipper.Get
+                       Flipper.LED
                        Flipper.Put
+                       Flipper.MonadFlipper
                        Flipper.Internal.AT45
                        Flipper.Internal.Button
                        Flipper.Internal.Config
@@ -44,7 +47,9 @@ library
                        Flipper.Internal.Utils
   build-depends:       base >= 4.7 && < 5
                      , bytestring
+                     , mtl
                      , text
+                     , transformers
   default-language:    Haskell2010
   extra-libraries:     flipper
 
