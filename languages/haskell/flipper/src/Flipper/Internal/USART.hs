@@ -26,13 +26,13 @@ usart0Get = c_usart0_get
 
 usart0Push :: Buffer -> IO ()
 usart0Push (Buffer p o l) = withForeignPtr p $ \p' ->
-    c_usart0_push (castPtr (plusPtr p' o)) (fromIntegral l)
+    c_usart0_push (plusPtr p' o) (fromIntegral l)
 
 usart0Pull :: Int -> IO Buffer
 usart0Pull l
     | l <= 0    = error "usart0Pull: length must be greater than zero."
     | otherwise = do b@(Buffer p _ _) <- allocBufferSafe l
-                     withForeignPtr p (\p' -> c_usart0_pull (castPtr p') (fromIntegral l))
+                     withForeignPtr p (\p' -> c_usart0_pull p' (fromIntegral l))
                      return b
 
 usart1Enable :: IO ()
@@ -52,13 +52,13 @@ usart1Get = c_usart1_get
 
 usart1Push :: Buffer -> IO ()
 usart1Push (Buffer p o l) = withForeignPtr p $ \p' ->
-    c_usart1_push (castPtr (plusPtr p' o)) (fromIntegral l)
+    c_usart1_push (plusPtr p' o) (fromIntegral l)
 
 usart1Pull :: Int -> IO Buffer
 usart1Pull l
     | l <= 0    = error "usart1Pull: length must be greater than zero."
     | otherwise = do b@(Buffer p _ _) <- allocBufferSafe l
-                     withForeignPtr p (\p' -> c_usart1_pull (castPtr p') (fromIntegral l))
+                     withForeignPtr p (\p' -> c_usart1_pull p' (fromIntegral l))
                      return b
 
 dbguEnable :: IO ()
@@ -78,13 +78,13 @@ dbguGet = c_dbgu_get
 
 dbguPush :: Buffer -> IO ()
 dbguPush (Buffer p o l) = withForeignPtr p $ \p' ->
-    c_dbgu_push (castPtr (plusPtr p' o)) (fromIntegral l)
+    c_dbgu_push (plusPtr p' o) (fromIntegral l)
 
 dbguPull :: Int -> IO Buffer
 dbguPull l
     | l <= 0    = error "dbguPull: length must be greater than zero."
     | otherwise = do b@(Buffer p _ _) <- allocBufferSafe l
-                     withForeignPtr p (\p' -> c_dbgu_pull (castPtr p') (fromIntegral l))
+                     withForeignPtr p (\p' -> c_dbgu_pull p' (fromIntegral l))
                      return b
 
 foreign import ccall safe "flipper/usart.h usart0_enable"
@@ -103,10 +103,10 @@ foreign import ccall safe "flipper/usart.h usart0_get"
     c_usart0_get :: IO Word8
 
 foreign import ccall safe "flipper/usart.h usart0_push"
-    c_usart0_push :: Ptr () -> CSize -> IO ()
+    c_usart0_push :: Ptr Word8 -> CSize -> IO ()
 
 foreign import ccall safe "flipper/usart.h usart0_pull"
-    c_usart0_pull :: Ptr () -> CSize -> IO ()
+    c_usart0_pull :: Ptr Word8 -> CSize -> IO ()
 
 foreign import ccall safe "flipper/usart.h usart1_enable"
     c_usart1_enable :: IO ()
@@ -124,10 +124,10 @@ foreign import ccall safe "flipper/usart.h usart1_get"
     c_usart1_get :: IO Word8
 
 foreign import ccall safe "flipper/usart.h usart1_push"
-    c_usart1_push :: Ptr () -> CSize -> IO ()
+    c_usart1_push :: Ptr Word8 -> CSize -> IO ()
 
 foreign import ccall safe "flipper/usart.h usart1_pull"
-    c_usart1_pull :: Ptr () -> CSize -> IO ()
+    c_usart1_pull :: Ptr Word8 -> CSize -> IO ()
 
 foreign import ccall safe "flipper/usart.h dbgu_enable"
     c_dbgu_enable :: IO ()
@@ -145,8 +145,7 @@ foreign import ccall safe "flipper/usart.h dbgu_get"
     c_dbgu_get :: IO Word8
 
 foreign import ccall safe "flipper/usart.h dbgu_push"
-    c_dbgu_push :: Ptr () -> CSize -> IO ()
+    c_dbgu_push :: Ptr Word8 -> CSize -> IO ()
 
 foreign import ccall safe "flipper/usart.h dbgu_pull"
-    c_dbgu_pull :: Ptr () -> CSize -> IO ()
-
+    c_dbgu_pull :: Ptr Word8 -> CSize -> IO ()

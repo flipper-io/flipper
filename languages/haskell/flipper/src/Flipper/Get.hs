@@ -23,7 +23,7 @@ program:
 @
 
 Where @name@ is assumed to be a null-terminated string, and @payload@ is an
-array of bytes of lenght @len@. An analogous Haskell data type may be
+array of bytes of length @len@. An analogous Haskell data type may be
 declared:
 
 @
@@ -153,7 +153,7 @@ getStorable = Get $ \b@(Buffer p o l) -> let s     = sizeOf (undefined :: a)
                                              val v = Done (Buffer p (o + s) (l - s)) v
                                          in if s > l then (WantMore (s - l) (Get ((unGet getStorable) . append b)))
                                                      else unsafeDupablePerformIO $ withForeignPtr p $ \p' ->
-                                                             val <$> peek (plusPtr (castPtr p') (fromIntegral o))
+                                                             val <$> peek (plusPtr (castPtr p') o)
 
 getWord8 :: Get Word8
 getWord8 = getStorable
@@ -182,7 +182,7 @@ getCBlock :: Get [Word8]
 getCBlock = Get g
     where g (Buffer _ _ 0) = WantMore 1 getCBlock
           g (Buffer p o l) = unsafeDupablePerformIO $ withForeignPtr p $ \p' ->
-                do c <- peek (plusPtr (castPtr p') (fromIntegral o)) :: IO Word8
+                do c <- peek (plusPtr p' o)
                    let s = sizeOf c
                    case c of 0 -> return $ Done (Buffer p (o + s) (l - s)) []
                              _ -> return $ (c:) <$> g (Buffer p (o + s) (l - s))

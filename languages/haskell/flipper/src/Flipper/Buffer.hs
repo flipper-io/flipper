@@ -70,6 +70,6 @@ append (Buffer p1 o1 l1) (Buffer p2 o2 l2) =
     in unsafeDupablePerformIO $ withForeignPtr p1 $ \p1' ->
             withForeignPtr p2 $ \p2' ->
             withForeignPtr p3 $ \p3' ->
-            do copyBytes p3' (plusPtr (castPtr p1') (fromIntegral o1)) l1
-               copyBytes (plusPtr (castPtr p3') (fromIntegral l1)) (plusPtr (castPtr p2') (fromIntegral o1)) l2
+            do copyBytes p3' (plusPtr p1' o1) l1
+               copyBytes (plusPtr p3' l1) (plusPtr p2' o1) l2
                return b

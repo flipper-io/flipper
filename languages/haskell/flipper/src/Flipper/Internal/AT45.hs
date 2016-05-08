@@ -42,7 +42,7 @@ pull :: FSHandle -> Int -> IO Buffer
 pull (FSHandle h) l
     | l <= 0    = error "pull: length must be greater than zero."
     | otherwise = do b@(Buffer p _ _) <- allocBufferSafe l
-                     withForeignPtr p (\p' -> c_at45_pull (castPtr p') (fromIntegral l) h)
+                     withForeignPtr p (\p' -> c_at45_pull p' (fromIntegral l) h)
                      return b
 
 -- | Don't use this, it allocates memory outside of the Haskell heap. Use 'pull'
@@ -51,7 +51,7 @@ dereference :: FSHandle -> Int -> IO Buffer
 dereference (FSHandle h) l
     | l <= 0 = error "dereference: length must be greater than zero."
     | otherwise = do p  <- c_at45_dereference h (fromIntegral l)
-                     fp <- newForeignPtr finalizerFree (castPtr p)
+                     fp <- newForeignPtr finalizerFree p
                      return $ Buffer fp 0 l
 
 foreign import ccall safe "flipper/at45.h at45_enable"
@@ -79,10 +79,10 @@ foreign import ccall safe "flipper/at45.h at45_format"
     c_at45_format :: IO ()
 
 foreign import ccall safe "flipper/at45.h at45_push"
-    c_at45_push :: Ptr () -> Word32 -> Word32 -> IO ()
+    c_at45_push :: Ptr Word8 -> Word32 -> Word32 -> IO ()
 
 foreign import ccall safe "flipper/at45.h at45_pull"
-    c_at45_pull :: Ptr () -> Word32 -> Word32 -> IO ()
+    c_at45_pull :: Ptr Word8 -> Word32 -> Word32 -> IO ()
 
 foreign import ccall safe "flipper/at45.h at45_dereference"
-    c_at45_dereference :: Word32 -> CSize -> IO (Ptr ())
+    c_at45_dereference :: Word32 -> CSize -> IO (Ptr Word8)

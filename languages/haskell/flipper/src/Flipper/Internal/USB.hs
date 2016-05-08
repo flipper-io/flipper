@@ -26,13 +26,13 @@ usbGet = c_usb_get
 
 usbPush :: Buffer -> IO ()
 usbPush (Buffer p o l) = withForeignPtr p $ \p' ->
-    c_usb_push (castPtr (plusPtr p' o)) (fromIntegral l)
+    c_usb_push (plusPtr p' o) (fromIntegral l)
 
 usbPull :: Int -> IO Buffer
 usbPull l
     | l <= 0    = error "usbPull: length must be greater than zero."
     | otherwise = do b@(Buffer p _ _) <- allocBufferSafe l
-                     withForeignPtr p (\p' -> c_usb_pull (castPtr p') (fromIntegral l))
+                     withForeignPtr p (\p' -> c_usb_pull p' (fromIntegral l))
                      return b
 
 foreign import ccall safe "flipper/usb.h usb_enable"
@@ -51,7 +51,7 @@ foreign import ccall safe "flipper/usb.h usb_get"
     c_usb_get :: IO Word8
 
 foreign import ccall safe "flipper/usb.h usb_push"
-    c_usb_push :: Ptr () -> CSize -> IO ()
+    c_usb_push :: Ptr Word8 -> CSize -> IO ()
 
 foreign import ccall safe "flipper/usb.h usb_pull"
-    c_usb_pull :: Ptr () -> CSize -> IO ()
+    c_usb_pull :: Ptr Word8 -> CSize -> IO ()

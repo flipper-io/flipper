@@ -5,7 +5,7 @@ import Data.Word
 import Foreign.Ptr
 
 newtype FDLKey = FDLKey { unFDLKey :: Word16 }
-newtype FDLAddress = FDLAddress { unFDLAddress :: Ptr () }
+newtype FDLAddress = FDLAddress { unFDLAddress :: Ptr Word8 }
 
 load :: FDLKey -> IO FDLAddress
 load = fmap FDLAddress . c_fdl_load . unFDLKey
@@ -17,10 +17,10 @@ resolve :: FDLKey -> FDLAddress -> IO ()
 resolve (FDLKey k) (FDLAddress a) = c_fdl_resolve k a
 
 foreign import ccall safe "flipper/fdl.hs fdl_load"
-    c_fdl_load :: Word16 -> IO (Ptr ())
+    c_fdl_load :: Word16 -> IO (Ptr Word8)
 
 foreign import ccall safe "flipper/fdl.hs fdl_launch"
     c_fdl_launch :: Word16 -> IO ()
 
 foreign import ccall safe "flipper/fdl.hs fdl_resolve"
-    c_fdl_resolve :: Word16 -> Ptr () -> IO ()
+    c_fdl_resolve :: Word16 -> Ptr Word8 -> IO ()
