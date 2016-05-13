@@ -12,35 +12,29 @@ structures sent to the device over an arbitrary bus. Suppose a Haskell program
 will send the records of the following type to a program running on the
 device:
 
-@
-    data SomeStruct = SomeStruct {
-        ssId      :: Int
-      , ssName    :: String
-      , ssPayload :: ByteString
-      }
-@
+>    data SomeStruct = SomeStruct {
+>        ssId      :: Int
+>      , ssName    :: String
+>      , ssPayload :: ByteString
+>      }
 
 The C program on the device might use this corresponding struct:
 
-@
-    typedef struct _some_struct
-    {
-        uint32_t id;
-        char *name;
-        uint32_t len;
-        void *payload;
-    } some_struct;
-@
+>    typedef struct _some_struct
+>    {
+>        uint32_t id;
+>        char *name;
+>        uint32_t len;
+>        void *payload;
+>    } some_struct;
 
 The following serializer may be defined:
 
-@
-    putSomeStruct :: Put SomeStruct
-    putSomeStruct (SomeStruct i n p) = mconcat [ putWord32 (fromIntegral i)
-                                               , putString n
-                                               , putByteString p
-                                               ]
-@
+>    putSomeStruct :: Put SomeStruct
+>    putSomeStruct (SomeStruct i n p) = mconcat [ putWord32 (fromIntegral i)
+>                                               , putString n
+>                                               , putByteString p
+>                                               ]
 
 If a 'Get' deserializer is also defined, then @SomeStruct@ may have a 'Bufferable'
 instance, so bus interfaces can be used without serialization/deserialization

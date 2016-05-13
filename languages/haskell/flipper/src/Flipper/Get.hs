@@ -12,49 +12,42 @@ C-style structures received from the device over an arbitrary bus. Suppose a
 program running on the device will send the following struct to a Haskell
 program:
 
-@
-    typedef struct _some_struct
-    {
-        uint32_t id;
-        char *name;
-        uint32_t len;
-        void *payload;
-    } some_struct;
-@
+>    typedef struct _some_struct
+>    {
+>        uint32_t id;
+>        char *name;
+>        uint32_t len;
+>        void *payload;
+>    } some_struct;
+
 
 Where @name@ is assumed to be a null-terminated string, and @payload@ is an
 array of bytes of length @len@. An analogous Haskell data type may be
 declared:
 
-@
-    data SomeStruct = SomeStruct {
-        ssId      :: Int
-      , ssName    :: String
-      , ssPayload :: ByteString
-      }
-@
+>    data SomeStruct = SomeStruct {
+>        ssId      :: Int
+>      , ssName    :: String
+>      , ssPayload :: ByteString
+>      }
 
 As well as a parser:
 
-@
-    getSomeStruct :: Get SomeStruct
-    getSomeStruct = do
-        i <- fromIntegral <$> getWord32
-        n <- getString
-        l <- fromIntegral <$> getWord32
-        p <- getSizedByteString l
-        return $ SomeStruct i n p
-@
+>    getSomeStruct :: Get SomeStruct
+>    getSomeStruct = do
+>        i <- fromIntegral <$> getWord32
+>        n <- getString
+>        l <- fromIntegral <$> getWord32
+>        p <- getSizedByteString l
+>        return $ SomeStruct i n p
 
 Or using applicative style:
 
-@
-    getSomeStruct :: Get SomeStruct
-    getSomeStruct = SomeStruct
-                <*> (fromIntegral <$> getWord32)
-                <*> getString
-                <*> getByteString
-@
+>    getSomeStruct :: Get SomeStruct
+>    getSomeStruct = SomeStruct
+>                <*> (fromIntegral <$> getWord32)
+>                <*> getString
+>                <*> getByteString
 
 If a 'Put' serializer is also defined, then @SomeStruct@ may have a 'Bufferable'
 instance, so bus interfaces can be used without serialization/deserialization
