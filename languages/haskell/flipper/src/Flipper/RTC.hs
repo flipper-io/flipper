@@ -1,6 +1,6 @@
 {-|
-Module      : Flipper.Internal.RTC
-Description : Internal RTC Module
+Module      : Flipper.RTC
+Description : RTC Interface
 Copyright   : George Morgan, Travis Whitaker 2016
 License     : All rights reserved.
 Maintainer  : travis@flipper.io
@@ -9,6 +9,4 @@ Portability : Windows, POSIX
 
 -}
 
-module Flipper.Internal.RTC where
-
--- Not implemented yet.
+module Flipper.RTC where

@@ -20,12 +20,27 @@ library
                        Flipper.AT45
                        Flipper.Buffer
                        Flipper.Bufferable
+                       Flipper.Button
+                       Flipper.Config
                        Flipper.Error
+                       Flipper.FDL
+                       Flipper.FMR
                        Flipper.FS
                        Flipper.Get
+                       Flipper.I2C
+                       Flipper.IO
                        Flipper.LED
-                       Flipper.Put
                        Flipper.MonadFlipper
+                       Flipper.Put
+                       Flipper.PWM
+                       Flipper.RTC
+                       Flipper.SAM
+                       Flipper.SPI
+                       Flipper.Temperature
+                       Flipper.Timer
+                       Flipper.USART
+                       Flipper.USB
+                       Flipper.WiFi
                        Flipper.Internal.AT45
                        Flipper.Internal.Buffer
                        Flipper.Internal.Button

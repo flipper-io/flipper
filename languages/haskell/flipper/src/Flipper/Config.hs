@@ -18,10 +18,12 @@ import Prelude hiding (read)
 
 import Data.Word
 
+import Flipper.MonadFlipper
+
 import qualified Flipper.Internal.Config as I
 
 read :: MonadFlipper m => Word8 -> m Word16
 read = bracketIO . I.read
 
 write :: MonadFlipper m => Word8 -> Word16 -> m ()
-write = bracketIO . I.write
+write = (bracketIO .) . I.write
