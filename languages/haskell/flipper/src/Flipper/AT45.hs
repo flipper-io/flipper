@@ -70,7 +70,7 @@ format = bracketIO I.format
 --   data that may later be deallocated with 'free'.
 push :: (Bufferable b, MonadFlipper m) => b -> m FSHandle
 push b = do
-    h <- alloc (fromIntegral (sizePut b))
+    h <- alloc (fromIntegral (sizePut (put b)))
     pushHandle b h
     return h
 

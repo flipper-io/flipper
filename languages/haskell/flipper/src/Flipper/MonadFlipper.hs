@@ -62,7 +62,7 @@ instance MonadIO m => MonadFlipper (FlipperT m) where
     throwFlipper = throwError
     catchFlipper = catchError
 
-runFlipperT :: FlipperT m a => m (Either FlipperException a)
+runFlipperT :: FlipperT m a -> m (Either FlipperException a)
 runFlipperT = runExceptT
 
 runFlipper :: Flipper a -> IO (Either FlipperException a)
