@@ -27,6 +27,7 @@ library
                        Flipper.Put
                        Flipper.MonadFlipper
                        Flipper.Internal.AT45
+                       Flipper.Internal.Buffer
                        Flipper.Internal.Button
                        Flipper.Internal.Config
                        Flipper.Internal.Error
