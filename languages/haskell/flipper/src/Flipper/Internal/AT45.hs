@@ -21,7 +21,7 @@ module Flipper.Internal.AT45 (
   , pullAdvance
   ) where
 
-import Flipper.Buffer
+import Flipper.Internal.Buffer
 import Flipper.Internal.FS
 
 import Foreign.C.Types

@@ -16,7 +16,14 @@ The Flipper monad and its typeclass.
            , LambdaCase
            #-}
 
-module Flipper.MonadFlipper where
+module Flipper.MonadFlipper (
+    MonadFlipper(..)
+  , FlipperT(..)
+  , Flipper(..)
+  , mkBracket
+  , bracketFlipper
+  , bracketIO
+  ) where
 
 import Control.Exception
 

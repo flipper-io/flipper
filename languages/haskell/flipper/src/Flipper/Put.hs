@@ -47,7 +47,25 @@ instance, so bus interfaces can be used without serialization/deserialization
 boilerplate.
 -}
 
-module Flipper.Put where
+module Flipper.Put (
+    Put()
+  , runPut
+  , putBuffer
+  , putBufferC
+  , putBufferPascal
+  , putStorable
+  , putWord8
+  , putInt8
+  , putWord16
+  , putInt16
+  , putWord32
+  , putInt32
+  , putWord64
+  , putInt64
+  , putString
+  , putText
+  , putByteString
+  ) where
 
 import qualified Data.ByteString       as B
 import qualified Data.ByteString.Char8 as C
@@ -60,7 +78,7 @@ import Data.Monoid
 import Data.Int
 import Data.Word
 
-import Flipper.Buffer
+import Flipper.Internal.Buffer
 
 import Foreign.ForeignPtr
 import Foreign.Marshal.Utils
@@ -118,6 +136,9 @@ putWord32 = putStorable
 
 putInt32 :: Int32 -> Put
 putInt32 = putStorable
+
+putWord64 :: Word64 -> Put
+putWord64 = putStorable
 
 putInt64 :: Int64 -> Put
 putInt64 = putStorable

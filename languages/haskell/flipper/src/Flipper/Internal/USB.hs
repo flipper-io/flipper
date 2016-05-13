@@ -18,7 +18,7 @@ module Flipper.Internal.USB (
 
 import Data.Word
 
-import Flipper.Buffer
+import Flipper.Internal.Buffer
 
 import Foreign.C.Types
 import Foreign.ForeignPtr

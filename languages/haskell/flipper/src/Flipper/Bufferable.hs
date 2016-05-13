@@ -13,12 +13,17 @@ be sent to or received from the device over an arbitrary bus.
 
 {-# LANGUAGE FlexibleInstances #-}
 
-module Flipper.Bufferable where
+module Flipper.Bufferable (
+    Bufferable(..)
+  ) where
 
 import Data.Complex
 import Data.Int
 import Data.Ratio
 import Data.Word
+
+import qualified Data.ByteString as B
+import qualified Data.Text       as T
 
 import Flipper.Get
 import Flipper.Put
@@ -265,3 +270,15 @@ instance Bufferable (FunPtr a) where
 instance Storable a => Bufferable (Complex a) where
     put = putStorable
     get = getStorable
+
+instance Bufferable String where
+    put = putString
+    get = getString
+
+instance Bufferable T.Text where
+    put = putText
+    get = getText
+
+instance Bufferable B.ByteString where
+    put = putByteString
+    get = getByteString
