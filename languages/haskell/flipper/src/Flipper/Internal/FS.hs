@@ -1,4 +1,18 @@
-module Flipper.Internal.FS where
+{-|
+Module      : Flipper.Internal.FS
+Description : Internal FS Module
+Copyright   : George Morgan, Travis Whitaker 2016
+License     : All rights reserved.
+Maintainer  : travis@flipper.io
+Stability   : Provisional
+Portability : Windows, POSIX
+
+-}
+
+module Flipper.Internal.FS (
+    FSHandle(..)
+  , checksum
+  ) where
 
 import Data.Word
 

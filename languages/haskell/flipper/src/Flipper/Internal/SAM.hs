@@ -1,4 +1,22 @@
-module Flipper.Internal.SAM where
+{-|
+Module      : Flipper.Internal.SAM
+Description : Internal SAM Module
+Copyright   : George Morgan, Travis Whitaker 2016
+License     : All rights reserved.
+Maintainer  : travis@flipper.io
+Stability   : Provisional
+Portability : Windows, POSIX
+
+-}
+
+module Flipper.Internal.SAM (
+    setPower
+  , reset
+  , loadDFU
+  , format
+  , suspend
+  , engage
+  ) where
 
 import Data.Word
 

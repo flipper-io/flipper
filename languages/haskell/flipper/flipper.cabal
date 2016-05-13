@@ -17,9 +17,11 @@ extra-source-files:  cbits
 library
   hs-source-dirs:      src
   exposed-modules:     Flipper
+                       Flipper.AT45
                        Flipper.Buffer
                        Flipper.Bufferable
                        Flipper.Error
+                       Flipper.FS
                        Flipper.Get
                        Flipper.LED
                        Flipper.Put

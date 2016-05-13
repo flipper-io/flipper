@@ -1,4 +1,20 @@
-module Flipper.Internal.SPI where
+{-|
+Module      : Flipper.Internal.SPI
+Description : Internal SPI Module
+Copyright   : George Morgan, Travis Whitaker 2016
+License     : All rights reserved.
+Maintainer  : travis@flipper.io
+Stability   : Provisional
+Portability : Windows, POSIX
+
+-}
+
+module Flipper.Internal.SPI (
+    enable
+  , disable
+  , push
+  , pull
+  ) where
 
 import Data.Word
 

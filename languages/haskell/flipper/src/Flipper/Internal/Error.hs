@@ -1,4 +1,23 @@
-module Flipper.Internal.Error where
+{-|
+Module      : Flipper.Internal.Error
+Description : Internal Error Module
+Copyright   : George Morgan, Travis Whitaker 2016
+License     : All rights reserved.
+Maintainer  : travis@flipper.io
+Stability   : Provisional
+Portability : Windows, POSIX
+
+-}
+
+module Flipper.Internal.Error (
+    FlipperError(..)
+  , withold
+  , disclose
+  , raise
+  , get
+  , clear
+  ) where
+
 
 import Data.Word
 
@@ -33,7 +52,7 @@ data FlipperError = OK
                   | NoFileFailure
                   | Unimplemented
                   | Unknown
-                  deriving (Eq, Show)
+                  deriving (Eq, Ord, Show)
 
 errorCode :: FlipperError -> Word16
 errorCode OK                    = 0

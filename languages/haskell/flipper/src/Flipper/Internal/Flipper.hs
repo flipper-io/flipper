@@ -1,4 +1,20 @@
-module Flipper.Internal.Flipper where
+{-|
+Module      : Flipper.Internal.Flipper
+Description : Internal Flipper Device Module
+Copyright   : George Morgan, Travis Whitaker 2016
+License     : All rights reserved.
+Maintainer  : travis@flipper.io
+Stability   : Provisional
+Portability : Windows, POSIX
+
+-}
+
+module Flipper.Internal.Flipper (
+    Endpoint(..)
+  , select
+  , attach
+  , detach
+  ) where
 
 import Flipper.Internal.Error
 import Flipper.Internal.Utils
@@ -12,6 +28,7 @@ import Foreign.Marshal.Alloc
 data Endpoint = USB (Maybe String) -- ^ Local connection via USB.
               | Network String     -- ^ Remote connection via TCP/UDP.
               | FVM                -- ^ Flipper simulation via FVM.
+              deriving (Eq, Ord, Show)
 
 enumEndpoint :: Endpoint -> CInt
 enumEndpoint (USB _ )    = 0

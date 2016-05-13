@@ -1,4 +1,18 @@
-module Flipper.Internal.LED where
+{-|
+Module      : Flipper.Internal.LED
+Description : Internal LED Module
+Copyright   : George Morgan, Travis Whitaker 2016
+License     : All rights reserved.
+Maintainer  : travis@flipper.io
+Stability   : Provisional
+Portability : Windows, POSIX
+
+-}
+
+module Flipper.Internal.LED (
+    RGB(..)
+  , setRGB
+  ) where
 
 import Data.Word
 
