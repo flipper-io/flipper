@@ -11,7 +11,10 @@ Portability : Windows, POSIX
 
 {-# LANGUAGE DeriveAnyClass #-}
 
-module Flipper.Error where
+module Flipper.Error (
+    FlipperError(..)
+  , FlipperException(..)
+  ) where
 
 import Control.Exception
 

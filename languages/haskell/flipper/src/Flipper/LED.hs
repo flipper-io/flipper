@@ -9,7 +9,10 @@ Portability : Windows, POSIX
 
 -}
 
-module Flipper.LED where
+module Flipper.LED (
+    I.RGB(..)
+  , setRGB
+  ) where
 
 import Flipper.MonadFlipper
 

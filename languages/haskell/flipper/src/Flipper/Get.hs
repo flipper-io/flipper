@@ -63,7 +63,27 @@ boilerplate.
 
 {-# LANGUAGE BangPatterns, ScopedTypeVariables #-}
 
-module Flipper.Get where
+module Flipper.Get (
+    Get()
+  , Result(..)
+  , runGet
+  , runGetWith
+  , getStorable
+  , getWord8
+  , getInt8
+  , getWord16
+  , getInt16
+  , getWord32
+  , getInt32
+  , getWord64
+  , getInt64
+  , getCBlock
+  , getSizedBlock
+  , getString
+  , getText
+  , getByteString
+  , getSizedByteString
+  ) where
 
 import Control.Applicative
 import Control.Monad
@@ -79,7 +99,7 @@ import qualified Data.ByteString as B
 import qualified Data.Text          as T
 import qualified Data.Text.Encoding as T
 
-import Flipper.Buffer
+import Flipper.Internal.Buffer
 
 import Foreign.ForeignPtr
 import Foreign.Ptr
@@ -173,6 +193,9 @@ getWord32 = getStorable
 getInt32 :: Get Int32
 getInt32 = getStorable
 
+getWord64 :: Get Word64
+getWord64 = getStorable
+
 getInt64 :: Get Int64
 getInt64 = getStorable
 
@@ -209,5 +232,6 @@ getByteString :: Get B.ByteString
 getByteString = do s <- getStorable :: Get Word32
                    toByteString <$> getSizedBlock (fromIntegral s)
 
+-- | Get a statically sized 'B.ByteString'.
 getSizedByteString :: Int -> Get B.ByteString
 getSizedByteString = (toByteString <$>) . getSizedBlock
