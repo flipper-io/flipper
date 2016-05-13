@@ -7,6 +7,8 @@ Maintainer  : travis@flipper.io
 Stability   : Provisional
 Portability : Windows, POSIX
 
+This module provides an interface to a Flipper device's built in RGB LED. This
+LED is ideal for displaying status information.
 -}
 
 module Flipper.LED (
@@ -18,5 +20,6 @@ import Flipper.MonadFlipper
 
 import qualified Flipper.Internal.LED as I
 
+-- | Set the RGB LED color.
 setRGB :: MonadFlipper m => I.RGB -> m ()
 setRGB = bracketIO . I.setRGB

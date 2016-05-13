@@ -7,7 +7,9 @@ Maintainer  : travis@flipper.io
 Stability   : Provisional
 Portability : Windows, POSIX
 
-The Flipper monad and its typeclass.
+This module defines a class of 'Monad's in which Flipper commands may be
+executed and Flipper monad transformer for adding Flipper support to a monad
+stack.
 -}
 
 {-# LANGUAGE BangPatterns
@@ -17,9 +19,14 @@ The Flipper monad and its typeclass.
            #-}
 
 module Flipper.MonadFlipper (
+    -- * The Class of Flipper Monads
     MonadFlipper(..)
+    -- * Flipper Monad Transformer
   , FlipperT(..)
   , Flipper(..)
+  , runFlipperT
+  , runFlipper
+    -- * Error Bracketing and Lifting
   , mkBracket
   , bracketFlipper
   , bracketIO
@@ -39,6 +46,8 @@ class MonadIO m => MonadFlipper m where
     throwFlipper :: FlipperException -> m a
     catchFlipper :: m a -> (FlipperException -> m a) -> m a
 
+-- | This instance simply uses 'throwIO' and 'catch', and is provided for easy
+--   interaction with a Flipper device in GHCi.
 instance MonadFlipper IO where
     throwFlipper = throwIO
     catchFlipper = catch
@@ -52,6 +61,12 @@ type Flipper = FlipperT IO
 instance MonadIO m => MonadFlipper (FlipperT m) where
     throwFlipper = throwError
     catchFlipper = catchError
+
+runFlipperT :: FlipperT m a => m (Either FlipperException a)
+runFlipperT = runExceptT
+
+runFlipper :: Flipper a -> IO (Either FlipperException a)
+runFlipper = runExceptT
 
 -- | Clear any error condition, execute a Flipper action, and raise any
 --   resulting error.
