@@ -1,4 +1,25 @@
-module Flipper.Internal.IO where
+{-|
+Module      : Flipper.Internal.IO
+Description : Internal IO Module
+Copyright   : George Morgan, Travis Whitaker 2016
+License     : All rights reserved.
+Maintainer  : travis@flipper.io
+Stability   : Provisional
+Portability : Windows, POSIX
+
+-}
+
+module Flipper.Internal.IO (
+    DigitalPin(..)
+  , AnalogPin(..)
+  , Direction(..)
+  , digitalDirection
+  , analogDirection
+  , digitalRead
+  , analogRead
+  , digitalWrite
+  , analogWrite
+  ) where
 
 import Foreign.Marshal.Utils
 
@@ -73,6 +94,12 @@ digitalDirection p d = c_io_set_direction (digPinCode p) (directionCode d)
 
 analogDirection :: AnalogPin -> Direction -> IO ()
 analogDirection p d = c_io_set_direction (anPinCode p) (directionCode d)
+
+digitalRead :: DigitalPin -> IO Bool
+digitalRead p = toBool <$> c_io_read (digPinCode p)
+
+analogRead :: AnalogPin -> IO Word16
+analogRead p = c_io_read (anPinCode p)
 
 digitalWrite :: DigitalPin -> Bool -> IO ()
 digitalWrite p v = c_io_write (digPinCode p) (fromBool v)

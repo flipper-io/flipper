@@ -1,4 +1,25 @@
-module Flipper.Internal.AT45 where
+{-|
+Module      : Flipper.Internal.AT45
+Description : Internal AT45 Module
+Copyright   : George Morgan, Travis Whitaker 2016
+License     : All rights reserved.
+Maintainer  : travis@flipper.io
+Stability   : Provisional
+Portability : Windows, POSIX
+
+-}
+
+module Flipper.Internal.AT45 (
+    enable
+  , disable
+  , reset
+  , alloc
+  , free
+  , format
+  , push
+  , pull
+  , pullAdvance
+  ) where
 
 import Flipper.Buffer
 import Flipper.Internal.FS
@@ -6,7 +27,9 @@ import Flipper.Internal.FS
 import Foreign.C.Types
 import Foreign.ForeignPtr
 import Foreign.Ptr
-import Foreign.Marshal.Alloc
+import Foreign.Marshal.Alloc hiding (free)
+
+import Data.IORef
 
 import Data.Word
 
@@ -44,6 +67,16 @@ pull (FSHandle h) l
     | otherwise = do b@(Buffer p _ _) <- allocBufferSafe l
                      withForeignPtr p (\p' -> c_at45_pull p' (fromIntegral l) h)
                      return b
+
+pullAdvance :: FSHandle -> IO (Int -> IO Buffer)
+pullAdvance (FSHandle h) = pullOnce <$> newIORef h
+    where pullOnce hp l
+                | l <= 0    = error "pullAdvance: length must be greater than zero."
+                | otherwise = do h' <- readIORef hp
+                                 b@(Buffer p _ _) <- allocBufferSafe l
+                                 withForeignPtr p (\p' -> c_at45_pull p' (fromIntegral l) h')
+                                 modifyIORef' hp (+ (fromIntegral l))
+                                 return b
 
 -- | Don't use this, it allocates memory outside of the Haskell heap. Use 'pull'
 --   instead.

@@ -45,6 +45,10 @@ instance Ord Buffer where
 instance Show Buffer where
     show = show . toByteString
 
+-- | The empty buffer.
+emptyBuffer :: Buffer
+emptyBuffer = Buffer (error "nullForeignPtr") 0 0
+
 allocBufferSafe :: Int -> IO Buffer
 allocBufferSafe l
     | l <= 0    = error "allocBuffer: length must be greater than zero."

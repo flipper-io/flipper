@@ -1,4 +1,28 @@
-module Flipper.Internal.USART where
+{-|
+Module      : Flipper.Internal.USART
+Description : Internal USART Module
+Copyright   : George Morgan, Travis Whitaker 2016
+License     : All rights reserved.
+Maintainer  : travis@flipper.io
+Stability   : Provisional
+Portability : Windows, POSIX
+
+-}
+
+module Flipper.Internal.USART (
+    usart0Enable
+  , usart0Disable
+  , usart0Push
+  , usart0Pull
+  , usart1Enable
+  , usart1Disable
+  , usart1Push
+  , usart1Pull
+  , dbguEnable
+  , dbguDisable
+  , dbguPush
+  , dbguPull
+  ) where
 
 import Data.Word
 

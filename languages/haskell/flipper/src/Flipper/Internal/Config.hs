@@ -1,4 +1,20 @@
-module Flipper.Internal.Config where
+{-|
+Module      : Flipper.Internal.Config
+Description : Internal Config Module
+Copyright   : George Morgan, Travis Whitaker 2016
+License     : All rights reserved.
+Maintainer  : travis@flipper.io
+Stability   : Provisional
+Portability : Windows, POSIX
+
+-}
+
+module Flipper.Internal.Config (
+    write
+  , read
+  ) where
+
+import Prelude hiding (read)
 
 import Data.Word
 

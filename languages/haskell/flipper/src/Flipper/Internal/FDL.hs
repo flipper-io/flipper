@@ -1,4 +1,21 @@
-module Flipper.Internal.FDL where
+{-|
+Module      : Flipper.Internal.FDL
+Description : Internal FDL Module
+Copyright   : George Morgan, Travis Whitaker 2016
+License     : All rights reserved.
+Maintainer  : travis@flipper.io
+Stability   : Provisional
+Portability : Windows, POSIX
+
+-}
+
+module Flipper.Internal.FDL (
+    FDLKey()
+  , FDLAddress()
+  , load
+  , launch
+  , resolve
+  ) where
 
 import Data.Word
 
