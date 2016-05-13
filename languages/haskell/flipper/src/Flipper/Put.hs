@@ -39,11 +39,20 @@ The following serializer may be defined:
 If a 'Get' deserializer is also defined, then @SomeStruct@ may have a 'Bufferable'
 instance, so bus interfaces can be used without serialization/deserialization
 boilerplate.
+
+This module, like all others in this package, is intended to be imported
+@qualified@, e.g.
+
+> import qualified Flipper.Put as Put
 -}
 
 module Flipper.Put (
+    -- * The 'Put' Serialization Monoid
     Put()
+    -- * Running Serializers
+  , sizePut
   , runPut
+    -- * Built-In Serializers
   , putBuffer
   , putBufferC
   , putBufferPascal
@@ -90,12 +99,18 @@ instance Monoid Put where
     mappend (Put w1 l1) (Put w2 l2) = Put w' (l1 + l2)
         where w' p = w1 p >> w2 (p `plusPtr` l1)
 
+-- | Compute the number of bytes a serializer will contribute to a 'Buffer'.
+sizePut :: Put -> Int
+sizePut (Put _ l) = l
+
+-- | Run a serializer, producing a 'Buffer'.
 runPut :: Put -> Buffer
 runPut (Put w l) = unsafePerformIO run
     where run = do b@(Buffer p _ _) <- allocBufferSafe l
                    withForeignPtr p w
                    return b
 
+-- | Write out raw 'Buffer' contents.
 putBuffer :: Buffer -> Put
 putBuffer (Buffer p o l) = Put w l
     where w d = withForeignPtr p $ \p' -> copyBytes d p' l
@@ -105,7 +120,7 @@ putBufferC :: Buffer -> Put
 putBufferC = (<> putStorable (0 :: Word8)) . putBuffer
 
 -- | 'Put' a 'Buffer' like Pascal would, with a preceeding 32-bit word
---   indicating the length.
+--   indicating the length. The buffer lenght must not exceed 2^32 - 1.
 putBufferPascal :: Buffer -> Put
 putBufferPascal b@(Buffer _ _ l) = putStorable ((fromIntegral l) :: Word32) <> putBuffer b
 
@@ -146,6 +161,6 @@ putString = putBufferC . fromByteString . C.pack
 putText :: T.Text -> Put
 putText = putBufferC . fromByteString . T.encodeUtf8
 
--- | May contain NULL. Must be less than 2^32 bytes long.
+-- | May contain NULL. Must be less than 2^32 - 1 bytes long.
 putByteString :: B.ByteString -> Put
 putByteString = putBufferPascal . fromByteString

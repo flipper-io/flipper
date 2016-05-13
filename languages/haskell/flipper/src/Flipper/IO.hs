@@ -7,12 +7,15 @@ Maintainer  : travis@flipper.io
 Stability   : Provisional
 Portability : Windows, POSIX
 
+This module provides an interface to a Flipper device's IO pins.
 -}
 
 module Flipper.IO (
+    -- * IO Pins
     I.DigitalPin(..)
   , I.AnalogPin(..)
   , I.Direction(..)
+    -- * Reading/Writing Pin State
   , digitalDirection
   , digitalRead
   , digitalWrite
@@ -27,15 +30,19 @@ import Flipper.MonadFlipper
 
 import qualified Flipper.Internal.IO as I
 
+-- | Set the IO direction of a digital pin.
 digitalDirection :: MonadFlipper m => I.DigitalPin -> I.Direction -> m ()
 digitalDirection = (bracketIO .) . I.digitalDirection
 
+-- | Read a 'Bool' from a digital pin.
 digitalRead :: MonadFlipper m => I.DigitalPin -> m Bool
 digitalRead = bracketIO . I.digitalRead
 
+-- | Write a 'Bool' to a digital pin.
 digitalWrite :: MonadFlipper m => I.DigitalPin -> Bool -> m ()
 digitalWrite = (bracketIO .) . I.digitalWrite
 
+-- | Set the IO direction of a digital pin.
 analogDirection :: MonadFlipper m => I.AnalogPin -> I.Direction -> m ()
 analogDirection = (bracketIO .) . I.analogDirection
 
@@ -43,6 +50,6 @@ analogDirection = (bracketIO .) . I.analogDirection
 analogRead :: MonadFlipper m => I.AnalogPin -> m Word16
 analogRead = bracketIO . I.analogRead
 
--- | make this interface more clever.
+-- | Make this interface more clever.
 analogWrite :: MonadFlipper m => I.AnalogPin -> Word16 -> m ()
 analogWrite = (bracketIO .) . I.analogWrite
