@@ -1,22 +1,23 @@
 {-|
-Module      : Flipper.AT45
-Description : AT45 Flash Memory Interface
+Module      : Flipper.NVM
+Description : Non Volatile Memory Interface
 Copyright   : George Morgan, Travis Whitaker 2016
 License     : All rights reserved.
 Maintainer  : travis@flipper.io
 Stability   : Provisional
 Portability : Windows, POSIX
 
-The AT45 is Flipper's flash chip. The flash chip may be used as a simple
-persistent file system in which any 'Bufferable' data may be stored.
+This module provides an interface to a Flipper device's non-volatile memory.
+This memory may be used as a simple persistent file system in which any
+'Bufferable' data may be stored.
 
 This module, like all others in this package, is intended to be imported
 @qualified@, e.g.
 
-> import qualified Flipper.AT45 as AT45
+> import qualified Flipper.NVM as NVM
 -}
 
-module Flipper.AT45 (
+module Flipper.NVM (
     -- * Chip Control
     enable
   , disable
@@ -39,18 +40,18 @@ import Flipper.Get
 import Flipper.Put
 import Flipper.MonadFlipper
 
-import qualified Flipper.Internal.AT45 as I
+import qualified Flipper.Internal.NVM as I
 
--- | Enable the AT45 chip. The chip must be enabled before any other operations
---   may be performed.
+-- | Enable the AT45 flash chip. The chip must be enabled before any other
+--   operations may be performed.
 enable :: MonadFlipper m => m ()
 enable = bracketIO I.enable
 
--- | Disable the AT45 chip.
+-- | Disable the AT45 flash chip.
 disable :: MonadFlipper m => m ()
 disable = bracketIO I.disable
 
--- | Reset the AT45 chip.
+-- | Reset the AT45 flash chip.
 reset :: MonadFlipper m => m ()
 reset = bracketIO I.reset
 
@@ -62,7 +63,7 @@ alloc = bracketIO . I.alloc
 free :: MonadFlipper m => FSHandle -> m ()
 free = bracketIO . I.free
 
--- | Format the AT45 chip, removing all stored data.
+-- | Format the AT45 flash chip, removing all stored data.
 format :: MonadFlipper m => m ()
 format = bracketIO I.format
 

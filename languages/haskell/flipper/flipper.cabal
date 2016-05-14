@@ -17,7 +17,6 @@ extra-source-files:  cbits
 library
   hs-source-dirs:      src
   exposed-modules:     Flipper
-                       Flipper.AT45
                        Flipper.Buffer
                        Flipper.Bufferable
                        Flipper.Button
@@ -31,6 +30,7 @@ library
                        Flipper.IO
                        Flipper.LED
                        Flipper.MonadFlipper
+                       Flipper.NVM
                        Flipper.Put
                        Flipper.PWM
                        Flipper.RTC
@@ -41,7 +41,6 @@ library
                        Flipper.USART
                        Flipper.USB
                        Flipper.WiFi
-                       Flipper.Internal.AT45
                        Flipper.Internal.Buffer
                        Flipper.Internal.Button
                        Flipper.Internal.Config
@@ -53,6 +52,7 @@ library
                        Flipper.Internal.I2C
                        Flipper.Internal.IO
                        Flipper.Internal.LED
+                       Flipper.Internal.NVM
                        Flipper.Internal.PWM
                        Flipper.Internal.RTC
                        Flipper.Internal.SAM
