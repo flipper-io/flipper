@@ -2,18 +2,39 @@
 
 ### Introduction
 
-The **Toolbox** is a repository of sofware components that work together enable dynamic control of Flipper hardware across a wide variety of host platforms and programming environments.
+The **Toolbox** is a repository of sofware components that work together to
+enable dynamic control of Flipper hardware across a wide variety of host
+platforms and programming environments.
 
-At the heart of the toobox is a lightweight yet sophistocated control stack designed to fascilitate real time interaction with Flipper hardware.
-
-### Getting Started
-
-The python script `manage.py` is a simple script that maintains the directory structure of the toolbox. It can create and destroy modules as well as rebuild the toolbox's symlink tree. Before attempting to build individual components of the toolbox for the first time, the command `python manage.py rebuild` must be executed in order to prepare the targets of the toolbox for compilation. Running the makefile in the root directory of the toolbox will automatically execute this command.
+At the heart of the toobox is a lightweight yet sophistocated control stack
+designed to fascilitate real time interaction with Flipper hardware.
 
 #### Building the Toolbox
 
-The entire toolbox can be built using the command `make all` in the toolbox's root directory. This command will subsequently build all of the minor targets of the toolbox and aggregate the outputs of the build into a directory in preparation for install. Minor targets can be built and installed individualy if desired from the root directory of the respective minor component.
+The toolbox uses the [shake](http://shakebuild.com/) build system. The easiest
+way to get shake is:
 
-#### Installing the Toolbox
+- Install the [Haskell Tool Stack](http://docs.haskellstack.org/en/stable/README/)
+- Run `stack setup`
+- Run `stack install shake`
+- Make sure that `~/.local/bin` is in your `$PATH`.
 
-The toolbox can be installed using the command `make install PREFIX=YOUR_PREFIX` where `YOUR_PREFIX` is the destination of the install. Most UNIX-like systems accept `/usr/local/` as the the prefix for user-installed software. As before, minor targets of the toolbox can be installed using the same command from their root directory.
+`shake` may be invoked like `make` with a list of targets. On an SMP computer,
+`shake` will automatically detect the number of cores available. The following
+targets are available:
+
+- `clean` removes all build artifacts.
+- `install` builds and installs the toolbox and the Flipper console. The
+  installation prefix will be read from the `$PREFIX` environment variable.
+  Otherwise `/usr/local` will be used as the default.
+- `install-libflipper` will build and install the toolbox.
+- `install-console` will build and install the Flipper console.
+- `native` will build all native targets.
+- `flipper-library` will build the toolbox.
+- `flipper-console` will build the Flipper console.
+- `flipper-osmium` will build Osmium for all targets.
+- `burn-at91sam4s` will burn Osmium to the AT91SAM4S.
+- `burn-atmega16u2` will burn Osmium to the ATMEGA16u2.
+
+See the [shake manual](http://shakebuild.com/manual) and
+[shake's Hackage page](http://shakebuild.com/manual) for more information.
