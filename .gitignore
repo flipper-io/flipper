@@ -17,3 +17,4 @@ console/flipper
 *.swp
 .shake
 .stack-work
+tags
