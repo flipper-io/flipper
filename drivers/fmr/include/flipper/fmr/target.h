@@ -11,67 +11,67 @@
 
 typedef uint32_t uintres_t;
 
-/* ~ It is very important that this structure be packed. ~ */
+/* It is very important that this structure be packed. */
 struct __attribute__((__packed__)) _fmr_header {
 
-	/* ~ Fixed packet header to ensure sync. ~ */
+	/* Fixed packet header to ensure sync. */
 	uint8_t fe;
 
-	/* ~ The length of the contents of the packet. ~ */
+	/* The length of the contents of the packet. */
 	uint8_t length;
 
-	/* ~ A checksum of everything below. ~ */
+	/* A checksum of everything below. */
 	uint16_t checksum;
 
 };
 
 struct __attribute__((__packed__)) _fmr_recipient {
 
-	/* ~ The target device. ~ */
+	/* The target device. */
 	uint8_t target;
 
-	/* ~ The destination object. ~ */
+	/* The destination object. */
 	uint8_t object;
 
-	/* ~ The index of the target method within the destination object. ~ */
+	/* The index of the target method within the destination object. */
 	uint8_t index;
 
-	/* ~ The number of arguments expected by the target method multiplied by sizeof(uint32_t). ~ */
+	/* The number of arguments expected by the target method multiplied by sizeof(uint32_t). */
 	uint8_t argc;
 
 };
 
 typedef struct __attribute__((__packed__)) _fmr_packet {
 
-	/* ~ The packet header. ~ */
+	/* The packet header. */
 	struct _fmr_header header;
 
-	/* ~ The packet destination. ~ */
+	/* The packet destination. */
 	struct _fmr_recipient recipient;
 
-	/* ~ The body of the packet. ~ */
+	/* The body of the packet. */
 	uint8_t body[FMR_BODY_SIZE];
 
 } fmr_packet;
 
 struct __attribute__((__packed__)) _fmr_response {
 
-	/* ~ A checksum of the response. ~ */
+	/* A checksum of the response. */
 	uint16_t checksum;
 
 	struct __attribute__((__packed__)) _body {
 
-		/* ~ The return value of the call. ~ */
+		/* The return value of the call. */
 		uintres_t retval;
 
-		/* ~ The error code of the call. ~ */
-		uinterror_t error;
+		/* The error code of the call. */
+		lf_error_t error;
 
 	} body;
 
 };
 
-/* ~ Declare the object prototype for a generic target: a device that responds to the Flipper Message Runtime. ~ */
+/* Declare the object prototype for a generic target: a device that responds to the Flipper Message Runtime. */
 struct _target {
 
 	void (* const configure)(const struct _bus *bus);
@@ -85,7 +85,7 @@ struct _target {
 
 };
 
-/* ~ Declare the object prototype for the self target: the device that implements the Flipper Message Runtime. ~ */
+/* Declare the object prototype for the self target: the device that implements the Flipper Message Runtime. */
 struct _self {
 
 	void (* const configure)(const struct _bus *bus);
@@ -96,7 +96,7 @@ struct _self {
 
 };
 
-/* ~ Every FMR compliant target will have a host as well as a device. ~ */
+/* Every FMR compliant target will have a host as well as a device. */
 extern struct _target host, device;
 extern struct _self self;
 
@@ -106,7 +106,7 @@ extern struct _target *sender;
 
 #ifdef __private_include__
 
-enum { _zero, _one, _two, _led, _button, _config, _error, _usart, _spi, _sam, _at45, _fs, _usb, _wifi, _io, _dbgu, _usart1, _fdl, _fmr };
+enum { _zero, _one, _two, _led, _button, _config, _error, _usart, _spi, _sam, _nvm, _fs, _usb, _wifi, _io, _dbgu, _usart1, _fdl, _fmr };
 
 uint8_t build_args(uint8_t argc, ...);
 uint32_t target_invoke(const struct _target *target, uint8_t object, uint8_t index, uint8_t argc, va_list *argv);

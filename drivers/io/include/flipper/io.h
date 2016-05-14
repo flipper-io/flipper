@@ -1,13 +1,13 @@
 #ifndef __io_h__
 #define __io_h__
 
-/* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
+/* Include all types and macros exposed by the Flipper Toolbox. */
 #include <flipper/core.h>
 
-/* ~ Decare a global enumerator to expose the IO namespace. ~ */
+/* Decare a global enumerator to expose the IO namespace. */
 enum {
 
-	RESERVED,	/* ~ Offset the enumerator by one so regular numbers can be used for pins IO1 through IO16. ~ */
+	RESERVED,	/* Offset the enumerator by one so regular numbers can be used for pins IO1 through IO16. */
 
 	IO1,
 	IO2,
@@ -16,7 +16,7 @@ enum {
 	IO5,
 	IO6,
 	IO7,
-	IO8,		/* ~ DIGITAL IO ~ */
+	IO8,		/* DIGITAL IO */
 	IO9,
 	IO10,
 	IO11,
@@ -30,13 +30,13 @@ enum {
 	A2,
 	A3,
 	A4,
-	A5,			/* ~ ANALOG IO ~ */
+	A5,			/* ANALOG IO */
 	A6,
 	A8,
 
 };
 
-/* ~ Declare the virtual driver object. ~ */
+/* Declare the virtual interface for this module. */
 extern const struct _io {
 
 	void (* configure)(void);
@@ -48,10 +48,10 @@ extern const struct _io {
 
 #ifdef __private_include__
 
-/* ~ Declare the FMR overlay for this driver object. ~ */
+/* Declare the FMR overlay for this driver. */
 enum { _io_configure, _io_set_direction, _io_write, _io_read };
 
-/* ~ Declare all function prototypes for this driver. ~ */
+/* Declare each prototype for all functions within this driver. */
 void io_configure(void);
 void io_set_direction(uint8_t pin, uint8_t direction);
 void io_write(uint8_t pin, uint16_t value);

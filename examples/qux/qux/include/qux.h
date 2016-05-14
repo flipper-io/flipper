@@ -3,7 +3,7 @@
 
 #include <flipper.h>
 
-/* ~ Declare the virtual interface for the qux driver. ~ */
+/* Declare the virtual interface for the qux driver. */
 extern const struct _qux {
 	
 	void (* configure)(void);
@@ -12,13 +12,13 @@ extern const struct _qux {
 	
 } qux;
 
-/* ~ Define the private definitions of the driver functions. ~ */
+/* Define the private definitions of the driver functions. */
 #ifdef __private_include__
 
-/* ~ Declare the enum overlay for this driver. ~ */
+/* Declare the enum overlay for this driver. */
 enum { _qux_configure, _qux_on, _qux_off };
 
-/* ~ Configures the necessary IO for the interface. ~ */
+/* Configures the necessary IO for the interface. */
 extern void qux_configure(void);
 extern void qux_on(void);
 extern void qux_off(void);

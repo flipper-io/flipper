@@ -9,7 +9,7 @@
 
 int main(int argc, char *argv[]) {
 
-	/* ~ Attach a Flipper device over USB. ~ */
+	/* Attach a Flipper device over USB. */
 	flipper.attach(FLIPPER_SOURCE_USB);
 
 	io.direction(7, OUTPUT);

@@ -1,10 +1,10 @@
 #ifndef __platform_h__
 #define __platform_h__
 
-/* ~ Include the avr-libc standard library headers. ~ */
+/* Include the avr-libc standard library headers. */
 #include "standards.h"
 
-/* ~ Include Flipper Message Runtime specific definitions for this platform. ~ */
+/* Include Flipper Message Runtime specific definitions for this platform. */
 #include "fmr.h"
 
 #if (defined(enable_interrupts) && defined(disable_interrupts))

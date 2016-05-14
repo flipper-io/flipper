@@ -21,26 +21,26 @@ void i2c_configure_clock(void) {
 
 void i2c_configure(void) {
 
-	/* ~ Select PIO A. ~ */
+	/* Select PIO A. */
 	set_bits_in_port_with_mask(AT91C_BASE_PIOA -> PIO_ASR, (AT91C_PA12_MISO | AT91C_PA13_MOSI | AT91C_PA14_SPCK));
 
-	/* ~ Disable use of the TWI pins by the PIO. They are now in use by the TWI controller. ~ */
+	/* Disable use of the TWI pins by the PIO. They are now in use by the TWI controller. */
 	set_bits_in_port_with_mask(AT91C_BASE_PIOA -> PIO_PDR, (AT91C_PA4_TWCK | AT91C_PA3_TWD));
 
-	/* ~ Enable the TWI clock. ~ */
+	/* Enable the TWI clock. */
 	set_bit_in_port(AT91C_ID_TWI, AT91C_BASE_PMC -> PMC_PCER);
 
-	/* ~ Reset the TWI controller. ~ */
+	/* Reset the TWI controller. */
 	AT91C_BASE_TWI -> TWI_CR = AT91C_TWI_SWRST;
 
-	/* ~ Configure the TWI controller in master mode. ~ */
+	/* Configure the TWI controller in master mode. */
 	AT91C_BASE_TWI -> TWI_CR = AT91C_TWI_MSEN;
 
 	i2c_configure_clock();
 
 }
 
-int i2c_put(int mode, int address, void *data, int length) {
+int i2c_put(int mode, int address, void *data, size_t length) {
 
 	unsigned int status, counter = 0, error = 0;
 
@@ -98,7 +98,7 @@ int i2c_put(int mode, int address, void *data, int length) {
 
 }
 
-int i2c_get(int mode, int address, void *data, int length) {
+int i2c_get(int mode, int address, void *data, size_t length) {
 
 	unsigned int status,counter=0,error=0;
 

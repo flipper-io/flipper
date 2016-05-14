@@ -4,25 +4,25 @@
 
 void led_configure(void) {
 
-	/* ~ Configure the DI (data in) pin of the LED as an output. ~ */
+	/* Configure the DI (data in) pin of the LED as an output. */
 	set_bit_in_port(LED_DI, LED_DDR);
 
 }
 
 void led_set_rgb(uint8_t r, uint8_t g, uint8_t b) {
 
-	/* ~ Disable interrupts to prevent timing issues. ~ */
+	/* Disable interrupts to prevent timing issues. */
 	disable_interrupts();
 
-	/* ~ Create an array to be sent to the LED in GRB format. ~ */
+	/* Create an array to be sent to the LED in GRB format. */
 	uint8_t *data = (uint8_t *)&((uint8_t []){ g, r, b });
 
-	/* ~ Send each of the three bytes to the LED, one by one. ~ */
+	/* Send each of the three bytes to the LED, one by one. */
 	for (uint8_t i = 3; i > 0; i --) {
 
 		uint8_t dummy, byte = *data++;
 
-		/* ~ Let the bit-banging begin. ~ */
+		/* Let the bit-banging begin. */
 		__asm__ volatile ("ldi %0,8     \n\t"
 						  "loop%=:out %2,%3 \n\t"
 						  "lsl %1           \n\t"
@@ -47,7 +47,7 @@ void led_set_rgb(uint8_t r, uint8_t g, uint8_t b) {
 
 	}
 
-	/* ~ Enable interrupts again. ~ */
+	/* Enable interrupts again. */
 	enable_interrupts();
 
 }

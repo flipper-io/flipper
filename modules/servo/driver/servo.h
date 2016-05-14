@@ -6,7 +6,7 @@
 
 #include <fmr/fmr.h>
 
-/* ~ Declare the virtual interface for the servo driver. ~ */
+/* Declare the virtual interface for the servo driver. */
 
 extern const struct _servo {
 	
@@ -18,15 +18,15 @@ extern const struct _servo {
 	
 } servo;
 
-/* ~ Define the private definitions of the driver functions. ~ */
+/* Define the private definitions of the driver functions. */
 
 #ifdef __private_include__
 
-/* ~ Declare the enum overlay for this driver. ~ */
+/* Declare the enum overlay for this driver. */
 
 enum { _servo_configure, _servo_attach, _servo_rotate };
 
-/* ~ Configures the necessary IO for the interface. ~ */
+/* Configures the necessary IO for the interface. */
 
 extern void servo_configure(void);
 

@@ -1,7 +1,7 @@
 #ifndef __core_h__
 #define __core_h__
 
-/* ~ Include the standard library headers. ~ */
+/* Include the standard library headers. */
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -10,13 +10,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* ~ Include types exposed by the Flipper Message Runtime. ~ */
+/* Include types exposed by the Flipper Message Runtime. */
 #include <flipper/fmr/bus.h>
 
-/* ~ Define the filesystem pointer type. ~ */
+/* Define the filesystem pointer type. */
 typedef uint32_t fsp;
 
-/* ~ Define a macro for verbose printing. ~ */
+/* Define a macro for verbose printing. */
 #if defined(__verbose__)
 #define verbose(...) fprintf(stdout, __VA_ARGS__);
 #else
@@ -33,7 +33,7 @@ typedef uint32_t fsp;
 #define INPUT   false
 #define OUTPUT  true
 
-/* ~ Define bit manipulation macros. ~ */
+/* Define bit manipulation macros. */
 #define bit(b)                                          (0x01 << (b))
 #define get_bit_from_port(b, p)                         ((p) & bit(b))
 #define set_bit_in_port(b, p)                           ((p) |= bit(b))
@@ -52,7 +52,7 @@ typedef uint32_t fsp;
 #define little(x)	((((uint16_t)(x)) << 8 ) | (((uint16_t)(x)) >> 8))
 #define little32(x) ((((uint32_t)(x)) << 16 ) | (((uint32_t)(x)) >> 16))
 
-/* ~ These macros are defined in platform specific header files. ~ */
+/* These macros are defined in platform specific header files. */
 #define enable_interrupts()
 #define disable_interrupts()
 

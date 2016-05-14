@@ -20,46 +20,46 @@ int main(void) {
 
 	/* !!! Perhaps engaging the WDT would be a good idea. In the event of a timeout, the device can reset, throw a warning, and continue. !!! */
 
-	/* ~ Clear the WDT reset flag. ~ */
+	/* Clear the WDT reset flag. */
 	MCUSR &= ~(1 << WDRF);
 
-	/* ~ Disable the watchdog timer. ~ */
+	/* Disable the watchdog timer. */
 	wdt_disable();
 
 	/* -- PLATFORM INSPECIFIC INITIALIZATION -- */
 
-	/* ~ Configure the filesystem and its dependencies. The order to this is important. ~ */
-	at45_configure();
+	/* Configure the filesystem and its dependencies. The order to this is important. */
+	nvm_configure();
 	spi_configure();
 	fs_configure();
 
-	/* ~ Configure the peripherals. ~ */
+	/* Configure the peripherals. */
 	button_configure();
 	led_configure();
 	sam_configure();
 	wifi_configure();
 
-	/* ~ Configure the builtins. ~ */
+	/* Configure the builtins. */
 	error_configure();
 
-	/* ~ Configure the busses. ~ */
+	/* Configure the busses. */
 	usb_configure();
 	usart0_configure((void *)(baudrate(115200)));
 
 	/* -- FLIPPER MESSAGE RUNTIME INITIALIZATION -- */
 
-	/* ~ Configure the host for this platform. ~ */
+	/* Configure the host for this platform. */
 	host_configure(&usb);
 
-	/* ~ Configure the device for this platform. ~ */
+	/* Configure the device for this platform. */
 	device_configure(&usart);
 
 	/* -- USER INTERFACE -- */
 
-	/* ~ Wait for the computer to attach. ~ */
+	/* Wait for the computer to attach. */
 	delay_ms(250);
 
-	/* ~ Light the status LED to indicate successful configuration. ~ */
+	/* Light the status LED to indicate successful configuration. */
 	led.rgb(0, 16, 0);
 
 	/* -- SCHEDULER -- */

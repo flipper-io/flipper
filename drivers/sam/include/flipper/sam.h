@@ -1,10 +1,10 @@
 #ifndef __sam_h__
 #define __sam_h__
 
-/* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
+/* Include all types and macros exposed by the Flipper Toolbox. */
 #include <flipper/core.h>
 
-/* ~ Declare the virtual driver object. ~ */
+/* Declare the virtual interface for this module. */
 extern const struct _sam {
 
 	void (* configure)(void);
@@ -19,10 +19,10 @@ extern const struct _sam {
 
 #ifdef __private_include__
 
-/* ~ Declare the FMR overlay for this driver object. ~ */
+/* Declare the FMR overlay for this driver. */
 enum { _sam_configure, _sam_set_power, _sam_reset, _sam_load_dfu, _sam_format, _sam_suspend, _sam_engage };
 
-/* ~ Declare all function prototypes for this driver. ~ */
+/* Declare each prototype for all functions within this driver. */
 void sam_configure(void);
 void sam_set_power(uint8_t power);
 void sam_reset(void);

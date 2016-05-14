@@ -1,28 +1,28 @@
 #ifndef __flipper_h__
 #define __flipper_h__
 
-/* ~ Include the header file that exposes the API for user-accessible drivers. ~ */
+/* Include the header file that exposes the API for user-accessible drivers. */
 #include <flipper/drivers.h>
 
-/* ~ Define the flipper control type. ~ */
+/* Define the flipper control type. */
 typedef enum { FLIPPER_USB, FLIPPER_NETWORK, FLIPPER_FVM } lf_endpoint;
 
 struct _lf_device {
 
-	/* ~ The name of the attached device. ~ */
+	/* The name of the attached device. */
 	char *name;
 
-	/* ~ The hardware identifier for the device. ~ */
+	/* The hardware identifier for the device. */
 	uintcrc_t identifier;
 
-	/* ~ The endpoint via which this device is attached. This also provides
-	 *   the appropriate interpretation for the handle field. ~ */
+	/* The endpoint via which this device is attached. This also provides
+	 *   the appropriate interpretation for the handle field. */
 	lf_endpoint endpoint;
 
-	/* ~ References the endpoint specific descriptor from which the device can be accessed. ~ */
+	/* References the endpoint specific descriptor from which the device can be accessed. */
 	void *handle;
 
-	/* ~ The next attached device. ~ */
+	/* The next attached device. */
 	struct _lf_device *next;
 	
 };
