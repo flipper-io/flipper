@@ -1,11 +1,11 @@
 #ifndef __drivers_h__
 #define __drivers_h__
 
-/* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
+/* Include all types and macros exposed by the Flipper Toolbox. */
 #include <flipper/core.h>
 
-/* ~ Include the header files for user-accessible drivers. ~ */
-#include <flipper/at45.h>
+/* Include the header files for user-accessible drivers. */
+#include <flipper/nvm.h>
 #include <flipper/button.h>
 #include <flipper/config.h>
 #include <flipper/error.h>

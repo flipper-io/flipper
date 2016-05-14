@@ -13,7 +13,7 @@ all:
 
 install:
 
-	# ~ Install the module. ~ */
+	# ~ Install the module. */
 	flipper install io.flipper.$(module) $(module)/$(module).bin
 
 clean:

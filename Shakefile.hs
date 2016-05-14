@@ -22,7 +22,7 @@ import System.FilePath
 -- * Target Drivers
 
 -- | Drivers for the libflipper target.
-libflipper_drivers = [ "at45"
+libflipper_drivers = [ "nvm"
                      , "button" 
                      , "config"
                      , "error"
@@ -44,7 +44,7 @@ libflipper_drivers = [ "at45"
                      ]
 
 -- | Drivers for the at91sam4s target.
-at91sam4s_drivers = [ "at45"
+at91sam4s_drivers = [ "nvm"
                     , "button"
                     , "config"
                     , "error"
@@ -65,7 +65,7 @@ at91sam4s_drivers = [ "at45"
                     ]
 
 -- | Drivers for the atmega16u2 target.
-atmega16u2_drivers = [ "at45"
+atmega16u2_drivers = [ "nvm"
                      , "button"
                      , "config"
                      , "error"

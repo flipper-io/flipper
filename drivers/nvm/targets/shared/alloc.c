@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/at45.h>
+#include <flipper/nvm.h>
 #include <flipper/fs.h>
 
 typedef struct _block {
@@ -9,7 +9,7 @@ typedef struct _block {
 
 } block;
 
-fsp at45_alloc(uint32_t length) {
+fsp nvm_alloc(size_t length) {
 
 	block *current, *last, *current_smallest, *last_smallest;
 
@@ -21,7 +21,7 @@ fsp at45_alloc(uint32_t length) {
 
 	if (length < sizeof(block) - sizeof(uint32_t)) length = sizeof(block) - sizeof(uint32_t);
 
-	for (smallest_size = 0, _current = _free_list, current = at45_dereference(_free_list, sizeof(block)), _last = 0, last = 0; _current; _last = _current, last = current, _current = current -> next, free(current), current = at45_dereference(current -> next, sizeof(block))) {
+	for (smallest_size = 0, _current = _free_list, current = nvm_dereference(_free_list, sizeof(block)), _last = 0, last = 0; _current; _last = _current, last = current, _current = current -> next, free(current), current = nvm_dereference(current -> next, sizeof(block))) {
 
 		if ((current -> size) < length) continue;
 
@@ -31,7 +31,7 @@ fsp at45_alloc(uint32_t length) {
 
 				last -> next = current -> next;
 
-				at45_push(last, sizeof(block), _last);
+				nvm_push(last, sizeof(block), _last);
 
 			}
 
@@ -39,7 +39,7 @@ fsp at45_alloc(uint32_t length) {
 
 				_free_list = current -> next;
 
-				at45_push(&_free_list, sizeof(fsp), _FREE_LIST);
+				nvm_push(&_free_list, sizeof(fsp), _FREE_LIST);
 
 			}
 
@@ -77,7 +77,7 @@ fsp at45_alloc(uint32_t length) {
 
 				last_smallest -> next = current_smallest -> next;
 
-				at45_push(last_smallest, sizeof(block), _last_smallest);
+				nvm_push(last_smallest, sizeof(block), _last_smallest);
 
 				free(last_smallest);
 
@@ -87,7 +87,7 @@ fsp at45_alloc(uint32_t length) {
 
 				_free_list = current_smallest -> next;
 
-				at45_push(&_free_list, sizeof(fsp), _FREE_LIST);
+				nvm_push(&_free_list, sizeof(fsp), _FREE_LIST);
 
 			}
 
@@ -101,17 +101,17 @@ fsp at45_alloc(uint32_t length) {
 
 		_current += smallest_size;
 
-		last_smallest = (block *)(at45_dereference(_current, sizeof(block)));
+		last_smallest = (block *)(nvm_dereference(_current, sizeof(block)));
 
 		_last_smallest = _current;
 
 		last_smallest -> size = length;
 
-		at45_push(last_smallest, sizeof(block), _last_smallest);
+		nvm_push(last_smallest, sizeof(block), _last_smallest);
 
 		current_smallest -> size = smallest_size - sizeof(uint32_t);
 
-		at45_push(current_smallest, sizeof(block), _current_smallest);
+		nvm_push(current_smallest, sizeof(block), _current_smallest);
 
 		free(last_smallest);
 
@@ -123,19 +123,19 @@ fsp at45_alloc(uint32_t length) {
 
 	if (available >= length && available >= length + sizeof(uint32_t)) {
 
-		current = (block *)(at45_dereference(_break_value, sizeof(block)));
+		current = (block *)(nvm_dereference(_break_value, sizeof(block)));
 
 		_current = _break_value;
 
 		current -> size = length;
 
-		at45_push(current, sizeof(block), _current);
+		nvm_push(current, sizeof(block), _current);
 
 		fsp block = (_break_value + offsetof(struct _block, next));
 
 		_break_value += length + sizeof(uint32_t);
 
-		at45_push(&_break_value, sizeof(fsp), _BREAK_VALUE);
+		nvm_push(&_break_value, sizeof(fsp), _BREAK_VALUE);
 
 		free(current);
 
@@ -147,7 +147,7 @@ fsp at45_alloc(uint32_t length) {
 
 }
 
-void at45_free(fsp pointer) {
+void nvm_free(fsp pointer) {
 
 	block *current, *last, *new;
 
@@ -159,11 +159,11 @@ void at45_free(fsp pointer) {
 
 	_new -= sizeof(uint32_t);
 
-	new = (block *)(at45_dereference(_new, sizeof(block)));
+	new = (block *)(nvm_dereference(_new, sizeof(block)));
 
 	new -> next = 0;
 
-	at45_push(new, sizeof(block), _new);
+	nvm_push(new, sizeof(block), _new);
 
 	if (_free_list == 0) {
 
@@ -171,7 +171,7 @@ void at45_free(fsp pointer) {
 
 			_break_value = _new;
 
-			at45_push(&_break_value, sizeof(fsp), _BREAK_VALUE);
+			nvm_push(&_break_value, sizeof(fsp), _BREAK_VALUE);
 
 		}
 
@@ -179,7 +179,7 @@ void at45_free(fsp pointer) {
 
 			_free_list = _new;
 
-			at45_push(&_free_list, sizeof(fsp), _FREE_LIST);
+			nvm_push(&_free_list, sizeof(fsp), _FREE_LIST);
 
 		}
 
@@ -189,7 +189,7 @@ void at45_free(fsp pointer) {
 
 	}
 
-	for (_current = _free_list, current = at45_dereference(_free_list, sizeof(block)), _last = 0, last = 0; _current; _last = _current, last = current, _current = current -> next, free(current), current = at45_dereference(current -> next, sizeof(block))) {
+	for (_current = _free_list, current = nvm_dereference(_free_list, sizeof(block)), _last = 0, last = 0; _current; _last = _current, last = current, _current = current -> next, free(current), current = nvm_dereference(current -> next, sizeof(block))) {
 
 		if (current < new) continue;
 
@@ -203,13 +203,13 @@ void at45_free(fsp pointer) {
 
 		}
 
-		at45_push(new, sizeof(block), _new);
+		nvm_push(new, sizeof(block), _new);
 
 		if (last == 0) {
 
 			_free_list = _new;
 
-			at45_push(&_free_list, sizeof(fsp), _FREE_LIST);
+			nvm_push(&_free_list, sizeof(fsp), _FREE_LIST);
 
 			free(new);
 
@@ -237,9 +237,9 @@ void at45_free(fsp pointer) {
 
 	}
 
-	at45_push(last, sizeof(block), _last);
+	nvm_push(last, sizeof(block), _last);
 
-	for (_current = _free_list, current = at45_dereference(_free_list, sizeof(block)), _last = 0, last = 0; current -> next != 0; _last = _current, last = current, _current = current -> next, free(current), current = at45_dereference(current -> next, sizeof(block))) free(last);
+	for (_current = _free_list, current = nvm_dereference(_free_list, sizeof(block)), _last = 0, last = 0; current -> next != 0; _last = _current, last = current, _current = current -> next, free(current), current = nvm_dereference(current -> next, sizeof(block))) free(last);
 
 	free(current);
 
@@ -249,7 +249,7 @@ void at45_free(fsp pointer) {
 
 			_free_list = 0;
 
-			at45_push(&_free_list, sizeof(fsp), _FREE_LIST);
+			nvm_push(&_free_list, sizeof(fsp), _FREE_LIST);
 
 		}
 
@@ -257,13 +257,13 @@ void at45_free(fsp pointer) {
 
 			last -> next = 0;
 
-			at45_push(last, sizeof(block), _last);
+			nvm_push(last, sizeof(block), _last);
 
 		}
 
 		_break_value = _last - sizeof(uint32_t);
 
-		at45_push(&_break_value, sizeof(fsp), _BREAK_VALUE);
+		nvm_push(&_break_value, sizeof(fsp), _BREAK_VALUE);
 
 	}
 

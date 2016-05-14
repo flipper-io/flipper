@@ -5,7 +5,7 @@ output = flipper
 # ~ Determine the target. ~ #
 target = $(shell echo $(shell uname -s) | tr A-Z a-z)
 
-# ~ Set target specific macros. ~ */
+# ~ Set target specific macros. */
 ifeq ($(target),darwin)
 
 else ifeq ($(target),linux)

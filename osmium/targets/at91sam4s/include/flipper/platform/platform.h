@@ -3,7 +3,7 @@
 
 #include "atmel.h"
 
-/* ~ Include Flipper Message Runtime specific definitions for this platform. ~ */
+/* Include Flipper Message Runtime specific definitions for this platform. */
 #include "fmr.h"
 
 #define SS AT91C_PA31_NPCS1

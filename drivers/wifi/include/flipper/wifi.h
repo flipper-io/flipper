@@ -1,10 +1,10 @@
 #ifndef __wifi_h__
 #define __wifi_h__
 
-/* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
+/* Include all types and macros exposed by the Flipper Toolbox. */
 #include <flipper/core.h>
 
-/* ~ Declare the virtual driver object. ~ */
+/* Declare the virtual interface for this module. */
 extern const struct _wifi {
 
 	void (* configure)(void);
@@ -13,10 +13,10 @@ extern const struct _wifi {
 
 #ifdef __private_include__
 
-/* ~ Declare the FMR overlay for this driver object. ~ */
+/* Declare the FMR overlay for this driver. */
 enum { _wifi_configure };
 
-/* ~ Declare all function prototypes for this driver. ~ */
+/* Declare each prototype for all functions within this driver. */
 void wifi_configure(void);
 
 #endif

@@ -8,6 +8,6 @@ void button_configure(void) {
 
 uint8_t button_read(void) {
 
-	return (uint8_t)(device.invoke(_button, _button_read, NO_ARGS) & 1);
+	return device.invoke(_button, _button_read, NO_ARGS);
 
 }

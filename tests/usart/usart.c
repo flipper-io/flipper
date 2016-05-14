@@ -10,12 +10,12 @@
 
 int main(int argc, char *argv[]) {
 
-	/* ~ Attach a Flipper device over USB. ~ */
+	/* Attach a Flipper device over USB. */
 	flipper.attach(FLIPPER_SOURCE_USB);
 
 	error.disclose();
 
-	/* ~ Send a trivial string over USART. ~ */
+	/* Send a trivial string over USART. */
 	char *hello = "ABCDEFGHIJK";
 	usart1.push(hello, strlen(hello));
 

@@ -209,7 +209,7 @@ int sam_load_firmware(char *firmware) {
 	printf("Resetting the device.\n");
 	sam.power(true);
 	led.rgb(0, 25, 0);
-	/* ~ Turn on the USART interrupt. ~ */
+	/* Turn on the USART interrupt. */
 //	usart.disable();
 	/* Disconnect Flipper. */
 	usb.disable();

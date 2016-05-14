@@ -1,18 +1,18 @@
 #ifndef __usb_h__
 #define __usb_h__
 
-/* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
+/* Include all types and macros exposed by the Flipper Toolbox. */
 #include <flipper/core.h>
 
-/* ~ Declare the virtual driver object. ~ */
+/* Declare the virtual interface for this module. */
 extern const struct _bus usb;
 
 #ifdef __private_include__
 
-/* ~ Declare the FMR overlay for this driver object. ~ */
+/* Declare the FMR overlay for this driver. */
 enum { _usb_configure, _usb_enable, _usb_disable, _usb_ready, _usb_put, _usb_get, _usb_push, _usb_pull };
 
-/* ~ Declare all function prototypes for this driver. ~ */
+/* Declare each prototype for all functions within this driver. */
 void usb_configure();
 void usb_enable(void);
 void usb_disable(void);

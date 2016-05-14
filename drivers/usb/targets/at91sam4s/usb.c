@@ -30,10 +30,10 @@ uint8_t usb_get(void) {
 
 }
 
-void usb_push(void *source, uint32_t length) {
+void usb_push(void *source, size_t length) {
 
 }
 
-void usb_pull(void *destination, uint32_t length) {
+void usb_pull(void *destination, size_t length) {
 
 }

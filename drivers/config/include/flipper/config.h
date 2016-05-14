@@ -1,12 +1,12 @@
 #ifndef __config_h__
 #define __config_h__
 
-/* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
+/* Include all types and macros exposed by the Flipper Toolbox. */
 #include <flipper/core.h>
 
 enum { CONFIG_NAME };
 
-/* ~ Declare the virtual driver object. ~ */
+/* Declare the virtual interface for this module. */
 extern const struct _config {
 
 	void (* configure)(void);
@@ -17,10 +17,10 @@ extern const struct _config {
 
 #ifdef __private_include__
 
-/* ~ Declare the FMR overlay for this driver object. ~ */
+/* Declare the FMR overlay for this driver. */
 enum { _config_configure, _config_write, _config_read };
 
-/* ~ Declare all function prototypes for this driver. ~ */
+/* Declare each prototype for all functions within this driver. */
 void config_configure(void);
 void config_write(uint8_t key, uint16_t value);
 uint16_t config_read(uint8_t key);

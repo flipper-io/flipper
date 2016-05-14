@@ -24,14 +24,14 @@ struct sockaddr_in network_address;
 
 void network_configure(void *ip) {
 
-	/* ~ Open a socket on the current network. ~ */
+	/* Open a socket on the current network. */
 	network_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 
 	if (network_socket < 0) {
 		error_raise(E_OPEN_SOCK, "");
 	}
 
-	/* ~ Clear the network address. ~ */
+	/* Clear the network address. */
 	bzero(&network_address, sizeof(network_address));
 	network_address.sin_family = AF_INET;
 	network_address.sin_addr.s_addr = inet_addr(ip);

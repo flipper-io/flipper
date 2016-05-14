@@ -1,13 +1,13 @@
 #ifndef __fmr_h__
 #define __fmr_h__
 
-/* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
+/* Include all types and macros exposed by the Flipper Toolbox. */
 #include <flipper/core.h>
 
-/* ~ Include all target related definitions exposed by the Flipper Message Runtime. ~ */
+/* Include all target related definitions exposed by the Flipper Message Runtime. */
 #include <flipper/fmr/target.h>
 
-/* ~ Include platform specific definitions related to the FMR. ~ */
+/* Include platform specific definitions related to the FMR. */
 #include <flipper/platform/platform.h>
 
 #include <flipper/fs.h>
@@ -16,7 +16,7 @@ typedef uint32_t fmr_module;
 
 #define fmr_bundle_id_from_string(string) checksum(string, strlen(string))
 
-/* ~ Define macros to abstract the FMR API. ~ */
+/* Define macros to abstract the FMR API. */
 #define __fmr_count_implicit(_0, _1, _2, _3, _4, _5, _6, n, ...) n
 #define __fmr_count(...) __fmr_count_implicit(__VA_ARGS__, 6, 5, 4, 3, 2, 1, 0)
 #define __six_args(format, x, ...) format(x), __five_args(format, __VA_ARGS__)
@@ -59,7 +59,7 @@ typedef struct _fmr_list {
 	struct _fmr_list *next;
 } fmr_list;
 
-/* ~ Declare the virtual driver object. ~ */
+/* Declare the virtual interface for this module. */
 extern const struct _fmr {
 	void (* configure)(void);
 	fmr_module (* bind)(char *bundle);
@@ -70,10 +70,10 @@ extern const struct _fmr {
 
 #ifdef __private_include__
 
-/* ~ Declare the FMR overlay for this driver object. ~ */
+/* Declare the FMR overlay for this driver. */
 enum { _fmr_configure, _fmr_bind, _fmr_invoke, _fmr_resolve };
 
-/* ~ Declare all function prototypes for this driver. ~ */
+/* Declare each prototype for all functions within this driver. */
 void fmr_configure(void);
 fmr_module fmr_bind(char *bundle);
 uint32_t fmr_invoke(fmr_module handle, uint8_t index, uint8_t argc, ...);

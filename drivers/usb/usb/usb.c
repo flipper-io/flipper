@@ -55,29 +55,29 @@ uint8_t usb_get(void) {
 
 void usb_push(void *source, size_t length) {
 
-	/* ~ Ensure the push request can fit into a single packet. TODO: serialize packets ~ */
+	/* Ensure the push request can fit into a single packet. TODO: serialize packets */
 	if (length > FMR_PACKET_SIZE) { error_raise(E_TOO_BIG, ""); return; }
 
-	/* ~ Send a usb packet to the active device. ~ */
+	/* Send a usb packet to the active device. */
 	hid_transmit_packet((uint8_t)(flipper_device -> handle), source);
 
 }
 
 void usb_pull(void *destination, size_t length) {
 
-	/* ~ Create a buffer into which an entire USB packet can be received. ~ */
+	/* Create a buffer into which an entire USB packet can be received. */
 	void *buffer = malloc(FMR_PACKET_SIZE);
 
-	/* ~ Ensure the request for memory was granted. ~ */
+	/* Ensure the request for memory was granted. */
 	if (!buffer) error_raise(E_NO_MEM, "");
 
-	/* ~ Receive a usb packet from the active device. ~ */
+	/* Receive a usb packet from the active device. */
 	hid_receive_packet((uint8_t)(flipper_device -> handle), buffer);
 
-	/* ~ Copy the appropriate amount of information from the buffer to the destination. ~ */
+	/* Copy the appropriate amount of information from the buffer to the destination. */
 	memcpy(destination, buffer, length);
 
-	/* ~ Free the buffer. ~ */
+	/* Free the buffer. */
 	free(buffer);
 
 }

@@ -2,7 +2,7 @@
 #include <flipper/usart.h>
 #include <flipper/platform/platform.h>
 
-/* ~ ----------------------- USART0 ----------------------- ~ */
+/* ----------------------- USART0 ----------------------- */
 
 void usart0_configure(void *baud) {
 
@@ -12,7 +12,7 @@ void usart0_configure(void *baud) {
 	UCSR1C = (1 << USBS1) | (3 << UCSZ10);
 	UCSR1B = (1 << RXEN1) | (1 << TXEN1);
 
-	/* ~ Enable the USART interrupt. ~ */
+	/* Enable the USART interrupt. */
 
 	// UCSR1B |= (1 << RXCIE1);
 
@@ -56,13 +56,13 @@ uint8_t usart0_get(void) {
 
 }
 
-void usart0_push(void *source, uint32_t length) {
+void usart0_push(void *source, size_t length) {
 
 	while (length --) usart0_put(*(uint8_t *)(source ++));
 
 }
 
-void usart0_pull(void *destination, uint32_t length) {
+void usart0_pull(void *destination, size_t length) {
 
 	while (length --) *(uint8_t *)(destination ++) = usart0_get();
 

@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
 		return EXIT_SUCCESS;
 	}
 
-	/* ~ Attatch this instance of libflipper to the first device present over USB. ~ */
+	/* Attatch this instance of libflipper to the first device present over USB. */
 	flipper.attach();
 
 	if (!strcmp(argv[1], "flash")) {
@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
 
 		if (argc < 4) { printf("\nPlease specify a bundle identifer ('io.flipper.module') as well as the name of the module.\n\n"); return EXIT_FAILURE; }
 
-		/* ~ Parse user input from the variadic argument list. ~ */
+		/* Parse user input from the variadic argument list. */
 		char *bundle = argv[2], *path = argv[3];
 
 		sam.power(0);
@@ -33,19 +33,19 @@ int main(int argc, char *argv[]) {
 
 		usleep(1000);
 
-		/* ~ Send the file to the device. ~ */
+		/* Send the file to the device. */
 		fs.upload(path, bundle);
 
 		usleep(1000);
 
 		sam.power(1);
 
-		/* ~ Let the operating system boot. ~ */
+		/* Let the operating system boot. */
 		usleep(100000);
 
 		uint16_t key = checksum(bundle, strlen(bundle));
 
-		/* ~ Instruct the dynamic loader to load the file. ~ */
+		/* Instruct the dynamic loader to load the file. */
 		fdl.load(key);
 
 	}
@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
 		char *bundle = argv[2];
 		uint16_t key = checksum(bundle, strlen(bundle));
 
-		/* ~ Launch the program. ~ */
+		/* Launch the program. */
 		fdl.launch(key);
 
 	}
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
 		sam.power(0);
 		uint16_t zero = 0;
 
-		/* ~ Zero the FDL break value. ~ */
+		/* Zero the FDL break value. */
 		fdl_write_config(zero, fdl_config_brk);
 
 		sam.power(1);

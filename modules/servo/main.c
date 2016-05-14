@@ -6,7 +6,7 @@
 
 #include <servo.h>
 
-/* ~ Simple program that uses the Flipper module 'servo.' ~ */
+/* Simple program that uses the Flipper module 'servo.' */
 
 int main(int argc, char *argv[]) {
 	
@@ -18,19 +18,19 @@ int main(int argc, char *argv[]) {
 		
 	}
 	
-	/* ~ Attach to a Flipper device over USB. ~ */
+	/* Attach to a Flipper device over USB. */
 	
 	flipper.attach(FLIPPER_SOURCE_NETWORK, "129.21.82.243");
 	
-	/* ~ Configure the 'servo' module. ~ */
+	/* Configure the 'servo' module. */
 	
 	servo.configure();
 	
-	/* ~ Attach the servo to the approprite pin. ~ */
+	/* Attach the servo to the approprite pin. */
 	
 	servo.attach(atoi(argv[1]));
 	
-	/* ~ Rotate the servo to the desired position. ~ */
+	/* Rotate the servo to the desired position. */
 	
 	servo.rotate(atoi(argv[2]));
 	

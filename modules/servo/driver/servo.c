@@ -5,13 +5,13 @@
 #define lower_bound 800
 #define upper_bound 3650
 
-/* ~ Create a handle for the module. ~ */
+/* Create a handle for the module. */
 
 static fmr_module handle;
 
 void servo_configure(void) {
 	
-	/* ~ Registers this module with the Flipper Message Runtime. Also calls the remote configure function. ~ */
+	/* Registers this module with the Flipper Message Runtime. Also calls the remote configure function. */
 	
 	handle = fmr.bind(fmr_bundle_id_from_string("io.flipper.servo"));
 	
@@ -19,7 +19,7 @@ void servo_configure(void) {
 
 void servo_attach(uint8_t pin) {
 	
-	/* ~ Invokes the function 'servo_attach' on the device. ~ */
+	/* Invokes the function 'servo_attach' on the device. */
 	
 	fmr.invoke(handle, _servo_attach, fmr_args(pin));
 	
@@ -33,7 +33,7 @@ long map(float x, float in_min, float in_max, float out_min, float out_max) {
 
 void servo_rotate(uint32_t position) {
 	
-	/* ~ Invokes the function 'qux_on' on the device. ~ */
+	/* Invokes the function 'qux_on' on the device. */
 	
 	long actual = map(position & 0xFF, 0, 255, lower_bound, upper_bound);
 	
