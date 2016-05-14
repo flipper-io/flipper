@@ -1,6 +1,6 @@
 {-|
-Module      : Flipper.Internal.AT45
-Description : Internal AT45 Module
+Module      : Flipper.Internal.NVM
+Description : Internal NVM Module
 Copyright   : George Morgan, Travis Whitaker 2016
 License     : All rights reserved.
 Maintainer  : travis@flipper.io
@@ -9,7 +9,7 @@ Portability : Windows, POSIX
 
 -}
 
-module Flipper.Internal.AT45 (
+module Flipper.Internal.NVM (
     enable
   , disable
   , reset
@@ -34,38 +34,38 @@ import Data.IORef
 import Data.Word
 
 enable :: IO ()
-enable = c_at45_enable
+enable = c_nvm_enable
 
 disable :: IO ()
-disable = c_at45_disable
+disable = c_nvm_disable
 
 reset :: IO ()
-reset = c_at45_reset
+reset = c_nvm_reset
 
 read :: FSHandle -> IO ()
-read = c_at45_read . unFSHandle
+read = c_nvm_read . unFSHandle
 
 get :: IO Word8
-get = c_at45_get
+get = c_nvm_get
 
 alloc :: Word32 -> IO FSHandle
-alloc = (FSHandle <$>) . c_at45_alloc
+alloc = (FSHandle <$>) . c_nvm_alloc
 
 free :: FSHandle -> IO ()
-free = c_at45_free . unFSHandle
+free = c_nvm_free . unFSHandle
 
 format :: IO ()
-format = c_at45_format
+format = c_nvm_format
 
 push :: Buffer -> FSHandle -> IO ()
 push (Buffer p o l) (FSHandle h) = withForeignPtr p $ \p' ->
-    c_at45_push (plusPtr p' o) (fromIntegral l) h
+    c_nvm_push (plusPtr p' o) (fromIntegral l) h
 
 pull :: FSHandle -> Int -> IO Buffer
 pull (FSHandle h) l
     | l <= 0    = error "pull: length must be greater than zero."
     | otherwise = do b@(Buffer p _ _) <- allocBufferSafe l
-                     withForeignPtr p (\p' -> c_at45_pull p' (fromIntegral l) h)
+                     withForeignPtr p (\p' -> c_nvm_pull p' (fromIntegral l) h)
                      return b
 
 pullAdvance :: FSHandle -> IO (Int -> IO Buffer)
@@ -74,7 +74,7 @@ pullAdvance (FSHandle h) = pullOnce <$> newIORef h
                 | l <= 0    = error "pullAdvance: length must be greater than zero."
                 | otherwise = do h' <- readIORef hp
                                  b@(Buffer p _ _) <- allocBufferSafe l
-                                 withForeignPtr p (\p' -> c_at45_pull p' (fromIntegral l) h')
+                                 withForeignPtr p (\p' -> c_nvm_pull p' (fromIntegral l) h')
                                  modifyIORef' hp (+ (fromIntegral l))
                                  return b
 
@@ -83,39 +83,39 @@ pullAdvance (FSHandle h) = pullOnce <$> newIORef h
 dereference :: FSHandle -> Int -> IO Buffer
 dereference (FSHandle h) l
     | l <= 0 = error "dereference: length must be greater than zero."
-    | otherwise = do p  <- c_at45_dereference h (fromIntegral l)
+    | otherwise = do p  <- c_nvm_dereference h (fromIntegral l)
                      fp <- newForeignPtr finalizerFree p
                      return $ Buffer fp 0 l
 
-foreign import ccall safe "flipper/at45.h at45_enable"
-    c_at45_enable :: IO ()
+foreign import ccall safe "flipper/nvm.h nvm_enable"
+    c_nvm_enable :: IO ()
 
-foreign import ccall safe "flipper/at45.h at45_disable"
-    c_at45_disable :: IO ()
+foreign import ccall safe "flipper/nvm.h nvm_disable"
+    c_nvm_disable :: IO ()
 
-foreign import ccall safe "flipper/at45.h at45_reset"
-    c_at45_reset :: IO ()
+foreign import ccall safe "flipper/nvm.h nvm_reset"
+    c_nvm_reset :: IO ()
 
-foreign import ccall safe "flipper/at45.h at45_read"
-    c_at45_read :: Word32 -> IO ()
+foreign import ccall safe "flipper/nvm.h nvm_read"
+    c_nvm_read :: Word32 -> IO ()
 
-foreign import ccall safe "flipper/at45.c at45_get"
-    c_at45_get :: IO Word8
+foreign import ccall safe "flipper/nvm.c nvm_get"
+    c_nvm_get :: IO Word8
 
-foreign import ccall safe "flipper/at45.h at45_alloc"
-    c_at45_alloc :: Word32 -> IO Word32
+foreign import ccall safe "flipper/nvm.h nvm_alloc"
+    c_nvm_alloc :: Word32 -> IO Word32
 
-foreign import ccall safe "flipper/at45.h at45_free"
-    c_at45_free :: Word32 -> IO ()
+foreign import ccall safe "flipper/nvm.h nvm_free"
+    c_nvm_free :: Word32 -> IO ()
 
-foreign import ccall safe "flipper/at45.h at45_format"
-    c_at45_format :: IO ()
+foreign import ccall safe "flipper/nvm.h nvm_format"
+    c_nvm_format :: IO ()
 
-foreign import ccall safe "flipper/at45.h at45_push"
-    c_at45_push :: Ptr Word8 -> Word32 -> Word32 -> IO ()
+foreign import ccall safe "flipper/nvm.h nvm_push"
+    c_nvm_push :: Ptr Word8 -> Word32 -> Word32 -> IO ()
 
-foreign import ccall safe "flipper/at45.h at45_pull"
-    c_at45_pull :: Ptr Word8 -> Word32 -> Word32 -> IO ()
+foreign import ccall safe "flipper/nvm.h nvm_pull"
+    c_nvm_pull :: Ptr Word8 -> Word32 -> Word32 -> IO ()
 
-foreign import ccall safe "flipper/at45.h at45_dereference"
-    c_at45_dereference :: Word32 -> CSize -> IO (Ptr Word8)
+foreign import ccall safe "flipper/nvm.h nvm_dereference"
+    c_nvm_dereference :: Word32 -> CSize -> IO (Ptr Word8)
