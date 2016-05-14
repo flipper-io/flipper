@@ -16,7 +16,7 @@ extern const struct _i2c {
 #ifdef __private_include__
 
 /* Declare the FMR overlay for this driver. */
-enum { _i2c_configure };
+enum { _i2c_configure, _i2c_put, _i2c_get };
 
 /* Declare each prototype for all functions within this driver. */
 void i2c_configure(void);
