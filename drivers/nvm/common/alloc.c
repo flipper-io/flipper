@@ -2,6 +2,8 @@
 #include <flipper/nvm.h>
 #include <flipper/fs.h>
 
+#ifdef __osmium__
+
 typedef struct _block {
 
 	uint32_t size;
@@ -270,3 +272,5 @@ void nvm_free(fsp pointer) {
 	free(new);
 
 }
+
+#endif

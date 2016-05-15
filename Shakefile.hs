@@ -115,6 +115,7 @@ arm_c_prep = [ "-std=gnu99"
              , "-DF_CPU=48054850UL"
              , "-D__osmium__"
              , "-Wno-pragmas"
+             , "--specs=rdimon.specs"
              ]
 
 -- | Preprocessor options for assembly arm targets.

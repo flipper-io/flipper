@@ -23,6 +23,8 @@
 #define nvm_payload_hi(page) (page >> 6)
 #define nvm_payload_lo(page) (page << 2)
 
+#ifdef __osmium__
+
 uint8_t nvm_get_status(void) {
 
 	/* Reset the device to prepare it for the incoming opcode. */
@@ -375,3 +377,5 @@ void *nvm_dereference(fsp source, size_t length) {
 	return destination;
 
 }
+
+#endif
