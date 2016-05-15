@@ -3,18 +3,30 @@
  */
 public class Led {
 
-    private Flipper._flipper mFlipper;
+    private Flipper mFlipper;
 
-    public Led(Flipper._flipper flipper) {
+    Led(Flipper flipper) {
         mFlipper = flipper;
-        mFlipper.led_configure();
     }
 
+    /**
+     * Configures the on-board RBG LED.
+     */
     public void configure() {
-        mFlipper.led_configure();
+        mFlipper.error.clear();
+        mFlipper.getBinding().led_configure();
+        Error.checkErrorCode(mFlipper.error.get());
     }
 
+    /**
+     * Sets the color of Flipper's RGB LED.
+     * @param red The component of red, 0-255.
+     * @param green The component of green, 0-255.
+     * @param blue The component of blue, 0-255.
+     */
     public void setRGB(int red, int green, int blue) {
-        mFlipper.led_set_rgb((byte) red, (byte) green, (byte) blue);
+        mFlipper.error.clear();
+        mFlipper.getBinding().led_set_rgb((byte) red, (byte) green, (byte) blue);
+        Error.checkErrorCode(mFlipper.error.get());
     }
 }

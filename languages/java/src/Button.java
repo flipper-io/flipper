@@ -3,17 +3,29 @@
  */
 public class Button {
 
-    private Flipper._flipper mFlipper;
+    private Flipper mFlipper;
 
-    public Button(Flipper._flipper flipper) {
+    Button(Flipper flipper) {
         mFlipper = flipper;
     }
 
+    /**
+     * Configures the on-board button.
+     */
     public void configure() {
-        mFlipper.button_configure();
+        mFlipper.error.clear();
+        mFlipper.getBinding().button_configure();
+        Error.checkErrorCode(mFlipper.error.get());
     }
 
+    /**
+     * Reads the state of Flipper's button.
+     * @return True if the button is pressed, false otherwise.
+     */
     public boolean read() {
-        return mFlipper.button_read() != 0;
+        mFlipper.error.clear();
+        boolean value = mFlipper.getBinding().button_read() != 0;
+        Error.checkErrorCode(mFlipper.error.get());
+        return value;
     }
 }
