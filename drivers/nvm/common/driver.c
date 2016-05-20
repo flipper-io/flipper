@@ -279,10 +279,10 @@ void nvm_push(void *source, size_t length, fsp destination) {
     disable_interrupts();
     
 	/* Calculate the page of the address. */
-	uint16_t page = destination / nvm_PAGE_SIZE;
+	uint16_t page = destination / NVM_PAGE_SIZE;
 
 	/* Calculate the destination of the address. */
-	uint16_t offset = destination % nvm_PAGE_SIZE;
+	uint16_t offset = destination % NVM_PAGE_SIZE;
 
 	/* Move the data from the page into the buffer. */
 	nvm_transfer_page_to_buffer_with_erase(page, 0);
@@ -300,7 +300,7 @@ void nvm_push(void *source, size_t length, fsp destination) {
 		offset ++;
 
 		/* If we've reached the end of the page, move to the next one. */
-		if (offset % nvm_PAGE_SIZE == 0) {
+		if (offset % NVM_PAGE_SIZE == 0) {
 
 			/* Reset the offset. */
 			offset = 0;
@@ -333,7 +333,7 @@ void nvm_push(void *source, size_t length, fsp destination) {
 
 void nvm_read(fsp address) {
 
-	nvm_begin_continuous_read(address / nvm_PAGE_SIZE, address % nvm_PAGE_SIZE);
+	nvm_begin_continuous_read(address / NVM_PAGE_SIZE, address % NVM_PAGE_SIZE);
 
 }
 
@@ -348,10 +348,10 @@ void nvm_pull(void *destination, size_t length, fsp source) {
     disable_interrupts();
     
 	/* Calculate the page of the address. */
-	uint16_t page = source / nvm_PAGE_SIZE;
+	uint16_t page = source / NVM_PAGE_SIZE;
 
 	/* Calculate the offset of the address. */
-	uint16_t offset = source % nvm_PAGE_SIZE;
+	uint16_t offset = source % NVM_PAGE_SIZE;
 
 	/* Begin a continuous memory array read. */
 	nvm_begin_continuous_read(page, offset);

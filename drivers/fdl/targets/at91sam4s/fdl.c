@@ -140,7 +140,7 @@ void *fdl_load(uint16_t key) {
 	//if (__fdl_brk + total > TOTAL_PAGES) { serprintf("Not enough internal memory to satisfy load request. Have %i and %i was requested.\n", TOTAL_PAGES - __fdl_brk, total); return NULL; }
 
 	/* Start the loading process by opening a continuous read from external flash given the page and offset at which the program is located. */
-	nvm_begin_continuous_read((l -> data / nvm_PAGE_SIZE), (l -> data % nvm_PAGE_SIZE));
+	nvm_begin_continuous_read((l -> data / NVM_PAGE_SIZE), (l -> data % NVM_PAGE_SIZE));
 
 	/* Configure the EFC. 48 clocks per ns. 1 FWS. */
 	set_bits_in_port_with_mask(AT91C_BASE_MC -> MC_FMR, ((0x30 << 16) & AT91C_MC_FMCN) | AT91C_MC_FWS_1FWS);

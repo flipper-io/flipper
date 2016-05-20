@@ -4,7 +4,7 @@
 /* Include all types and macros exposed by the Flipper Toolbox. */
 #include <flipper/core.h>
 
-#define nvm_PAGE_SIZE 528
+#define NVM_PAGE_SIZE 528
 
 /* Declare the virtual interface for this module. */
 extern const struct _nvm {
