@@ -12,6 +12,7 @@ Portability : Windows, POSIX
 module Flipper.Internal.FDL (
     FDLKey()
   , FDLAddress()
+  , bundleKey
   , load
   , launch
   , resolve
@@ -21,8 +22,16 @@ import Data.Word
 
 import Foreign.Ptr
 
+import Flipper.Bufferable
+import Flipper.Put
+
+import qualified Flipper.Internal.FS as FS
+
 newtype FDLKey = FDLKey { unFDLKey :: Word16 }
 newtype FDLAddress = FDLAddress { unFDLAddress :: Ptr Word8 }
+
+bundleKey :: String -> FDLKey
+bundleKey = FDLKey . FS.checksum . runPut . put
 
 load :: FDLKey -> IO FDLAddress
 load = fmap FDLAddress . c_fdl_load . unFDLKey

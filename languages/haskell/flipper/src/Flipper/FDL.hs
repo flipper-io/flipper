@@ -12,6 +12,7 @@ Portability : Windows, POSIX
 module Flipper.FDL (
     I.FDLKey()
   , I.FDLAddress()
+  , bundleKey
   , load
   , launch
   , resolve
@@ -20,6 +21,9 @@ module Flipper.FDL (
 import Flipper.MonadFlipper
 
 import qualified Flipper.Internal.FDL as I
+
+bundleKey :: String -> I.FDLKey
+bundleKey = I.bundleKey
 
 load :: MonadFlipper m => I.FDLKey -> m I.FDLAddress
 load = bracketIO . I.load
