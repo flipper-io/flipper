@@ -45,9 +45,9 @@
 #define MOSI                    0x02
 #define MISO                    0x03
 
-#define BUTTON_DDR              DDRD
-#define BUTTON_IN               PIND
-#define BUTTON_PIN              0x00
+#define BUTTON_DDR              DDRC
+#define BUTTON_IN               PINC
+#define BUTTON_PIN              0x06
 
 #define SAM_POWER_DDR           DDRD
 #define SAM_POWER_PORT          PORTD
@@ -55,14 +55,14 @@
 
 #define SAM_RESET_DDR           DDRD
 #define SAM_RESET_PORT          PORTD
-#define SAM_RESET_PIN           0x04
+#define SAM_RESET_PIN           0x05
 
 #define SAM_TEST_DDR            DDRD
 #define SAM_TEST_PORT           PORTD
-#define SAM_TEST_PIN            0x05
+#define SAM_TEST_PIN            0x04
 
-#define SAM_ERASE_DDR           DDRC
-#define SAM_ERASE_PORT          PORTC
-#define SAM_ERASE_PIN           0x05
+#define SAM_ERASE_DDR           DDRD
+#define SAM_ERASE_PORT          PORTD
+#define SAM_ERASE_PIN           0x06
 
 #endif

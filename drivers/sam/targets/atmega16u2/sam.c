@@ -16,10 +16,10 @@ void sam_configure(void) {
 	set_bit_in_port(SAM_TEST_PIN, SAM_TEST_DDR);
 
 	/* Dessert the 7S' reset pin. */
-	clear_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
+	//clear_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
 
 	/* Configure the 7S' reset pin as an output. */
-	set_bit_in_port(SAM_RESET_PIN, SAM_RESET_DDR);
+	//set_bit_in_port(SAM_RESET_PIN, SAM_RESET_DDR);
 
 	/* Configure the 7S' erase pin as an output. */
 	set_bit_in_port(SAM_ERASE_PIN, SAM_ERASE_DDR);
@@ -135,7 +135,7 @@ void sam_format(void) {
 	sam_set_power(false);
 
 	/* Wait for the 7S to power down. */
-	delay_ms(50);
+	delay_ms(500);
 
 	/* Put the 7S into erase mode by pulling its erase pin high. */
 	set_bit_in_port(SAM_ERASE_PIN, SAM_ERASE_PORT);
@@ -144,7 +144,10 @@ void sam_format(void) {
 	set_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
 
 	/* Wait for flash to be completely erased. */
-	delay_seconds(1);
+	delay_seconds(5);
+	delay_seconds(5);
+	delay_seconds(5);
+	delay_seconds(5);
 
 	/* Power down the 7S. */
 	clear_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
@@ -153,7 +156,7 @@ void sam_format(void) {
 	clear_bit_in_port(SAM_ERASE_PIN, SAM_ERASE_PORT);
 
 	/* Wait for everything to settle. */
-	delay_ms(50);
+	delay_ms(500);
 
 	/* Power the 7S back on. */
 	sam_set_power(true);

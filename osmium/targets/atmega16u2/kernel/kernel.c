@@ -7,15 +7,6 @@ extern void usb_receive_interrupt(void);
 
 int main(void) {
 
-	led_configure();
-	sam_configure();
-
-	led.rgb(0, 16, 0);
-
-	sam.power(0);
-
-	while (1);
-
 	/* -- PLATFORM SPECIFIC INITIALIZATION -- */
 
 	/* !!! Perhaps engaging the WDT would be a good idea. In the event of a timeout, the device can reset, throw a warning, and continue. !!! */

@@ -155,11 +155,11 @@ which s = do
 -- | Determine under which name arm gcc is installed.
 arm_gcc :: Action FilePath
 arm_gcc = (fromMaybe (error "ARM gcc isn't available in $PATH") . msum)
-        <$> sequence [ which "arm-elf-gcc"
-                     , which "arm-elf-eabi-gcc"
+        <$> sequence [ which "arm-elf-eabi-gcc"
+                     , which "arm-elf-gcc"
                      , which "arm-eabi-newlib-gcc"
                      , which "arm-none-eabi-gcc"
-                     , which "/opt/local/bin/arm-elf-gcc"
+                     , which "/opt/local/bin/arm-elf-eabi-gcc"
                      ]
 
 -- | Determine under which name arm objcopy is installed.
