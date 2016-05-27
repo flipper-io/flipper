@@ -22,6 +22,8 @@ module Flipper.NVM (
     enable
   , disable
   , reset
+    -- * Allocating Space
+  , alloc
     -- * Reading and Writing Data
   , push
   , pushHandle
