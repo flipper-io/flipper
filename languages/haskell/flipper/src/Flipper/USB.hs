@@ -16,30 +16,42 @@ module Flipper.USB (
     enable
   , disable
     -- * Sending/Receiving Data
+  , put
+  , get
   , push
   , pull
   ) where
 
+import Data.Word
+
 import Flipper.Buffer
-import Flipper.Bufferable
 import Flipper.Get
 import Flipper.Put
 import Flipper.MonadFlipper
 
+import qualified Flipper.Bufferable   as B
 import qualified Flipper.Internal.USB as I
 
 -- | Enable USB.
 enable :: MonadFlipper m => m ()
-enable = bracketIO I.usbEnable
+enable = bracketIO I.enable
 
 -- | Disable USB.
 disable :: MonadFlipper m => m ()
-disable = bracketIO I.usbDisable
+disable = bracketIO I.disable
+
+-- | Send a byte over USB.
+put :: MonadFlipper m => Word8 -> m ()
+put = bracketIO . I.put
+
+-- | Receive a byte over USB.
+get :: MonadFlipper m => m Word8
+get = bracketIO I.get
 
 -- | Send any 'Bufferable' data to the device over USB.
-push :: (Bufferable b, MonadFlipper m) => b -> m ()
-push = bracketIO . I.usbPush . runPut . put
+push :: (B.Bufferable b, MonadFlipper m) => b -> m ()
+push = bracketIO . I.push . runPut . B.put
 
 -- | Receive any 'Bufferable' data from the device over USB.
-pull :: (Bufferable b, MonadFlipper m) => m (Either String b)
-pull = runGetWith get (bracketIO . I.usbPull) emptyBuffer
+pull :: (B.Bufferable b, MonadFlipper m) => m (Either String b)
+pull = runGetWith B.get (bracketIO . I.pull) emptyBuffer

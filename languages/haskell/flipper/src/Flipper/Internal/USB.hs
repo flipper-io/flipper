@@ -10,10 +10,12 @@ Portability : Windows, POSIX
 -}
 
 module Flipper.Internal.USB (
-    usbEnable
-  , usbDisable
-  , usbPush
-  , usbPull
+    enable
+  , disable
+  , put
+  , get
+  , push
+  , pull
   ) where
 
 import Data.Word
@@ -25,27 +27,27 @@ import Foreign.ForeignPtr
 import Foreign.Marshal.Utils
 import Foreign.Ptr
 
-usbEnable :: IO ()
-usbEnable = c_usb_enable
+enable :: IO ()
+enable = c_usb_enable
 
-usbDisable :: IO ()
-usbDisable = c_usb_disable
+disable :: IO ()
+disable = c_usb_disable
 
-usbReady :: IO Bool
-usbReady = toBool <$> c_usb_ready
+ready :: IO Bool
+ready = toBool <$> c_usb_ready
 
-usbPut :: Word8 -> IO ()
-usbPut = c_usb_put
+put :: Word8 -> IO ()
+put = c_usb_put
 
-usbGet :: IO Word8
-usbGet = c_usb_get
+get :: IO Word8
+get = c_usb_get
 
-usbPush :: Buffer -> IO ()
-usbPush (Buffer p o l) = withForeignPtr p $ \p' ->
+push :: Buffer -> IO ()
+push (Buffer p o l) = withForeignPtr p $ \p' ->
     c_usb_push (plusPtr p' o) (fromIntegral l)
 
-usbPull :: Int -> IO Buffer
-usbPull l
+pull :: Int -> IO Buffer
+pull l
     | l <= 0    = error "usbPull: length must be greater than zero."
     | otherwise = do b@(Buffer p _ _) <- allocBufferSafe l
                      withForeignPtr p (\p' -> c_usb_pull p' (fromIntegral l))

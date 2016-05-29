@@ -16,16 +16,19 @@ module Flipper.SPI (
     enable
   , disable
     -- * Sending/Receiving Data
+  , put
+  , get
   , push
-  , pull
-  ) where
+  , pull) where
+
+import Data.Word
 
 import Flipper.Buffer
-import Flipper.Bufferable
 import Flipper.Get
 import Flipper.Put
 import Flipper.MonadFlipper
 
+import qualified Flipper.Bufferable   as B
 import qualified Flipper.Internal.SPI as I
 
 -- | Enable the SPI bus.
@@ -36,10 +39,18 @@ enable = bracketIO I.enable
 disable :: MonadFlipper m => m ()
 disable = bracketIO I.disable
 
+-- | Send a byte over the SPI bus.
+put :: MonadFlipper m => Word8 -> m ()
+put = bracketIO . I.put
+
+-- | Receive a byte over the SPI bus.
+get :: MonadFlipper m => m Word8
+get = bracketIO I.get
+
 -- Send any 'Bufferable' data over the SPI bus.
-push :: (Bufferable b, MonadFlipper m) => b -> m ()
-push = bracketIO . I.push . runPut . put
+push :: (B.Bufferable b, MonadFlipper m) => b -> m ()
+push = bracketIO . I.push . runPut . B.put
 
 -- Receive any 'Bufferable' data over the SPI bus.
-pull :: (Bufferable b, MonadFlipper m) => m (Either String b)
-pull = runGetWith get (bracketIO . I.pull) emptyBuffer
+pull :: (B.Bufferable b, MonadFlipper m) => m (Either String b)
+pull = runGetWith B.get (bracketIO . I.pull) emptyBuffer
