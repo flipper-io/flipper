@@ -5,7 +5,9 @@
 obj-c/*.framework
 obj-c/build
 *.o
-*.m
+*.so
+*.a
+*.mk
 *.pyc
 *.elf
 *.bin
