@@ -12,14 +12,20 @@ Portability : Windows, POSIX
 module Flipper.Internal.USART (
     usart0Enable
   , usart0Disable
+  , usart0Put
+  , usart0Get
   , usart0Push
   , usart0Pull
   , usart1Enable
   , usart1Disable
+  , usart1Put
+  , usart1Get
   , usart1Push
   , usart1Pull
   , dbguEnable
   , dbguDisable
+  , dbguPut
+  , dbguGet
   , dbguPush
   , dbguPull
   ) where

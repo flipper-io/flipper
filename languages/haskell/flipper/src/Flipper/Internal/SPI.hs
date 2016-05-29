@@ -12,6 +12,8 @@ Portability : Windows, POSIX
 module Flipper.Internal.SPI (
     enable
   , disable
+  , put
+  , get
   , push
   , pull
   ) where
