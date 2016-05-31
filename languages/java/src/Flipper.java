@@ -72,7 +72,6 @@ public class Flipper {
         void nvm_format();
         void nvm_push(Pointer source, int length, int destination);
         void nvm_pull(Pointer destination, int length, int source);
-        Pointer nvm_dereference(int source, int length);
     }
 
     /**
@@ -97,6 +96,7 @@ public class Flipper {
     public final Error error = new Error(this);
     public final Fs fs = new Fs(this);
     public final I2c i2c = new I2c(this);
+    public final Nvm nvm = new Nvm(this);
 
     /**
      * Constructs a Flipper object bound to a Flipper with the given name
@@ -105,13 +105,13 @@ public class Flipper {
      * @param name The name of the Flipper device to connect to.
      */
     public Flipper(int endpoint, String name) {
-        //getBinding().flipper_attach_name(endpoint, name);
+        getBinding().flipper_attach_name(endpoint, name);
     }
 
     /**
      * Constructs an instance of Flipper.
      */
     public Flipper() {
-        //getBinding().flipper_attach();
+        getBinding().flipper_attach();
     }
 }
