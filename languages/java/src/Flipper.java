@@ -1,5 +1,6 @@
 import com.sun.jna.Library;
 import com.sun.jna.Native;
+import com.sun.jna.Pointer;
 
 /**
  * Created by Nick Mosher on 4/1/16.
@@ -41,6 +42,37 @@ public class Flipper {
         //Flipper led driver bindings.
         void led_configure();
         void led_set_rgb(byte red, byte green, byte blue);
+
+        //Flipper filesystem driver bindings.
+        void fs_configure();
+        void fs_format();
+        int fs_data(String name);
+        int fs_upload(String path, String name);
+        void fs_download(String name, String path);
+
+        //Flipper config driver bindings.
+        void config_configure();
+        void config_write(byte key, short value);
+        short config_read(byte key);
+
+        //Flipper I2c driver bindings.
+        void i2c_configure();
+        int i2c_put(int mode, int address, Pointer data, int length);
+        int i2c_get(int mode, int address, Pointer data, int length);
+
+        //Flipper Nvm driver bindings.
+        void nvm_configure();
+        void nvm_enable();
+        void nvm_disable();
+        void nvm_reset();
+        void nvm_read(int address);
+        byte nvm_get();
+        int nvm_alloc(int length);
+        void nvm_free(int pointer);
+        void nvm_format();
+        void nvm_push(Pointer source, int length, int destination);
+        void nvm_pull(Pointer destination, int length, int source);
+        Pointer nvm_dereference(int source, int length);
     }
 
     /**
@@ -63,6 +95,8 @@ public class Flipper {
     public final Button button = new Button(this);
     public final Led led = new Led(this);
     public final Error error = new Error(this);
+    public final Fs fs = new Fs(this);
+    public final I2c i2c = new I2c(this);
 
     /**
      * Constructs a Flipper object bound to a Flipper with the given name
@@ -71,13 +105,13 @@ public class Flipper {
      * @param name The name of the Flipper device to connect to.
      */
     public Flipper(int endpoint, String name) {
-        getBinding().flipper_attach_name(endpoint, name);
+        //getBinding().flipper_attach_name(endpoint, name);
     }
 
     /**
      * Constructs an instance of Flipper.
      */
     public Flipper() {
-        getBinding().flipper_attach();
+        //getBinding().flipper_attach();
     }
 }
