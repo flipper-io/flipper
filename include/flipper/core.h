@@ -10,11 +10,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* Include types exposed by the Flipper Message Runtime. */
-#include <flipper/fmr/bus.h>
-
 /* Define the filesystem pointer type. */
 typedef uint32_t fsp;
+typedef uint32_t fmr_size_t;
+
+/* Include types exposed by the Flipper Message Runtime. */
+#include <flipper/fmr/bus.h>
 
 /* Define a macro for verbose printing. */
 #if defined(__verbose__)

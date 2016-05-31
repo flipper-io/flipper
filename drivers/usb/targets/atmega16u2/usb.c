@@ -33,13 +33,13 @@ uint8_t usb_get(void) {
 
 }
 
-void usb_push(void *source, size_t length) {
+void usb_push(void *source, fmr_size_t length) {
 
 	usb_send_packet(source);
 
 }
 
-void usb_pull(void *destination, size_t length) {
+void usb_pull(void *destination, fmr_size_t length) {
 
 	uint8_t size = 0;
 

@@ -65,7 +65,7 @@ extern const struct _fmr {
 	fmr_module (* bind)(char *bundle);
 	uint32_t (* invoke)(fmr_module handle, uint8_t index, uint8_t argc, ...);
 	uint32_t (* invoke_list)(fmr_module handle, uint8_t index, fmr_list *args);
-	void *(* resolve)(void *source, size_t length);
+	void *(* resolve)(void *source, fmr_size_t length);
 } fmr;
 
 #ifdef __private_include__
@@ -78,7 +78,7 @@ void fmr_configure(void);
 fmr_module fmr_bind(char *bundle);
 uint32_t fmr_invoke(fmr_module handle, uint8_t index, uint8_t argc, ...);
 uint32_t fmr_invoke_list(fmr_module handle, uint8_t index, fmr_list *args);
-void *fmr_resolve(void *source, size_t length);
+void *fmr_resolve(void *source, fmr_size_t length);
 
 #endif
 #endif

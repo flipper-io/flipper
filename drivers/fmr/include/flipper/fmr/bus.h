@@ -12,8 +12,8 @@ struct _bus {
 	uint8_t (* const ready)(void);
 	void (* const put)(uint8_t byte);
 	uint8_t (* const get)(void);
-	void (* const push)(void *source, size_t length);
-	void (* const pull)(void *destination, size_t length);
+	void (* const push)(void *source, fmr_size_t length);
+	void (* const pull)(void *destination, fmr_size_t length);
 
 	uint8_t synchronous;
 

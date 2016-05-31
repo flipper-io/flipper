@@ -41,7 +41,7 @@ uint32_t self_invoke(const struct _target *sender) {
 	return 0;
 }
 
-uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, size_t length) {
+uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, fmr_size_t length) {
 
 	/* Allocate the appropriate amount of memory in external memory to buffer the incoming data. */
 	void *destination = malloc(length);
@@ -83,7 +83,7 @@ uint32_t self_push(uint8_t object, uint8_t index, uint8_t argc, size_t length) {
 	uint32_t len = length;
 
 	/* Calculate the amount of space we have left in the packet after the parameters have been loaded. */
-	size_t remaining = FMR_PACKET_SIZE - (sizeof(struct _fmr_header) + sizeof(struct _fmr_recipient) + fmrpacket.recipient.argc + argc);
+	fmr_size_t remaining = FMR_PACKET_SIZE - (sizeof(struct _fmr_header) + sizeof(struct _fmr_recipient) + fmrpacket.recipient.argc + argc);
 
 	/* Save the destination in a local variable we can modify. */
 	void *dest = destination;
@@ -145,7 +145,7 @@ pull:
 
 }
 
-uint32_t self_pull(uint8_t object, uint8_t index, uint8_t argc, size_t length) {
+uint32_t self_pull(uint8_t object, uint8_t index, uint8_t argc, fmr_size_t length) {
 
 	/* Allocate the appropriate amount of memory in external memory to buffer the outgoing data. */
 	void *source = malloc(length);
@@ -192,7 +192,7 @@ uint32_t self_pull(uint8_t object, uint8_t index, uint8_t argc, size_t length) {
 	uint32_t retval = self_call();
 
 	/* Calculate how much space we have left in the current packet. */
-	size_t remaining;
+	fmr_size_t remaining;
 
 	/* Create a local variable to keep track of the offset in the packet at which we are loading data. */
 	uint8_t *offset;

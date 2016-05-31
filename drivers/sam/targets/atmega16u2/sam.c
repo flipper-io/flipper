@@ -144,10 +144,7 @@ void sam_format(void) {
 	set_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
 
 	/* Wait for flash to be completely erased. */
-	delay_seconds(5);
-	delay_seconds(5);
-	delay_seconds(5);
-	delay_seconds(5);
+	delay_ms(5000);
 
 	/* Power down the 7S. */
 	clear_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);

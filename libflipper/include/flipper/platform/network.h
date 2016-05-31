@@ -17,8 +17,8 @@ void network_disable(void);
 uint8_t network_ready(void);
 void network_put(uint8_t byte);
 uint8_t network_get(void);
-void network_push(void *source, size_t length);
-void network_pull(void *source, size_t length);
+void network_push(void *source, fmr_size_t length);
+void network_pull(void *source, fmr_size_t length);
 
 #endif
 #endif
