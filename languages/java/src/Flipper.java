@@ -72,6 +72,34 @@ public class Flipper {
         void nvm_format();
         void nvm_push(Pointer source, int length, int destination);
         void nvm_pull(Pointer destination, int length, int source);
+
+        //Flipper Usart driver bindings.
+    void usart0_configure(Pointer baud);
+        void usart0_enable();
+        void usart0_disable();
+        byte usart0_ready();
+        void usart0_put(byte data);
+        byte usart0_get();
+        void usart0_push(Pointer source, int length);
+        void usart0_pull(Pointer destination, int length);
+
+        void usart1_configure(Pointer baud);
+        void usart1_enable();
+        void usart1_disable();
+        byte usart1_ready();
+        void usart1_put(byte data);
+        byte usart1_get();
+        void usart1_push(Pointer source, int length);
+        void usart1_pull(Pointer destination, int length);
+
+        void dbgu_configure(Pointer baud);
+        void dbgu_enable();
+        void dbgu_disable();
+        byte dbgu_ready();
+        void dbgu_put(byte data);
+        byte dbgu_get();
+        void dbgu_push(Pointer source, int length);
+        void dbgu_pull(Pointer destination, int length);
     }
 
     /**
@@ -97,6 +125,9 @@ public class Flipper {
     public final Fs fs = new Fs(this);
     public final I2c i2c = new I2c(this);
     public final Nvm nvm = new Nvm(this);
+    public final Usart usart0 = new Usart(this, Usart.USART0);
+    public final Usart usart1 = new Usart(this, Usart.USART1);
+    public final Usart dbgu = new Usart(this, Usart.DGBU);
 
     /**
      * Constructs a Flipper object bound to a Flipper with the given name
