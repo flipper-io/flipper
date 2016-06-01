@@ -118,4 +118,4 @@ foreign import ccall safe "flipper/nvm.h nvm_pull"
     c_nvm_pull :: Ptr Word8 -> Word32 -> Word32 -> IO ()
 
 foreign import ccall safe "flipper/nvm.h nvm_dereference"
-    c_nvm_dereference :: Word32 -> CSize -> IO (Ptr Word8)
+    c_nvm_dereference :: Word32 -> Word32 -> IO (Ptr Word8)

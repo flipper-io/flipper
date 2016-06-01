@@ -33,4 +33,4 @@ checksum (Buffer fp o l) = unsafeDupablePerformIO $
     withForeignPtr fp (\p -> return (c_fs_checksum (plusPtr p o) (fromIntegral l)))
 
 foreign import ccall safe "flipper/fs/crc.h checksum"
-    c_fs_checksum :: Ptr Word8 -> CSize -> Word16
+    c_fs_checksum :: Ptr Word8 -> Word32 -> Word16
