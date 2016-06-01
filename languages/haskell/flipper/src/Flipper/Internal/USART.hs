@@ -133,10 +133,10 @@ foreign import ccall safe "flipper/usart.h usart0_get"
     c_usart0_get :: IO Word8
 
 foreign import ccall safe "flipper/usart.h usart0_push"
-    c_usart0_push :: Ptr Word8 -> CSize -> IO ()
+    c_usart0_push :: Ptr Word8 -> Word32 -> IO ()
 
 foreign import ccall safe "flipper/usart.h usart0_pull"
-    c_usart0_pull :: Ptr Word8 -> CSize -> IO ()
+    c_usart0_pull :: Ptr Word8 -> Word32 -> IO ()
 
 foreign import ccall safe "flipper/usart.h usart1_enable"
     c_usart1_enable :: IO ()
@@ -154,10 +154,10 @@ foreign import ccall safe "flipper/usart.h usart1_get"
     c_usart1_get :: IO Word8
 
 foreign import ccall safe "flipper/usart.h usart1_push"
-    c_usart1_push :: Ptr Word8 -> CSize -> IO ()
+    c_usart1_push :: Ptr Word8 -> Word32 -> IO ()
 
 foreign import ccall safe "flipper/usart.h usart1_pull"
-    c_usart1_pull :: Ptr Word8 -> CSize -> IO ()
+    c_usart1_pull :: Ptr Word8 -> Word32 -> IO ()
 
 foreign import ccall safe "flipper/usart.h dbgu_enable"
     c_dbgu_enable :: IO ()
@@ -175,7 +175,7 @@ foreign import ccall safe "flipper/usart.h dbgu_get"
     c_dbgu_get :: IO Word8
 
 foreign import ccall safe "flipper/usart.h dbgu_push"
-    c_dbgu_push :: Ptr Word8 -> CSize -> IO ()
+    c_dbgu_push :: Ptr Word8 -> Word32 -> IO ()
 
 foreign import ccall safe "flipper/usart.h dbgu_pull"
-    c_dbgu_pull :: Ptr Word8 -> CSize -> IO ()
+    c_dbgu_pull :: Ptr Word8 -> Word32 -> IO ()

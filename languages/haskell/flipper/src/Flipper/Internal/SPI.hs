@@ -69,7 +69,7 @@ foreign import ccall safe "flipper/spi.h spi_get"
     c_spi_get :: IO Word8
 
 foreign import ccall safe "flipper/spi.h spi_push"
-    c_spi_push :: Ptr Word8 -> CSize -> IO ()
+    c_spi_push :: Ptr Word8 -> Word32 -> IO ()
 
 foreign import ccall safe "flipper/spi.h spi_pull"
-    c_spi_pull :: Ptr Word8 -> CSize -> IO ()
+    c_spi_pull :: Ptr Word8 -> Word32 -> IO ()

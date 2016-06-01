@@ -69,7 +69,7 @@ foreign import ccall safe "flipper/usb.h usb_get"
     c_usb_get :: IO Word8
 
 foreign import ccall safe "flipper/usb.h usb_push"
-    c_usb_push :: Ptr Word8 -> CSize -> IO ()
+    c_usb_push :: Ptr Word8 -> Word32 -> IO ()
 
 foreign import ccall safe "flipper/usb.h usb_pull"
-    c_usb_pull :: Ptr Word8 -> CSize -> IO ()
+    c_usb_pull :: Ptr Word8 -> Word32 -> IO ()
