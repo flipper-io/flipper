@@ -55,14 +55,14 @@ uint8_t usart_get_byte(AT91S_USART *usart) {
 
 }
 
-void usart_push(AT91S_USART *usart, void *source, size_t length) {
+void usart_push(AT91S_USART *usart, void *source, fmr_size_t length) {
 
 	/* THIS SHOULD BE OPTIMIZED TO USE THE DMAC. */
 	while (length --) usart_put_byte(usart, *(uint8_t *)(source ++));
 
 }
 
-void usart_pull(AT91S_USART *usart, void *destination, size_t length) {
+void usart_pull(AT91S_USART *usart, void *destination, fmr_size_t length) {
 
 	/* THIS SHOULD BE OPTIMIZED TO USE THE DMAC. */
 	while (length --) *(uint8_t *)(destination ++) = usart_get_byte(usart);
@@ -114,13 +114,13 @@ uint8_t usart0_get(void) {
 
 }
 
-void usart0_push(void *source, size_t length) {
+void usart0_push(void *source, fmr_size_t length) {
 
 	usart_push(AT91C_BASE_US0, source, length);
 
 }
 
-void usart0_pull(void *destination, size_t length) {
+void usart0_pull(void *destination, fmr_size_t length) {
 
 	usart_pull(AT91C_BASE_US0, destination, length);
 
@@ -171,13 +171,13 @@ uint8_t usart1_get(void) {
 
 }
 
-void usart1_push(void *source, size_t length) {
+void usart1_push(void *source, fmr_size_t length) {
 
 	usart_push(AT91C_BASE_US1, source, length);
 
 }
 
-void usart1_pull(void *destination, size_t length) {
+void usart1_pull(void *destination, fmr_size_t length) {
 
 	usart_pull(AT91C_BASE_US1, destination, length);
 
@@ -213,10 +213,10 @@ uint8_t dbgu_get(void) {
 
 }
 
-void dbgu_push(void *source, size_t length) {
+void dbgu_push(void *source, fmr_size_t length) {
 
 }
 
-void dbgu_pull(void *destination, size_t length) {
+void dbgu_pull(void *destination, fmr_size_t length) {
 
 }

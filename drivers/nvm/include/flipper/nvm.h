@@ -14,12 +14,12 @@ extern const struct _nvm {
 	void (* reset)(void);
 	void (* read)(fsp address);
 	uint8_t (* get)(void);
-	fsp (* alloc)(size_t length);
+	fsp (* alloc)(fmr_size_t length);
 	void (* free)(fsp pointer);
 	void (* format)(void);
-	void (* push)(void *source, size_t length, fsp destination);
-	void (* pull)(void *destination, size_t length, fsp source);
-	void *(* dereference)(fsp source, size_t length);
+	void (* push)(void *source, fmr_size_t length, fsp destination);
+	void (* pull)(void *destination, fmr_size_t length, fsp source);
+	void *(* dereference)(fsp source, fmr_size_t length);
 } nvm;
 
 #ifdef __private_include__
@@ -34,12 +34,12 @@ void nvm_disable(void);
 void nvm_reset(void);
 void nvm_read(fsp address);
 uint8_t nvm_get(void);
-fsp nvm_alloc(size_t length);
+fsp nvm_alloc(fmr_size_t length);
 void nvm_free(fsp pointer);
 void nvm_format(void);
-void nvm_push(void *source, size_t length, fsp destination);
-void nvm_pull(void *destination, size_t length, fsp source);
-void *nvm_dereference(fsp source, size_t length);
+void nvm_push(void *source, fmr_size_t length, fsp destination);
+void nvm_pull(void *destination, fmr_size_t length, fsp source);
+void *nvm_dereference(fsp source, fmr_size_t length);
 
 /* Declare all necessary private driver functions. */
 void nvm_transfer_page_to_buffer_with_erase(uint16_t page, uint8_t buffer);

@@ -73,7 +73,7 @@ uint32_t fmr_invoke_list(fmr_module handle, uint8_t index, fmr_list *args) {
 
 }
 
-void *fmr_resolve(void *source, size_t length) {
+void *fmr_resolve(void *source, fmr_size_t length) {
 
 	return NULL;
 

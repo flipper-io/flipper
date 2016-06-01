@@ -12,10 +12,10 @@ extern const struct _fs {
 
 	void (* configure)(void);
 	void (* format)(void);
-//	void (* create)(char *name, void *data, size_t length);
+//	void (* create)(char *name, void *data, fmr_size_t length);
 //	void (* delete)(char *name);
 //  void (* rename)(char *name, char *new);
-//  void (* append)(char *name, void *data, size_t length);
+//  void (* append)(char *name, void *data, fmr_size_t length);
 //  void (* put)(void);
 //  void (* get)(void);
 	fsp (* data)(char *name);

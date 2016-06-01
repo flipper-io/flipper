@@ -6,13 +6,13 @@ void i2c_configure(void) {
 
 }
 
-int i2c_put(int mode, int address, void *data, size_t length) {
+int i2c_put(int mode, int address, void *data, fmr_size_t length) {
 
 	return 0;
 
 }
 
-int i2c_get(int mode, int address, void *data, size_t length) {
+int i2c_get(int mode, int address, void *data, fmr_size_t length) {
 
 	return 0;
 

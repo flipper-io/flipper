@@ -35,7 +35,7 @@ uint8_t nvm_get(void) {
 
 }
 
-fsp nvm_alloc(size_t length) {
+fsp nvm_alloc(fmr_size_t length) {
 
 	return device_invoke(_nvm, _nvm_alloc, 2, hi16(length), lo16(length));
 
@@ -53,19 +53,19 @@ void nvm_format(void) {
 
 }
 
-void nvm_push(void *source, size_t length, fsp destination) {
+void nvm_push(void *source, fmr_size_t length, fsp destination) {
 
 	device_push(_nvm, _nvm_push, 2, source, length, hi16(destination), lo16(destination));
 
 }
 
-void nvm_pull(void *destination, size_t length, fsp source) {
+void nvm_pull(void *destination, fmr_size_t length, fsp source) {
 
 	device_pull(_nvm, _nvm_pull, 2, destination, length, hi16(source), lo16(source));
 
 }
 
-void *nvm_dereference(fsp source, size_t length) {
+void *nvm_dereference(fsp source, fmr_size_t length) {
 
 	void *local = malloc(length);
 

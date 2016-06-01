@@ -74,13 +74,13 @@ uint8_t spi_get(void) {
 
 }
 
-void spi_push(void *source, size_t length) {
+void spi_push(void *source, fmr_size_t length) {
 
 	while (length --) spi_put(*(uint8_t *)(source ++));
 
 }
 
-void spi_pull(void *destination, size_t length) {
+void spi_pull(void *destination, fmr_size_t length) {
 
 	while (length --) *(uint8_t *)(destination ++) = spi_get();
 

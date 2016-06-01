@@ -274,7 +274,7 @@ void nvm_reset_settings(void) {
 
 }
 
-void nvm_push(void *source, size_t length, fsp destination) {
+void nvm_push(void *source, fmr_size_t length, fsp destination) {
     
     disable_interrupts();
     
@@ -343,7 +343,7 @@ uint8_t nvm_get(void) {
 
 }
 
-void nvm_pull(void *destination, size_t length, fsp source) {
+void nvm_pull(void *destination, fmr_size_t length, fsp source) {
     
     disable_interrupts();
     
@@ -366,7 +366,7 @@ void nvm_pull(void *destination, size_t length, fsp source) {
 
 }
 
-void *nvm_dereference(fsp source, size_t length) {
+void *nvm_dereference(fsp source, fmr_size_t length) {
 
 	/* Allocate local memory to service the request. */
 	void *destination = malloc(length);

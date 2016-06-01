@@ -12,10 +12,14 @@ int main(void) {
 	/* !!! Perhaps engaging the WDT would be a good idea. In the event of a timeout, the device can reset, throw a warning, and continue. !!! */
 
 	/* Clear the WDT reset flag. */
-	MCUSR &= ~(1 << WDRF);
+	wdt_reset();
+	wdt_disable();
 
 	/* Disable the watchdog timer. */
 	wdt_disable();
+
+	/* Enable interrupts. */
+	enable_interrupts();
 
 	/* -- PLATFORM INSPECIFIC INITIALIZATION -- */
 
