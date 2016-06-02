@@ -74,7 +74,7 @@ public class Flipper {
         void nvm_pull(Pointer destination, int length, int source);
 
         //Flipper Usart driver bindings.
-    void usart0_configure(Pointer baud);
+        void usart0_configure(Pointer baud);
         void usart0_enable();
         void usart0_disable();
         byte usart0_ready();
@@ -100,6 +100,26 @@ public class Flipper {
         byte dbgu_get();
         void dbgu_push(Pointer source, int length);
         void dbgu_pull(Pointer destination, int length);
+
+        //Flipper Usb driver bindings.
+        void usb_configure();
+        void usb_enable();
+        void usb_disable();
+        byte usb_ready();
+        void usb_put(byte data);
+        byte usb_get();
+        void usb_push(Pointer source, int length);
+        void usb_pull(Pointer destination, int length);
+
+        //Flipper SPI driver bindings.
+        void spi_configure();
+        void spi_enable();
+        void spi_disable();
+        byte spi_ready();
+        void spi_put(byte data);
+        byte spi_get();
+        void spi_push(Pointer source, int length);
+        void spi_pull(Pointer destination, int length);
     }
 
     /**
