@@ -18,16 +18,20 @@ module Flipper.USART (
   , enable
   , disable
     -- * Sending/Receiving Data
+  , put
+  , get
   , push
   , pull
   ) where
 
+import Data.Word
+
 import Flipper.Buffer
-import Flipper.Bufferable
 import Flipper.Get
 import Flipper.Put
 import Flipper.MonadFlipper
 
+import qualified Flipper.Bufferable     as B
 import qualified Flipper.Internal.USART as I
 
 -- | The USART units available on the device.
@@ -48,14 +52,26 @@ disable USART0 = bracketIO I.usart0Disable
 disable USART1 = bracketIO I.usart1Disable
 disable DBGU   = bracketIO I.dbguDisable
 
+-- | Send a byte over a USART bus.
+put :: MonadFlipper m => USART -> Word8 -> m ()
+put USART0 = bracketIO . I.usart0Put
+put USART1 = bracketIO . I.usart1Put
+put DBGU   = bracketIO . I.dbguPut
+
+-- | Receive a byte over a USART bus.
+get :: MonadFlipper m => USART -> m Word8
+get USART0 = bracketIO I.usart0Get
+get USART1 = bracketIO I.usart1Get
+get DBGU   = bracketIO I.dbguGet
+
 -- | Send any 'Bufferable' data over a USART bus.
-push :: (Bufferable b, MonadFlipper m) => USART -> b -> m ()
-push USART0 = bracketIO . I.usart0Push . runPut . put
-push USART1 = bracketIO . I.usart1Push . runPut . put
-push DBGU   = bracketIO . I.dbguPush . runPut . put
+push :: (B.Bufferable b, MonadFlipper m) => USART -> b -> m ()
+push USART0 = bracketIO . I.usart0Push . runPut . B.put
+push USART1 = bracketIO . I.usart1Push . runPut . B.put
+push DBGU   = bracketIO . I.dbguPush . runPut . B.put
 
 -- | Receive any 'Bufferable' data over a USART bus.
-pull :: (Bufferable b, MonadFlipper m) => USART -> m (Either String b)
-pull USART0 = runGetWith get (bracketIO . I.usart0Pull) emptyBuffer
-pull USART1 = runGetWith get (bracketIO . I.usart1Pull) emptyBuffer
-pull DBGU   = runGetWith get (bracketIO . I.dbguPull) emptyBuffer
+pull :: (B.Bufferable b, MonadFlipper m) => USART -> m (Either String b)
+pull USART0 = runGetWith B.get (bracketIO . I.usart0Pull) emptyBuffer
+pull USART1 = runGetWith B.get (bracketIO . I.usart1Pull) emptyBuffer
+pull DBGU   = runGetWith B.get (bracketIO . I.dbguPull) emptyBuffer

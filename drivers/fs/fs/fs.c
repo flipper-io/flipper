@@ -68,7 +68,7 @@ void print_progress(int progress, int total_len, int char_width) {
 
 }
 
-void chunky_transfer(uint8_t *buffer, size_t size, fsp data, int flags) {
+void chunky_transfer(uint8_t *buffer, fmr_size_t size, fsp data, int flags) {
 
 	unsigned int remaining_bytes = size;
 	unsigned int read_idx = 0;

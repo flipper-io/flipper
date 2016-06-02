@@ -11,7 +11,7 @@ typedef struct _block {
 
 } block;
 
-fsp nvm_alloc(size_t length) {
+fsp nvm_alloc(fmr_size_t length) {
 
 	block *current, *last, *current_smallest, *last_smallest;
 

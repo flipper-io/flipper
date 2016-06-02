@@ -5,21 +5,18 @@
 #include "console.h"
 
 #define address(x)				((void *)(x))
-#define USERSPACE				address(0x00202000)
-#define SAM_STACK				address(0x0204000)
+#define USERSPACE				address(0x20000000)
+#define SAM_STACK				address(0x20020000)
 #define APPLET_OFFSET			0x01
 #define _APPLET_STACK			address(USERSPACE + 0x20)
 #define _APPLET_DESTINATION		address(USERSPACE + 0x28)
 #define _APPLET_SOURCE			address(USERSPACE + 0x2C)
 #define _APPLET_WORDS			address(USERSPACE + 0x30)
 #define APPLET_SIZE				0x34
-#define FLASHSPACE				address(0x00100000)
-#define EFC0_FMR				address(0xFFFFFF60)
-#define EFC0_FCR				address(0xFFFFFF64)
-#define EFC0_FSR				address(0xFFFFFF68)
-#define EFC1_FMR				address(0xFFFFFF70)
-#define EFC1_FCR				address(0xFFFFFF74)
-#define EFC1_FSR				address(0xFFFFFF78)
+#define FLASHSPACE				address(0x00400000)
+#define EFC0_FMR				address(0x400E0A00)
+#define EFC0_FCR				address(0x400E0A04)
+#define EFC0_FSR				address(0x400E0A08)
 #define EFC_KEY					0x5A
 #define EFC_FCMD_WP				0x01
 #define EFC_FCMD_SLB			0x02
@@ -56,7 +53,7 @@ void sam_ba_jump_to_address(void *address) {
 	free(buffer);
 }
 
-size_t page_count_for_file_with_path(const char *path) {
+fmr_size_t page_count_for_file_with_path(const char *path) {
 
 	/* Open the file. */
 	FILE *file = fopen (path, "rb");
@@ -103,6 +100,8 @@ void sam_ba_copy_chunk(void *destination, void *source) {
 	usart.push(buffer, (uint32_t)(strlen(buffer)));
 	free(buffer);
 
+	usleep(2000);
+
 	/* Send the header. */
 	usart.push((char []){ 0x01, 0x01, 0xFE }, 3);
 
@@ -117,7 +116,7 @@ void sam_ba_copy_chunk(void *destination, void *source) {
 	usart.put(lo(cs));
 
 	/* Send termination. */
-	usart.put(0x04);
+//	usart.put(0x04);
 
 }
 
@@ -127,20 +126,27 @@ void sam_erase_flash(void) {
 
 int sam_load_firmware(char *firmware) {
 
-	led.rgb(8, 0, 0);
-	printf("Flashing '%s'.\n\n", firmware);
+	error.disclose();
+
+	printf("Preparing to flash '%s'.\n\n", firmware);
 
 	/* First, we need to put the device into programming mode. Let the user know, then throw up a progress bar. */
-	printf("Entering programming mode.\n\n");
+	printf("Entering DFU mode.\n\n");
+    sam.format();
+    //wait_with_progress(2);
 
-    sam.dfu();
-
-    wait_with_progress(2);
+	usart.enable();
 
 	/* Next, we need to verify that the device has properly entered programming mode. Send the handshake sequence. */
-	uint8_t connected = false;
+	int connected = 0;
 
-    for (int i = 0; (i < 100) && !connected; i ++) { usart.push((uint8_t []){ 0x80, 0x80, 0x23 }, 3); uint8_t exp[3] = { 0x0A, 0x0D, 0x3E }; uint8_t res[3]; usart.pull(res, 3); connected = !memcmp(exp, res, 3); }
+	for (int i = 0; (i < 100) && !connected; i ++) {
+		usart0_put('#');
+		uint8_t ack[3];
+		usart0_pull(ack, 3);
+		printf("Received 0x%02x, 0x%02x, 0x%02x\n", ack[0], ack[1], ack[2]);
+		connected = !memcmp(ack, (char []){ 0x0A, 0x0D, 0x3E }, 3);
+	}
 
 	if (!connected) {
 		printf("\nERROR. Did not receive adknowledgement from the DFU.\n\n");
@@ -158,10 +164,6 @@ int sam_load_firmware(char *firmware) {
 
 	/* Erase all internal flash. */
 	sam_ba_write_fcr0(EFC_FCMD_EA, 0);
-	char *sdk_path = getenv("FLIPPERSDK");
-	if (!strlen(sdk_path)) { printf("FATAL ERROR. No environment variables declared for the Flipper SDK. Please reinstall the SDK and try again.\n\n"); exit(EXIT_FAILURE); }
-
-	char *applet_path = strcat(sdk_path, "/resources/copy.applet");
 
 	/* Next, we can move the copy applet into userspace. Since we can't directly access flash space through the SAM-BA, we need to have this code do it for us. */
 	uint8_t applet[] = { 0x09, 0x48, 0x0A, 0x49, 0x0A, 0x4A, 0x02, 0xE0, 0x08, 0xC9, 0x08, 0xC0, 0x01, 0x3A, 0x00, 0x2A, 0xFA, 0xD1, 0x04, 0x48, 0x00, 0x28, 0x01, 0xD1, 0x01, 0x48, 0x85, 0x46, 0x70, 0x47, 0xC0, 0x46, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };

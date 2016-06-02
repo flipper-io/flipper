@@ -9,7 +9,7 @@ typedef uint16_t uintcrc_t;
 #ifdef __private_include__
 
 /* Declare all function prototypes. */
-uint16_t checksum(void *source, size_t length);
+uint16_t checksum(void *source, fmr_size_t length);
 
 #endif
 #endif

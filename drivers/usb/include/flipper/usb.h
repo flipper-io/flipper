@@ -19,8 +19,8 @@ void usb_disable(void);
 uint8_t usb_ready(void);
 void usb_put(uint8_t byte);
 uint8_t usb_get(void);
-void usb_push(void *source, size_t length);
-void usb_pull(void *destination, size_t length);
+void usb_push(void *source, fmr_size_t length);
+void usb_pull(void *destination, fmr_size_t length);
 
 #endif
 #endif

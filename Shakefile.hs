@@ -259,7 +259,7 @@ cRule :: Action FilePath -- ^ Action returning compiler path.
       -> Action ()
 cRule comp inc prec o = do
     let c = dropObjExts o
-        m = c -<.> "m"
+        m = c -<.> "mk"
         includes = mkIncFlags inc
     cc <- comp
     () <- command [] cc (prec ++ includes ++ [ "-c"
@@ -301,7 +301,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     phony "clean" $ removeFilesAfter "." [ "//*.o"
                                          , "//*.so"
                                          , "//*.dylib"
-                                         , "//*.m"
+                                         , "//*.mk"
                                          , "//*.elf"
                                          , "//*.bin"
                                          , "console/flipper"
@@ -474,7 +474,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     "//*.asm.native.o" %> \o -> do
         as <- nasm
         let s = dropObjExts o
-            m = s -<.> "m"
+            m = s -<.> "mk"
         objfmt <- objformat
         unit $ command [] as [ "-f"
                              , objfmt
