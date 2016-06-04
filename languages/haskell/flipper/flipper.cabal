@@ -65,6 +65,7 @@ library
                        Flipper.Internal.Utils
   build-depends:       base >= 4.7 && < 5
                      , bytestring
+                     , deepseq
                      , mtl
                      , text
                      , transformers
