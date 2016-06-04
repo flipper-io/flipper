@@ -60,19 +60,6 @@ public class Flipper {
         int i2c_put(int mode, int address, Pointer data, int length);
         int i2c_get(int mode, int address, Pointer data, int length);
 
-        //Flipper Nvm driver bindings.
-        void nvm_configure();
-        void nvm_enable();
-        void nvm_disable();
-        void nvm_reset();
-        void nvm_read(int address);
-        byte nvm_get();
-        int nvm_alloc(int length);
-        void nvm_free(int pointer);
-        void nvm_format();
-        void nvm_push(Pointer source, int length, int destination);
-        void nvm_pull(Pointer destination, int length, int source);
-
         //Flipper Usart driver bindings.
         void usart0_configure(Pointer baud);
         void usart0_enable();
@@ -144,7 +131,6 @@ public class Flipper {
     public final Error error = new Error(this);
     public final Fs fs = new Fs(this);
     public final I2c i2c = new I2c(this);
-    public final Nvm nvm = new Nvm(this);
     public final Usart usart0 = new Usart(this, Usart.USART0);
     public final Usart usart1 = new Usart(this, Usart.USART1);
     public final Usart dbgu = new Usart(this, Usart.DGBU);
