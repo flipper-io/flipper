@@ -58,7 +58,9 @@ public class Flipper {
         //Flipper I2c driver bindings.
         void i2c_configure();
         int i2c_put(int mode, int address, Pointer data, int length);
+        int i2c_put(int mode, int address, Structure data, int length);
         int i2c_get(int mode, int address, Pointer data, int length);
+        int i2c_get(int mode, int address, Structure data, int length);
 
         //Flipper Usart driver bindings.
         void usart0_configure(Pointer baud);
@@ -68,7 +70,9 @@ public class Flipper {
         void usart0_put(byte data);
         byte usart0_get();
         void usart0_push(Pointer source, int length);
+        void usart0_push(Structure source, int length);
         void usart0_pull(Pointer destination, int length);
+        void usart0_pull(Structure destination, int length);
 
         void usart1_configure(Pointer baud);
         void usart1_enable();
@@ -77,7 +81,9 @@ public class Flipper {
         void usart1_put(byte data);
         byte usart1_get();
         void usart1_push(Pointer source, int length);
+        void usart1_push(Structure source, int length);
         void usart1_pull(Pointer destination, int length);
+        void usart1_pull(Structure destination, int length);
 
         void dbgu_configure(Pointer baud);
         void dbgu_enable();
@@ -86,7 +92,9 @@ public class Flipper {
         void dbgu_put(byte data);
         byte dbgu_get();
         void dbgu_push(Pointer source, int length);
+        void dbgu_push(Structure source, int length);
         void dbgu_pull(Pointer destination, int length);
+        void dbgu_pull(Structure destination, int length);
 
         //Flipper Usb driver bindings.
         void usb_configure();
@@ -96,7 +104,9 @@ public class Flipper {
         void usb_put(byte data);
         byte usb_get();
         void usb_push(Pointer source, int length);
+        void usb_push(Structure source, int length);
         void usb_pull(Pointer destination, int length);
+        void usb_pull(Structure destination, int length);
 
         //Flipper SPI driver bindings.
         void spi_configure();
@@ -106,7 +116,9 @@ public class Flipper {
         void spi_put(byte data);
         byte spi_get();
         void spi_push(Pointer source, int length);
+        void spi_push(Structure source, int length);
         void spi_pull(Pointer destination, int length);
+        void spi_pull(Structure destination, int length);
     }
 
     /**
@@ -133,7 +145,7 @@ public class Flipper {
     public final I2c i2c = new I2c(this);
     public final Usart usart0 = new Usart(this, Usart.USART0);
     public final Usart usart1 = new Usart(this, Usart.USART1);
-    public final Usart dbgu = new Usart(this, Usart.DGBU);
+    public final Usart dbgu = new Usart(this, Usart.DBGU);
 
     /**
      * Constructs a Flipper object bound to a Flipper with the given name
@@ -142,13 +154,13 @@ public class Flipper {
      * @param name The name of the Flipper device to connect to.
      */
     public Flipper(int endpoint, String name) {
-        getBinding().flipper_attach_name(endpoint, name);
+//        getBinding().flipper_attach_name(endpoint, name);
     }
 
     /**
      * Constructs an instance of Flipper.
      */
     public Flipper() {
-        getBinding().flipper_attach();
+//        getBinding().flipper_attach();
     }
 }

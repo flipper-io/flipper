@@ -8,7 +8,7 @@ public class Usart {
 
     static final int USART0 = 0;
     static final int USART1 = 1;
-    static final int DGBU   = 2;
+    static final int DBGU = 2;
 
     private Flipper mFlipper;
     private int mPort;
@@ -31,7 +31,7 @@ public class Usart {
             case USART1:
                 mFlipper.getBinding().usart1_enable();
                 break;
-            case DGBU:
+            case DBGU:
                 mFlipper.getBinding().dbgu_enable();
                 break;
             default:
@@ -51,7 +51,7 @@ public class Usart {
             case USART1:
                 mFlipper.getBinding().usart1_disable();
                 break;
-            case DGBU:
+            case DBGU:
                 mFlipper.getBinding().dbgu_disable();
                 break;
             default:
@@ -74,7 +74,7 @@ public class Usart {
             case USART1:
                 ready = mFlipper.getBinding().usart1_ready();
                 break;
-            case DGBU:
+            case DBGU:
                 ready = mFlipper.getBinding().dbgu_ready();
                 break;
             default:
@@ -97,7 +97,7 @@ public class Usart {
             case USART1:
                 mFlipper.getBinding().usart1_put(data);
                 break;
-            case DGBU:
+            case DBGU:
                 mFlipper.getBinding().dbgu_put(data);
                 break;
             default:
@@ -120,7 +120,7 @@ public class Usart {
             case USART1:
                 data = mFlipper.getBinding().usart1_get();
                 break;
-            case DGBU:
+            case DBGU:
                 data = mFlipper.getBinding().dbgu_get();
                 break;
             default:
@@ -132,20 +132,20 @@ public class Usart {
 
     /**
      * Pushes all data from the given byte array over this USART bus.
-     * @param data The byte array with data to be pushed.
+     * @param source The byte array with data to be pushed.
      */
-    public void push(byte[] data) {
-        push(data, data.length);
+    public void push(byte[] source) {
+        push(source, source.length);
     }
 
     /**
      * Pushes data from the given byte array over this USART bus.
-     * @param data The byte array with data to be pushed.
+     * @param source The byte array with data to be pushed.
      * @param length The length of data (in bytes) to push.
      */
-    public void push(byte[] data, int length) {
+    public void push(byte[] source, int length) {
         Pointer pointer = new Memory(length);
-        pointer.write(0, data, 0, length);
+        pointer.write(0, source, 0, length);
         push(pointer, length);
     }
 
@@ -163,10 +163,33 @@ public class Usart {
             case USART1:
                 mFlipper.getBinding().usart1_push(source, length);
                 break;
-            case DGBU:
+            case DBGU:
                 mFlipper.getBinding().dbgu_push(source, length);
                 break;
             default:
+                throw new IllegalStateException("Usart port " + mPort + " is invalid.");
+        }
+        Error.checkErrorCode(mFlipper.error.get());
+    }
+
+    /**
+     * Pushes data from the given Structure over this USART bus.
+     * @param source The Structure with data to be pushed.
+     */
+    public void push(Structure source) {
+        mFlipper.error.clear();
+        switch(mPort) {
+            case USART0:
+                mFlipper.getBinding().usart0_push(source, source.calculateSize());
+                break;
+            case USART1:
+                mFlipper.getBinding().usart1_push(source, source.calculateSize());
+                break;
+            case DBGU:
+                mFlipper.getBinding().dbgu_push(source, source.calculateSize());
+                break;
+            default:
+                throw new IllegalStateException("Usart port " + mPort + " is invalid.");
         }
         Error.checkErrorCode(mFlipper.error.get());
     }
@@ -175,21 +198,21 @@ public class Usart {
      * Pulls data from this USART bus and stores it into the given byte buffer
      * until the buffer is full. Be cautious, this will block until enough data
      * is pulled to completely fill the given buffer.
-     * @param buffer The byte array buffer that the data is pulled into.
+     * @param destination The byte array buffer that the data is pulled into.
      */
-    public void pull(byte[] buffer) {
-        pull(buffer, buffer.length);
+    public void pull(byte[] destination) {
+        pull(destination, destination.length);
     }
 
     /**
      * Pulls data from this USART bus and stores it into the given byte buffer.
-     * @param buffer The byte array buffer that the data is pulled into.
+     * @param destination The byte array buffer that the data is pulled into.
      * @param length The length of data (in bytes) to pull.
      */
-    public void pull(byte[] buffer, int length) {
+    public void pull(byte[] destination, int length) {
         Pointer pointer = new Memory(length);
         pull(pointer, length);
-        pointer.read(0, buffer, 0, length);
+        pointer.read(0, destination, 0, length);
     }
 
     /**
@@ -206,10 +229,33 @@ public class Usart {
             case USART1:
                 mFlipper.getBinding().usart1_pull(destination, length);
                 break;
-            case DGBU:
+            case DBGU:
                 mFlipper.getBinding().dbgu_pull(destination, length);
                 break;
             default:
+                throw new IllegalStateException("Usart port " + mPort + " is invalid.");
+        }
+        Error.checkErrorCode(mFlipper.error.get());
+    }
+
+    /**
+     * Pulls data from this USART bus and stores it into the given Structure.
+     * @param destination The Structure that data is pulled into.
+     */
+    public void pull(Structure destination) {
+        mFlipper.error.clear();
+        switch(mPort) {
+            case USART0:
+                mFlipper.getBinding().usart0_pull(destination, destination.calculateSize());
+                break;
+            case USART1:
+                mFlipper.getBinding().usart0_pull(destination, destination.calculateSize());
+                break;
+            case DBGU:
+                mFlipper.getBinding().usart0_pull(destination, destination.calculateSize());
+                break;
+            default:
+                throw new IllegalStateException("Usart port " + mPort + " is invalid.");
         }
         Error.checkErrorCode(mFlipper.error.get());
     }

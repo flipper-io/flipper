@@ -73,28 +73,28 @@ public class Usb {
 
     /**
      * Sends an array of bytes over Flipper's USB bus.
-     * @param data The array of bytes to send.
+     * @param source The array of bytes to send.
      */
-    public void push(byte[] data) {
-        push(data, data.length);
+    public void push(byte[] source) {
+        push(source, source.length);
     }
 
     /**
      * Sends a certain number of bytes from an array over Flipper's USB bus.
-     * @param data The byte array to send data from.
+     * @param source The byte array to send data from.
      * @param length The number of bytes to send. Must be less than or equal
      *               to the length of the given data array.
      */
-    public void push(byte[] data, int length) {
-        if(length > data.length) {
-            throw new ArrayIndexOutOfBoundsException("Given length to push is larger than buffer.");
+    public void push(byte[] source, int length) {
+        if(length > source.length) {
+            throw new ArrayIndexOutOfBoundsException("Given length to push is larger than source buffer.");
         }
 
         //Allocate explicit memory for the data being sent.
         Pointer pointer = new Memory(length);
 
         //Copy the data to push into the pointer.
-        pointer.write(0, data, 0, length);
+        pointer.write(0, source, 0, length);
 
         //Call overloaded push with Pointer.
         push(pointer, length);
@@ -102,14 +102,24 @@ public class Usb {
 
     /**
      * Sends data from a JNA Pointer object over Flipper's USB bus.
-     * @param data The JNA Pointer containing data to send.
+     * @param source The JNA Pointer containing data to send.
      * @param length The length of data (in bytes) to send from the Pointer.
      *               This must be less than or equal to the length of memory
      *               allocated for the given Pointer.
      */
-    public void push(Pointer data, int length) {
+    public void push(Pointer source, int length) {
         mFlipper.error.clear();
-        mFlipper.getBinding().usb_push(data, length);
+        mFlipper.getBinding().usb_push(source, length);
+        Error.checkErrorCode(mFlipper.error.get());
+    }
+
+    /**
+     * Sends data from a Structure object over Flipper's USB bus.
+     * @param source The Structure containing data to send.
+     */
+    public void push(Structure source) {
+        mFlipper.error.clear();
+        mFlipper.getBinding().usb_push(source, source.calculateSize());
         Error.checkErrorCode(mFlipper.error.get());
     }
 
@@ -117,23 +127,23 @@ public class Usb {
      * Receives incoming data from Flipper's USB bus and stores it into a
      * byte array. Caution: This will block until enough data is received
      * to completely fill the given array.
-     * @param buffer The buffer to store received data in.
+     * @param destination The buffer to store received data in.
      */
-    public void pull(byte[] buffer) {
-        pull(buffer, buffer.length);
+    public void pull(byte[] destination) {
+        pull(destination, destination.length);
     }
 
     /**
      * Receives incoming data from Flipper's USB bus and stores it into a
      * byte array. Caution: This will block until the specified amount of
      * data (in bytes) is received.
-     * @param buffer The buffer to store received data in.
+     * @param destination The buffer to store received data in.
      * @param length The number of bytes to receive. This must be less than
      *               or equal to the length of the given buffer.
      */
-    public void pull(byte[] buffer, int length) {
-        if(length > buffer.length) {
-            throw new ArrayIndexOutOfBoundsException("Given length to pull is larger than buffer.");
+    public void pull(byte[] destination, int length) {
+        if(length > destination.length) {
+            throw new ArrayIndexOutOfBoundsException("Given length to pull is larger than destination buffer.");
         }
 
         //Allocate explicit memory for the data being retrieved.
@@ -143,20 +153,31 @@ public class Usb {
         pull(pointer, length);
 
         //Copy the retrieved data from the pointer into the buffer.
-        pointer.read(0, buffer, 0, length);
+        pointer.read(0, destination, 0, length);
     }
 
     /**
      * Receives incoming data from Flipper's USB bus and stores it into a
      * JNA Pointer object. Caution: This will block until the specified amount
      * of data (in bytes) is received.
-     * @param buffer The JNA Pointer to store received data in.
+     * @param destination The JNA Pointer to store received data in.
      * @param length The number of bytes to receive. This must be less than or
      *               equal to the length of memory allocated for the given Pointer.
      */
-    public void pull(Pointer buffer, int length) {
+    public void pull(Pointer destination, int length) {
         mFlipper.error.clear();
-        mFlipper.getBinding().usb_pull(buffer, length);
+        mFlipper.getBinding().usb_pull(destination, length);
+        Error.checkErrorCode(mFlipper.error.get());
+    }
+
+    /**
+     * Receives incoming data from Flipper's USB bus and stores it into a
+     * Structure object.
+     * @param destination The Structure to store received data in.
+     */
+    public void pull(Structure destination) {
+        mFlipper.error.clear();
+        mFlipper.getBinding().usb_pull(destination, destination.calculateSize());
         Error.checkErrorCode(mFlipper.error.get());
     }
 }
