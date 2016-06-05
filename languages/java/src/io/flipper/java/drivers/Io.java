@@ -1,7 +1,9 @@
+package io.flipper.java.drivers;
+
 /**
  * Created by Nick Mosher on 4/1/16.
  */
-class Io {
+public class Io {
 
     private Flipper mFlipper;
 

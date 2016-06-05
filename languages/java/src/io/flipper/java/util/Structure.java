@@ -1,3 +1,5 @@
+package io.flipper.java.util;
+
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
@@ -50,11 +52,10 @@ public class Structure extends com.sun.jna.Structure {
 
     /**
      * Helper method provided by JNA's Structure class allows for measurement
-     * of the byte-size of this Structure. Default-access allows Flipper
-     * drivers to utilize this capability.
+     * of the byte-size of this Structure.
      * @return The size (in bytes) of this Structure.
      */
-    int calculateSize() {
+    public int calculateSize() {
         return super.calculateSize(false);
     }
 }

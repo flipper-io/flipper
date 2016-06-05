@@ -1,3 +1,5 @@
+package io.flipper.java.drivers;
+
 /**
  * Wrapper class for Flipper's on-board button.
  */

@@ -1,7 +1,11 @@
+package io.flipper.java.drivers;
+
+import io.flipper.java.util.FlipperException;
+
 /**
- * Created by nick on 5/14/16.
+ * Created by Nick Mosher on 5/14/16.
  */
-class Error {
+public class Error {
 
     private Flipper mFlipper;
 

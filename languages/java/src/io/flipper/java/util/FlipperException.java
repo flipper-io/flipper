@@ -1,3 +1,5 @@
+package io.flipper.java.util;
+
 /**
  * Created by Nick Mosher on 5/14/16.
  */

@@ -1,6 +1,11 @@
+package io.flipper.java.drivers;
+
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
+import io.flipper.java.util.Structure;
+
+import java.lang.*;
 
 /**
  * Created by Nick Mosher on 4/1/16.
