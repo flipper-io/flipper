@@ -26,32 +26,34 @@ import Flipper.Internal.Utils
 import Foreign.C.String
 import Foreign.Ptr
 
-data FlipperError = OK
-                  | FMRChecksumWrong
-                  | MemAllocFailed
-                  | TooManyArgs
-                  | FVMLoadFailed
-                  | FVMSymbolFailed
-                  | SocketOpenFailed
-                  | SocketConnectFailed
-                  | FlipperUnbound
-                  | FlipperNotFound
-                  | HIDManagerFailed
-                  | HIDManagerNoDevice
-                  | HIDTooManyDevices
-                  | HIDOpenDeviceFailed
-                  | HIDDeviceDisconnected
-                  | HIDWriteFailed
-                  | HIDTimeout
-                  | IOKitDictionaryError
-                  | DynLibNotFound
-                  | DynLibLoadFailure
-                  | DynLibAlreadyLoaded
-                  | FileOpenFailure
-                  | AddFileFailure
-                  | NoFileFailure
-                  | Unimplemented
-                  | Unknown
+-- | An error condition, reported by the device or occuring within the
+--   @libflipper@ library.
+data FlipperError = OK                    -- ^ All clear.
+                  | FMRChecksumWrong      -- ^ Incorrect FMR packet checksum.
+                  | MemAllocFailed        -- ^ Memory allocation failed.
+                  | TooManyArgs           -- ^ Too many FMR invokation arguments.
+                  | FVMLoadFailed         -- ^ Failed to load the FVM library.
+                  | FVMSymbolFailed       -- ^ Failed to map the FVM symbol table.
+                  | SocketOpenFailed      -- ^ Couldn't open socket.
+                  | SocketConnectFailed   -- ^ Couldn't connect socket.
+                  | FlipperUnbound        -- ^ No Flipper device attached.
+                  | FlipperNotFound       -- ^ No Flipper device found at the provided endpoint.
+                  | HIDManagerFailed      -- ^ HID manager failure.
+                  | HIDManagerNoDevice    -- ^ HID manager failed to find device.
+                  | HIDTooManyDevices     -- ^ Too many devices for HID manager to enumerate.
+                  | HIDOpenDeviceFailed   -- ^ HID failed to open device interface.
+                  | HIDDeviceDisconnected -- ^ HID manager disconnected from device abnormally.
+                  | HIDWriteFailed        -- ^ HID manager failed to write to device.
+                  | HIDTimeout            -- ^ HID manager timed out.
+                  | IOKitDictionaryError  -- ^ IOKit dictionary map error.
+                  | DynLibNotFound        -- ^ Dynamic library not found.
+                  | DynLibLoadFailure     -- ^ Couldn't load dynamic library.
+                  | DynLibAlreadyLoaded   -- ^ Dynamic library already loaded.
+                  | FileOpenFailure       -- ^ Couldn't open file.
+                  | AddFileFailure        -- ^ Couldn't create file.
+                  | NoFileFailure         -- ^ File does not exist.
+                  | Unimplemented         -- ^ Functinality unimplemented.
+                  | Unknown               -- ^ Unknown error.
                   deriving (Eq, Ord, Show)
 
 errorCode :: FlipperError -> Word16

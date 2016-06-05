@@ -16,10 +16,11 @@ module Flipper.Internal.LED (
 
 import Data.Word
 
+-- | RGB value.
 data RGB = RGB {
-    red   :: Word8
-  , green :: Word8
-  , blue  :: Word8
+    red   :: Word8 -- ^ Red value.
+  , green :: Word8 -- ^ Green value.
+  , blue  :: Word8 -- ^ Blue value.
   } deriving (Eq, Ord, Show)
 
 setRGB :: RGB -> IO ()

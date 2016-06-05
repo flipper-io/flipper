@@ -15,5 +15,7 @@ module Flipper.Internal.Utils (
 
 import qualified Foreign.Marshal.Utils as U
 
+-- | Map the return value from a C function that returns non-zero on failure to
+--   a 'Bool'.
 retSuc :: (Eq a, Num a) => a -> Bool
 retSuc = not . U.toBool

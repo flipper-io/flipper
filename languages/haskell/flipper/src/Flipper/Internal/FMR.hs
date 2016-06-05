@@ -22,6 +22,7 @@ import Foreign.Ptr
 import Foreign.Storable
 import Foreign.Marshal.Alloc
 
+-- | FMR module identifier.
 newtype FMRModule = FMRModule { unFMRModule :: Word32 }
 
 bind :: String -> IO FMRModule

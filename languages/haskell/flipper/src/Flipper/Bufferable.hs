@@ -8,7 +8,122 @@ Stability   : Provisional
 Portability : Windows, POSIX
 
 This module provides the 'Bufferable' typeclass, representing any data that may
-be sent to or received from the device over an arbitrary bus.
+be sent to or received from the device over an arbitrary bus. This is
+accomplished by providing a 'Put' serializer and a 'Get' deserializer. While
+serializers and deserializers may be written from scratch, often the Haskell
+data type representing the data being exchanged is analogous to the
+corresponding C struct. When this is the case, a 'Bufferable' instance may be
+derived automatically with GHC generics. For example:
+
+> -- Needs -XDeriveGeneric, -XDeriveAnyClass
+>
+> import GHC.Generics
+>
+> import qualified Data.ByteString as B
+>
+> import Flipper.Bufferable
+>
+> data SomeStruct = SomeStruct {
+>     ssID      :: Int
+>   , ssName    :: String
+>   , ssPayload :: B.ByteString
+>   } deriving (Generic, Bufferable)
+
+The following conditions must be satisfied for a 'Bufferable' instance to be
+automatically generated:
+
+ - The data type must have exactly one constructor.
+ - The data type's constructor's arguments' types must have 'Bufferable'
+   instances.
+ - The data type's constructor must not be recursive.
+
+== Struct Packing
+
+The machinery for deriving 'Bufferable' instances assumes that the analogous C
+struct's fields are arranged in the same order as the Haskell data type
+constructor's arguments. However, no assumptions are made about how the struct
+is packed. If possible, use @\_\_attribute\_\_((\_\_packed\_\_))@ on the
+corresponding struct, and use fundamental Haskell types from "Data.Int",
+"Data.Word", and "Foreign.C.Types" whose widths are guaranteed.
+
+Even if the use of a padded struct unavoidable, it is still not necessary to
+write a serializer/deserializer pair by hand. The 'Padding' type may be used in
+Haskell data types to indicate where padding is present in the corresponding C
+struct and how wide it is. Suppose we're dealing with the following C struct on
+a machine with 32-bit words (like Flipper):
+
+> typedef struct _rec
+> {
+>         uint8_t   a;
+>         uint16_t b;
+>         uint8_t  c;
+>         uint32_t d;
+> } rec;
+
+If this struct is not packed, it will look like this in memory:
+
+> ┌───────────┬─────────────────┬────────────┬───────────┬──────────────────┬────────────┐
+> │8 bits of a│8 bits of padding│16 bits of b│8 bits of c│24 bits of padding│32 bits of d│
+> └───────────┴─────────────────┴────────────┴───────────┴──────────────────┴────────────┘
+
+This struct may be represented with the following Haskell data type:
+
+> -- Needs -XDeriveGeneric, -XDeriveAnyClass, -XDataKinds
+>
+> import Data.Word
+>
+> import GHC.Generics
+>
+> import Flipper.Bufferable
+>
+> data Rec = Rec {
+>    a    :: Word8
+>  , pad1 :: Padding 1
+>  , b    :: Word16
+>  , pad2 :: Padding 2
+>  , c    :: Word8
+>  , pad3 :: Padding 3
+>  , d    :: Word32
+>  } deriving (Generic, Bufferable)
+
+== C Arrays
+
+In C there are two common strategies for delimiting arrays. The first involves
+a distinguished sentinel element whose presence indicates the end of the array;
+C strings are an example of this strategy. To accomodate such structures the
+'SentinelSequence' data type and accompanying 'Sentinel' typeclass are provided.
+A value of type @SentinelSequence a s@ will generate a 'Bufferable' instance
+that reads consecutive values of type @a@ until the 'sentinel' value of type @s@
+is encountered. Analogously the generated serializer will encode adjacent values
+of type @a@, followed by the 'sentinel' value of type @s@. An example for C
+strings:
+
+> newtype CString = CString { unCString :: SentinelSequence Char Char }
+>                 deriving (Generic, Bufferable)
+>
+> instance Sentinel Char where
+>     sentinel = '\0'
+
+This example is redundant; the 'Bufferable' instance for 'String' already
+provides this exact behavior, and the 'CBlock' 'Bufferable' instance provides
+this behavior for 'B.ByteStrings'.
+
+Another technique is to lead the array with an unsigned integer providing the
+number of elements in the array. Applied to character data, such a structure is
+known as a Pascal string. The 'SizedSequence' data type provides 'Bufferable'
+instances for such structures. A value of type @SizedSequence a l@ will first
+look read a quantity of type @l@, and then read @l@ following elements. Here @l@
+is a phantom type that merely encodes what sort of integer is present at the
+beginning of the array. Analogously the generated serializer will encode the
+length of the sequence as type @l@, then encode adjacent values of type @a@. An
+example for 32-bit led Pascal strings:
+
+> newtype PString = PString { unPascalString :: SizedSequence Char Word32 }
+>                 deriving (Generic, Bufferable)
+
+The related type 'SizedByteString' provides the same behavior for
+'B.ByteStrings'.
+
 -}
 
 {-# LANGUAGE FlexibleInstances
@@ -73,26 +188,38 @@ import System.Posix.Types
 
 import Text.Read hiding (get)
 
+-- | Generic class for 'Bufferable'.
 class GBufferable g where
     gput :: g p -> Put
     gget :: Get (g p)
 
+-- | Instance for uninhabited types.
 instance GBufferable V1 where
     gput = undefined
     gget = undefined
 
+-- | Instance for concretized types.
 instance (Bufferable a) => GBufferable (K1 i a) where
     gput (K1 x) = put x
     gget        = K1 <$> get
 
+-- | Instance for sum types.
 instance (GBufferable f, GBufferable g) => GBufferable (f :*: g) where
     gput (f :*: g) = gput f <> gput g
     gget           = (:*:) <$> gget <*> gget
 
+-- | Instance for metadata
 instance GBufferable a => GBufferable (M1 i t a) where
     gput (M1 x) = gput x
     gget        = M1 <$> gget
 
+-- | Provides a 'Bufferable' instance whose deserializer sequentially decodes
+--   values of type @a@ until the 'sentinel' value of type @s@ is encoded, where
+--   'sentinel' is provided by the 'Sentinel' class. Analogously the generated
+--   serializer will sequentially encode values of type @a@, followed by the
+--   'sentinel' value of type @s@. @s@ is a phantom type, merely encoding the
+--   type whose 'Sentinel' instance provides the 'sentinel' for values of this
+--   type.
 newtype SentinelSequence a s = SentinelSequence { unSentinelSequence :: [a] }
                              deriving ( Eq
                                       , Ord
@@ -103,9 +230,17 @@ newtype SentinelSequence a s = SentinelSequence { unSentinelSequence :: [a] }
                                       , Traversable
                                       )
 
+-- | The class of types containing a single 'sentinel' value.
 class Sentinel s where
+    -- | The sentinel value.
     sentinel :: s
 
+-- | Provides a 'Bufferable' instance whose deserializer first decodes an
+--   integer of type @l@, then decodes @l@ values of type @a@. Analogously the
+--   generated serializer will first encode the length of the sequence as type
+--   @l@, then sequentially encode values of type @a@. @l@ is a phantom type,
+--   merely encoding the width and interpretation of the integer leading the
+--   array.
 newtype SizedSequence a l = SizedSequence { unSizedSequence :: [a] }
                           deriving ( Eq
                                    , Ord
@@ -116,6 +251,8 @@ newtype SizedSequence a l = SizedSequence { unSizedSequence :: [a] }
                                    , Traversable
                                    )
 
+-- | Provides a 'Bufferable' instance for C strings, i.e. a contiguous block of
+--   non-null bytes terminted by the null byte.
 newtype CBlock = CBlock { unCBlock :: B.ByteString }
                deriving ( Eq
                         , Ord
@@ -125,6 +262,8 @@ newtype CBlock = CBlock { unCBlock :: B.ByteString }
                         , NFData
                         )
 
+-- | Provides a 'Bufferable' instance for arrays of bytes accompanied by a
+--   leading integer of type @l@ indicating the number of bytes in the array.
 newtype SizedByteString l = SizedByteString { unSizedByteString :: B.ByteString }
                           deriving ( Eq
                                    , Ord
@@ -134,39 +273,58 @@ newtype SizedByteString l = SizedByteString { unSizedByteString :: B.ByteString 
                                    , NFData
                                    )
 
+-- | A type for encoding struct padding at the Haskell type level. Use of this
+--   type requires a recent GHC supporting the @-XDataKinds@ language extension.
+--   The type level natural @s@ is the number of bytes of padding provided by
+--   the generated 'Bufferable' instance. Although this type is uninhabited
+--   (i.e. 'undefined' or ⊥ is the only value of any 'Padding' type), degenerate
+--   instances are provided for common typeclasses so that they may be derived
+--   for data types containing padding.
 data Padding (s :: Nat) deriving (Generic, NFData)
 
+-- | '(==)' always returns 'True'.
 instance Eq (Padding s) where
     _ == _ = True
 
+-- | 'compare' always returns 'EQ'.
 instance Ord (Padding s) where
     compare _ _ = EQ
 
+-- | 'readPrec' consumes no input and returns 'undefined'.
 instance Read (Padding s) where
     readPrec = pure undefined
 
+-- | Outputs "Padding s" where s is a type level natural.
 instance KnownNat s => Show (Padding s) where
     show p = "Padding " ++ show (padSize p)
 
+-- | 'toEnum' returns 'undefined', 'fromEnum' returns 0.
 instance Enum (Padding s) where
     toEnum _   = undefined
     fromEnum _ = 0
 
+-- | 'minBound' = 'maxBound' = 0
 instance Bounded (Padding s) where
     minBound = undefined
     maxBound = undefined
 
+-- | 'range' = [], 'index' = 0, 'inRange' = True
 instance Ix (Padding s) where
     range _     = []
     index _ _   = 0
     inRange _ _ = True
 
+-- | Returns a 'Proxy' for the padding width.
 padProxy :: Padding s -> Proxy s
 padProxy _ = Proxy
 
+-- | Provides the padding width at the term level.
 padSize :: KnownNat s => Padding s -> Integer
 padSize = natVal . padProxy
 
+-- | The class of types for which 'Put' serializers and 'Get' deserializers are
+--   available. Instances may be derived with GHC generics or written by hand
+--   with the utilities in the "Flipper.Put" and "Flipper.Get" modules.
 class Bufferable a where
     put :: a -> Put -- ^ Serializer.
     get :: Get a    -- ^ Deserializer.
@@ -430,14 +588,18 @@ instance Storable a => Bufferable (Complex a) where
     put = putStorable
     get = getStorable
 
+-- | Assumes ASCII encoding and the presence of a null terminator.
 instance Bufferable String where
     put = putString
     get = getString
 
+-- | Assumes UTF8 encoding and the presence of a null terminator.
 instance Bufferable T.Text where
     put = putText
     get = getText
 
+-- | Assumes the initial 4 bytes are an unsigned 32-bit little-endian length.
+--   Identical to 'SizedByteString Word32'.
 instance Bufferable B.ByteString where
     put = putByteString
     get = getByteString

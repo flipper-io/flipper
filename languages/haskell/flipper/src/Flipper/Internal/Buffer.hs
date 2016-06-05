@@ -66,6 +66,7 @@ allocBuffer = unsafePerformIO . allocBufferSafe
 toByteString :: Buffer -> B.ByteString
 toByteString (Buffer p o l) = B.PS p o l
 
+-- | O(1) conversion from a 'B.ByteString'.
 fromByteString :: B.ByteString -> Buffer
 fromByteString (B.PS p o l) = Buffer p o l
 

@@ -22,6 +22,7 @@ import Data.Typeable
 
 import Flipper.Internal.Error
 
+-- | An exception providing a 'FlipperError'.
 data FlipperException = FlipperException FlipperError
                       deriving (Eq, Show, Typeable)
 

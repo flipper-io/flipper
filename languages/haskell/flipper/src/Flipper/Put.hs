@@ -7,7 +7,7 @@ Maintainer  : travis@flipper.io
 Stability   : Provisional
 Portability : Windows, POSIX
 
-This module provides a serialization monad intended for encoding C-style
+This module provides a serialization monoid intended for encoding C-style
 structures sent to the device over an arbitrary bus. Suppose a Haskell program
 will send the records of the following type to a program running on the
 device:

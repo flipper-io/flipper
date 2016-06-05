@@ -27,6 +27,7 @@ import Flipper.Put
 
 import qualified Flipper.Internal.FS as FS
 
+-- | Flipper dynamic loader artifact key.
 newtype FDLKey = FDLKey { unFDLKey :: Word16 }
 newtype FDLAddress = FDLAddress { unFDLAddress :: Ptr Word8 }
 

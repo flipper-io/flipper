@@ -24,6 +24,7 @@ import Foreign.Ptr
 
 import System.IO.Unsafe
 
+-- | Flipper file system reference.
 newtype FSHandle = FSHandle { unFSHandle :: Word32 }
 
 -- Not totally implemented yet.

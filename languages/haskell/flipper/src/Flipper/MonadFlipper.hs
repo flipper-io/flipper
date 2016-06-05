@@ -8,14 +8,12 @@ Stability   : Provisional
 Portability : Windows, POSIX
 
 This module defines a class of 'Monad's in which Flipper commands may be
-executed and Flipper monad transformer for adding Flipper support to a monad
+executed and a Flipper monad transformer for adding Flipper support to a monad
 stack.
 -}
 
-{-# LANGUAGE BangPatterns
-           , TypeSynonymInstances
+{-# LANGUAGE TypeSynonymInstances
            , FlexibleInstances
-           , LambdaCase
            #-}
 
 module Flipper.MonadFlipper (

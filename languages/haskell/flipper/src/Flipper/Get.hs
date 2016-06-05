@@ -129,7 +129,7 @@ instance Applicative Get where
 instance Alternative Get where
     empty               = fail "empty"
     (Get x) <|> (Get y) = Get $ \b -> case x b of (Done b' x')   -> Done b' x'
-                                                  (WantMore l c) -> WantMore l (c <|> (Get y))
+                                                  (WantMore l c) -> WantMore l (c <|> (Get (y . (b `append`))))
                                                   (Failure b' e) -> y b
 
 instance Monad Get where
@@ -143,6 +143,7 @@ instance MonadPlus Get where
     mzero = fail "mzero"
     mplus = (<|>)
 
+-- | Monoid over 'Get' alternatives.
 instance Monoid (Get a) where
     mempty = fail "mempty"
     mappend = (<|>)
@@ -155,7 +156,10 @@ runGet (Get g) = checkResult . g
           checkResult (WantMore _ _) = Left "runGet: parser requested more input."
 
 -- | Run a 'Get' that may be supplied more input.
-runGetWith :: Monad m => Get a -> (Int -> m Buffer) -> Buffer -> m (Either String a)
+runGetWith :: Monad m => Get a               -- ^ The parser to run.
+                      -> (Int -> m Buffer)   -- ^ A function for requesting additional input.
+                      -> Buffer              -- ^ Initial input.
+                      -> m (Either String a) -- ^ Result.
 runGetWith (Get g) m i = case g i of (Done _ x)     -> return $ Right x
                                      (WantMore l c) -> m l >>= runGetWith (Get g) m
                                      (Failure _ e)  -> return $ Left e

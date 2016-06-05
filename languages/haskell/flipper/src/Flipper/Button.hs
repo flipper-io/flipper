@@ -7,6 +7,7 @@ Maintainer  : travis@flipper.io
 Stability   : Provisional
 Portability : Windows, POSIX
 
+This module provides an interface to Flipper's on-board button.
 -}
 
 module Flipper.Button (
@@ -19,5 +20,6 @@ import Flipper.MonadFlipper
 
 import qualified Flipper.Internal.Button as I
 
+-- | Read the button state.
 read :: MonadFlipper m => m Bool
 read = bracketIO I.read

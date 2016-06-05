@@ -10,6 +10,8 @@ Portability : Windows, POSIX
 Flipper is an embedded development platform with first-class support for many
 programming languages. See <http://flipper.io> for more information.
 
+= Attaching to Flipper
+
 In order to control the Flipper device, it must be attached over one of several
 provided interfaces, including USB, TCP/UDP, and Bluetooth. If multiple
 Flipper devices are attached to the same computer, then a single distinguished
@@ -26,6 +28,88 @@ This module, like all others in this package, is intended to be imported
 
 > import qualified Flipper
 
+= Interacting with Flipper
+
+Most functions in this package return into a monad in the 'MonadFlipper' class.
+A 'MonadFlipper' instance is provided for 'IO', making it easy to interact with
+Flipper in small programs or GHCi. For example, to turn Flipper's LED blue:
+
+>>> import qualified Flipper
+>>> import qualified Flipper.LED as LED
+>>> Flipper.attach (USB Nothing)
+True
+>>> LED.setRGB (RGB 0 0 255)
+
+Or to blink the LED at 2 Hz:
+
+> module Main where
+>
+> import qualified Flipper
+> import qualified Flipper.LED as LED
+>
+> import Control.Concurrent (threadDelay)
+>
+> blink :: IO ()
+> blink = do LED.setRGB blue
+>            threadDelay 500000
+>            LED.setRGB off
+>            threadDelay 500000
+>    where blue = RGB 0 0 255
+>          off  = RGB 0 0 0
+>
+> main :: IO ()
+> main = do Flipper.attach (USB Nothing) >> forever blink
+
+When interacting with Flipper in the 'IO' monad, any faults detected via
+Flipper's error reporting mechanism will throw Haskell exceptions. There are
+more sophisticated monads provided in the "Flipper.MonadFlipper" module that
+provide type-safe and deterministic handling for Flipper errors.
+
+= Exchanging Data with Flipper
+
+If a Haskell data type is analogous to a C struct in use on the device, then an
+instance of the 'Bufferable' class may be derived. Functions in this package for
+controlling Flipper's buses can send or receive any 'Bufferable' data. For
+example:
+
+> -- Needs -XDeriveGeneric, -XDeriveAnyClass
+>
+> module SomeStruct where
+>
+> import qualified Flipper.Bufferable as Buf
+> import qualified Flipper.USB        as USB
+>
+> import qualified Data.ByteString as B
+>
+> import GHC.Generics
+>
+> data SomeStruct = SomeStruct {
+>     ssID      :: Int
+>   , ssName    :: String
+>   , ssPayload :: B.ByteString
+>   } deriving (Generic, Bufferable)
+>
+> sendSomeStructUSB = USB.push
+> recvSomeStructUSB = USB.pull
+
+There are data types provided in the "Flipper.Bufferable" module for specifying
+the relationship between a Haskell data type and the analogous C struct.
+Alternatively custom serializers may be specified with the 'Put' builder monoid
+provided by the "Flipper.Put" module, and custom parsers may be specified with
+the 'Get' monad provided by the "Flipper.Get" module.
+
+= Flipper and Haskell Threads
+
+This package wraps functions from the @libflipper@ C library, which is not
+thread-safe and relies on thread-local global state. For a program that uses
+multiple operating system threads (e.g. a Haskell program linked with the
+@-threaded@ option), this means that multiple functions that return into
+'MonadFlipper' must /not/ be called concurrently, and all such operations must
+be performed by the same operating system thread. In GHC this may be
+accomplished with bound threads, see the corresponding section in the module
+documentation for "Control.Concurrent". If your program does not make use of
+Haskell threads (i.e. no calls to 'forkIO') or is not linked with the
+@-threaded@ option then there is nothing to worry about.
 -}
 
 module Flipper (

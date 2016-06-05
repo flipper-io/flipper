@@ -35,9 +35,9 @@ import qualified Flipper.Bufferable     as B
 import qualified Flipper.Internal.USART as I
 
 -- | The USART units available on the device.
-data USART = USART0
-           | USART1
-           | DBGU
+data USART = USART0 -- ^ What pins provide USART0?
+           | USART1 -- ^ What pins provide USART1?
+           | DBGU   -- ^ What pins provide DBGU?
            deriving (Eq, Ord, Show)
 
 -- | Enable a USART bus.
