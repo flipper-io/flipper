@@ -1,0 +1,13 @@
+.DS_Store
+.lock-waf*
+build/
+*.xcodeproj
+*.module
+*.o
+*.a
+*.pyc
+*.elf
+*.bin
+*.so
+*.dylib
+*.swp

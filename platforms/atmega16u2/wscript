@@ -1,0 +1,33 @@
+# Platform build script.
+
+# Target: Atmel ATMEGA16U2
+
+def configure(cfg):
+    cfg.setenv('platform-atmega16u2')
+    # Set the platform name.
+    cfg.env.platform = 'atmega16u2'
+    # Build osmium for the platform.
+    cfg.env.BUILD_OSMIUM = True
+    # Build modules for this platform.
+    cfg.env.BUILD_MODULES = True
+    # Set the platform flags.
+    cfg.env.append_value('CFLAGS', ['-std=c99', '-Os', '-DARCH=ARCH_AVR8', '-D__AVR_ATMEGA16U2__', '-DF_CPU=16000000UL', '-Wno-pragmas', '-mmcu=atmega16u2'])
+    cfg.env.append_value('LDFLAGS', '-mmcu=atmega16u2')
+    # Load the appropriate archiver.
+    cfg.find_program('avr-ar', var='AR')
+     # Load the appropriate assembler.
+    cfg.find_program('avr-as', var='AS')
+    cfg.env.AS_TGT_F = ['-c', '-o']
+    cfg.env.ASLNK_TGT_F = ['-o']
+    cfg.load('asm')
+    # Load the appropriate C compiler.
+    cfg.find_program('avr-gcc', var='CC')
+    cfg.load('gcc')
+    # Load the appropriate binary utilities.
+    cfg.find_program('avr-objcopy', var='OBJCOPY')
+    # Load the appropriate uploader.
+    cfg.env.UPLOADER = 'dfu_programmer'
+    cfg.load('dfu_programmer', tooldir = 'tools')
+
+def build(bld):
+    bld.stlib(source = bld.path.ant_glob('src/**'), target = 'platform-atmega16u2', env = bld.all_envs['platform-atmega16u2'])

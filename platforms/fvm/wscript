@@ -1,0 +1,15 @@
+# Platform build script.
+
+# Target: Flipper Virtual Machine (FVM)
+
+def configure(cfg):
+    cfg.setenv('platform-fvm')
+    # Set the platform name.
+    cfg.env.platform = 'fvm'
+    # Set the platform flags.
+    cfg.env.append_value('CFLAGS', ['-std=c99'])
+    # Load the appropriate C compiler.
+    cfg.load('compiler_c')
+
+def build(bld):
+    bld.stlib(source = bld.path.ant_glob('src/**'), target = 'platform-fvm', env = bld.all_envs['platform-fvm'])

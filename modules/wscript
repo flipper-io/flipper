@@ -1,0 +1,15 @@
+# Modules build script.
+
+from waflib import Errors
+import os
+
+def configure(cfg):
+    pass
+
+def build(bld):
+    platforms = bld.env.PLATFORMS
+    for platform in platforms:
+        name = os.path.basename(platform)
+        _env = bld.all_envs['platform-' + name]
+        if _env.BUILD_MODULES:
+            bld.stlib(source = bld.path.ant_glob('*/src/**') + bld.path.ant_glob('*/targets/' + name + '/**'), target = 'modules-' + name, env = _env)

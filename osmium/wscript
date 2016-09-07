@@ -1,0 +1,16 @@
+# Osmium build script.
+
+import os
+
+def configure(cfg):
+    pass
+
+def build(bld):
+    for platform in bld.env.PLATFORMS:
+        name = os.path.basename(platform)
+        _env = bld.all_envs['platform-' + name]
+        if _env.BUILD_OSMIUM:
+            bld.program(source = bld.path.ant_glob('src/**'), target = 'osmium-' + name + '.elf', use = 'platform-' + name + ' modules-' + name, install_path = None, env = _env)
+            bld(rule = '${OBJCOPY} -O ihex ${SRC} ${TGT}', source = 'osmium-' + name + '.elf', target = 'osmium-' + name + '.hex', env = _env)
+            if bld.options.upload == name:
+                bld(features = _env.UPLOADER, source = 'osmium-' + name + '.hex', env = _env)

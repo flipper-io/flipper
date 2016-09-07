@@ -1,0 +1,8 @@
+# Osmium build script.
+
+def configure(cfg):
+    pass
+
+def build(bld):
+    # Build libflipper.
+    bld.shlib(source = bld.path.ant_glob('src/**'), target = 'flipper', name = 'libflipper', use = 'platform-posix' + ' modules-posix', env = bld.all_envs['platform-posix'])

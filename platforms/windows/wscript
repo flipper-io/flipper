@@ -1,0 +1,10 @@
+# Platform build script.
+
+# Target: Windows
+
+def configure(cfg):
+    cfg.setenv('top')
+    cfg.setenv('platform-windows', cfg.env.derive())
+
+def build(bld):
+    pass
