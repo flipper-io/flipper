@@ -1,5 +1,6 @@
 .DS_Store
 .lock-waf*
+.waf*
 build/
 *.xcodeproj
 *.module

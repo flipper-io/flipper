@@ -1,21 +1,25 @@
-# Toolbox
+# Flipper Toolbox
 
 ### Overview
 
-**The Flipper "Toolbox" is a repository of sofware components designed to work together to provide effortless control of Flipper hardware from a wide variety of host platforms and programming environments.**
+Flipper is an embedded development platform that provides application level abstraction over common hardware peripherals such as **GPIO**, **I2C**, **SPI**, **UART**, and more. The Flipper "Toolbox", or simply toolbox, is a repository of discrete sofware components designed to provide effortless control of Flipper hardware from a wide variety of host platforms and programming environments.
 
-A lightweight control stack known as the Flipper Message Runtime lies at the heart of the toolbox and fascilitates real time interaction with Flipper hardware. The message runtime allows collections of applications, functions, routines, and variables to be modified, invoked, or replaced during runtime. FMR also enables the seamless transmission of data between separate address spaces with no overhead to user programs.
+This repository is organized into a variety of submodules that contain the sources to discrete components pertainent to the differing layers of abstraction mentioned above. More on each of these submodules can be found within the `README` of the submodule. 
 
-This repository is organized into a variety of subfolders that contain the source for discreet components pertainent to the Flipper project as a whole. The roles of these components are described below.
+### Building
 
-### Components
+> ⚠️ **Warning:** Python (>= 2.5) must be installed to build the toolbox.
 
-#### modules
+The **toolbox** uses the [**Waf**](https://github.com/waf-project/waf) build system. *"Waf is a Python-based framework for configuring, compiling and installing applications."*
 
+This repository ships with an executable Waf script. The only dependancy required to execute the Waf script is Python. The entire source can be configured and compiled using the following command.
 
+```
+./waf configure build
+```
 
-#### osmium
+Any platform specific dependancies not found will be listed duing the configuration phase. Subsequent compilations can be performed simply by executing the Waf script.
 
-#### libflipper
-
-#### firmware
+```
+./waf
+```
