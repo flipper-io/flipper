@@ -13,6 +13,8 @@ def configure(cfg):
     # Set the platform flags.
     cfg.env.append_value('CFLAGS', ['-std=c99', '-Os', '-DARCH=ARCH_AVR8', '-D__AVR_ATMEGA16U2__', '-DF_CPU=16000000UL', '-Wno-pragmas', '-mmcu=atmega16u2'])
     cfg.env.append_value('LDFLAGS', '-mmcu=atmega16u2')
+    # Load the appropriate binary utilities.
+    cfg.find_program('avr-objcopy', var='OBJCOPY')
     # Load the appropriate archiver.
     cfg.find_program('avr-ar', var='AR')
      # Load the appropriate assembler.
@@ -23,8 +25,6 @@ def configure(cfg):
     # Load the appropriate C compiler.
     cfg.find_program('avr-gcc', var='CC')
     cfg.load('gcc')
-    # Load the appropriate binary utilities.
-    cfg.find_program('avr-objcopy', var='OBJCOPY')
     # Load the appropriate uploader.
     cfg.env.UPLOADER = 'dfu_programmer'
     cfg.load('dfu_programmer', tooldir = 'tools')

@@ -8,12 +8,11 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/* Define USB related constants. */
+/* Used to  */
 #define USB_VENDOR_ID	0x16C0
 #define USB_PRODUCT_ID	0x0480
 #define USB_USAGE_PAGE	0xFFAB

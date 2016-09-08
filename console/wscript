@@ -1,8 +1,7 @@
 # Console build script.
 
 def configure(cfg):
-    # Load the appropriate C compiler.
-    cfg.load('compiler_c')
+    pass
 
 def build(bld):
-    bld.program(source = bld.path.ant_glob('src/**'), target = 'flipper', name = 'console', use = 'libflipper platform-fvm', env = bld.all_envs['platform-posix'])
+    bld.program(source = bld.path.ant_glob('src/**'), target = 'flipper', name = 'console', use = 'flipper platform-fvm', env = bld.all_envs['platform-posix'])

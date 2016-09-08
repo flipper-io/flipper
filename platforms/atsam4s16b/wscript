@@ -13,6 +13,8 @@ def configure(cfg):
     # Set the platform flags.
     cfg.env.append_value('CFLAGS', ['-std=c99', '-Os', '-nostartfiles', '-ffreestanding', '-mthumb', '-mcpu=cortex-m4'])
     cfg.env.append_value('LDFLAGS', '--specs=rdimon.specs')
+    # Load the appropriate binary utilities.
+    cfg.find_program('arm-none-eabi-objcopy', var='OBJCOPY')
     # Load the appropriate archiver.
     cfg.find_program('arm-none-eabi-ar', var='AR')
      # Load the appropriate assembler.
@@ -23,8 +25,6 @@ def configure(cfg):
     # Load the appropriate C compiler.
     cfg.find_program('arm-none-eabi-gcc', var='CC')
     cfg.load('gcc')
-    # Load the appropriate binary utilities.
-    cfg.find_program('arm-none-eabi-objcopy', var='OBJCOPY')
 
 def build(bld):
     bld.stlib(source = bld.path.ant_glob('src/**'), target = 'platform-atsam4s16b', env = bld.all_envs['platform-atsam4s16b'])

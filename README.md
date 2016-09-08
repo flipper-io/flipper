@@ -2,9 +2,11 @@
 
 ### Overview
 
-Flipper is an embedded development platform that provides application level abstraction over common hardware peripherals such as **GPIO**, **I2C**, **SPI**, **UART**, and more. The Flipper "Toolbox", or simply toolbox, is a repository of discrete sofware components designed to provide effortless control of Flipper hardware from a wide variety of host platforms and programming environments.
+Flipper is an embedded development platform designed from the ground up to provide seamless abstraction between the application layer and common hardware peripherals such as **GPIO**, **I2C**, **SPI**, **UART**, and more.
 
-This repository is organized into a variety of submodules that contain the sources to discrete components pertainent to the differing layers of abstraction mentioned above. More on each of these submodules can be found within the `README` of the submodule. 
+The **Flipper Toolbox** is a repository of discrete sofware components designed to control Flipper hardware from a wide variety of host platforms and programming environments.
+
+This repository is organized into a variety of submodules pertainent to the differing layers of abstraction mentioned above. More on each of these submodules can be found within the `README` of the submodule.
 
 ### Building
 
