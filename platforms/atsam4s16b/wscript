@@ -14,17 +14,17 @@ def configure(cfg):
     cfg.env.append_value('CFLAGS', ['-std=c99', '-Os', '-nostartfiles', '-ffreestanding', '-mthumb', '-mcpu=cortex-m4'])
     cfg.env.append_value('LDFLAGS', '--specs=rdimon.specs')
     # Load the appropriate archiver.
-    cfg.find_program('arm-elf-eabi-ar', var='AR')
+    cfg.find_program('arm-none-eabi-ar', var='AR')
      # Load the appropriate assembler.
-    cfg.find_program('arm-elf-eabi-as', var='AS')
+    cfg.find_program('arm-none-eabi-as', var='AS')
     cfg.env.AS_TGT_F = ['-c', '-o']
     cfg.env.ASLNK_TGT_F = ['-o']
     cfg.load('asm')
     # Load the appropriate C compiler.
-    cfg.find_program('arm-elf-eabi-gcc', var='CC')
+    cfg.find_program('arm-none-eabi-gcc', var='CC')
     cfg.load('gcc')
     # Load the appropriate binary utilities.
-    cfg.find_program('arm-elf-eabi-objcopy', var='OBJCOPY')
+    cfg.find_program('arm-none-eabi-objcopy', var='OBJCOPY')
 
 def build(bld):
     bld.stlib(source = bld.path.ant_glob('src/**'), target = 'platform-atsam4s16b', env = bld.all_envs['platform-atsam4s16b'])

@@ -12,3 +12,4 @@ build/
 *.so
 *.dylib
 *.swp
+*.nix
