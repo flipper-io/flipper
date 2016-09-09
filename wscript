@@ -23,7 +23,7 @@ def configure(cfg):
     cfg.env.STLIB_MARKER = []
     cfg.env.SHLIB_MARKER = []
     # Obtain platforms.
-    cfg.env.PLATFORMS = [cfg.path.abspath() + '/platforms/posix'] #map(str, cfg.path.ant_glob('platforms/*', dir=True, src=False))
+    cfg.env.PLATFORMS = map(str, cfg.path.ant_glob('platforms/*', dir=True, src=False))
     # Create platform environments.
     for platform in [os.path.basename(platform) for platform in cfg.env.PLATFORMS]:
         _env = cfg.env.derive()
@@ -38,7 +38,7 @@ def build(bld):
     # Build all of the supported platforms.
     _platforms(bld)
     # Build Osmium.
-#    bld.recurse('osmium')
+    bld.recurse('osmium')
     # Build libflipper.
     bld.recurse('libflipper')
     # Build the console.
