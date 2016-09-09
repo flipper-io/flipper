@@ -27,7 +27,8 @@ def configure(cfg):
     cfg.load('gcc')
 
 def build(bld):
-    bld.stlib(source = bld.path.ant_glob('src/**'), target = 'platform-atsam4s16b', env = bld.all_envs['platform-atsam4s16b'])
+    _env = bld.all_envs['platform-atsam4s16b']
+    bld.stlib(source = bld.path.ant_glob('src/**'), target = 'platform-atsam4s16b', env = _env)
 
 def upload(ctx):
     pass

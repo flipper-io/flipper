@@ -3,8 +3,7 @@
 # Target: Espressif ESP8266EX
 
 def configure(cfg):
-    cfg.setenv('top')
-    cfg.setenv('platform-esp8266ex', cfg.env.derive())
+    cfg.setenv('platform-esp8266ex')
 
 def build(bld):
     pass

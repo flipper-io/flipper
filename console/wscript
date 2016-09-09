@@ -4,4 +4,5 @@ def configure(cfg):
     pass
 
 def build(bld):
-    bld.program(source = bld.path.ant_glob('src/**'), target = 'flipper', name = 'console', use = 'flipper platform-fvm', env = bld.all_envs['platform-posix'])
+    _env = bld.all_envs['platform-posix'].derive()
+    bld.program(source = bld.path.ant_glob('src/**'), target = 'flipper', name = 'console', use = 'flipper', env = _env)

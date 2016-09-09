@@ -30,4 +30,5 @@ def configure(cfg):
     cfg.load('dfu_programmer', tooldir = 'tools')
 
 def build(bld):
-    bld.stlib(source = bld.path.ant_glob('src/**'), target = 'platform-atmega16u2', env = bld.all_envs['platform-atmega16u2'])
+    _env = bld.all_envs['platform-atmega16u2']
+    bld.stlib(source = bld.path.ant_glob('src/**'), target = 'platform-atmega16u2', env = _env)

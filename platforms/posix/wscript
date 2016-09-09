@@ -10,12 +10,11 @@ def configure(cfg):
     cfg.env.BUILD_MODULES = True
     # Set the platform flags.
     cfg.env.append_value('CFLAGS', ['-std=c99'])
-    # Check for libusb-1.0.
-    cfg.check_cfg(package = 'libusb-1.0')
     # Load the appropriate C compiler.
     cfg.load('compiler_c')
+    # Check for and import libusb-1.0.
+    cfg.check(lib = 'usb-1.0', mandatory = True, uselib_store = 'usb-1.0')
 
 def build(bld):
-    # Find and load libusb-1.0.
-    bld.read_shlib('usb-1.0')
-    bld.stlib(source = bld.path.ant_glob('src/**'), target = 'platform-posix', use = 'usb-1.0', env = bld.all_envs['platform-posix'])
+    _env = bld.all_envs['platform-posix'].derive()
+    bld.stlib(source = bld.path.ant_glob('src/**'), target = 'platform-posix', use = 'usb-1.0', env = _env)

@@ -5,4 +5,5 @@ def configure(cfg):
 
 def build(bld):
     # Build libflipper.
-    bld.shlib(source = bld.path.ant_glob('src/**'), target = 'flipper', use = 'platform-posix' + ' modules-posix', env = bld.all_envs['platform-posix'])
+    _env = bld.all_envs['platform-posix'].derive()
+    bld.shlib(source = bld.path.ant_glob('src/**'), target = 'flipper', use = 'platform-posix' + ' modules-posix', env = _env)
