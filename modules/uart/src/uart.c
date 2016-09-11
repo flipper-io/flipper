@@ -3,12 +3,12 @@
 
 /* Define the virtual interface for this module. */
 const struct _uart uart = {
-	usart0_configure,
-	usart0_enable,
-	usart0_disable,
-	usart0_ready,
-	usart0_put,
-	usart0_get,
-	usart0_push,
-	usart0_pull,
+	uart_configure,
+	uart_enable,
+	uart_disable,
+	uart_ready,
+	uart_put,
+	uart_get,
+	uart_push,
+	uart_pull,
 };

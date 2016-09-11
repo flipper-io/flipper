@@ -18,20 +18,18 @@ extern const struct _uart {
 
 #ifdef __private_include__
 
-/* ----------------------- USART0 ----------------------- */
-
 /* Declare the FMR overlay for this driver. */
 enum { _usart_configure, _usart_enable, _usart_disable, _usart_ready, _usart_put, _usart_get, _usart_push, _usart_pull };
 
 /* Declare each prototype for all functions within this driver. */
-void usart0_configure(void *baud);
-void usart0_enable(void);
-void usart0_disable(void);
-uint8_t usart0_ready(void);
-void usart0_put(uint8_t byte);
-uint8_t usart0_get();
-void usart0_push(void *source, uint32_t length);
-void usart0_pull(void *destination, uint32_t length);
+void uart_configure(void *baud);
+void uart_enable(void);
+void uart_disable(void);
+uint8_t uart_ready(void);
+void uart_put(uint8_t byte);
+uint8_t uart_get();
+void uart_push(void *source, uint32_t length);
+void uart_pull(void *destination, uint32_t length);
 
 #endif
 #endif
