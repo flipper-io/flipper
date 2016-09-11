@@ -133,7 +133,6 @@ struct _fmr_arg *fmr_pop(struct _fmr_list *list);
 void fmr_free(struct _fmr_list *list);
 /* Binds a module to its counterpart the selected Flipper device. */
 int fmr_bind(struct _fmr_module *module, char *name);
-/* Generates a message runtime packet capable of invoking the specified function with the given argument list. */
 int fmr_generate(struct _fmr_module *module, fmr_function function, struct _fmr_list *args, struct _fmr_packet *packet);
 /* Parses an fmr_packet and generates the necessary side effects. */
 void fmr_parse(struct _fmr_packet *packet);

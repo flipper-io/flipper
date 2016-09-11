@@ -3,8 +3,6 @@
 #include <flipper/error.h>
 #include <flipper/flipper.h>
 
-#ifndef __fmr_omit_constructors__
-
 struct _fmr_list *fmr_build(fmr_argc argc, ...) {
 	/* Ensure that the argument count is within bounds. */
 	if (argc > FMR_MAX_ARGC) {
@@ -178,8 +176,6 @@ int fmr_generate(struct _fmr_module *module, fmr_function function, struct _fmr_
 	fmr_free(args);
 	return lf_success;
 }
-
-#endif
 
 void fmr_parse(struct _fmr_packet *packet) {
 	

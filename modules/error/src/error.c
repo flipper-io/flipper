@@ -2,7 +2,12 @@
 #include <flipper/error.h>
 #include <flipper/flipper.h>
 
-char *error_messages[] = { "No error.", "Malloc failure.", "Null pointer.", "Overflow.", "No target device.", "Device not attached.", "Device already attached.", "File already exists.", "File does not exist.", "FMR packet overflow.", "Endpoint error.", "Libusb error.", "Transfer error.", "Socket error.", "No module counterpart found." };
+#define KNRM  "\x1B[0m"
+#define KRED  "\x1B[31m"
+#define KBLU  "\x1B[34m"
+#define KYEL  "\x1B[33m"
+
+char *error_messages[] = { "no error", "malloc failure", "null pointer", "overflow", "no target device", "device not attached", "device already attached", "file already exists", "file does not exist", "packet overflow", "endpoint error", "libusb error", "transfer error", "socket error", "no module found" };
 
 void error_raise(lf_error_t error, const char *format, ...) {
 	/* Create a local copy of the error code. */
@@ -26,11 +31,12 @@ void error_raise(lf_error_t error, const char *format, ...) {
 raise:
 		/* Print the exception if a message is provided. */
 		if (format) {
+			fprintf(stderr, KYEL "\nThe Flipper runtime encountered the following error:\n  " KRED "'");
 			vfprintf(stderr, format, argv);
-			fprintf(stderr, "\n\n");
+			fprintf(stderr, "'\n");
 		}
 		/* Print the error code. */
-		fprintf(stderr, "Error code (%i): %s\n\n", _error, error_messages[_error]);
+		fprintf(stderr, KNRM "Error code (%i): '" KBLU "%s" KNRM "'\n\n", _error, error_messages[_error]);
 		/* Release the va_list. */
 		va_end(argv);
 		/* Exit. */

@@ -39,7 +39,7 @@ int usb_configure(struct _lf_endpoint *endpoint) {
 	/* Attach a physical device to this endpoint. */
 	record -> handle = libusb_open_device_with_vid_pid(record -> context, VENDOR, PRODUCT);
 	if (!(record -> handle)) {
-		error_raise(E_LIBUSB, error_message("Failed to open USB device."));
+		error_raise(E_LIBUSB, error_message("No Flipper device attached."));
 		return lf_error;
 	}
 	/* Claim the interface used to send and receive message runtime packets. */
