@@ -2,10 +2,11 @@
 #include <flipper/uart.h>
 #include <platform/atmega16u2.h>
 
-void uart_configure(void *baudrate) {
-	uint16_t baud = (uint16_t)(baudrate);
-	UBRR1H = hi(baud);
-	UBRR1L = lo(baud);
+void uart_configure(void) {
+#define BAUD PLATFORM_BAUDRATE
+#include <util/setbaud.h>
+	UBRR1H = UBRRH_VALUE;
+	UBRR1L = UBRRL_VALUE;
 	UCSR1C = (1 << USBS1) | (3 << UCSZ10);
 	UCSR1B = (1 << RXEN1) | (1 << TXEN1);
 	/* Enable the USART interrupt. */

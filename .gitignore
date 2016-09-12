@@ -1,4 +1,5 @@
 .DS_Store
+.clang_complete
 .lock-waf*
 .waf*
 build/

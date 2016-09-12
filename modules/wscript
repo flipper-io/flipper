@@ -13,3 +13,4 @@ def build(bld):
         _env = bld.all_envs['platform-' + name].derive()
         if _env.BUILD_MODULES:
             bld.stlib(source = bld.path.ant_glob('*/src/**') + bld.path.ant_glob('*/targets/' + name + '/**'), target = 'modules-' + name, env = _env)
+    bld.install_files('${PREFIX}/include/flipper/', bld.path.ant_glob('*/include/flipper/**'))

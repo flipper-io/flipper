@@ -16,7 +16,7 @@
 #define enable_interrupts() sei()
 #define disable_interrupts() cli()
 
-#define baudrate(baudrate) ((F_CPU / 8 / baudrate - 1) / 2)
+#define PLATFORM_BAUDRATE 115200
 
 #define delay_ms(ms) _delay_ms(ms)
 #define delay_seconds(sec) delay_ms(sec * 1000)
@@ -36,7 +36,6 @@
 #define FLASH_RESET_DDR         DDRD
 #define FLASH_RESET_PORT        PORTD
 #define FLASH_RESET_PIN         0x00
-
 
 #define LED_DDR                 DDRC
 #define LED_PORT                PORTC

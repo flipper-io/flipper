@@ -22,7 +22,7 @@ extern const struct _uart {
 enum { _usart_configure, _usart_enable, _usart_disable, _usart_ready, _usart_put, _usart_get, _usart_push, _usart_pull };
 
 /* Declare each prototype for all functions within this driver. */
-void uart_configure(void *baud);
+void uart_configure(void);
 void uart_enable(void);
 void uart_disable(void);
 uint8_t uart_ready(void);

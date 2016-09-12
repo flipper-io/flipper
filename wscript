@@ -43,3 +43,6 @@ def build(bld):
     bld.recurse('libflipper')
     # Build the console.
     bld.recurse('console')
+    # Install the top-level headers.
+    bld.install_files('${PREFIX}/include/', bld.path.ant_glob('include/flipper.h'))
+    bld.install_files('${PREFIX}/include/flipper/', bld.path.ant_glob('include/flipper/**'))
