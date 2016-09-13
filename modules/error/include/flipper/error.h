@@ -26,8 +26,16 @@ enum {
 	E_LAST
 };
 
-/* Nullifies error messages on platforms that do not need to store them. */
+/* If this flag is set, error messages are nullified on platforms that do not need to store error strings. */
+#ifdef __enable_error_side_effects__
+/* These are the error strings that correspond to the values in the error code enumeration. */
+#define LF_ERROR_MESSAGE_STRINGS "no error", "malloc failure", "null pointer", "overflow", "no target device", "device not attached", "device already attached", "file already exists", "file does not exist", "packet overflow", "endpoint error", "libusb error", "transfer error", "socket error", "no module found"
+/* Allow the 'error_message' macro to serve as a passthrough for any variadic arguments supplied to it. */
 #define error_message(...) __VA_ARGS__
+#else
+/* Define the 'error_message' macro as NULL to prevent memory from being wasted storing error strings that will never be used.*/
+#define error_message(...) NULL
+#endif
 
 /* Prevents the execution of a statement from producing error-related side effects. */
 #define suppress_errors(statement) error_pause(); statement; error_resume();

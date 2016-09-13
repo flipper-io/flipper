@@ -87,7 +87,7 @@ struct _lf_device {
 	/* The current error state of the device. */
 	lf_error_t error;
 	/* Describes whether or not errors generated on this device will produce side effects on the host. */
-	uint8_t errors_cause_exit;
+	uint8_t errors_generate_side_effects;
 	/* The next device in the list of attached devices. */
 	struct _lf_device *next;
 };

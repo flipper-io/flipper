@@ -4,8 +4,8 @@
 
 def configure(cfg):
     cfg.setenv('platform-atmega16u2')
-    # Set the platform name.
-    cfg.env.platform = 'atmega16u2'
+    # Set the target name.
+    cfg.env.TARGET = 'atmega16u2'
     # Build osmium for the platform.
     cfg.env.BUILD_OSMIUM = True
     # Build modules for this platform.

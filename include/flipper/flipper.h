@@ -12,6 +12,7 @@
 
 /* ~ Declare the virtual interface for this driver. ~ */
 extern struct _flipper {
+#ifdef __flipper_constructors__
 	/* Attaches the current instance of libflipper to the first available device over the default endpoint. */
 	int (* attach)(void);
 	/* Attaches to a Flipper device by name over the default endpoint. */
@@ -28,6 +29,7 @@ extern struct _flipper {
 	int (* exit)(void);
 	/* The head of a linked list that aggregates all attached devices. */
 	struct _lf_device *attached;
+#endif
 	/* The selected device with which interaction will take place. */
 	struct _lf_device *device;
 } flipper;
@@ -36,29 +38,29 @@ extern struct _flipper {
 
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
 
-int flipper_attach(void);
-int flipper_attach_usb(char *name);
-int flipper_attach_network(char *name, char *hostname);
-int flipper_attach_endpoint(char *name, const struct _lf_endpoint *endpoint);
-int flipper_select(char *name);
-int flipper_detach(char *name);
-int flipper_exit(void);
+extern int flipper_attach(void);
+extern int flipper_attach_usb(char *name);
+extern int flipper_attach_network(char *name, char *hostname);
+extern int flipper_attach_endpoint(char *name, const struct _lf_endpoint *endpoint);
+extern int flipper_select(char *name);
+extern int flipper_detach(char *name);
+extern int flipper_exit(void);
 
 /* ~ User functions. ~ */
 
 /* Performs a proper function invocation on the device associated with the provided module. */
-int lf_invoke(struct _fmr_module *module, fmr_function function, struct _fmr_list *args);
+extern int lf_invoke(struct _fmr_module *module, fmr_function function, struct _fmr_list *args);
 
 /* ~ Helper functions. ~ */
 
 /* Gets the word size of the specified device. */
-fmr_type lf_word_size(struct _lf_device *device);
+extern fmr_type lf_word_size(struct _lf_device *device);
 /* Sends a packet to the specified device. */
-int lf_transfer_packet(struct _lf_device *device, struct _fmr_packet *packet);
+extern int lf_transfer_packet(struct _lf_device *device, struct _fmr_packet *packet);
 /* Retrieves a packet from the specified device. */
-int lf_retrieve_packet(struct _lf_device *device, struct _fmr_packet *packet);
+extern int lf_retrieve_packet(struct _lf_device *device, struct _fmr_packet *packet);
 /* Obtains a packet from the specified device and parses the result of the previous operation. */
-int lf_obtain_result(struct _lf_device *device, struct _fmr_result *result);
+extern int lf_obtain_result(struct _lf_device *device, struct _fmr_result *result);
 
 #endif
 #endif

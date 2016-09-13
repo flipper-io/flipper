@@ -4,12 +4,12 @@
 
 def configure(cfg):
     cfg.setenv('platform-posix')
-    # Set the platform name.
-    cfg.env.platform = 'posix'
+    # Set the target name.
+    cfg.env.TARGET = 'fmr'
     # Build modules for this platform.
     cfg.env.BUILD_MODULES = True
     # Set the platform flags.
-    cfg.env.append_value('CFLAGS', ['-std=c99'])
+    cfg.env.append_value('CFLAGS', ['-std=c99', '-D__flipper_constructors__', '-D__enable_error_side_effects__', '-D__fs_transfer_symbols__'])
     # Load the appropriate C compiler.
     cfg.load('compiler_c')
     # Check for and import libusb-1.0.

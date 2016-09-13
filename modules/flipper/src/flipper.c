@@ -3,17 +3,20 @@
 #include <flipper/error.h>
 #include <platform/posix.h>
 
-#ifndef __fmr_standalone__
-
 /* Expose the virtual interface for this driver. */
 struct _flipper flipper = {
+#ifdef __flipper_constructors__
 	flipper_attach,
 	flipper_attach_usb,
 	flipper_attach_network,
 	flipper_attach_endpoint,
 	flipper_select,
 	flipper_detach
+#endif
 };
+
+/* On devices that do not support messaging other Flipper devices, the device record construction symbols can be omitted; disable this flag to omit said symbols. */
+#ifdef __flipper_constructors__
 
 struct _lf_device *lf_attach(char *name) {
 	/* Allocate memory to contain the record of the device. */
@@ -27,7 +30,7 @@ struct _lf_device *lf_attach(char *name) {
 	/* Set the device's identifier. */
 	device -> identifier = lf_checksum(name, strlen(name));
 	/* Cause the device to generate error related side effects on the host. */
-	device -> errors_cause_exit = true;
+	device -> errors_generate_side_effects = true;
 	/* Obtain the head of the linked list of attached devices. */
 	struct _lf_device *last, *head = flipper.attached;
 	last = head;
@@ -191,6 +194,8 @@ int __attribute__((__destructor__)) flipper_exit(void) {
 	return lf_success;
 }
 
+#endif
+
 fmr_type lf_word_size(struct _lf_device *device) {
 	/* If no device is selected, raise an error. */
 	if (!device) {
@@ -272,5 +277,3 @@ int lf_obtain_result(struct _lf_device *device, struct _fmr_result *result) {
 	memcpy(result, &(packet.body), sizeof(struct _fmr_result));
 	return lf_success;
 }
-
-#endif

@@ -46,7 +46,7 @@ void sam_reset(void) {
 
 void sam_erase(void) {
 	/* Disable interrupts. */
-	disable_interrupts();
+	cli();
 	/* Indicate that we are busy. */
 	led_set_rgb(LED_COLOR_BUSY);
 	/* Power down the primary CPU. */
@@ -70,5 +70,5 @@ void sam_erase(void) {
 	/* Indicate that the operation was successful. */
 	led_set_rgb(LED_COLOR_SUCCESS);
 	/* Re-enable interrupts. */
-	enable_interrupts();
+	sei();
 }

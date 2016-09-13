@@ -12,8 +12,8 @@ int main(int argc, char *argv[]) {
 	raw[0] = atoi(argv[1]);
 	raw[1] = atoi(argv[2]);
 	raw[2] = atoi(argv[3]);
-	usb_push(raw, FMR_PACKET_SIZE);
-	usb_pull(raw, FMR_PACKET_SIZE);
+	libusb_push(raw, FMR_PACKET_SIZE);
+	libusb_pull(raw, FMR_PACKET_SIZE);
 
 	flipper_exit();
 

@@ -6,4 +6,8 @@ def configure(cfg):
 def build(bld):
     # Build libflipper.
     _env = bld.all_envs['platform-posix'].derive()
-    bld.shlib(source = bld.path.ant_glob('src/**'), target = 'flipper', use = 'platform-posix' + ' modules-posix', env = _env)
+    # Even though none of the symbols are used, include them in the shared library.
+    _env.append_value('LDFLAGS', '-Wl,-all_load')
+#    _env.STLIB_MARKER = '-Wl,--whole-archive'
+#    _env.SHLIB_MARKER = '-Wl,--no-whole-archive'
+    bld.shlib(source = bld.path.ant_glob('src/**'), target = 'flipper', use = 'platform-posix modules-posix', env = _env)

@@ -1,22 +1,25 @@
 /* usb.c - USB endpoint wrapper using libusb. */
 
 #define __private_include__
-#include <platform/posix/usb.h>
 #include <flipper/flipper.h>
+#include <platform/posix/libusb.h>
 #include <libusb-1.0/libusb.h>
 #include <flipper/error.h>
+
+#define INTERRUPT_ENDPOINT	0x01
+#define BULK_ENDPOINT		0x03
 
 #define USB_DIRECTION_IN 0x80
 #define USB_DIRECTION_OUT 0x01
 
-const struct _lf_endpoint usb = {
-	usb_configure,
-	usb_ready,
-	usb_put,
-	usb_get,
-	usb_push,
-	usb_pull,
-	usb_destroy
+const struct _lf_endpoint libusb = {
+	libusb_configure,
+	libusb_ready,
+	libusb_put,
+	libusb_get,
+	libusb_push,
+	libusb_pull,
+	libusb_destroy
 };
 
 struct _libusb_record {
@@ -24,7 +27,7 @@ struct _libusb_record {
 	struct libusb_context *context;
 };
 
-int usb_configure(struct _lf_endpoint *endpoint) {
+int libusb_configure(struct _lf_endpoint *endpoint) {
 	/* Allocate memory for the USB record if it has not yet been allocated. */
 	if (!(endpoint -> record)) {
 		endpoint -> record = malloc(sizeof(struct _libusb_record));
@@ -37,7 +40,7 @@ int usb_configure(struct _lf_endpoint *endpoint) {
 		return lf_error;
 	}
 	/* Attach a physical device to this endpoint. */
-	record -> handle = libusb_open_device_with_vid_pid(record -> context, VENDOR, PRODUCT);
+	record -> handle = libusb_open_device_with_vid_pid(record -> context, USB_VENDOR_ID, USB_PRODUCT_ID);
 	if (!(record -> handle)) {
 		error_raise(E_LIBUSB, error_message("No Flipper device attached."));
 		return lf_error;
@@ -54,21 +57,21 @@ int usb_configure(struct _lf_endpoint *endpoint) {
 	return lf_success;
 }
 
-uint8_t usb_ready(void) {
+uint8_t libusb_ready(void) {
 
 	return 0;
 }
 
-void usb_put(uint8_t byte) {
+void libusb_put(uint8_t byte) {
 
 }
 
-uint8_t usb_get(void) {
+uint8_t libusb_get(void) {
 
 	return 0;
 }
 
-int usb_transfer(void *data, lf_size_t length, uint8_t direction) {
+int libusb_transfer(void *data, lf_size_t length, uint8_t direction) {
 	struct _libusb_record *record = flipper.device -> endpoint -> record;
 	if (!record) {
 		error_raise(E_ENDPOINT, error_message("No libusb record associated with the selected USB endpoint. Did you attach?"));
@@ -88,15 +91,15 @@ int usb_transfer(void *data, lf_size_t length, uint8_t direction) {
 	return lf_success;
 }
 
-int usb_push(void *source, lf_size_t length) {
-	return usb_transfer(source, length, USB_DIRECTION_OUT);
+int libusb_push(void *source, lf_size_t length) {
+	return libusb_transfer(source, length, USB_DIRECTION_OUT);
 }
 
-int usb_pull(void *destination, lf_size_t length) {
-	return usb_transfer(destination, length, USB_DIRECTION_IN);
+int libusb_pull(void *destination, lf_size_t length) {
+	return libusb_transfer(destination, length, USB_DIRECTION_IN);
 }
 
-int usb_destroy(struct _lf_endpoint *endpoint) {
+int libusb_destroy(struct _lf_endpoint *endpoint) {
 	struct _libusb_record *record = flipper.device -> endpoint -> record;
 	if (!record) {
 		error_raise(E_ENDPOINT, error_message("No libusb record associated with the selected USB endpoint. Did you attach?"));

@@ -22,7 +22,7 @@ void nvm_reset(void) {
 }
 
 void nvm_write(nvm_p address) {
-	
+
 }
 
 void nvm_put(uint8_t byte) {
@@ -38,7 +38,13 @@ uint8_t nvm_get(void) {
 	return 0;
 }
 
-/* The symbols 'nvm_alloc' and 'nvm_free' are declared in alloc.c. */
+nvm_p nvm_alloc(lf_size_t length) {
+	return 0;
+}
+
+void nvm_free(nvm_p pointer) {
+
+}
 
 void nvm_format(void) {
 	memset(v_nvm, 0xFF, NVM_SIZE);

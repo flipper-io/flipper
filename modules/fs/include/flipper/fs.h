@@ -47,10 +47,13 @@ extern const struct _fs {
 	uint8_t (* get)(void);
 	/* Returns a pointer to a file's data within NVM. */
 	nvm_p (* data)(char *name);
+/* If this flag is turned on, symbols to move data from the host's file system to the device's will be enabled. */
+#ifdef __fs_transfer_symbols__
 	/* Copies a file from the host's filesystem to the device's filesystem. */
 	nvm_p (* transfer)(char *path, char *name);
 	/* Copies a file from the device's filesystem to the host's filesystem. */
 	void (* receive)(char *name, char *path);
+#endif
 } fs;
 
 #ifdef __private_include__
@@ -69,7 +72,7 @@ extern nvm_p _break_value;
 extern nvm_p _root_leaf;
 
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
-int fs_configure(void);
+extern int fs_configure(void);
 void fs_format(void);
 int fs_create(char *name, void *data, size_t length);
 int fs_remove(char *name);

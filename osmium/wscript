@@ -8,9 +8,11 @@ def configure(cfg):
 def build(bld):
     for platform in bld.env.PLATFORMS:
         name = os.path.basename(platform)
-        _env = bld.all_envs['platform-' + name]
+        _env = bld.all_envs['platform-' + name].derive()
         if _env.BUILD_OSMIUM:
             bld.program(source = bld.path.ant_glob('src/**'), target = 'osmium-' + name + '.elf', use = 'platform-' + name + ' modules-' + name, install_path = None, env = _env)
+            bld.add_group()
             bld(rule = '${OBJCOPY} -O ihex ${SRC} ${TGT}', source = 'osmium-' + name + '.elf', target = 'osmium-' + name + '.hex', env = _env)
+            bld.add_group()
             if bld.options.upload == name:
                 bld(features = _env.UPLOADER, source = 'osmium-' + name + '.hex', env = _env)

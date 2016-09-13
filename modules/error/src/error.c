@@ -7,8 +7,6 @@
 #define KBLU  "\x1B[34m"
 #define KYEL  "\x1B[33m"
 
-char *error_messages[] = { "no error", "malloc failure", "null pointer", "overflow", "no target device", "device not attached", "device already attached", "file already exists", "file does not exist", "packet overflow", "endpoint error", "libusb error", "transfer error", "socket error", "no module found" };
-
 void error_raise(lf_error_t error, const char *format, ...) {
 	/* Create a local copy of the error code. */
 	lf_error_t _error;
@@ -22,8 +20,10 @@ void error_raise(lf_error_t error, const char *format, ...) {
 	if (error != E_LAST) { flipper.device -> error = error; }
 	/* Set the local copy of the error. */
 	_error = flipper.device -> error;
+/* When set, this flag allows errors to cause system side effects. */
+#ifdef __enable_error_side_effects__
 	/* If the selected device is configured to cause side effects, do so. */
-	if (flipper.device -> errors_cause_exit) {
+	if (flipper.device -> errors_generate_side_effects) {
 		/* Construct a va_list to access variadic arguments. */
 		va_list argv;
 		/* Initialize the va_list that we created above. */
@@ -35,13 +35,19 @@ raise:
 			vfprintf(stderr, format, argv);
 			fprintf(stderr, "'\n");
 		}
+		/* Expose the error message strings. */
+		char *message[] = { LF_ERROR_MESSAGE_STRINGS };
 		/* Print the error code. */
-		fprintf(stderr, KNRM "Error code (%i): '" KBLU "%s" KNRM "'\n\n", _error, error_messages[_error]);
+		fprintf(stderr, KNRM "Error code (%i): '" KBLU "%s" KNRM "'\n\n", _error, message[_error]);
 		/* Release the va_list. */
 		va_end(argv);
 		/* Exit. */
 		exit(EXIT_FAILURE);
 	}
+#else
+raise:
+	return;
+#endif
 }
 
 void error_resume(void) {
@@ -51,7 +57,7 @@ void error_resume(void) {
 		return;
 	}
 	/* Change the configuration. */
-	flipper.device -> errors_cause_exit = true;
+	flipper.device -> errors_generate_side_effects = true;
 }
 
 void error_pause(void) {
@@ -61,5 +67,5 @@ void error_pause(void) {
 		return;
 	}
 	/* Change the configuration. */
-	flipper.device -> errors_cause_exit = false;
+	flipper.device -> errors_generate_side_effects = false;
 }

@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/spi.h>
-#include <platform/atsam4s16b.h>
+#include <flipper/fmr.h>
 
 void spi_configure() {
 
