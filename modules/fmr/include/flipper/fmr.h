@@ -60,6 +60,12 @@ static inline fmr_va fmr_intx(fmr_type type, fmr_va arg) {
 
 /* Standardizes the notion of a module. */
 struct _fmr_module {
+	/* A string containing the module's name. */
+	char *name;
+	/* A string giving the description of a module. */
+	char *description;
+	/* The version of the module. */
+	lf_version_t version;
 	/* The module's identifier. */
 	lf_id_t identifier;
 	/* The device upon which the module's counterpart is located. */

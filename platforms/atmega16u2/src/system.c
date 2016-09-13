@@ -8,10 +8,10 @@
 
 void system_task(void) {
 	while (1) {
-		char *packet[32];
+		uint8_t packet[32];
 		int8_t _e = interrupt_receive_packet((void *)(packet));
 		if (_e > 0) {
-
+			uart_push(packet, 32);
 		}
 	}
 }

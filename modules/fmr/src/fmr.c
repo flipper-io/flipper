@@ -138,6 +138,19 @@ int fmr_bind(struct _fmr_module *module, char *name) {
 }
 
 int fmr_generate(struct _fmr_module *module, fmr_function function, struct _fmr_list *args, struct _fmr_packet *packet) {
+	/* Ensure that each of the given parameters are valid. */
+	if (!module) {
+		error_raise(E_NULL, error_message("Invalid target module provided during message runtime packet generation."));
+		return lf_error;
+	}
+	if (!args) {
+		error_raise(E_NULL, error_message("Invalid argument list provided during message runtime packet generation."));
+		return lf_error;
+	}
+	if (!packet) {
+		error_raise(E_NULL, error_message("Invalid packet reference provided during message runtime packet generation."));
+		return lf_error;
+	}
 	/* Clear the packet. */
 	memset(packet, 0, sizeof(struct _fmr_packet));
 	/* Store the argument count in the packet. */
@@ -146,6 +159,7 @@ int fmr_generate(struct _fmr_module *module, fmr_function function, struct _fmr_
 	packet -> header.magic = 0xfe;
 	/* Calculate the number of bytes needed to encode the widths of the types. */
 	uint8_t encode_length = lf_ceiling((args -> argc * 2), 8);
+	/* Compute the initial length of the packet. */
 	packet -> header.length = sizeof(struct _fmr_header) + sizeof(struct _fmr_target) + encode_length;
 	/* Calculate the offset into the packet at which the arguments will be loaded. */
 	uint8_t *offset = (uint8_t *)&(packet -> body) + encode_length;
@@ -178,5 +192,5 @@ int fmr_generate(struct _fmr_module *module, fmr_function function, struct _fmr_
 }
 
 void fmr_parse(struct _fmr_packet *packet) {
-	
+
 }

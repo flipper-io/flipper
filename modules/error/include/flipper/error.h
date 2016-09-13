@@ -18,6 +18,7 @@ enum {
 	E_FS_EXISTS,
 	E_FS_NO_FILE,
 	E_FMR_OVERFLOW,
+	E_FMR,
 	E_ENDPOINT,
 	E_LIBUSB,
 	E_TRANSFER,
@@ -29,7 +30,7 @@ enum {
 /* If this flag is set, error messages are nullified on platforms that do not need to store error strings. */
 #ifdef __enable_error_side_effects__
 /* These are the error strings that correspond to the values in the error code enumeration. */
-#define LF_ERROR_MESSAGE_STRINGS "no error", "malloc failure", "null pointer", "overflow", "no target device", "device not attached", "device already attached", "file already exists", "file does not exist", "packet overflow", "endpoint error", "libusb error", "transfer error", "socket error", "no module found"
+#define LF_ERROR_MESSAGE_STRINGS "no error", "malloc failure", "null pointer", "overflow", "no target device", "device not attached", "device already attached", "file already exists", "file does not exist", "message runtime packet overflow", "message runtime error", "endpoint error", "libusb error", "transfer error", "socket error", "no module found"
 /* Allow the 'error_message' macro to serve as a passthrough for any variadic arguments supplied to it. */
 #define error_message(...) __VA_ARGS__
 #else

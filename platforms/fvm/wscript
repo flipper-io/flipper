@@ -5,7 +5,7 @@
 def configure(cfg):
     cfg.setenv('platform-fvm')
     # Set the platform name.
-    cfg.env.platform = 'fvm'
+    cfg.env.TARGET = 'fmr'
     # Set the platform flags.
     cfg.env.append_value('CFLAGS', ['-std=c99'])
     # Load the appropriate C compiler.

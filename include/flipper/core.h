@@ -3,6 +3,9 @@
 #ifndef __lf_core_h__
 #define __lf_core_h__
 
+/* The current version of libflipper. */
+#define LF_VERSION 0x0001
+
 /* Include the standard library headers. */
 #include <stdarg.h>
 #include <stdbool.h>
@@ -12,7 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* Used to  */
+/* Identification information for the USB controller. */
 #define USB_VENDOR_ID	0x16C0
 #define USB_PRODUCT_ID	0x0480
 #define USB_USAGE_PAGE	0xFFAB
@@ -28,6 +31,9 @@ typedef uint32_t nvm_p;
 /* Used to quantify block sizes sent accross different platforms. */
 typedef uint32_t lf_size_t;
 #define LF_SIZE_T_MAX UINT32_MAX
+
+/* Used to quantify the version of modules in a standardized format. */
+typedef uint16_t lf_version_t;
 
 #define lf_success 0
 #define lf_error -1
@@ -94,5 +100,8 @@ struct _lf_device {
 
 /* Provides a checksum for a given block of data. */
 lf_id_t lf_checksum(void *source, size_t length);
+
+/* Include all message runtime related declarations. */
+#include <flipper/fmr.h>
 
 #endif

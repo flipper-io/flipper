@@ -18,7 +18,8 @@ def configure(cfg):
     # Load the appropriate archiver.
     cfg.find_program('avr-ar', var='AR')
      # Load the appropriate assembler.
-    cfg.find_program('avr-as', var='AS')
+    cfg.find_program('avr-gcc', var='AS')
+    cfg.env.append_value('ASFLAGS', cfg.env['CFLAGS'])
     cfg.env.AS_TGT_F = ['-c', '-o']
     cfg.env.ASLNK_TGT_F = ['-o']
     cfg.load('asm')
