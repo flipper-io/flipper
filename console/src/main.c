@@ -6,12 +6,15 @@
 
 int main(int argc, char *argv[]) {
 
-	flipper_attach_endpoint("fvm", &lf_fvm_ep);
-//	flipper_attach();
+	flipper_attach();
+	uint8_t packet[FMR_PACKET_SIZE];
+	packet[0] = atoi(argv[1]);
+	packet[1] = atoi(argv[2]);
+	packet[2] = atoi(argv[3]);
+	libusb_push(packet, sizeof(packet));
 
-	adc.configure();
-	printf("%p\n", _adc);
-	printf("%s: %s\n", _adc -> name, _adc -> description);
+#if 0
+	flipper_attach_endpoint("fvm", &lf_fvm_ep);
 
 	/* Create an empty message runtime module instance. */
 	struct _fmr_module _lf_led_module;
@@ -22,11 +25,9 @@ int main(int argc, char *argv[]) {
 		error_raise(E_MODULE, "Failed to bind to LED module.");
 	}
 
-	/* Define the enumerator that will be laid over the driver structure. */
-	enum { _lf_led_configure, _lf_led_set_rgb };
-
 	/* Perform the function invocation. */
-	lf_invoke(&_lf_led_module, _lf_led_set_rgb, fmr_args(fmr_int8(0), fmr_int8(1), fmr_int8(2)));
+	lf_invoke(&_lf_led_module, _led_set_rgb, fmr_args(fmr_int8(0), fmr_int8(1), fmr_int8(2)));
+#endif
 
     return 0;
 }

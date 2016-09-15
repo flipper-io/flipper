@@ -143,5 +143,8 @@ int fmr_generate(struct _fmr_module *module, fmr_function function, struct _fmr_
 /* Parses an fmr_packet and generates the necessary side effects. */
 void fmr_parse(struct _fmr_packet *packet);
 
+/* Unpacks argument types and calls a function pointer per the given architecture's calling convention. */
+extern uint32_t fmr_call(void *function, uint8_t argc, uint16_t argt, void *argv);
+
 #endif
 #endif

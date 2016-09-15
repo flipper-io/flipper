@@ -11,7 +11,7 @@ void system_task(void) {
 		uint8_t packet[32];
 		int8_t _e = interrupt_receive_packet((void *)(packet));
 		if (_e > 0) {
-			uart_push(packet, 32);
+			fmr_call(&led_set_rgb, 3, 0x00, packet);
 		}
 	}
 }
