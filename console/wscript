@@ -1,8 +1,0 @@
-# Console build script.
-
-def configure(cfg):
-    pass
-
-def build(bld):
-    _env = bld.all_envs['platform-posix'].derive()
-    bld.program(source = bld.path.ant_glob('src/**'), target = 'flipper', name = 'console', use = 'flipper platform-fvm', env = _env)
