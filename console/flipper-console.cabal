@@ -10,7 +10,6 @@ maintainer:          travis@flipper.io
 copyright:           George Morgan, Travis Whitaker 2016
 category:            Flipper
 build-type:          Simple
--- extra-source-files:
 cabal-version:       >=1.10
 
 executable flipper
