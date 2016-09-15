@@ -6,6 +6,8 @@
 
 int main(int argc, char *argv[]) {
 
+#if 0
+
 	flipper_attach();
 	uint8_t packet[FMR_PACKET_SIZE];
 	packet[0] = atoi(argv[1]);
@@ -13,8 +15,11 @@ int main(int argc, char *argv[]) {
 	packet[2] = atoi(argv[3]);
 	libusb_push(packet, sizeof(packet));
 
-#if 0
-	flipper_attach_endpoint("fvm", &lf_fvm_ep);
+#else
+
+	//flipper_attach_endpoint("fvm", &lf_fvm_ep);
+
+	flipper_attach();
 
 	/* Create an empty message runtime module instance. */
 	struct _fmr_module _lf_led_module;
@@ -26,7 +31,8 @@ int main(int argc, char *argv[]) {
 	}
 
 	/* Perform the function invocation. */
-	lf_invoke(&_lf_led_module, _led_set_rgb, fmr_args(fmr_int8(0), fmr_int8(1), fmr_int8(2)));
+	lf_invoke(&_lf_led_module, _led_set_rgb, fmr_args(fmr_int8(atoi(argv[1])), fmr_int8(atoi(argv[2])), fmr_int8(atoi(argv[3]))));
+
 #endif
 
     return 0;

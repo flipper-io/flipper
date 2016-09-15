@@ -216,6 +216,7 @@ int lf_invoke(struct _fmr_module *module, fmr_function function, struct _fmr_lis
 	if (_e < lf_success) {
 		return lf_error;
 	}
+	return 0;
 	/* Receive a response packet from the target device. */
 	struct _fmr_result result;
 	_e = lf_obtain_result(module -> device, &result);

@@ -23,12 +23,8 @@ struct _fmr_list *fmr_build(fmr_argc argc, ...) {
 	while (argc --) {
 		/* Unstage the value of the argument from the variadic argument list. */
 		fmr_va value = va_arg(argv, fmr_va);
-		/* If the argument has overflowed, throw an error. */
-		if (value & (1UL << fmr_ovf_shift)) {
-			error_raise(E_OVERFLOW, error_message("The argument provided (0x%lx) cannot be sent over FMR without explicit truncation."), value);
-		}
 		/* Append the argument to the fmr_list. */
-		fmr_append(list, (fmr_type)((value >> fmr_type_shift) & 0x7), value);
+		fmr_append(list, (fmr_type)((value >> (sizeof(fmr_arg) * 8)) & 0x7), value);
 	}
 	/* Release the variadic argument list. */
 	va_end(argv);
@@ -60,18 +56,6 @@ void fmr_append(struct _fmr_list *list, fmr_type type, fmr_va value) {
 	if (!argument) {
 		error_raise(E_MALLOC, error_message("Failed to allocate the memory required to append to the argument list located at %p.", argument, list));
 		return;
-	}
-	/* If the type is implicit, chose a type width for the user. */
-	if (type == fmr_implicit_t) {
-		if (value < 0x100) {
-			type = fmr_int8_t;
-		}
-		else if (value < 0x10000) {
-			type = fmr_int16_t;
-		}
-		else {
-			type = fmr_int32_t;
-		}
 	}
 	/* Write the type and value of the argument into the list. */
 	memcpy(argument, &((struct _fmr_arg){ (fmr_arg)value, type, NULL }), sizeof(struct _fmr_arg));
@@ -153,10 +137,10 @@ int fmr_generate(struct _fmr_module *module, fmr_function function, struct _fmr_
 	}
 	/* Clear the packet. */
 	memset(packet, 0, sizeof(struct _fmr_packet));
-	/* Store the argument count in the packet. */
-	packet -> target.argc = args -> argc;
 	/* Set the magic number. */
 	packet -> header.magic = 0xfe;
+	/* Store the argument count in the packet. */
+	packet -> target.argc = args -> argc;
 	/* Calculate the number of bytes needed to encode the widths of the types. */
 	uint8_t encode_length = lf_ceiling((args -> argc * 2), 8);
 	/* Compute the initial length of the packet. */

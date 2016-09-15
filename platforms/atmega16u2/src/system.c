@@ -8,10 +8,17 @@
 
 void system_task(void) {
 	while (1) {
-		uint8_t packet[32];
-		int8_t _e = interrupt_receive_packet((void *)(packet));
+		struct _fmr_packet packet;
+		int8_t _e = interrupt_receive_packet((void *)(&packet));
 		if (_e > 0) {
-			fmr_call(&led_set_rgb, 3, 0x00, packet);
+			/* Calculate the number of bytes needed to encode the widths of the types. */
+			uint8_t encode_length = lf_ceiling((packet.target.argc * 2), 8);
+			/* Create a buffer for encoding argument types. */
+			uint32_t types = 0;
+			/* Copy the encoded type widths into the packet. */
+			memcpy(&types, (void *)(&(packet.body)), encode_length);
+			/* Call the function. */
+			fmr_call(&led_set_rgb, packet.target.argc, (uint16_t)types, packet.body + encode_length);
 		}
 	}
 }

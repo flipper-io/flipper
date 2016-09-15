@@ -65,7 +65,7 @@ int fvm_push(void *source, lf_size_t length) {
 	/* Create a buffer for encoding argument types. */
 	uint32_t types = 0;
 	memcpy(&types, packet.body, encode_length);
-	char *typestrs[] = { "fmr_implicit", "fmr_int8", "fmr_int16", "fmr_int32" };
+	char *typestrs[] = { "fmr_int8", "fmr_int16", "fmr_int32" };
 	for (int i = 0; i < packet.target.argc; i ++) {
 		fmr_type type = types & 0x3;
 		fmr_arg arg = 0;

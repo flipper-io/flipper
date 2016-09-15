@@ -24,8 +24,6 @@ typedef uint32_t fmr_return;
 
 /* Enumerates the basic type signatures an argument can be classified using. */
 typedef enum {
-	/* Used when no argument type is explicitly provided. */
-	fmr_implicit_t,
 	/* Explicit argument types. */
 	fmr_int8_t,
 	fmr_int16_t,
@@ -40,13 +38,7 @@ typedef enum {
 #define fmr_args(...) fmr_build(__fmr_count(__VA_ARGS__), ##__VA_ARGS__)
 
 /* Explicitly describes the width of an argument to the argument parser. */
-#define fmr_max_of(t) (((1UL << ((sizeof(t) * 8UL) - 1UL)) - 1UL) | (0xfUL << ((sizeof(t) * 8UL) - 4UL)))
-#define fmr_type_shift (sizeof(fmr_arg) * 8)
-#define fmr_ovf_shift (fmr_type_shift + 2)
-#define fmr_overflow_flag(arg) ((fmr_va)((arg) > fmr_max_of(fmr_arg)) << fmr_ovf_shift)
-static inline fmr_va fmr_intx(fmr_type type, fmr_va arg) {
-	return (fmr_overflow_flag(arg) | ((type & 0x3UL) << fmr_type_shift) | (fmr_arg)arg);
-}
+#define fmr_intx(type, arg) (((fmr_va)type << (sizeof(fmr_arg) * 8)) | arg)
 #define fmr_int8(arg) fmr_intx(fmr_int8_t, (uint8_t)arg)
 #define fmr_int16(arg) fmr_intx(fmr_int16_t, (uint16_t)arg)
 #define fmr_int32(arg) fmr_intx(fmr_int32_t, (uint32_t)arg)
@@ -56,7 +48,7 @@ static inline fmr_va fmr_intx(fmr_type type, fmr_va arg) {
 #define fmr_int(arg) fmr_int32(arg)
 
 /* Calculates the length of an FMR type. */
-#define fmr_sizeof(type) (1 << (type - 1))
+#define fmr_sizeof(type) (1 << type)
 
 /* Standardizes the notion of a module. */
 struct _fmr_module {
@@ -91,7 +83,7 @@ struct _fmr_list {
 };
 
 /* Contains the information required to obtain and verify the packet body. */
-struct _fmr_header {
+struct __attribute__((__packed__)) _fmr_header {
 	/* A magic number indicating the start of the packet. */
 	uint8_t magic;
 	/* The checksum of the packet's contents. */
@@ -101,7 +93,7 @@ struct _fmr_header {
 };
 
 /* Describes the target module with which the packet will be interacting.  */
-struct _fmr_target {
+struct __attribute__((__packed__)) _fmr_target {
 	/* The identifier of the module. */
 	lf_id_t module;
 	/* The identifier of the function or variable. */
@@ -111,7 +103,7 @@ struct _fmr_target {
 };
 
 /* Organizes the sub-components of an FMR packet into a single data structure. */
-struct _fmr_packet {
+struct __attribute__((__packed__)) _fmr_packet {
 	struct _fmr_header header;
 	struct _fmr_target target;
 	uint8_t body[(FMR_PACKET_SIZE - sizeof(struct _fmr_header) - sizeof(struct _fmr_target))];
