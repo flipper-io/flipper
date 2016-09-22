@@ -13,8 +13,8 @@ def configure(cfg):
     # Load the appropriate C compiler.
     cfg.load('compiler_c')
     # Check for and import libusb-1.0.
-    cfg.check(lib = 'usb-1.0', mandatory = True, uselib_store = 'usb-1.0')
+    cfg.check_cfg(package = 'libusb-1.0', args = ['--cflags', '--libs'], mandatory = True, uselib_store = 'libusb-1.0')
 
 def build(bld):
     _env = bld.all_envs['platform-posix'].derive()
-    bld.stlib(source = bld.path.ant_glob('src/**'), target = 'platform-posix', use = 'usb-1.0', env = _env)
+    bld.stlib(source = bld.path.ant_glob('src/**'), target = 'platform-posix', use = 'libusb-1.0', env = _env)

@@ -3,7 +3,7 @@
 #define __private_include__
 #include <flipper/flipper.h>
 #include <platform/posix/libusb.h>
-#include <libusb-1.0/libusb.h>
+#include <libusb.h>
 #include <flipper/error.h>
 
 #define INTERRUPT_ENDPOINT	0x01
