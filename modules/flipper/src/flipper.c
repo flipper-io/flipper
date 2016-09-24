@@ -3,12 +3,10 @@
 
 /* Expose the virtual interface for this driver. */
 struct _flipper flipper = {
-#ifdef __flipper_constructors__
 	flipper_attach,
 	flipper_attach_usb,
 	flipper_attach_network,
 	flipper_attach_endpoint,
 	flipper_select,
 	flipper_detach
-#endif
 };

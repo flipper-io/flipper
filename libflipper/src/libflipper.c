@@ -47,7 +47,6 @@ struct _lf_device *lf_attach(char *name) {
 failure:
 	free(device);
 	return NULL;
-
 }
 
 int flipper_attach(void) {
@@ -189,6 +188,8 @@ fmr_type lf_word_size(struct _lf_device *device) {
 	return (device -> attributes >> 1) & 0x7;
 }
 
+/* -- Packet manipulation functions. -- */
+
 int lf_invoke(struct _fmr_module *module, fmr_function function, struct _fmr_list *args) {
 	/* Ensure that we have a valid module and argument pointer. */
 	if (!module) {
@@ -196,12 +197,13 @@ int lf_invoke(struct _fmr_module *module, fmr_function function, struct _fmr_lis
 		return lf_error;
 	}
 	/* Ensure that the argument list is valid. */
-	else if (!args) {
+	if (!args) {
 		error_raise(E_NULL, error_message("No arguments specified for message runtime invocation."));
 		return lf_error;
 	}
 	/* Ensure that the device pointer is valid. */
-	else if (!(module -> device)) {
+	struct _lf_device *device = module -> device;
+	if (!device) {
 		error_raise(E_NULL, error_message("No device specified for message runtime invocation."));
 		return lf_error;
 	}
@@ -212,16 +214,23 @@ int lf_invoke(struct _fmr_module *module, fmr_function function, struct _fmr_lis
 		return lf_error;
 	}
 	/* Send the packet to the target device. */
-	_e = lf_transfer_packet(module -> device, &packet);
+	_e = lf_transfer_packet(device, &packet);
 	if (_e < lf_success) {
 		return lf_error;
 	}
-	return 0;
-	/* Receive a response packet from the target device. */
-	struct _fmr_result result;
-	_e = lf_obtain_result(module -> device, &result);
+	/* Obtain the response packet from the device. */
+	_e = lf_retrieve_packet(device, &packet);
 	if (_e < lf_success) {
-		error_raise(E_LAST, error_message("Failed to obtain result from device '%s'.", module -> device -> name));
+		return lf_error;
+	}
+	/* Parse the response packet from the device. */
+	struct _fmr_result result;
+	memcpy(&result, &packet, sizeof(struct _fmr_result));
+	/* Synchronize with the device's error state. */
+	device -> error = result.error;
+	/* If the device encountered an error, raise it. */
+	if (device -> error != E_OK) {
+		error_raise(E_LAST, error_message("The device '%s' encountered an error.", device -> name));
 	}
 	/* Return the result of the invocation. */
 	return result.value;
@@ -249,15 +258,43 @@ int lf_retrieve_packet(struct _lf_device *device, struct _fmr_packet *packet) {
 	return lf_success;
 }
 
-int lf_obtain_result(struct _lf_device *device, struct _fmr_result *result) {
-	struct _fmr_packet packet;
-	/* Retrieve a packet from the device. */
-	int _e = lf_retrieve_packet(device, &packet);
-	/* Ensure that the result was successfully obtained from the device. */
-	if (_e < lf_success) {
-		return lf_error;
+#ifdef __lf_debug__
+
+/* Debugging functions for displaying the contents of various FMR related data structures. */
+
+void lf_debug_packet(struct _fmr_packet *packet) {
+	printf("- Message runtime packet deconstruction. -\n\n");
+	printf("header:\n");
+	printf("\t└─ magic:\t0x%x\n", packet.header.magic);
+	printf("\t└─ checksum:\t0x%x\n", packet.header.checksum);
+	printf("\t└─ length:\t%d bytes\n", packet.header.length);
+	printf("target:\n");
+	printf("\t└─ module:\t0x%x\n", packet.target.module);
+	printf("\t└─ function:\t0x%x\n", packet.target.function);
+	printf("\t└─ argc:\t0x%x (%d arguments)\n", packet.target.argc, packet.target.argc);
+	printf("arguments:\n");
+	/* Calculate the number of bytes needed to encode the widths of the types. */
+	uint8_t encode_length = lf_ceiling((packet.target.argc * 2), 8);
+	/* Calculate the offset into the packet at which the arguments will be loaded. */
+	uint8_t *offset = packet.body + encode_length;
+	/* Create a buffer for encoding argument types. */
+	uint32_t types = 0;
+	memcpy(&types, packet.body, encode_length);
+	char *typestrs[] = { "fmr_int8", "fmr_int16", "fmr_int32" };
+	for (int i = 0; i < packet.target.argc; i ++) {
+		fmr_type type = types & 0x3;
+		fmr_arg arg = 0;
+		memcpy(&arg, offset, fmr_sizeof(type));
+		printf("\t└─ %s:\t0x%x\n", typestrs[type], arg);
+		offset += fmr_sizeof(type);
+		types >>= 2;
 	}
-	/* Parse the result from the packet. */
-	memcpy(result, &(packet.body), sizeof(struct _fmr_result));
-	return lf_success;
+	printf("\nRaw packet data:\n\n");
+	for (int i = 1; i <= FMR_PACKET_SIZE; i ++) {
+		printf("0x%02x ", *(uint8_t *)(source + i - 1));
+		if (i != 0 && i % 8 == 0) printf("\n");
+	}
+	printf("\n");
 }
+
+#endif

@@ -37,3 +37,10 @@ executing the Waf script.
 ```
 ./waf
 ```
+
+### FMR Documentation
+
+Following the deprication of the FMR 1.0 specification formally defined in "A Multi-Archiectural Approach to the Development of Embedded Hardware," a more refined specification and API (FMR 2.0) has been set forth. This implementation provides a better defined suite of generator functions that provide granular control over the construction of outgoing packets and the parsing of incoming packets. FMR 2.0 also enables the transmission of arbitrary data between address spaces using a more advanced push/pull architecture that can balance the load of data transfer on a bus alternative to the one used by the message runtime (in favor of more data transfer per unit time as opposed to responsiveness to packets).
+
+The superficial API exposed by the FMR 2.0 interface is defined below:
+

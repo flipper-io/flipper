@@ -12,7 +12,6 @@
 
 /* ~ Declare the virtual interface for this driver. ~ */
 extern struct _flipper {
-#ifdef __flipper_constructors__
 	/* Attaches the current instance of libflipper to the first available device over the default endpoint. */
 	int (* attach)(void);
 	/* Attaches to a Flipper device by name over the default endpoint. */
@@ -29,7 +28,6 @@ extern struct _flipper {
 	int (* exit)(void);
 	/* The head of a linked list that aggregates all attached devices. */
 	struct _lf_device *attached;
-#endif
 	/* The selected device with which interaction will take place. */
 	struct _lf_device *device;
 } flipper;
@@ -59,8 +57,6 @@ extern fmr_type lf_word_size(struct _lf_device *device);
 extern int lf_transfer_packet(struct _lf_device *device, struct _fmr_packet *packet);
 /* Retrieves a packet from the specified device. */
 extern int lf_retrieve_packet(struct _lf_device *device, struct _fmr_packet *packet);
-/* Obtains a packet from the specified device and parses the result of the previous operation. */
-extern int lf_obtain_result(struct _lf_device *device, struct _fmr_result *result);
 
 #endif
 #endif

@@ -31,7 +31,8 @@ int main(int argc, char *argv[]) {
 	}
 
 	/* Perform the function invocation. */
-	lf_invoke(&_lf_led_module, _led_set_rgb, fmr_args(fmr_int8(atoi(argv[1])), fmr_int8(atoi(argv[2])), fmr_int8(atoi(argv[3]))));
+	uint32_t result = lf_invoke(&_lf_led_module, _led_set_rgb, fmr_args(fmr_int32(0xdeadbeef)));
+	printf("The value was 0x%08x.\n", result);
 
 #endif
 

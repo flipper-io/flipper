@@ -59,6 +59,11 @@ typedef uint16_t lf_version_t;
 #define flip_bits_in_port_with_mask(p, m)	((p) ^= (m))
 #define lo(x) ((uint8_t)(x))
 #define hi(x) ((uint8_t)(x >> 8))
+#define lo16(x) ((uint16_t)(((uint32_t)(x))))
+#define hi16(x) ((uint16_t)(((uint32_t)(x)) >> 16))
+#define little(x)	((((uint16_t)(x)) << 8 ) | (((uint16_t)(x)) >> 8))
+#define little32(x) ((((uint32_t)(x)) << 16 ) | (((uint32_t)(x)) >> 16))
+
 
 /* Standardizes interaction with a physical hardware bus for the transmission of arbitrary data. */
 struct _lf_endpoint {
