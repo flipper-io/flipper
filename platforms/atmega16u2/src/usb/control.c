@@ -1,5 +1,5 @@
 #define __private_include__
-#include <private/usb.h>
+#include <private/megausb.h>
 
 static volatile uint8_t usb_configuration = 0;
 

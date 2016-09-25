@@ -24,4 +24,7 @@ int fvm_push(void *source, lf_size_t length);
 int fvm_pull(void *destination, lf_size_t length);
 int fvm_destroy(struct _lf_endpoint *endpoint);
 
+/* Packet debugging function provided by libflipper. */
+extern void lf_debug_packet(struct _fmr_packet *packet);
+
 #endif

@@ -53,22 +53,24 @@ _load_8:
 	dec XL
 	rjmp _load_done
 _load_16:
+	dec XL
+	ld r0, Z+
+	st X+, r0
 	ld r0, Z+
 	st X, r0
-	ld r0, Z+
-	st -X, r0
-	dec XL
+	subi XL, 0x02
 	rjmp _load_done
 _load_32:
+	subi XL, 0x03
+	ld r0, Z+
+	st X+, r0
+	ld r0, Z+
+	st X+, r0
+	ld r0, Z+
+	st X+, r0
 	ld r0, Z+
 	st X, r0
-	ld r0, Z+
-	st -X, r0
-	ld r0, Z+
-	st -X, r0
-	ld r0, Z+
-	st -X, r0
-	dec XL
+	subi XL, 0x04
 _load_done:
 	; Shift the encoded types two bits to the right.
 	asr argt_h

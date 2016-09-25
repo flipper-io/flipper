@@ -31,7 +31,7 @@ void error_raise(lf_error_t error, const char *format, ...) {
 raise:
 		/* Print the exception if a message is provided. */
 		if (format) {
-			fprintf(stderr, KYEL "\nThe Flipper runtime encountered the following error:\n  " KRED "'");
+			fprintf(stderr, KYEL "\nThe Flipper runtime encountered the following error:\n  " KNRM "↳ " KRED "'");
 			vfprintf(stderr, format, argv);
 			fprintf(stderr, "'\n");
 		}

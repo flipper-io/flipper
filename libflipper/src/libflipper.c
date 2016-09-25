@@ -63,7 +63,10 @@ int flipper_attach_usb(char *name) {
 	/* Set the device's endpoint. */
 	device -> endpoint = endpoint;
 	/* Configure the device's endpoint. */
-	endpoint -> configure(endpoint);
+	int8_t _e = endpoint -> configure(endpoint);
+	if (_e < lf_success) {
+		error_raise(E_NO_DEVICE, error_message("Failed to connect to Flipper device."));
+	}
 	/* Broadcast a packet to the device over the default endpoint to verify the identifier. */
 	//!MISSING!
 	/* Ask the device for its attributes. */
@@ -258,30 +261,28 @@ int lf_retrieve_packet(struct _lf_device *device, struct _fmr_packet *packet) {
 	return lf_success;
 }
 
-#ifdef __lf_debug__
-
 /* Debugging functions for displaying the contents of various FMR related data structures. */
 
 void lf_debug_packet(struct _fmr_packet *packet) {
 	printf("- Message runtime packet deconstruction. -\n\n");
 	printf("header:\n");
-	printf("\t└─ magic:\t0x%x\n", packet.header.magic);
-	printf("\t└─ checksum:\t0x%x\n", packet.header.checksum);
-	printf("\t└─ length:\t%d bytes\n", packet.header.length);
+	printf("\t└─ magic:\t0x%x\n", packet -> header.magic);
+	printf("\t└─ checksum:\t0x%x\n", packet -> header.checksum);
+	printf("\t└─ length:\t%d bytes\n", packet -> header.length);
 	printf("target:\n");
-	printf("\t└─ module:\t0x%x\n", packet.target.module);
-	printf("\t└─ function:\t0x%x\n", packet.target.function);
-	printf("\t└─ argc:\t0x%x (%d arguments)\n", packet.target.argc, packet.target.argc);
+	printf("\t└─ module:\t0x%x\n", packet -> target.module);
+	printf("\t└─ function:\t0x%x\n", packet -> target.function);
+	printf("\t└─ argc:\t0x%x (%d arguments)\n", packet -> target.argc, packet -> target.argc);
 	printf("arguments:\n");
 	/* Calculate the number of bytes needed to encode the widths of the types. */
-	uint8_t encode_length = lf_ceiling((packet.target.argc * 2), 8);
+	uint8_t encode_length = lf_ceiling((packet -> target.argc * 2), 8);
 	/* Calculate the offset into the packet at which the arguments will be loaded. */
-	uint8_t *offset = packet.body + encode_length;
+	uint8_t *offset = packet -> body + encode_length;
 	/* Create a buffer for encoding argument types. */
 	uint32_t types = 0;
-	memcpy(&types, packet.body, encode_length);
+	memcpy(&types, packet -> body, encode_length);
 	char *typestrs[] = { "fmr_int8", "fmr_int16", "fmr_int32" };
-	for (int i = 0; i < packet.target.argc; i ++) {
+	for (int i = 0; i < packet -> target.argc; i ++) {
 		fmr_type type = types & 0x3;
 		fmr_arg arg = 0;
 		memcpy(&arg, offset, fmr_sizeof(type));
@@ -291,10 +292,8 @@ void lf_debug_packet(struct _fmr_packet *packet) {
 	}
 	printf("\nRaw packet data:\n\n");
 	for (int i = 1; i <= FMR_PACKET_SIZE; i ++) {
-		printf("0x%02x ", *(uint8_t *)(source + i - 1));
+		printf("0x%02x ", *(uint8_t *)(packet + i - 1));
 		if (i != 0 && i % 8 == 0) printf("\n");
 	}
 	printf("\n");
 }
-
-#endif

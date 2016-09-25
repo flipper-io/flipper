@@ -1,4 +1,4 @@
-/* usb.c - USB endpoint wrapper using libusb. */
+/* libusb.c - USB endpoint wrapper using libusb. */
 
 #define __private_include__
 #include <flipper/flipper.h>
@@ -42,13 +42,12 @@ int libusb_configure(struct _lf_endpoint *endpoint) {
 	/* Attach a physical device to this endpoint. */
 	record -> handle = libusb_open_device_with_vid_pid(record -> context, USB_VENDOR_ID, USB_PRODUCT_ID);
 	if (!(record -> handle)) {
-		error_raise(E_LIBUSB, error_message("No Flipper device attached."));
 		return lf_error;
 	}
 	/* Claim the interface used to send and receive message runtime packets. */
 	_e = libusb_claim_interface(record -> handle, 0);
 	if (_e < 0) {
-		error_raise(E_LIBUSB, error_message("Failed to claim interface 0."));
+		error_raise(E_LIBUSB, error_message("Failed to claim interface 0 on attached device."));
 		return lf_error;
 	}
 	libusb_set_debug(record -> context, 3);
@@ -85,7 +84,7 @@ int libusb_transfer(void *data, lf_size_t length, uint8_t direction) {
 		_e = libusb_bulk_transfer(record -> handle, BULK_ENDPOINT + direction, data, length, &_length, 0);
 	}
 	if (_e < 0 || (_length != length)) {
-		error_raise(E_TRANSFER, error_message("Failed to transfer data to/from USB device."));
+		error_raise(E_COMMUNICATION, error_message("Failed to communicate with USB device. Connection interrupted."));
 		return lf_error;
 	}
 	return lf_success;

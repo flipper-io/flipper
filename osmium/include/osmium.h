@@ -5,7 +5,7 @@
 #include <flipper/core.h>
 
 /* A flipper device object which the target can use to keep track of flipper specific state. */
-struct _lf_device self;
+extern struct _lf_device self;
 
 #ifdef __private_include__
 

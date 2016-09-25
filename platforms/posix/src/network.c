@@ -76,7 +76,7 @@ int network_push(void *source, lf_size_t length) {
 	socklen_t len = sizeof(struct sockaddr_in);
 	ssize_t _e = sendto(record -> fd, source, length, 0, (struct sockaddr *)&(record -> device), len);
 	if (_e < 0) {
-		error_raise(E_TRANSFER, error_message("Failed to transfer data to networked device."));
+		error_raise(E_COMMUNICATION, error_message("Failed to transfer data to networked device."));
 		return lf_error;
 	}
 	return lf_success;
@@ -88,7 +88,7 @@ int network_pull(void *destination, lf_size_t length) {
 	socklen_t _length;
 	ssize_t _e = recvfrom(record -> fd, destination, length, 0, (struct sockaddr *)&(record -> device), &_length);
 	if (_e < 0) {
-		error_raise(E_TRANSFER, error_message("Failed to transfer data to networked device."));
+		error_raise(E_COMMUNICATION, error_message("Failed to transfer data to networked device."));
 		return lf_error;
 	}
 	return lf_success;

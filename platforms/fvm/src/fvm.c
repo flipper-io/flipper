@@ -54,7 +54,8 @@ int fvm_push(void *source, lf_size_t length) {
 }
 
 int fvm_pull(void *destination, lf_size_t length) {
-	return 0;
+	memset(destination, 0, length);
+	return lf_success;
 }
 
 int fvm_destroy(struct _lf_endpoint *endpoint) {

@@ -1,5 +1,5 @@
 #define __private_include__
-#include <private/usb.h>
+#include <private/megausb.h>
 
 const uint8_t PROGMEM endpoint[] = {
 	/* Bidirectional interrupt endpoints for quick FMR transactions. */

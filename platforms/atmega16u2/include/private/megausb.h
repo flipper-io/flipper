@@ -1,11 +1,24 @@
-#ifndef __atmega16u2_usb_h__
-#define __atmega16u2_usb_h__
+#ifndef __megausb_h__
+#define __megausb_h__
 
 /* Include all types and macros exposed by the Flipper Toolbox. */
 #include <flipper/core.h>
 #include <platform/atmega16u2.h>
 
+/* ~ Declare the virtual interface for this driver. ~ */
+extern const struct _lf_endpoint megausb;
+
 #ifdef __private_include__
+
+/* ~ Declare the prototypes for all functions exposed by this driver. ~ */
+extern int megausb_configure(struct _lf_endpoint *endpoint);
+extern uint8_t megausb_ready(void);
+extern void megausb_put(uint8_t byte);
+extern uint8_t megausb_get(void);
+extern int megausb_push(void *source, lf_size_t length);
+extern int megausb_pull(void *destination, lf_size_t length);
+extern int megausb_destroy(struct _lf_endpoint *endpoint);
+
 #define DEFAULT_TIMEOUT                 50
 #define MANUFACTURER_STRING             L"Flipper Engineering"
 #define PRODUCT_STRING                  L"Flipper: Carbon Edition"
