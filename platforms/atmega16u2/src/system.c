@@ -18,6 +18,7 @@ struct _lf_device self = {
 #define cpu_prescale(clock) (CLKPR = 0x80, CLKPR = clock)
 
 uint32_t retcat(uint16_t l, uint16_t h) {
+	error_raise(E_FMR, NULL);
 	return ((uint32_t)h << 16) | l;
 }
 
@@ -26,20 +27,9 @@ void system_task(void) {
 		struct _fmr_packet packet;
 		int8_t _e = megausb_pull((void *)(&packet), sizeof(struct _fmr_packet));
 		if (_e > 0) {
-			/* Calculate the number of bytes needed to encode the widths of the types. */
-			uint8_t encode_length = lf_ceiling((packet.target.argc * 2), 8);
-			/* Create a buffer for encoding argument types. */
-			uint32_t types = 0;
-			/* Copy the encoded type widths into the packet. */
-			memcpy(&types, (void *)(&(packet.body)), encode_length);
-			/* Call the function. */
-			fmr_arg result = fmr_call(&retcat, packet.target.argc, (uint16_t)types, packet.body + encode_length);
-			struct _fmr_result _result;
-			/* This architecture is a little endian system, so we convert the endianess of the return type before sending it back to the host. */
-			_result.value = result;
-			_result.error = E_OK;
-			memcpy(&packet, &_result, sizeof(struct _fmr_result));
-			megausb_push(&_result, sizeof(struct _fmr_result));
+			/* Invoke the appropraite function. */
+			fmr_parse(&packet);
+			megausb_push(&packet, sizeof(struct _fmr_result));
 		}
 	}
 }

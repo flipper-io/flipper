@@ -6,22 +6,12 @@
 
 int main(int argc, char *argv[]) {
 
-#if 0
-
-	flipper_attach();
-	uint8_t packet[FMR_PACKET_SIZE];
-	packet[0] = atoi(argv[1]);
-	packet[1] = atoi(argv[2]);
-	packet[2] = atoi(argv[3]);
-	libusb_push(packet, sizeof(packet));
-
-#else
-
 	flipper_attach_endpoint("fvm", &lf_fvm_ep);
 	flipper_attach();
 
 	/* Create an empty message runtime module instance. */
 	struct _fmr_module _lf_led_module;
+	_lf_led_module.device = flipper.device;
 
 	/* Bind the empty instance to the default 'led' module which comes pre-loaded on all devices. */
 	int _e = fmr_bind(&_lf_led_module, "_lf_led");
@@ -30,10 +20,8 @@ int main(int argc, char *argv[]) {
 	}
 
 	/* Perform the function invocation. */
-	uint32_t result = lf_invoke(&_lf_led_module, _led_set_rgb, fmr_args(fmr_int16(0xbeef), fmr_int16(0xdead)));
+	uint32_t result = lf_invoke(&_lf_led_module, _led_set_rgb, fmr_args(fmr_int8(atoi(argv[1])), fmr_int8(atoi(argv[2])), fmr_int8(atoi(argv[3]))));
 	printf("The value was 0x%08x.\n", result);
-
-#endif
 
     return 0;
 }

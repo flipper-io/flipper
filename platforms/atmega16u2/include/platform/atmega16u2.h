@@ -1,6 +1,11 @@
 #ifndef __platform_h__
 #define __platform_h__
 
+/* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
+#include <flipper/core.h>
+
+extern struct _lf_device self;
+
 /* Include the avr-libc standard library headers. */
 #include <avr/common.h>
 #include <util/delay.h>

@@ -47,5 +47,9 @@ void error_raise(lf_error_t error, const char *format, ...);
 void error_resume(void);
 /* Pauses errors from producing side effects of any kind. */
 void error_pause(void);
+/* Return the current error state. */
+lf_error_t error_get(void);
+/* Clear the current error state. */
+void error_clear(void);
 
 #endif

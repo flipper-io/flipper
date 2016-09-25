@@ -50,6 +50,24 @@ raise:
 #endif
 }
 
+lf_error_t error_get(void) {
+	/* If no device is selected, raise an error. */
+	if (!flipper.device) {
+		error_raise(E_NO_DEVICE, NULL);
+		return lf_error;
+	}
+	return flipper.device -> error;
+}
+
+void error_clear(void) {
+	/* If no device is selected, raise an error. */
+	if (!flipper.device) {
+		error_raise(E_NO_DEVICE, NULL);
+		return;
+	}
+	flipper.device -> error = E_OK;
+}
+
 void error_resume(void) {
 	/* If no device is selected, raise an error. */
 	if (!flipper.device) {

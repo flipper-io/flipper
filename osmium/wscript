@@ -10,6 +10,8 @@ def build(bld):
         name = os.path.basename(platform)
         _env = bld.all_envs['platform-' + name].derive()
         if _env.BUILD_OSMIUM:
+            # Loads all the symbols from the provided static libraries before linking.
+            _env.STLIB_MARKER = '-Wl,--start-group'
             bld.program(source = bld.path.ant_glob('src/**'), target = 'osmium-' + name + '.elf', use = 'platform-' + name + ' modules-' + name, install_path = None, env = _env)
             bld.add_group()
             bld(rule = '${OBJCOPY} -O ihex ${SRC} ${TGT}', source = 'osmium-' + name + '.elf', target = 'osmium-' + name + '.hex', env = _env)

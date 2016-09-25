@@ -233,7 +233,7 @@ int lf_invoke(struct _fmr_module *module, fmr_function function, struct _fmr_lis
 	device -> error = result.error;
 	/* If the device encountered an error, raise it. */
 	if (device -> error != E_OK) {
-		error_raise(E_LAST, error_message("The device '%s' encountered an error.", device -> name));
+		error_raise(E_LAST, error_message("The device '%s' encountered the following error:", device -> name));
 	}
 	/* Return the result of the invocation. */
 	return result.value;

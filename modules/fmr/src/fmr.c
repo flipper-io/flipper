@@ -112,10 +112,6 @@ void fmr_free(struct _fmr_list *list) {
 int fmr_bind(struct _fmr_module *module, char *name) {
 	/* Calculate the module's identifier. */
 	module -> identifier = lf_checksum(name, strlen(name));
-	/* If the module has not already been assigned to a device, assign it to the actively selected device. */
-	if (!module -> device) {
-		module -> device = flipper.device;
-	}
 	/* Ask the device if it has a module with the given identifier. */
 
 	return lf_success;
@@ -175,6 +171,18 @@ int fmr_generate(struct _fmr_module *module, fmr_function function, struct _fmr_
 	return lf_success;
 }
 
-void fmr_parse(struct _fmr_packet *packet) {
+extern void led_set_rgb(uint8_t, uint8_t, uint8_t);
 
+void fmr_parse(struct _fmr_packet *packet) {
+	/* Calculate the number of bytes needed to encode the widths of the types. */
+	uint8_t encode_length = lf_ceiling((packet -> target.argc * 2), 8);
+	/* Create a buffer for encoding argument types. */
+	uint32_t types = 0;
+	/* Copy the encoded type widths into the packet. */
+	memcpy(&types, (void *)(&(packet -> body)), encode_length);
+	struct _fmr_result result;
+	/* Invoke the function. */
+	result.value = fmr_call(&led_set_rgb, packet -> target.argc, (uint16_t)types, packet -> body + encode_length);
+	result.error = error_get();
+	memcpy(&packet, &result, sizeof(struct _fmr_result));
 }

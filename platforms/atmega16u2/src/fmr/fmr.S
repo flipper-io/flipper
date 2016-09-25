@@ -12,7 +12,6 @@
 
 ; uint32_t fmr_call(void *function, uint8_t argc, uint16_t argt, void *argv);
 
-.func fmr_call
 .global fmr_call
 
 fmr_call:
