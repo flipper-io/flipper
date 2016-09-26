@@ -12,7 +12,7 @@
 #define USB_DIRECTION_IN 0x80
 #define USB_DIRECTION_OUT 0x01
 
-const struct _lf_endpoint libusb = {
+struct _lf_endpoint libusb = {
 	libusb_configure,
 	libusb_ready,
 	libusb_put,

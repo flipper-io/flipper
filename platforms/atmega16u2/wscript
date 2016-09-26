@@ -28,7 +28,7 @@ def configure(cfg):
     cfg.load('gcc')
     # Load the appropriate uploader.
     cfg.env.UPLOADER = 'dfu_programmer'
-    cfg.load('dfu_programmer', tooldir = 'tools')
+    cfg.load('dfu_programmer', tooldir = 'assets')
 
 def build(bld):
     _env = bld.all_envs['platform-atmega16u2']

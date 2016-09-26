@@ -1,4 +1,4 @@
-import os
+import os, platform
 
 APPNAME = 'flipper-toolbox'
 VERSION = '0.1'
@@ -46,3 +46,5 @@ def build(bld):
     # Install the top-level headers.
     bld.install_files('${PREFIX}/include/', bld.path.ant_glob('include/flipper.h'))
     bld.install_files('${PREFIX}/include/flipper/', bld.path.ant_glob('include/flipper/**'))
+    if (platform.system() == 'Linux'):
+        bld.install_files('/etc/udev/rules.d', 'assets/99-flipper.rules')

@@ -5,7 +5,7 @@
 #include <flipper/core.h>
 
 /* ~ Declare the virtual interface for this driver. ~ */
-extern const struct _lf_endpoint libusb;
+extern struct _lf_endpoint libusb;
 
 #ifdef __private_include__
 
