@@ -27,8 +27,11 @@ void system_task(void) {
 		struct _fmr_packet packet;
 		int8_t _e = megausb_pull((void *)(&packet), sizeof(struct _fmr_packet));
 		if (_e > 0) {
-			/* Invoke the appropraite function. */
-			fmr_parse(&packet);
+			/* Create a buffer to the result of the operation. */
+			struct _fmr_result result;
+			/* Execute the packet. */
+			fmr_perform(&packet, &result);
+			/* Send the result back to the host. */
 			megausb_push(&packet, sizeof(struct _fmr_result));
 		}
 	}

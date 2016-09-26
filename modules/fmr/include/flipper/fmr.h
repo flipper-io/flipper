@@ -132,10 +132,9 @@ void fmr_free(struct _fmr_list *list);
 /* Binds a module to its counterpart the selected Flipper device. */
 int fmr_bind(struct _fmr_module *module, char *name);
 int fmr_generate(struct _fmr_module *module, fmr_function function, struct _fmr_list *args, struct _fmr_packet *packet);
-/* Parses an fmr_packet and generates the necessary side effects. */
-void fmr_parse(struct _fmr_packet *packet);
-
-/* Unpacks argument types and calls a function pointer per the given architecture's calling convention. */
+/* Executes an fmr_packet and stores the result of the operation in the result buffer provided. */
+void fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result);
+/* Unpacks the argument buffer into the CPU following the native architecture's calling convention and jumps to the given function pointer. */
 extern uint32_t fmr_call(void *function, uint8_t argc, uint16_t argt, void *argv);
 
 #endif
