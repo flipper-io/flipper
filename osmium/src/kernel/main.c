@@ -12,6 +12,9 @@ int main() {
 	led_configure();
 	led_set_rgb(LED_COLOR_SUCCESS);
 
+	/* Clear the error state. */
+	error_clear();
+
 	/* Perform the system task. */
 	system_task();
 

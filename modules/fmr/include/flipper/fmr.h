@@ -134,6 +134,11 @@ int fmr_bind(struct _fmr_module *module, char *name);
 int fmr_generate(struct _fmr_module *module, fmr_function function, struct _fmr_list *args, struct _fmr_packet *packet);
 /* Executes an fmr_packet and stores the result of the operation in the result buffer provided. */
 void fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result);
+
+/* ~ Functions with platform specific implementation. ~ */
+
+/* Abstracts platform specific implementation needed to access the standard module array. */
+extern const void *fmr_module(lf_id_t module);
 /* Unpacks the argument buffer into the CPU following the native architecture's calling convention and jumps to the given function pointer. */
 extern uint32_t fmr_call(void *function, uint8_t argc, uint16_t argt, void *argv);
 

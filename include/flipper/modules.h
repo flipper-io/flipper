@@ -21,7 +21,7 @@
 #include <flipper/usb.h>
 #include <flipper/wdt.h>
 
-/* Create an enumeraion giving the precomputed identifiers for the standard modules provided. */
+/* Create an enumeraion defining all precomputed identifiers for the provided standard modules. */
 enum {
     _adc_id,
     _button_id,
@@ -42,5 +42,9 @@ enum {
     _usb_id,
     _wdt_id
 };
+
+/* Describe a reference to the platform specific module-array. */
+extern const void *const fmr_modules[];
+/* NOTE: The preprocessor macro 'fmr_module(index)' should be used to access objects within this array. */
 
 #endif

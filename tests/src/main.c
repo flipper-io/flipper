@@ -18,6 +18,7 @@ int main(int argc, char *argv[]) {
 	if (_e < lf_success) {
 		error_raise(E_MODULE, "Failed to bind to LED module.");
 	}
+	_lf_led_module.identifier = 0;
 
 	/* Perform the function invocation. */
 	uint32_t result = lf_invoke(&_lf_led_module, _led_set_rgb, fmr_args(fmr_int8(atoi(argv[1])), fmr_int8(atoi(argv[2])), fmr_int8(atoi(argv[3]))));

@@ -22,6 +22,8 @@ void error_raise(lf_error_t error, const char *format, ...) {
 	_error = flipper.device -> error;
 /* When set, this flag allows errors to cause system side effects. */
 #ifdef __enable_error_side_effects__
+	/* Expose the error message strings. */
+	char *messages[] = { LF_ERROR_MESSAGE_STRINGS };
 	/* If the selected device is configured to cause side effects, do so. */
 	if (flipper.device -> errors_generate_side_effects) {
 		/* Construct a va_list to access variadic arguments. */
@@ -29,16 +31,21 @@ void error_raise(lf_error_t error, const char *format, ...) {
 		/* Initialize the va_list that we created above. */
 		va_start(argv, format);
 raise:
+		if (_error > (sizeof(messages) / sizeof(char *))) {
+			_error = E_STRING;
+		}
 		/* Print the exception if a message is provided. */
 		if (format) {
-			fprintf(stderr, KYEL "\nThe Flipper runtime encountered the following error:\n  " KNRM "↳ " KRED "'");
-			vfprintf(stderr, format, argv);
-			fprintf(stderr, "'\n");
+			fprintf(stderr, KYEL "\nThe Flipper runtime encountered the following error:\n  " KNRM "↳ " KRED);
+			if (_error == E_STRING) {
+				fprintf(stderr, "An invalid error code (%i) was provided.\n", error);
+			} else {
+				vfprintf(stderr, format, argv);
+				fprintf(stderr, "\n");
+			}
 		}
-		/* Expose the error message strings. */
-		char *message[] = { LF_ERROR_MESSAGE_STRINGS };
 		/* Print the error code. */
-		fprintf(stderr, KNRM "Error code (%i): '" KBLU "%s" KNRM "'\n\n", _error, message[_error]);
+		fprintf(stderr, KNRM "Error code (%i): '" KBLU "%s" KNRM "'\n\n", _error, messages[_error]);
 		/* Release the va_list. */
 		va_end(argv);
 		/* Exit. */

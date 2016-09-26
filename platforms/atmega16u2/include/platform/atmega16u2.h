@@ -4,8 +4,6 @@
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
 #include <flipper/core.h>
 
-extern struct _lf_device self;
-
 /* Include the avr-libc standard library headers. */
 #include <avr/common.h>
 #include <util/delay.h>
@@ -16,6 +14,9 @@ extern struct _lf_device self;
 #include <avr/power.h>
 #include <avr/sleep.h>
 #include <avr/wdt.h>
+
+/* A flipper device object which the target can use to keep track of state specific to itself. */
+extern struct _lf_device self;
 
 /* These macros are defined in platform specific header files. */
 #define enable_interrupts() sei()
