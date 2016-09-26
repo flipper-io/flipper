@@ -9,7 +9,7 @@ def configure(cfg):
     # Build modules for this platform.
     cfg.env.BUILD_MODULES = True
     # Set the platform flags.
-    cfg.env.append_value('CFLAGS', ['-std=c99', '-D__flipper_constructors__', '-D__enable_error_side_effects__', '-D__fs_transfer_symbols__'])
+    cfg.env.append_value('CFLAGS', ['-std=c99', '-D__flipper_constructors__', '-D__enable_error_side_effects__', '-D__fs_transfer_symbols__', '-g'])
     # Load the appropriate C compiler.
     cfg.load('compiler_c')
     # Check for and import libusb-1.0.

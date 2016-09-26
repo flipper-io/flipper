@@ -5,6 +5,8 @@
 
 /* Pointer to the start of virtual non-volatile memory. */
 uint8_t *v_nvm;
+/* Declaration of the virtual packet. */
+struct _fmr_packet vpacket;
 
 const struct _lf_endpoint lf_fvm_ep = {
 	fvm_configure,
@@ -16,19 +18,11 @@ const struct _lf_endpoint lf_fvm_ep = {
 	fvm_destroy
 };
 
-void fvm_begin(void) {
+int fvm_configure(struct _lf_endpoint *endpoint) {
 	/* Allocate the memory needed to emulate NVM. */
 	v_nvm = (uint8_t *)malloc(NVM_SIZE);
 	/* Format NVM. */
 	nvm_format();
-}
-
-void fvm_end(void) {
-	/* Free the memory used to emulate virtual NVM. */
-	free(v_nvm);
-}
-
-int fvm_configure(struct _lf_endpoint *endpoint) {
 	return 0;
 }
 
@@ -45,16 +39,21 @@ uint8_t fvm_get(void) {
 }
 
 int fvm_push(void *source, lf_size_t length) {
-	struct _fmr_packet packet;
-	memcpy(&packet, source, length);
+	memset(&vpacket, 0, sizeof(struct _fmr_packet));
+	memcpy(&vpacket, source, length);
 #ifdef __lf_debug__
-	lf_debug_packet(&packet);
+	lf_debug_packet(&vpacket);
 #endif
+	struct _fmr_result result;
+	error_pause();
+	fmr_perform(&vpacket, &result);
+	error_resume();
+	memcpy(&vpacket, &result, sizeof(struct _fmr_result));
 	return lf_success;
 }
 
 int fvm_pull(void *destination, lf_size_t length) {
-	memset(destination, 0, length);
+	memcpy(destination, &vpacket, length);
 	return lf_success;
 }
 

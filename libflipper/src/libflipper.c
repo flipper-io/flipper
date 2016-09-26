@@ -291,9 +291,9 @@ void lf_debug_packet(struct _fmr_packet *packet) {
 		types >>= 2;
 	}
 	printf("\nRaw packet data:\n\n");
-	for (int i = 1; i <= FMR_PACKET_SIZE; i ++) {
-		printf("0x%02x ", *(uint8_t *)(packet + i - 1));
-		if (i != 0 && i % 8 == 0) printf("\n");
+	for (int i = 1; i <= sizeof(struct _fmr_packet); i ++) {
+		printf("0x%02x ", ((uint8_t *)packet)[i - 1]);
+		if (i % 8 == 0) printf("\n");
 	}
 	printf("\n");
 }

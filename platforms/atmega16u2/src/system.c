@@ -25,6 +25,7 @@ uint32_t retcat(uint16_t l, uint16_t h) {
 void system_task(void) {
 	while (1) {
 		struct _fmr_packet packet;
+		memset(&packet, 0, sizeof(struct _fmr_packet));
 		int8_t _e = megausb_pull((void *)(&packet), sizeof(struct _fmr_packet));
 		if (_e > 0) {
 			/* Create a buffer to the result of the operation. */

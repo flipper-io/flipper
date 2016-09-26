@@ -6,7 +6,7 @@
 
 int main(int argc, char *argv[]) {
 
-	flipper_attach_endpoint("fvm", &lf_fvm_ep);
+	//flipper_attach_endpoint("fvm", &lf_fvm_ep);
 	flipper_attach();
 
 	/* Create an empty message runtime module instance. */
