@@ -27,9 +27,6 @@ extern struct _lf_device self;
 #define delay_ms(ms) _delay_ms(ms)
 #define delay_seconds(sec) delay_ms(sec * 1000)
 
-#define crc_attributes PROGMEM
-#define crc_access(dereference) pgm_read_word(&dereference)
-
 /* Pin definition macros for F3 hardware. */
 #define FLASH_CS_DDR            DDRB
 #define FLASH_CS_PORT           PORTB

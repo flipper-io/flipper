@@ -1,6 +1,8 @@
 #define __private_include__
 #include <flipper/core.h>
 
+/*                                      16   12   5
+   This is the CCITT CRC 16 polynomial X  + X  + X  + 1. */
 #define POLY 0x8408
 
 /* This function uses the CCITT crc16 algorithm. */

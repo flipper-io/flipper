@@ -48,7 +48,6 @@ void system_init() {
 	/* Configure the UART subsystem. */
 	uart_configure();
 	/* Configure reset button and PCINT8 interrupt. */
-	DDRC &= ~(1 << 6);
 	PCMSK1 |= (1 << PCINT8);
 	PCICR |= (1 << PCIE1);
 	sei();

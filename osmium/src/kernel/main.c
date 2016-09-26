@@ -8,7 +8,8 @@ int main() {
 	/* Initialize the platform hardware. */
 	system_init();
 
-	/* Initialize the status LED hardware. */
+	/* Initialize peripheral hardware. */
+	button_configure();
 	led_configure();
 	led_set_rgb(LED_COLOR_SUCCESS);
 
