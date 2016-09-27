@@ -83,17 +83,17 @@ static const uint8_t PROGMEM configuration[CONFIGURATION_SIZE] = {
 	0x07,						// bLength
 	0x05,						// bDescriptorType
 	BULK_TRANSMIT_ENDPOINT | 0x80,		// bEndpointAddress
-	0x02,						// bmAttributes (0x02=bulk)
+	0x02,						// bmAttributes (0x02 = bulk)
 	BULK_TRANSMIT_SIZE, 0x00,	// wMaxPacketSize
-	0,							// bInterval
+	BULK_TRANSMIT_INTERVAL,		// bInterval
 
 	/* Bulk OUT endpoint descriptor. (USB spec 9.6.6, page 269-271, Table 9-13) */
 	0x07,						// bLength
 	0x05,						// bDescriptorType
 	BULK_RECEIVE_ENDPOINT,		// bEndpointAddress
-	0x02,						// bmAttributes (0x02=bulk)
+	0x02,						// bmAttributes (0x02 = bulk)
 	BULK_RECEIVE_SIZE, 0x00,	// wMaxPacketSize
-	0							// bInterval
+	BULK_RECEIVE_INTERVAL		// bInterval
 
 };
 

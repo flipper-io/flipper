@@ -4,9 +4,26 @@
 #include <platform/posix.h>
 #include <platform/fvm.h>
 
+#define v(i) atoi(argv[i])
+
 int main(int argc, char *argv[]) {
 
-	//flipper_attach_endpoint("fvm", &lf_fvm_ep);
+#if 1
+
+	flipper_attach();
+
+	/* Bulk endpoint tests. */
+	char buffer[FMR_PACKET_SIZE];
+	buffer[0] = v(1);
+	buffer[1] = v(2);
+	buffer[2] = v(3);
+	libusb_transfer(buffer, FMR_PACKET_SIZE, 0x01);
+	libusb_transfer(buffer, FMR_PACKET_SIZE, 0x80);
+	printf("0x%02x 0x%02x 0x%02x\n", buffer[0], buffer[1], buffer[2]);
+
+#else
+
+	flipper_attach_endpoint("fvm", &lf_fvm_ep);
 	flipper_attach();
 
 	if (argc < 4) {
@@ -28,6 +45,8 @@ int main(int argc, char *argv[]) {
 	/* Perform the function invocation. */
 	uint32_t result = lf_invoke(&_lf_led_module, _led_set_rgb, fmr_args(fmr_int8(atoi(argv[1])), fmr_int8(atoi(argv[2])), fmr_int8(atoi(argv[3]))));
 	printf("The value was 0x%08x.\n", result);
+
+#endif
 
     return 0;
 }

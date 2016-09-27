@@ -57,6 +57,10 @@ extern fmr_type lf_word_size(struct _lf_device *device);
 extern int lf_transfer_packet(struct _lf_device *device, struct _fmr_packet *packet);
 /* Retrieves a packet from the specified device. */
 extern int lf_retrieve_packet(struct _lf_device *device, struct _fmr_packet *packet);
+/* Moves data from the address space of the host to that of the device. */
+extern int lf_push(struct _fmr_module *module, fmr_function function, void *source, lf_size_t length, struct _fmr_list *args);
+/* Moves data from the address space of the device to that of the host. */
+extern int lf_pull(struct _fmr_module *module, fmr_function function, void *destination, lf_size_t length, struct _fmr_list *args);
 
 #endif
 #endif

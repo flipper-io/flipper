@@ -25,12 +25,14 @@ extern int megausb_destroy(struct _lf_endpoint *endpoint);
 
 /* USB endpoint configuration macros. */
 
+/* NOTE: Summing the SIZE parameters of each endpoint should be less than or equal to 176. */
+
 #define USB_CONTROL_ENDPOINT			0x00
 #define USB_CONTROL_SIZE				16
 
 #define INTERRUPT_TRANSMIT_ENDPOINT		0x01
 #define INTERRUPT_TRANSMIT_BUFFER		ENDPOINT_SINGLE_BUFFER
-#define INTERRUPT_TRANSMIT_SIZE			64
+#define INTERRUPT_TRANSMIT_SIZE			32
 #define INTERRUPT_TRANSMIT_INTERVAL		1
 #define INTERRUPT_RECEIVE_ENDPOINT		0x02
 #define INTERRUPT_RECEIVE_BUFFER		ENDPOINT_SINGLE_BUFFER
@@ -38,11 +40,13 @@ extern int megausb_destroy(struct _lf_endpoint *endpoint);
 #define INTERRUPT_RECEIVE_INTERVAL		1
 
 #define BULK_TRANSMIT_ENDPOINT			0x03
-#define BULK_TRANSMIT_BUFFER			ENDPOINT_DOUBLE_BUFFER
+#define BULK_TRANSMIT_BUFFER			ENDPOINT_SINGLE_BUFFER
 #define BULK_TRANSMIT_SIZE				32
+#define BULK_TRANSMIT_INTERVAL			1
 #define BULK_RECEIVE_ENDPOINT			0x04
-#define BULK_RECEIVE_BUFFER				ENDPOINT_DOUBLE_BUFFER
+#define BULK_RECEIVE_BUFFER				ENDPOINT_SINGLE_BUFFER
 #define BULK_RECEIVE_SIZE				32
+#define BULK_RECEIVE_INTERVAL			1
 
 #define ENDPOINT_TYPE_CONTROL			0x00
 #define ENDPOINT_TYPE_BULK_IN			0x81

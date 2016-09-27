@@ -261,6 +261,18 @@ int lf_retrieve_packet(struct _lf_device *device, struct _fmr_packet *packet) {
 	return lf_success;
 }
 
+int lf_push(struct _fmr_module *module, fmr_function function, void *source, lf_size_t length, struct _fmr_list *args) {
+	/* Call the device's fmr_push_handler with metadata about the transfer. */
+	/* Blast data out the bulk endpoint. */
+	/* Recieve function result. */
+}
+
+int lf_pull(struct _fmr_module *module, fmr_function function, void *destination, lf_size_t length, struct _fmr_list *args) {
+	/* Call the device's fmr_pull_handler with metadata about the transfer. */
+	/* Blast data out the bulk endpoint. */
+	/* Recieve function result. */
+}
+
 /* Debugging functions for displaying the contents of various FMR related data structures. */
 
 void lf_debug_packet(struct _fmr_packet *packet) {
