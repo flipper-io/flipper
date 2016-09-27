@@ -39,7 +39,7 @@ extern struct _flipper {
 extern int flipper_attach(void);
 extern int flipper_attach_usb(char *name);
 extern int flipper_attach_network(char *name, char *hostname);
-extern int flipper_attach_endpoint(char *name, const struct _lf_endpoint *endpoint);
+extern int flipper_attach_endpoint(char *name, struct _lf_endpoint *endpoint);
 extern int flipper_select(char *name);
 extern int flipper_detach(char *name);
 extern int flipper_exit(void);
@@ -55,6 +55,8 @@ extern int lf_invoke(struct _fmr_module *module, fmr_function function, struct _
 extern fmr_type lf_word_size(struct _lf_device *device);
 /* Load the device's configuration information. */
 int lf_load_configuration(struct _lf_device *device);
+/* Returns the globally selected device. */
+struct _lf_device *lf_device(void);
 
 /* Sends a packet to the specified device. */
 extern int lf_transfer_packet(struct _lf_device *device, struct _fmr_packet *packet);

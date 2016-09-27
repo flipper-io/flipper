@@ -3,15 +3,16 @@
 #include <flipper/error.h>
 #include <platform/posix.h>
 
-struct _lf_device *lf_attach(char *name) {
+int lf_attach(char *name, struct _lf_endpoint *endpoint) {
 	/* Allocate memory to contain the record of the device. */
 	struct _lf_device *device = (struct _lf_device *)calloc(1, sizeof(struct _lf_device));
 	if (!device) {
 		error_raise(E_MALLOC, error_message("Failed to allocate the memory required to create a new fmr_device."));
-		return NULL;
+		return lf_error;
 	}
 	if (strlen(name) > sizeof(device -> configuration.name)) {
 		error_raise(E_NAME, error_message("The name '%s' is too long. Please choose a name with %i characters or less.", name, sizeof(device -> configuration.name)));
+		goto failure;
 	}
 	/* Set the device's name. */
 	strcpy(device -> configuration.name, name);
@@ -43,13 +44,32 @@ struct _lf_device *lf_attach(char *name) {
 		/* Stage the device into the list of attached devices. */
 		last -> next = device;
 	}
+	/* Set the device's endpoint. */
+	device -> endpoint = endpoint;
+	if (!endpoint) {
+		error_raise(E_ENDPOINT, error_message("No endpoint provided for the device '%s'.", name));
+		goto  failure;
+	}
 	/* Set the current device. */
 	flipper.device = device;
+	/* Save the test identifier. */
+	lf_id_t _identifier = device -> configuration.identifier;
+	/* Broadcast a packet to the device over the default endpoint to verify the identifier. */
+	int _e = lf_load_configuration(device);
+	if (_e < lf_success) {
+		error_raise(E_CONFIGURATION, error_message("Failed to obtain configuration for device '%s'.", name));
+		goto failure;
+	}
+	/* Compare the device identifiers. */
+	if (device -> configuration.identifier != _identifier) {
+		error_raise(E_NO_DEVICE, error_message("Identifier mismatch for device '%s'.", name));
+		goto failure;
+	}
 	/* Return with success. */
-	return device;
+	return lf_success;
 failure:
 	free(device);
-	return NULL;
+	return lf_error;
 }
 
 int flipper_attach(void) {
@@ -58,67 +78,20 @@ int flipper_attach(void) {
 }
 
 int flipper_attach_usb(char *name) {
-	struct _lf_device *device = lf_attach(name);
-	if (!device) {
-		return lf_error;
-	}
-	const struct _lf_endpoint *endpoint = &libusb;
-	/* Set the device's endpoint. */
-	device -> endpoint = endpoint;
-	/* Configure the device's endpoint. */
-	int8_t _e = endpoint -> configure(endpoint);
-	if (_e < lf_success) {
-		error_raise(E_NO_DEVICE, error_message("Failed to connect to Flipper device."));
-	}
-	/* Save the test identifier. */
-	lf_id_t _identifier = device -> configuration.identifier;
-	/* Broadcast a packet to the device over the default endpoint to verify the identifier. */
-	_e = lf_load_configuration(device);
-	if (_e < lf_success) {
-		error_raise(E_CONFIGURATION, error_message("Failed to obtain configuration for device '%s'.", name));
-		return lf_error;
-	}
-	/* Compare the device identifiers. */
-	if (device -> configuration.identifier != _identifier) {
-		error_raise(E_NO_DEVICE, error_message("Identifier mismatch for device '%s'.", name));
-		return lf_error;
-	}
-	return lf_success;
+	struct _lf_endpoint *_ep = &lf_usb_ep;
+	_ep -> configure(_ep);
+	return lf_attach(name, _ep);
 }
 
 int flipper_attach_network(char *name, char *hostname) {
-	struct _lf_device *device = lf_attach(name);
-	if (!device) {
-		return lf_error;
-	}
-	const struct _lf_endpoint *endpoint = &lf_network_ep;
-	/* Set the device's endpoint. */
-	device -> endpoint = endpoint;
-	/* Configure the device's endpoint. */
-	endpoint -> configure(endpoint, hostname);
-	/* Broadcast a packet to the device over the default endpoint to verify the identifier. */
-	//!MISSING!
-	/* Ask the device for its attributes. */
-	//!MISSING!
-	device -> configuration.attributes = lf_device_32bit | lf_device_little_endian;
-	return lf_success;
+	struct _lf_endpoint *_ep = &lf_network_ep;
+	_ep -> configure(_ep, hostname);
+	return lf_attach(name, _ep);
 }
 
-int flipper_attach_endpoint(char *name, const struct _lf_endpoint *endpoint) {
-	struct _lf_device *device = lf_attach(name);
-	if (!device) {
-		return lf_error;
-	}
-	/* Set the device's endpoint. */
-	device -> endpoint = endpoint;
-	/* Configure the device's endpoint. */
+int flipper_attach_endpoint(char *name, struct _lf_endpoint *endpoint) {
 	endpoint -> configure(endpoint);
-	/* Broadcast a packet to the device over the default endpoint to verify the identifier. */
-	//!MISSING!
-	/* Ask the device for its attributes. */
-	//!MISSING!
-	device -> configuration.attributes = lf_device_32bit | lf_device_little_endian;
-	return lf_error;
+	return lf_attach(name, endpoint);
 }
 
 int flipper_select(char *name) {
@@ -141,11 +114,17 @@ int flipper_select(char *name) {
 }
 
 int flipper_release(struct _lf_device *device) {
-	/* Destroy the endpoint. */
-	device -> endpoint -> destroy();
-	/* If the device's endpoint previously allocated memory to contain a record, release it. */
-	if (device -> endpoint -> record) {
-		free(device -> endpoint -> record);
+	if (!device) {
+		error_raise(E_NULL, error_message("No device provided for release."));
+		return lf_error;
+	}
+	/* If the device has an endpoint, deallocate it. */
+	if (device -> endpoint) {
+		device -> endpoint -> destroy();
+		/* If the device's endpoint previously allocated memory to contain a record, release it. */
+		if (device -> endpoint -> record) {
+			free(device -> endpoint -> record);
+		}
 	}
 	/* If the device we are detaching is the actively selected device, nullify it. */
 	if (device == flipper.attached) {
@@ -202,8 +181,6 @@ fmr_type lf_word_size(struct _lf_device *device) {
 	return (device -> configuration.attributes >> 1) & 0x7;
 }
 
-/* -- Packet manipulation functions. -- */
-
 int lf_load_configuration(struct _lf_device *device) {
 	struct _fmr_packet packet;
 	/* Generate the a null procedure call in the outgoing packet. */
@@ -216,7 +193,7 @@ int lf_load_configuration(struct _lf_device *device) {
 	if (_e < lf_success) {
 		return lf_error;
 	}
-	/* Obtain the response packet from the device. */
+	/* Obtain a response packet from the device. */
 	_e = lf_retrieve_packet(device, &packet);
 	if (_e < lf_success) {
 		return lf_error;
@@ -225,6 +202,16 @@ int lf_load_configuration(struct _lf_device *device) {
 	memcpy(&(device -> configuration), &packet, sizeof(struct _lf_configuration));
 	return lf_success;
 }
+
+struct _lf_device *lf_device(void) {
+	if (!flipper.device) {
+		error_raise(E_NO_DEVICE, error_message("No device selected. Please attach a device."));
+		return NULL;
+	}
+	return flipper.device;
+}
+
+/* -- Packet manipulation functions. -- */
 
 int lf_invoke(struct _fmr_module *module, fmr_function function, struct _fmr_list *args) {
 	/* Ensure that we have a valid module and argument pointer. */

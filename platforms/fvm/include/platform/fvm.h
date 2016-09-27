@@ -10,7 +10,7 @@
 /* Declare all global variables. */
 extern uint8_t *v_nvm;
 
-extern const struct _lf_endpoint lf_fvm_ep;
+extern struct _lf_endpoint lf_fvm_ep;
 
 /* Declare function prototypes. */
 void fvm_begin(void);

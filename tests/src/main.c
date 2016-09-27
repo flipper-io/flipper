@@ -17,21 +17,21 @@ int main(int argc, char *argv[]) {
 	buffer[0] = v(1);
 	buffer[1] = v(2);
 	buffer[2] = v(3);
-	libusb_transfer(buffer, FMR_PACKET_SIZE, 0x01);
-	libusb_transfer(buffer, FMR_PACKET_SIZE, 0x80);
+	lf_usb_transfer(buffer, FMR_PACKET_SIZE, 0x01);
+	lf_usb_transfer(buffer, FMR_PACKET_SIZE, 0x80);
 	printf("0x%02x 0x%02x 0x%02x\n", buffer[0], buffer[1], buffer[2]);
 
 #else
 
-	flipper_attach_endpoint("fvm", &lf_fvm_ep);
+	//flipper_attach_endpoint("fvm", &lf_fvm_ep);
 	flipper_attach_usb("flipper");
+
 	/* Load the device's configuration. */
-	lf_load_configuration(flipper.device);
 	printf("connected:\n name: '%s'\n identifier: 0x%04x\n version: 0x%04x\n attributes: 0x%02x.\n",
-			flipper.device -> configuration.name,
-			flipper.device -> configuration.identifier,
-			flipper.device -> configuration.version,
-			flipper.device -> configuration.attributes);
+			lf_device() -> configuration.name,
+			lf_device() -> configuration.identifier,
+			lf_device() -> configuration.version,
+			lf_device() -> configuration.attributes);
 
 	if (argc < 4) {
 		error_raise(E_NULL, "Invalid number of arguments provided. Expected R, G, B.");
@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
 
 	/* Create an empty message runtime module instance. */
 	struct _fmr_module _lf_led_module;
-	_lf_led_module.device = flipper.device;
+	_lf_led_module.device = lf_device();
 
 	/* Bind the empty instance to the default 'led' module which comes pre-loaded on all devices. */
 	int _e = fmr_bind(&_lf_led_module, "_lf_led");

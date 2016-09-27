@@ -4,7 +4,7 @@
 #define __lf_network_h__
 #include <flipper/core.h>
 
-extern const struct _lf_endpoint lf_network_ep;
+extern struct _lf_endpoint lf_network_ep;
 
 #ifdef __private_include__
 

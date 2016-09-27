@@ -35,28 +35,7 @@ enum {
 /* If this flag is set, error messages are nullified on platforms that do not need to store error strings. */
 #ifdef __enable_error_side_effects__
 /* These are the error strings that correspond to the values in the error code enumeration. */
-#define LF_ERROR_MESSAGE_STRINGS "no error", \
-								"malloc failure", \
-								"null pointer", \
-								"overflow", \
-								"no such device", \
-								"device not yet attached", \
-								"device already attached", \
-								"file already exists", \
-								"file does not exist", \
-								"message runtime packet overflow", \
-								"message runtime error", \
-								"endpoint error", \
-								"libusb error", \
-								"communication error", \
-								"socket error", \
-								"no module found", \
-								"address resoultion failure", \
-								"invalid error string", \
-								"checksums do not match", \
-								"invalid name", \
-								"configuration error", \
-								NULL
+#define LF_ERROR_MESSAGE_STRINGS "no error", "malloc failure", "null pointer", "overflow", "no device", "device not yet attached", "device already attached", "file already exists", "file does not exist", "message runtime packet overflow", "message runtime error", "endpoint error", "libusb error", "communication error", "socket error", "no module found", "address resoultion failure", "invalid error string", "checksums do not match", "invalid name", "configuration error"
 /* Allow the 'error_message' macro to serve as a passthrough for any variadic arguments supplied to it. */
 #define error_message(...) __VA_ARGS__
 #else

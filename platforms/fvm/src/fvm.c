@@ -8,7 +8,7 @@ uint8_t *v_nvm;
 /* Declaration of the virtual packet. */
 struct _fmr_packet vpacket;
 
-const struct _lf_endpoint lf_fvm_ep = {
+struct _lf_endpoint lf_fvm_ep = {
 	fvm_configure,
 	fvm_ready,
 	fvm_put,
@@ -59,7 +59,6 @@ int fvm_pull(void *destination, lf_size_t length) {
 
 int fvm_destroy(struct _lf_endpoint *endpoint) {
 	if (v_nvm) {
-		printf("FVM was destroyed successfully.\n");
 		free(v_nvm);
 		v_nvm = NULL;
 	}

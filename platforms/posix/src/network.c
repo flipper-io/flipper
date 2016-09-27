@@ -6,7 +6,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-const struct _lf_endpoint lf_network_ep = {
+struct _lf_endpoint lf_network_ep = {
 	network_configure,
 	network_ready,
 	network_put,
@@ -69,7 +69,7 @@ uint8_t network_get(void) {
 
 int network_push(void *source, lf_size_t length) {
 	/* Obtain a pointer to and cast to the network record associated with the active endpoint. */
-	struct _network_record *record = flipper.device -> endpoint -> record;
+	struct _network_record *record = lf_device() -> endpoint -> record;
 	char derp[length];
 	memcpy(derp, source, length);
 	printf("'%s' to %s\n", derp, inet_ntoa(record -> device.sin_addr));
@@ -84,7 +84,7 @@ int network_push(void *source, lf_size_t length) {
 
 int network_pull(void *destination, lf_size_t length) {
 	/* Obtain a pointer to and cast to the network record associated with the active endpoint. */
-	struct _network_record *record = flipper.device -> endpoint -> record;
+	struct _network_record *record = lf_device() -> endpoint -> record;
 	socklen_t _length;
 	ssize_t _e = recvfrom(record -> fd, destination, length, 0, (struct sockaddr *)&(record -> device), &_length);
 	if (_e < 0) {
