@@ -110,6 +110,8 @@ void fmr_free(struct _fmr_list *list) {
 }
 
 int fmr_bind(struct _fmr_module *module, char *name) {
+	/* Copy the name into the module. */
+	module -> name = name;
 	/* Calculate the module's identifier. */
 	module -> identifier = lf_checksum(name, strlen(name));
 	/* Ask the device if it has a module with the given identifier. */
@@ -196,7 +198,7 @@ void fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
 	/* Copy the encoded type widths into the buffer. */
 	memcpy(&types, (void *)(&(packet -> body)), dencode_length);
 	/* If the module is a standard moudle, obtain it internally. */
-	void *function = NULL;	
+	void *function = NULL;
 	if (packet -> target.attributes & LF_STANDARD_MODULE) {
 		/* Dereference the pointer to the target module. */
 		void *object = (void *)(fmr_module(packet -> target.module));

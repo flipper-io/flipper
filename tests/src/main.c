@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
 	printf("0x%02x 0x%02x 0x%02x\n", buffer[0], buffer[1], buffer[2]);
 
 #else
-	
+
 	//flipper_attach_endpoint("fvm", &lf_fvm_ep);
 	flipper_attach();
 
@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
 	if (_e < lf_success) {
 		error_raise(E_MODULE, "Failed to bind to LED module.");
 	}
-	_lf_led_module.identifier = 0;
+	_lf_led_module.identifier = 100;
 
 	/* Perform the function invocation. */
 	uint32_t result = lf_invoke(&_lf_led_module, _led_set_rgb, fmr_args(fmr_int8(atoi(argv[1])), fmr_int8(atoi(argv[2])), fmr_int8(atoi(argv[3]))));
