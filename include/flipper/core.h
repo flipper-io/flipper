@@ -20,6 +20,10 @@
 #define USB_PRODUCT_ID	0x0480
 #define USB_USAGE_PAGE	0xFFAB
 #define USB_USAGE		0x0200
+#define INTERRUPT_TRANSMIT_SIZE 32
+#define INTERRUPT_RECEIVE_SIZE 64
+#define BULK_TRANSMIT_SIZE 32
+#define BULK_RECEIVE_SIZE 32
 
 /* Used to contain the result of checksumming operations. */
 typedef uint16_t lf_id_t;

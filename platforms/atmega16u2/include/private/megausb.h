@@ -8,6 +8,8 @@
 /* ~ Declare the virtual interface for this driver. ~ */
 extern const struct _lf_endpoint megausb;
 
+extern volatile uint8_t megausb_configured;
+
 #ifdef __private_include__
 
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
@@ -32,20 +34,16 @@ extern int megausb_destroy(struct _lf_endpoint *endpoint);
 
 #define INTERRUPT_TRANSMIT_ENDPOINT		0x01
 #define INTERRUPT_TRANSMIT_BUFFER		ENDPOINT_SINGLE_BUFFER
-#define INTERRUPT_TRANSMIT_SIZE			32
 #define INTERRUPT_TRANSMIT_INTERVAL		1
 #define INTERRUPT_RECEIVE_ENDPOINT		0x02
 #define INTERRUPT_RECEIVE_BUFFER		ENDPOINT_SINGLE_BUFFER
-#define INTERRUPT_RECEIVE_SIZE			64
 #define INTERRUPT_RECEIVE_INTERVAL		1
 
 #define BULK_TRANSMIT_ENDPOINT			0x03
 #define BULK_TRANSMIT_BUFFER			ENDPOINT_SINGLE_BUFFER
-#define BULK_TRANSMIT_SIZE				32
 #define BULK_TRANSMIT_INTERVAL			1
 #define BULK_RECEIVE_ENDPOINT			0x04
 #define BULK_RECEIVE_BUFFER				ENDPOINT_SINGLE_BUFFER
-#define BULK_RECEIVE_SIZE				32
 #define BULK_RECEIVE_INTERVAL			1
 
 #define ENDPOINT_TYPE_CONTROL			0x00

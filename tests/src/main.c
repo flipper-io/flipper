@@ -8,7 +8,7 @@
 
 int main(int argc, char *argv[]) {
 
-#if 1
+#if 0
 
 	flipper_attach();
 

@@ -24,6 +24,9 @@ uint32_t retcat(uint16_t l, uint16_t h) {
 
 void system_task(void) {
 	while (1) {
+
+#if 0
+		/* bulk transfer tests. */
 		char buffer[FMR_PACKET_SIZE];
 		if (bulk_receive_packet(buffer) > 0) {
 			led_set_rgb(buffer[0], buffer[1], buffer[2]);
@@ -32,7 +35,8 @@ void system_task(void) {
 			buffer[2] = 0x0c;
 			bulk_transmit_packet(buffer);
 		}
-#if 0
+#else
+		/* FMR */
 		struct _fmr_packet packet;
 		memset(&packet, 0, sizeof(struct _fmr_packet));
 		int8_t _e = megausb_pull((void *)(&packet), sizeof(struct _fmr_packet));
