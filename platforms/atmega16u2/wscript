@@ -26,6 +26,7 @@ def configure(cfg):
     # Load the appropriate C compiler.
     cfg.find_program('avr-gcc', var='CC')
     cfg.load('gcc')
+    # Check for avr-libc.
     cfg.check_cc(lib = 'c')
     # Load the appropriate uploader.
     cfg.env.UPLOADER = 'dfu_programmer'

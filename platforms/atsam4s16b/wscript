@@ -25,6 +25,8 @@ def configure(cfg):
     # Load the appropriate C compiler.
     cfg.find_program('arm-none-eabi-gcc', var='CC')
     cfg.load('gcc')
+    # Check for newlib.
+    cfg.check_cc(lib = 'c')
 
 def build(bld):
     _env = bld.all_envs['platform-atsam4s16b']
