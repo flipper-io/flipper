@@ -207,3 +207,7 @@ done:
 	result -> error = error_get();
 	return;
 }
+
+/* Helper functions to libflipper. */
+
+//void fmr_push(lf_id_t module, lf_id_t function, )

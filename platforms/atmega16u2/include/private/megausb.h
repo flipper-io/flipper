@@ -22,27 +22,21 @@ extern int megausb_pull(void *destination, lf_size_t length);
 extern int megausb_destroy(struct _lf_endpoint *endpoint);
 
 #define DEFAULT_TIMEOUT                 50
-#define MANUFACTURER_STRING             L"Flipper Engineering"
-#define PRODUCT_STRING                  L"Flipper: Carbon Edition"
+#define MANUFACTURER_STRING             L"flipper.io"
+#define PRODUCT_STRING                  L"Flipper: Carbon"
 
 /* USB endpoint configuration macros. */
-
-/* NOTE: Summing the SIZE parameters of each endpoint should be less than or equal to 176. */
 
 #define USB_CONTROL_ENDPOINT			0x00
 #define USB_CONTROL_SIZE				16
 
-#define INTERRUPT_TRANSMIT_ENDPOINT		0x01
 #define INTERRUPT_TRANSMIT_BUFFER		ENDPOINT_SINGLE_BUFFER
 #define INTERRUPT_TRANSMIT_INTERVAL		1
-#define INTERRUPT_RECEIVE_ENDPOINT		0x02
 #define INTERRUPT_RECEIVE_BUFFER		ENDPOINT_SINGLE_BUFFER
 #define INTERRUPT_RECEIVE_INTERVAL		1
 
-#define BULK_TRANSMIT_ENDPOINT			0x03
 #define BULK_TRANSMIT_BUFFER			ENDPOINT_SINGLE_BUFFER
 #define BULK_TRANSMIT_INTERVAL			1
-#define BULK_RECEIVE_ENDPOINT			0x04
 #define BULK_RECEIVE_BUFFER				ENDPOINT_SINGLE_BUFFER
 #define BULK_RECEIVE_INTERVAL			1
 

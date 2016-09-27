@@ -3,11 +3,11 @@
 
 const uint8_t PROGMEM endpoint[] = {
 	/* Bidirectional interrupt endpoints for quick FMR transactions. */
-	1, ENDPOINT_TYPE_INTERRUPT_IN, ENDPOINT_SIZE(INTERRUPT_TRANSMIT_SIZE) | INTERRUPT_TRANSMIT_BUFFER,
-	1, ENDPOINT_TYPE_INTERRUPT_OUT, ENDPOINT_SIZE(INTERRUPT_RECEIVE_SIZE) | INTERRUPT_RECEIVE_BUFFER,
+	1, ENDPOINT_TYPE_INTERRUPT_IN, ENDPOINT_SIZE(INTERRUPT_IN_SIZE) | INTERRUPT_TRANSMIT_BUFFER,
+	1, ENDPOINT_TYPE_INTERRUPT_OUT, ENDPOINT_SIZE(INTERRUPT_OUT_SIZE) | INTERRUPT_RECEIVE_BUFFER,
 	/* Bidirectional bulk endpoints for large push/pull exchanges. */
-	1, ENDPOINT_TYPE_BULK_IN, ENDPOINT_SIZE(BULK_TRANSMIT_SIZE) | BULK_TRANSMIT_BUFFER,
-	1, ENDPOINT_TYPE_BULK_OUT, ENDPOINT_SIZE(BULK_RECEIVE_SIZE) | BULK_RECEIVE_BUFFER
+	1, ENDPOINT_TYPE_BULK_IN, ENDPOINT_SIZE(BULK_IN_SIZE) | BULK_TRANSMIT_BUFFER,
+	1, ENDPOINT_TYPE_BULK_OUT, ENDPOINT_SIZE(BULK_OUT_SIZE) | BULK_RECEIVE_BUFFER
 };
 
 static const uint8_t PROGMEM device_descriptor[] = {
@@ -55,17 +55,17 @@ static const uint8_t PROGMEM configuration[CONFIGURATION_SIZE] = {
 	/* Interrupt IN endpoint descriptor. (USB spec 9.6.6, page 269-271, Table 9-13) */
 	0x07,						// bLength
 	0x05,						// bDescriptorType
-	INTERRUPT_TRANSMIT_ENDPOINT | 0x80,	// bEndpointAddress
+	INTERRUPT_IN_ENDPOINT, // bEndpointAddress
 	0x03,						// bmAttributes (0x03=intr)
-	INTERRUPT_TRANSMIT_SIZE, 0x00,	// wMaxPacketSize
+	INTERRUPT_IN_SIZE, 0x00,	// wMaxPacketSize
 	INTERRUPT_TRANSMIT_INTERVAL,	// bInterval
 
 	/* Interrupt OUT endpoint descriptor. (USB spec 9.6.6, page 269-271, Table 9-13) */
 	0x07,						// bLength
 	0x05,						// bDescriptorType
-	INTERRUPT_RECEIVE_ENDPOINT,	// bEndpointAddress
+	INTERRUPT_OUT_ENDPOINT,	// bEndpointAddress
 	0x03,						// bmAttributes (0x03=intr)
-	INTERRUPT_RECEIVE_SIZE, 0x00,	// wMaxPacketSize
+	INTERRUPT_OUT_SIZE, 0x00, // wMaxPacketSize
 	INTERRUPT_RECEIVE_INTERVAL,	// bInterval
 
 //	/* Interface 1 (bulk) descriptor. (USB spec 9.6.5, page 267-269, Table 9-12) */
@@ -82,19 +82,18 @@ static const uint8_t PROGMEM configuration[CONFIGURATION_SIZE] = {
 	/* Bulk IN endpoint descriptor. (USB spec 9.6.6, page 269-271, Table 9-13) */
 	0x07,						// bLength
 	0x05,						// bDescriptorType
-	BULK_TRANSMIT_ENDPOINT | 0x80,		// bEndpointAddress
+	BULK_IN_ENDPOINT, 		// bEndpointAddress
 	0x02,						// bmAttributes (0x02 = bulk)
-	BULK_TRANSMIT_SIZE, 0x00,	// wMaxPacketSize
+	BULK_IN_SIZE, 0x00,	// wMaxPacketSize
 	BULK_TRANSMIT_INTERVAL,		// bInterval
 
 	/* Bulk OUT endpoint descriptor. (USB spec 9.6.6, page 269-271, Table 9-13) */
 	0x07,						// bLength
 	0x05,						// bDescriptorType
-	BULK_RECEIVE_ENDPOINT,		// bEndpointAddress
+	BULK_OUT_ENDPOINT,		// bEndpointAddress
 	0x02,						// bmAttributes (0x02 = bulk)
-	BULK_RECEIVE_SIZE, 0x00,	// wMaxPacketSize
+	BULK_OUT_SIZE, 0x00,	// wMaxPacketSize
 	BULK_RECEIVE_INTERVAL		// bInterval
-
 };
 
 struct usb_string {

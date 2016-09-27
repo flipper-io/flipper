@@ -13,7 +13,7 @@ int8_t bulk_receive_packet(uint8_t *destination) {
 	uint8_t timeout = UDFNUML + DEFAULT_TIMEOUT;
 
 	/* Select the endpoint that has been configured to receive bulk data. */
-	UENUM = BULK_RECEIVE_ENDPOINT;
+	UENUM = BULK_OUT_ENDPOINT;
 
 	/* Wait until data has been received. */
 	while (!(UEINTX & (1 << RWAL))) {
@@ -28,13 +28,13 @@ int8_t bulk_receive_packet(uint8_t *destination) {
 	}
 
 	/* Transfer the buffered data to the destination. */
-	uint8_t len = BULK_RECEIVE_SIZE;
+	uint8_t len = BULK_OUT_SIZE;
 	while (len --) *destination ++ = UEDATX;
 
 	/* Re-enable interrupts for the receive endpoint. */
 	UEINTX = (1 << NAKINI) | (1 << RWAL) | (1 << RXSTPI) | (1 << STALLEDI) | (1 << TXINI);
 
-	return BULK_RECEIVE_SIZE;
+	return BULK_OUT_SIZE;
 }
 
 /* Receive a packet using the appropriate bulk endpoint. */
@@ -49,7 +49,7 @@ int8_t bulk_transmit_packet(uint8_t *source) {
 	uint8_t timeout = UDFNUML + DEFAULT_TIMEOUT;
 
 	/* Select the endpoint that has been configured to receive bulk data. */
-	UENUM = BULK_TRANSMIT_ENDPOINT;
+	UENUM = BULK_IN_ENDPOINT & ~USB_IN_MASK;
 
 	/* Wait until data has been received. */
 	while (!(UEINTX & (1 << RWAL))) {
@@ -64,11 +64,11 @@ int8_t bulk_transmit_packet(uint8_t *source) {
 	}
 
 	/* Transfer the buffered data to the destination. */
-	uint8_t len = BULK_TRANSMIT_SIZE;
+	uint8_t len = BULK_IN_SIZE;
 	while (len --) UEDATX = *source ++;
 
 	/* Re-enable interrupts for the receive endpoint. */
 	UEINTX = (1 << RWAL) | (1 << NAKOUTI) | (1 << RXSTPI) | (1 << STALLEDI);
 
-	return BULK_TRANSMIT_SIZE;
+	return BULK_IN_SIZE;
 }

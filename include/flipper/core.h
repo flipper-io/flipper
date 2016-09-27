@@ -20,10 +20,18 @@
 #define USB_PRODUCT_ID	0x0480
 #define USB_USAGE_PAGE	0xFFAB
 #define USB_USAGE		0x0200
-#define INTERRUPT_TRANSMIT_SIZE 32
-#define INTERRUPT_RECEIVE_SIZE 64
-#define BULK_TRANSMIT_SIZE 32
-#define BULK_RECEIVE_SIZE 32
+
+/* NOTE: Summing the size parameters of each endpoints below should be less than or equal to 160. */
+
+#define USB_IN_MASK				0x80
+#define INTERRUPT_IN_ENDPOINT	(0x01 | USB_IN_MASK)
+#define INTERRUPT_IN_SIZE 		32
+#define INTERRUPT_OUT_ENDPOINT	0x02
+#define INTERRUPT_OUT_SIZE		64
+#define BULK_IN_ENDPOINT		(0x03 | USB_IN_MASK)
+#define BULK_IN_SIZE			32
+#define BULK_OUT_ENDPOINT		0x04
+#define BULK_OUT_SIZE			32
 
 /* Used to contain the result of checksumming operations. */
 typedef uint16_t lf_id_t;

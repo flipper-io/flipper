@@ -6,12 +6,6 @@
 #include <libusb.h>
 #include <flipper/error.h>
 
-#define INTERRUPT_ENDPOINT	0x01
-#define BULK_ENDPOINT		0x03
-
-#define USB_DIRECTION_IN 0x80
-#define USB_DIRECTION_OUT 0x01
-
 struct _lf_endpoint libusb = {
 	libusb_configure,
 	libusb_ready,
@@ -70,18 +64,23 @@ uint8_t libusb_get(void) {
 	return 0;
 }
 
-int libusb_transfer(void *data, lf_size_t length, uint8_t direction) {
+int libusb_transfer(void *data, lf_size_t length, uint8_t endpoint) {
 	struct _libusb_record *record = flipper.device -> endpoint -> record;
 	if (!record) {
 		error_raise(E_ENDPOINT, error_message("No libusb record associated with the selected USB endpoint. Did you attach?"));
 		return lf_error;
 	}
 	int _length, _e;
-	if (length <= sizeof(struct _fmr_packet)) {
-		_e = libusb_interrupt_transfer(record -> handle, INTERRUPT_ENDPOINT + direction, data, length, &_length, 0);
-	}
-	else {
-		_e = libusb_bulk_transfer(record -> handle, BULK_ENDPOINT + direction, data, length, &_length, 0);
+	if (endpoint == INTERRUPT_IN_ENDPOINT || endpoint == INTERRUPT_OUT_ENDPOINT) {
+		if (endpoint == INTERRUPT_IN_ENDPOINT) {
+			length = 32;
+		}
+		_e = libusb_interrupt_transfer(record -> handle, endpoint, data, length, &_length, 0);
+	} else if (endpoint == BULK_IN_ENDPOINT || endpoint == BULK_OUT_ENDPOINT) {
+		_e = libusb_bulk_transfer(record -> handle, endpoint, data, length, &_length, 0);
+	} else {
+		error_raise(E_ENDPOINT, error_message("An invalid endpoint (0x%02x) was provided for USB transfer.", endpoint));
+		return lf_error;
 	}
 	if (_e < 0 || (_length != length)) {
 		error_raise(E_COMMUNICATION, error_message("Failed to communicate with USB device. Connection interrupted."));
@@ -91,11 +90,11 @@ int libusb_transfer(void *data, lf_size_t length, uint8_t direction) {
 }
 
 int libusb_push(void *source, lf_size_t length) {
-	return libusb_transfer(source, length, USB_DIRECTION_OUT);
+	return libusb_transfer(source, length, INTERRUPT_OUT_ENDPOINT);
 }
 
 int libusb_pull(void *destination, lf_size_t length) {
-	return libusb_transfer(destination, length, USB_DIRECTION_IN);
+	return libusb_transfer(destination, length, INTERRUPT_IN_ENDPOINT);
 }
 
 int libusb_destroy(struct _lf_endpoint *endpoint) {

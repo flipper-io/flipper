@@ -1,5 +1,5 @@
-#ifndef __usb_h__
-#define __usb_h__
+#ifndef __lf_usb_h__
+#define __lf_usb_h__
 
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
 #include <flipper/core.h>

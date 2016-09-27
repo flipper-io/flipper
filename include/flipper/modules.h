@@ -45,6 +45,6 @@ enum {
 
 /* Describe a reference to the platform specific module-array. */
 extern const void *const fmr_modules[];
-/* NOTE: The preprocessor macro 'fmr_module(index)' should be used to access objects within this array. */
+/* NOTE: The platform specific function 'fmr_module(lf_id_t module)' should be used to access objects within this array. */
 
 #endif

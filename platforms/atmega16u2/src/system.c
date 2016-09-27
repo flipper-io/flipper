@@ -17,11 +17,6 @@ struct _lf_device self = {
 
 #define cpu_prescale(clock) (CLKPR = 0x80, CLKPR = clock)
 
-uint32_t retcat(uint16_t l, uint16_t h) {
-	error_raise(E_FMR, NULL);
-	return ((uint32_t)h << 16) | l;
-}
-
 void system_task(void) {
 	while (1) {
 
