@@ -23,15 +23,15 @@
 
 /* NOTE: Summing the size parameters of each endpoints below should be less than or equal to 160. */
 
-#define USB_IN_MASK				0x80
-#define INTERRUPT_IN_ENDPOINT	(0x01 | USB_IN_MASK)
-#define INTERRUPT_IN_SIZE 		32
-#define INTERRUPT_OUT_ENDPOINT	0x02
-#define INTERRUPT_OUT_SIZE		64
-#define BULK_IN_ENDPOINT		(0x03 | USB_IN_MASK)
-#define BULK_IN_SIZE			32
-#define BULK_OUT_ENDPOINT		0x04
-#define BULK_OUT_SIZE			32
+#define USB_IN_MASK            0x80
+#define INTERRUPT_IN_ENDPOINT  (0x01 | USB_IN_MASK)
+#define INTERRUPT_IN_SIZE      32
+#define INTERRUPT_OUT_ENDPOINT 0x02
+#define INTERRUPT_OUT_SIZE     64
+#define BULK_IN_ENDPOINT       (0x03 | USB_IN_MASK)
+#define BULK_IN_SIZE           32
+#define BULK_OUT_ENDPOINT      0x04
+#define BULK_OUT_SIZE          32
 
 /* Used to contain the result of checksumming operations. */
 typedef uint16_t lf_id_t;
@@ -76,6 +76,17 @@ typedef uint16_t lf_version_t;
 #define little(x)	((((uint16_t)(x)) << 8 ) | (((uint16_t)(x)) >> 8))
 #define little32(x) ((((uint32_t)(x)) << 16 ) | (((uint32_t)(x)) >> 16))
 
+/* Standardizes a way to obtain the name, version, and attributes of a Flipper device. */
+struct _lf_configuration {
+	/* The human readable name of the device. */
+	char name[16];
+	/* An identifier unique to the device. */
+	lf_id_t identifier;
+	/* The device's firmware version. */
+	lf_version_t version;
+	/* The attributes of the device. 3 (attach by default), 2:1 (word length), 0 (endianness) */
+	uint8_t attributes;
+};
 
 /* Standardizes interaction with a physical hardware bus for the transmission of arbitrary data. */
 struct _lf_endpoint {
@@ -99,12 +110,7 @@ struct _lf_endpoint {
 
 /* Describes a device capible of responding to FMR packets. */
 struct _lf_device {
-	/* The human readable name of the device. */
-	char *name;
-	/* An identifier unique to the device. */
-	lf_id_t identifier;
-	/* The attributes of the device. 2:1 (word length), 0 (endianness) */
-	uint8_t attributes;
+	struct _lf_configuration configuration;
 	/* A pointer to the endpoint through which packets will be transferred. */
 	const struct _lf_endpoint *endpoint;
 	/* The current error state of the device. */

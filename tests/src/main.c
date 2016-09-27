@@ -24,7 +24,14 @@ int main(int argc, char *argv[]) {
 #else
 
 	flipper_attach_endpoint("fvm", &lf_fvm_ep);
-	flipper_attach();
+	flipper_attach_usb("flipper");
+	/* Load the device's configuration. */
+	lf_load_configuration(flipper.device);
+	printf("connected:\n name: '%s'\n identifier: 0x%04x\n version: 0x%04x\n attributes: 0x%02x.\n",
+			flipper.device -> configuration.name,
+			flipper.device -> configuration.identifier,
+			flipper.device -> configuration.version,
+			flipper.device -> configuration.attributes);
 
 	if (argc < 4) {
 		error_raise(E_NULL, "Invalid number of arguments provided. Expected R, G, B.");

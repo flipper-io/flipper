@@ -10,10 +10,13 @@ struct _lf_device *lf_attach(char *name) {
 		error_raise(E_MALLOC, error_message("Failed to allocate the memory required to create a new fmr_device."));
 		return NULL;
 	}
+	if (strlen(name) > sizeof(device -> configuration.name)) {
+		error_raise(E_NAME, error_message("The name '%s' is too long. Please choose a name with %i characters or less.", name, sizeof(device -> configuration.name)));
+	}
 	/* Set the device's name. */
-	device -> name = name;
+	strcpy(device -> configuration.name, name);
 	/* Set the device's identifier. */
-	device -> identifier = lf_checksum(name, strlen(name));
+	device -> configuration.identifier = lf_checksum(name, strlen(name));
 	/* Cause the device to generate error related side effects on the host. */
 	device -> errors_generate_side_effects = true;
 	/* Obtain the head of the linked list of attached devices. */
@@ -28,9 +31,9 @@ struct _lf_device *lf_attach(char *name) {
 		/* Walk the list of attached devices until the desired device is found. */
 		while (head) {
 			/* Compare the name of the attached device with the name of the new device. */
-			if (!strcmp(head -> name, device -> name)) {
+			if (!strcmp(head -> configuration.name, device -> configuration.name)) {
 				/* If a device with the given name has already been attached, raise an error. */
-				error_raise(E_ALREADY_ATTACHED, error_message("Could not attach a device named '%s'. A device with that name has already been attached.", device -> name));
+				error_raise(E_ALREADY_ATTACHED, error_message("Could not attach a device named '%s'. A device with that name has already been attached.", device -> configuration.name));
 				goto failure;
 			}
 			/* Advance to the next attached device. */
@@ -67,11 +70,19 @@ int flipper_attach_usb(char *name) {
 	if (_e < lf_success) {
 		error_raise(E_NO_DEVICE, error_message("Failed to connect to Flipper device."));
 	}
+	/* Save the test identifier. */
+	lf_id_t _identifier = device -> configuration.identifier;
 	/* Broadcast a packet to the device over the default endpoint to verify the identifier. */
-	//!MISSING!
-	/* Ask the device for its attributes. */
-	//!MISSING!
-	device -> attributes = lf_device_32bit | lf_device_little_endian;
+	_e = lf_load_configuration(device);
+	if (_e < lf_success) {
+		error_raise(E_CONFIGURATION, error_message("Failed to obtain configuration for device '%s'.", name));
+		return lf_error;
+	}
+	/* Compare the device identifiers. */
+	if (device -> configuration.identifier != _identifier) {
+		error_raise(E_NO_DEVICE, error_message("Identifier mismatch for device '%s'.", name));
+		return lf_error;
+	}
 	return lf_success;
 }
 
@@ -89,7 +100,7 @@ int flipper_attach_network(char *name, char *hostname) {
 	//!MISSING!
 	/* Ask the device for its attributes. */
 	//!MISSING!
-	device -> attributes = lf_device_32bit | lf_device_little_endian;
+	device -> configuration.attributes = lf_device_32bit | lf_device_little_endian;
 	return lf_success;
 }
 
@@ -106,7 +117,7 @@ int flipper_attach_endpoint(char *name, const struct _lf_endpoint *endpoint) {
 	//!MISSING!
 	/* Ask the device for its attributes. */
 	//!MISSING!
-	device -> attributes = lf_device_32bit | lf_device_little_endian;
+	device -> configuration.attributes = lf_device_32bit | lf_device_little_endian;
 	return lf_error;
 }
 
@@ -116,7 +127,7 @@ int flipper_select(char *name) {
 	/* Walk the list of attached devices until the desired device is found. */
 	while (head) {
 		/* Compare the name of the attached device with the name provided. */
-		if (!strcmp(head -> name, name)) {
+		if (!strcmp(head -> configuration.name, name)) {
 			/* If we have a match, set the current device. */
 			flipper.device = head;
 			return lf_success;
@@ -154,7 +165,7 @@ int flipper_detach(char *name) {
 	/* Walk the list of attached devices until the desired device is found. */
 	while (device) {
 		/* Compare the name of the attached device with the name provided. */
-		if (!strcmp(device -> name, name)) {
+		if (!strcmp(device -> configuration.name, name)) {
 			/* If we have isolated the device to detach, release it. */
 			return flipper_release(device);
 		}
@@ -188,10 +199,32 @@ fmr_type lf_word_size(struct _lf_device *device) {
 		return 0;
 	}
 	/* Extract and return the device's word size from its attributes. */
-	return (device -> attributes >> 1) & 0x7;
+	return (device -> configuration.attributes >> 1) & 0x7;
 }
 
 /* -- Packet manipulation functions. -- */
+
+int lf_load_configuration(struct _lf_device *device) {
+	struct _fmr_packet packet;
+	/* Generate the a null procedure call in the outgoing packet. */
+	struct _fmr_module dummy;
+	int _e = fmr_generate(&dummy, 0, fmr_build(0), &packet);
+	/* Set the configuration bit in the target attributes. */
+	packet.target.attributes |= LF_CONFIGURATION;
+	/* Send the packet to the target device. */
+	_e = lf_transfer_packet(device, &packet);
+	if (_e < lf_success) {
+		return lf_error;
+	}
+	/* Obtain the response packet from the device. */
+	_e = lf_retrieve_packet(device, &packet);
+	if (_e < lf_success) {
+		return lf_error;
+	}
+	/* Copy the device's configuration into the device record. */
+	memcpy(&(device -> configuration), &packet, sizeof(struct _lf_configuration));
+	return lf_success;
+}
 
 int lf_invoke(struct _fmr_module *module, fmr_function function, struct _fmr_list *args) {
 	/* Ensure that we have a valid module and argument pointer. */
@@ -233,7 +266,7 @@ int lf_invoke(struct _fmr_module *module, fmr_function function, struct _fmr_lis
 	device -> error = result.error;
 	/* If the device encountered an error, raise it. */
 	if (device -> error != E_OK) {
-		error_raise(E_LAST, error_message("The device '%s' encountered the following error:", device -> name));
+		error_raise(E_LAST, error_message("The device '%s' encountered the following error:", device -> configuration.name));
 	}
 	/* Return the result of the invocation. */
 	return result.value;
@@ -244,7 +277,7 @@ int lf_transfer_packet(struct _lf_device *device, struct _fmr_packet *packet) {
 	int _e = device -> endpoint -> push(packet, sizeof(struct _fmr_packet));
 	/* Ensure that the packet was successfully transferred to the device. */
 	if (_e < lf_success) {
-		error_raise(E_ENDPOINT, error_message("Failed to transfer packet to device '%s'.", device -> name));
+		error_raise(E_ENDPOINT, error_message("Failed to transfer packet to device '%s'.", device -> configuration.name));
 		return lf_error;
 	}
 	return lf_success;
@@ -255,7 +288,7 @@ int lf_retrieve_packet(struct _lf_device *device, struct _fmr_packet *packet) {
 	int _e = device -> endpoint -> pull(packet, sizeof(struct _fmr_packet));
 	/* Ensure that the packet was successfully obtained from the device. */
 	if (_e < lf_success) {
-		error_raise(E_ENDPOINT, error_message("Failed to retrieve packet from the device '%s'.", device -> name));
+		error_raise(E_ENDPOINT, error_message("Failed to retrieve packet from the device '%s'.", device -> configuration.name));
 		return lf_error;
 	}
 	return lf_success;
@@ -265,12 +298,14 @@ int lf_push(struct _fmr_module *module, fmr_function function, void *source, lf_
 	/* Call the device's fmr_push_handler with metadata about the transfer. */
 	/* Blast data out the bulk endpoint. */
 	/* Recieve function result. */
+	return lf_success;
 }
 
 int lf_pull(struct _fmr_module *module, fmr_function function, void *destination, lf_size_t length, struct _fmr_list *args) {
 	/* Call the device's fmr_pull_handler with metadata about the transfer. */
 	/* Blast data out the bulk endpoint. */
 	/* Recieve function result. */
+	return lf_success;
 }
 
 /* Debugging functions for displaying the contents of various FMR related data structures. */

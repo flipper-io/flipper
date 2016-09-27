@@ -55,7 +55,7 @@ static const uint8_t PROGMEM configuration[CONFIGURATION_SIZE] = {
 	/* Interrupt IN endpoint descriptor. (USB spec 9.6.6, page 269-271, Table 9-13) */
 	0x07,						// bLength
 	0x05,						// bDescriptorType
-	INTERRUPT_IN_ENDPOINT, // bEndpointAddress
+	INTERRUPT_IN_ENDPOINT,		// bEndpointAddress
 	0x03,						// bmAttributes (0x03=intr)
 	INTERRUPT_IN_SIZE, 0x00,	// wMaxPacketSize
 	INTERRUPT_TRANSMIT_INTERVAL,	// bInterval
@@ -63,9 +63,9 @@ static const uint8_t PROGMEM configuration[CONFIGURATION_SIZE] = {
 	/* Interrupt OUT endpoint descriptor. (USB spec 9.6.6, page 269-271, Table 9-13) */
 	0x07,						// bLength
 	0x05,						// bDescriptorType
-	INTERRUPT_OUT_ENDPOINT,	// bEndpointAddress
+	INTERRUPT_OUT_ENDPOINT,		// bEndpointAddress
 	0x03,						// bmAttributes (0x03=intr)
-	INTERRUPT_OUT_SIZE, 0x00, // wMaxPacketSize
+	INTERRUPT_OUT_SIZE, 0x00,	// wMaxPacketSize
 	INTERRUPT_RECEIVE_INTERVAL,	// bInterval
 
 //	/* Interface 1 (bulk) descriptor. (USB spec 9.6.5, page 267-269, Table 9-12) */
@@ -90,9 +90,9 @@ static const uint8_t PROGMEM configuration[CONFIGURATION_SIZE] = {
 	/* Bulk OUT endpoint descriptor. (USB spec 9.6.6, page 269-271, Table 9-13) */
 	0x07,						// bLength
 	0x05,						// bDescriptorType
-	BULK_OUT_ENDPOINT,		// bEndpointAddress
+	BULK_OUT_ENDPOINT,			// bEndpointAddress
 	0x02,						// bmAttributes (0x02 = bulk)
-	BULK_OUT_SIZE, 0x00,	// wMaxPacketSize
+	BULK_OUT_SIZE, 0x00,		// wMaxPacketSize
 	BULK_RECEIVE_INTERVAL		// bInterval
 };
 

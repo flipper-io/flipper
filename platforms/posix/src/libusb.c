@@ -73,7 +73,7 @@ int libusb_transfer(void *data, lf_size_t length, uint8_t endpoint) {
 	int _length, _e;
 	if (endpoint == INTERRUPT_IN_ENDPOINT || endpoint == INTERRUPT_OUT_ENDPOINT) {
 		if (endpoint == INTERRUPT_IN_ENDPOINT) {
-			length = 32;
+			length = INTERRUPT_IN_SIZE;
 		}
 		_e = libusb_interrupt_transfer(record -> handle, endpoint, data, length, &_length, 0);
 	} else if (endpoint == BULK_IN_ENDPOINT || endpoint == BULK_OUT_ENDPOINT) {

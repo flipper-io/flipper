@@ -40,7 +40,8 @@ enum {
     _timer_id,
     _uart_id,
     _usb_id,
-    _wdt_id
+    _wdt_id,
+    _std_module_id_max
 };
 
 /* Describe a reference to the platform specific module-array. */

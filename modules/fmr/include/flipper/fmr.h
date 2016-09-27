@@ -91,9 +91,14 @@ struct __attribute__((__packed__)) _fmr_header {
 	/* The length of the packet expressed in bytes. */
 	uint16_t length;
 };
+#define LF_CONFIGURATION 0x20
+#define LF_STANDARD_MODULE 0x80
+#define LF_PUSH_PULL_FUNCTION 0x40
 
 /* Describes the target module with which the packet will be interacting.  */
 struct __attribute__((__packed__)) _fmr_target {
+	/* Attributes of the target module and function. */
+	uint8_t attributes;
 	/* The identifier of the module. */
 	lf_id_t module;
 	/* The identifier of the function or variable. */

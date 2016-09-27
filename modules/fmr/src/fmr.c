@@ -1,7 +1,7 @@
 #define __private_include__
 #include <flipper/fmr.h>
 #include <flipper/error.h>
-#include <flipper/flipper.h>
+#include <flipper/modules.h>
 
 struct _fmr_list *fmr_build(fmr_argc argc, ...) {
 	/* Ensure that the argument count is within bounds. */
@@ -136,6 +136,10 @@ int fmr_generate(struct _fmr_module *module, fmr_function function, struct _fmr_
 	/* Set the magic number. */
 	packet -> header.magic = 0xfe;
 	packet -> header.checksum = 0x00;
+	/* If the module's identifier is in the range of identifiers reserved for the standard modules, make this packet invoke a standard module. */
+	if (module -> identifier < _std_module_id_max) {
+		packet -> target.attributes |= LF_STANDARD_MODULE;
+	}
 	/* Store the target module, function, and argument count in the packet. */
 	packet -> target.module = module -> identifier;
 	packet -> target.function = function;
@@ -191,10 +195,17 @@ void fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
 	uint32_t types = 0;
 	/* Copy the encoded type widths into the buffer. */
 	memcpy(&types, (void *)(&(packet -> body)), dencode_length);
-	/* Dereference the pointer to the target module. */
-	void *object = (void *)(fmr_module(packet -> target.module));
-	/* Dereference a pointer to the target function. */
-	void *function = ((void **)(object))[packet -> target.function];
+	/* If the module is a standard moudle, obtain it internally. */
+	void *function = NULL;	
+	if (packet -> target.attributes & LF_STANDARD_MODULE) {
+		/* Dereference the pointer to the target module. */
+		void *object = (void *)(fmr_module(packet -> target.module));
+		/* Dereference a pointer to the target function. */
+		function = ((void **)(object))[packet -> target.function];
+	} else {
+		error_raise(E_MODULE, NULL);
+		goto done;
+	}
 	/* Ensure that the function is valid. */
 	if (function) {
 		/* Perform the function call internally. */

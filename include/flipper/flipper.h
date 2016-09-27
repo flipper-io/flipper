@@ -53,6 +53,9 @@ extern int lf_invoke(struct _fmr_module *module, fmr_function function, struct _
 
 /* Gets the word size of the specified device. */
 extern fmr_type lf_word_size(struct _lf_device *device);
+/* Load the device's configuration information. */
+int lf_load_configuration(struct _lf_device *device);
+
 /* Sends a packet to the specified device. */
 extern int lf_transfer_packet(struct _lf_device *device, struct _fmr_packet *packet);
 /* Retrieves a packet from the specified device. */
