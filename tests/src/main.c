@@ -22,12 +22,12 @@ int main(int argc, char *argv[]) {
 	printf("0x%02x 0x%02x 0x%02x\n", buffer[0], buffer[1], buffer[2]);
 
 #else
-
+	
 	//flipper_attach_endpoint("fvm", &lf_fvm_ep);
-	flipper_attach_usb("flipper");
+	flipper_attach();
 
 	/* Load the device's configuration. */
-	printf("connected:\n name: '%s'\n identifier: 0x%04x\n version: 0x%04x\n attributes: 0x%02x.\n",
+	printf("connected:\n name: '%s'\n identifier: 0x%04x\n version: 0x%04x\n attributes: 0x%02x\n",
 			lf_device() -> configuration.name,
 			lf_device() -> configuration.identifier,
 			lf_device() -> configuration.version,

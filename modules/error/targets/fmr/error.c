@@ -58,39 +58,17 @@ raise:
 }
 
 lf_error_t error_get(void) {
-	/* If no device is selected, raise an error. */
-	if (!flipper.device) {
-		error_raise(E_NO_DEVICE, NULL);
-		return lf_error;
-	}
-	return flipper.device -> error;
+	return lf_device() -> error;
 }
 
 void error_clear(void) {
-	/* If no device is selected, raise an error. */
-	if (!flipper.device) {
-		error_raise(E_NO_DEVICE, NULL);
-		return;
-	}
-	flipper.device -> error = E_OK;
+	lf_device() -> error = E_OK;
 }
 
 void error_resume(void) {
-	/* If no device is selected, raise an error. */
-	if (!flipper.device) {
-		error_raise(E_NO_DEVICE, NULL);
-		return;
-	}
-	/* Change the configuration. */
-	flipper.device -> errors_generate_side_effects = true;
+	lf_device() -> errors_generate_side_effects = true;
 }
 
 void error_pause(void) {
-	/* If no device is selected, raise an error. */
-	if (!flipper.device) {
-		error_raise(E_NO_DEVICE, NULL);
-		return;
-	}
-	/* Change the configuration. */
-	flipper.device -> errors_generate_side_effects = false;
+	lf_device() -> errors_generate_side_effects = false;
 }
