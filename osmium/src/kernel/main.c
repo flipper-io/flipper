@@ -2,6 +2,7 @@
 #include <osmium.h>
 #include <flipper/modules.h>
 #include <flipper/uart.h>
+#include <private/nvm.h>
 
 int main() {
 
@@ -16,8 +17,16 @@ int main() {
 	/* Clear the error state. */
 	error_clear();
 
-	// spi_configure();
-	// fs_configure();
+	spi_configure();
+	nvm_configure();
+	char out[] = "butts";
+	nvm_push(out, sizeof(out), 0);
+	char in[sizeof(out)];
+	nvm_pull(in, sizeof(in), 0);
+	if (memcmp(out, in, sizeof(out))) {
+		error_raise(E_CHECKSUM, NULL);
+		led_set_rgb(LED_COLOR_ERROR);
+	}
 
 	/* Perform the system task. */
 	system_task();
