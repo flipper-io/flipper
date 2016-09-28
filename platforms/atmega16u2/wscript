@@ -14,17 +14,21 @@ def configure(cfg):
     cfg.env.append_value('CFLAGS', ['-std=c99', '-Os', '-DARCH=ARCH_AVR8', '-D__AVR_ATMEGA16U2__', '-DF_CPU=16000000UL', '-Wno-pragmas', '-mmcu=atmega16u2'])
     cfg.env.append_value('LDFLAGS', '-mmcu=atmega16u2')
     # Load the appropriate binary utilities.
-    cfg.find_program('avr-objcopy', var='OBJCOPY')
+    objcopy = cfg.find_program('avr-objcopy')
+    cfg.env.OBJCOPY = objcopy
     # Load the appropriate archiver.
-    cfg.find_program('avr-ar', var='AR')
+    ar = cfg.find_program('avr-ar')
+    cfg.env.AR = ar
      # Load the appropriate assembler.
-    cfg.find_program('avr-gcc', var='AS')
+    asm = cfg.find_program('avr-gcc')
+    cfg.env.AS = asm
     cfg.env.append_value('ASFLAGS', cfg.env['CFLAGS'])
     cfg.env.AS_TGT_F = ['-c', '-o']
     cfg.env.ASLNK_TGT_F = ['-o']
     cfg.load('asm')
     # Load the appropriate C compiler.
-    cfg.find_program('avr-gcc', var='CC')
+    cc = cfg.find_program('avr-gcc')
+    cfg.env.CC = cc
     cfg.load('gcc')
     # Check for avr-libc.
     cfg.check_cc(lib = 'c')

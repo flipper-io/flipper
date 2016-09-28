@@ -14,16 +14,20 @@ def configure(cfg):
     cfg.env.append_value('CFLAGS', ['-std=c99', '-Os', '-nostartfiles', '-ffreestanding', '-mthumb', '-mcpu=cortex-m4'])
     cfg.env.append_value('LDFLAGS', '--specs=rdimon.specs')
     # Load the appropriate binary utilities.
-    cfg.find_program('arm-none-eabi-objcopy', var='OBJCOPY')
+    objcopy = cfg.find_program('arm-none-eabi-objcopy')
+    cfg.env.OBJCOPY = objcopy
     # Load the appropriate archiver.
-    cfg.find_program('arm-none-eabi-ar', var='AR')
+    ar = cfg.find_program('arm-none-eabi-ar')
+    cfg.env.AR = ar
      # Load the appropriate assembler.
-    cfg.find_program('arm-none-eabi-as', var='AS')
+    asm = cfg.find_program('arm-none-eabi-as')
+    cfg.env.AS = asm
     cfg.env.AS_TGT_F = ['-c', '-o']
     cfg.env.ASLNK_TGT_F = ['-o']
     cfg.load('asm')
     # Load the appropriate C compiler.
-    cfg.find_program('arm-none-eabi-gcc', var='CC')
+    cc = cfg.find_program('arm-none-eabi-gcc')
+    cfg.env.CC = cc
     cfg.load('gcc')
     # Check for newlib.
     cfg.check_cc(lib = 'c')
