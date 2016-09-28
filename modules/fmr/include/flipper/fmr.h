@@ -19,6 +19,7 @@
 typedef uint64_t fmr_va;
 typedef uint32_t fmr_arg;
 typedef uint8_t fmr_argc;
+typedef lf_id_t fmr_module;
 typedef uint8_t fmr_function;
 typedef uint32_t fmr_return;
 
@@ -137,14 +138,14 @@ void fmr_free(struct _fmr_list *list);
 /* Binds a module to its counterpart the selected Flipper device. */
 int fmr_bind(struct _fmr_module *module, char *name);
 /* Generates the appropriate data structure needed for the remote procedure call of 'funtion' in 'module'. */
-int fmr_generate(struct _fmr_module *module, fmr_function function, struct _fmr_list *args, struct _fmr_packet *packet);
+int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *args, struct _fmr_packet *packet);
 /* Executes an fmr_packet and stores the result of the operation in the result buffer provided. */
 void fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result);
 
 /* ~ Functions with platform specific implementation. ~ */
 
 /* Abstracts platform specific implementation needed to access the standard module array. */
-extern const void *fmr_module(lf_id_t module);
+extern const void *lf_std_module(lf_id_t module);
 /* Unpacks the argument buffer into the CPU following the native architecture's calling convention and jumps to the given function pointer. */
 extern uint32_t fmr_call(void *function, uint8_t argc, uint16_t argt, void *argv);
 

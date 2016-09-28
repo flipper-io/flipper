@@ -40,7 +40,7 @@ int lf_usb_configure(struct _lf_endpoint *endpoint) {
 	/* Attach a physical device to this endpoint. */
 	record -> handle = libusb_open_device_with_vid_pid(record -> context, USB_VENDOR_ID, USB_PRODUCT_ID);
 	if (!(record -> handle)) {
-		error_raise(E_NO_DEVICE, error_message("Could not connect to Flipper device over USB. Ensure the device is connected."));
+		error_raise(E_NO_DEVICE, error_message("Could not connect to Flipper device over USB. Ensure that a device is connected."));
 		return lf_error;
 	}
 	/* Claim the interface used to send and receive message runtime packets. */

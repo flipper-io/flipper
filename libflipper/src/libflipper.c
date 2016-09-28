@@ -184,8 +184,7 @@ fmr_type lf_word_size(struct _lf_device *device) {
 int lf_load_configuration(struct _lf_device *device) {
 	struct _fmr_packet packet;
 	/* Generate the a null procedure call in the outgoing packet. */
-	struct _fmr_module dummy;
-	int _e = fmr_generate(&dummy, 0, fmr_build(0), &packet);
+	int _e = fmr_generate(0, 0, fmr_build(0), &packet);
 	/* Set the configuration bit in the target attributes. */
 	packet.target.attributes |= LF_CONFIGURATION;
 	/* Send the packet to the target device. */
@@ -232,7 +231,7 @@ int lf_invoke(struct _fmr_module *module, fmr_function function, struct _fmr_lis
 	}
 	struct _fmr_packet packet;
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_generate(module, function, args, &packet);
+	int _e = fmr_generate(module -> identifier, function, args, &packet);
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -281,17 +280,16 @@ int lf_retrieve_packet(struct _lf_device *device, struct _fmr_packet *packet) {
 	return lf_success;
 }
 
-int lf_push(struct _fmr_module *module, fmr_function function, void *source, lf_size_t length, struct _fmr_list *args) {
+int lf_push(struct _lf_device *device, void *source, lf_size_t length) {
 	/* Call the device's fmr_push_handler with metadata about the transfer. */
+	
 	/* Blast data out the bulk endpoint. */
-	/* Recieve function result. */
 	return lf_success;
 }
 
-int lf_pull(struct _fmr_module *module, fmr_function function, void *destination, lf_size_t length, struct _fmr_list *args) {
+int lf_pull(struct _lf_device *device, void *destination, lf_size_t length) {
 	/* Call the device's fmr_pull_handler with metadata about the transfer. */
 	/* Blast data out the bulk endpoint. */
-	/* Recieve function result. */
 	return lf_success;
 }
 

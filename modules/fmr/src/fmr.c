@@ -119,12 +119,7 @@ int fmr_bind(struct _fmr_module *module, char *name) {
 	return lf_success;
 }
 
-int fmr_generate(struct _fmr_module *module, fmr_function function, struct _fmr_list *args, struct _fmr_packet *packet) {
-	/* Ensure that each of the given parameters are valid. */
-	if (!module) {
-		error_raise(E_NULL, error_message("Invalid target module provided during message runtime packet generation."));
-		return lf_error;
-	}
+int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *args, struct _fmr_packet *packet) {
 	if (!args) {
 		error_raise(E_NULL, error_message("Invalid argument list provided during message runtime packet generation."));
 		return lf_error;
@@ -139,11 +134,11 @@ int fmr_generate(struct _fmr_module *module, fmr_function function, struct _fmr_
 	packet -> header.magic = 0xfe;
 	packet -> header.checksum = 0x00;
 	/* If the module's identifier is in the range of identifiers reserved for the standard modules, make this packet invoke a standard module. */
-	if (module -> identifier < _std_module_id_max) {
+	if (module < _std_module_id_max) {
 		packet -> target.attributes |= LF_STANDARD_MODULE;
 	}
 	/* Store the target module, function, and argument count in the packet. */
-	packet -> target.module = module -> identifier;
+	packet -> target.module = module;
 	packet -> target.function = function;
 	packet -> target.argc = args -> argc;
 	/* Calculate the number of bytes needed to encode the widths of the types. */
@@ -201,7 +196,7 @@ void fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
 	void *function = NULL;
 	if (packet -> target.attributes & LF_STANDARD_MODULE) {
 		/* Dereference the pointer to the target module. */
-		void *object = (void *)(fmr_module(packet -> target.module));
+		void *object = (void *)(lf_std_module(packet -> target.module));
 		/* Dereference a pointer to the target function. */
 		function = ((void **)(object))[packet -> target.function];
 	} else {
@@ -222,5 +217,3 @@ done:
 }
 
 /* Helper functions to libflipper. */
-
-//void fmr_push(lf_id_t module, lf_id_t function, )

@@ -19,7 +19,7 @@ extern struct _flipper {
 	/* Attaches to a Flipper device by name and IP over the network. */
 	int (* attach_network)(char *name, char *ip);
 	/* Attaches to a Flipper device by name over an arbitrary endpoint. */
-	int (* attach_endpoint)(char *name, const struct _lf_endpoint *endpoint);
+	int (* attach_endpoint)(char *name, struct _lf_endpoint *endpoint);
 	/* Selects a Flipper device. */
 	int (* select)(char *name);
 	/* Detaches a Flipper device. */
@@ -63,9 +63,9 @@ extern int lf_transfer_packet(struct _lf_device *device, struct _fmr_packet *pac
 /* Retrieves a packet from the specified device. */
 extern int lf_retrieve_packet(struct _lf_device *device, struct _fmr_packet *packet);
 /* Moves data from the address space of the host to that of the device. */
-extern int lf_push(struct _fmr_module *module, fmr_function function, void *source, lf_size_t length, struct _fmr_list *args);
+extern int lf_push(struct _lf_device *device, void *source, lf_size_t length);
 /* Moves data from the address space of the device to that of the host. */
-extern int lf_pull(struct _fmr_module *module, fmr_function function, void *destination, lf_size_t length, struct _fmr_list *args);
+extern int lf_pull(struct _lf_device *device, void *destination, lf_size_t length);
 
 #endif
 #endif

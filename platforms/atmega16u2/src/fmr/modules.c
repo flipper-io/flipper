@@ -4,8 +4,26 @@
 #include <platform/atmega16u2.h>
 
 /* Define the standard modules accessible on this platform. */
-const void *const fmr_modules[] PROGMEM = { &led };
+const void *const fmr_modules[] PROGMEM = {
+    _forward_id,
+    &button,
+    _forward_id,
+    _forward_id,
+    _forward_id,
+    _forward_id,
+    _forward_id,
+    _forward_id,
+    &led,
+    _forward_id,
+    _forward_id,
+    _forward_id,
+    _forward_id,
+    _forward_id,
+    _forward_id,
+    _forward_id,
+    _forward_id,
+};
 
-const void *fmr_module(lf_id_t module) {
+const void *lf_std_module(lf_id_t module) {
     return (void *)(pgm_read_word(&fmr_modules[module]));
 }

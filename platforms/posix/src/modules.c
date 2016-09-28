@@ -4,9 +4,27 @@
 #include <platform/posix.h>
 
 /* Define the standard modules accessible on this platform. */
-const void *const fmr_modules[] = { &led };
+const void *const fmr_modules[] = {
+    _forward_id,
+    &button,
+    _forward_id,
+    _forward_id,
+    _forward_id,
+    _forward_id,
+    _forward_id,
+    _forward_id,
+    &led,
+    _forward_id,
+    _forward_id,
+    _forward_id,
+    _forward_id,
+    _forward_id,
+    _forward_id,
+    _forward_id,
+    _forward_id,
+};
 
-const void *fmr_module(lf_id_t module) {
+const void *lf_std_module(lf_id_t module) {
     return fmr_modules[module];
 }
 
