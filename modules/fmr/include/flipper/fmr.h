@@ -18,9 +18,10 @@
 /* Define types exposed by the FMR API. */
 typedef uint64_t fmr_va;
 typedef uint32_t fmr_arg;
-typedef uint8_t fmr_argc;
 typedef lf_id_t fmr_module;
 typedef uint8_t fmr_function;
+typedef uint8_t fmr_argc;
+typedef uint16_t fmr_types;
 typedef uint32_t fmr_return;
 
 /* Enumerates the basic type signatures an argument can be classified using. */
@@ -123,7 +124,19 @@ struct _fmr_result {
 	lf_error_t error;
 };
 
+/* Declare the virtual interface for this module. */
+extern const struct _fmr {
+	/* Configures the button hardware. */
+	fmr_return (* push)(fmr_module module, fmr_function function, lf_size_t length);
+	/* Reads back the button state; returns 0 when released and 1 when pressed. */
+	void (* pull)(uint16_t address, lf_size_t length);
+} fmr;
+
 #ifdef __private_include__
+
+/* ~ Declare the FMR overlay for this driver. ~ */
+
+enum { _fmr_push, _fmr_pull };
 
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
 
@@ -141,6 +154,11 @@ int fmr_bind(struct _fmr_module *module, char *name);
 int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *args, struct _fmr_packet *packet);
 /* Executes an fmr_packet and stores the result of the operation in the result buffer provided. */
 void fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result);
+
+/* Helper function for lf_push. */
+fmr_return fmr_push(fmr_module module, fmr_function function, lf_size_t length);
+/* Helper function for lf_pull. */
+void fmr_pull(uint16_t address, lf_size_t length);
 
 /* ~ Functions with platform specific implementation. ~ */
 

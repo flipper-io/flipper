@@ -20,6 +20,20 @@ struct _lf_device self = {
 
 #define cpu_prescale(clock) (CLKPR = 0x80, CLKPR = clock)
 
+/* Helper functions to libflipper. */
+
+fmr_return fmr_push(fmr_module module, fmr_function function, lf_size_t length) {
+	void *swap = malloc(length);
+	if (!swap) {
+		error_raise(E_MALLOC, NULL);
+	}
+	megausb_pull(swap, length);
+	return (fmr_return)((uintptr_t)swap);
+}
+
+void fmr_pull(uint16_t address, lf_size_t length) {
+	megausb_push((void *)(address), length);
+}
 
 struct _lf_configuration *system_configuration(void) {
 	return &self.configuration;

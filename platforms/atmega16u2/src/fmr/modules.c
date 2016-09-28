@@ -9,7 +9,7 @@ const void *const fmr_modules[] PROGMEM = {
     &button,
     _forward_id,
     _forward_id,
-    _forward_id,
+    &fmr,
     _forward_id,
     _forward_id,
     _forward_id,

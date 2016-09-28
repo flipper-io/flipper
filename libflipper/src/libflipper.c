@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/flipper.h>
-#include <flipper/error.h>
+#include <flipper/modules.h>
 #include <platform/posix.h>
 
 int lf_attach(char *name, struct _lf_endpoint *endpoint) {
@@ -212,15 +212,28 @@ struct _lf_device *lf_device(void) {
 
 /* -- Packet manipulation functions. -- */
 
+int lf_get_result(struct _lf_device *device, struct _fmr_result *result) {
+	struct _fmr_packet packet;
+	/* Obtain the response packet from the device. */
+	int _e = lf_retrieve_packet(device, &packet);
+	if (_e < lf_success) {
+		return lf_error;
+	}
+	/* Parse the response packet from the device. */
+	memcpy(result, &packet, sizeof(struct _fmr_result));
+	/* Synchronize with the device's error state. */
+	device -> error = result -> error;
+	/* If the device encountered an error, raise it. */
+	if (device -> error != E_OK) {
+		error_raise(E_LAST, error_message("The following error occured on the device '%s':", device -> configuration.name));
+	}
+	return lf_success;
+}
+
 int lf_invoke(struct _fmr_module *module, fmr_function function, struct _fmr_list *args) {
 	/* Ensure that we have a valid module and argument pointer. */
 	if (!module) {
 		error_raise(E_NULL, error_message("No module specified for message runtime invocation."));
-		return lf_error;
-	}
-	/* Ensure that the argument list is valid. */
-	if (!args) {
-		error_raise(E_NULL, error_message("No arguments specified for message runtime invocation."));
 		return lf_error;
 	}
 	/* Ensure that the device pointer is valid. */
@@ -240,20 +253,9 @@ int lf_invoke(struct _fmr_module *module, fmr_function function, struct _fmr_lis
 	if (_e < lf_success) {
 		return lf_error;
 	}
-	/* Obtain the response packet from the device. */
-	_e = lf_retrieve_packet(device, &packet);
-	if (_e < lf_success) {
-		return lf_error;
-	}
-	/* Parse the response packet from the device. */
+	/* Obtain the result of the operation. */
 	struct _fmr_result result;
-	memcpy(&result, &packet, sizeof(struct _fmr_result));
-	/* Synchronize with the device's error state. */
-	device -> error = result.error;
-	/* If the device encountered an error, raise it. */
-	if (device -> error != E_OK) {
-		error_raise(E_LAST, error_message("The following error occured on the device '%s' while executing a function in the module '%s':", device -> configuration.name, module -> name));
-	}
+	lf_get_result(device, &result);
 	/* Return the result of the invocation. */
 	return result.value;
 }
@@ -280,16 +282,60 @@ int lf_retrieve_packet(struct _lf_device *device, struct _fmr_packet *packet) {
 	return lf_success;
 }
 
-int lf_push(struct _lf_device *device, void *source, lf_size_t length) {
+void *lf_push(struct _lf_device *device, void *source, lf_size_t length) {
 	/* Call the device's fmr_push_handler with metadata about the transfer. */
-	
-	/* Blast data out the bulk endpoint. */
-	return lf_success;
+	struct _fmr_packet packet;
+	/* Generate the function call in the outgoing packet. */
+	int _e = fmr_generate(_fmr_id, _fmr_push, fmr_args(fmr_int16(0), fmr_int8(0), fmr_int32(length)), &packet);
+	if (_e < lf_success) {
+		return NULL;
+	}
+	/* Send the packet to the target device. */
+	_e = lf_transfer_packet(device, &packet);
+	if (_e < lf_success) {
+		return NULL;
+	}
+
+	/* Send the data to the device. */
+	_e = device -> endpoint -> push(source, length);
+	/* Ensure that the data was successfully transferred to the device. */
+	if (_e < lf_success) {
+		return NULL;
+	}
+
+	struct _fmr_result result;
+	/* Obtain the result of the operation. */
+	lf_get_result(device, &result);
+	/* Return a pointer to the data. */
+	return (void *)((uintptr_t)result.value);
 }
 
-int lf_pull(struct _lf_device *device, void *destination, lf_size_t length) {
-	/* Call the device's fmr_pull_handler with metadata about the transfer. */
-	/* Blast data out the bulk endpoint. */
+int lf_pull(struct _lf_device *device, void *destination, void *source, lf_size_t length) {
+	/* Call the device's fmr_push_handler with metadata about the transfer. */
+	struct _fmr_packet packet;
+	/* Generate the function call in the outgoing packet. */
+	int _e = fmr_generate(_fmr_id, _fmr_pull, fmr_args(fmr_int16(source), fmr_int32(length)), &packet);
+	if (_e < lf_success) {
+		return lf_error;
+	}
+	/* Send the packet to the target device. */
+	_e = lf_transfer_packet(device, &packet);
+	if (_e < lf_success) {
+		return lf_error;
+	}
+
+	/* Send the data to the device. */
+	_e = device -> endpoint -> pull(destination, length);
+	/* Ensure that the data was successfully transferred to the device. */
+	if (_e < lf_success) {
+		return lf_error;
+	}
+
+	/* Obtain the response packet from the device. */
+	_e = lf_retrieve_packet(device, &packet);
+	if (_e < lf_success) {
+		return lf_error;
+	}
 	return lf_success;
 }
 

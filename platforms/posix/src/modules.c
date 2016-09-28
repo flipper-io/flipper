@@ -31,3 +31,17 @@ const void *lf_std_module(lf_id_t module) {
 uint32_t fmr_call(void *function, uint8_t argc, uint16_t argt, void *argv) {
     return 0;
 }
+
+/* TEMP */
+
+fmr_return fmr_push(fmr_module module, fmr_function function, lf_size_t length) {
+	void *swap = malloc(length);
+	if (!swap) {
+		error_raise(E_MALLOC, NULL);
+	}
+
+}
+
+void fmr_pull(uint16_t address, lf_size_t length) {
+
+}
