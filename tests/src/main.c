@@ -8,6 +8,25 @@
 
 void led_test(int argc, char *argv[]);
 
+struct _fmr_module *make_module(char *name, fmr_module identifier) {
+	/* Create an empty message runtime module instance. */
+	struct _fmr_module *_module = malloc(sizeof(struct _fmr_module));
+	if (!_module) {
+		error_raise(E_MALLOC, "Malloc error for module.");
+		return NULL;
+	}
+	_module -> device = lf_device();
+	/* Bind the empty instance to the default 'led' module which comes pre-loaded on all devices. */
+	int _e = fmr_bind(_module, name);
+	if (_e < lf_success) {
+		error_raise(E_MODULE, error_message("Failed to bind to '%s' module.", name));
+		free(_module);
+		return NULL;
+	}
+	_module -> identifier = identifier;
+	return _module;
+}
+
 int main(int argc, char *argv[]) {
 
 #if 0
@@ -32,25 +51,21 @@ int main(int argc, char *argv[]) {
 
 	/* - FMR Tests - */
 
-	/* Create an empty message runtime module instance. */
-	struct _fmr_module _lf_fmr_module;
-	_lf_fmr_module.device = lf_device();
-
-	/* Bind the empty instance to the default 'led' module which comes pre-loaded on all devices. */
-	int _e = fmr_bind(&_lf_fmr_module, "_lf_fmr");
-	if (_e < lf_success) {
-		error_raise(E_MODULE, "Failed to bind to FMR module.");
-	}
-	_lf_fmr_module.identifier = _fmr_id;
+	struct _fmr_module *_uart = make_module("uart", _uart_id);
 
 	//uint32_t result = lf_invoke(&_lf_fmr_module, _fmr_push, NULL);
-	char out[] = "BUTT";
-	void *address = lf_push(lf_device(), out, sizeof(out));
-	printf("Pushed to device. Address is %p.\n", address);
+	//char out[] = "#";
+	//void *address = lf_push(_uart, _uart_push, out, sizeof(out));
+	//printf("Pushed to device. Address is %p.\n", address);
+	lf_invoke(_uart, _uart_put, fmr_args(fmr_int8('#')));
 
-	char in[sizeof(out)];
-	lf_pull(lf_device(), in, address, sizeof(in));
-	printf("Pulled from device. Value is '%s'.\n", in);
+	char in[3];
+	lf_pull(_uart, _uart_pull, in, sizeof(in));
+	printf("Pulled from device. Value is: \n ");
+	for (int i = 0; i < sizeof(in); i ++) {
+		printf("0x%02x, ", in[i]);
+	}
+	printf("\n");
 
 #endif
 

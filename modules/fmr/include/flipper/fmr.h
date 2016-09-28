@@ -127,9 +127,9 @@ struct _fmr_result {
 /* Declare the virtual interface for this module. */
 extern const struct _fmr {
 	/* Configures the button hardware. */
-	fmr_return (* push)(fmr_module module, fmr_function function, lf_size_t length);
+	void (* push)(fmr_module module, fmr_function function, lf_size_t length);
 	/* Reads back the button state; returns 0 when released and 1 when pressed. */
-	void (* pull)(uint16_t address, lf_size_t length);
+	void (* pull)(fmr_module module, fmr_function function, lf_size_t length);
 } fmr;
 
 #ifdef __private_include__
@@ -152,20 +152,22 @@ void fmr_free(struct _fmr_list *list);
 int fmr_bind(struct _fmr_module *module, char *name);
 /* Generates the appropriate data structure needed for the remote procedure call of 'funtion' in 'module'. */
 int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *args, struct _fmr_packet *packet);
+/* Executes a standard module. */
+fmr_return fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, fmr_types types, void *arguments);
 /* Executes an fmr_packet and stores the result of the operation in the result buffer provided. */
 void fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result);
 
 /* Helper function for lf_push. */
-fmr_return fmr_push(fmr_module module, fmr_function function, lf_size_t length);
+void fmr_push(fmr_module module, fmr_function function, lf_size_t length);
 /* Helper function for lf_pull. */
-void fmr_pull(uint16_t address, lf_size_t length);
+void fmr_pull(fmr_module module, fmr_function function, lf_size_t length);
 
 /* ~ Functions with platform specific implementation. ~ */
 
 /* Abstracts platform specific implementation needed to access the standard module array. */
-extern const void *lf_std_module(lf_id_t module);
+extern const void *lf_std_function(fmr_module module, fmr_function function);
 /* Unpacks the argument buffer into the CPU following the native architecture's calling convention and jumps to the given function pointer. */
-extern uint32_t fmr_call(void *function, uint8_t argc, uint16_t argt, void *argv);
+extern uint32_t fmr_call(const void *function, uint8_t argc, uint16_t argt, void *argv);
 
 #endif
 #endif

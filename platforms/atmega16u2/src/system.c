@@ -3,6 +3,7 @@
 #include <private/megausb.h>
 #include <flipper/uart.h>
 #include <flipper/led.h>
+#include <private/sam-ba.h>
 
 /* The fmr_device object containing global state about this device. */
 struct _lf_device self = {
@@ -22,17 +23,30 @@ struct _lf_device self = {
 
 /* Helper functions to libflipper. */
 
-fmr_return fmr_push(fmr_module module, fmr_function function, lf_size_t length) {
+void fmr_push(fmr_module module, fmr_function function, lf_size_t length) {
 	void *swap = malloc(length);
 	if (!swap) {
 		error_raise(E_MALLOC, NULL);
+		return;
 	}
 	megausb_pull(swap, length);
-	return (fmr_return)((uintptr_t)swap);
+	/* Call the function. */
+	const void *address = lf_std_function(module, function);
+	((void (*)(void *, uint32_t))address)(swap, length);
+	free(swap);
 }
 
-void fmr_pull(uint16_t address, lf_size_t length) {
-	megausb_push((void *)(address), length);
+void fmr_pull(fmr_module module, fmr_function function, lf_size_t length) {
+	void *swap = malloc(length);
+	if (!swap) {
+		error_raise(E_MALLOC, NULL);
+		return;
+	}
+	/* Call the function. */
+	const void *address = lf_std_function(module, function);
+	((void (*)(void *, uint32_t))address)(swap, length);
+	megausb_push(swap, length);
+	free(swap);
 }
 
 struct _lf_configuration *system_configuration(void) {
@@ -84,6 +98,8 @@ void system_init() {
 	configure_usb();
 	/* Configure the UART subsystem. */
 	uart_configure();
+	/* Configure the SAM4S. */
+	sam_configure();
 	/* Configure reset button and PCINT8 interrupt. */
 	PCMSK1 |= (1 << PCINT8);
 	PCICR |= (1 << PCIE1);

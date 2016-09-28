@@ -42,6 +42,8 @@ uint8_t uart_get(void) {
 	return UDR1;
 }
 
+#include <flipper/error.h>
+
 void uart_push(void *source, uint32_t length) {
 	while (length --) uart_put(*(uint8_t *)(source ++));
 }

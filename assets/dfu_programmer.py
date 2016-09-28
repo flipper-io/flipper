@@ -7,17 +7,17 @@ from waflib.Build import BuildContext
 class dfu_programmer(Task.Task):
     def run(self):
         cmd = str(self.env.DFU_PROGRAMMER[0])
-        cmd += ' ' + str(self.env.TARGET)
-        cmd += ' erase'
+        cmd += ' ' + str("at90usb162")
+        cmd += ' erase --force'
         if self.exec_command(cmd):
             return 1
         cmd = str(self.env.DFU_PROGRAMMER[0])
-        cmd += ' ' + str(self.env.TARGET)
+        cmd += ' ' + str("at90usb162")
         cmd += ' flash ' + str(self.inputs[0])
         if self.exec_command(cmd):
             return 1
         cmd = str(self.env.DFU_PROGRAMMER[0])
-        cmd += ' ' + str(self.env.TARGET)
+        cmd += ' ' + str("at90usb162")
         cmd += ' launch --no-reset'
         return self.exec_command(cmd)
 

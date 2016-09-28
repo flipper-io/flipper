@@ -182,10 +182,8 @@ int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *arg
 
 /* Executes a standard module. */
 fmr_return fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, fmr_types types, void *arguments) {
-	/* Dereference the pointer to the target module. */
-	void *object = (void *)(lf_std_module(module));
-	/* Dereference a pointer to the target function. */
-	void *address = ((void **)(object))[function];
+	/* Obtain the address of the function. */
+	const void *address = lf_std_function(module, function);
 	/* Ensure that the function address is valid. */
 	if (!address) {
 		error_raise(E_RESOULTION, NULL);

@@ -24,17 +24,17 @@ const void *const fmr_modules[] = {
     _forward_id,
 };
 
-const void *lf_std_module(lf_id_t module) {
-    return fmr_modules[module];
+const void *lf_std_function(fmr_module module, fmr_function function) {
+    return NULL;
 }
 
-uint32_t fmr_call(void *function, uint8_t argc, uint16_t argt, void *argv) {
+uint32_t fmr_call(const void *function, uint8_t argc, uint16_t argt, void *argv) {
     return 0;
 }
 
 /* TEMP */
 
-fmr_return fmr_push(fmr_module module, fmr_function function, lf_size_t length) {
+void fmr_push(fmr_module module, fmr_function function, lf_size_t length) {
 	void *swap = malloc(length);
 	if (!swap) {
 		error_raise(E_MALLOC, NULL);
@@ -42,6 +42,6 @@ fmr_return fmr_push(fmr_module module, fmr_function function, lf_size_t length) 
 
 }
 
-void fmr_pull(uint16_t address, lf_size_t length) {
+void fmr_pull(fmr_module module, fmr_function function, lf_size_t length) {
 
 }

@@ -16,6 +16,9 @@ int main() {
 	/* Clear the error state. */
 	error_clear();
 
+	// spi_configure();
+	// fs_configure();
+
 	/* Perform the system task. */
 	system_task();
 

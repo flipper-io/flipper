@@ -1,5 +1,5 @@
-#ifndef __usart_h__
-#define __usart_h__
+#ifndef __uart_h__
+#define __uart_h__
 
 /* Include all types and macros exposed by the Flipper Toolbox. */
 #include <flipper/core.h>
@@ -19,7 +19,7 @@ extern const struct _uart {
 #ifdef __private_include__
 
 /* Declare the FMR overlay for this driver. */
-enum { _usart_configure, _usart_enable, _usart_disable, _usart_ready, _usart_put, _usart_get, _usart_push, _usart_pull };
+enum { _uart_configure, _uart_enable, _uart_disable, _uart_ready, _uart_put, _uart_get, _uart_push, _uart_pull };
 
 /* Declare each prototype for all functions within this driver. */
 void uart_configure(void);
