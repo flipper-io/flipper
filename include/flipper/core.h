@@ -33,6 +33,12 @@
 #define BULK_OUT_ENDPOINT      0x04
 #define BULK_OUT_SIZE          32
 
+/* Terminal colors. */
+#define KNRM  "\x1B[0m"
+#define KRED  "\x1B[31m"
+#define KBLU  "\x1B[34m"
+#define KYEL  "\x1B[33m"
+
 /* Used to contain the result of checksumming operations. */
 typedef uint16_t lf_id_t;
 /* Describes a type used to contain libflipper error codes. */
@@ -77,7 +83,7 @@ typedef uint16_t lf_version_t;
 #define little32(x) ((((uint32_t)(x)) << 16 ) | (((uint32_t)(x)) >> 16))
 
 /* Standardizes a way to obtain the name, version, and attributes of a Flipper device. */
-struct _lf_configuration {
+struct __attribute__((__packed__)) _lf_configuration {
 	/* The human readable name of the device. */
 	char name[16];
 	/* An identifier unique to the device. */

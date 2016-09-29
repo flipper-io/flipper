@@ -76,18 +76,32 @@ int lf_usb_transfer(void *data, lf_size_t length, uint8_t endpoint) {
 		return lf_error;
 	}
 	int _length, _e;
+	lf_size_t len = 0;
 	if (endpoint == INTERRUPT_IN_ENDPOINT || endpoint == INTERRUPT_OUT_ENDPOINT) {
-		if (endpoint == INTERRUPT_IN_ENDPOINT) {
-			length = INTERRUPT_IN_SIZE;
+		if (endpoint == INTERRUPT_IN_ENDPOINT && length <= INTERRUPT_IN_SIZE) {
+			len = INTERRUPT_IN_SIZE;
+		} else if (endpoint == INTERRUPT_OUT_ENDPOINT && length <= INTERRUPT_OUT_SIZE) {
+			len = INTERRUPT_OUT_SIZE;
+		} else {
+			error_raise(E_OVERFLOW, error_message("More data than can be transferred over USB. (%i bytes)", length));
+			return lf_error;
 		}
-		_e = libusb_interrupt_transfer(record -> handle, endpoint, data, length, &_length, 0);
+		uint8_t *buffer = malloc(len);
+		memset(buffer, 0, len);
+		if (endpoint == INTERRUPT_OUT_ENDPOINT) {
+			memcpy(buffer, data, length);
+		}
+		_e = libusb_interrupt_transfer(record -> handle, endpoint, buffer, len, &_length, 0);
+		if (endpoint == INTERRUPT_IN_ENDPOINT) {
+			memcpy(data, buffer, length);
+		}
 	} else if (endpoint == BULK_IN_ENDPOINT || endpoint == BULK_OUT_ENDPOINT) {
 		_e = libusb_bulk_transfer(record -> handle, endpoint, data, length, &_length, 0);
 	} else {
 		error_raise(E_ENDPOINT, error_message("An invalid endpoint (0x%02x) was provided for USB transfer.", endpoint));
 		return lf_error;
 	}
-	if (_e < 0 || (_length != length)) {
+	if (_e < 0 || (_length != len)) {
 		error_raise(E_COMMUNICATION, error_message("Failed to communicate with USB device. Connection interrupted."));
 		return lf_error;
 	}

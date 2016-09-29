@@ -2,11 +2,6 @@
 #include <flipper/error.h>
 #include <flipper/flipper.h>
 
-#define KNRM  "\x1B[0m"
-#define KRED  "\x1B[31m"
-#define KBLU  "\x1B[34m"
-#define KYEL  "\x1B[33m"
-
 /* Expose the error message strings. */
 char *messages[] = { LF_ERROR_MESSAGE_STRINGS };
 
