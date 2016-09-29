@@ -65,7 +65,9 @@ int sam_ba_copy(void *destination, void *source, uint32_t length) {
 send:
 		/* Transfer the packet. */
 		uart.push(&packet, sizeof(struct _xpacket));
-		if (uart.get() != ACK && retries < 4) {
+		char c = uart.get();
+		if (c != ACK && retries < 4) {
+			printf("Got 0x%02x\n", c);
 			retries ++;
 			goto send;
 		} else {
@@ -87,17 +89,22 @@ int main(int argc, char *argv[]) {
 	//flipper_attach_endpoint("fvm", &lf_fvm_ep);
 	flipper.attach();
 	led.rgb(0, 0, 0);
-	uart.put('#');
-	char ack[3];
-	uart.pull(ack, sizeof(ack));
-	if (!memcmp(ack, (char []){ 0x0a, 0x0d, 0x3e }, sizeof(ack))) {
-		fprintf(stderr, "Successfully entered update mode.\n");
-	} else {
-		fprintf(stderr, KRED "Failed to enter update mode.\n");
+	/* Enter DFU mode. */
+	cpu.dfu();
+	for (int i = 0; i < 3; i ++) {
+		uart.put('#');
+		char ack[3];
+		uart.pull(ack, sizeof(ack));
+		if (!memcmp(ack, (char []){ 0x0a, 0x0d, 0x3e }, sizeof(ack))) {
+			fprintf(stderr, "Successfully entered update mode.\n");
+			goto connected;
+		}
+		printf("0x%02x 0x%02x 0x%02x", ack[0], ack[1], ack[2]);
 	}
+	fprintf(stderr, KRED "Failed to enter update mode.\n");
+	return EXIT_FAILURE;
+connected:
 	printf("Internal ROM space starts at 0x%08x.", IRAM_ADDR);
-
-	return EXIT_SUCCESS;
 
 	int _e = sam_ba_copy((void *)IRAM_ADDR, applet, sizeof(applet));
 	if (_e < lf_success) {

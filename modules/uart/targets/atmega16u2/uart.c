@@ -1,3 +1,4 @@
+
 #define __private_include__
 #include <flipper/uart.h>
 #include <platform/atmega16u2.h>
@@ -34,7 +35,6 @@ void uart_put(uint8_t byte) {
 	while (!(UCSR1A & (1 << UDRE1)));
 	UDR1 = byte;
 }
-
 
 uint8_t uart_get(void) {
 	uint16_t timeout = 0;

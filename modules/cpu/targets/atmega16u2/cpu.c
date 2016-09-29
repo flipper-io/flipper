@@ -1,9 +1,8 @@
 #define __private_include__
-#include <private/sam-ba.h>
+#include <flipper/cpu.h>
 #include <platform/atmega16u2.h>
-#include <flipper/led.h>
 
-void sam_configure(void) {
+void cpu_configure(void) {
     /* Turn the SAM4S on. */
     set_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
 	/* Configure the SAM4S's power pin as an output. */
@@ -20,25 +19,7 @@ void sam_configure(void) {
 	set_bit_in_port(SAM_ERASE_PIN, SAM_ERASE_DDR);
 }
 
-void sam_suspend(void) {
-	/* Assert the SAM4S's reset pin. */
-	set_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
-}
-
-void sam_engage(void) {
-	/* Deassert the SAM4S's reset pin. */
-	clear_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
-}
-
-void sam_power(uint8_t power) {
-    if (power) {
-        set_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
-    } else {
-        clear_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
-    }
-}
-
-void sam_reset(void) {
+void cpu_reset(void) {
     /* Assert the SAM4S's reset pin. */
 	set_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
 	/* Wait for 50 ms to simulate the press of a physical reset button, ensuring a thorough reset of the processor. */
@@ -47,13 +28,24 @@ void sam_reset(void) {
 	clear_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
 }
 
-void sam_erase(void) {
+void cpu_hault(void) {
+	/* Assert the SAM4S's reset pin. */
+	set_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
+}
+
+void cpu_power(uint8_t power) {
+    if (power) {
+        set_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
+    } else {
+        clear_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
+    }
+}
+
+void cpu_dfu(void) {
 	/* Disable interrupts. */
 	cli();
 	/* Power down the SAM4S. */
-	sam_power(false);
-	/* Wait for the SAM4S to power down. */
-	delay_ms(500);
+    clear_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
 	/* Put the SAM4S into erase mode by pulling its erase pin high. */
 	set_bit_in_port(SAM_ERASE_PIN, SAM_ERASE_PORT);
 	/* Power the SAM4S back on. */
@@ -64,10 +56,8 @@ void sam_erase(void) {
 	clear_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
 	/* Take the SAM4S out of erase mode by pulling its erase pin back low. */
 	clear_bit_in_port(SAM_ERASE_PIN, SAM_ERASE_PORT);
-	/* Wait for everything to settle. */
-	delay_ms(500);
 	/* Power the SAM4S back on. */
-	sam_power(true);
+    set_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
 	/* Re-enable interrupts. */
 	sei();
 }

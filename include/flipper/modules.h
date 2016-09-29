@@ -4,6 +4,7 @@
 /* Include the header files for all of the standard modules exposed by the toolbox. */
 #include <flipper/adc.h>
 #include <flipper/button.h>
+#include <flipper/cpu.h>
 #include <flipper/dac.h>
 #include <flipper/error.h>
 #include <flipper/fmr.h>
@@ -27,6 +28,7 @@
 enum {
     _adc_id,
     _button_id,
+    _cpu_id,
     _dac_id,
     _error_id,
     _fmr_id,

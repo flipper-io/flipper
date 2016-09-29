@@ -7,6 +7,7 @@
 const void *const fmr_modules[] PROGMEM = {
     _forward_id,    // adc
     &button,        // button
+    &cpu,           // cpu
     _forward_id,    // dac
     _forward_id,    // error
     &fmr,           // fmr

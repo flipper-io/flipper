@@ -2,8 +2,8 @@
 #include <platform/atmega16u2.h>
 #include <private/megausb.h>
 #include <flipper/uart.h>
+#include <flipper/cpu.h>
 #include <flipper/led.h>
-#include <private/sam-ba.h>
 
 /* The fmr_device object containing global state about this device. */
 struct _lf_device self = {
@@ -98,7 +98,7 @@ void system_init() {
 	/* Configure the UART subsystem. */
 	uart_configure();
 	/* Configure the SAM4S. */
-	sam_configure();
+	cpu_configure();
 	/* Configure reset button and PCINT8 interrupt. */
 	PCMSK1 |= (1 << PCINT8);
 	PCICR |= (1 << PCIE1);
