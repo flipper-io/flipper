@@ -32,7 +32,9 @@ void uart_put(uint8_t byte) {
 }
 
 uint8_t uart_get(void) {
-    return lf_invoke(&_uart, _uart_get, NULL);
+    uint32_t byte = lf_invoke(&_uart, _uart_get, NULL);
+    printf("actually: 0x%08x\n", byte);
+    return byte;
 }
 
 void uart_push(void *source, uint32_t length) {

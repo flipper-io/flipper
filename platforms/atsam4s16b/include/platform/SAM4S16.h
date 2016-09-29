@@ -45,7 +45,7 @@
 
 #ifdef __cplusplus
  extern "C" {
-#endif 
+#endif
 
 #ifndef __ASSEMBLY__
 #include <stdint.h>
@@ -59,7 +59,7 @@ typedef volatile       uint32_t RwReg; /**< Read-Write 32-bit register (volatile
 #define CAST(type, value) ((type *)(value))
 #define REG_ACCESS(type, address) (*(type*)(address)) /**< C code: Register value */
 #else
-#define CAST(type, value) (value) 
+#define CAST(type, value) (value)
 #define REG_ACCESS(type, address) (address) /**< Assembly code: Register address */
 #endif
 
@@ -82,7 +82,7 @@ typedef enum IRQn
   PendSV_IRQn           = -2,  /**< 14 Cortex-M3 Pend SV Interrupt           */
   SysTick_IRQn          = -1,  /**< 15 Cortex-M3 System Tick Interrupt       */
 /******  SAM4S16 specific Interrupt Numbers *********************************/
-  
+
   SUPC_IRQn            =  0, /**<  0 SAM4S16 Supply Controller (SUPC) */
   RSTC_IRQn            =  1, /**<  1 SAM4S16 Reset Controller (RSTC) */
   RTC_IRQn             =  2, /**<  2 SAM4S16 Real Time Clock (RTC) */
@@ -119,7 +119,7 @@ typedef enum IRQn
 } IRQn_Type;
 
 /**
- * \brief Configuration of the Cortex-M3 Processor and Core Peripherals 
+ * \brief Configuration of the Cortex-M3 Processor and Core Peripherals
  */
 
 #define __MPU_PRESENT          1 /**< SAM4S16 does provide a MPU */
@@ -7797,7 +7797,7 @@ typedef struct {
   #define IFLASH_LOCK_REGION_SIZE 8192u
   #define IFLASH_NB_OF_PAGES      2048
   #define IFLASH_NB_OF_LOCK_BITS  128u
-  #define IRAM_SIZE               0x20000u 
+  #define IRAM_SIZE               0x20000u
 
 #ifdef __cplusplus
 }
