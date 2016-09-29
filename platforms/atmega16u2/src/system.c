@@ -90,6 +90,8 @@ void system_task(void) {
 	}
 }
 
+extern void led_pulse(uint8_t r, uint8_t g, uint8_t b);
+
 void system_init() {
 	/* Prescale CPU for maximum clock. */
 	cpu_prescale(0);
@@ -99,6 +101,9 @@ void system_init() {
 	uart_configure();
 	/* Configure the SAM4S. */
 	cpu_configure();
+	led_configure();
+	/* Pulse the LED. */
+	led_pulse(0, 0, 1);
 	/* Configure reset button and PCINT8 interrupt. */
 	PCMSK1 |= (1 << PCINT8);
 	PCICR |= (1 << PCIE1);

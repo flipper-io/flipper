@@ -29,7 +29,8 @@ uint8_t megausb_get(void) {
 }
 
 int megausb_push(void *source, lf_size_t length) {
-	for (lf_size_t packet = 0; packet < lf_ceiling(length, INTERRUPT_IN_SIZE); packet ++) {
+	lf_size_t total = lf_ceiling(length, INTERRUPT_IN_SIZE);
+	for (lf_size_t packet = 0; packet < total; packet ++) {
 		uint8_t len = INTERRUPT_IN_SIZE;
 		if (length < len) {
 			len = length;
@@ -44,7 +45,8 @@ int megausb_push(void *source, lf_size_t length) {
 }
 
 int megausb_pull(void *destination, lf_size_t length) {
-	for (lf_size_t packet = 0; packet < lf_ceiling(length, INTERRUPT_OUT_SIZE); packet ++) {
+	lf_size_t total = lf_ceiling(length, INTERRUPT_OUT_SIZE);
+	for (lf_size_t packet = 0; packet < total; packet ++) {
 		uint8_t len = INTERRUPT_OUT_SIZE;
 		if (length < len) {
 			len = length;

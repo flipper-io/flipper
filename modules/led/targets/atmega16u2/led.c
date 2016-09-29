@@ -3,10 +3,36 @@
 #include <platform/atmega16u2.h>
 
 void led_configure(void) {
-
 	/* Configure the DI (data in) pin of the LED as an output. */
 	set_bit_in_port(LED_DI, LED_DDR);
+}
 
+
+uint8_t r_c, g_c, b_c;
+int8_t direction = 1;
+uint8_t ticks;
+
+void led_pulse(uint8_t r, uint8_t g, uint8_t b) {
+	TCCR1B |= (1 << WGM12);
+	OCR1A = 15625;
+	TIMSK1 |= (1 << OCIE1A);
+	TCCR1B |= (0 << CS12) | (1 << CS11) | (0 << CS10);
+	r_c = r;
+	g_c = g;
+	b_c = b;
+	direction = 1;
+}
+
+ISR(TIMER1_COMPA_vect) {
+	//r_c += direction;
+	//g_c += direction;
+	b_c += direction;
+	led_set_rgb(r_c, g_c, b_c);
+	if (b_c >= 128) {
+		direction = -1;
+	} else if (b_c == 1) {
+		direction = 1;
+	}
 }
 
 void led_set_rgb(uint8_t r, uint8_t g, uint8_t b) {
@@ -49,5 +75,5 @@ void led_set_rgb(uint8_t r, uint8_t g, uint8_t b) {
 
 	/* Enable interrupts again. */
 	enable_interrupts();
-	
+
 }

@@ -62,14 +62,17 @@ int sam_ba_copy(void *destination, void *source, uint32_t length) {
 		memcpy(packet.data, _source + ((pno - 1) * XLEN), _len);
 		/* Perform the checksum. */
 		packet.checksum = lf_checksum(packet.data, sizeof(packet.data));
-send:
 		/* Transfer the packet. */
 		uart.push(&packet, sizeof(struct _xpacket));
+		printf("\n");
+		for (int i = 0; i < sizeof(packet); i ++) {
+			printf("%i: 0x%02x (%c)\n", i, *(uint8_t *)((void *)(&packet) + i), *(uint8_t *)((void *)(&packet) + i));
+		}
+		printf("---");
 		char c = uart.get();
 		if (c != ACK && retries < 4) {
 			printf("Got 0x%02x\n", c);
 			retries ++;
-			goto send;
 		} else {
 			error_raise(E_ACK, error_message("Did not receive acknowledgement from device."));
 			return lf_error;
@@ -88,22 +91,35 @@ int main(int argc, char *argv[]) {
 
 	//flipper_attach_endpoint("fvm", &lf_fvm_ep);
 	flipper.attach();
-	led.rgb(0, 0, 0);
+
 	/* Enter DFU mode. */
 	cpu.dfu();
 	for (int i = 0; i < 3; i ++) {
+		/* Send the synchronization character. */
 		uart.put('#');
 		char ack[3];
+		/* Check for acknowledgement. */
 		uart.pull(ack, sizeof(ack));
 		if (!memcmp(ack, (char []){ 0x0a, 0x0d, 0x3e }, sizeof(ack))) {
-			fprintf(stderr, "Successfully entered update mode.\n");
+			fprintf(stderr, KGRN "Successfully entered update mode.\n" KNRM);
 			goto connected;
 		}
-		printf("0x%02x 0x%02x 0x%02x", ack[0], ack[1], ack[2]);
 	}
+	/* If no acknowledgement was received, throw and error. */
 	fprintf(stderr, KRED "Failed to enter update mode.\n");
 	return EXIT_FAILURE;
+
 connected:
+
+	;
+	uint8_t data[133];
+	for (int i = 0; i < sizeof(data); i ++) {
+		data[i] = i;
+	}
+	uart.push(data, sizeof(data));
+
+	return EXIT_SUCCESS;
+
 	printf("Internal ROM space starts at 0x%08x.", IRAM_ADDR);
 
 	int _e = sam_ba_copy((void *)IRAM_ADDR, applet, sizeof(applet));
@@ -114,9 +130,3 @@ connected:
 
     return EXIT_SUCCESS;
 }
-
-// printf("\n");
-// for (int i = 0; i < length; i ++) {
-// 	printf("%i: 0x%02x (%c)\n", i, *(uint8_t *)(source + i), *(uint8_t *)(source + i));
-// }
-// printf("---");

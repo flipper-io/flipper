@@ -70,8 +70,10 @@ uint8_t lf_usb_get(void) {
 }
 
 int lf_usb_push(void *source, lf_size_t length) {
+	lf_size_t lenorg = length;
 	struct _lf_usb_record *record = lf_device() -> endpoint -> record;
-	for (lf_size_t packet = 0; packet < lf_ceiling(length, INTERRUPT_OUT_SIZE); packet ++) {
+	uint16_t total = lf_ceiling(length, INTERRUPT_OUT_SIZE);
+	for (lf_size_t packet = 0; packet < total; packet ++) {
 		lf_size_t _len = INTERRUPT_OUT_SIZE;
 		if (length < _len) {
 			_len = length;
@@ -91,7 +93,8 @@ int lf_usb_push(void *source, lf_size_t length) {
 
 int lf_usb_pull(void *destination, lf_size_t length) {
 	struct _lf_usb_record *record = lf_device() -> endpoint -> record;
-	for (lf_size_t packet = 0; packet < lf_ceiling(length, INTERRUPT_IN_SIZE); packet ++) {
+	lf_size_t total = lf_ceiling(length, INTERRUPT_IN_SIZE);
+	for (lf_size_t packet = 0; packet < total; packet ++) {
 		lf_size_t _len = INTERRUPT_IN_SIZE;
 		if (length < _len) {
 			_len = length;
