@@ -2,7 +2,7 @@
 #include <private/megausb.h>
 
 /* Receive a packet using the appropriate interrupt endpoint. */
-int8_t interrupt_receive_packet(uint8_t *destination) {
+int8_t megausb_interrupt_receive(uint8_t *destination, lf_size_t length) {
 
 	/* If USB is not configured, return with error. */
 	if (!megausb_configured) {
@@ -29,7 +29,14 @@ int8_t interrupt_receive_packet(uint8_t *destination) {
 
 	/* Transfer the buffered data to the destination. */
 	uint8_t len = INTERRUPT_OUT_SIZE;
-	while (len --) *destination ++ = UEDATX;
+	while (len --) {
+		if (length --) {
+			*destination ++ = UEDATX;
+		} else {
+			/* Flush the byte. */
+			(void)UEDATX;
+		}
+	}
 
 	/* Re-enable interrupts for the receive endpoint. */
 	UEINTX = (1 << NAKINI) | (1 << RWAL) | (1 << RXSTPI) | (1 << STALLEDI) | (1 << TXINI);
@@ -38,7 +45,7 @@ int8_t interrupt_receive_packet(uint8_t *destination) {
 }
 
 /* Send a packet using the appropriate interrupt endpoint. */
-int8_t interrupt_transmit_packet(uint8_t *source) {
+int8_t megausb_interrupt_transmit(uint8_t *source, lf_size_t length) {
 
 	/* If USB is not configured, return with error. */
 	if (!megausb_configured) {
@@ -65,7 +72,13 @@ int8_t interrupt_transmit_packet(uint8_t *source) {
 
 	/* Transfer the buffered data to the destination. */
 	uint8_t len = INTERRUPT_IN_SIZE;
-	while (len --) UEDATX = *source ++;
+	while (len --) {
+		if (length --) {
+			UEDATX = *source ++;
+		} else {
+			UEDATX = 0;
+		}
+	}
 
 	/* Re-enable interrupts for the transmit endpoint. */
 	UEINTX = (1 << RWAL) | (1 << NAKOUTI) | (1 << RXSTPI) | (1 << STALLEDI);

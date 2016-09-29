@@ -9,7 +9,7 @@
 struct _lf_device self = {
 	{
 		"flipper",
-		0x4fa7,
+		0xc713,
 		LF_VERSION,
 		(lf_device_16bit | lf_device_little_endian)
 	},
@@ -69,9 +69,8 @@ void system_task(void) {
 #else
 		/* FMR */
 		struct _fmr_packet packet;
-		memset(&packet, 0, sizeof(struct _fmr_packet));
 		int8_t _e = megausb_pull((void *)(&packet), sizeof(struct _fmr_packet));
-		if (_e > 0) {
+		if (!(_e < lf_success)) {
 			/* Create a buffer to the result of the operation. */
 			struct _fmr_result result;
 			/* If the host is asking for the device attributes, return them. */

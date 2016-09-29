@@ -128,7 +128,7 @@ struct _lf_device {
 };
 
 /* Provides a checksum for a given block of data. */
-lf_id_t lf_checksum(void *source, size_t length);
+lf_id_t lf_checksum(void *source, lf_size_t length);
 
 /* Include all message runtime related declarations. */
 #include <flipper/fmr.h>

@@ -69,51 +69,44 @@ uint8_t lf_usb_get(void) {
 	return 0;
 }
 
-int lf_usb_transfer(void *data, lf_size_t length, uint8_t endpoint) {
+int lf_usb_push(void *source, lf_size_t length) {
 	struct _lf_usb_record *record = lf_device() -> endpoint -> record;
-	if (!record) {
-		error_raise(E_ENDPOINT, error_message("No libusb record associated with the selected USB endpoint. Did you attach?"));
-		return lf_error;
-	}
-	int _length, _e;
-	lf_size_t len = 0;
-	if (endpoint == INTERRUPT_IN_ENDPOINT || endpoint == INTERRUPT_OUT_ENDPOINT) {
-		if (endpoint == INTERRUPT_IN_ENDPOINT && length <= INTERRUPT_IN_SIZE) {
-			len = INTERRUPT_IN_SIZE;
-		} else if (endpoint == INTERRUPT_OUT_ENDPOINT && length <= INTERRUPT_OUT_SIZE) {
-			len = INTERRUPT_OUT_SIZE;
-		} else {
-			error_raise(E_OVERFLOW, error_message("More data than can be transferred over USB. (%i bytes)", length));
+	for (lf_size_t packet = 0; packet < lf_ceiling(length, INTERRUPT_OUT_SIZE); packet ++) {
+		lf_size_t _len = INTERRUPT_OUT_SIZE;
+		if (length < _len) {
+			_len = length;
+		}
+		int _length;
+		uint8_t buffer[INTERRUPT_OUT_SIZE];
+		memcpy(buffer, (void *)(source + (packet * INTERRUPT_OUT_SIZE)), _len);
+		int _e = libusb_interrupt_transfer(record -> handle, INTERRUPT_OUT_ENDPOINT, buffer, INTERRUPT_OUT_SIZE, &_length, 0);
+		if (_e < 0 || _length != INTERRUPT_OUT_SIZE) {
+			error_raise(E_COMMUNICATION, error_message("Incomplete USB transfer detected."));
 			return lf_error;
 		}
-		uint8_t *buffer = malloc(len);
-		memset(buffer, 0, len);
-		if (endpoint == INTERRUPT_OUT_ENDPOINT) {
-			memcpy(buffer, data, length);
-		}
-		_e = libusb_interrupt_transfer(record -> handle, endpoint, buffer, len, &_length, 0);
-		if (endpoint == INTERRUPT_IN_ENDPOINT) {
-			memcpy(data, buffer, length);
-		}
-	} else if (endpoint == BULK_IN_ENDPOINT || endpoint == BULK_OUT_ENDPOINT) {
-		_e = libusb_bulk_transfer(record -> handle, endpoint, data, length, &_length, 0);
-	} else {
-		error_raise(E_ENDPOINT, error_message("An invalid endpoint (0x%02x) was provided for USB transfer.", endpoint));
-		return lf_error;
-	}
-	if (_e < 0 || (_length != len)) {
-		error_raise(E_COMMUNICATION, error_message("Failed to communicate with USB device. Connection interrupted."));
-		return lf_error;
+		length -= _len;
 	}
 	return lf_success;
 }
 
-int lf_usb_push(void *source, lf_size_t length) {
-	return lf_usb_transfer(source, length, INTERRUPT_OUT_ENDPOINT);
-}
-
 int lf_usb_pull(void *destination, lf_size_t length) {
-	return lf_usb_transfer(destination, length, INTERRUPT_IN_ENDPOINT);
+	struct _lf_usb_record *record = lf_device() -> endpoint -> record;
+	for (lf_size_t packet = 0; packet < lf_ceiling(length, INTERRUPT_IN_SIZE); packet ++) {
+		lf_size_t _len = INTERRUPT_IN_SIZE;
+		if (length < _len) {
+			_len = length;
+		}
+		int _length;
+		uint8_t buffer[INTERRUPT_IN_SIZE];
+		int _e = libusb_interrupt_transfer(record -> handle, INTERRUPT_IN_ENDPOINT, buffer, INTERRUPT_IN_SIZE, &_length, 0);
+		memcpy((void *)(destination + (packet * INTERRUPT_IN_SIZE)), buffer, _len);
+		if (_e < 0 || _length != INTERRUPT_IN_SIZE) {
+			error_raise(E_COMMUNICATION, error_message("Incomplete USB transfer detected."));
+			return lf_error;
+		}
+		length -= _len;
+	}
+	return lf_success;
 }
 
 int lf_usb_destroy(struct _lf_endpoint *endpoint) {

@@ -79,8 +79,8 @@ extern const struct descriptor {
 } PROGMEM descriptors[DESC_COUNT];
 
 void configure_usb(void);
-int8_t interrupt_receive_packet(uint8_t *destination);
-int8_t interrupt_transmit_packet(uint8_t *source);
+int8_t megausb_interrupt_receive(uint8_t *destination, lf_size_t length);
+int8_t megausb_interrupt_transmit(uint8_t *source, lf_size_t length);
 
 int8_t bulk_receive_packet(uint8_t *destination);
 int8_t bulk_transmit_packet(uint8_t *source);

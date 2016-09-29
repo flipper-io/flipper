@@ -62,7 +62,7 @@ int lf_attach(char *name, struct _lf_endpoint *endpoint) {
 	}
 	/* Compare the device identifiers. */
 	if (device -> configuration.identifier != _identifier) {
-		error_raise(E_NO_DEVICE, error_message("Identifier mismatch for device '%s'.", name));
+		error_raise(E_NO_DEVICE, error_message("Identifier mismatch for device '%s'. (0x%04x instead of 0x%04x)", name, device -> configuration.identifier, _identifier));
 		goto failure;
 	}
 	/* Return with success. */

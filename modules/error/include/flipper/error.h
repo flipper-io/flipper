@@ -29,6 +29,7 @@ enum {
 	E_CHECKSUM,
 	E_NAME,
 	E_CONFIGURATION,
+	E_ACK,
 	E_LAST
 };
 
@@ -56,6 +57,7 @@ enum {
 								 "checksums do not match", \
 								 "invalid name", \
 								 "configuration error", \
+								 "acknowledgement error", \
 								 NULL
 
 /* Allow the 'error_message' macro to serve as a passthrough for any variadic arguments supplied to it. */
