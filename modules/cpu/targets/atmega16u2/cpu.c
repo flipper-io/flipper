@@ -28,7 +28,7 @@ void cpu_reset(void) {
 	clear_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
 }
 
-void cpu_hault(void) {
+void cpu_halt(void) {
 	/* Assert the SAM4S's reset pin. */
 	set_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
 }

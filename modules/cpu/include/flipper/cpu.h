@@ -8,7 +8,7 @@
 extern const struct _cpu {
 	void (* configure)(void);
 	void (* reset)(void);
-	void (* hault)(void);
+	void (* halt)(void);
 	void (* power)(uint8_t power);
 	void (* dfu)(void);
 } cpu;
@@ -16,12 +16,12 @@ extern const struct _cpu {
 #ifdef __private_include__
 
 /* Declare the FMR overlay for this driver. */
-enum { _cpu_configure, _cpu_reset, _cpu_hault, _cpu_power, _cpu_dfu };
+enum { _cpu_configure, _cpu_reset, _cpu_halt, _cpu_power, _cpu_dfu };
 
 /* Declare each prototype for all functions within this driver. */
 extern void cpu_configure(void);
 extern void cpu_reset(void);
-extern void cpu_hault(void);
+extern void cpu_halt(void);
 extern void cpu_power(uint8_t power);
 extern void cpu_dfu(void);
 
