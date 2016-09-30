@@ -1,0 +1,6 @@
+def configure(cfg):
+    cfg.find_program('ghc')
+    cfg.find_program('stack')
+
+def build(bld):
+    bld(rule='cd ../console; stack build --extra-lib-dirs=`realpath ../build/libflipper` --copy-bins --local-bin-path ../build/console')

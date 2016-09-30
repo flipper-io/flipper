@@ -9,6 +9,8 @@ Portability : Windows, POSIX
 
 -}
 
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 module Flipper.Internal.FS (
     FSHandle(..)
   , checksum
@@ -26,6 +28,10 @@ import System.IO.Unsafe
 
 -- | Flipper file system reference.
 newtype FSHandle = FSHandle { unFSHandle :: Word32 }
+                 deriving ( Eq
+                          , Ord
+                          , Show
+                          )
 
 -- Not totally implemented yet.
 
