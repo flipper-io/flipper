@@ -5,7 +5,7 @@
 const struct _cpu cpu = {
 	cpu_configure,
 	cpu_reset,
-	cpu_hault,
+	cpu_halt,
 	cpu_power,
 	cpu_dfu
 };

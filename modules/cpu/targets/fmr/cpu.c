@@ -19,8 +19,8 @@ void cpu_reset(void) {
     lf_invoke(&_cpu, _cpu_reset, NULL);
 }
 
-void cpu_hault(void) {
-    lf_invoke(&_cpu, _cpu_hault, NULL);
+void cpu_halt(void) {
+    lf_invoke(&_cpu, _cpu_halt, NULL);
 }
 
 void cpu_power(uint8_t power) {

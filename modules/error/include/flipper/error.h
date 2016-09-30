@@ -30,6 +30,7 @@ enum {
 	E_NAME,
 	E_CONFIGURATION,
 	E_ACK,
+	/* Throw last error; this state is never set. */
 	E_LAST
 };
 
