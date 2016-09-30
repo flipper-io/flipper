@@ -21,11 +21,11 @@ void cpu_configure(void) {
 
 void cpu_reset(void) {
     /* Assert the SAM4S's reset pin. */
-	set_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
+	clear_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
 	/* Wait for 50 ms to simulate the press of a physical reset button, ensuring a thorough reset of the processor. */
 	delay_ms(50);
 	/* Release the simulated reset button. */
-	clear_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
+	set_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
 }
 
 void cpu_hault(void) {
@@ -46,7 +46,8 @@ void cpu_dfu(void) {
 	cli();
 	/* Power down the SAM4S. */
     clear_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
-	/* Put the SAM4S into erase mode by pulling its erase pin high. */
+    delay_ms(250);
+    /* Put the SAM4S into erase mode by pulling its erase pin high. */
 	set_bit_in_port(SAM_ERASE_PIN, SAM_ERASE_PORT);
 	/* Power the SAM4S back on. */
 	set_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
@@ -56,6 +57,7 @@ void cpu_dfu(void) {
 	clear_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
 	/* Take the SAM4S out of erase mode by pulling its erase pin back low. */
 	clear_bit_in_port(SAM_ERASE_PIN, SAM_ERASE_PORT);
+    delay_ms(250);
 	/* Power the SAM4S back on. */
     set_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
 	/* Re-enable interrupts. */

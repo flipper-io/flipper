@@ -46,9 +46,6 @@ extern int flipper_exit(void);
 
 /* ~ User functions. ~ */
 
-/* Performs a proper function invocation on the device associated with the provided standard module. */
-extern fmr_return lf_invoke_std(fmr_module module, fmr_function, struct _fmr_list *args);
-
 /* Performs a proper function invocation on the device associated with the provided module. */
 extern int lf_invoke(struct _fmr_module *module, fmr_function function, struct _fmr_list *args);
 

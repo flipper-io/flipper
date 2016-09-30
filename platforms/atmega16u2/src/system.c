@@ -103,7 +103,7 @@ void system_init() {
 	cpu_configure();
 	led_configure();
 	/* Pulse the LED. */
-	led_pulse(0, 0, 1);
+	//led_pulse(0, 0, 1);
 	/* Configure reset button and PCINT8 interrupt. */
 	PCMSK1 |= (1 << PCINT8);
 	PCICR |= (1 << PCIE1);

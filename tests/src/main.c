@@ -29,23 +29,18 @@ uint8_t applet[] = {
 	0xFA, 0xD1, 0x04, 0x48, 0x00, 0x28, 0x01, 0xD1,
 	0x01, 0x48, 0x85, 0x46, 0x70, 0x47, 0x00, 0xBF,
 	0x00, 0x00, 0x02, 0x20, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x34, 0x00, 0x00, 0x20,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x80, 0x00, 0x00, 0x00
 };
 
-#define _APPLET IRAM_ADDR
+#define _APPLET IRAM_ADDR + 4096
 #define _APPLET_DESTINATION _APPLET + 0x28
+#define _APPLET_SOURCE _APPLET + 0x2C
 #define USERSPACE _APPLET + sizeof(applet)
 
 void sam_ba_jump(uint32_t address) {
 	char buffer[11];
 	sprintf(buffer, "G%08X#", address);
-	uart.push(buffer, sizeof(buffer) - 1);
-}
-
-void sam_ba_transfer(uint32_t address) {
-	char buffer[12];
-	sprintf(buffer, "S%08X,#", address);
 	uart.push(buffer, sizeof(buffer) - 1);
 }
 
@@ -55,39 +50,55 @@ void sam_ba_write_word(uint32_t destination, uint32_t word) {
 	uart.push(buffer, sizeof(buffer) - 1);
 }
 
+uint32_t sam_ba_read_word(uint32_t destination) {
+	char buffer[12];
+	sprintf(buffer, "w%08X,#", destination);
+	uart.push(buffer, sizeof(buffer) - 1);
+	uint32_t result;
+	uart.pull(&result, sizeof(uint32_t));
+	return result;
+}
+
 void sam_ba_write_fcr0(uint8_t command, uint32_t page) {
 	sam_ba_write_word(0x400E0A04U, (EEFC_FCR_FKEY(0x5A) | EEFC_FCR_FARG(page) | EEFC_FCR_FCMD(command)));
 }
 
 int sam_ba_copy(uint32_t destination, void *source, uint32_t length) {
-	sam_ba_transfer(destination);
+	/* Initialize the transfer. */
+	char buffer[12];
+	sprintf(buffer, "S%08X,#", destination);
+	uart.push(buffer, sizeof(buffer) - 1);
+	if (uart.get() != 'C') {
+		return lf_error;
+	}
 	/* Calculate the number of packets needed to perform the transfer. */
 	int packets = lf_ceiling(length, XLEN);
-	uint8_t pno = 1;
-	void *_source = source;
+	uint8_t pno = 0;
 	uint8_t retries = 0;
-	while (packets --) {
+	for (int packet = 0; packet < packets; packet ++) {
 		uint32_t _len = XLEN;
 		if (length < _len) {
 			_len = length;
 		}
 		/* Construct the base packet. */
-		struct _xpacket packet = { SOH, pno, ~pno, {0}, 0x00 };
+		struct _xpacket _packet = { SOH, (packet + 1), ~(packet + 1), { 0 }, 0x00 };
 		/* Copy the data into the packet. */
-		memcpy(packet.data, _source + ((pno - 1) * XLEN), _len);
-		/* Perform the checksum. */
-		packet.checksum = little(lf_checksum(packet.data, sizeof(packet.data)));
+		memcpy(_packet.data, (void *)(source + (packet * XLEN)), _len);
+		/* Calculate the checksum. */
+		_packet.checksum = little(lf_checksum(_packet.data, sizeof(_packet.data)));
 		/* Transfer the packet. */
-		uart.push(&packet, sizeof(struct _xpacket));
-		/* Increment the source. */
-		_source += XLEN;
+		uart.push(&_packet, sizeof(struct _xpacket));
+		if (uart.get() != ACK) {
+			return lf_error;
+		}
 		/* Decrement the length. */
 		length -= _len;
-		/* Increment the packet number. */
-		pno ++;
 	}
 	/* Send end of transmission. */
 	uart.put(EOT);
+	if (uart.get() != ACK) {
+		return lf_error;
+	}
 	return lf_success;
 }
 
@@ -132,6 +143,7 @@ int main(int argc, char *argv[]) {
 	size_t firmware_size = ftell(firmware);
 	fseek(firmware, 0L, SEEK_SET);
 
+	printf("Entering DFU mode.\n");
 	/* Enter DFU mode. */
 	cpu.dfu();
 	for (int i = 0; i < 3; i ++) {
@@ -152,17 +164,38 @@ int main(int argc, char *argv[]) {
 connected:
 
 	/* Set normal mode. */
+	printf("Entering normal mode.\n");
 	uart.push("N#", 2);
-
-	/* Move the copy applet into RAM. */
-	int _e = sam_ba_copy(IRAM_ADDR, applet, sizeof(applet));
-	if (_e < lf_success) {
-		return EXIT_FAILURE;
+	char ack[2];
+	uart.pull(ack, sizeof(ack));
+	if (memcmp(ack, (char []){ 0x0A, 0x0D }, sizeof(ack))) {
+		fprintf(stderr, "Failed to enter normal mode.\n");
+		goto done;
 	}
-	printf(KGRN "Successfully uploaded applet.\n" KNRM);
+	printf(KGRN "Successfully entered normal mode.\n" KNRM);
+
+	printf("Uploading copy applet.\n");
+	/* Move the copy applet into RAM. */
+	int _e = sam_ba_copy(_APPLET, applet, sizeof(applet));
+	if (_e < lf_success) {
+		fprintf(stderr, KRED "Failed to upload copy applet.\n" KNRM);
+		goto done;
+	}
+	printf(KGRN "Successfully uploaded copy applet.\n" KNRM);
+
+	/* Write the source. */
+	sam_ba_write_word(_APPLET + _APPLET_SOURCE, USERSPACE);
 
 	/* Obtain a linear buffer of the firmware precalculated by page. */
 	void *pagedata = load_page_data(firmware, firmware_size);
+
+	sam_ba_write_word(IRAM_ADDR + 8192, 0xdeadbeef);
+	uint32_t result = sam_ba_read_word(IRAM_ADDR + 8192);
+	printf("Value is 0x%08x\n", result);
+
+	// sam_ba_copy(USERSPACE, pagedata, firmware_size);
+	// sam_ba_jump(USERSPACE);
+	// goto done;
 
 	/* Calculate the number of pages to send. */
 	lf_size_t pages = lf_ceiling(firmware_size, IFLASH_PAGE_SIZE);
@@ -175,19 +208,28 @@ connected:
 		printf("%s", buf);
 		fflush(stdout);
 		/* Copy the page. */
-		sam_ba_copy(USERSPACE, (void *)(pagedata + (page * IFLASH_PAGE_SIZE)), IFLASH_PAGE_SIZE);
+		int _e = sam_ba_copy(USERSPACE, (void *)(pagedata + (page * IFLASH_PAGE_SIZE)), IFLASH_PAGE_SIZE);
+		if (_e < lf_success) {
+			fprintf(stderr, KRED "Failed to upload page %i of %i.\n" KNRM, page, pages);
+			goto done;
+		}
 		/* Write the destination. */
-		sam_ba_write_word(IRAM_ADDR + _APPLET_DESTINATION, (uint32_t)(IFLASH_ADDR + (page * IFLASH_PAGE_SIZE)));
+		sam_ba_write_word(_APPLET + _APPLET_DESTINATION, (uint32_t)(IFLASH_ADDR + (page * IFLASH_PAGE_SIZE)));
 		/* Jump to the copy applet to move the page into the flash write buffer. */
 		sam_ba_jump(_APPLET);
 		/* Erase and write the page into flash. */
 		sam_ba_write_fcr0(0x03, page);
 		/* Clear the progress message. */
 		if (page != pages - 1) for (int j = 0; j < strlen(buf); j ++) printf("\b");
+		printf("\n");
 		fflush(stdout);
 	}
+
+done:
 	/* Free the memory allocated to hold the page data. */
 	free(pagedata);
+
+	printf(KGRN "Successfully uploaded new firmware.\n" KNRM);
 
 	/* Reset the CPU. */
 	cpu.reset();
