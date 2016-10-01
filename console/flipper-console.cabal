@@ -1,7 +1,7 @@
 name:                flipper-console
 version:             0.1.0.0
 synopsis:            Flipper Console
-description:         FLipper Console
+description:         Flipper Console
 homepage:            https://github.com/georgemorgan/flipper
 license:             AllRightsReserved
 license-file:        LICENSE
