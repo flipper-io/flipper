@@ -1,16 +1,16 @@
 {-|
-Module      : Flipper.IO
-Description : IO Pin Interface
+Module      : Flipper.GPIO
+Description : GPIO Pin Interface
 Copyright   : George Morgan, Travis Whitaker 2016
 License     : All rights reserved.
 Maintainer  : travis@flipper.io
 Stability   : Provisional
 Portability : Windows, POSIX
 
-This module provides an interface to a Flipper device's IO pins.
+This module provides an interface to a Flipper device's GPIO pins.
 -}
 
-module Flipper.IO (
+module Flipper.GPIO (
     -- * IO Pins
     I.DigitalPin(..)
   , I.AnalogPin(..)
@@ -28,7 +28,7 @@ import Data.Word
 
 import Flipper.MonadFlipper
 
-import qualified Flipper.Internal.IO as I
+import qualified Flipper.Internal.GPIO as I
 
 -- | Set the IO direction of a digital pin.
 digitalDirection :: MonadFlipper m => I.DigitalPin -> I.Direction -> m ()

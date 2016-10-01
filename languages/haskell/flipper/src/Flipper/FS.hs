@@ -11,15 +11,41 @@ Portability : Windows, POSIX
 
 module Flipper.FS (
     I.FSHandle()
-  , checksum
+  , format
+  , create
+  , remove
+  , rename
+  , withGet
+  , withPut
+  , getHandle
   ) where
 
 import Data.Word
 
+import Flipper.Buffer
 import Flipper.Bufferable
+import Flipper.MonadFlipper
 import Flipper.Put
 
 import qualified Flipper.Internal.FS as I
 
-checksum :: Bufferable b => b -> Word16
-checksum = I.checksum . runPut . put
+format :: MonadFlipper m => m ()
+format = bracketIO I.format
+
+create :: MonadFlipper m => String -> Buffer -> m ()
+create = (bracketIO .) . I.create
+
+remove :: MonadFlipper m => String -> m ()
+remove = bracketIO . remove
+
+rename :: MonadFlipper m => String -> String -> m ()
+rename = (bracketIO .) . I.rename
+
+withGet :: MonadFlipper m => String -> (IO Word8 -> IO a) -> m a
+withGet = (bracketIO .) . I.withGet
+
+withPut :: MonadFlipper m => String -> ((Word8 -> IO ()) -> IO a) -> m a
+withPut = (bracketIO .) . I.withPut
+
+getHandle :: MonadFlipper m => String -> m I.FSHandle
+getHandle = bracketIO . I.getHandle

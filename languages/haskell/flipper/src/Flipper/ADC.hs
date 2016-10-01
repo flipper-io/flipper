@@ -1,6 +1,6 @@
 {-|
-Module      : Flipper.Internal.FMR
-Description : Internal FMR Module
+Module      : Flipper.ADC
+Description : Analog to Digital Converter
 Copyright   : George Morgan, Travis Whitaker 2016
 License     : All rights reserved.
 Maintainer  : travis@flipper.io
@@ -9,4 +9,4 @@ Portability : Windows, POSIX
 
 -}
 
-module Flipper.Internal.FMR where
+module Flipper.ADC where

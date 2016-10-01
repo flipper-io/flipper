@@ -28,9 +28,32 @@ import Foreign.Ptr
 
 -- | An error condition, reported by the device or occuring within the
 --   @libflipper@ library.
-data FlipperError = OK                    -- ^ All clear.
+data FlipperError = OK                -- ^ All lcear
+                  | MemAllocFailed    -- ^ Memory allocation failed.
+                  | Null              -- ^ Null pointer error.
+                  | Overflow          -- ^ Overflow.
+                  | NoDevice          -- ^ No device available.
+                  | NotAttached       -- ^ Device not attached.
+                  | AlreadyAttached   -- ^ Device already attached.
+                  | FileAlreadyExists -- ^ File already exists.
+                  | FMRPacketOverflow -- ^ FMR packet buffer overflow.
+                  | FMRError          -- ^ Unspecified FMR error.
+                  | Endpoint          -- ^ Unspecified communication endpoint
+                                      --   error.
+                  | USB               -- ^ @libusb@ error.
+                  | Communication     -- ^ Device communication error.
+                  | Socket            -- ^ Socket error.
+                  | Module            -- ^ Module not found.
+                  | Resolution        -- ^ Module dispatch resolution error.
+                  | NoString          -- ^ String not found.
+                  | Checksum          -- ^ Checksum error.
+                  | Name              -- ^ Name not found.
+                  | Configuration     -- ^ Configuration read error.
+                  | Acknowledge       -- ^ Device failed to acknowledge.
+
+-- | An error condition, reported by the device or occuring within the
+--   @libflipper@ library.
                   | FMRChecksumWrong      -- ^ Incorrect FMR packet checksum.
-                  | MemAllocFailed        -- ^ Memory allocation failed.
                   | TooManyArgs           -- ^ Too many FMR invokation arguments.
                   | FVMLoadFailed         -- ^ Failed to load the FVM library.
                   | FVMSymbolFailed       -- ^ Failed to map the FVM symbol table.
