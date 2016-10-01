@@ -26,8 +26,7 @@ data Call = ButtonCall ButtonAction
 data ButtonAction = ButtonRead
                   deriving (Eq, Ord, Show)
 
-data FSAction = FSFormat
-              | FSCreateFromString String String
+data FSAction = FSCreateFromString String String
               | FSCreateFromFile String FilePath
               | FSRemove String
               | FSRename String String

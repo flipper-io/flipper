@@ -37,7 +37,7 @@ parseFlash :: Parser ConsoleAction
 parseFlash = Flash <$> (string' "flash" *> spaces *> parseEscString)
 
 parseInstall :: Parser ConsoleAction
-parseInstall = Install <$> (string' "install" *> spaces *> parseBundleID) <*> parseEscString
+parseInstall = Install <$> (string' "install" *> spaces *> parseModuleID) <*> parseEscString
 
 parseLaunch :: Parser ConsoleAction
 parseLaunch = Launch <$> (string' "launch" *> spaces *> parseEscString)
@@ -56,126 +56,85 @@ parseFormat = string' "format" *> pure Format
 
 parseCall :: Parser Call
 parseCall = choice [ ButtonCall <$> try parseButtonAction
-                   , ConfigCall <$> try parseConfigAction
-                   , IOCall <$> try parseIOAction
-                   , LEDCall <$> try parseLEDAction
-                   , NVMCall <$> try parseNVMAction
-                   , SPICall <$> try parseSPICall
-                   , USARTCall <$> try parseUSARTCall
-                   , USBCall <$> try parseUSBCall
+                   , FSCall <$> parseFSAction
+                   , GPIOCall <$> parseGPIOAction
+                   , LEDAction <$> parseLEDAction
+                   , SPICall <$> parseSPIAction
+                   , UARTCall <$> parseUARTCall
                    ]
-
-parseNVMAction :: Parser NVMAction
-parseNVMAction = string' "nvm" *> spaces *> choice [ try parseNVMEnable
-                                                   , try parseNVMDisable
-                                                   , try parseNVMReset
-                                                   , try parseNVMFormat
-                                                   , try parseNVMAlloc
-                                                   , try parseNVMRead
-                                                   , try parseNVMWrite
-                                                   ]
 
 parseButtonAction :: Parser ButtonAction
 parseButtonAction = string' "button" *> spaces *> choice [ try parseButtonRead
                                                          ]
 
-parseConfigAction :: Parser ConfigAction
-parseConfigAction = string' "config"  *> spaces *> choice [ try parseConfigRead
-                                                          , try parseConfigWrite
-                                                          ]
+parseFSAction :: Parser FSAction
+parseFSAction = string "fs" *> spaces *> choice [ try parseFSCreateFromString
+                                                , try parseFSRemove
+                                                , try parseFSRename
+                                                ]
 
-parseIOAction :: Parser IOAction
-parseIOAction = string' "io" *> spaces *> choice [ try parseIODigitalDirection
-                                                 , try parseIODigitalRead
-                                                 , try parseIODigitalWrite
-                                                 , try parseIOAnalogDirection
-                                                 , try parseIOAnalogRead
-                                                 , try parseIOAnalogWrite
-                                                 ]
+parseGPIOAction :: Parser GPIOAction
+parseGPIOAction = string' "gpio" *> spaces *> choice [ try parseGPIODigitalDirection
+                                                     , try parseGPIODigitalRead
+                                                     , try parseGPIODigitalWrite
+                                                     , try parseGPIOAnalogDirection
+                                                     , try parseGPIOAnalogRead
+                                                     , try parseGPIOAnalogWrite
+                                                     ]
 
 parseLEDAction :: Parser LEDAction
 parseLEDAction = string' "led" *> spaces *> choice [ try parseLEDsetRGB
                                                    ]
 
-parseSPICall :: Parser SPIAction
-parseSPICall = string' "spi" *> spaces *> choice [ try parseSPIEnable
+parseSPIAction :: Parser SPIAction
+parseSPIAction = string' "spi" *> spaces *> choice [ try parseSPIEnable
                                                  , try parseSPIDisable
                                                  , try parseSPIRead
-                                                 , try parseSPIWrite
+                                                 , try parseSPIWriteFromString
                                                  ]
 
-parseUSARTCall :: Parser USARTAction
-parseUSARTCall = bus <**> (spaces *> action)
-    where bus    = choice [ try (string' "usart0" *> pure USART0)
-                          , try (string' "usart1" *> pure USART1)
-                          , try (string' "dbgu" *> pure DBGU)
-                          ]
-          action = choice [ try parseUSARTEnable
-                          , try parseUSARTDisable
-                          , try parseUSARTRead
-                          , try parseUSARTWrite
-                          ]
-
-parseUSBCall :: Parser USBAction
-parseUSBCall = string' "usb" *> spaces *> choice [ try parseUSBEnable
-                                                 , try parseUSBDisable
-                                                 , try parseUSBRead
-                                                 , try parseUSBWrite
-                                                 ]
-
-parseNVMEnable :: Parser NVMAction
-parseNVMEnable = string' "enable" *> pure NVMEnable
-
-parseNVMDisable :: Parser NVMAction
-parseNVMDisable = string' "disable" *> pure NVMDisable
-
-parseNVMReset :: Parser NVMAction
-parseNVMReset = string' "reset" *> pure NVMReset
-
-parseNVMFormat :: Parser NVMAction
-parseNVMFormat = string' "format" *> pure NVMFormat
-
-parseNVMAlloc :: Parser NVMAction
-parseNVMAlloc = NVMAlloc <$> (string' "alloc" *> spaces *> parseAllocSize)
-
-parseNVMRead :: Parser NVMAction
-parseNVMRead = NVMRead <$> (string' "read" *> spaces *> parseFSHandle)
-
-parseNVMWrite :: Parser NVMAction
-parseNVMWrite = NVMWrite <$> (string' "write" *> spaces *> parseFSHandle)
-                           <*> (spaces *> parseEscString)
+parseUARTAction :: Parser UARTAction
+parseUARTAction = string' "uart" *> spaces *> choice [ try parseUARTEnable
+                                                     , try parseUARTDisable
+                                                     , try parseUARTRead
+                                                     , try parseUARTWriteFromString
+                                                     ]
 
 parseButtonRead :: Parser ButtonAction
 parseButtonRead = string "read" *> pure ButtonRead
 
-parseConfigRead :: Parser ConfigAction
-parseConfigRead = ConfigRead <$> (string "read" *> spaces *> parseWord8)
+parseFSCreateFromString :: Parser FSAction
+parseFSCreateFromString = FSCreateFromString <$> (string "create" *> spaces *> parsEscString)
+                                             <*> (spaces *> parseEscString)
 
-parseConfigWrite :: Parser ConfigAction
-parseConfigWrite = ConfigWrite <$> (string "write" *> spaces *> parseWord8)
-                               <*> (spaces *> parseWord16)
+parseFSRemove :: Parser FSAction
+parseFSRemove = FSRemove <$> (string' "remove" *> spaces *> parseEscString)
 
-parseIODigitalDirection :: Parser IOAction
-parseIODigitalDirection = IODigitalDirection <$> (string' "direction" *> spaces *> parseDigitalPin)
-                                             <*> (spaces *> parseDirection)
+parseFSRename :: Parser FSAction
+parseFSRename = FSRename <$> (string' "rename" *> spaces *> parseEscString)
+                         <*> (spaces *> parseEscString)
 
-parseIODigitalRead :: Parser IOAction
-parseIODigitalRead = IODigitalRead <$> (string' "read" *> spaces *> parseDigitalPin)
+parseGPIODigitalDirection :: Parser GPIOAction
+parseGPIODigitalDirection = GPIODigitalDirection <$> (string' "direction" *> spaces *> parseDigitalPin)
+                                                 <*> (spaces *> parseDirection)
 
-parseIODigitalWrite :: Parser IOAction
-parseIODigitalWrite = IODigitalWrite <$> (string' "write" *> spaces *> parseDigitalPin)
-                                     <*> (spaces *> parseBool)
+parseGPIODigitalRead :: Parser GPIOAction
+parseGPIODigitalRead = GPIODigitalRead <$> (string' "read" *> spaces *> parseDigitalPin)
 
-parseIOAnalogDirection :: Parser IOAction
-parseIOAnalogDirection = IOAnalogDirection <$> (string' "direction" *> spaces *> parseAnalogPin)
-                                           <*> (spaces *> parseDirection)
+parseGPIODigitalWrite :: Parser GPIOAction
+parseGPIODigitalWrite = GPIODigitalWrite <$> (string' "write" *> spaces *> parseDigitalPin)
+                                         <*> (spaces *> parseBool)
 
-parseIOAnalogRead :: Parser IOAction
-parseIOAnalogRead = IOAnalogRead <$> (string' "read" *> spaces *> parseAnalogPin)
+parseGPIOAnalogDirection :: Parser GPIOAction
+parseGPIOAnalogDirection = GPIOAnalogDirection <$> (string' "direction" *> spaces *> parseAnalogPin)
+                                               <*> (spaces *> parseDirection)
 
-parseIOAnalogWrite :: Parser IOAction
-parseIOAnalogWrite = IOAnalogWrite <$> (string' "write" *> spaces *> parseAnalogPin)
-                                   <*> (spaces *> parseWord16)
+parseGPIOAnalogRead :: Parser GPIOAction
+parseGPIOAnalogRead = GPIOAnalogRead <$> (string' "read" *> spaces *> parseAnalogPin)
+
+parseGPIOAnalogWrite :: Parser GPIOAction
+parseGPIOAnalogWrite = GPIOAnalogWrite <$> (string' "write" *> spaces *> parseAnalogPin)
+                                       <*> (spaces *> parseWord16)
 
 parseLEDsetRGB :: Parser LEDAction
 parseLEDsetRGB = LEDSetRGB <$> (string' "set" *> spaces *> parseRGB)
@@ -187,34 +146,22 @@ parseSPIDisable :: Parser SPIAction
 parseSPIDisable = string' "disable" *> pure SPIDisable
 
 parseSPIRead :: Parser SPIAction
-parseSPIRead = string' "read" *> pure SPIRead
+parseSPIRead = SPIRead <$> (string' "read" *> spaces *> parseIntegerLit)
 
-parseSPIWrite :: Parser SPIAction
-parseSPIWrite = SPIWrite <$> (string' "write" *> spaces *> parseEscString)
+parseSPIWriteFromString :: Parser SPIAction
+parseSPIWriteFromString = SPIWriteFromString <$> (string' "write" *> spaces *> parseEscString)
 
-parseUSARTEnable :: Parser (USART -> USARTAction)
-parseUSARTEnable = string' "enable" *> pure USARTEnable
+parseUARTEnable :: Parse UARTAction
+parseUARTEnable = string' "enable" *> pure UARTEnable
 
-parseUSARTDisable :: Parser (USART -> USARTAction)
-parseUSARTDisable = string' "disable" *> pure USARTDisable
+parseUARTDisable :: Parser UARTAction
+parseUARTDisable = string' "disable" *> pure UARTDisable
 
-parseUSARTRead :: Parser (USART -> USARTAction)
-parseUSARTRead = string' "read" *> pure USARTRead
+parseUARTRead :: Parser UARTAction
+parseUARTRead = string' "read" *> pure UARTRead
 
-parseUSARTWrite :: Parser (USART -> USARTAction)
-parseUSARTWrite = (\s -> (\b -> USARTWrite b s)) <$> (string' "write" *> spaces *> parseEscString)
-
-parseUSBEnable :: Parser USBAction
-parseUSBEnable = string' "enable" *> pure USBEnable
-
-parseUSBDisable :: Parser USBAction
-parseUSBDisable = string' "disable" *> pure USBDisable
-
-parseUSBRead :: Parser USBAction
-parseUSBRead = string' "read" *> pure USBRead
-
-parseUSBWrite :: Parser USBAction
-parseUSBWrite = USBWrite <$> (string' "write" *> spaces *> parseEscString)
+parseUARTWriteFromString :: Parser UARTAction
+parseUARTWriteFromString = UARTWriteFromString <$> (string' "write" *> spaces *> parseEscString)
 
 parseDigitalPin :: Parser DigitalPin
 parseDigitalPin = choice [ try (string' "10" *> pure IO10)
@@ -258,11 +205,8 @@ parseRGB = RGB <$> parseWord8
                <*> (spaces *> parseWord8)
                <*> (spaces *> parseWord8)
 
-parseFSHandle :: Parser FSHandle
-parseFSHandle = (FSHandle . fromIntegral) <$> parseIntegerLit
-
-parseBundleID :: Parser BundleID
-parseBundleID = BundleID <$> sepBy1 (someTill alphaNumChar (string' ".")) (string' ".")
+parseModuleID :: Parser ModuleID
+parseModuleID = BundleID <$> sepBy1 (someTill alphaNumChar (string' ".")) (string' ".")
 
 parseEscString :: Parser String
 parseEscString = string' "\"" *> esc
