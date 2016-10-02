@@ -32,7 +32,7 @@ def configure(cfg):
     # Configure all supported platforms.
     _platforms(cfg)
     # Configure console.
-    #cfg.recurse('console')
+    cfg.recurse('console')
 
 def build(bld):
     # Build all of the standard modules.
@@ -46,7 +46,7 @@ def build(bld):
     # Build the tests.
     bld.recurse('tests')
     # Build the console.
-    #bld.recurse('console')
+    bld.recurse('console')
     # Install the top-level headers.
     bld.install_files('${PREFIX}/include/', bld.path.ant_glob('include/flipper.h'))
     bld.install_files('${PREFIX}/include/flipper/', bld.path.ant_glob('include/flipper/**'))

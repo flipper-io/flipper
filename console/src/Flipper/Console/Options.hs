@@ -53,25 +53,25 @@ flash :: ParserInfo ConsoleAction
 flash = info (Flash <$> flashP) flashI
     where flashI = mconcat [ fullDesc
                            ]
-          flashP = strOption $ mconcat [ metavar "FIRMWARE"
-                                       , help "Firmware file image."
-                                       ]
+          flashP = strArgument $ mconcat [ metavar "FIRMWARE"
+                                         , help "Firmware file image."
+                                         ]
 
 install :: ParserInfo ConsoleAction
 install = info (Install <$> moduleID <*> installP) installI
     where installI = mconcat [ fullDesc
                              ]
-          installP = strOption $ mconcat [ metavar "MODULE_FILE"
-                                         , help "Module file image."
-                                         ]
+          installP = strArgument $ mconcat [ metavar "MODULE_FILE"
+                                           , help "Module file image."
+                                           ]
 
 launch :: ParserInfo ConsoleAction
 launch = info (Launch <$> launchP) launchI
     where launchI = mconcat [ fullDesc
                             ]
-          launchP = strOption $ mconcat [ metavar "MODULE"
-                                        , help "Module name."
-                                        ]
+          launchP = strArgument $ mconcat [ metavar "MODULE"
+                                          , help "Module name."
+                                          ]
 
 reset :: ParserInfo ConsoleAction
 reset = info (pure Reset) resetI
@@ -148,13 +148,13 @@ buttonRead :: Parser ButtonAction
 buttonRead = subparser (command "read" (info (pure ButtonRead) mempty))
 
 fsCreateFromString :: Parser FSAction
-fsCreateFromString = subparser (command "create" (info (FSCreateFromString <$> strOption mempty <*> strOption mempty) mempty))
+fsCreateFromString = subparser (command "create" (info (FSCreateFromString <$> strArgument mempty <*> strArgument mempty) mempty))
 
 fsRemove :: Parser FSAction
-fsRemove = subparser (command "remove" (info (FSRemove <$> strOption mempty) mempty))
+fsRemove = subparser (command "remove" (info (FSRemove <$> strArgument mempty) mempty))
 
 fsRename :: Parser FSAction
-fsRename = subparser (command "rename" (info (FSRename <$> strOption mempty <*> strOption mempty) mempty))
+fsRename = subparser (command "rename" (info (FSRename <$> strArgument mempty <*> strArgument mempty) mempty))
 
 gpioDirection :: Parser GPIOAction
 gpioDirection = subparser (command "direction" (info (digitalDirection <|> analogDirection) mempty))
@@ -205,7 +205,7 @@ spiRead :: Parser SPIAction
 spiRead = subparser (command "read" (info (pure SPIRead) mempty))
 
 spiWriteFromString :: Parser SPIAction
-spiWriteFromString = subparser (command "write" (info (SPIWriteFromString <$> strOption mempty) mempty))
+spiWriteFromString = subparser (command "write" (info (SPIWriteFromString <$> strArgument mempty) mempty))
 
 uartEnable :: Parser UARTAction
 uartEnable = subparser (command "enable" (info (pure UARTEnable) mempty))
@@ -217,7 +217,7 @@ uartRead :: Parser UARTAction
 uartRead = subparser (command "read" (info (pure UARTRead) mempty))
 
 uartWriteFromString :: Parser UARTAction
-uartWriteFromString = subparser (command "write" (info (UARTWriteFromString <$> strOption mempty) mempty))
+uartWriteFromString = subparser (command "write" (info (UARTWriteFromString <$> strArgument mempty) mempty))
 
 moduleID :: Parser ModuleID
 moduleID = argument (readParser parseModuleID) mempty
