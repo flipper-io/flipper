@@ -9,8 +9,6 @@ Portability : Windows, POSIX
 
 -}
 
-{-# LANGUAGE BangPatterns #-}
-
 module Flipper.Internal.Buffer (
     Buffer(..)
   , emptyBuffer
@@ -40,7 +38,7 @@ data Buffer = Buffer !(ForeignPtr Word8) -- Pointer
 
 -- Just use the strict 'ByteString' implementation.
 instance Eq Buffer where
-    a == b = (toByteString a) == (toByteString b)
+    a == b = toByteString a == toByteString b
 
 -- Just use the strict 'ByteString' implementation.
 instance Ord Buffer where
@@ -81,5 +79,5 @@ append (Buffer p1 o1 l1) (Buffer p2 o2 l2) =
             withForeignPtr p2 $ \p2' ->
             withForeignPtr p3 $ \p3' ->
             do copyBytes p3' (plusPtr p1' o1) l1
-               copyBytes (plusPtr p3' l1) (plusPtr p2' o1) l2
+               copyBytes (plusPtr p3' l1) (plusPtr p2' o2) l2
                return b

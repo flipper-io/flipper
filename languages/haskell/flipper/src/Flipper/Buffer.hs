@@ -12,8 +12,6 @@ different allocation behavior and an interface specialized for building device
 communication primitives.
 -}
 
-{-# LANGUAGE BangPatterns #-}
-
 module Flipper.Buffer (
     Buffer()
   , emptyBuffer

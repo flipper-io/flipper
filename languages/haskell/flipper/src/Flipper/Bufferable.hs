@@ -138,7 +138,6 @@ The related type 'SizedByteString' provides the same behavior for
            , DeriveFoldable
            , DeriveGeneric
            , DeriveTraversable
-           , DeriveDataTypeable
            , DeriveAnyClass
            #-}
 
@@ -151,7 +150,7 @@ module Flipper.Bufferable (
   , SizedSequence(..)
   , CBlock(..)
   , SizedByteString(..)
-  , Padding(..)
+  , Padding()
   ) where
 
 import Control.Applicative
@@ -162,10 +161,7 @@ import Data.Complex
 import Data.Data
 import Data.Int
 import Data.Ix
-import Data.List
 import Data.Monoid
-import Data.Proxy
-import Data.String
 import Data.Ratio
 import Data.Word
 
@@ -334,7 +330,7 @@ class Bufferable a where
     get = to <$> gget
 
 instance (Bufferable a, Bufferable s, Sentinel s) => Bufferable (SentinelSequence a s) where
-    put (SentinelSequence as) = (mconcat (map put as)) <> (put (sentinel :: s))
+    put (SentinelSequence as) = mconcat (map put as) <> put (sentinel :: s)
     get = SentinelSequence <$> g
         where g = (Nothing <$ (get :: Get s)) <|> (Just <$> (get :: Get a))
                   >>= \case Nothing  -> return []
@@ -349,7 +345,7 @@ instance Bufferable CBlock where
     get = (CBlock . B.pack) <$> getCBlock
 
 instance (Bufferable l, Integral l, Num l) => Bufferable (SizedByteString l) where
-    put (SizedByteString bs) = put (fromIntegral (B.length bs) :: l) <> (putBuffer (fromByteString bs))
+    put (SizedByteString bs) = put (fromIntegral (B.length bs) :: l) <> putBuffer (fromByteString bs)
     get = SizedByteString <$> ((get :: Get l) >>= (getSizedByteString . fromIntegral))
 
 instance KnownNat p => Bufferable (Padding p) where

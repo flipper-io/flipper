@@ -22,7 +22,6 @@ module Flipper.FS (
 
 import Data.Word
 
-import Flipper.Buffer
 import Flipper.Bufferable
 import Flipper.MonadFlipper
 import Flipper.Put
@@ -32,8 +31,8 @@ import qualified Flipper.Internal.FS as I
 format :: MonadFlipper m => m ()
 format = bracketIO I.format
 
-create :: MonadFlipper m => String -> Buffer -> m ()
-create = (bracketIO .) . I.create
+create :: (Bufferable b, MonadFlipper m) => String -> b -> m ()
+create n b = bracketIO (I.create n (runPut (put b)))
 
 remove :: MonadFlipper m => String -> m ()
 remove = bracketIO . remove

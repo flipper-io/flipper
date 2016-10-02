@@ -54,7 +54,7 @@ instance, so bus interfaces can be used without serialization/deserialization
 boilerplate.
 -}
 
-{-# LANGUAGE BangPatterns, ScopedTypeVariables #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Flipper.Get (
     Get()
@@ -81,8 +81,6 @@ module Flipper.Get (
 import Control.Applicative
 import Control.Monad
 
-import Data.Monoid
-
 import Data.Char
 import Data.Int
 import Data.Word
@@ -102,7 +100,7 @@ import System.IO.Unsafe
 
 -- | A lightweight parser monad, intended for implementing decoders for C
 --   structures sent to or received from the device over some bus.
-newtype Get a = Get { unGet :: (Buffer -> Result a) }
+newtype Get a = Get { unGet :: Buffer -> Result a }
 
 -- | Parse result.
 data Result a = -- | Successful parse.
@@ -118,23 +116,23 @@ instance Functor Result where
     fmap _ (Failure b s)  = Failure b s
 
 instance Functor Get where
-    fmap f (Get g) = Get $ (fmap f) . g
+    fmap f (Get g) = Get $ fmap f . g
 
 instance Applicative Get where
-    pure x              = Get (\b -> Done b x)
+    pure x              = Get (`Done` x)
     (Get f) <*> (Get x) = Get $ \b -> case f b of (Done b' f')   -> fmap f' (x b')
-                                                  (WantMore l c) -> WantMore l (c <*> (Get x))
+                                                  (WantMore l c) -> WantMore l (c <*> Get x)
                                                   (Failure b' e) -> Failure b' e
 
 instance Alternative Get where
     empty               = fail "empty"
     (Get x) <|> (Get y) = Get $ \b -> case x b of (Done b' x')   -> Done b' x'
-                                                  (WantMore l c) -> WantMore l (c <|> (Get (y . (b `append`))))
-                                                  (Failure b' e) -> y b
+                                                  (WantMore l c) -> WantMore l (c <|> Get (y . (b `append`)))
+                                                  (Failure b' _) -> y b'
 
 instance Monad Get where
     return        = pure
-    (Get x) >>= f = Get $ \b -> case x b of (Done b' x')   -> (unGet (f x')) b'
+    (Get x) >>= f = Get $ \b -> case x b of (Done b' x')   -> unGet (f x') b'
                                             (WantMore l c) -> WantMore l (c >>= f)
                                             (Failure b' e) -> Failure b' e
     fail e        = Get $ \b -> Failure b e
@@ -161,14 +159,14 @@ runGetWith :: Monad m => Get a               -- ^ The parser to run.
                       -> Buffer              -- ^ Initial input.
                       -> m (Either String a) -- ^ Result.
 runGetWith (Get g) m i = case g i of (Done _ x)     -> return $ Right x
-                                     (WantMore l c) -> m l >>= runGetWith (Get g) m
+                                     (WantMore l c) -> m l >>= runGetWith c m
                                      (Failure _ e)  -> return $ Left e
 
 -- | Generic parser for any type with a 'Storable' instance.
-getStorable :: forall a . Storable a => Get a
-getStorable = Get $ \b@(Buffer p o l) -> let s     = sizeOf (undefined :: a)
-                                             val v = Done (Buffer p (o + s) (l - s)) v
-                                         in if s > l then (WantMore (s - l) (Get ((unGet getStorable) . append b)))
+getStorable :: forall a. Storable a => Get a
+getStorable = Get $ \b@(Buffer p o l) -> let s   = sizeOf (undefined :: a)
+                                             val = Done (Buffer p (o + s) (l - s))
+                                         in if s > l then WantMore (s - l) (Get (unGet getStorable . append b))
                                                      else unsafeDupablePerformIO $ withForeignPtr p $ \p' ->
                                                              val <$> peek (plusPtr (castPtr p') o)
 
@@ -213,7 +211,7 @@ getSizedBlock s
     | s <= 0    = fail "getSizedBlock: size must be greater than zero."
     | otherwise = Get g
     where g b@(Buffer p o l)
-            | l < s     = WantMore (s - l) (Get ((unGet (getSizedBlock s)) . append b))
+            | l < s     = WantMore (s - l) (Get (unGet (getSizedBlock s) . append b))
             | otherwise = Done (Buffer p (o + s) (l - s)) (Buffer p o s)
 
 -- | Assumes ASCII encoding and presence of NULL terminator.

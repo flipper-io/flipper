@@ -105,13 +105,13 @@ digitalWrite :: DigitalPin -> Bool -> IO ()
 digitalWrite p v = c_gpio_write (digPinCode p) (fromBool v)
 
 analogWrite :: AnalogPin -> Word16 -> IO ()
-analogWrite p v = c_gpio_write (anPinCode p) v
+analogWrite p = c_gpio_write (anPinCode p)
 
-foreign import ccall safe "flipper/gpio.h io_set_direction"
+foreign import ccall safe "flipper/gpio.h gpio_set_direction"
     c_gpio_set_direction :: Word8 -> Word8 -> IO ()
 
-foreign import ccall safe "flipper/gpio.h io_write"
+foreign import ccall safe "flipper/gpio.h gpio_write"
     c_gpio_write :: Word8 -> Word16 -> IO ()
 
-foreign import ccall safe "flipper/gpio.h io_read"
+foreign import ccall safe "flipper/gpio.h gpio_read"
     c_gpio_read :: Word8 -> IO Word16

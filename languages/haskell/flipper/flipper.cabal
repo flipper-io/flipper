@@ -68,6 +68,12 @@ library
                      , transformers
   default-language:    Haskell2010
   extra-libraries:     flipper
+  ghc-options:         -O2
+                       -Wall
+                       -Werror
+                       -fwarn-identities
+                       -fwarn-missing-signatures
+                       -fno-warn-unused-do-bind
 
 --test-suite flipper-test
 --  type:                exitcode-stdio-1.0

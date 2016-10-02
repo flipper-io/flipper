@@ -31,8 +31,6 @@ import Foreign.C.String
 import Foreign.ForeignPtr
 import Foreign.Ptr
 
-import System.IO.Unsafe
-
 -- | Flipper file system reference.
 newtype FSHandle = FSHandle { unFSHandle :: Word32 }
                  deriving (Eq, Ord, Show)
@@ -85,9 +83,11 @@ foreign import ccall safe "flipper/fs.h fs_write"
 foreign import ccall safe "flipper/fs.h fs_read"
     c_fs_read :: CString -> IO ()
 
+-- FIX ME
 foreign import ccall safe "flipper/fs.h fs_get"
     c_fs_get :: IO Word8
 
+-- FIX ME
 foreign import ccall safe "flipper/fs.h fs_put"
     c_fs_put :: Word8 -> IO ()
 

@@ -113,7 +113,7 @@ runPut (Put w l) = unsafePerformIO run
 -- | Write out raw 'Buffer' contents.
 putBuffer :: Buffer -> Put
 putBuffer (Buffer p o l) = Put w l
-    where w d = withForeignPtr p $ \p' -> copyBytes d p' l
+    where w d = withForeignPtr p $ \p' -> copyBytes d (p' `plusPtr` o) l
 
 -- | 'Put' a 'Buffer' like C would, with a null terminator.
 putBufferC :: Buffer -> Put
@@ -122,7 +122,7 @@ putBufferC = (<> putStorable (0 :: Word8)) . putBuffer
 -- | 'Put' a 'Buffer' like Pascal would, with a preceeding 32-bit word
 --   indicating the length. The buffer lenght must not exceed 2^32 - 1.
 putBufferPascal :: Buffer -> Put
-putBufferPascal b@(Buffer _ _ l) = putStorable ((fromIntegral l) :: Word32) <> putBuffer b
+putBufferPascal b@(Buffer _ _ l) = putStorable (fromIntegral l :: Word32) <> putBuffer b
 
 -- | 'Put' for any natively marshalable data.
 putStorable :: Storable a => a -> Put

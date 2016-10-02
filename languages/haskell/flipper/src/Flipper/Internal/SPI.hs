@@ -22,9 +22,7 @@ import Data.Word
 
 import Flipper.Internal.Buffer
 
-import Foreign.C.Types
 import Foreign.ForeignPtr
-import Foreign.Marshal.Utils
 import Foreign.Ptr
 
 enable :: IO ()
@@ -32,9 +30,6 @@ enable = c_spi_enable
 
 disable :: IO ()
 disable = c_spi_disable
-
-ready :: IO Bool
-ready = toBool <$> c_spi_ready
 
 put :: Word8 -> IO ()
 put = c_spi_put
@@ -58,9 +53,6 @@ foreign import ccall safe "flipper/spi.h spi_enable"
 
 foreign import ccall safe "flipper/spi.h spi_disable"
     c_spi_disable :: IO ()
-
-foreign import ccall safe "flipper/spi.h spi_ready"
-    c_spi_ready :: IO Word8
 
 foreign import ccall safe "flipper/spi.h spi_put"
     c_spi_put :: Word8 -> IO ()

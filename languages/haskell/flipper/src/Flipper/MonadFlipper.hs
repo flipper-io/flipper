@@ -20,8 +20,8 @@ module Flipper.MonadFlipper (
     -- * The Class of Flipper Monads
     MonadFlipper(..)
     -- * Flipper Monad Transformer
-  , FlipperT(..)
-  , Flipper(..)
+  , FlipperT
+  , Flipper
   , runFlipperT
   , runFlipper
     -- * Error Bracketing and Lifting
@@ -33,7 +33,6 @@ module Flipper.MonadFlipper (
 import Control.Exception
 
 import Control.Monad.Except
-import Control.Monad.IO.Class
 
 import Flipper.Error
 import Flipper.Internal.Error

@@ -22,9 +22,7 @@ import Data.Word
 
 import Flipper.Internal.Buffer
 
-import Foreign.C.Types
 import Foreign.ForeignPtr
-import Foreign.Marshal.Utils
 import Foreign.Ptr
 
 uartEnable :: IO ()
@@ -32,9 +30,6 @@ uartEnable = c_uart_enable
 
 uartDisable :: IO ()
 uartDisable = c_uart_disable
-
-uartReady :: IO Bool
-uartReady = toBool <$> c_uart_ready
 
 uartPut :: Word8 -> IO ()
 uartPut = c_uart_put
@@ -58,9 +53,6 @@ foreign import ccall safe "flipper/uart.h uart_enable"
 
 foreign import ccall safe "flipper/uart.h uart_disable"
     c_uart_disable :: IO ()
-
-foreign import ccall safe "flipper/uart.h uart_ready"
-    c_uart_ready :: IO Word8
 
 foreign import ccall safe "flipper/uart.h uart_put"
     c_uart_put :: Word8 -> IO ()
