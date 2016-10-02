@@ -51,7 +51,7 @@ extern int flipper_exit(void);
 /* ~ User functions. ~ */
 
 /* Performs a proper function invocation on the device associated with the provided module. */
-extern int lf_invoke(struct _fmr_module *module, fmr_function function, struct _fmr_list *args);
+extern fmr_return lf_invoke(struct _fmr_module *module, fmr_function function, struct _fmr_list *args);
 
 /* ~ Helper functions. ~ */
 
@@ -67,7 +67,7 @@ extern int lf_transfer(struct _lf_device *device, struct _fmr_packet *packet);
 /* Retrieves a packet from the specified device. */
 extern int lf_retrieve(struct _lf_device *device, struct _fmr_result *response);
 /* Moves data from the address space of the host to that of the device. */
-extern void *lf_push(struct _fmr_module *module, fmr_function function, void *source, lf_size_t length);
+extern int lf_push(struct _fmr_module *module, fmr_function function, void *source, lf_size_t length);
 /* Moves data from the address space of the device to that of the host. */
 extern int lf_pull(struct _fmr_module *module, fmr_function function, void *destination, lf_size_t length);
 

@@ -276,7 +276,7 @@ connected:
 		}
 	}
 
-	printf(KGRN " Successfully uploaded new firmware.\n" KNRM);
+	printf(KGRN "\n Successfully uploaded new firmware.\n" KNRM);
 
 	printf("Resetting the CPU.\n");
 	/* Reset the CPU. */

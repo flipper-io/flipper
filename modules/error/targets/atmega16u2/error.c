@@ -2,6 +2,10 @@
 #include <flipper/error.h>
 #include <platform/atmega16u2.h>
 
+int error_configure(void) {
+    return lf_success;
+}
+
 void error_raise(lf_error_t error, const char *format, ...) {
     self.error = error;
 }

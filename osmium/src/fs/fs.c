@@ -35,9 +35,7 @@ void fs_format(void) {
 	/* Write the break value pointer to NVM. */
 	nvm_push(&_break_value, sizeof(nvm_p), _BREAK_VALUE);
 	/* ~ Create the root leaf. ~ */
-	leaf root;
-	/* Zero the leaf. */
-	memset(&root, 0, sizeof(leaf));
+	leaf root = { 0 };
 	/* Set the key of the root leaf. */
 	root.key = 0x4321;
 	/* ~ Allocate space externall for the root leaf. ~ */

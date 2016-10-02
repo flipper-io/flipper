@@ -11,7 +11,7 @@ int lf_attach(char *name, struct _lf_endpoint *endpoint) {
 		return lf_error;
 	}
 	if (strlen(name) > sizeof(device -> configuration.name)) {
-		error_raise(E_NAME, error_message("The name '%s' is too long. Please choose a name with %i characters or less.", name, sizeof(device -> configuration.name)));
+		error_raise(E_NAME, error_message("The name '%s' is too long. Please choose a name with %lu characters or less.", name, sizeof(device -> configuration.name)));
 		goto failure;
 	}
 	/* Set the device's name. */
@@ -191,7 +191,7 @@ fmr_type lf_word_size(struct _lf_device *device) {
 int lf_load_configuration(struct _lf_device *device) {
 	struct _fmr_packet packet;
 	/* Generate the a null procedure call in the outgoing packet. */
-	int _e = fmr_generate(0, 0, fmr_build(0), &packet);
+	int _e = fmr_generate(0, 0, NULL, &packet);
 	/* Set the configuration bit in the target attributes. */
 	packet.target.attributes |= LF_CONFIGURATION;
 	/* Send the packet to the target device. */
@@ -230,7 +230,7 @@ int lf_get_result(struct _lf_device *device, struct _fmr_result *result) {
 	return lf_success;
 }
 
-int lf_invoke(struct _fmr_module *module, fmr_function function, struct _fmr_list *args) {
+fmr_return lf_invoke(struct _fmr_module *module, fmr_function function, struct _fmr_list *args) {
 	/* Ensure that we have a valid module and argument pointer. */
 	if (!module) {
 		error_raise(E_NULL, error_message("No module specified for message runtime invocation."));
@@ -241,6 +241,10 @@ int lf_invoke(struct _fmr_module *module, fmr_function function, struct _fmr_lis
 	/* If no device is provided, send the request to the actively selected device. */
 	if (!device) {
 		device = lf_device();
+		/* If we still don't have a device, return with error. */
+		if (!device) {
+			return lf_error;
+		}
 	}
 	struct _fmr_packet packet;
 	/* Generate the function call in the outgoing packet. */
@@ -253,8 +257,8 @@ int lf_invoke(struct _fmr_module *module, fmr_function function, struct _fmr_lis
 	if (_e < lf_success) {
 		return lf_error;
 	}
-	/* Obtain the result of the operation. */
 	struct _fmr_result result;
+	/* Obtain the result of the operation. */
 	lf_get_result(device, &result);
 	/* Return the result of the invocation. */
 	return result.value;
@@ -282,16 +286,14 @@ int lf_retrieve(struct _lf_device *device, struct _fmr_result *response) {
 	return lf_success;
 }
 
-void *lf_push(struct _fmr_module *module, fmr_function function, void *source, lf_size_t length) {
+int lf_push(struct _fmr_module *module, fmr_function function, void *source, lf_size_t length) {
 	/* Ensure that we have a valid module and argument pointer. */
 	if (!module) {
 		error_raise(E_NULL, error_message("No module specified for message runtime push to module '%s'.", module -> name));
-		return NULL;
-	}
-	if (!source) {
+		return lf_error;
+	} else if (!source) {
 		error_raise(E_NULL, error_message("No source provided for message runtime push to module '%s'.", module -> name));
-	}
-	if (!length) {
+	} else if (!length) {
 		return lf_success;
 	}
 	/* Ensure that the device pointer is valid. */
@@ -300,31 +302,28 @@ void *lf_push(struct _fmr_module *module, fmr_function function, void *source, l
 	if (!device) {
 		device = lf_device();
 	}
-	/* Call the device's fmr_push_handler with metadata about the transfer. */
 	struct _fmr_packet packet;
 	/* Generate the function call in the outgoing packet. */
 	int _e = fmr_generate(_fmr_id, _fmr_push, fmr_args(fmr_int16(module -> identifier), fmr_int8(function), fmr_int32(length)), &packet);
 	if (_e < lf_success) {
-		return NULL;
+		return lf_error;
 	}
 	/* Send the packet to the target device. */
 	_e = lf_transfer(device, &packet);
 	if (_e < lf_success) {
-		return NULL;
+		return lf_error;
 	}
-
-	/* Send the data to the device. */
+	/* Transfer the data through to the address space of the device. */
 	_e = device -> endpoint -> push(source, length);
 	/* Ensure that the data was successfully transferred to the device. */
 	if (_e < lf_success) {
-		return NULL;
+		return lf_error;
 	}
-
 	struct _fmr_result result;
 	/* Obtain the result of the operation. */
 	lf_get_result(device, &result);
 	/* Return a pointer to the data. */
-	return (void *)((uintptr_t)result.value);
+	return lf_success;
 }
 
 int lf_pull(struct _fmr_module *module, fmr_function function, void *destination, lf_size_t length) {
@@ -332,20 +331,16 @@ int lf_pull(struct _fmr_module *module, fmr_function function, void *destination
 	if (!module) {
 		error_raise(E_NULL, error_message("No module specified for message runtime pull from module '%s'.", module -> name));
 		return lf_error;
-	}
-	if (!destination) {
+	} else if (!destination) {
 		error_raise(E_NULL, error_message("No destination provided for message runtime pull from module '%s'.", module -> name));
-	}
-	if (!length) {
+	} else if (!length) {
 		return lf_success;
 	}
-	/* Ensure that the device pointer is valid. */
 	struct _lf_device *device = module -> device;
 	/* If no device is provided, send the request to the actively selected device. */
 	if (!device) {
 		device = lf_device();
 	}
-	/* Call the device's fmr_push_handler with metadata about the transfer. */
 	struct _fmr_packet packet;
 	/* Generate the function call in the outgoing packet. */
 	int _e = fmr_generate(_fmr_id, _fmr_pull, fmr_args(fmr_int16(module -> identifier), fmr_int8(function), fmr_int32(length)), &packet);
@@ -357,14 +352,12 @@ int lf_pull(struct _fmr_module *module, fmr_function function, void *destination
 	if (_e < lf_success) {
 		return lf_error;
 	}
-
-	/* Send the data to the device. */
+	/* Obtain the data from the address space of the device. */
 	_e = device -> endpoint -> pull(destination, length);
 	/* Ensure that the data was successfully transferred to the device. */
 	if (_e < lf_success) {
 		return lf_error;
 	}
-
 	struct _fmr_result result;
 	/* Obtain the result of the operation. */
 	lf_get_result(device, &result);
