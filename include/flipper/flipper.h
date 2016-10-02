@@ -26,6 +26,10 @@ extern struct _flipper {
 	int (* detach)(char *name);
 	/* Safely destroys all libflipper state before termination. */
 	int (* exit)(void);
+	/* Last observed error code. */
+	lf_error_t error_code;
+	/* Global flag indicating whether or not error_raise() prints or calls exit(). */
+	uint8_t errors_cause_side_effects;
 	/* The head of a linked list that aggregates all attached devices. */
 	struct _lf_device *attached;
 	/* The selected device with which interaction will take place. */

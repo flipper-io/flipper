@@ -8,5 +8,10 @@ struct _flipper flipper = {
 	flipper_attach_network,
 	flipper_attach_endpoint,
 	flipper_select,
-	flipper_detach
+	flipper_detach,
+	flipper_exit,
+	E_OK,
+	1,
+	NULL,
+	NULL,
 };

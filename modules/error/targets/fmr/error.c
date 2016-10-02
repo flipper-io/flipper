@@ -6,24 +6,14 @@
 char *messages[] = { LF_ERROR_MESSAGE_STRINGS };
 
 void error_raise(lf_error_t error, const char *format, ...) {
-	/* Create a local copy of the error code. */
-	lf_error_t _error;
-	/* If no device is selected, raise an error manually. */
-	if (!flipper.device) {
-		_error = error;
-		goto raise;
-	}
-	/* Set the global error if the error being raised does not rely on the previous error state. */
-	if (error != E_LAST) { flipper.device -> error = error; }
-	/* Set the local copy of the error. */
-	_error = flipper.device -> error;
-/* When set, this flag allows errors to cause system side effects. */
+	lf_error_t _error = error;
+	/* Record the observed error. */
+	flipper.error_code = error;
 #ifdef __enable_error_side_effects__
-	/* If the selected device is configured to cause side effects, do so. */
-	if (flipper.device -> errors_generate_side_effects) {
+	if(flipper.errors_cause_side_effects && error)
+	{
 		/* Construct a va_list to access variadic arguments. */
 		va_list argv;
-raise:
 		/* Initialize the va_list that we created above. */
 		va_start(argv, format);
 		if (_error > (sizeof(messages) / sizeof(char *))) {
@@ -46,24 +36,22 @@ raise:
 		/* Exit. */
 		exit(EXIT_FAILURE);
 	}
-#else
-raise:
-	return;
 #endif
+	return;
 }
 
 lf_error_t error_get(void) {
-	return lf_device() -> error;
+	return flipper.error_code;
 }
 
 void error_clear(void) {
-	lf_device() -> error = E_OK;
+	flipper.error_code = E_OK;
 }
 
 void error_resume(void) {
-	lf_device() -> errors_generate_side_effects = true;
+	flipper.errors_cause_side_effects = 1;
 }
 
 void error_pause(void) {
-	lf_device() -> errors_generate_side_effects = false;
+	flipper.errors_cause_side_effects = 0;
 }

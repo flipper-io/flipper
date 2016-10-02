@@ -18,8 +18,6 @@ int lf_attach(char *name, struct _lf_endpoint *endpoint) {
 	strcpy(device -> configuration.name, name);
 	/* Set the device's identifier. */
 	device -> configuration.identifier = lf_checksum(name, strlen(name));
-	/* Cause the device to generate error related side effects on the host. */
-	device -> errors_generate_side_effects = true;
 	/* Obtain the head of the linked list of attached devices. */
 	struct _lf_device *last, *head = flipper.attached;
 	last = head;
@@ -79,18 +77,27 @@ int flipper_attach(void) {
 
 int flipper_attach_usb(char *name) {
 	struct _lf_endpoint *_ep = &lf_usb_ep;
-	_ep -> configure(_ep);
+	if(_ep -> configure(_ep))
+	{
+		return lf_error;
+	}
 	return lf_attach(name, _ep);
 }
 
 int flipper_attach_network(char *name, char *hostname) {
 	struct _lf_endpoint *_ep = &lf_network_ep;
-	_ep -> configure(_ep, hostname);
+	if(_ep -> configure(_ep, hostname))
+	{
+		return lf_error;
+	}
 	return lf_attach(name, _ep);
 }
 
 int flipper_attach_endpoint(char *name, struct _lf_endpoint *endpoint) {
-	endpoint -> configure(endpoint);
+	if(endpoint -> configure(endpoint))
+	{
+		return lf_error;
+	}
 	return lf_attach(name, endpoint);
 }
 
@@ -216,11 +223,9 @@ int lf_get_result(struct _lf_device *device, struct _fmr_result *result) {
 	if (_e < lf_success) {
 		return lf_error;
 	}
-	/* Synchronize with the device's error state. */
-	device -> error = result -> error;
-	/* If the device encountered an error, raise it. */
-	if (device -> error != E_OK) {
-		error_raise(E_LAST, error_message("The following error occured on the device '%s':", device -> configuration.name));
+	/* Record the observed error code. */
+	if (result -> error != E_OK) {
+		error_raise(result -> error, error_message("The following error occured on the device '%s':", device -> configuration.name));
 	}
 	return lf_success;
 }
