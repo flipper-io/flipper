@@ -40,18 +40,26 @@ readParser p = eitherReader (showLeft . M.runParser p "")
           showLeft (Left e)  = (Left (show e))
 
 action :: Parser ConsoleAction
-action = builtin <|> (ConsoleCall <$> call)
-    where builtin = subparser $ mconcat [ command "flash" flash
-                                        , command "install" install
-                                        , command "launch" launch
-                                        , command "reset" reset
-                                        , command "suspend" suspend
-                                        , command "format" format
-                                        ]
+action = hsubparser (mconcat builtins <> mconcat calls)
+    where builtins = [ command "flash" flash
+                     , command "install" install
+                     , command "launch" launch
+                     , command "reset" reset
+                     , command "suspend" suspend
+                     , command "format" format
+                     ]
+          calls = [ command "button" ((ConsoleCall . ButtonCall) <$> button)
+                  , command "fs" ((ConsoleCall . FSCall) <$> fs)
+                  , command "gpio" ((ConsoleCall . GPIOCall) <$> gpio)
+                  , command "led" ((ConsoleCall . LEDCall) <$> led)
+                  , command "spi" ((ConsoleCall . SPICall) <$> spi)
+                  , command "uart" ((ConsoleCall . UARTCall) <$> uart)
+                  ]
 
 flash :: ParserInfo ConsoleAction
 flash = info (Flash <$> flashP) flashI
     where flashI = mconcat [ fullDesc
+                           , progDesc "Flash firmware to the device."
                            ]
           flashP = strArgument $ mconcat [ metavar "FIRMWARE"
                                          , help "Firmware file image."
@@ -60,6 +68,7 @@ flash = info (Flash <$> flashP) flashI
 install :: ParserInfo ConsoleAction
 install = info (Install <$> moduleID <*> installP) installI
     where installI = mconcat [ fullDesc
+                             , progDesc "Install a module on the device."
                              ]
           installP = strArgument $ mconcat [ metavar "MODULE_FILE"
                                            , help "Module file image."
@@ -68,6 +77,7 @@ install = info (Install <$> moduleID <*> installP) installI
 launch :: ParserInfo ConsoleAction
 launch = info (Launch <$> launchP) launchI
     where launchI = mconcat [ fullDesc
+                            , progDesc "Launch a module on the device."
                             ]
           launchP = strArgument $ mconcat [ metavar "MODULE"
                                           , help "Module name."
@@ -76,30 +86,25 @@ launch = info (Launch <$> launchP) launchI
 reset :: ParserInfo ConsoleAction
 reset = info (pure Reset) resetI
     where resetI = mconcat [ fullDesc
+                           , progDesc "Reset the device."
                            ]
 
 suspend :: ParserInfo ConsoleAction
 suspend = info (pure Suspend) suspendI
     where suspendI = mconcat [ fullDesc
+                             , progDesc "Suspend the device."
                              ]
 
 format :: ParserInfo ConsoleAction
 format = info (pure Format) formatI
     where formatI = mconcat [ fullDesc
+                            , progDesc "Format the flash memory on the device."
                             ]
 
-call :: Parser Call
-call = subparser $ mconcat [ command "button" (ButtonCall <$> button)
-                           , command "fs" (FSCall <$> fs)
-                           , command "gpio" (GPIOCall <$> gpio)
-                           , command "led" (LEDCall <$> led)
-                           , command "spi" (SPICall <$> spi)
-                           , command "uart" (UARTCall <$> uart)
-                           ]
-
 button :: ParserInfo ButtonAction
-button = info buttonRead buttonI
+button = info (hsubparser buttonRead) buttonI
     where buttonI = mconcat [ fullDesc
+                            , progDesc "Read the device's button state."
                             ]
 
 fs :: ParserInfo FSAction
@@ -110,21 +115,25 @@ fs = info fsP fsI
                      , fsRename
                      ]
           fsI = mconcat [ fullDesc
+                        , progDesc "Interact with the device's file system."
                         ]
 
 gpio :: ParserInfo GPIOAction
 gpio = info (gpioDirection <|> gpioRead <|> gpioWrite) ioI
     where ioI = mconcat  [ fullDesc
+                         , progDesc "Interact with the device's GPIO pins."
                          ]
 
 led :: ParserInfo LEDAction
 led = info ledRGB ledI
     where ledI = mconcat [ fullDesc
+                         , progDesc "Set the device's RGB LED state."
                          ]
 
 spi :: ParserInfo SPIAction
 spi = info spiP spiI
     where spiI = mconcat [ fullDesc
+                         , progDesc "Interact with the device's SPI bus."
                          ]
           spiP = asum [ spiEnable
                       , spiDisable
@@ -136,6 +145,7 @@ spi = info spiP spiI
 uart :: ParserInfo UARTAction
 uart = info uartP uartI
     where uartI = mconcat [ fullDesc
+                          , progDesc "Interact with the device's UART bus."
                           ]
           uartP = asum [ uartEnable
                        , uartDisable
@@ -144,29 +154,68 @@ uart = info uartP uartI
 --                       , uartWriteFromFile
                        ]
 
-buttonRead :: Parser ButtonAction
-buttonRead = subparser (command "read" (info (pure ButtonRead) mempty))
+buttonRead :: Mod CommandFields ButtonAction
+buttonRead = command "read" (info (pure ButtonRead) readI)
+    where readI = mconcat [ fullDesc
+                          , progDesc "Read the device's button state."
+                          ]
 
 fsCreateFromString :: Parser FSAction
-fsCreateFromString = subparser (command "create" (info (FSCreateFromString <$> strArgument mempty <*> strArgument mempty) mempty))
+fsCreateFromString = hsubparser (command "create" (info (FSCreateFromString <$> strArgument fnameP <*> strArgument stringP) createI))
+    where fnameP = mconcat [ help "File name to create."
+                           , metavar "FILENAME"
+                           ]
+          stringP = mconcat [ help "File contents as quoted string."
+                            , metavar "CONTENTS"
+                            ]
+          createI = mconcat [ fullDesc
+                            , progDesc "Create a file on the device from a user-provided string."
+                            ]
 
 fsRemove :: Parser FSAction
-fsRemove = subparser (command "remove" (info (FSRemove <$> strArgument mempty) mempty))
+fsRemove = hsubparser (command "remove" (info (FSRemove <$> strArgument fnameP) removeI))
+    where fnameP = mconcat [ help "File name to remove."
+                           , metavar "FILENAME"
+                           ]
+          removeI = mconcat [ fullDesc
+                            , progDesc "Remove a file on the device."
+                            ]
 
 fsRename :: Parser FSAction
-fsRename = subparser (command "rename" (info (FSRename <$> strArgument mempty <*> strArgument mempty) mempty))
+fsRename = hsubparser (command "rename" (info (FSRename <$> strArgument fromP <*> strArgument toP) renameI))
+    where fromP = mconcat [ help "Old file name."
+                          , metavar "FROM"
+                          ]
+          toP = mconcat [ help "New file name."
+                        , metavar "TO"
+                        ]
+          renameI = mconcat [ fullDesc
+                            , progDesc "Rename a file on the device."
+                            ]
 
 gpioDirection :: Parser GPIOAction
-gpioDirection = subparser (command "direction" (info (digitalDirection <|> analogDirection) mempty))
+gpioDirection = hsubparser (command "direction" (info (digitalDirection <|> analogDirection) directionI))
+    where directionI = mconcat [ fullDesc
+                               , progDesc "Set a GPIO pin's I/O direction."
+                               ]
 
 digitalPin :: Parser DigitalPin
-digitalPin = argument (readParser parseDigitalPin) mempty
+digitalPin = argument (readParser parseDigitalPin) dpinP
+    where dpinP = mconcat [ metavar "DIGITAL_PIN"
+                          , help "Digital GPIO pin."
+                          ]
 
 analogPin :: Parser AnalogPin
-analogPin = argument (readParser parseAnalogPin) mempty
+analogPin = argument (readParser parseAnalogPin) apinP
+    where apinP = mconcat [ metavar "ANALOG_PIN"
+                          , help "Analog GPIO pin."
+                          ]
 
 direction :: Parser Direction
-direction = argument (readParser parseDirection) mempty
+direction = argument (readParser parseDirection) dirP
+    where dirP = mconcat [ metavar "DIRECTION"
+                         , help "GPIO pin I/O direction."
+                         ]
 
 digitalDirection :: Parser GPIOAction
 digitalDirection = GPIODigitalDirection <$> digitalPin <*> direction
@@ -175,7 +224,10 @@ analogDirection :: Parser GPIOAction
 analogDirection = GPIOAnalogDirection <$> analogPin <*> direction
 
 gpioRead :: Parser GPIOAction
-gpioRead = subparser (command "read" (info (digitalRead <|> analogRead) mempty))
+gpioRead = hsubparser (command "read" (info (digitalRead <|> analogRead) readI))
+    where readI = mconcat [ fullDesc
+                          , progDesc "Read a GPIO pin's value."
+                          ]
 
 digitalRead :: Parser GPIOAction
 digitalRead = GPIODigitalRead <$> digitalPin
@@ -184,7 +236,10 @@ analogRead :: Parser GPIOAction
 analogRead = GPIOAnalogRead <$> analogPin
 
 gpioWrite :: Parser GPIOAction
-gpioWrite = subparser (command "write" (info (digitalWrite <|> analogWrite) mempty))
+gpioWrite = hsubparser (command "write" (info (digitalWrite <|> analogWrite) writeI))
+    where writeI = mconcat [ fullDesc
+                           , progDesc "Set a GPIO pin's state."
+                           ]
 
 digitalWrite :: Parser GPIOAction
 digitalWrite = GPIODigitalWrite <$> digitalPin <*> bool
@@ -193,34 +248,69 @@ analogWrite :: Parser GPIOAction
 analogWrite = GPIOAnalogWrite <$> analogPin <*> word16
 
 ledRGB :: Parser LEDAction
-ledRGB = subparser (command "rgb" (info (LEDSetRGB <$> rgb) mempty))
+ledRGB = hsubparser (command "rgb" (info (LEDSetRGB <$> rgb) rgbI))
+    where rgbI = mconcat [ fullDesc
+                         , progDesc "Set the device's LED RGB state."
+                         ]
 
 spiEnable :: Parser SPIAction
-spiEnable = subparser (command "enable" (info (pure SPIEnable) mempty))
-
+spiEnable = hsubparser (command "enable" (info (pure SPIEnable) enableI))
+    where enableI = mconcat [ fullDesc
+                            , progDesc "Enable the SPI bus."
+                            ]
 spiDisable :: Parser SPIAction
-spiDisable = subparser (command "disable" (info (pure SPIDisable) mempty))
+spiDisable = hsubparser (command "disable" (info (pure SPIDisable) disableI))
+    where disableI = mconcat [ fullDesc
+                             , progDesc "Disable the SPI bus."
+                             ]
 
 spiRead :: Parser SPIAction
-spiRead = subparser (command "read" (info (pure SPIRead) mempty))
+spiRead = hsubparser (command "read" (info (pure SPIRead) readI))
+    where readI = mconcat [ fullDesc
+                          , progDesc "Read a null-terminated string from the SPI bus."
+                          ]
 
 spiWriteFromString :: Parser SPIAction
-spiWriteFromString = subparser (command "write" (info (SPIWriteFromString <$> strArgument mempty) mempty))
+spiWriteFromString = hsubparser (command "write" (info (SPIWriteFromString <$> strArgument stringP) writeI))
+    where stringP = mconcat [ metavar "PAYLOAD"
+                            , help "The string to send over SPI."
+                            ]
+          writeI = mconcat [ fullDesc
+                           , progDesc "Write a null-terminated string to the SPI bus."
+                           ]
 
 uartEnable :: Parser UARTAction
-uartEnable = subparser (command "enable" (info (pure UARTEnable) mempty))
+uartEnable = hsubparser (command "enable" (info (pure UARTEnable) enableI))
+    where enableI = mconcat [ fullDesc
+                            , progDesc "Enable the UART bus."
+                            ]
 
 uartDisable :: Parser UARTAction
-uartDisable = subparser (command "disable" (info (pure UARTDisable) mempty))
+uartDisable = hsubparser (command "disable" (info (pure UARTDisable) disableI))
+    where disableI = mconcat [ fullDesc
+                             , progDesc "Disable the UART bus."
+                             ]
 
 uartRead :: Parser UARTAction
-uartRead = subparser (command "read" (info (pure UARTRead) mempty))
+uartRead = hsubparser (command "read" (info (pure UARTRead) readI))
+    where readI = mconcat [ fullDesc
+                          , progDesc "Read a null-terminated string from the UART bus."
+                          ]
 
 uartWriteFromString :: Parser UARTAction
-uartWriteFromString = subparser (command "write" (info (UARTWriteFromString <$> strArgument mempty) mempty))
+uartWriteFromString = hsubparser (command "write" (info (UARTWriteFromString <$> strArgument stringP) writeI))
+    where stringP = mconcat [ metavar "PAYLOAD"
+                            , help "The string to send over UART."
+                            ]
+          writeI = mconcat [ fullDesc
+                           , progDesc "Write a null-terminated string to the UART bus."
+                           ]
 
 moduleID :: Parser ModuleID
-moduleID = argument (readParser parseModuleID) mempty
+moduleID = argument (readParser parseModuleID) moduleP
+    where moduleP = mconcat [ metavar "MODULE_ID"
+                            , help "The module ID."
+                            ]
 
 word8 :: Parser Word8
 word8 = argument (readParser parseWord8) mempty
@@ -232,7 +322,15 @@ bool :: Parser Bool
 bool = argument (readParser parseBool) mempty
 
 rgb :: Parser RGB
-rgb = RGB <$> word8 <*> word8 <*> word8
-
-allocSize :: Parser Int
-allocSize = argument (readParser parseAllocSize) mempty
+rgb = RGB <$> argument (readParser parseWord8) rP
+          <*> argument (readParser parseWord8) gP
+          <*> argument (readParser parseWord8) bP
+    where rP = mconcat [ metavar "RED"
+                       , help "8-bit red value."
+                       ]
+          gP = mconcat [ metavar "GREEN"
+                       , help "8-bit green value."
+                       ]
+          bP = mconcat [ metavar "BLUE"
+                       , help "8-bit red value."
+                       ]
