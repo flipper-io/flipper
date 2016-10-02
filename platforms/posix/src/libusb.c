@@ -23,7 +23,7 @@ struct _lf_usb_record {
 
 int lf_usb_configure(struct _lf_endpoint *endpoint) {
 	if (!endpoint) {
-		error_raise(E_NULL, error_message("No endpoint record provided for libusb initialization."));
+		error_raise(E_NULL, error_message("No endpoint record provided for libusb configuration. Reattach your device and try again."));
 		return lf_error;
 	}
 	/* Allocate memory for the USB record if it has not yet been allocated. */
@@ -34,19 +34,19 @@ int lf_usb_configure(struct _lf_endpoint *endpoint) {
 	/* Initialize the libusb context associated with this endpoint. */
 	int _e = libusb_init(&(record -> context));
 	if (_e < 0) {
-		error_raise(E_LIBUSB, error_message("Failed to initialize libusb."));
+		error_raise(E_LIBUSB, error_message("Failed to initialize libusb. Reboot and try again."));
 		return lf_error;
 	}
 	/* Attach a physical device to this endpoint. */
 	record -> handle = libusb_open_device_with_vid_pid(record -> context, USB_VENDOR_ID, USB_PRODUCT_ID);
 	if (!(record -> handle)) {
-		error_raise(E_NO_DEVICE, error_message("Could not connect to Flipper device over USB. Ensure that a device is connected."));
+		error_raise(E_NO_DEVICE, error_message("Could not find any devices connected via USB. Ensure that a device is connected."));
 		return lf_error;
 	}
 	/* Claim the interface used to send and receive message runtime packets. */
 	_e = libusb_claim_interface(record -> handle, 0);
 	if (_e < 0) {
-		error_raise(E_LIBUSB, error_message("Failed to claim interface 0 on attached device."));
+		error_raise(E_LIBUSB, error_message("Failed to claim interface on attached device. Please quit any other programs using your device."));
 		return lf_error;
 	}
 	libusb_set_debug(record -> context, 3);
@@ -83,7 +83,7 @@ int lf_usb_push(void *source, lf_size_t length) {
 		memcpy(buffer, (void *)(source + (packet * INTERRUPT_OUT_SIZE)), _len);
 		int _e = libusb_interrupt_transfer(record -> handle, INTERRUPT_OUT_ENDPOINT, buffer, INTERRUPT_OUT_SIZE, &_length, 0);
 		if (_e < 0 || _length != INTERRUPT_OUT_SIZE) {
-			error_raise(E_COMMUNICATION, error_message("Incomplete USB transfer detected."));
+			error_raise(E_COMMUNICATION, error_message("Failed to transmit complete USB packet."));
 			return lf_error;
 		}
 		length -= _len;
@@ -104,7 +104,7 @@ int lf_usb_pull(void *destination, lf_size_t length) {
 		int _e = libusb_interrupt_transfer(record -> handle, INTERRUPT_IN_ENDPOINT, buffer, INTERRUPT_IN_SIZE, &_length, 0);
 		memcpy((void *)(destination + (packet * INTERRUPT_IN_SIZE)), buffer, _len);
 		if (_e < 0 || _length != INTERRUPT_IN_SIZE) {
-			error_raise(E_COMMUNICATION, error_message("Incomplete USB transfer detected."));
+			error_raise(E_COMMUNICATION, error_message("Failed to receive complete USB packet."));
 			return lf_error;
 		}
 		length -= _len;
@@ -115,7 +115,7 @@ int lf_usb_pull(void *destination, lf_size_t length) {
 int lf_usb_destroy(struct _lf_endpoint *endpoint) {
 	struct _lf_usb_record *record = lf_device() -> endpoint -> record;
 	if (!record) {
-		error_raise(E_ENDPOINT, error_message("No libusb record associated with the selected USB endpoint. Did you attach?"));
+		error_raise(E_ENDPOINT, error_message("No libusb record associated with the USB endpoint."));
 		return lf_error;
 	}
 	/* Close the device handle. */
