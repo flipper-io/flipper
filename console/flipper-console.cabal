@@ -22,12 +22,19 @@ executable flipper
                      , Flipper.Console.Options
   ghc-options:         -O2
   build-depends:       base
+                     , bytestring
                      , flipper
                      , haskeline
                      , megaparsec
                      , optparse-applicative
                      , transformers
   default-language:    Haskell2010
+  ghc-options:         -O2
+                       -Wall
+                       -Werror
+                       -fwarn-identities
+                       -fwarn-missing-signatures
+                       -fno-warn-unused-do-bind
 
 source-repository head
   type:     git

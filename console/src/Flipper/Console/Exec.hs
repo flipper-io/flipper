@@ -4,12 +4,9 @@ import Control.Monad.Trans.Class
 
 import qualified Data.ByteString as BS
 
-import Flipper
-
 import Flipper.Error
 import Flipper.MonadFlipper
 
-import qualified Flipper.Buffer as B
 import qualified Flipper.Button as Button
 import qualified Flipper.FS     as FS
 import qualified Flipper.GPIO   as GPIO
@@ -24,12 +21,12 @@ import Flipper.Console.Error
 
 import System.Console.Haskeline
 
-import System.IO
-
 import qualified Text.Megaparsec        as M
-import qualified Text.Megaparsec.String as M
 
 type FC = FlipperT (InputT IO)
+
+liftFC :: IO a -> FC a
+liftFC = lift . lift
 
 runFC :: FC a -> IO (Either FlipperException a)
 runFC = (runInputT defaultSettings) . runFlipperT
@@ -41,24 +38,19 @@ printCStringFC :: Either String String -> FC ()
 printCStringFC (Left e)  = lift $ outputStrLn e
 printCStringFC (Right v) = lift $ outputStrLn v
 
-withFileFC :: FilePath -> (Buffer -> FC a) -> FC a
-withFileFC fp f = withFile fp ReadMode $ \h ->
-    (Buffer.fromByteString <$> lift (BS.readFile h)) >>= f
-
 execConsoleAction :: ConsoleAction -> FC ()
 execConsoleAction (Flash f)       = execFlash f
 execConsoleAction (Install m f)   = execInstall m f
 execConsoleAction (Launch s)      = execLaunch s
 execConsoleAction Reset           = execReset
 execConsoleAction Suspend         = execSuspend
-execConsoleAction Engage          = execEngage
 execConsoleAction Format          = execFormat
 execConsoleAction (ConsoleCall c) = execCall c
 
 execFlash :: FilePath -> FC ()
 execFlash = undefined
 
-execInstall :: BundleID -> FilePath -> FC ()
+execInstall :: ModuleID -> FilePath -> FC ()
 execInstall = undefined
 
 execLaunch :: String -> FC ()
@@ -70,9 +62,6 @@ execReset = CPU.reset
 execSuspend :: FC ()
 execSuspend = CPU.halt
 
-execEngage :: FC ()
-execEngage = CPU.power True
-
 execFormat :: FC ()
 execFormat = FS.format
 
@@ -82,10 +71,16 @@ execCall (FSCall f)     = execFSAction f
 execCall (GPIOCall g)   = execGPIOAction g
 execCall (LEDCall l)    = execLEDAction l
 execCall (SPICall s)    = execSPIAction s
-execCall (UARTCall u)   = execUSARTAction u
+execCall (UARTCall u)   = execUARTAction u
 
 execButtonAction :: ButtonAction -> FC ()
 execButtonAction ButtonRead = Button.read >>= printFC
+
+execFSAction :: FSAction -> FC ()
+execFSAction (FSCreateFromString n c) = FS.create n c
+execFSAction (FSCreateFromFile n fp)  = liftFC (BS.readFile fp) >>= FS.create n
+execFSAction (FSRemove n)             = FS.remove n
+execFSAction (FSRename t f)           = FS.rename t f
 
 execGPIOAction :: GPIOAction -> FC ()
 execGPIOAction (GPIODigitalDirection p d) = GPIO.digitalDirection p d
@@ -99,18 +94,18 @@ execLEDAction :: LEDAction -> FC ()
 execLEDAction (LEDSetRGB c) = LED.setRGB c
 
 execSPIAction :: SPIAction -> FC ()
-execSPIAction SPIEnable                 = SPI.enable
-execSPIAction SPIDisable                = SPI.disable
-execSPIAction (SPIRead i)               = SPI.pull i >>= printCStringFC
-execSPIAction (SPIWriteFromString s)    = SPI.push s
-execSPIAction (SPIWriteFromFilePath fp) = withFileFC fp SPI.push
+execSPIAction SPIEnable              = SPI.enable
+execSPIAction SPIDisable             = SPI.disable
+execSPIAction SPIRead                = SPI.pull >>= printCStringFC
+execSPIAction (SPIWriteFromString s) = SPI.push s
+execSPIAction (SPIWriteFromFile fp)  = liftFC (BS.readFile fp) >>= SPI.push
 
 execUARTAction :: UARTAction -> FC ()
-execUARTAction UARTEnable                 = UART.enable
-execUARTAction UARTDisable                = UART.disable
-execUARTAction (UARTRead i)               = UART.pull i >>= printCStringFC
-execUARTAction (UARTWriteFromString s)    = UART.push s
-execUARTAction (UARTWriteFromFilePath fp) = withFileFC fp UART.push
+execUARTAction UARTEnable              = UART.enable
+execUARTAction UARTDisable             = UART.disable
+execUARTAction UARTRead                = UART.pull >>= printCStringFC
+execUARTAction (UARTWriteFromString s) = UART.push s
+execUARTAction (UARTWriteFromFile fp)  = liftFC (BS.readFile fp) >>= UART.push
 
 fcREPL :: FC ()
 fcREPL = do

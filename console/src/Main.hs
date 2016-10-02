@@ -7,9 +7,7 @@ import Control.Monad.Trans.Class
 import Flipper
 import Flipper.MonadFlipper
 
-import Flipper.Console.Action
 import Flipper.Console.Exec
-import Flipper.Console.Parsers
 import Flipper.Console.Options
 
 import Options.Applicative

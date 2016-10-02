@@ -2,12 +2,14 @@ module Flipper.Console.Action where
 
 import Data.Word
 
+import Flipper.GPIO
+import Flipper.LED
+
 data ConsoleAction = Flash FilePath
                    | Install ModuleID FilePath
                    | Launch String
                    | Reset
                    | Suspend
-                   | Engage
                    | Format
                    | ConsoleCall Call
                    deriving (Eq, Ord, Show)
@@ -45,14 +47,14 @@ data LEDAction = LEDSetRGB RGB
 
 data SPIAction = SPIEnable
                | SPIDisable
-               | SPIRead Int
+               | SPIRead
                | SPIWriteFromString String
                | SPIWriteFromFile FilePath
                deriving (Eq, Ord, Show)
 
 data UARTAction = UARTEnable
                 | UARTDisable
-                | UARTRead Int
+                | UARTRead
                 | UARTWriteFromString String
-                | UARTWriteFromFilePath String
+                | UARTWriteFromFile String
                 deriving (Eq, Ord, Show)

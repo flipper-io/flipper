@@ -6,10 +6,8 @@ import Data.Foldable
 import Data.Word
 
 import Flipper
-import Flipper.FS
-import Flipper.IO (DigitalPin(..), AnalogPin(..), Direction(..))
+import Flipper.GPIO (DigitalPin(..), AnalogPin(..), Direction(..))
 import Flipper.LED
-import Flipper.USART
 
 import Flipper.Console.Action
 import Flipper.Console.Parsers
@@ -48,7 +46,6 @@ action = builtin <|> (ConsoleCall <$> call)
                                         , command "launch" launch
                                         , command "reset" reset
                                         , command "suspend" suspend
-                                        , command "engage" engage
                                         , command "format" format
                                         ]
 
@@ -61,7 +58,7 @@ flash = info (Flash <$> flashP) flashI
                                        ]
 
 install :: ParserInfo ConsoleAction
-install = info (Install <$> bundleID <*> installP) installI
+install = info (Install <$> moduleID <*> installP) installI
     where installI = mconcat [ fullDesc
                              ]
           installP = strOption $ mconcat [ metavar "MODULE_FILE"
@@ -86,11 +83,6 @@ suspend = info (pure Suspend) suspendI
     where suspendI = mconcat [ fullDesc
                              ]
 
-engage :: ParserInfo ConsoleAction
-engage = info (pure Engage) engageI
-    where engageI = mconcat [ fullDesc
-                            ]
-
 format :: ParserInfo ConsoleAction
 format = info (pure Format) formatI
     where formatI = mconcat [ fullDesc
@@ -98,15 +90,11 @@ format = info (pure Format) formatI
 
 call :: Parser Call
 call = subparser $ mconcat [ command "button" (ButtonCall <$> button)
-                           , command "config" (ConfigCall <$> config)
-                           , command "io" (IOCall <$> io)
+                           , command "fs" (FSCall <$> fs)
+                           , command "gpio" (GPIOCall <$> gpio)
                            , command "led" (LEDCall <$> led)
-                           , command "nvm" (NVMCall <$> nvm)
                            , command "spi" (SPICall <$> spi)
-                           , command "usart0" (USARTCall <$> (usart USART0))
-                           , command "usart1" (USARTCall <$> (usart USART1))
-                           , command "dbgu" (USARTCall <$> (usart DBGU))
-                           , command "usb" (USBCall <$> usb)
+                           , command "uart" (UARTCall <$> uart)
                            ]
 
 button :: ParserInfo ButtonAction
@@ -114,13 +102,18 @@ button = info buttonRead buttonI
     where buttonI = mconcat [ fullDesc
                             ]
 
-config :: ParserInfo ConfigAction
-config = info (configRead <|> configWrite) configI
-    where configI = mconcat [ fullDesc
-                            ]
+fs :: ParserInfo FSAction
+fs = info fsP fsI
+    where fsP = asum [ fsCreateFromString
+--                     , fsCreateFromFile
+                     , fsRemove
+                     , fsRename
+                     ]
+          fsI = mconcat [ fullDesc
+                        ]
 
-io :: ParserInfo IOAction
-io = info (ioDirection <|> ioRead <|> ioWrite) ioI
+gpio :: ParserInfo GPIOAction
+gpio = info (gpioDirection <|> gpioRead <|> gpioWrite) ioI
     where ioI = mconcat  [ fullDesc
                          ]
 
@@ -129,19 +122,6 @@ led = info ledRGB ledI
     where ledI = mconcat [ fullDesc
                          ]
 
-nvm :: ParserInfo NVMAction
-nvm = info nvmP nvmI
-    where nvmI = mconcat [ fullDesc
-                         ]
-          nvmP = asum [ nvmEnable
-                      , nvmDisable
-                      , nvmReset
-                      , nvmFormat
-                      , nvmAlloc
-                      , nvmRead
-                      , nvmWrite
-                      ]
-
 spi :: ParserInfo SPIAction
 spi = info spiP spiI
     where spiI = mconcat [ fullDesc
@@ -149,40 +129,35 @@ spi = info spiP spiI
           spiP = asum [ spiEnable
                       , spiDisable
                       , spiRead
-                      , spiWrite
+                      , spiWriteFromString
+--                      , spiWriteFromFile
                       ]
 
-usart :: USART -> ParserInfo USARTAction
-usart u = info (usartP <*> pure u) usartI
-    where usartI = mconcat [ fullDesc
-                           ]
-          usartP = asum [ usartEnable
-                        , usartDisable
-                        , usartRead
-                        , usartWrite
-                        ]
-
-usb :: ParserInfo USBAction
-usb = info usbP usbI
-    where usbI = mconcat [ fullDesc
-                         ]
-          usbP = asum [ usbEnable
-                      , usbDisable
-                      , usbRead
-                      , usbWrite
-                      ]
+uart :: ParserInfo UARTAction
+uart = info uartP uartI
+    where uartI = mconcat [ fullDesc
+                          ]
+          uartP = asum [ uartEnable
+                       , uartDisable
+                       , uartRead
+                       , uartWriteFromString
+--                       , uartWriteFromFile
+                       ]
 
 buttonRead :: Parser ButtonAction
 buttonRead = subparser (command "read" (info (pure ButtonRead) mempty))
 
-configRead :: Parser ConfigAction
-configRead = subparser (command "read" (info (ConfigRead <$> word8) mempty))
+fsCreateFromString :: Parser FSAction
+fsCreateFromString = subparser (command "create" (info (FSCreateFromString <$> strOption mempty <*> strOption mempty) mempty))
 
-configWrite :: Parser ConfigAction
-configWrite = subparser (command "write" (info (ConfigWrite <$> word8 <*> word16) mempty))
+fsRemove :: Parser FSAction
+fsRemove = subparser (command "remove" (info (FSRemove <$> strOption mempty) mempty))
 
-ioDirection :: Parser IOAction
-ioDirection = subparser (command "direction" (info (digitalDirection <|> analogDirection) mempty))
+fsRename :: Parser FSAction
+fsRename = subparser (command "rename" (info (FSRename <$> strOption mempty <*> strOption mempty) mempty))
+
+gpioDirection :: Parser GPIOAction
+gpioDirection = subparser (command "direction" (info (digitalDirection <|> analogDirection) mempty))
 
 digitalPin :: Parser DigitalPin
 digitalPin = argument (readParser parseDigitalPin) mempty
@@ -193,53 +168,32 @@ analogPin = argument (readParser parseAnalogPin) mempty
 direction :: Parser Direction
 direction = argument (readParser parseDirection) mempty
 
-digitalDirection :: Parser IOAction
-digitalDirection = IODigitalDirection <$> digitalPin <*> direction
+digitalDirection :: Parser GPIOAction
+digitalDirection = GPIODigitalDirection <$> digitalPin <*> direction
 
-analogDirection :: Parser IOAction
-analogDirection = IOAnalogDirection <$> analogPin <*> direction
+analogDirection :: Parser GPIOAction
+analogDirection = GPIOAnalogDirection <$> analogPin <*> direction
 
-ioRead :: Parser IOAction
-ioRead = subparser (command "read" (info (digitalRead <|> analogRead) mempty))
+gpioRead :: Parser GPIOAction
+gpioRead = subparser (command "read" (info (digitalRead <|> analogRead) mempty))
 
-digitalRead :: Parser IOAction
-digitalRead = IODigitalRead <$> digitalPin
+digitalRead :: Parser GPIOAction
+digitalRead = GPIODigitalRead <$> digitalPin
 
-analogRead :: Parser IOAction
-analogRead = IOAnalogRead <$> analogPin
+analogRead :: Parser GPIOAction
+analogRead = GPIOAnalogRead <$> analogPin
 
-ioWrite :: Parser IOAction
-ioWrite = subparser (command "write" (info (digitalWrite <|> analogWrite) mempty))
+gpioWrite :: Parser GPIOAction
+gpioWrite = subparser (command "write" (info (digitalWrite <|> analogWrite) mempty))
 
-digitalWrite :: Parser IOAction
-digitalWrite = IODigitalWrite <$> digitalPin <*> bool
+digitalWrite :: Parser GPIOAction
+digitalWrite = GPIODigitalWrite <$> digitalPin <*> bool
 
-analogWrite :: Parser IOAction
-analogWrite = IOAnalogWrite <$> analogPin <*> word16
+analogWrite :: Parser GPIOAction
+analogWrite = GPIOAnalogWrite <$> analogPin <*> word16
 
 ledRGB :: Parser LEDAction
 ledRGB = subparser (command "rgb" (info (LEDSetRGB <$> rgb) mempty))
-
-nvmEnable :: Parser NVMAction
-nvmEnable = subparser (command "enable" (info (pure NVMEnable) mempty))
-
-nvmDisable :: Parser NVMAction
-nvmDisable = subparser (command "disable" (info (pure NVMDisable) mempty))
-
-nvmReset :: Parser NVMAction
-nvmReset = subparser (command "reset" (info (pure NVMDisable) mempty))
-
-nvmFormat :: Parser NVMAction
-nvmFormat = subparser (command "format" (info (pure NVMDisable) mempty))
-
-nvmAlloc :: Parser NVMAction
-nvmAlloc = subparser (command "alloc" (info (NVMAlloc <$> allocSize) mempty))
-
-nvmRead :: Parser NVMAction
-nvmRead = subparser (command "read" (info (NVMRead <$> fshandle) mempty))
-
-nvmWrite :: Parser NVMAction
-nvmWrite = subparser (command "write" (info (NVMWrite <$> fshandle <*> strOption mempty) mempty))
 
 spiEnable :: Parser SPIAction
 spiEnable = subparser (command "enable" (info (pure SPIEnable) mempty))
@@ -250,35 +204,23 @@ spiDisable = subparser (command "disable" (info (pure SPIDisable) mempty))
 spiRead :: Parser SPIAction
 spiRead = subparser (command "read" (info (pure SPIRead) mempty))
 
-spiWrite :: Parser SPIAction
-spiWrite = subparser (command "write" (info (SPIWrite <$> strOption mempty) mempty))
+spiWriteFromString :: Parser SPIAction
+spiWriteFromString = subparser (command "write" (info (SPIWriteFromString <$> strOption mempty) mempty))
 
-usartEnable :: Parser (USART -> USARTAction)
-usartEnable = subparser (command "enable" (info (pure USARTEnable) mempty))
+uartEnable :: Parser UARTAction
+uartEnable = subparser (command "enable" (info (pure UARTEnable) mempty))
 
-usartDisable :: Parser (USART -> USARTAction)
-usartDisable = subparser (command "disable" (info (pure USARTDisable) mempty))
+uartDisable :: Parser UARTAction
+uartDisable = subparser (command "disable" (info (pure UARTDisable) mempty))
 
-usartRead :: Parser (USART -> USARTAction)
-usartRead = subparser (command "read" (info (pure USARTRead) mempty))
+uartRead :: Parser UARTAction
+uartRead = subparser (command "read" (info (pure UARTRead) mempty))
 
-usartWrite :: Parser (USART -> USARTAction)
-usartWrite = subparser (command "write" (info (((\s -> (\u -> USARTWrite u s))) <$> strOption mempty) mempty))
+uartWriteFromString :: Parser UARTAction
+uartWriteFromString = subparser (command "write" (info (UARTWriteFromString <$> strOption mempty) mempty))
 
-usbEnable :: Parser USBAction
-usbEnable = subparser (command "enable" (info (pure USBEnable) mempty))
-
-usbDisable :: Parser USBAction
-usbDisable = subparser (command "disable" (info (pure USBDisable) mempty))
-
-usbRead :: Parser USBAction
-usbRead = subparser (command "read" (info (pure USBRead) mempty))
-
-usbWrite :: Parser USBAction
-usbWrite = subparser (command "write" (info (USBWrite <$> strOption mempty) mempty))
-
-bundleID :: Parser BundleID
-bundleID = argument (readParser parseBundleID) mempty
+moduleID :: Parser ModuleID
+moduleID = argument (readParser parseModuleID) mempty
 
 word8 :: Parser Word8
 word8 = argument (readParser parseWord8) mempty
@@ -294,6 +236,3 @@ rgb = RGB <$> word8 <*> word8 <*> word8
 
 allocSize :: Parser Int
 allocSize = argument (readParser parseAllocSize) mempty
-
-fshandle :: Parser FSHandle
-fshandle = argument (readParser parseFSHandle) mempty

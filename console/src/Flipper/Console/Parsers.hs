@@ -8,11 +8,8 @@ import Flipper
 
 import Flipper.Console.Action
 
-import Flipper.IO
+import Flipper.GPIO
 import Flipper.LED
-import Flipper.USART
-
-import Flipper.Internal.FS
 
 import Text.Megaparsec
 import Text.Megaparsec.Lexer
@@ -28,7 +25,6 @@ parseConsoleAction = choice [ try parseFlash
                             , try parseLaunch
                             , try parseReset
                             , try parseSuspend
-                            , try parseEngage
                             , try parseFormat
                             , ConsoleCall <$> parseCall
                             ]
@@ -48,9 +44,6 @@ parseReset = string' "reset" *> pure Reset
 parseSuspend :: Parser ConsoleAction
 parseSuspend = string' "suspend" *> pure Suspend
 
-parseEngage :: Parser ConsoleAction
-parseEngage = string' "engage" *> pure Engage
-
 parseFormat :: Parser ConsoleAction
 parseFormat = string' "format" *> pure Format
 
@@ -58,9 +51,9 @@ parseCall :: Parser Call
 parseCall = choice [ ButtonCall <$> try parseButtonAction
                    , FSCall <$> parseFSAction
                    , GPIOCall <$> parseGPIOAction
-                   , LEDAction <$> parseLEDAction
+                   , LEDCall <$> parseLEDAction
                    , SPICall <$> parseSPIAction
-                   , UARTCall <$> parseUARTCall
+                   , UARTCall <$> parseUARTAction
                    ]
 
 parseButtonAction :: Parser ButtonAction
@@ -104,7 +97,7 @@ parseButtonRead :: Parser ButtonAction
 parseButtonRead = string "read" *> pure ButtonRead
 
 parseFSCreateFromString :: Parser FSAction
-parseFSCreateFromString = FSCreateFromString <$> (string "create" *> spaces *> parsEscString)
+parseFSCreateFromString = FSCreateFromString <$> (string "create" *> spaces *> parseEscString)
                                              <*> (spaces *> parseEscString)
 
 parseFSRemove :: Parser FSAction
@@ -146,12 +139,12 @@ parseSPIDisable :: Parser SPIAction
 parseSPIDisable = string' "disable" *> pure SPIDisable
 
 parseSPIRead :: Parser SPIAction
-parseSPIRead = SPIRead <$> (string' "read" *> spaces *> parseIntegerLit)
+parseSPIRead = string' "read" *> pure SPIRead
 
 parseSPIWriteFromString :: Parser SPIAction
 parseSPIWriteFromString = SPIWriteFromString <$> (string' "write" *> spaces *> parseEscString)
 
-parseUARTEnable :: Parse UARTAction
+parseUARTEnable :: Parser UARTAction
 parseUARTEnable = string' "enable" *> pure UARTEnable
 
 parseUARTDisable :: Parser UARTAction
@@ -206,7 +199,7 @@ parseRGB = RGB <$> parseWord8
                <*> (spaces *> parseWord8)
 
 parseModuleID :: Parser ModuleID
-parseModuleID = BundleID <$> sepBy1 (someTill alphaNumChar (string' ".")) (string' ".")
+parseModuleID = ModuleID <$> sepBy1 (someTill alphaNumChar (string' ".")) (string' ".")
 
 parseEscString :: Parser String
 parseEscString = string' "\"" *> esc
@@ -249,7 +242,7 @@ parseUSBEndpoint = string' "usb" *> option (USB Nothing)
                                     ((USB . Just) <$> (string' ":" *> some alphaNumChar))
 
 parseNetworkEndpoint :: Parser Endpoint
-parseNetworkEndpoint = Network <$> (some (alphaNumChar <|> char '.'))
+parseNetworkEndpoint = Network <$> (some alphaNumChar) <*> (some (alphaNumChar <|> char '.'))
 
 parseFVMEndpoint :: Parser Endpoint
 parseFVMEndpoint = string' "fvm" *> pure FVM
