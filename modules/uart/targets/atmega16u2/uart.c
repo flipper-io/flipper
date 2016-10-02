@@ -1,4 +1,3 @@
-
 #define __private_include__
 #include <flipper/uart.h>
 #include <platform/atmega16u2.h>
@@ -6,15 +5,13 @@
 void uart_configure(void) {
 #define BAUD PLATFORM_BAUDRATE
 #include <util/setbaud.h>
-UBRR1H = 0x00;
-UBRR1L = 0x08;
-// 	UBRR1H = UBRRH_VALUE;
-// 	UBRR1L = UBRRL_VALUE;
-// #if USE_2X
-//     UCSR1A |= (1 << U2X1);
-// #else
-//     UCSR1A &= ~(1 << U2X1);
-// #endif
+	UBRR1H = UBRRH_VALUE;
+	UBRR1L = UBRRL_VALUE;
+#if USE_2X
+    UCSR1A |= (1 << U2X1);
+#else
+    UCSR1A &= ~(1 << U2X1);
+#endif
 	UCSR1C = (1 << USBS1) | (3 << UCSZ10);
 	UCSR1B = (1 << RXEN1) | (1 << TXEN1);
 	/* Enable the USART interrupt. */
@@ -38,9 +35,10 @@ void uart_put(uint8_t byte) {
 	UDR1 = byte;
 }
 
+
 uint8_t uart_get(void) {
 	uint16_t timeout = 0;
-	while (!uart_ready() && timeout != -1) timeout ++;
+	while (!(UCSR1A & (1 << RXC1)) && timeout != -1) timeout ++;
 	return UDR1;
 }
 
