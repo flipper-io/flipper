@@ -5,6 +5,10 @@
 /* Expose the error message strings. */
 char *messages[] = { LF_ERROR_MESSAGE_STRINGS };
 
+int error_configure(void) {
+	return lf_success;
+}
+
 void error_raise(lf_error_t error, const char *format, ...) {
 	lf_error_t _error = error;
 	/* Record the observed error. */

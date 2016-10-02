@@ -147,7 +147,7 @@ void fmr_append(struct _fmr_list *list, fmr_type type, fmr_va value);
 /* Removes and returns the item at the top of the list. */
 struct _fmr_arg *fmr_pop(struct _fmr_list *list);
 /* Frees an fmr_list. */
-void fmr_free(struct _fmr_list *list);
+int fmr_free(struct _fmr_list *list);
 /* Binds a module to its counterpart the selected Flipper device. */
 int fmr_bind(struct _fmr_module *module, char *name);
 /* Generates the appropriate data structure needed for the remote procedure call of 'funtion' in 'module'. */
@@ -155,7 +155,7 @@ int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *arg
 /* Executes a standard module. */
 fmr_return fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, fmr_types types, void *arguments);
 /* Executes an fmr_packet and stores the result of the operation in the result buffer provided. */
-void fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result);
+int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result);
 
 /* Helper function for lf_push. */
 void fmr_push(fmr_module module, fmr_function function, lf_size_t length);
