@@ -37,3 +37,15 @@ void fs_read(char *name) {
 nvm_p fs_data(char *name) {
     return 0;
 }
+
+// FIX ME
+uint8_t fs_get()
+{
+	return 0;
+}
+
+// FIX ME
+void fs_put(uint8_t c)
+{
+	return;
+}
