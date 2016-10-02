@@ -2,7 +2,6 @@ module Flipper.Console.Options where
 
 import Control.Applicative
 
-import Data.Foldable
 import Data.Word
 
 import Flipper
@@ -109,23 +108,27 @@ button = info (hsubparser buttonRead) buttonI
 
 fs :: ParserInfo FSAction
 fs = info fsP fsI
-    where fsP = asum [ fsCreateFromString
---                     , fsCreateFromFile
-                     , fsRemove
-                     , fsRename
-                     ]
+    where fsP = hsubparser $ mconcat [ fsCreateFromString
+--                                   , fsCreateFromFile
+                                     , fsRemove
+                                     , fsRename
+                                     ]
           fsI = mconcat [ fullDesc
                         , progDesc "Interact with the device's file system."
                         ]
 
 gpio :: ParserInfo GPIOAction
-gpio = info (gpioDirection <|> gpioRead <|> gpioWrite) ioI
-    where ioI = mconcat  [ fullDesc
-                         , progDesc "Interact with the device's GPIO pins."
-                         ]
+gpio = info gpioP gpioI
+    where gpioP = hsubparser $ mconcat [ gpioDirection
+                                       , gpioRead
+                                       , gpioWrite
+                                       ]
+          gpioI = mconcat  [ fullDesc
+                           , progDesc "Interact with the device's GPIO pins."
+                           ]
 
 led :: ParserInfo LEDAction
-led = info ledRGB ledI
+led = info (hsubparser ledRGB) ledI
     where ledI = mconcat [ fullDesc
                          , progDesc "Set the device's RGB LED state."
                          ]
@@ -135,24 +138,24 @@ spi = info spiP spiI
     where spiI = mconcat [ fullDesc
                          , progDesc "Interact with the device's SPI bus."
                          ]
-          spiP = asum [ spiEnable
-                      , spiDisable
-                      , spiRead
-                      , spiWriteFromString
---                      , spiWriteFromFile
-                      ]
+          spiP = hsubparser $ mconcat [ spiEnable
+                                      , spiDisable
+                                      , spiRead
+                                      , spiWriteFromString
+--                                    , spiWriteFromFile
+                                      ]
 
 uart :: ParserInfo UARTAction
 uart = info uartP uartI
     where uartI = mconcat [ fullDesc
                           , progDesc "Interact with the device's UART bus."
                           ]
-          uartP = asum [ uartEnable
-                       , uartDisable
-                       , uartRead
-                       , uartWriteFromString
---                       , uartWriteFromFile
-                       ]
+          uartP = hsubparser $ mconcat [ uartEnable
+                                       , uartDisable
+                                       , uartRead
+                                       , uartWriteFromString
+--                                     , uartWriteFromFile
+                                       ]
 
 buttonRead :: Mod CommandFields ButtonAction
 buttonRead = command "read" (info (pure ButtonRead) readI)
@@ -160,8 +163,8 @@ buttonRead = command "read" (info (pure ButtonRead) readI)
                           , progDesc "Read the device's button state."
                           ]
 
-fsCreateFromString :: Parser FSAction
-fsCreateFromString = hsubparser (command "create" (info (FSCreateFromString <$> strArgument fnameP <*> strArgument stringP) createI))
+fsCreateFromString :: Mod CommandFields FSAction
+fsCreateFromString = command "create" (info (FSCreateFromString <$> strArgument fnameP <*> strArgument stringP) createI)
     where fnameP = mconcat [ help "File name to create."
                            , metavar "FILENAME"
                            ]
@@ -172,8 +175,8 @@ fsCreateFromString = hsubparser (command "create" (info (FSCreateFromString <$> 
                             , progDesc "Create a file on the device from a user-provided string."
                             ]
 
-fsRemove :: Parser FSAction
-fsRemove = hsubparser (command "remove" (info (FSRemove <$> strArgument fnameP) removeI))
+fsRemove :: Mod CommandFields FSAction
+fsRemove = command "remove" (info (FSRemove <$> strArgument fnameP) removeI)
     where fnameP = mconcat [ help "File name to remove."
                            , metavar "FILENAME"
                            ]
@@ -181,8 +184,8 @@ fsRemove = hsubparser (command "remove" (info (FSRemove <$> strArgument fnameP) 
                             , progDesc "Remove a file on the device."
                             ]
 
-fsRename :: Parser FSAction
-fsRename = hsubparser (command "rename" (info (FSRename <$> strArgument fromP <*> strArgument toP) renameI))
+fsRename :: Mod CommandFields FSAction
+fsRename = command "rename" (info (FSRename <$> strArgument fromP <*> strArgument toP) renameI)
     where fromP = mconcat [ help "Old file name."
                           , metavar "FROM"
                           ]
@@ -193,8 +196,8 @@ fsRename = hsubparser (command "rename" (info (FSRename <$> strArgument fromP <*
                             , progDesc "Rename a file on the device."
                             ]
 
-gpioDirection :: Parser GPIOAction
-gpioDirection = hsubparser (command "direction" (info (digitalDirection <|> analogDirection) directionI))
+gpioDirection :: Mod CommandFields GPIOAction
+gpioDirection = command "direction" (info (digitalDirection <|> analogDirection) directionI)
     where directionI = mconcat [ fullDesc
                                , progDesc "Set a GPIO pin's I/O direction."
                                ]
@@ -223,8 +226,8 @@ digitalDirection = GPIODigitalDirection <$> digitalPin <*> direction
 analogDirection :: Parser GPIOAction
 analogDirection = GPIOAnalogDirection <$> analogPin <*> direction
 
-gpioRead :: Parser GPIOAction
-gpioRead = hsubparser (command "read" (info (digitalRead <|> analogRead) readI))
+gpioRead :: Mod CommandFields GPIOAction
+gpioRead = command "read" (info (digitalRead <|> analogRead) readI)
     where readI = mconcat [ fullDesc
                           , progDesc "Read a GPIO pin's value."
                           ]
@@ -235,8 +238,8 @@ digitalRead = GPIODigitalRead <$> digitalPin
 analogRead :: Parser GPIOAction
 analogRead = GPIOAnalogRead <$> analogPin
 
-gpioWrite :: Parser GPIOAction
-gpioWrite = hsubparser (command "write" (info (digitalWrite <|> analogWrite) writeI))
+gpioWrite :: Mod CommandFields GPIOAction
+gpioWrite = command "write" (info (digitalWrite <|> analogWrite) writeI)
     where writeI = mconcat [ fullDesc
                            , progDesc "Set a GPIO pin's state."
                            ]
@@ -247,31 +250,31 @@ digitalWrite = GPIODigitalWrite <$> digitalPin <*> bool
 analogWrite :: Parser GPIOAction
 analogWrite = GPIOAnalogWrite <$> analogPin <*> word16
 
-ledRGB :: Parser LEDAction
-ledRGB = hsubparser (command "rgb" (info (LEDSetRGB <$> rgb) rgbI))
+ledRGB :: Mod CommandFields LEDAction
+ledRGB = command "rgb" (info (LEDSetRGB <$> rgb) rgbI)
     where rgbI = mconcat [ fullDesc
                          , progDesc "Set the device's LED RGB state."
                          ]
 
-spiEnable :: Parser SPIAction
-spiEnable = hsubparser (command "enable" (info (pure SPIEnable) enableI))
+spiEnable :: Mod CommandFields SPIAction
+spiEnable = command "enable" (info (pure SPIEnable) enableI)
     where enableI = mconcat [ fullDesc
                             , progDesc "Enable the SPI bus."
                             ]
-spiDisable :: Parser SPIAction
-spiDisable = hsubparser (command "disable" (info (pure SPIDisable) disableI))
+spiDisable :: Mod CommandFields SPIAction
+spiDisable = command "disable" (info (pure SPIDisable) disableI)
     where disableI = mconcat [ fullDesc
                              , progDesc "Disable the SPI bus."
                              ]
 
-spiRead :: Parser SPIAction
-spiRead = hsubparser (command "read" (info (pure SPIRead) readI))
+spiRead :: Mod CommandFields SPIAction
+spiRead = command "read" (info (pure SPIRead) readI)
     where readI = mconcat [ fullDesc
                           , progDesc "Read a null-terminated string from the SPI bus."
                           ]
 
-spiWriteFromString :: Parser SPIAction
-spiWriteFromString = hsubparser (command "write" (info (SPIWriteFromString <$> strArgument stringP) writeI))
+spiWriteFromString :: Mod CommandFields SPIAction
+spiWriteFromString = command "write" (info (SPIWriteFromString <$> strArgument stringP) writeI)
     where stringP = mconcat [ metavar "PAYLOAD"
                             , help "The string to send over SPI."
                             ]
@@ -279,26 +282,26 @@ spiWriteFromString = hsubparser (command "write" (info (SPIWriteFromString <$> s
                            , progDesc "Write a null-terminated string to the SPI bus."
                            ]
 
-uartEnable :: Parser UARTAction
-uartEnable = hsubparser (command "enable" (info (pure UARTEnable) enableI))
+uartEnable :: Mod CommandFields UARTAction
+uartEnable = command "enable" (info (pure UARTEnable) enableI)
     where enableI = mconcat [ fullDesc
                             , progDesc "Enable the UART bus."
                             ]
 
-uartDisable :: Parser UARTAction
-uartDisable = hsubparser (command "disable" (info (pure UARTDisable) disableI))
+uartDisable :: Mod CommandFields UARTAction
+uartDisable = command "disable" (info (pure UARTDisable) disableI)
     where disableI = mconcat [ fullDesc
                              , progDesc "Disable the UART bus."
                              ]
 
-uartRead :: Parser UARTAction
-uartRead = hsubparser (command "read" (info (pure UARTRead) readI))
+uartRead :: Mod CommandFields UARTAction
+uartRead = command "read" (info (pure UARTRead) readI)
     where readI = mconcat [ fullDesc
                           , progDesc "Read a null-terminated string from the UART bus."
                           ]
 
-uartWriteFromString :: Parser UARTAction
-uartWriteFromString = hsubparser (command "write" (info (UARTWriteFromString <$> strArgument stringP) writeI))
+uartWriteFromString :: Mod CommandFields UARTAction
+uartWriteFromString = command "write" (info (UARTWriteFromString <$> strArgument stringP) writeI)
     where stringP = mconcat [ metavar "PAYLOAD"
                             , help "The string to send over UART."
                             ]
