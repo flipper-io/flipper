@@ -276,6 +276,13 @@ connected:
 		}
 	}
 
+	/* Read the contents of flash. */
+	printf("\n\n");
+	for (int i = 0; i < 8; i ++) {
+		uint32_t word = sam_ba_read_word(IFLASH_ADDR + (i * sizeof(uint32_t)));
+		printf("0x%08x\n", word);
+	}
+
 	printf(KGRN "\n Successfully uploaded new firmware.\n" KNRM);
 
 	printf("Resetting the CPU.\n");

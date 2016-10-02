@@ -44,7 +44,8 @@ def build(bld):
     # Build libflipper.
     bld.recurse('libflipper')
     # Build the tests.
-    bld.recurse('tests')
+    for test in [os.path.basename(test) for test in map(str, bld.path.ant_glob('tests/*', dir=True, src=False))]:
+        bld.recurse('tests/' + test)
     # Build the console.
     bld.recurse('console')
     # Install the top-level headers.
