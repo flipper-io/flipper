@@ -120,21 +120,24 @@ instance Functor Get where
 
 instance Applicative Get where
     pure x              = Get (`Done` x)
-    (Get f) <*> (Get x) = Get $ \b -> case f b of (Done b' f')   -> fmap f' (x b')
-                                                  (WantMore l c) -> WantMore l (c <*> Get x)
-                                                  (Failure b' e) -> Failure b' e
+    (Get f) <*> (Get x) = Get $ \b -> case f b of
+        (Done b' f')   -> fmap f' (x b')
+        (WantMore l c) -> WantMore l (c <*> Get x)
+        (Failure b' e) -> Failure b' e
 
 instance Alternative Get where
     empty               = fail "empty"
-    (Get x) <|> (Get y) = Get $ \b -> case x b of (Done b' x')   -> Done b' x'
-                                                  (WantMore l c) -> WantMore l (c <|> Get (y . (b `append`)))
-                                                  (Failure b' _) -> y b'
+    (Get x) <|> (Get y) = Get $ \b -> case x b of
+        (Done b' x')   -> Done b' x'
+        (WantMore l c) -> WantMore l (c <|> Get (y . (b `append`)))
+        (Failure b' _) -> y b'
 
 instance Monad Get where
     return        = pure
-    (Get x) >>= f = Get $ \b -> case x b of (Done b' x')   -> unGet (f x') b'
-                                            (WantMore l c) -> WantMore l (c >>= f)
-                                            (Failure b' e) -> Failure b' e
+    (Get x) >>= f = Get $ \b -> case x b of
+        (Done b' x')   -> unGet (f x') b'
+        (WantMore l c) -> WantMore l (c >>= f)
+        (Failure b' e) -> Failure b' e
     fail e        = Get $ \b -> Failure b e
 
 instance MonadPlus Get where
@@ -155,20 +158,23 @@ runGet (Get g) = checkResult . g
 
 -- | Run a 'Get' that may be supplied more input.
 runGetWith :: Monad m => Get a               -- ^ The parser to run.
-                      -> (Int -> m Buffer)   -- ^ A function for requesting additional input.
+                      -> (Int -> m Buffer)   -- ^ A function for requesting
+                                             --   additional input.
                       -> Buffer              -- ^ Initial input.
                       -> m (Either String a) -- ^ Result.
-runGetWith (Get g) m i = case g i of (Done _ x)     -> return $ Right x
-                                     (WantMore l c) -> m l >>= runGetWith c m
-                                     (Failure _ e)  -> return $ Left e
+runGetWith (Get g) m i = case g i of
+    (Done _ x)     -> return $ Right x
+    (WantMore l c) -> m l >>= runGetWith c m
+    (Failure _ e)  -> return $ Left e
 
 -- | Generic parser for any type with a 'Storable' instance.
 getStorable :: forall a. Storable a => Get a
-getStorable = Get $ \b@(Buffer p o l) -> let s   = sizeOf (undefined :: a)
-                                             val = Done (Buffer p (o + s) (l - s))
-                                         in if s > l then WantMore (s - l) (Get (unGet getStorable . append b))
-                                                     else unsafeDupablePerformIO $ withForeignPtr p $ \p' ->
-                                                             val <$> peek (plusPtr (castPtr p') o)
+getStorable = Get $ \b@(Buffer p o l) ->
+    let s   = sizeOf (undefined :: a)
+        val = Done (Buffer p (o + s) (l - s))
+    in if s > l then WantMore (s - l) (Get (unGet getStorable . append b))
+                else unsafeDupablePerformIO $ withForeignPtr p $ \p' ->
+                        val <$> peek (plusPtr (castPtr p') o)
 
 getWord8 :: Get Word8
 getWord8 = getStorable
@@ -211,7 +217,8 @@ getSizedBlock s
     | s <= 0    = fail "getSizedBlock: size must be greater than zero."
     | otherwise = Get g
     where g b@(Buffer p o l)
-            | l < s     = WantMore (s - l) (Get (unGet (getSizedBlock s) . append b))
+            | l < s     = WantMore (s - l)
+                                   (Get (unGet (getSizedBlock s) . append b))
             | otherwise = Done (Buffer p (o + s) (l - s)) (Buffer p o s)
 
 -- | Assumes ASCII encoding and presence of NULL terminator.

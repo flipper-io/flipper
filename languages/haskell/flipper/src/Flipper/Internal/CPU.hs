@@ -1,6 +1,6 @@
 {-|
 Module      : Flipper.Internal.CPU
-Description : Internal SAM43 CPU Module
+Description : Internal SAM4S CPU Module
 Copyright   : George Morgan, Travis Whitaker 2016
 License     : All rights reserved.
 Maintainer  : travis@flipper.io

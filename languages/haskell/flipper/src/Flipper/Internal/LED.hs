@@ -21,7 +21,10 @@ data RGB = RGB {
     red   :: Word8 -- ^ Red value.
   , green :: Word8 -- ^ Green value.
   , blue  :: Word8 -- ^ Blue value.
-  } deriving (Eq, Ord, Show)
+  } deriving ( Eq
+             , Ord
+             , Show
+             )
 
 setRGB :: RGB -> IO ()
 setRGB (RGB r g b) = c_flipper_set_rgb r g b

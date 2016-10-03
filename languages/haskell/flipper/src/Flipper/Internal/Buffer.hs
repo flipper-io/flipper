@@ -55,7 +55,8 @@ emptyBuffer = Buffer (error "nullForeignPtr") 0 0
 allocBufferSafe :: Int -> IO Buffer
 allocBufferSafe l
     | l <= 0    = error "allocBuffer: length must be greater than zero."
-    | otherwise = (\p -> Buffer (castForeignPtr p) 0 l) <$> mallocPlainForeignPtrBytes l
+    | otherwise = (\p -> Buffer (castForeignPtr p) 0 l)
+              <$> mallocPlainForeignPtrBytes l
 
 allocBuffer :: Int -> Buffer
 allocBuffer = unsafePerformIO . allocBufferSafe

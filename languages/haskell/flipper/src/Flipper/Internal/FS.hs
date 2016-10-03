@@ -33,20 +33,26 @@ import Foreign.Ptr
 
 -- | Flipper file system reference.
 newtype FSHandle = FSHandle { unFSHandle :: Word32 }
-                 deriving (Eq, Ord, Show)
+                 deriving ( Eq
+                          , Ord
+                          , Show
+                          )
 
 format :: IO ()
 format = c_fs_format
 
 create :: String -> Buffer -> IO ()
-create s (Buffer p o l) = withForeignPtr p $ \p' -> withCString s $ \s' ->
-    c_fs_create s' (p' `plusPtr` o) (fromIntegral l)
+create s (Buffer p o l) = withForeignPtr p $ \p' ->
+                          withCString s $ \s' ->
+                          c_fs_create s' (p' `plusPtr` o) (fromIntegral l)
 
 remove :: String -> IO ()
 remove s = withCString s c_fs_remove
 
 rename :: String -> String -> IO ()
-rename t f = withCString t $ \t' -> withCString f $ \f' -> c_fs_rename t' f'
+rename t f = withCString t $ \t' ->
+             withCString f $ \f' ->
+             c_fs_rename t' f'
 
 withGet :: String -> (IO Word8 -> IO a) -> IO a
 withGet s f = withCString s $ \s' -> do

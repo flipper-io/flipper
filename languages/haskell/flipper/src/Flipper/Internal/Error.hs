@@ -26,7 +26,7 @@ import Foreign.Ptr
 
 -- | An error condition, reported by the device or occuring within the
 --   @libflipper@ library.
-data FlipperError = OK                -- ^ All lcear
+data FlipperError = OK                -- ^ All clear.
                   | MemAllocFailed    -- ^ Memory allocation failed.
                   | Null              -- ^ Null pointer error.
                   | Overflow          -- ^ Overflow.
@@ -50,7 +50,10 @@ data FlipperError = OK                -- ^ All lcear
                   | Configuration     -- ^ Configuration read error.
                   | Acknowledge       -- ^ Device failed to acknowledge.
                   | Unknown           -- ^ Unknown error.
-                  deriving (Eq, Ord, Show)
+                  deriving ( Eq
+                           , Ord
+                           , Show
+                           )
 
 errorCode :: FlipperError -> Word16
 errorCode OK                = 0

@@ -122,7 +122,8 @@ putBufferC = (<> putStorable (0 :: Word8)) . putBuffer
 -- | 'Put' a 'Buffer' like Pascal would, with a preceeding 32-bit word
 --   indicating the length. The buffer lenght must not exceed 2^32 - 1.
 putBufferPascal :: Buffer -> Put
-putBufferPascal b@(Buffer _ _ l) = putStorable (fromIntegral l :: Word32) <> putBuffer b
+putBufferPascal b@(Buffer _ _ l) = putStorable (fromIntegral l :: Word32)
+                                <> putBuffer b
 
 -- | 'Put' for any natively marshalable data.
 putStorable :: Storable a => a -> Put

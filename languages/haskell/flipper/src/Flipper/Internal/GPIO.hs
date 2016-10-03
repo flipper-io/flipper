@@ -41,7 +41,10 @@ data DigitalPin = IO1
                 | IO14
                 | IO15
                 | IO16
-                deriving (Eq, Ord, Show)
+                deriving ( Eq
+                         , Ord
+                         , Show
+                         )
 
 data AnalogPin = A1
                | A2
@@ -51,11 +54,17 @@ data AnalogPin = A1
                | A6
                | A7
                | A8
-               deriving (Eq, Ord, Show)
+               deriving ( Eq
+                        , Ord
+                        , Show
+                        )
 
 data Direction = Input
                | Output
-               deriving (Eq, Ord, Show)
+               deriving ( Eq
+                        , Ord
+                        , Show
+                        )
 
 digPinCode :: DigitalPin -> Word8
 digPinCode IO1  = 1

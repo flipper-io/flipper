@@ -80,9 +80,8 @@ This struct may be represented with the following Haskell data type:
 >    a    :: Word8
 >  , pad1 :: Padding 1
 >  , b    :: Word16
->  , pad2 :: Padding 2
 >  , c    :: Word8
->  , pad3 :: Padding 3
+>  , pad2 :: Padding 3
 >  , d    :: Word32
 >  } deriving (Generic, Bufferable)
 
@@ -112,8 +111,8 @@ Another technique is to lead the array with an unsigned integer providing the
 number of elements in the array. Applied to character data, such a structure is
 known as a Pascal string. The 'SizedSequence' data type provides 'Bufferable'
 instances for such structures. A value of type @SizedSequence a l@ will first
-look read a quantity of type @l@, and then read @l@ following elements. Here @l@
-is a phantom type that merely encodes what sort of integer is present at the
+read a quantity of type @l@, and then read @l@ following elements. Here @l@ is a
+phantom type that merely encodes what sort of integer is present at the
 beginning of the array. Analogously the generated serializer will encode the
 length of the sequence as type @l@, then encode adjacent values of type @a@. An
 example for 32-bit led Pascal strings:
@@ -329,28 +328,45 @@ class Bufferable a where
     default get :: (Generic a, GBufferable (Rep a)) => Get a
     get = to <$> gget
 
-instance (Bufferable a, Bufferable s, Sentinel s) => Bufferable (SentinelSequence a s) where
+instance ( Bufferable a
+         , Bufferable s
+         , Sentinel s
+         ) => Bufferable (SentinelSequence a s) where
     put (SentinelSequence as) = mconcat (map put as) <> put (sentinel :: s)
     get = SentinelSequence <$> g
         where g = (Nothing <$ (get :: Get s)) <|> (Just <$> (get :: Get a))
                   >>= \case Nothing  -> return []
                             (Just v) -> (v:) <$> g
 
-instance (Bufferable a, Integral l, Num l, Bufferable l) => Bufferable (SizedSequence a l) where
-    put (SizedSequence as) = put (fromIntegral (length as) :: l) <> mconcat (map put as)
-    get = SizedSequence <$> ((get :: Get l) >>= (\s -> replicateM (fromIntegral s) (get :: Get a)))
+instance ( Bufferable a
+         , Integral l
+         , Num l
+         , Bufferable l
+         ) => Bufferable (SizedSequence a l) where
+    put (SizedSequence as) = put (fromIntegral (length as) :: l)
+                          <> mconcat (map put as)
+    get = SizedSequence <$> ( (get :: Get l) >>= (\s ->
+                              replicateM (fromIntegral s) (get :: Get a))
+                            )
 
 instance Bufferable CBlock where
     put = putBufferC . fromByteString . unCBlock
     get = (CBlock . B.pack) <$> getCBlock
 
-instance (Bufferable l, Integral l, Num l) => Bufferable (SizedByteString l) where
-    put (SizedByteString bs) = put (fromIntegral (B.length bs) :: l) <> putBuffer (fromByteString bs)
-    get = SizedByteString <$> ((get :: Get l) >>= (getSizedByteString . fromIntegral))
+instance ( Bufferable l
+         , Integral l
+         , Num l
+         ) => Bufferable (SizedByteString l) where
+    put (SizedByteString bs) = put (fromIntegral (B.length bs) :: l)
+                            <> putBuffer (fromByteString bs)
+    get = SizedByteString <$> ( (get :: Get l) >>=
+                                (getSizedByteString . fromIntegral)
+                              )
 
 instance KnownNat p => Bufferable (Padding p) where
     put p = mconcat (replicate (fromIntegral (padSize p)) (putWord8 0))
-    get = getSizedBlock (fromIntegral (padSize (undefined :: Padding p))) *> pure undefined
+    get = getSizedBlock (fromIntegral (padSize (undefined :: Padding p)))
+       *> pure undefined
 
 instance Bufferable Bool where
     put = putStorable

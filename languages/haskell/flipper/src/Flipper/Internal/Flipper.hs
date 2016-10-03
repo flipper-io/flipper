@@ -22,12 +22,14 @@ import Flipper.Internal.Utils
 import Foreign.C.String
 import Foreign.C.Types
 
-
 -- | An endpoint via which a Flipper device may be attached.
 data Endpoint = USB (Maybe String)    -- ^ Local connection via USB.
               | Network String String -- ^ Remote connection via TCP/UDP.
               | FVM                   -- ^ Flipper simulation via FVM.
-              deriving (Eq, Ord, Show)
+              deriving ( Eq
+                       , Ord
+                       , Show
+                       )
 
 select :: String -> IO Bool
 select n = withCString n ((retSuc <$>) . c_flipper_select)
@@ -35,7 +37,10 @@ select n = withCString n ((retSuc <$>) . c_flipper_select)
 attach :: Endpoint -> IO Bool
 attach   (USB Nothing) = pause >> withCString "flipper" ((retSuc <$>) . c_flipper_attach_usb)
 attach (USB (Just n))  = pause >> withCString n ((retSuc <$>) . c_flipper_attach_usb)
-attach (Network n h)   = pause >> withCString n (\n' -> withCString h (\h' -> retSuc <$> c_flipper_attach_network n' h'))
+attach (Network n h)   = pause >> withCString n (\n' ->
+                                  withCString h (\h' ->
+                                  retSuc <$> c_flipper_attach_network n' h'
+                                  ))
 attach FVM             = pause >> return False
 
 detach :: String -> IO Bool
