@@ -100,6 +100,10 @@ parseFSCreateFromString :: Parser FSAction
 parseFSCreateFromString = FSCreateFromString <$> (string "create" *> spaces *> parseEscString)
                                              <*> (spaces *> parseEscString)
 
+parseFSCreateFromFile :: Parser FSAction
+parseFSCreateFromFile = FSCreateFromFile <$> (string "createfile" *> spaces *> parseEscString)
+                                         <*> (spaces *> parseEscString)
+
 parseFSRemove :: Parser FSAction
 parseFSRemove = FSRemove <$> (string' "remove" *> spaces *> parseEscString)
 
@@ -144,6 +148,9 @@ parseSPIRead = string' "read" *> pure SPIRead
 parseSPIWriteFromString :: Parser SPIAction
 parseSPIWriteFromString = SPIWriteFromString <$> (string' "write" *> spaces *> parseEscString)
 
+parseSPIWriteFromFile :: Parser SPIAction
+parseSPIWriteFromFile = SPIWriteFromFile <$> (string' "writefile" *> spaces *> parseEscString)
+
 parseUARTEnable :: Parser UARTAction
 parseUARTEnable = string' "enable" *> pure UARTEnable
 
@@ -155,6 +162,9 @@ parseUARTRead = string' "read" *> pure UARTRead
 
 parseUARTWriteFromString :: Parser UARTAction
 parseUARTWriteFromString = UARTWriteFromString <$> (string' "write" *> spaces *> parseEscString)
+
+parseUARTWriteFromFile :: Parser UARTAction
+parseUARTWriteFromFile = UARTWriteFromFile <$> (string' "writefile" *> spaces *> parseEscString)
 
 parseDigitalPin :: Parser DigitalPin
 parseDigitalPin = choice [ try (string' "10" *> pure IO10)

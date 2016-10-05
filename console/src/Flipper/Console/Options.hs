@@ -109,7 +109,7 @@ button = info (hsubparser buttonRead) buttonI
 fs :: ParserInfo FSAction
 fs = info fsP fsI
     where fsP = hsubparser $ mconcat [ fsCreateFromString
---                                   , fsCreateFromFile
+                                     , fsCreateFromFile
                                      , fsRemove
                                      , fsRename
                                      ]
@@ -142,7 +142,7 @@ spi = info spiP spiI
                                       , spiDisable
                                       , spiRead
                                       , spiWriteFromString
---                                    , spiWriteFromFile
+                                      , spiWriteFromFile
                                       ]
 
 uart :: ParserInfo UARTAction
@@ -154,7 +154,7 @@ uart = info uartP uartI
                                        , uartDisable
                                        , uartRead
                                        , uartWriteFromString
---                                     , uartWriteFromFile
+                                       , uartWriteFromFile
                                        ]
 
 buttonRead :: Mod CommandFields ButtonAction
@@ -173,6 +173,18 @@ fsCreateFromString = command "create" (info (FSCreateFromString <$> strArgument 
                             ]
           createI = mconcat [ fullDesc
                             , progDesc "Create a file on the device from a user-provided string."
+                            ]
+
+fsCreateFromFile :: Mod CommandFields FSAction
+fsCreateFromFile = command "createfile" (info (FSCreateFromString <$> strArgument fnameP <*> strArgument fileP) createI)
+    where fnameP = mconcat [ help "File name to create."
+                           , metavar "DEVICE_FILENAME"
+                           ]
+          fileP = mconcat [ help "Path to local file."
+                          , metavar "LOCAL_FILENAME"
+                          ]
+          createI = mconcat [ fullDesc
+                            , progDesc "Create a file on the device from a local file."
                             ]
 
 fsRemove :: Mod CommandFields FSAction
@@ -282,6 +294,15 @@ spiWriteFromString = command "write" (info (SPIWriteFromString <$> strArgument s
                            , progDesc "Write a null-terminated string to the SPI bus."
                            ]
 
+spiWriteFromFile :: Mod CommandFields SPIAction
+spiWriteFromFile = command "writefile" (info (SPIWriteFromString <$> strArgument fileP) writeI)
+    where fileP = mconcat [ metavar "FILEPATH"
+                          , help "Path to local file."
+                          ]
+          writeI = mconcat [ fullDesc
+                           , progDesc "Write a local file to the SPI bus."
+                           ]
+
 uartEnable :: Mod CommandFields UARTAction
 uartEnable = command "enable" (info (pure UARTEnable) enableI)
     where enableI = mconcat [ fullDesc
@@ -307,6 +328,15 @@ uartWriteFromString = command "write" (info (UARTWriteFromString <$> strArgument
                             ]
           writeI = mconcat [ fullDesc
                            , progDesc "Write a null-terminated string to the UART bus."
+                           ]
+
+uartWriteFromFile :: Mod CommandFields UARTAction
+uartWriteFromFile = command "writefile" (info (UARTWriteFromString <$> strArgument fileP) writeI)
+    where fileP = mconcat [ metavar "FILEPATH"
+                          , help "Path to local file."
+                          ]
+          writeI = mconcat [ fullDesc
+                           , progDesc "Write a local file to the UART bus."
                            ]
 
 moduleID :: Parser ModuleID
