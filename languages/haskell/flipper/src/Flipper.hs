@@ -14,7 +14,7 @@ programming languages. See <http://flipper.io> for more information.
 
 In order to control the Flipper device, it must be attached over one of several
 provided interfaces, including USB, TCP/UDP, and Bluetooth. If multiple
-Flipper devices are attached to the same computer, then a single distinguished
+Flipper devices are attached to the same process, then a single distinguished
 active device is designated to receive commands. Only one device may be
 designated as active at a time and this designation is global across an instance
 of a Flipper-controlling program. However, any other device may be designated by
@@ -58,7 +58,7 @@ Or to blink the LED at 2 Hz:
 >          off  = RGB 0 0 0
 >
 > main :: IO ()
-> main = do Flipper.attach (USB Nothing) >> forever blink
+> main = Flipper.attach (USB Nothing) >> forever blink
 
 When interacting with Flipper in the 'IO' monad, any faults detected via
 Flipper's error reporting mechanism will throw Haskell exceptions. There are

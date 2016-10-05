@@ -29,7 +29,8 @@ endpoint = option (readParser parseEndpoint) opt
     where opt = mconcat [ long "endpoint"
                         , short 'e'
                         , metavar "ENDPOINT"
-                        , help "The endpoint via which Flipper will be attached."
+                        , help "The endpoint via which Flipper\
+                               \ will be attached."
                         , value (USB Nothing)
                         ]
 
@@ -164,7 +165,12 @@ buttonRead = command "read" (info (pure ButtonRead) readI)
                           ]
 
 fsCreateFromString :: Mod CommandFields FSAction
-fsCreateFromString = command "create" (info (FSCreateFromString <$> strArgument fnameP <*> strArgument stringP) createI)
+fsCreateFromString = command "create" (info ( FSCreateFromString
+                                              <$> strArgument fnameP
+                                              <*> strArgument stringP
+                                            )
+                                            createI
+                                      )
     where fnameP = mconcat [ help "File name to create."
                            , metavar "FILENAME"
                            ]
@@ -172,11 +178,17 @@ fsCreateFromString = command "create" (info (FSCreateFromString <$> strArgument 
                             , metavar "CONTENTS"
                             ]
           createI = mconcat [ fullDesc
-                            , progDesc "Create a file on the device from a user-provided string."
+                            , progDesc "Create a file on the device from a \
+                                       \user-provided string."
                             ]
 
 fsCreateFromFile :: Mod CommandFields FSAction
-fsCreateFromFile = command "createfile" (info (FSCreateFromString <$> strArgument fnameP <*> strArgument fileP) createI)
+fsCreateFromFile = command "createfile" ( info ( FSCreateFromString
+                                                 <$> strArgument fnameP
+                                                 <*> strArgument fileP
+                                               )
+                                               createI
+                                        )
     where fnameP = mconcat [ help "File name to create."
                            , metavar "DEVICE_FILENAME"
                            ]
@@ -184,7 +196,8 @@ fsCreateFromFile = command "createfile" (info (FSCreateFromString <$> strArgumen
                           , metavar "LOCAL_FILENAME"
                           ]
           createI = mconcat [ fullDesc
-                            , progDesc "Create a file on the device from a local file."
+                            , progDesc "Create a file on the device from a \
+                                       \local file."
                             ]
 
 fsRemove :: Mod CommandFields FSAction
@@ -197,7 +210,12 @@ fsRemove = command "remove" (info (FSRemove <$> strArgument fnameP) removeI)
                             ]
 
 fsRename :: Mod CommandFields FSAction
-fsRename = command "rename" (info (FSRename <$> strArgument fromP <*> strArgument toP) renameI)
+fsRename = command "rename" ( info ( FSRename
+                                     <$> strArgument fromP
+                                     <*> strArgument toP
+                                   )
+                                   renameI
+                            )
     where fromP = mconcat [ help "Old file name."
                           , metavar "FROM"
                           ]
@@ -209,7 +227,11 @@ fsRename = command "rename" (info (FSRename <$> strArgument fromP <*> strArgumen
                             ]
 
 gpioDirection :: Mod CommandFields GPIOAction
-gpioDirection = command "direction" (info (digitalDirection <|> analogDirection) directionI)
+gpioDirection = command "direction" ( info ( digitalDirection
+                                             <|> analogDirection
+                                           )
+                                           directionI
+                                    )
     where directionI = mconcat [ fullDesc
                                , progDesc "Set a GPIO pin's I/O direction."
                                ]
@@ -282,20 +304,30 @@ spiDisable = command "disable" (info (pure SPIDisable) disableI)
 spiRead :: Mod CommandFields SPIAction
 spiRead = command "read" (info (pure SPIRead) readI)
     where readI = mconcat [ fullDesc
-                          , progDesc "Read a null-terminated string from the SPI bus."
+                          , progDesc "Read a null-terminated string from the \
+                                     \SPI bus."
                           ]
 
 spiWriteFromString :: Mod CommandFields SPIAction
-spiWriteFromString = command "write" (info (SPIWriteFromString <$> strArgument stringP) writeI)
+spiWriteFromString = command "write" ( info ( SPIWriteFromString
+                                              <$> strArgument stringP
+                                            )
+                                            writeI
+                                     )
     where stringP = mconcat [ metavar "PAYLOAD"
                             , help "The string to send over SPI."
                             ]
           writeI = mconcat [ fullDesc
-                           , progDesc "Write a null-terminated string to the SPI bus."
+                           , progDesc "Write a null-terminated string to the \
+                                      \SPI bus."
                            ]
 
 spiWriteFromFile :: Mod CommandFields SPIAction
-spiWriteFromFile = command "writefile" (info (SPIWriteFromString <$> strArgument fileP) writeI)
+spiWriteFromFile = command "writefile" ( info ( SPIWriteFromString
+                                                <$> strArgument fileP
+                                              )
+                                              writeI
+                                       )
     where fileP = mconcat [ metavar "FILEPATH"
                           , help "Path to local file."
                           ]
@@ -318,20 +350,30 @@ uartDisable = command "disable" (info (pure UARTDisable) disableI)
 uartRead :: Mod CommandFields UARTAction
 uartRead = command "read" (info (pure UARTRead) readI)
     where readI = mconcat [ fullDesc
-                          , progDesc "Read a null-terminated string from the UART bus."
+                          , progDesc "Read a null-terminated string from the \
+                                     \UART bus."
                           ]
 
 uartWriteFromString :: Mod CommandFields UARTAction
-uartWriteFromString = command "write" (info (UARTWriteFromString <$> strArgument stringP) writeI)
+uartWriteFromString = command "write" ( info ( UARTWriteFromString
+                                               <$> strArgument stringP
+                                             )
+                                             writeI
+                                      )
     where stringP = mconcat [ metavar "PAYLOAD"
                             , help "The string to send over UART."
                             ]
           writeI = mconcat [ fullDesc
-                           , progDesc "Write a null-terminated string to the UART bus."
+                           , progDesc "Write a null-terminated string to the \
+                                      \UART bus."
                            ]
 
 uartWriteFromFile :: Mod CommandFields UARTAction
-uartWriteFromFile = command "writefile" (info (UARTWriteFromString <$> strArgument fileP) writeI)
+uartWriteFromFile = command "writefile" ( info ( UARTWriteFromString
+                                                 <$> strArgument fileP
+                                               )
+                                               writeI
+                                        )
     where fileP = mconcat [ metavar "FILEPATH"
                           , help "Path to local file."
                           ]

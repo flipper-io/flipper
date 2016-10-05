@@ -21,7 +21,8 @@ runOptions (Options e o) = (void . runFC) $ do
         False -> lift $ outputStrLn "No device found at that endpoint."
         True  -> case o of
             Nothing  -> fcREPL
-            (Just c) -> catchFlipper (execConsoleAction c) (reportConsoleError (Just c))
+            (Just c) -> catchFlipper (execConsoleAction c)
+                                     (reportConsoleError (Just c))
 
 main :: IO ()
 main = execParser opts >>= runOptions

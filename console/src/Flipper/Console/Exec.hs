@@ -114,9 +114,11 @@ fcREPL = do
               (Just l) -> execUserInput l *> fcREPL
 
 execUserInput :: String -> FC ()
-execUserInput l = case M.runParser parseConsoleAction "<interactive>" l
-                  of (Left e)  -> lift (outputStrLn (show e))
-                     (Right c) -> catchFlipper (execConsoleAction c) (reportConsoleError (Just c))
+execUserInput l = case M.runParser parseConsoleAction "<interactive>" l of
+    (Left e)  -> lift (outputStrLn (show e))
+    (Right c) -> catchFlipper (execConsoleAction c)
+                              (reportConsoleError (Just c))
 
 reportConsoleError :: Maybe ConsoleAction -> FlipperException -> FC ()
-reportConsoleError c (FlipperException e) = lift (outputStrLn (consoleError c e))
+reportConsoleError c (FlipperException e) =
+    lift (outputStrLn (consoleError c e))
