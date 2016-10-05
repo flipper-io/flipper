@@ -154,7 +154,8 @@ runGet :: Get a -> Buffer -> Either String a
 runGet (Get g) = checkResult . g
     where checkResult (Done _ x)     = Right x
           checkResult (Failure _ e)  = Left e
-          checkResult (WantMore _ _) = Left "runGet: parser requested more input."
+          checkResult (WantMore _ _) =
+              Left "runGet: parser requested more input."
 
 -- | Run a 'Get' that may be supplied more input.
 runGetWith :: Monad m => Get a               -- ^ The parser to run.

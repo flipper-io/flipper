@@ -36,9 +36,9 @@ The following serializer may be defined:
 >                                               , putByteString p
 >                                               ]
 
-If a 'Get' deserializer is also defined, then @SomeStruct@ may have a 'Bufferable'
-instance, so bus interfaces can be used without serialization/deserialization
-boilerplate.
+If a 'Get' deserializer is also defined, then @SomeStruct@ may have a
+'Bufferable' instance, so bus interfaces can be used without
+serialization/deserialization boilerplate.
 
 This module, like all others in this package, is intended to be imported
 @qualified@, e.g.

@@ -29,7 +29,7 @@ import Flipper.Get
 import Flipper.Put
 import Flipper.MonadFlipper
 
-import qualified Flipper.Bufferable     as B
+import qualified Flipper.Bufferable    as B
 import qualified Flipper.Internal.UART as I
 
 -- | Enable the UART bus.
