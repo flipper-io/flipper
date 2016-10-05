@@ -56,7 +56,7 @@ int fs_create(char *name, void *data, size_t length) {
 	suppress_errors(nvm_p _leaf = fs_add_leaf_with_key(_root_leaf, key));
 	if (!_leaf) {
 		/* Raise an error with the error code generated from the statement above. */
-		error_raise(E_LAST, error_message("Failed to create file named '%s'.", name));
+		error_raise(error_get(), error_message("Failed to create file named '%s'.", name));
 		return lf_error;
 	}
 	/* If there is data to copy, perform the necessary actions. */

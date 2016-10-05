@@ -30,8 +30,6 @@ enum {
 	E_NAME,
 	E_CONFIGURATION,
 	E_ACK,
-	/* Throw last error; this state is never set. */
-	E_LAST
 };
 
 /* If this flag is set, error messages are nullified on platforms that do not need to store error strings. */
@@ -58,8 +56,7 @@ enum {
 								 "checksums do not match", \
 								 "invalid name", \
 								 "configuration error", \
-								 "acknowledgement error", \
-								 NULL
+								 "acknowledgement error"
 
 /* Allow the 'error_message' macro to serve as a passthrough for any variadic arguments supplied to it. */
 #define error_message(...) __VA_ARGS__

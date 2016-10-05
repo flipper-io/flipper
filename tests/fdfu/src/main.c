@@ -4,6 +4,12 @@
 #include <platform/fvm.h>
 #include <platform/atsam4s16b.h>
 
+#define BOARD_OSCOUNT   (CKGR_MOR_MOSCXTST(0x8))
+#define BOARD_PLLBR     (CKGR_PLLBR_MULB(0x7) \
+                       | CKGR_PLLBR_PLLBCOUNT(0x1) \
+                       | CKGR_PLLBR_DIVB(0x1))
+#define BOARD_MCKR      (PMC_MCKR_PRES_CLK_2 | PMC_MCKR_CSS_PLLB_CLK)
+
 /* Defines the XMODEM flow control bytes. */
 #define SOH 0x01
 #define EOT 0x04
@@ -24,25 +30,17 @@ struct __attribute__((__packed__)) _xpacket {
 
 /* See utils/copy.s for the source of this applet. These are the raw thumb instructions that result from the compilation of the applet. */
 uint8_t applet[] = {
-	0x5F, 0xEA, 0x0E, 0x04,
-	0x05, 0x48, 0x06, 0x49,
-	0x06, 0x4A, 0x03, 0xE0,
-	0x08, 0xC9, 0x08, 0xC0,
-	0xA2, 0xF1, 0x01, 0x02,
-	0x00, 0x2A, 0xF9, 0xD1,
-	0x20, 0x47, 0x00, 0xBF,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x80, 0x00, 0x00, 0x00,
-	0xAF, 0xF3, 0x00, 0x80,
-	0xAF, 0xF3, 0x00, 0x80
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x48, 0x0A, 0x49, 0x0A, 0x4A, 0x02, 0xE0, 0x08, 0xC9, 0x08, 0xC0, 0x01, 0x3A, 0x00, 0x2A, 0xFA, 0xD1, 0x08, 0x48, 0x09, 0x49, 0x01, 0x60, 0x07, 0x48, 0x00, 0x68, 0x01, 0x21, 0x08, 0x40, 0x88, 0x42, 0xF9, 0xD1, 0x70, 0x47, 0x00, 0xBF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x04, 0x0A, 0x0E, 0x40, 0x08, 0x0A, 0x0E, 0x40, 0x03, 0x00, 0x00, 0x5A
 };
 
 /* Place the applet in RAM somewhere far away from the region used by the SAM-BA. */
-#define _APPLET IRAM_ADDR + 0x1000
+#define _APPLET IRAM_ADDR + 0x800
+#define _APPLET_STACK _APPLET
+#define _APPLET_ENTRY _APPLET + 0x04
 #define _APPLET_DESTINATION _APPLET + 0x30
 #define _APPLET_SOURCE _APPLET + 0x34
-#define _PAGEBUFFER IRAM_ADDR + 0x2000
+#define _APPLET_WORDS _APPLET + 0x38
+#define _PAGEBUFFER _APPLET + 0x100
 
 /* Instructs the SAM-BA to jump to the given address. */
 void sam_ba_jump(uint32_t address) {
@@ -66,14 +64,26 @@ uint8_t sam_ba_read_byte(uint32_t source) {
 	return uart.get();
 }
 
+/* Instructs the SAM-BA to write a byte from the address provided. */
+void sam_ba_write_byte(uint32_t destination, uint8_t byte) {
+	char buffer[20];
+	sprintf(buffer, "O%08X,%02X#", destination, byte);
+	uart.push(buffer, sizeof(buffer) - 1);
+}
+
 /* Instructs the SAM-BA to read a word from the address provided. */
 uint32_t sam_ba_read_word(uint32_t source) {
-	char buffer[12];
-	sprintf(buffer, "w%08X,#", source);
-	uart.push(buffer, sizeof(buffer) - 1);
-	uint32_t result = 0;
-	uart.pull(&result, sizeof(uint32_t));
-	return result;
+//	char buffer[12];
+//	sprintf(buffer, "w%08X,#", source);
+//	uart.push(buffer, sizeof(buffer) - 1);
+//	uint32_t result = 0;
+//	uart.pull(&result, sizeof(uint32_t));
+	uint8_t ret[4];
+	ret[0] = sam_ba_read_byte(source);
+	ret[1] = sam_ba_read_byte(source + 1);
+	ret[2] = sam_ba_read_byte(source + 2);
+	ret[3] = sam_ba_read_byte(source + 3);
+	return *(uint32_t *)ret;
 }
 
 /* Writes the given command and page number the EEFC -> FCR register. */
@@ -149,36 +159,20 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	/* Open the firmware image. */
-	FILE *firmware = fopen(argv[1], "rb");
-	if (!firmware) {
-		fprintf(stderr, "The file being opened, '%s', does not exist.\n", argv[1]);
-		return EXIT_FAILURE;
-	}
-
-	/* Open the applet image. */
-	FILE *applet_f = fopen(argv[2], "rb");
-	if (!applet_f) {
-		fprintf(stderr, "The file being opened, '%s', does not exist.\n", argv[2]);
-		return EXIT_FAILURE;
-	}
-
 	/* Attach to a Flipper device. */
 	flipper.attach();
-	uart.enable();
+
+    /* Open the firmware image. */
+    FILE *firmware = fopen(argv[1], "rb");
+    if (!firmware) {
+        fprintf(stderr, "The file being opened, '%s', does not exist.\n", argv[1]);
+        return EXIT_FAILURE;
+    }
 
 	/* Determine the size of the file. */
 	fseek(firmware, 0L, SEEK_END);
 	size_t firmware_size = ftell(firmware);
 	fseek(firmware, 0L, SEEK_SET);
-
-	/* Determine the size of the applet. */
-	fseek(applet_f, 0L, SEEK_END);
-	size_t applet_s = ftell(applet_f);
-	fseek(applet_f, 0L, SEEK_SET);
-
-	/* Obtain a linear buffer of the applet precalculated by page. */
-	void *applet_d = load_page_data(applet_f, applet_s);
 
 	printf("Entering DFU mode.\n");
 	/* Enter DFU mode. */
@@ -200,35 +194,43 @@ int main(int argc, char *argv[]) {
 
 connected:
 
-	/* Set normal mode. */
-	printf("Entering normal mode.\n");
-	uart.push("N#", 2);
-	char ack[2];
-	uart.pull(ack, sizeof(ack));
-	if (memcmp(ack, (char []){ 0x0A, 0x0D }, sizeof(ack))) {
-		fprintf(stderr, "Failed to enter normal mode.\n");
-		goto done;
-	}
-	printf(KGRN " Successfully entered normal mode.\n" KNRM);
+    /* Set normal mode. */
+    printf("Entering normal mode.\n");
+    uart.push("N#", 2);
+    char ack[2];
+    uart.pull(ack, sizeof(ack));
+    if (memcmp(ack, (char []){ 0x0A, 0x0D }, sizeof(ack))) {
+        fprintf(stderr, "Failed to enter normal mode.\n");
+        return EXIT_FAILURE;
+    }
+    printf(KGRN " Successfully entered normal mode.\n" KNRM);
 
+    printf("Checking security bit.\n");
+	sam_ba_write_efc_fcr(0x0D, 0);
+	if (sam_ba_read_word(0x400E0A0C) & 0x01) {
+		fprintf(stderr, KRED "The device's security bit is set. Please erase again.\n");
+		return EXIT_FAILURE;
+	}
+    printf(KGRN " Security bit is clear.\n" KNRM);
 
 	printf("Uploading copy applet.\n");
 	/* Move the copy applet into RAM. */
-	int _e = sam_ba_copy(_APPLET, applet_d, sizeof(applet));
+	int _e = sam_ba_copy(_APPLET, applet, sizeof(applet));
 	if (_e < lf_success) {
 		fprintf(stderr, KRED "Failed to upload copy applet.\n" KNRM);
-		goto done;
+		return EXIT_FAILURE;
 	}
-	printf(KGRN " Successfully uploaded copy applet.\n" KNRM);
+	printf(KGRN " Successfully uploaded copy applet.\n\n" KNRM);
 
+    /* Write the stack address into the applet. */
+    sam_ba_write_word(_APPLET_STACK, IRAM_ADDR + IRAM_SIZE);
+    /* Write the entry address into the applet. */
+    sam_ba_write_word(_APPLET_ENTRY, _APPLET + 0x09);
 	/* Write the source of the page data into the applet. */
-	sam_ba_write_word(_APPLET + _APPLET_SOURCE, _PAGEBUFFER);
+	sam_ba_write_word(_APPLET_SOURCE, _PAGEBUFFER);
 
 	/* Obtain a linear buffer of the firmware precalculated by page. */
 	void *pagedata = load_page_data(firmware, firmware_size);
-
-	/* Set flash wait states. */
-	sam_ba_write_word(0x400E0A00, EEFC_FMR_FWS(5));
 
 	/* Calculate the number of pages to send. */
 	lf_size_t pages = lf_ceiling(firmware_size, IFLASH_PAGE_SIZE);
@@ -246,28 +248,10 @@ connected:
 			fprintf(stderr, KRED "\nFailed to upload page %i of %i.\n" KNRM, page + 1, pages);
 			goto done;
 		}
-
-		//printf("Jumping to 0x%08x\n", _PAGEBUFFER + 1);
-		// sam_ba_write_word(0x400E0E00U, (1 << 8)); // PER
-		// sam_ba_write_word(0x400E0E10U, (1 << 8)); // OER
-		// sam_ba_write_word(0x400E0E30U, (1 << 8)); // SODR
-        // sam_ba_write_word(0x020010000, 0xeaea4f4f);
-		// sam_ba_jump(_PAGEBUFFER + 1);
-        // uint32_t sus[4];
-        // sus[0] = sam_ba_read_byte(0x020010000);
-        // sus[1] = sam_ba_read_byte(0x020010001);
-        // sus[2] = sam_ba_read_byte(0x020010002);
-        // sus[3] = sam_ba_read_byte(0x020010003);
-        // printf("\nsus: %08x\n", *(uint32_t *)sus);
-
-		/* Write the destination. */
-		sam_ba_write_word(_APPLET + _APPLET_DESTINATION, (uint32_t)(IFLASH_ADDR + (page * IFLASH_PAGE_SIZE)));
-		/* Jump to the copy applet to move the page into the flash write buffer. */
-		sam_ba_jump(_APPLET + 1);
-		/* Erase and write the page into flash. */
-		sam_ba_write_word(IFLASH_ADDR, 0xdeadbeef);
-		sam_ba_write_word(IFLASH_ADDR+4, 0xdeafbabe);
-		sam_ba_write_efc_fcr(0x03, page);
+        /* Write the destination of the page data into the applet. */
+		sam_ba_write_word(_APPLET_DESTINATION, IFLASH_ADDR + (page * IFLASH_PAGE_SIZE));
+        /* Execute the applet to load the page into flash. */
+        sam_ba_jump(_APPLET);
 		/* Clear the progress message. */
 		if (page != pages - 1) {
 			for (int j = 0; j < strlen(buf); j ++) printf("\b");
@@ -276,19 +260,19 @@ connected:
 		}
 	}
 
-	/* Read the contents of flash. */
-	printf("\n\n");
-	for (int i = 0; i < 8; i ++) {
-		uint32_t word = sam_ba_read_word(IFLASH_ADDR + (i * sizeof(uint32_t)));
-		printf("0x%08x\n", word);
-	}
+    // printf("\n\n");
+	// for (int i = 0; i < lf_ceiling(firmware_size, sizeof(uint32_t)); i ++) {
+	// 	uint32_t word = sam_ba_read_word(IFLASH_ADDR + (i * sizeof(uint32_t)));
+	// 	uint32_t _word = *(uint32_t *)(pagedata + (i * sizeof(uint32_t)));
+	// 	printf("0x%08x : 0x%08x -> %s\n", word, _word, (word == _word) ? "GOOD" : "BAD");
+	// }
 
-	printf(KGRN "\n Successfully uploaded new firmware.\n" KNRM);
-
-	printf("Resetting the CPU.\n");
+	printf("\n\nResetting the CPU.\n");
 	/* Reset the CPU. */
 	cpu.reset();
 	printf(KGRN " Successfully reset the CPU.\n" KNRM);
+
+    printf(KGRN "\nSuccessfully uploaded new firmware.\n" KNRM);
 
 done:
 	/* Free the memory allocated to hold the page data. */
