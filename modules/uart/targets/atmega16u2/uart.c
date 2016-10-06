@@ -35,10 +35,7 @@ void uart_put(uint8_t byte) {
 	UDR1 = byte;
 }
 
-
 uint8_t uart_get(void) {
-	uint16_t timeout = 0;
-	while (!(UCSR1A & (1 << RXC1)) && timeout != -1) timeout ++;
 	return UDR1;
 }
 

@@ -24,9 +24,11 @@ void cpu_configure(void) {
 void cpu_reset(void) {
     /* Assert the SAM4S's reset pin. */
 	clear_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
+    clear_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
 	/* Wait for 50 ms to simulate the press of a physical reset button, ensuring a thorough reset of the processor. */
-	delay_ms(100);
+    delay_ms(50);
 	/* Release the simulated reset button. */
+    set_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
 	set_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
 }
 
@@ -44,30 +46,22 @@ void cpu_power(uint8_t power) {
 }
 
 void cpu_dfu(void) {
-	/* Disable interrupts. */
-	cli();
     /* Put the SAM4S into erase mode by pulling its erase pin high. */
 	set_bit_in_port(SAM_ERASE_PIN, SAM_ERASE_PORT);
     /* Assert the reset pin. */
     clear_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
     /* Power down the SAM4S. */
     clear_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
-    /* Wait for power down. */
-    delay_ms(125);
 	/* Power the SAM4S back on. */
 	set_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
-	/* Wait for flash to be completely erased. */
-	delay_ms(250);
+	/* Wait for the GPNVM bits to be erased. */
+	delay_ms(500);
 	/* Take the SAM4S out of erase mode by pulling its erase pin back low. */
 	clear_bit_in_port(SAM_ERASE_PIN, SAM_ERASE_PORT);
-    /* Deassert the reset pin. */
-    set_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
     /* Power down the SAM4S. */
     clear_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
-    /* Wait for the chip to power down. */
-    delay_ms(125);
 	/* Power the SAM4S back on. */
     set_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
-	/* Re-enable interrupts. */
-	sei();
+    /* Deassert the reset pin. */
+    set_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
 }

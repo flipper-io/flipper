@@ -1,4 +1,5 @@
 #define __private_include__
+#include <unistd.h>
 #include <flipper.h>
 #include <platform/posix.h>
 #include <platform/fvm.h>
@@ -28,9 +29,26 @@ struct __attribute__((__packed__)) _xpacket {
 	uint16_t checksum;
 };
 
-/* See utils/copy.s for the source of this applet. These are the raw thumb instructions that result from the compilation of the applet. */
+/* See utils/copy_x.s for the source of this applet. These are the raw thumb instructions that result from the compilation of the applet. */
 uint8_t applet[] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x48, 0x0A, 0x49, 0x0A, 0x4A, 0x02, 0xE0, 0x08, 0xC9, 0x08, 0xC0, 0x01, 0x3A, 0x00, 0x2A, 0xFA, 0xD1, 0x08, 0x48, 0x09, 0x49, 0x01, 0x60, 0x07, 0x48, 0x00, 0x68, 0x01, 0x21, 0x08, 0x40, 0x88, 0x42, 0xF9, 0xD1, 0x70, 0x47, 0x00, 0xBF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x04, 0x0A, 0x0E, 0x40, 0x08, 0x0A, 0x0E, 0x40, 0x03, 0x00, 0x00, 0x5A
+    0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00,
+    0x09, 0x48, 0x0A, 0x49,
+    0x0A, 0x4A, 0x02, 0xE0,
+    0x08, 0xC9, 0x08, 0xC0,
+    0x01, 0x3A, 0x00, 0x2A,
+    0xFA, 0xD1, 0x08, 0x48,
+    0x09, 0x49, 0x01, 0x60,
+    0x07, 0x48, 0x00, 0x68,
+    0x01, 0x21, 0x08, 0x42,
+    0xFA, 0xD1, 0x70, 0x47,
+    0xAF, 0xF3, 0x00, 0x80,
+    0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00,
+    0x80, 0x00, 0x00, 0x00,
+    0x04, 0x0A, 0x0E, 0x40,
+    0x08, 0x0A, 0x0E, 0x40,
+    0x03, 0x00, 0x00, 0x5A
 };
 
 /* Place the applet in RAM somewhere far away from the region used by the SAM-BA. */
@@ -40,7 +58,14 @@ uint8_t applet[] = {
 #define _APPLET_DESTINATION _APPLET + 0x30
 #define _APPLET_SOURCE _APPLET + 0x34
 #define _APPLET_WORDS _APPLET + 0x38
-#define _PAGEBUFFER _APPLET + 0x100
+#define _PAGEBUFFER _APPLET + sizeof(applet)
+
+#define EFC_SGPB 0x0B
+#define EFC_GGPB 0x0D
+
+int retries = 0;
+/* Defines the number of times communication will be retried. */
+#define RETRIES 4
 
 /* Instructs the SAM-BA to jump to the given address. */
 void sam_ba_jump(uint32_t address) {
@@ -96,11 +121,18 @@ int sam_ba_copy(uint32_t destination, void *source, uint32_t length) {
 	/* Initialize the transfer. */
 	char buffer[20];
 	sprintf(buffer, "S%08X,%08X#", destination, length);
+retry:
 	uart.push(buffer, sizeof(buffer) - 1);
 	/* Check for the clear to send byte. */
 	if (uart.get() != 'C') {
-		return lf_error;
+        if (retries > RETRIES) {
+            retries = 0;
+            return lf_error;
+        }
+        retries ++;
+        goto retry;
 	}
+    retries = 0;
 	/* Calculate the number of packets needed to perform the transfer. */
 	int packets = lf_ceiling(length, XLEN);
 	for (int packet = 0; packet < packets; packet ++) {
@@ -126,7 +158,7 @@ int sam_ba_copy(uint32_t destination, void *source, uint32_t length) {
 	/* Send end of transmission. */
 	uart.put(EOT);
 	/* Obtain acknowledgement. */
-	if (uart.get() != ACK) {
+    if (uart.get() != ACK) {
 		return lf_error;
 	}
 	return lf_success;
@@ -174,39 +206,54 @@ int main(int argc, char *argv[]) {
 	size_t firmware_size = ftell(firmware);
 	fseek(firmware, 0L, SEEK_SET);
 
-	printf("Entering DFU mode.\n");
-	/* Enter DFU mode. */
-	cpu.dfu();
-	for (int i = 0; i < 3; i ++) {
-		/* Send the synchronization character. */
-		uart.put('#');
-		char ack[3];
-		/* Check for acknowledgement. */
-		uart.pull(ack, sizeof(ack));
-		if (!memcmp(ack, (char []){ 0x0a, 0x0d, 0x3e }, sizeof(ack))) {
-			fprintf(stderr, KGRN " Successfully entered update mode.\n" KNRM);
-			goto connected;
-		}
-	}
-	/* If no acknowledgement was received, throw and error. */
-	fprintf(stderr, KRED "Failed to enter update mode.\n");
-	return EXIT_FAILURE;
+	printf("Entering update mode.\n");
+retry_dfu:
+    /* Send the synchronization character. */
+    uart.put('#');
+    char d_ack[3];
+    /* Check for acknowledgement. */
+    uart.pull(d_ack, sizeof(d_ack));
+    if (!memcmp(d_ack, (char []){ 0x0a, 0x0d, 0x3e }, sizeof(d_ack))) {
+        retries = 0;
+        fprintf(stderr, KGRN " Successfully entered update mode.\n" KNRM);
+        goto connected;
+    }
+
+	if (retries > RETRIES) {
+        retries = 0;
+        /* If no acknowledgement was received, throw and error. */
+    	fprintf(stderr, KRED "Failed to enter update mode.\n");
+        return EXIT_FAILURE;
+    }
+
+    /* Enter DFU mode. */
+    cpu.dfu();
+
+    for (int i = 0; i < 20; i ++) {
+        printf(".");
+        fflush(stdout);
+        usleep(250000);
+    }
+    printf("\n");
+
+    retries ++;
+    goto retry_dfu;
 
 connected:
 
     /* Set normal mode. */
     printf("Entering normal mode.\n");
     uart.push("N#", 2);
-    char ack[2];
-    uart.pull(ack, sizeof(ack));
-    if (memcmp(ack, (char []){ 0x0A, 0x0D }, sizeof(ack))) {
+    char n_ack[2];
+    uart.pull(n_ack, sizeof(n_ack));
+    if (memcmp(n_ack, (char []){ 0x0A, 0x0D }, sizeof(n_ack))) {
         fprintf(stderr, "Failed to enter normal mode.\n");
         return EXIT_FAILURE;
     }
     printf(KGRN " Successfully entered normal mode.\n" KNRM);
 
     printf("Checking security bit.\n");
-	sam_ba_write_efc_fcr(0x0D, 0);
+	sam_ba_write_efc_fcr(EFC_GGPB, 0);
 	if (sam_ba_read_word(0x400E0A0C) & 0x01) {
 		fprintf(stderr, KRED "The device's security bit is set. Please erase again.\n");
 		return EXIT_FAILURE;
@@ -220,7 +267,7 @@ connected:
 		fprintf(stderr, KRED "Failed to upload copy applet.\n" KNRM);
 		return EXIT_FAILURE;
 	}
-	printf(KGRN " Successfully uploaded copy applet.\n\n" KNRM);
+	printf(KGRN " Successfully uploaded copy applet.\n" KNRM);
 
     /* Write the stack address into the applet. */
     sam_ba_write_word(_APPLET_STACK, IRAM_ADDR + IRAM_SIZE);
@@ -235,13 +282,12 @@ connected:
 	/* Calculate the number of pages to send. */
 	lf_size_t pages = lf_ceiling(firmware_size, IFLASH_PAGE_SIZE);
 	/* Send the firmware, page by page. */
-	printf("Uploading page ");
 	for (lf_size_t page = 0; page < pages; page ++) {
-		char buf[32];
+		char buf[64];
 		/* Print the page count. */
-		sprintf(buf, "%i / %u.", page + 1, pages);
+		sprintf(buf, "Uploading page %i / %u. (%.2f%%)", page + 1, pages, ((float)(page + 1))/pages*100);
 		printf("%s", buf);
-		fflush(stdout);
+        fflush(stdout);
 		/* Copy the page. */
 		int _e = sam_ba_copy(_PAGEBUFFER, (void *)(pagedata + (page * IFLASH_PAGE_SIZE)), IFLASH_PAGE_SIZE);
 		if (_e < lf_success) {
@@ -253,12 +299,33 @@ connected:
         /* Execute the applet to load the page into flash. */
         sam_ba_jump(_APPLET);
 		/* Clear the progress message. */
-		if (page != pages - 1) {
-			for (int j = 0; j < strlen(buf); j ++) printf("\b");
-			printf("\n");
-			fflush(stdout);
-		}
+		if (page < pages - 1) printf("\33[2K\r");
 	}
+
+    /* Print statistics about the memory usage. */
+    printf(KGRN "\n Successfully uploaded all pages. %zu bytes used. (%.2f%% of flash)\n" KNRM, firmware_size, (float)firmware_size/IFLASH_SIZE*100);
+
+    /* Set GPNVM1 to boot from flash memory. */
+    sam_ba_write_efc_fcr(EFC_SGPB, 0x01);
+
+    printf("Checking GPNVM1 bit.\n");
+	sam_ba_write_efc_fcr(EFC_GGPB, 0);
+retry_gpnv1:
+	if (!(sam_ba_read_byte(0x400E0A0C) & (1 << 1))) {
+		if (retries > RETRIES) {
+            printf(KRED " GPNVM1 bit is not set.\n" KNRM);
+            retries = 0;
+            return EXIT_FAILURE;
+        }
+        /* Set GPNVM1 to boot from flash memory. */
+        sam_ba_write_efc_fcr(EFC_SGPB, 0x01);
+        /* Read the state of the GPNVM bits. */
+        sam_ba_write_efc_fcr(EFC_GGPB, 0);
+        retries ++;
+        goto retry_gpnv1;
+	}
+    retries = 0;
+    printf(KGRN "The device's GPNVM1 bit is set.\n" KNRM);
 
     // printf("\n\n");
 	// for (int i = 0; i < lf_ceiling(firmware_size, sizeof(uint32_t)); i ++) {
@@ -267,10 +334,10 @@ connected:
 	// 	printf("0x%08x : 0x%08x -> %s\n", word, _word, (word == _word) ? "GOOD" : "BAD");
 	// }
 
-	printf("\n\nResetting the CPU.\n");
+	printf("Resetting the CPU.\n");
 	/* Reset the CPU. */
 	cpu.reset();
-	printf(KGRN " Successfully reset the CPU.\n" KNRM);
+    printf(KGRN " Successfully reset the CPU.\n" KNRM "----------------------");
 
     printf(KGRN "\nSuccessfully uploaded new firmware.\n" KNRM);
 
