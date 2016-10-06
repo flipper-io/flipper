@@ -40,11 +40,9 @@ wait:
     # Load the value of the EEFC -> FSR.
     ldr r0, fsr0
     ldr r0, [r0, #0]
-    # Mask all but the first bit out of the register contents.
-    mov r1, #1
-    and r0, r1
     # Wait until the EEFC has finished writing the page.
-    cmp r0, r1
+    mov r1, #1
+    tst r0, r1
     bne wait
 done:
     # Return to the caller.

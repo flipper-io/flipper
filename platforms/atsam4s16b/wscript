@@ -11,7 +11,7 @@ def configure(cfg):
     # Build modules for this platform.
     cfg.env.BUILD_MODULES = True
     # Set the platform flags.
-    cfg.env.append_value('CFLAGS', ['-std=c99', '-Os', '-nostartfiles', '-ffreestanding', '-mthumb', '-mcpu=cortex-m4'])
+    cfg.env.append_value('CFLAGS', ['-std=c99', '-Os', '-nostdlib', '-mcpu=cortex-m4', '-march=armv7e-m', '-mthumb'])
     cfg.env.append_value('LDFLAGS', '--specs=rdimon.specs')
     # Load the appropriate binary utilities.
     objcopy = cfg.find_program('arm-none-eabi-objcopy')
@@ -34,7 +34,7 @@ def configure(cfg):
 
 def build(bld):
     _env = bld.all_envs['platform-atsam4s16b']
-    bld.stlib(source = bld.path.ant_glob('src/**'), target = 'platform-atsam4s16b', env = _env)
+    bld.stlib(source = bld.path.ant_glob('src/**') + bld.path.ant_glob('lib/**'), target = 'platform-atsam4s16b', env = _env)
 
 def upload(ctx):
     pass

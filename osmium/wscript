@@ -15,6 +15,7 @@ def build(bld):
             bld.program(source = bld.path.ant_glob('src/**'), target = 'osmium-' + name + '.elf', use = 'platform-' + name + ' modules-' + name, install_path = None, env = _env)
             bld.add_group()
             bld(rule = '${OBJCOPY} -O ihex ${SRC} ${TGT}', source = 'osmium-' + name + '.elf', target = 'osmium-' + name + '.hex', env = _env)
+            bld(rule = '${OBJCOPY} -O binary ${SRC} ${TGT}', source = 'osmium-' + name + '.elf', target = 'osmium-' + name + '.bin', env = _env)
             bld.add_group()
             if bld.options.upload == name:
                 bld(features = _env.UPLOADER, source = 'osmium-' + name + '.hex', env = _env)
