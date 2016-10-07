@@ -7,8 +7,8 @@
 
 void system_init(void) {
 
-	/* Enable the reset pin to reset the device. */
-	//RSTC -> RSTC_MR |= RSTC_MR_URSTEN;
+	/* Allow the reset pin to reset the device. */
+	RSTC -> RSTC_MR |= RSTC_MR_URSTEN;
 
 	/* Initialize the main oscillator. */
 	if (!(PMC -> CKGR_MOR & CKGR_MOR_MOSCSEL)) {
@@ -51,11 +51,24 @@ void system_init(void) {
 
 }
 
+volatile void delay_ms() {
+	uint64_t counter = 1000000;
+	while (counter --) __asm__("nop");
+}
+
 void system_task(void) {
 
 	PIOA -> PIO_PER |= (1 << 8);
 	PIOA -> PIO_OER |= (1 << 8);
-	PIOA -> PIO_SODR |= (1 << 8);
+
+	while (1) {
+		PIOA -> PIO_SODR |= (1 << 8);
+		PIOA -> PIO_CODR &= ~(1 << 8);
+		delay_ms();
+		PIOA -> PIO_SODR &= ~(1 << 8);
+		PIOA -> PIO_CODR |= (1 << 8);
+		delay_ms();
+	}
 
 }
 

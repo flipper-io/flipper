@@ -347,7 +347,9 @@ retry_gpnv1:
 
 	printf("Resetting the CPU.\n");
 	/* Reset the CPU. */
-	cpu.reset();
+	cpu.power(0);
+	sleep(1);
+	cpu.power(1);
 	printf(KGRN " Successfully reset the CPU.\n" KNRM "----------------------");
 
 	printf(KGRN "\nSuccessfully uploaded new firmware.\n" KNRM);

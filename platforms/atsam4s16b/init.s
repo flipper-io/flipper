@@ -32,8 +32,7 @@
 .global system_init
 .global system_task
 _reset:
-	bl system_init
-	bl system_task
+	bl main
 @_copy_data:
 @	# Copy the data section from Flash to SRAM.
 @	ldr r1, =__text_end__
