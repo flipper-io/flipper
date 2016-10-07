@@ -4,7 +4,6 @@ import Control.Monad.Trans.Class
 
 import qualified Data.ByteString as BS
 
-import Flipper.Error
 import Flipper.MonadFlipper
 
 import qualified Flipper.Button as Button
@@ -16,27 +15,13 @@ import qualified Flipper.SPI    as SPI
 import qualified Flipper.UART   as UART
 
 import Flipper.Console.Action
+import Flipper.Console.FC
+import Flipper.Console.Flash
 import Flipper.Console.Parsers
-import Flipper.Console.Error
 
 import System.Console.Haskeline
 
 import qualified Text.Megaparsec        as M
-
-type FC = FlipperT (InputT IO)
-
-liftFC :: IO a -> FC a
-liftFC = lift . lift
-
-runFC :: FC a -> IO (Either FlipperException a)
-runFC = (runInputT defaultSettings) . runFlipperT
-
-printFC :: Show a => a -> FC ()
-printFC = lift . outputStrLn . show
-
-printCStringFC :: Either String String -> FC ()
-printCStringFC (Left e)  = lift $ outputStrLn e
-printCStringFC (Right v) = lift $ outputStrLn v
 
 execConsoleAction :: ConsoleAction -> FC ()
 execConsoleAction (Flash f)       = execFlash f
@@ -46,9 +31,6 @@ execConsoleAction Reset           = execReset
 execConsoleAction Suspend         = execSuspend
 execConsoleAction Format          = execFormat
 execConsoleAction (ConsoleCall c) = execCall c
-
-execFlash :: FilePath -> FC ()
-execFlash = undefined
 
 execInstall :: ModuleID -> FilePath -> FC ()
 execInstall = undefined
@@ -118,7 +100,3 @@ execUserInput l = case M.runParser parseConsoleAction "<interactive>" l of
     (Left e)  -> lift (outputStrLn (show e))
     (Right c) -> catchFlipper (execConsoleAction c)
                               (reportConsoleError (Just c))
-
-reportConsoleError :: Maybe ConsoleAction -> FlipperException -> FC ()
-reportConsoleError c (FlipperException e) =
-    lift (outputStrLn (consoleError c e))

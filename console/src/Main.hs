@@ -8,6 +8,7 @@ import Flipper
 import Flipper.MonadFlipper
 
 import Flipper.Console.Exec
+import Flipper.Console.FC
 import Flipper.Console.Options
 
 import Options.Applicative
