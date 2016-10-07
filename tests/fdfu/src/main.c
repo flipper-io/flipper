@@ -332,12 +332,14 @@ retry_gpnv1:
 				uint32_t _word = *(uint32_t *)(pagedata + (i * sizeof(uint32_t)));
 				uint8_t match = ((uint16_t)word == (uint16_t)_word);
 				if (!match && retries < RETRIES) {
+					if (retries == 0) {
+						errors ++;
+					}
 					retries ++;
 					continue;
 				}
 				retries = 0;
 				printf("0x%08x: (0x%08x : 0x%08x) -> %s\n", addr, word, _word, (match) ? "GOOD" : "BAD");
-				errors ++;
 			}
 			printf("\nVerification complete. %i errors detected.\n\n", errors);
 		}
