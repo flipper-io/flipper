@@ -12,9 +12,9 @@ def configure(cfg):
 	cfg.env.BUILD_MODULES = True
 	# Set the platform flags.
 	cfg.env.append_value('CFLAGS', ['-std=c99', '-Os', '-mcpu=cortex-m4', '-march=armv7e-m', '-mthumb', '-nostdlib', '-nostartfiles', '-ffreestanding'])
-	cfg.env.append_value('LDFLAGS', ['-Wl,-T' + cfg.path.abspath() + '/sam4s16.ld', '--specs=rdimon.specs'])
+	cfg.env.append_value('LDFLAGS', ['-Wl,-T' + cfg.path.abspath() + '/sam4s16.ld'])
 	# Catalog the start files
-	cfg.env.STARTFILES = str(cfg.path.find_node('init.s').relpath())
+	cfg.env.STARTFILES = str(cfg.path.find_node('board_cstartup_gnu.c').relpath())
 	#print "Startfiles are: " + str(cfg.env.STARTFILES)
 	# Load the appropriate binary utilities.
 	cfg.env.OBJCOPY = cfg.find_program('arm-none-eabi-objcopy')
@@ -29,7 +29,7 @@ def configure(cfg):
 	cfg.env.CC = cfg.find_program('arm-none-eabi-gcc')
 	cfg.load('gcc')
 	# Check for newlib.
-	cfg.check_cc(lib = 'c')
+	cfg.check_cc(linkflags = '--specs=nosys.specs', lib = 'c')
 
 def build(bld):
 	_env = bld.all_envs['platform-atsam4s16b']

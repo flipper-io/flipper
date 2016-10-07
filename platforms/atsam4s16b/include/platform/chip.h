@@ -6,6 +6,8 @@
 
 #include "SAM4S16.h"
 
+#include "cmsis/core_cm3.h"
+
 #include "include/exceptions.h"
 #include "include/acc.h"
 #include "include/adc.h"
@@ -34,4 +36,3 @@
 #include "include/USBD_Config.h"
 
 #endif
-

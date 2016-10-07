@@ -5,6 +5,8 @@
 #define BOARD_PLLBR (CKGR_PLLBR_MULB(0x0f) | CKGR_PLLBR_PLLBCOUNT(0x1) | CKGR_PLLBR_DIVB(0x3))
 #define BOARD_MCKR (PMC_MCKR_PRES_CLK_1 | PMC_MCKR_CSS_PLLB_CLK)
 
+#define F_CPU 64000000
+
 void system_init(void) {
 
 	/* Allow the reset pin to reset the device. */
@@ -37,10 +39,10 @@ void system_init(void) {
 	//REG_PMC_USB = PMC_USB_USBS | PMC_USB_USBDIV(1);
 
 	/* Configure the PLLA for USB. */
-	PMC -> CKGR_PLLAR = (1<<29) | CKGR_PLLAR_DIVA(1) | CKGR_PLLAR_MULA(7) | CKGR_PLLAR_PLLACOUNT_Msk;
-	while(!(PMC -> PMC_SR & PMC_SR_LOCKA));
-	/* Use PLLA for the USB clock. */
-	PMC -> PMC_USB = PMC_USB_USBDIV(1);
+	// PMC -> CKGR_PLLAR = (1<<29) | CKGR_PLLAR_DIVA(1) | CKGR_PLLAR_MULA(7) | CKGR_PLLAR_PLLACOUNT_Msk;
+	// while(!(PMC -> PMC_SR & PMC_SR_LOCKA));
+	// /* Use PLLA for the USB clock. */
+	// PMC -> PMC_USB = PMC_USB_USBDIV(1);
 
 	/* Switch to the fast clock. */
 	PMC -> PMC_MCKR = (BOARD_MCKR & ~PMC_MCKR_CSS_Msk) | PMC_MCKR_CSS_MAIN_CLK;
@@ -58,10 +60,17 @@ volatile void delay_ms() {
 
 void system_task(void) {
 
+	PMC_EnablePeripheral(ID_USART0);
+	const Pin usart0_pins[] = { PIO_PA5A_RXD0 | PIO_PA6A_TXD0, PIOA, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT };
+	PIO_Configure(usart0_pins, PIO_LISTSIZE(usart0_pins));
+	USART_Configure(USART0, USART_MODE_ASYNCHRONOUS, 115200, BOARD_MCK);
+	USART_SetTransmitterEnabled(USART0, 1);
+
 	PIOA -> PIO_PER |= (1 << 8);
 	PIOA -> PIO_OER |= (1 << 8);
 
 	while (1) {
+		USART_WriteBuffer(USART0, "Hello world!", 11);
 		PIOA -> PIO_SODR |= (1 << 8);
 		PIOA -> PIO_CODR &= ~(1 << 8);
 		delay_ms();

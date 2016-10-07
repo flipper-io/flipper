@@ -51,7 +51,7 @@ SECTIONS
 	.text :
 	{
 		. = ALIGN(4);
-		_vectors = .;
+		_sfixed = .;
 		KEEP(*(.vectors .vectors.*))
 		*(.text .text.* .gnu.linkonce.t.*)
 		*(.glue_7t) *(.glue_7)
@@ -121,16 +121,16 @@ SECTIONS
 	/* .bss section which is used for uninitialized data */
 	.bss (NOLOAD) :
 	{
-		__bss_start__ = .;
 		. = ALIGN(4);
 		_sbss = . ;
 		_szero = .;
+		__bss_start__ = .;
 		*(.bss .bss.*)
 		*(COMMON)
 		. = ALIGN(4);
+		__bss_end__ = .;
 		_ebss = . ;
 		_ezero = .;
-		__bss_end__ = .;
 	} > ram
 
 	/* stack section */
@@ -143,9 +143,7 @@ SECTIONS
 		_estack = .;
 	} > ram
 
-	_stack = ORIGIN(ram) + LENGTH(ram);
-
 	. = ALIGN(4);
-	end = . ;
-	PROVIDE (__end__ = .);
+	_end = . ;
+	__end__ = .;
 }

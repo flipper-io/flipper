@@ -40,14 +40,6 @@ write:
 	orr r1, r2
 	# Write the page into flash memory.
 	str r1, [r0, #0]
-wait:
-	# Load the value of the EEFC -> FSR.
-	ldr r0, fsr0
-	ldr r0, [r0, #0]
-	# Wait until the EEFC has finished writing the page.
-	mov r1, #1
-	tst r0, r1
-	bne wait
 done:
 	# Return to the caller.
 	bx lr
