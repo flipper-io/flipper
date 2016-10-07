@@ -34,9 +34,9 @@ uint8_t applet[] = {
 	0xFA, 0xD1, 0x09, 0x48,
 	0x0A, 0x49, 0x06, 0x4A,
 	0x11, 0x43, 0x01, 0x60,
-	0x07, 0x48, 0x00, 0x68,
-	0x01, 0x21, 0x08, 0x42,
-	0xFA, 0xD1, 0x70, 0x47,
+	0x70, 0x47, 0x00, 0xBF,
+	0xAF, 0xF3, 0x00, 0x80,
+	0xAF, 0xF3, 0x00, 0x80,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -265,8 +265,6 @@ connected:
 	sam_ba_write_word(_APPLET_STACK, IRAM_ADDR + IRAM_SIZE);
 	/* Write the entry address into the applet. */
 	sam_ba_write_word(_APPLET_ENTRY, _APPLET + 0x09);
-	/* Write the destination of the page data into the applet. */
-	sam_ba_write_word(_APPLET_DESTINATION, IFLASH_ADDR);
 	/* Write the source of the page data into the applet. */
 	sam_ba_write_word(_APPLET_SOURCE, _PAGEBUFFER);
 
@@ -286,12 +284,15 @@ connected:
 			fprintf(stderr, KRED "\nFailed to upload page %i of %i.\n" KNRM, page + 1, pages);
 			goto done;
 		}
+		/* Write the destination of the page data into the applet. */
+		sam_ba_write_word(_APPLET_DESTINATION, IFLASH_ADDR);
 		/* Write the page number into the applet. */
 		sam_ba_write_word(_APPLET_PAGE, EEFC_FCR_FARG(page));
 		/* Execute the applet to load the page into flash. */
 		sam_ba_jump(_APPLET);
 		/* Wait until the EFC has finished writing the page. */
-		while(!(sam_ba_read_byte(0x400E0A08U) & 1));
+		while(!(sam_ba_read_byte(0x400E0A08U) & 1) && retries ++ < 4);
+		retries = 0;
 		/* Clear the progress message. */
 		if (page < pages - 1) printf("\33[2K\r");
 	}
