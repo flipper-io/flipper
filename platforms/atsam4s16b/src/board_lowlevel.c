@@ -82,7 +82,6 @@ extern WEAK void LowLevelInit( void )
 	/* Set 3 FWS for Embedded Flash Access */
 	EFC->EEFC_FMR = EEFC_FMR_FWS(6);
 
-
 	/* Initialize main oscillator */
 	if ( !(PMC->CKGR_MOR & CKGR_MOR_MOSCSEL) )
 	{

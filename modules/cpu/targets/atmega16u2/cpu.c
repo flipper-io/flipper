@@ -26,7 +26,7 @@ void cpu_reset(void) {
 	clear_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
 	clear_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
 	/* Wait for 50 ms to simulate the press of a physical reset button, ensuring a thorough reset of the processor. */
-	delay_ms(50);
+	delay_ms(500);
 	/* Release the simulated reset button. */
 	set_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
 	set_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);

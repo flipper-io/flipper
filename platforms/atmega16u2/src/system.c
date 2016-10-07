@@ -59,12 +59,12 @@ void system_task(void) {
 #if 0
 		/* bulk transfer tests. */
 		char buffer[FMR_PACKET_SIZE];
-		if (bulk_receive_packet(buffer) > 0) {
+		if (megausb_bulk_receive(buffer) > 0) {
 			led_set_rgb(buffer[0], buffer[1], buffer[2]);
 			buffer[0] = 0x0a;
 			buffer[1] = 0x0b;
 			buffer[2] = 0x0c;
-			bulk_transmit_packet(buffer);
+			megausb_bulk_transmit(buffer);
 		}
 #else
 		/* FMR */
