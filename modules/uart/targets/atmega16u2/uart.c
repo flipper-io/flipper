@@ -8,9 +8,9 @@ void uart_configure(void) {
 	UBRR1H = UBRRH_VALUE;
 	UBRR1L = UBRRL_VALUE;
 #if USE_2X
-    UCSR1A |= (1 << U2X1);
+	UCSR1A |= (1 << U2X1);
 #else
-    UCSR1A &= ~(1 << U2X1);
+	UCSR1A &= ~(1 << U2X1);
 #endif
 	UCSR1C = (1 << USBS1) | (3 << UCSZ10);
 	UCSR1B = (1 << RXEN1) | (1 << TXEN1);
