@@ -265,6 +265,8 @@ connected:
 	sam_ba_write_word(_APPLET_STACK, IRAM_ADDR + IRAM_SIZE);
 	/* Write the entry address into the applet. */
 	sam_ba_write_word(_APPLET_ENTRY, _APPLET + 0x09);
+	/* Write the destination of the page data into the applet. */
+	sam_ba_write_word(_APPLET_DESTINATION, IFLASH_ADDR);
 	/* Write the source of the page data into the applet. */
 	sam_ba_write_word(_APPLET_SOURCE, _PAGEBUFFER);
 
@@ -284,8 +286,6 @@ connected:
 			fprintf(stderr, KRED "\nFailed to upload page %i of %i.\n" KNRM, page + 1, pages);
 			goto done;
 		}
-		/* Write the destination of the page data into the applet. */
-		sam_ba_write_word(_APPLET_DESTINATION, IFLASH_ADDR);
 		/* Write the page number into the applet. */
 		sam_ba_write_word(_APPLET_PAGE, EEFC_FCR_FARG(page));
 		/* Execute the applet to load the page into flash. */
@@ -348,9 +348,9 @@ retry_gpnv1:
 
 	printf("Resetting the CPU.\n");
 	/* Reset the CPU. */
-	cpu.power(0);
-	sleep(1);
-	cpu.power(1);
+	uart.disable();
+	cpu.reset();
+	uart.enable();
 	printf(KGRN " Successfully reset the CPU.\n" KNRM "----------------------");
 
 	printf(KGRN "\nSuccessfully uploaded new firmware.\n" KNRM);
