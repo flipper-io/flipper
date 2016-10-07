@@ -321,21 +321,26 @@ retry_gpnv1:
 	retries = 0;
 	printf(KGRN "The device's GPNVM1 bit is set.\n" KNRM);
 
-	printf("\n\n");
-	for (uint32_t i = 0; i < lf_ceiling(firmware_size, sizeof(uint32_t)); i ++) {
-		if (i % 128 == 0) printf("-------\n");
-check:
-		;
-		uint32_t addr = IFLASH_ADDR + (i * sizeof(uint32_t));
-		uint32_t word = sam_ba_read_word(addr);
-		uint32_t _word = *(uint32_t *)(pagedata + (i * sizeof(uint32_t)));
-		uint8_t match = ((uint16_t)word == (uint16_t)_word);
-		if (!match && retries < RETRIES) {
-			retries ++;
-			goto check;
+	if (argc > 2) {
+		if (!strcmp(argv[2], "verify")) {
+			printf("\nVerifying flash contents.\n");
+			uint32_t errors = 0;
+			for (uint32_t i = 0; i < lf_ceiling(firmware_size, sizeof(uint32_t)); i ++) {
+				if (i % 128 == 0) printf("-------\n");
+				uint32_t addr = IFLASH_ADDR + (i * sizeof(uint32_t));
+				uint32_t word = sam_ba_read_word(addr);
+				uint32_t _word = *(uint32_t *)(pagedata + (i * sizeof(uint32_t)));
+				uint8_t match = ((uint16_t)word == (uint16_t)_word);
+				if (!match && retries < RETRIES) {
+					retries ++;
+					continue;
+				}
+				retries = 0;
+				printf("0x%08x: (0x%08x : 0x%08x) -> %s\n", addr, word, _word, (match) ? "GOOD" : "BAD");
+				errors ++;
+			}
+			printf("\nVerification complete. %i errors detected.\n\n", errors);
 		}
-		retries = 0;
-		printf("0x%08x: (0x%08x : 0x%08x) -> %s\n", addr, word, _word, (match) ? "GOOD" : "BAD");
 	}
 
 	printf("Resetting the CPU.\n");
