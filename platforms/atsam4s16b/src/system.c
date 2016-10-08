@@ -9,17 +9,17 @@ void system_init(void) {
 }
 
 void delay_ms() {
-	uint64_t counter = 1000000;
+	uint64_t counter = 16000000;
 	while (counter --) __asm__("nop");
 }
 
 void system_task(void) {
 
 	PMC_EnablePeripheral(ID_USART0);
-	const Pin usart0_pins[] = { (Pin){ PIO_PA5A_RXD0 | PIO_PA6A_TXD0, PIOA, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT } };
+	const Pin usart0_pins[] = { (Pin){ /*PIO_PA9A_URXD0 | PIO_PA10A_UTXD0*/PIO_PA5A_RXD0 | PIO_PA6A_TXD0, PIOA, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT } };
 	PIO_Configure(usart0_pins, PIO_LISTSIZE(usart0_pins));
-	USART_Configure(USART0, USART_MODE_ASYNCHRONOUS, 115200, BOARD_MCK);
-	USART_SetTransmitterEnabled(USART0, 1);
+	USART_Configure((Usart *)USART0, USART_MODE_ASYNCHRONOUS, 115200, BOARD_MCK);
+	USART_SetTransmitterEnabled((Usart *)USART0, 1);
 
 	PIOA -> PIO_PER |= (1 << 8);
 	PIOA -> PIO_OER |= (1 << 8);
@@ -27,7 +27,7 @@ void system_task(void) {
 	const char *dingas = "Hello world!";
 
 	while (1) {
-		USART_WriteBuffer(USART0, dingas, 11);
+		USART_PutChar((Usart *)USART0, 'a');
 		PIOA -> PIO_SODR |= (1 << 8);
 		PIOA -> PIO_CODR &= ~(1 << 8);
 		delay_ms();

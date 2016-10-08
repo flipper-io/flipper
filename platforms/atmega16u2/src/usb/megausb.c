@@ -29,7 +29,16 @@ uint8_t megausb_get(void) {
 }
 
 int megausb_push(void *source, lf_size_t length) {
-	int8_t bytes = megausb_bulk_transmit(source, length);
+	int8_t bytes;
+#ifndef __ALL_BULK__
+	if (length <= INTERRUPT_IN_SIZE) {
+		bytes = megausb_interrupt_transmit(source, length);
+	} else {
+#endif
+		bytes = megausb_bulk_transmit(source, length);
+#ifndef __ALL_BULK__
+	}
+#endif
 	if (bytes <= 0) {
 		return lf_error;
 	}
@@ -37,7 +46,16 @@ int megausb_push(void *source, lf_size_t length) {
 }
 
 int megausb_pull(void *destination, lf_size_t length) {
-	int8_t bytes = megausb_bulk_receive(destination, length);
+	int8_t bytes;
+#ifndef __ALL_BULK__
+	if (length <= INTERRUPT_OUT_SIZE) {
+		bytes = megausb_interrupt_receive(destination, length);
+	} else {
+#endif
+		bytes = megausb_bulk_receive(destination, length);
+#ifndef __ALL_BULK__
+	}
+#endif
 	if (bytes <= 0) {
 		return lf_error;
 	}

@@ -33,7 +33,7 @@ int8_t megausb_bulk_receive(uint8_t *destination, lf_size_t length) {
 		uint8_t len = BULK_OUT_SIZE;
 		while (len --) {
 			if (length --) {
-				/* If there is still valid data to send, load it into the transmit buffer. */
+				/* If there is still valid data to send, load it from the receive buffer. */
 				*destination ++ = UEDATX;
 			} else {
 				/* Otherwise, flush the buffer. */
