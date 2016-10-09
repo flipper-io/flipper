@@ -25,13 +25,16 @@
 
 #define USB_IN_MASK            0x80
 #define INTERRUPT_IN_ENDPOINT  (0x01 | USB_IN_MASK)
-#define INTERRUPT_IN_SIZE      32
+#define INTERRUPT_IN_SIZE      16
 #define INTERRUPT_OUT_ENDPOINT 0x02
-#define INTERRUPT_OUT_SIZE     64
+#define INTERRUPT_OUT_SIZE     16
 #define BULK_IN_ENDPOINT       (0x03 | USB_IN_MASK)
-#define BULK_IN_SIZE           32
+#define BULK_IN_SIZE           64
 #define BULK_OUT_ENDPOINT      0x04
-#define BULK_OUT_SIZE          32
+#define BULK_OUT_SIZE          64
+
+/* If defined, uses bulk for all USB transfers. */
+#define __ALL_BULK__
 
 /* Terminal colors. */
 #define KNRM  "\x1B[0m"

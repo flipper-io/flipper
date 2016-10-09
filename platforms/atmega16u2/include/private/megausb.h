@@ -82,8 +82,8 @@ void configure_usb(void);
 int8_t megausb_interrupt_receive(uint8_t *destination, lf_size_t length);
 int8_t megausb_interrupt_transmit(uint8_t *source, lf_size_t length);
 
-int8_t bulk_receive_packet(uint8_t *destination);
-int8_t bulk_transmit_packet(uint8_t *source);
+int8_t megausb_bulk_receive(uint8_t *destination, lf_size_t length);
+int8_t megausb_bulk_transmit(uint8_t *source, lf_size_t length);
 
 int8_t usb_serial_write(const uint8_t *buffer, uint16_t size);
 

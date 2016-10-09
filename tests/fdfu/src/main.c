@@ -60,7 +60,8 @@ uint8_t applet[] = {
 #define EFC_SGPB 0x0B
 #define EFC_GGPB 0x0D
 
-int retries = 0;
+#define REGADDR(reg) (uint32_t)&(reg)
+
 /* Defines the number of times communication will be retried. */
 #define RETRIES 4
 
@@ -83,6 +84,8 @@ uint8_t sam_ba_read_byte(uint32_t source) {
 	char buffer[12];
 	sprintf(buffer, "o%08X,#", source);
 	uart.push(buffer, sizeof(buffer) - 1);
+	uint32_t retries = 0;
+	while(!uart.ready() && retries ++ < 8);
 	return uart.get();
 }
 
@@ -98,14 +101,16 @@ uint32_t sam_ba_read_word(uint32_t source) {
 	char buffer[12];
 	sprintf(buffer, "w%08X,#", source);
 	uart.push(buffer, sizeof(buffer) - 1);
+	uint8_t retries = 0;
+	while(!uart.ready() && retries ++ < 8);
 	uint32_t result = 0;
 	uart.pull(&result, sizeof(uint32_t));
 	return result;
 }
 
-/* Writes the given command and page number the EEFC -> FCR register. */
-void sam_ba_write_efc_fcr(uint8_t command, uint32_t page) {
-	sam_ba_write_word(0x400E0A04U, (EEFC_FCR_FKEY(0x5A) | EEFC_FCR_FARG(page) | EEFC_FCR_FCMD(command)));
+/* Writes the given command and argument into the EFC -> EEFC_FCR register. */
+void sam_ba_write_efc_fcr(uint8_t command, uint32_t arg) {
+	sam_ba_write_word(REGADDR(EFC -> EEFC_FCR), (EEFC_FCR_FKEY(0x5A) | EEFC_FCR_FARG(arg) | EEFC_FCR_FCMD(command)));
 }
 
 /* Moves data from the host to the device's RAM using the SAM-BA and XMODEM protocol. */
@@ -115,14 +120,11 @@ int sam_ba_copy(uint32_t destination, void *source, uint32_t length) {
 	sprintf(buffer, "S%08X,%08X#", destination, length);
 retry:
 	uart.push(buffer, sizeof(buffer) - 1);
+	uint8_t retries = 0;
+	while(!uart.ready() && retries ++ < 8);
 	/* Check for the clear to send byte. */
 	if (uart.get() != 'C') {
-		if (retries > RETRIES) {
-			retries = 0;
-			return lf_error;
-		}
-		retries ++;
-		goto retry;
+		return lf_error;
 	}
 	retries = 0;
 	/* Calculate the number of packets needed to perform the transfer. */
@@ -141,6 +143,8 @@ retry:
 		/* Transfer the packet to the SAM-BA. */
 		uart.push(&_packet, sizeof(struct _xpacket));
 		/* Obtain acknowledgement. */
+		retries = 0;
+		while(!uart.ready() && retries ++ < 8);
 		if (uart.get() != ACK) {
 			return lf_error;
 		}
@@ -150,6 +154,8 @@ retry:
 	/* Send end of transmission. */
 	uart.put(EOT);
 	/* Obtain acknowledgement. */
+	retries = 0;
+	while(!uart.ready() && retries ++ < 8);
 	if (uart.get() != ACK) {
 		return lf_error;
 	}
@@ -199,6 +205,7 @@ int main(int argc, char *argv[]) {
 	fseek(firmware, 0L, SEEK_SET);
 
 	printf("Entering update mode.\n");
+	uint8_t retries = 0;
 retry_dfu:
 	/* Send the synchronization character. */
 	uart.put('#');
@@ -206,13 +213,11 @@ retry_dfu:
 	/* Check for acknowledgement. */
 	uart.pull(d_ack, sizeof(d_ack));
 	if (!memcmp(d_ack, (char []){ 0x0a, 0x0d, 0x3e }, sizeof(d_ack))) {
-		retries = 0;
 		fprintf(stderr, KGRN " Successfully entered update mode.\n" KNRM);
 		goto connected;
 	}
 
 	if (retries > RETRIES) {
-		retries = 0;
 		/* If no acknowledgement was received, throw and error. */
 		fprintf(stderr, KRED "Failed to enter update mode.\n");
 		return EXIT_FAILURE;
@@ -238,6 +243,9 @@ connected:
 	uart.push("N#", 2);
 	char n_ack[2];
 	uart.pull(n_ack, sizeof(n_ack));
+	retries = 0;
+	while(!uart.ready() && retries ++ < 8);
+	retries = 0;
 	if (memcmp(n_ack, (char []){ 0x0A, 0x0D }, sizeof(n_ack))) {
 		fprintf(stderr, "Failed to enter normal mode.\n");
 		return EXIT_FAILURE;
@@ -246,7 +254,7 @@ connected:
 
 	printf("Checking security bit.\n");
 	sam_ba_write_efc_fcr(EFC_GGPB, 0);
-	if (sam_ba_read_word(0x400E0A0C) & 0x01) {
+	if (sam_ba_read_word(REGADDR(EFC -> EEFC_FRR)) & 0x01) {
 		fprintf(stderr, KRED "The device's security bit is set. Please erase again.\n");
 		return EXIT_FAILURE;
 	}
@@ -291,7 +299,12 @@ connected:
 		/* Execute the applet to load the page into flash. */
 		sam_ba_jump(_APPLET);
 		/* Wait until the EFC has finished writing the page. */
-		while(!(sam_ba_read_byte(0x400E0A08U) & 1) && retries ++ < 4);
+		uint8_t retries = 0, fsr = 0;
+		while(!((fsr = sam_ba_read_byte(REGADDR(EFC -> EEFC_FSR))) & 1) && retries ++ < 4) {
+			if (fsr & 0xE) {
+				fprintf(stderr, KRED "Flash write error on page %u.\n" KNRM, page);
+			}
+		}
 		retries = 0;
 		/* Clear the progress message. */
 		if (page < pages - 1) printf("\33[2K\r");
@@ -305,52 +318,54 @@ connected:
 
 	printf("Checking GPNVM1 bit.\n");
 	sam_ba_write_efc_fcr(EFC_GGPB, 0);
-retry_gpnv1:
-	if (!(sam_ba_read_byte(0x400E0A0C) & (1 << 1))) {
+	retries = 0;
+	if (!(sam_ba_read_byte(REGADDR(EFC -> EEFC_FRR)) & (1 << 1)) && retries ++ < RETRIES) {
 		if (retries > RETRIES) {
 			printf(KRED " GPNVM1 bit is not set.\n" KNRM);
-			retries = 0;
 			return EXIT_FAILURE;
 		}
 		/* Set GPNVM1 to boot from flash memory. */
 		sam_ba_write_efc_fcr(EFC_SGPB, 0x01);
 		/* Read the state of the GPNVM bits. */
 		sam_ba_write_efc_fcr(EFC_GGPB, 0);
-		retries ++;
-		goto retry_gpnv1;
 	}
-	retries = 0;
 	printf(KGRN "The device's GPNVM1 bit is set.\n" KNRM);
 
 	if (argc > 2) {
 		if (!strcmp(argv[2], "verify")) {
 			printf("\nVerifying flash contents.\n");
-			uint32_t errors = 0;
-			for (uint32_t i = 0; i < lf_ceiling(firmware_size, sizeof(uint32_t)); i ++) {
-				if (i % 128 == 0) printf("-------\n");
+			uint32_t errors = 0, perrors = 0, total = lf_ceiling(firmware_size, sizeof(uint32_t));
+			uint8_t retries = 0;
+			for (uint32_t i = 0; i < total; i ++) {
 				uint32_t addr = IFLASH_ADDR + (i * sizeof(uint32_t));
+				if ((i % (IFLASH_PAGE_SIZE/sizeof(uint32_t)) == 0)) {
+					printf(" Checking address 0x%08x (page %lu) -> %s\n", addr, i / (IFLASH_PAGE_SIZE/sizeof(uint32_t)), (!perrors) ? KGRN "GOOD" KNRM : KRED "BAD" KNRM);
+				}
 				uint32_t word = sam_ba_read_word(addr);
 				uint32_t _word = *(uint32_t *)(pagedata + (i * sizeof(uint32_t)));
 				uint8_t match = ((uint16_t)word == (uint16_t)_word);
-				if (!match && retries < RETRIES) {
+				if (!match && retries ++ < RETRIES) {
 					if (retries == 0) {
+						perrors ++;
 						errors ++;
 					}
-					retries ++;
 					continue;
 				}
 				retries = 0;
-				printf("0x%08x: (0x%08x : 0x%08x) -> %s\n", addr, word, _word, (match) ? "GOOD" : "BAD");
 			}
-			printf("\nVerification complete. %i errors detected.\n\n", errors);
+			printf("Verification complete. %s%i word errors detected.\n\n" KNRM, (errors) ? KRED : KGRN, errors);
 		}
 	}
 
+	sam_ba_write_word(REGADDR(SCB -> VTOR), (uint32_t)(IFLASH_ADDR & SCB_VTOR_TBLOFF_Msk) | (1 << SCB_VTOR_TBLBASE_Pos));
+	sam_ba_write_word(REGADDR(RSTC -> RSTC_MR), RSTC_MR_KEY(0xA5) | RSTC_MR_URSTEN);
+
 	printf("Resetting the CPU.\n");
 	/* Reset the CPU. */
-	uart.disable();
-	cpu.reset();
-	uart.enable();
+	cpu.power(0);
+	usleep(1000000);
+	cpu.power(1);
+	//cpu.reset();
 	printf(KGRN " Successfully reset the CPU.\n" KNRM "----------------------");
 
 	printf(KGRN "\nSuccessfully uploaded new firmware.\n" KNRM);

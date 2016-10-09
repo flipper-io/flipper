@@ -43,14 +43,14 @@
    </li>
  * <li> Enable transmitter or receiver respectively by set US_CR_TXEN or US_CR_RXEN in US_CR.</li>
  * <li> Read from or write to the peripheral with  \ref USART_ReadBuffer or \ref USART_WriteBuffer.
-        These operations could be done by polling or interruption. </li>
+		These operations could be done by polling or interruption. </li>
  * <li> For polling, check the status bit US_CSR_ENDRX/US_CSR_RXBUFF (READ) or US_CSR_ENDTX/
-        US_CSR_TXBUFE (WRITE).  </li>
+		US_CSR_TXBUFE (WRITE).  </li>
  * <li> For interruption,"enable" the status bit through US_IER and
-        realize the hanler with USARTx_IrqHandler according to IRQ vector
-        table which is defined in board_cstartup_<toolchain>.c
-        To enable the interruption of USART,it should be configured with priority and enabled first through
-        NVIC .</li>
+		realize the hanler with USARTx_IrqHandler according to IRQ vector
+		table which is defined in board_cstartup_<toolchain>.c
+		To enable the interruption of USART,it should be configured with priority and enabled first through
+		NVIC .</li>
  * </ul>
  *
  * For more accurate information, please look at the USART section of the
@@ -97,40 +97,40 @@
  *  \param masterClock  Frequency of the system master clock (in Hz).
  */
 void USART_Configure(Usart *usart,
-                            uint32_t mode,
-                            uint32_t baudrate,
-                            uint32_t masterClock)
+							uint32_t mode,
+							uint32_t baudrate,
+							uint32_t masterClock)
 {
-    /* Reset and disable receiver & transmitter*/
-    usart->US_CR = US_CR_RSTRX | US_CR_RSTTX
-                   | US_CR_RXDIS | US_CR_TXDIS;
+	/* Reset and disable receiver & transmitter*/
+	usart->US_CR = US_CR_RSTRX | US_CR_RSTTX
+				   | US_CR_RXDIS | US_CR_TXDIS;
 
-    /* Configure mode*/
-    usart->US_MR = mode;
+	/* Configure mode*/
+	usart->US_MR = mode;
 
-    /* Configure baudrate*/
-    /* Asynchronous, no oversampling*/
-    if ( ((mode & US_MR_SYNC) == 0) && ((mode & US_MR_OVER) == 0) )
-    {
-        usart->US_BRGR = (masterClock / baudrate) / 16;
-    }
+	/* Configure baudrate*/
+	/* Asynchronous, no oversampling*/
+	if ( ((mode & US_MR_SYNC) == 0) && ((mode & US_MR_OVER) == 0) )
+	{
+		usart->US_BRGR = (masterClock / baudrate) / 16;
+	}
 
-    if( ((mode & US_MR_USART_MODE_SPI_MASTER) == US_MR_USART_MODE_SPI_MASTER)
-     || ((mode & US_MR_SYNC) == US_MR_SYNC))
-    {
-        if( (mode & US_MR_USCLKS_Msk) == US_MR_USCLKS_MCK)
-        {
-            usart->US_BRGR = masterClock / baudrate;
-        }
-        else
-        {
-            if ( (mode & US_MR_USCLKS_DIV) == US_MR_USCLKS_DIV)
-            {
-                usart->US_BRGR = masterClock / baudrate / 8;
-            }
-        }
-    }
-    /* TODO other modes*/
+	if( ((mode & US_MR_USART_MODE_SPI_MASTER) == US_MR_USART_MODE_SPI_MASTER)
+	 || ((mode & US_MR_SYNC) == US_MR_SYNC))
+	{
+		if( (mode & US_MR_USCLKS_Msk) == US_MR_USCLKS_MCK)
+		{
+			usart->US_BRGR = masterClock / baudrate;
+		}
+		else
+		{
+			if ( (mode & US_MR_USCLKS_DIV) == US_MR_USCLKS_DIV)
+			{
+				usart->US_BRGR = masterClock / baudrate / 8;
+			}
+		}
+	}
+	/* TODO other modes*/
 }
 /**
  * \brief Enables or disables the transmitter of an USART peripheral.
@@ -142,14 +142,14 @@ void USART_Configure(Usart *usart,
  */
 void USART_SetTransmitterEnabled(Usart *usart, uint8_t enabled)
 {
-    if (enabled) {
+	if (enabled) {
 
-        usart->US_CR = US_CR_TXEN;
-    }
-    else {
+		usart->US_CR = US_CR_TXEN;
+	}
+	else {
 
-        usart->US_CR = US_CR_TXDIS;
-    }
+		usart->US_CR = US_CR_TXDIS;
+	}
 }
 
 /**
@@ -160,16 +160,16 @@ void USART_SetTransmitterEnabled(Usart *usart, uint8_t enabled)
  * \param enabled  If true, the receiver is enabled; otherwise it is disabled.
  */
 void USART_SetReceiverEnabled(Usart *usart,
-                                     uint8_t enabled)
+									 uint8_t enabled)
 {
-    if (enabled) {
+	if (enabled) {
 
-        usart->US_CR = US_CR_RXEN;
-    }
-    else {
+		usart->US_CR = US_CR_RXEN;
+	}
+	else {
 
-        usart->US_CR = US_CR_RXDIS;
-    }
+		usart->US_CR = US_CR_RXDIS;
+	}
 }
 
 /**
@@ -184,28 +184,28 @@ void USART_SetReceiverEnabled(Usart *usart,
  * \param timeOut  Time out value (0 = no timeout).
  */
 void USART_Write(
-    Usart *usart,
-    uint16_t data,
-    volatile uint32_t timeOut)
+	Usart *usart,
+	uint16_t data,
+	volatile uint32_t timeOut)
 {
-    if (timeOut == 0) {
+	if (timeOut == 0) {
 
-        while ((usart->US_CSR & US_CSR_TXEMPTY) == 0);
-    }
-    else {
+		while ((usart->US_CSR & US_CSR_TXEMPTY) == 0);
+	}
+	else {
 
-        while ((usart->US_CSR & US_CSR_TXEMPTY) == 0) {
+		while ((usart->US_CSR & US_CSR_TXEMPTY) == 0) {
 
-            if (timeOut == 0) {
+			if (timeOut == 0) {
 
-                TRACE_ERROR("USART_Write: Timed out.\n\r");
-                return;
-            }
-            timeOut--;
-        }
-    }
+				TRACE_ERROR("USART_Write: Timed out.\n\r");
+				return;
+			}
+			timeOut--;
+		}
+	}
 
-    usart->US_THR = data;
+	usart->US_THR = data;
 }
 
 /**
@@ -219,31 +219,31 @@ void USART_Write(
  * \param size  Size of the data buffer (in bytes).
  */
 uint8_t USART_WriteBuffer(
-    Usart *usart,
-    void *buffer,
-    uint32_t size)
+	Usart *usart,
+	void *buffer,
+	uint32_t size)
 {
-    /* Check if the first PDC bank is free*/
-    if ((usart->US_TCR == 0) && (usart->US_TNCR == 0)) {
+	/* Check if the first PDC bank is free*/
+	if ((usart->US_TCR == 0) && (usart->US_TNCR == 0)) {
 
-        usart->US_TPR = (uint32_t) buffer;
-        usart->US_TCR = size;
-        usart->US_PTCR = US_PTCR_TXTEN;
+		usart->US_TPR = (uint32_t) buffer;
+		usart->US_TCR = size;
+		usart->US_PTCR = US_PTCR_TXTEN;
 
-        return 1;
-    }
-    /* Check if the second PDC bank is free*/
-    else if (usart->US_TNCR == 0) {
+		return 1;
+	}
+	/* Check if the second PDC bank is free*/
+	else if (usart->US_TNCR == 0) {
 
-        usart->US_TNPR = (uint32_t) buffer;
-        usart->US_TNCR = size;
+		usart->US_TNPR = (uint32_t) buffer;
+		usart->US_TNCR = size;
 
-        return 1;
-    }
-    else {
+		return 1;
+	}
+	else {
 
-        return 0;
-    }
+		return 0;
+	}
 }
 
 
@@ -256,27 +256,27 @@ uint8_t USART_WriteBuffer(
  * \param timeOut  Time out value (0 -> no timeout).
  */
 uint16_t USART_Read(
-    Usart *usart,
-    volatile uint32_t timeOut)
+	Usart *usart,
+	volatile uint32_t timeOut)
 {
-    if (timeOut == 0) {
+	if (timeOut == 0) {
 
-        while ((usart->US_CSR & US_CSR_RXRDY) == 0);
-    }
-    else {
+		while ((usart->US_CSR & US_CSR_RXRDY) == 0);
+	}
+	else {
 
-        while ((usart->US_CSR & US_CSR_RXRDY) == 0) {
+		while ((usart->US_CSR & US_CSR_RXRDY) == 0) {
 
-            if (timeOut == 0) {
+			if (timeOut == 0) {
 
-                TRACE_ERROR( "USART_Read: Timed out.\n\r" ) ;
-                return 0;
-            }
-            timeOut--;
-        }
-    }
+				TRACE_ERROR( "USART_Read: Timed out.\n\r" ) ;
+				return 0;
+			}
+			timeOut--;
+		}
+	}
 
-    return usart->US_RHR;
+	return usart->US_RHR;
 }
 
 /**
@@ -289,30 +289,30 @@ uint16_t USART_Read(
  * \param size  Size of the data buffer (in bytes).
  */
 uint8_t USART_ReadBuffer(Usart *usart,
-                                      void *buffer,
-                                      uint32_t size)
+									  void *buffer,
+									  uint32_t size)
 {
-    /* Check if the first PDC bank is free*/
-    if ((usart->US_RCR == 0) && (usart->US_RNCR == 0)) {
+	/* Check if the first PDC bank is free*/
+	if ((usart->US_RCR == 0) && (usart->US_RNCR == 0)) {
 
-        usart->US_RPR = (uint32_t) buffer;
-        usart->US_RCR = size;
-        usart->US_PTCR = US_PTCR_RXTEN;
+		usart->US_RPR = (uint32_t) buffer;
+		usart->US_RCR = size;
+		usart->US_PTCR = US_PTCR_RXTEN;
 
-        return 1;
-    }
-    /* Check if the second PDC bank is free*/
-    else if (usart->US_RNCR == 0) {
+		return 1;
+	}
+	/* Check if the second PDC bank is free*/
+	else if (usart->US_RNCR == 0) {
 
-        usart->US_RNPR = (uint32_t) buffer;
-        usart->US_RNCR = size;
+		usart->US_RNPR = (uint32_t) buffer;
+		usart->US_RNCR = size;
 
-        return 1;
-    }
-    else {
+		return 1;
+	}
+	else {
 
-        return 0;
-    }
+		return 0;
+	}
 }
 
 /**
@@ -323,14 +323,14 @@ uint8_t USART_ReadBuffer(Usart *usart,
  */
 uint8_t USART_IsDataAvailable(Usart *usart)
 {
-    if ((usart->US_CSR & US_CSR_RXRDY) != 0) {
+	if ((usart->US_CSR & US_CSR_RXRDY) != 0) {
 
-        return 1;
-    }
-    else {
+		return 1;
+	}
+	else {
 
-        return 0;
-    }
+		return 0;
+	}
 }
 
 /**
@@ -341,9 +341,9 @@ uint8_t USART_IsDataAvailable(Usart *usart)
  */
 void USART_SetIrdaFilter(Usart *pUsart, uint8_t filter)
 {
-    assert( pUsart != NULL ) ;
+	assert( pUsart != NULL ) ;
 
-    pUsart->US_IF = filter;
+	pUsart->US_IF = filter;
 }
 
 /**
@@ -355,17 +355,17 @@ void USART_SetIrdaFilter(Usart *pUsart, uint8_t filter)
  * \param c  Character to send
  */
 void USART_PutChar(
-    Usart *usart,
-    uint8_t c)
+	Usart *usart,
+	uint8_t c)
 {
-    /* Wait for the transmitter to be ready*/
-    while ((usart->US_CSR & US_CSR_TXEMPTY) == 0);
+	/* Wait for the transmitter to be ready*/
+	while ((usart->US_CSR & US_CSR_TXEMPTY) == 0);
 
-    /* Send character*/
-    usart->US_THR = c;
+	/* Send character*/
+	usart->US_THR = c;
 
-    /* Wait for the transfer to complete*/
-    while ((usart->US_CSR & US_CSR_TXEMPTY) == 0);
+	/* Wait for the transfer to complete*/
+	while ((usart->US_CSR & US_CSR_TXEMPTY) == 0);
 }
 
 /**
@@ -373,28 +373,28 @@ void USART_PutChar(
  */
 uint32_t USART_IsRxReady(Usart *usart)
 {
-    return (usart->US_CSR & US_CSR_RXRDY);
+	return (usart->US_CSR & US_CSR_RXRDY);
 }
 /**
  * \brief   Get present status
  */
 uint32_t USART_GetStatus(Usart *usart)
 {
-    return usart->US_CSR;
+	return usart->US_CSR;
 }
 /**
  * \brief   Enable interrupt
  */
 void USART_EnableIt(Usart *usart,uint32_t mode)
 {
-    usart->US_IER = mode;
+	usart->US_IER = mode;
 }
 /**
  * \brief   Disable interrupt
  */
 void USART_DisableIt(Usart *usart,uint32_t mode)
 {
-    usart->US_IDR = mode;
+	usart->US_IDR = mode;
 }
 /**
  * \brief  Reads and returns a character from the USART.
@@ -405,6 +405,6 @@ void USART_DisableIt(Usart *usart,uint32_t mode)
  */
 uint8_t USART_GetChar(Usart *usart)
 {
-    while ((usart->US_CSR & US_CSR_RXRDY) == 0);
-    return usart->US_RHR;
+	while ((usart->US_CSR & US_CSR_RXRDY) == 0);
+	return usart->US_RHR;
 }

@@ -7,7 +7,7 @@
 int main() {
 
 	/* Initialize the platform hardware. */
-	//system_init();
+	system_init();
 
 	/* Initialize peripheral hardware. */
 	button_configure();

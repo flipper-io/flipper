@@ -70,45 +70,74 @@ uint8_t lf_usb_get(void) {
 }
 
 int lf_usb_push(void *source, lf_size_t length) {
-	lf_size_t lenorg = length;
 	struct _lf_usb_record *record = lf_device() -> endpoint -> record;
-	uint16_t total = lf_ceiling(length, INTERRUPT_OUT_SIZE);
-	for (lf_size_t packet = 0; packet < total; packet ++) {
-		lf_size_t _len = INTERRUPT_OUT_SIZE;
-		if (length < _len) {
-			_len = length;
-		}
-		int _length;
-		uint8_t buffer[INTERRUPT_OUT_SIZE];
-		memcpy(buffer, (void *)(source + (packet * INTERRUPT_OUT_SIZE)), _len);
-		int _e = libusb_interrupt_transfer(record -> handle, INTERRUPT_OUT_ENDPOINT, buffer, INTERRUPT_OUT_SIZE, &_length, 0);
-		if (_e < 0 || _length != INTERRUPT_OUT_SIZE) {
-			error_raise(E_COMMUNICATION, error_message("Failed to transmit complete USB packet."));
-			return lf_error;
-		}
-		length -= _len;
+	int _length;
+	int _e;
+#ifndef __ALL_BULK__
+	if (length <= INTERRUPT_OUT_SIZE) {
+		_e = libusb_interrupt_transfer(record -> handle, INTERRUPT_OUT_ENDPOINT, source, length, &_length, 0);
+	} else {
+#endif
+		_e = libusb_bulk_transfer(record -> handle, BULK_OUT_ENDPOINT, source, length, &_length, 0);
+#ifndef __ALL_BULK__
 	}
+#endif
+	if (_e < 0 || _length != length) {
+		error_raise(E_COMMUNICATION, error_message("Failed to transmit complete USB packet."));
+		return lf_error;
+	}
+	// uint16_t total = lf_ceiling(length, BULK_OUT_SIZE);
+	// for (lf_size_t packet = 0; packet < total; packet ++) {
+	// 	lf_size_t _len = BULK_OUT_SIZE;
+	// 	if (length < _len) {
+	// 		_len = length;
+	// 	}
+	// 	int _length;
+	// 	uint8_t buffer[BULK_OUT_SIZE];
+	// 	memcpy(buffer, (void *)(source + (packet * BULK_OUT_SIZE)), _len);
+	// 	int _e = libusb_bulk_transfer(record -> handle, BULK_OUT_ENDPOINT, buffer, BULK_OUT_SIZE, &_length, 0);
+	// 	if (_e < 0 || _length != BULK_OUT_SIZE) {
+	// 		error_raise(E_COMMUNICATION, error_message("Failed to transmit complete USB packet."));
+	// 		return lf_error;
+	// 	}
+	// 	length -= _len;
+	// }
 	return lf_success;
 }
 
 int lf_usb_pull(void *destination, lf_size_t length) {
 	struct _lf_usb_record *record = lf_device() -> endpoint -> record;
-	lf_size_t total = lf_ceiling(length, INTERRUPT_IN_SIZE);
-	for (lf_size_t packet = 0; packet < total; packet ++) {
-		lf_size_t _len = INTERRUPT_IN_SIZE;
-		if (length < _len) {
-			_len = length;
-		}
-		int _length;
-		uint8_t buffer[INTERRUPT_IN_SIZE];
-		int _e = libusb_interrupt_transfer(record -> handle, INTERRUPT_IN_ENDPOINT, buffer, INTERRUPT_IN_SIZE, &_length, 0);
-		memcpy((void *)(destination + (packet * INTERRUPT_IN_SIZE)), buffer, _len);
-		if (_e < 0 || _length != INTERRUPT_IN_SIZE) {
-			error_raise(E_COMMUNICATION, error_message("Failed to receive complete USB packet."));
-			return lf_error;
-		}
-		length -= _len;
+	int _length;
+	int _e;
+#ifndef __ALL_BULK__
+	if (length <= INTERRUPT_IN_SIZE) {
+		_e = libusb_interrupt_transfer(record -> handle, INTERRUPT_IN_ENDPOINT, destination, length, &_length, 0);
+	} else {
+#endif
+		_e = libusb_bulk_transfer(record -> handle, BULK_IN_ENDPOINT, destination, length, &_length, 0);
+#ifndef __ALL_BULK__
 	}
+#endif
+	if (_e < 0 || _length != length) {
+		error_raise(E_COMMUNICATION, error_message("Failed to receive complete USB packet."));
+		return lf_error;
+	}
+	// lf_size_t total = lf_ceiling(length, BULK_IN_SIZE);
+	// for (lf_size_t packet = 0; packet < total; packet ++) {
+	// 	lf_size_t _len = BULK_IN_SIZE;
+	// 	if (length < _len) {
+	// 		_len = length;
+	// 	}
+	// 	int _length;
+	// 	uint8_t buffer[BULK_IN_SIZE];
+	// 	int _e = libusb_bulk_transfer(record -> handle, BULK_IN_ENDPOINT, buffer, BULK_IN_SIZE, &_length, 0);
+	// 	memcpy((void *)(destination + (packet * BULK_IN_SIZE)), buffer, _len);
+	// 	if (_e < 0 || _length != BULK_IN_SIZE) {
+	// 		error_raise(E_COMMUNICATION, error_message("Failed to receive complete USB packet."));
+	// 		return lf_error;
+	// 	}
+	// 	length -= _len;
+	// }
 	return lf_success;
 }
 

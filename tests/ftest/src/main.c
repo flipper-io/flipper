@@ -5,10 +5,15 @@
 
 int main(int argc, char *argv[]) {
 
-    error.pause();
-    flipper.attach();
+	flipper.attach();
 
-    printf(KGRN "Successfully attached to Flipper device.\n");
+	printf(KGRN "Successfully attached to Flipper device.\n");
 
-    return EXIT_SUCCESS;
+	while(1) {
+		while(!uart.ready());
+		uint8_t c = uart.get();
+		printf("0x%02x (%c)\n", c, c);
+	}
+
+	return EXIT_SUCCESS;
 }
