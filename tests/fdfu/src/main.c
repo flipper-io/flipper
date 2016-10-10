@@ -43,7 +43,7 @@ uint8_t applet[] = {
 	0x80, 0x00, 0x00, 0x00,
 	0x04, 0x0A, 0x0E, 0x40,
 	0x08, 0x0A, 0x0E, 0x40,
-	0x03, 0x00, 0x00, 0x5A
+	0x01, 0x00, 0x00, 0x5A
 };
 
 /* Place the applet in RAM somewhere far away from the region used by the SAM-BA. */
@@ -344,21 +344,21 @@ connected:
 				uint32_t word = sam_ba_read_word(addr);
 				uint32_t _word = *(uint32_t *)(pagedata + (i * sizeof(uint32_t)));
 				uint8_t match = ((uint16_t)word == (uint16_t)_word);
-				if (!match && retries ++ < RETRIES) {
+				//printf("0x%08x: 0x%08x (0x%08x) -> %s\n", addr, word, _word, (match) ? KGRN "GOOD" KNRM : KRED "BAD" KNRM);
+				if (!match && retries < RETRIES) {
 					if (retries == 0) {
 						perrors ++;
 						errors ++;
 					}
+					retries ++;
 					continue;
 				}
 				retries = 0;
+				perrors = 0;
 			}
 			printf("Verification complete. %s%i word errors detected.\n\n" KNRM, (errors) ? KRED : KGRN, errors);
 		}
 	}
-
-	sam_ba_write_word(REGADDR(SCB -> VTOR), (uint32_t)(IFLASH_ADDR & SCB_VTOR_TBLOFF_Msk) | (1 << SCB_VTOR_TBLBASE_Pos));
-	sam_ba_write_word(REGADDR(RSTC -> RSTC_MR), RSTC_MR_KEY(0xA5) | RSTC_MR_URSTEN);
 
 	printf("Resetting the CPU.\n");
 	/* Reset the CPU. */

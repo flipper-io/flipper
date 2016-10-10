@@ -30,11 +30,11 @@ void fmr_pull(fmr_module module, fmr_function function, lf_size_t length) {
 
 /* Interrupt handler for this device driver. */
 void UART0_IrqHandler(void) {
-	struct _fmr_packet packet;
-	uart0_pull(&packet, sizeof(packet));
-	struct _fmr_result result;
-	fmr_perform(&packet, &result);
-	uart0_push(&result, sizeof(struct _fmr_result));
+	// struct _fmr_packet packet;
+	// uart0_pull(&packet, sizeof(packet));
+	// struct _fmr_result result;
+	// fmr_perform(&packet, &result);
+	// uart0_push(&result, sizeof(struct _fmr_result));
 }
 
 void delay_ms() {
@@ -44,13 +44,15 @@ void delay_ms() {
 
 void system_task(void) {
 
-	//gpio_enable(PIO_PA8, PIO_DEFAULT);
+	gpio_enable(PIO_PA8, PIO_DEFAULT);
 
 	while (1) {
-		// gpio_write(PIO_PA8, 1);
-		// delay_ms();
-		// gpio_write(PIO_PA8, 0);
-		// delay_ms();
+		usart_push(&usart, sizeof(struct _gpio));
+		usart_put('\n');
+		gpio_write(PIO_PA8, 1);
+		delay_ms();
+		gpio_write(PIO_PA8, 0);
+		delay_ms();
 	}
 
 }
@@ -58,12 +60,15 @@ void system_task(void) {
 void system_init(void) {
 	/* Allow the reset pin to reset the device. */
 	RSTC -> RSTC_MR |= RSTC_MR_URSTEN;
-	/* Configure the GPIO peripheral. */
-	// const void *cfg = lf_std_function(_gpio_id, _gpio_configure);
+	//const void *cfg = lf_std_function(_gpio_id, _gpio_configure);
 	// ((void (*)(void))cfg)();
 	/* Configure the UART0 peripheral. */
 	//uart0_configure();
-	
+	/* Configure the USART0 peripheral. */
+	usart_configure();
+	/* Configure the GPIO peripheral. */
+	gpio_configure();
+	//usart_push(&gpio.configure, sizeof(void *));
 }
 
 void system_deinit(void) {

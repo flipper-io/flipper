@@ -61,6 +61,7 @@ SECTIONS
 		/* Support C constructors, and C destructors in both user code
 		   and the C library. This also provides support for C++ code. */
 
+/*
 		. = ALIGN(4);
 		KEEP(*(.init))
 		. = ALIGN(4);
@@ -94,6 +95,7 @@ SECTIONS
 		KEEP (*(EXCLUDE_FILE (*crtend.o) .dtors))
 		KEEP (*(SORT(.dtors.*)))
 		KEEP (*crtend.o(.dtors))
+*/
 
 		. = ALIGN(4);
 		_efixed = .;            /* End of text section */

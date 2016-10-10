@@ -65,4 +65,4 @@ fcr0:
 fsr0:
 	.word 0x400E0A08
 ewp:
-	.word 0x5a000003
+	.word 0x5a000001
