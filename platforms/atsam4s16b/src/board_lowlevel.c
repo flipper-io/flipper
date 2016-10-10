@@ -51,12 +51,12 @@
 // 					   | CKGR_PLLBR_DIVB(0x1))
 // #define BOARD_MCKR      (PMC_MCKR_PRES_CLK_2 | PMC_MCKR_CSS_PLLB_CLK)
 
-/* Clock settings at 64MHz */
-#if (BOARD_MCK == 64000000)
+/* Clock settings at 48MHz */
+#if (BOARD_MCK == 48000000)
 #define BOARD_OSCOUNT   (CKGR_MOR_MOSCXTST(8))
-#define BOARD_PLLBR     (CKGR_PLLBR_MULB(16) \
+#define BOARD_PLLBR     (CKGR_PLLBR_MULB(24) \
 					   | CKGR_PLLBR_PLLBCOUNT(1) \
-					   | CKGR_PLLBR_DIVB(5))
+					   | CKGR_PLLBR_DIVB(10))
 #define BOARD_MCKR      (PMC_MCKR_PRES_CLK_1 | PMC_MCKR_CSS_PLLB_CLK)
 
 #else
@@ -80,7 +80,7 @@ extern WEAK void LowLevelInit( void )
 	uint32_t timeout = 0;
 
 	/* Set 3 FWS for Embedded Flash Access */
-	EFC->EEFC_FMR = EEFC_FMR_FWS(6);
+	EFC->EEFC_FMR = EEFC_FMR_FWS(2);
 
 	/* Initialize main oscillator */
 	if ( !(PMC->CKGR_MOR & CKGR_MOR_MOSCSEL) )

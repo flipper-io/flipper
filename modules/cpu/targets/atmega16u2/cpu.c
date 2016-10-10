@@ -1,5 +1,6 @@
 #define __private_include__
 #include <flipper/cpu.h>
+#include <flipper/uart.h>
 #include <platform/atmega16u2.h>
 
 void cpu_configure(void) {

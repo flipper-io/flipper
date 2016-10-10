@@ -3,7 +3,7 @@
 
 #include "chip.h"
 
-#define BOARD_MCK 64000000
+#define BOARD_MCK 48000000
 #define PLATFORM_BAUDRATE 115200
 
 #endif

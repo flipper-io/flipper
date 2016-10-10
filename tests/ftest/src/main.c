@@ -10,6 +10,8 @@ int main(int argc, char *argv[]) {
 	printf(KGRN "Successfully attached to Flipper device.\n");
 
 	while(1) {
+		char _c = getchar();
+		uart.put(_c);
 		while(!uart.ready());
 		uint8_t c = uart.get();
 		printf("0x%02x (%c)\n", c, c);
