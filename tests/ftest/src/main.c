@@ -9,13 +9,25 @@ int main(int argc, char *argv[]) {
 
 	printf(KGRN "Successfully attached to Flipper device.\n");
 
-	while(1) {
-		char _c = getchar();
-		uart.put(_c);
-		while(!uart.ready());
-		uint8_t c = uart.get();
-		printf("0x%02x (%c)\n", c, c);
-	}
+	/* Create the SAM4S endpoint using uart0 as the interface. */
+	struct _lf_endpoint sam4s_ep = {
+		uart0_configure,
+		uart0_ready,
+		uart0_put,
+		uart0_get,
+		uart0_push,
+		uart0_pull
+	};
+	/* Create the SAM4S device. */
+	struct _lf_device sam4s;
+	sam4s.configuration.attributes = lf_device_little_endian | lf_device_32bit;
+	sam4s.endpoint = &sam4s_ep;
+	/* Construct the GPIO module. */
+	struct _fmr_module _gpio;
+	_gpio.device = &sam4s;
+	/* Execute the configure function. */
+	uint32_t val = lf_invoke(&_gpio, _gpio_configure, NULL);
+	printf("Got return value 0x%08x\n", val);
 
 	return EXIT_SUCCESS;
 }

@@ -21,7 +21,7 @@ def configure(cfg):
 	# Load the appropriate archiver.
 	cfg.env.AR = cfg.find_program('arm-none-eabi-ar')
 	# Load the appropriate assembler.
-	cfg.env.AS = cfg.find_program('arm-none-eabi-as')
+	cfg.env.AS = cfg.find_program('arm-none-eabi-gcc')
 	cfg.env.AS_TGT_F = ['-c', '-o']
 	cfg.env.ASLNK_TGT_F = ['-o']
 	cfg.load('asm')

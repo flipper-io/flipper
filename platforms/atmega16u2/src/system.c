@@ -1,7 +1,7 @@
 #define __private_include__
 #include <platform/atmega16u2.h>
 #include <private/megausb.h>
-#include <flipper/uart.h>
+#include <flipper/uart0.h>
 #include <flipper/cpu.h>
 #include <flipper/led.h>
 
@@ -97,8 +97,8 @@ void system_init() {
 	cpu_prescale(0);
 	/* Configure the USB subsystem. */
 	configure_usb();
-	/* Configure the UART subsystem. */
-	uart_configure();
+	/* Configure the UART0 subsystem. */
+	uart0_configure();
 	/* Configure the SAM4S. */
 	cpu_configure();
 	led_configure();

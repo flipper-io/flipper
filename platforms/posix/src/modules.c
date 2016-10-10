@@ -5,31 +5,32 @@
 
 /* Define the standard modules accessible on this platform. */
 const void *const fmr_modules[] = {
-    _forward_id,
-    &button,
-    _forward_id,
-    _forward_id,
-    _forward_id,
-    _forward_id,
-    _forward_id,
-    _forward_id,
-    &led,
-    _forward_id,
-    _forward_id,
-    _forward_id,
-    _forward_id,
-    _forward_id,
-    _forward_id,
-    _forward_id,
-    _forward_id,
+	_forward_id,
+	&button,
+	_forward_id,
+	_forward_id,
+	_forward_id,
+	_forward_id,
+	_forward_id,
+	_forward_id,
+	&led,
+	_forward_id,
+	_forward_id,
+	_forward_id,
+	_forward_id,
+	_forward_id,
+	_forward_id,
+	_forward_id,    // usart
+	_forward_id,
+	_forward_id,
 };
 
 const void *lf_std_function(fmr_module module, fmr_function function) {
-    return NULL;
+	return NULL;
 }
 
 uint32_t fmr_call(const void *function, uint8_t argc, uint16_t argt, void *argv) {
-    return 0;
+	return 0;
 }
 
 /* TEMP */

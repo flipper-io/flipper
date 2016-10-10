@@ -100,9 +100,9 @@ struct __attribute__((__packed__)) _lf_configuration {
 
 /* Standardizes interaction with a physical hardware bus for the transmission of arbitrary data. */
 struct _lf_endpoint {
-	/* Configures the endpoint hardware given an arbitrary parameter. */
+	/* Configures the endpoint record given an arbitrary set of parameters. */
 	int (* configure)();
-	/* Indicates whether or not the hardware is ready to send or receive data. */
+	/* Indicates whether or not the endpoint is ready to send or receive data. */
 	uint8_t (* ready)(void);
 	/* Sends a single byte through the endpoint. */
 	void (* put)(uint8_t byte);

@@ -1,11 +1,40 @@
 #define __private_include__
+#include <flipper/gpio.h>
+#include <flipper/uart0.h>
+#include <flipper/modules.h>
 #include <platform/atsam4s16b.h>
 
-void system_init(void) {
+/* The fmr_device object containing global state about this device. */
+struct _lf_device self = {
+	{
+		"flipper",
+		0xc713,
+		LF_VERSION,
+		(lf_device_32bit | lf_device_little_endian)
+	},
+	NULL,
+	E_OK,
+	false,
+	NULL
+};
 
-	/* Allow the reset pin to reset the device. */
-	RSTC -> RSTC_MR |= RSTC_MR_URSTEN;
+/* Helper functions to libflipper. */
 
+void fmr_push(fmr_module module, fmr_function function, lf_size_t length) {
+
+}
+
+void fmr_pull(fmr_module module, fmr_function function, lf_size_t length) {
+
+}
+
+/* Interrupt handler for this device driver. */
+void UART0_IrqHandler(void) {
+	struct _fmr_packet packet;
+	uart0_pull(&packet, sizeof(packet));
+	struct _fmr_result result;
+	fmr_perform(&packet, &result);
+	uart0_push(&result, sizeof(struct _fmr_result));
 }
 
 void delay_ms() {
@@ -13,48 +42,28 @@ void delay_ms() {
 	while (counter --) __asm__("nop");
 }
 
-void UART0_IrqHandler(void) {
-	while (USART_IsDataAvailable((Usart *)UART0)) {
-		USART_PutChar((Usart *)UART0, USART_GetChar((Usart *)UART0));
-	}
-}
-
 void system_task(void) {
 
-	/* Enable the UART0 clock in the PMC. */
-	PMC_EnablePeripheral(ID_UART0);
-
-	/* Declare a pin map that will configure the appropriate output pins for the UART0. */
-	const Pin usart0_pins[] = { (Pin){ PIO_PA9A_URXD0 | PIO_PA10A_UTXD0, PIOA, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT } };
-	/* Write the pinmap into the PIO. */
-	PIO_Configure(usart0_pins, PIO_LISTSIZE(usart0_pins));
-	/* Configure the UART0. */
-	USART_Configure((Usart *)UART0, USART_MODE_ASYNCHRONOUS, 115200, BOARD_MCK);
-	/* Enable the UART0 IRQ in the NVIC. */
-	NVIC_EnableIRQ(UART0_IRQn);
-	/* Enable the UART0 interrupt on receive. */
-	USART_EnableIt((Usart *)UART0, UART_IER_RXRDY);
-	/* Enable the UART0 transmitter. */
-	USART_SetTransmitterEnabled((Usart *)UART0, 1);
-	/* Enable the UART0 receiver. */
-	USART_SetReceiverEnabled((Usart *)UART0, 1);
-
-	PIOA -> PIO_PER |= (1 << 8);
-	PIOA -> PIO_OER |= (1 << 8);
-	PIOA -> PIO_SODR |= (1 << 8);
-	PIOA -> PIO_CODR &= ~(1 << 8);
-
-	const char dingas[] = "Hello world!";
+	//gpio_enable(PIO_PA8, PIO_DEFAULT);
 
 	while (1) {
-		PIOA -> PIO_SODR |= (1 << 8);
-		PIOA -> PIO_CODR &= ~(1 << 8);
-		delay_ms();
-		PIOA -> PIO_SODR &= ~(1 << 8);
-		PIOA -> PIO_CODR |= (1 << 8);
-		delay_ms();
+		// gpio_write(PIO_PA8, 1);
+		// delay_ms();
+		// gpio_write(PIO_PA8, 0);
+		// delay_ms();
 	}
 
+}
+
+void system_init(void) {
+	/* Allow the reset pin to reset the device. */
+	RSTC -> RSTC_MR |= RSTC_MR_URSTEN;
+	/* Configure the GPIO peripheral. */
+	// const void *cfg = lf_std_function(_gpio_id, _gpio_configure);
+	// ((void (*)(void))cfg)();
+	/* Configure the UART0 peripheral. */
+	//uart0_configure();
+	
 }
 
 void system_deinit(void) {

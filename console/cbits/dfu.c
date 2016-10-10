@@ -68,38 +68,38 @@ int retries = 0;
 void sam_ba_jump(uint32_t address) {
 	char buffer[11];
 //	sprintf(buffer, "G%08X#", address);
-	uart.push(buffer, sizeof(buffer) - 1);
+	uart0.push(buffer, sizeof(buffer) - 1);
 }
 
 /* Instructs the SAM-BA to write a word to the address provided. */
 void sam_ba_write_word(uint32_t destination, uint32_t word) {
 	char buffer[20];
 //	sprintf(buffer, "W%08X,%08X#", destination, word);
-	uart.push(buffer, sizeof(buffer) - 1);
+	uart0.push(buffer, sizeof(buffer) - 1);
 }
 
 /* Instructs the SAM-BA to read a byte from the address provided. */
 uint8_t sam_ba_read_byte(uint32_t source) {
 	char buffer[12];
 //	sprintf(buffer, "o%08X,#", source);
-	uart.push(buffer, sizeof(buffer) - 1);
-	return uart.get();
+	uart0.push(buffer, sizeof(buffer) - 1);
+	return uart0.get();
 }
 
 /* Instructs the SAM-BA to write a byte from the address provided. */
 void sam_ba_write_byte(uint32_t destination, uint8_t byte) {
 	char buffer[20];
 //	sprintf(buffer, "O%08X,%02X#", destination, byte);
-	uart.push(buffer, sizeof(buffer) - 1);
+	uart0.push(buffer, sizeof(buffer) - 1);
 }
 
 /* Instructs the SAM-BA to read a word from the address provided. */
 uint32_t sam_ba_read_word(uint32_t source) {
 	char buffer[12];
 //	sprintf(buffer, "w%08X,#", source);
-	uart.push(buffer, sizeof(buffer) - 1);
+	uart0.push(buffer, sizeof(buffer) - 1);
 	uint32_t result = 0;
-	uart.pull(&result, sizeof(uint32_t));
+	uart0.pull(&result, sizeof(uint32_t));
 	return result;
 }
 
@@ -114,9 +114,9 @@ int sam_ba_copy(uint32_t destination, void *source, uint32_t length) {
 	char buffer[20];
 //	sprintf(buffer, "S%08X,%08X#", destination, length);
 retry:
-	uart.push(buffer, sizeof(buffer) - 1);
+	uart0.push(buffer, sizeof(buffer) - 1);
 	/* Check for the clear to send byte. */
-	if (uart.get() != 'C') {
+	if (uart0.get() != 'C') {
 		if (retries > RETRIES) {
 			retries = 0;
 			return lf_error;
@@ -139,18 +139,18 @@ retry:
 		/* Calculate the checksum of the data and write it to the packet in little endian format. */
 		_packet.checksum = little(lf_checksum(_packet.data, sizeof(_packet.data)));
 		/* Transfer the packet to the SAM-BA. */
-		uart.push(&_packet, sizeof(struct _xpacket));
+		uart0.push(&_packet, sizeof(struct _xpacket));
 		/* Obtain acknowledgement. */
-		if (uart.get() != ACK) {
+		if (uart0.get() != ACK) {
 			return lf_error;
 		}
 		/* Decrement the length appropriately. */
 		length -= _len;
 	}
 	/* Send end of transmission. */
-	uart.put(EOT);
+	uart0.put(EOT);
 	/* Obtain acknowledgement. */
-	if (uart.get() != ACK) {
+	if (uart0.get() != ACK) {
 		return lf_error;
 	}
 	return lf_success;
@@ -168,10 +168,10 @@ int install(uint8_t *firmware, size_t firmware_size, int *status) {
 //	printf("Entering update mode.\n");
 retry_dfu:
 	/* Send the synchronization character. */
-	uart.put('#');
+	uart0.put('#');
 	char d_ack[3];
 	/* Check for acknowledgement. */
-	uart.pull(d_ack, sizeof(d_ack));
+	uart0.pull(d_ack, sizeof(d_ack));
 	if (!memcmp(d_ack, (char []){ 0x0a, 0x0d, 0x3e }, sizeof(d_ack))) {
 		retries = 0;
 //		fprintf(stderr, KGRN " Successfully entered update mode.\n" KNRM);
@@ -202,9 +202,9 @@ connected:
 
 	/* Set normal mode. */
 //	printf("Entering normal mode.\n");
-	uart.push("N#", 2);
+	uart0.push("N#", 2);
 	char n_ack[2];
-	uart.pull(n_ack, sizeof(n_ack));
+	uart0.pull(n_ack, sizeof(n_ack));
 	if (memcmp(n_ack, (char []){ 0x0A, 0x0D }, sizeof(n_ack))) {
 //		fprintf(stderr, "Failed to enter normal mode.\n");
 		return -1;
@@ -315,9 +315,9 @@ retry_gpnv1:
 
 //	printf("Resetting the CPU.\n");
 	/* Reset the CPU. */
-	uart.disable();
+	uart0.disable();
 	cpu.reset();
-	uart.enable();
+	uart0.enable();
 //	printf(KGRN " Successfully reset the CPU.\n" KNRM "----------------------");
 
 //	printf(KGRN "\nSuccessfully uploaded new firmware.\n" KNRM);

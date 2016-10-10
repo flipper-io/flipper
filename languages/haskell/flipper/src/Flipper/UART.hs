@@ -34,24 +34,24 @@ import qualified Flipper.Internal.UART as I
 
 -- | Enable the UART bus.
 enable :: MonadFlipper m => m ()
-enable = bracketIO I.uartEnable
+enable = bracketIO I.usartEnable
 
 -- | Disable the UART bus.
 disable :: MonadFlipper m => m ()
-disable = bracketIO I.uartDisable
+disable = bracketIO I.usartDisable
 
 -- | Send a byte over the UART bus.
 put :: MonadFlipper m => Word8 -> m ()
-put = bracketIO . I.uartPut
+put = bracketIO . I.usartPut
 
 -- | Receive a byte over the UART bus.
 get :: MonadFlipper m => m Word8
-get = bracketIO I.uartGet
+get = bracketIO I.usartGet
 
 -- | Send any 'Bufferable' data over the UART bus.
 push :: (B.Bufferable b, MonadFlipper m) => b -> m ()
-push = bracketIO . I.uartPush . runPut . B.put
+push = bracketIO . I.usartPush . runPut . B.put
 
 -- | Receive any 'Bufferable' data over the UART bus.
 pull :: (B.Bufferable b, MonadFlipper m) => m (Either String b)
-pull = runGetWith B.get (bracketIO . I.uartPull) emptyBuffer
+pull = runGetWith B.get (bracketIO . I.usartPull) emptyBuffer

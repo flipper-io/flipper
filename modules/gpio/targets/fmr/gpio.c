@@ -2,15 +2,15 @@
 #include <flipper/gpio.h>
 #include <flipper/fmr.h>
 
-void gpio_configure(void) {
+int gpio_configure(void) {
 
 }
 
-void gpio_set_direction(uint8_t pin, uint8_t direction) {
+void gpio_enable(uint32_t mask, uint8_t properties) {
 
 }
 
-void gpio_write(uint8_t pin, uint16_t value) {
+void gpio_write(uint32_t mask, uint8_t value) {
 
 }
 

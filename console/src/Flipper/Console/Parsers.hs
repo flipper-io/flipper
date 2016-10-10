@@ -89,8 +89,8 @@ parseSPIAction = string' "spi" *> spaces *> choice [ try parseSPIEnable
                                                  ]
 
 parseUARTAction :: Parser UARTAction
-parseUARTAction = string' "uart" *> spaces *> choice uarts
-    where uarts = [ try parseUARTEnable
+parseUARTAction = string' "usart" *> spaces *> choice usarts
+    where usarts = [ try parseUARTEnable
                   , try parseUARTDisable
                   , try parseUARTRead
                   , try parseUARTWriteFromString

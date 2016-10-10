@@ -53,7 +53,7 @@ action = hsubparser (mconcat builtins <> mconcat calls)
                   , command "gpio" ((ConsoleCall . GPIOCall) <$> gpio)
                   , command "led" ((ConsoleCall . LEDCall) <$> led)
                   , command "spi" ((ConsoleCall . SPICall) <$> spi)
-                  , command "uart" ((ConsoleCall . UARTCall) <$> uart)
+                  , command "usart" ((ConsoleCall . UARTCall) <$> usart)
                   ]
 
 flash :: ParserInfo ConsoleAction
@@ -146,16 +146,16 @@ spi = info spiP spiI
                                       , spiWriteFromFile
                                       ]
 
-uart :: ParserInfo UARTAction
-uart = info uartP uartI
-    where uartI = mconcat [ fullDesc
+usart :: ParserInfo UARTAction
+usart = info usartP usartI
+    where usartI = mconcat [ fullDesc
                           , progDesc "Interact with the device's UART bus."
                           ]
-          uartP = hsubparser $ mconcat [ uartEnable
-                                       , uartDisable
-                                       , uartRead
-                                       , uartWriteFromString
-                                       , uartWriteFromFile
+          usartP = hsubparser $ mconcat [ usartEnable
+                                       , usartDisable
+                                       , usartRead
+                                       , usartWriteFromString
+                                       , usartWriteFromFile
                                        ]
 
 buttonRead :: Mod CommandFields ButtonAction
@@ -335,27 +335,27 @@ spiWriteFromFile = command "writefile" ( info ( SPIWriteFromString
                            , progDesc "Write a local file to the SPI bus."
                            ]
 
-uartEnable :: Mod CommandFields UARTAction
-uartEnable = command "enable" (info (pure UARTEnable) enableI)
+usartEnable :: Mod CommandFields UARTAction
+usartEnable = command "enable" (info (pure UARTEnable) enableI)
     where enableI = mconcat [ fullDesc
                             , progDesc "Enable the UART bus."
                             ]
 
-uartDisable :: Mod CommandFields UARTAction
-uartDisable = command "disable" (info (pure UARTDisable) disableI)
+usartDisable :: Mod CommandFields UARTAction
+usartDisable = command "disable" (info (pure UARTDisable) disableI)
     where disableI = mconcat [ fullDesc
                              , progDesc "Disable the UART bus."
                              ]
 
-uartRead :: Mod CommandFields UARTAction
-uartRead = command "read" (info (pure UARTRead) readI)
+usartRead :: Mod CommandFields UARTAction
+usartRead = command "read" (info (pure UARTRead) readI)
     where readI = mconcat [ fullDesc
                           , progDesc "Read a null-terminated string from the \
                                      \UART bus."
                           ]
 
-uartWriteFromString :: Mod CommandFields UARTAction
-uartWriteFromString = command "write" ( info ( UARTWriteFromString
+usartWriteFromString :: Mod CommandFields UARTAction
+usartWriteFromString = command "write" ( info ( UARTWriteFromString
                                                <$> strArgument stringP
                                              )
                                              writeI
@@ -368,8 +368,8 @@ uartWriteFromString = command "write" ( info ( UARTWriteFromString
                                       \UART bus."
                            ]
 
-uartWriteFromFile :: Mod CommandFields UARTAction
-uartWriteFromFile = command "writefile" ( info ( UARTWriteFromString
+usartWriteFromFile :: Mod CommandFields UARTAction
+usartWriteFromFile = command "writefile" ( info ( UARTWriteFromString
                                                  <$> strArgument fileP
                                                )
                                                writeI

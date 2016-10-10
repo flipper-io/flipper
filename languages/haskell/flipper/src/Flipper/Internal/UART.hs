@@ -10,12 +10,12 @@ Portability : Windows, POSIX
 -}
 
 module Flipper.Internal.UART (
-    uartEnable
-  , uartDisable
-  , uartPut
-  , uartGet
-  , uartPush
-  , uartPull
+    usartEnable
+  , usartDisable
+  , usartPut
+  , usartGet
+  , usartPush
+  , usartPull
   ) where
 
 import Data.Word
@@ -25,43 +25,43 @@ import Flipper.Internal.Buffer
 import Foreign.ForeignPtr
 import Foreign.Ptr
 
-uartEnable :: IO ()
-uartEnable = c_uart_enable
+usartEnable :: IO ()
+usartEnable = c_usart_enable
 
-uartDisable :: IO ()
-uartDisable = c_uart_disable
+usartDisable :: IO ()
+usartDisable = c_usart_disable
 
-uartPut :: Word8 -> IO ()
-uartPut = c_uart_put
+usartPut :: Word8 -> IO ()
+usartPut = c_usart_put
 
-uartGet :: IO Word8
-uartGet = c_uart_get
+usartGet :: IO Word8
+usartGet = c_usart_get
 
-uartPush :: Buffer -> IO ()
-uartPush (Buffer p o l) = withForeignPtr p $ \p' ->
-   c_uart_push (plusPtr p' o) (fromIntegral l)
+usartPush :: Buffer -> IO ()
+usartPush (Buffer p o l) = withForeignPtr p $ \p' ->
+   c_usart_push (plusPtr p' o) (fromIntegral l)
 
-uartPull :: Int -> IO Buffer
-uartPull l
-    | l <= 0    = error "uartPull: length must be greater than zero."
+usartPull :: Int -> IO Buffer
+usartPull l
+    | l <= 0    = error "usartPull: length must be greater than zero."
     | otherwise = do b@(Buffer p _ _) <- allocBufferSafe l
-                     withForeignPtr p (\p' -> c_uart_pull p' (fromIntegral l))
+                     withForeignPtr p (\p' -> c_usart_pull p' (fromIntegral l))
                      return b
 
-foreign import ccall safe "flipper/uart.h uart_enable"
-    c_uart_enable :: IO ()
+foreign import ccall safe "flipper/usart.h usart_enable"
+    c_usart_enable :: IO ()
 
-foreign import ccall safe "flipper/uart.h uart_disable"
-    c_uart_disable :: IO ()
+foreign import ccall safe "flipper/usart.h usart_disable"
+    c_usart_disable :: IO ()
 
-foreign import ccall safe "flipper/uart.h uart_put"
-    c_uart_put :: Word8 -> IO ()
+foreign import ccall safe "flipper/usart.h usart_put"
+    c_usart_put :: Word8 -> IO ()
 
-foreign import ccall safe "flipper/uart.h uart_get"
-    c_uart_get :: IO Word8
+foreign import ccall safe "flipper/usart.h usart_get"
+    c_usart_get :: IO Word8
 
-foreign import ccall safe "flipper/uart.h uart_push"
-    c_uart_push :: Ptr Word8 -> Word32 -> IO ()
+foreign import ccall safe "flipper/usart.h usart_push"
+    c_usart_push :: Ptr Word8 -> Word32 -> IO ()
 
-foreign import ccall safe "flipper/uart.h uart_pull"
-    c_uart_pull :: Ptr Word8 -> Word32 -> IO ()
+foreign import ccall safe "flipper/usart.h usart_pull"
+    c_usart_pull :: Ptr Word8 -> Word32 -> IO ()

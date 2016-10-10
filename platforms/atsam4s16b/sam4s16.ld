@@ -60,12 +60,14 @@ SECTIONS
 
 		/* Support C constructors, and C destructors in both user code
 		   and the C library. This also provides support for C++ code. */
+
 		. = ALIGN(4);
 		KEEP(*(.init))
 		. = ALIGN(4);
 		__preinit_array_start = .;
 		KEEP (*(.preinit_array))
 		__preinit_array_end = .;
+
 
 		. = ALIGN(4);
 		__init_array_start = .;

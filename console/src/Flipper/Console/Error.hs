@@ -28,7 +28,7 @@ callCtx (FSCall f)     = fsCtx f
 callCtx (GPIOCall g)   = gpioCtx g
 callCtx (LEDCall l)    = ledCtx l
 callCtx (SPICall s)    = spiCtx s
-callCtx (UARTCall u)   = uartCtx u
+callCtx (UARTCall u)   = usartCtx u
 
 buttonCtx :: ButtonAction -> String
 buttonCtx ButtonRead = "Reading button state."
@@ -88,12 +88,12 @@ spiCtx (SPIWriteFromFile fp)  = mconcat [ "Writing file"
                                         , " to SPI bus."
                                         ]
 
-uartCtx :: UARTAction -> String
-uartCtx UARTEnable              = "Enabling UART bus."
-uartCtx UARTDisable             = "Disabling UART bus."
-uartCtx UARTRead                = "Reading from UART bus."
-uartCtx (UARTWriteFromString p) = "Writing to UART bus: " <> p
-uartCtx (UARTWriteFromFile fp)  = mconcat [ "Writing file"
+usartCtx :: UARTAction -> String
+usartCtx UARTEnable              = "Enabling UART bus."
+usartCtx UARTDisable             = "Disabling UART bus."
+usartCtx UARTRead                = "Reading from UART bus."
+usartCtx (UARTWriteFromString p) = "Writing to UART bus: " <> p
+usartCtx (UARTWriteFromFile fp)  = mconcat [ "Writing file"
                                         , fp
                                         , " to UART bus."
                                         ]

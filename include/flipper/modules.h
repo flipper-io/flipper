@@ -18,7 +18,8 @@
 #include <flipper/swd.h>
 #include <flipper/temp.h>
 #include <flipper/timer.h>
-#include <flipper/uart.h>
+#include <flipper/uart0.h>
+#include <flipper/usart.h>
 #include <flipper/usb.h>
 #include <flipper/wdt.h>
 
@@ -26,26 +27,27 @@
 
 /* Create an enumeraion defining all precomputed identifiers for the provided standard modules. */
 enum {
-    _adc_id,
-    _button_id,
-    _cpu_id,
-    _dac_id,
-    _error_id,
-    _fmr_id,
-    _fs_id,
-    _gpio_id,
-    _i2c_id,
-    _led_id,
-    _pwm_id,
-    _rtc_id,
-    _spi_id,
-    _swd_id,
-    _temp_id,
-    _timer_id,
-    _uart_id,
-    _usb_id,
-    _wdt_id,
-    _std_module_id_max,
+	_adc_id,
+	_button_id,
+	_cpu_id,
+	_dac_id,
+	_error_id,
+	_fmr_id,
+	_fs_id,
+	_gpio_id,
+	_i2c_id,
+	_led_id,
+	_pwm_id,
+	_rtc_id,
+	_spi_id,
+	_swd_id,
+	_temp_id,
+	_timer_id,
+	_uart0_id,
+	_usart_id,
+	_usb_id,
+	_wdt_id,
+	_std_module_id_max,
 };
 
 /* Describe a reference to the platform specific module-array. */

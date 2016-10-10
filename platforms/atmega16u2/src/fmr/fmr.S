@@ -39,7 +39,7 @@ _load:
 	; Obtain the argument type from the lowest two bits by masking 0b11.
 	mov r16, argt_l
 	andi r16, 3
-	; Jump to the appropraite code for the arguments type.
+	; Jump to the appropraite code for the argument's type.
 	cpi r16, 0
 	breq _load_8
 	cpi r16, 1

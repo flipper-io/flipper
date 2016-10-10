@@ -99,10 +99,10 @@ directionCode Input  = 0
 directionCode Output = 1
 
 digitalDirection :: DigitalPin -> Direction -> IO ()
-digitalDirection p d = c_gpio_set_direction (digPinCode p) (directionCode d)
+digitalDirection p d = c_gpio_enable (digPinCode p) (directionCode d)
 
 analogDirection :: AnalogPin -> Direction -> IO ()
-analogDirection p d = c_gpio_set_direction (anPinCode p) (directionCode d)
+analogDirection p d = c_gpio_enable (anPinCode p) (directionCode d)
 
 digitalRead :: DigitalPin -> IO Bool
 digitalRead p = toBool <$> c_gpio_read (digPinCode p)
@@ -116,8 +116,8 @@ digitalWrite p v = c_gpio_write (digPinCode p) (fromBool v)
 analogWrite :: AnalogPin -> Word16 -> IO ()
 analogWrite p = c_gpio_write (anPinCode p)
 
-foreign import ccall safe "flipper/gpio.h gpio_set_direction"
-    c_gpio_set_direction :: Word8 -> Word8 -> IO ()
+foreign import ccall safe "flipper/gpio.h gpio_enable"
+    c_gpio_enable :: Word8 -> Word8 -> IO ()
 
 foreign import ccall safe "flipper/gpio.h gpio_write"
     c_gpio_write :: Word8 -> Word16 -> IO ()

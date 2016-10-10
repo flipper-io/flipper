@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/cpu.h>
-#include <flipper/uart.h>
+#include <flipper/uart0.h>
 #include <platform/atmega16u2.h>
 
 void cpu_configure(void) {
@@ -38,13 +38,13 @@ void cpu_halt(void) {
 
 void cpu_power(uint8_t power) {
 	if (power) {
-		uart_enable();
+		uart0_enable();
 		set_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
 		set_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
 	} else {
 		clear_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
 		clear_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
-		uart_disable();
+		uart0_disable();
 	}
 }
 

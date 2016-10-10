@@ -1,7 +1,6 @@
 #define __private_include__
 #include <osmium.h>
 #include <flipper/modules.h>
-#include <flipper/uart.h>
 #include <private/nvm.h>
 
 int main() {

@@ -1,20 +1,20 @@
 #define __private_include__
 #include <flipper/fmr.h>
 #include <flipper/modules.h>
-#include <platform/atmega16u2.h>
+#include <platform/atsam4s16b.h>
 
 /* Define the standard modules accessible on this platform. */
-const void *const fmr_modules[] PROGMEM = {
+const void *const fmr_modules[] = {
 	_forward_id,    // adc
-	&button,        // button
-	&cpu,           // cpu
+	_forward_id,    // button
+	_forward_id,    // cpu
 	_forward_id,    // dac
 	_forward_id,    // error
-	&fmr,           // fmr
+	_forward_id,    // fmr
 	_forward_id,    // fs
-	_forward_id,    // gpio
+	&gpio,    		// gpio
 	_forward_id,    // i2c
-	&led,           // led
+	_forward_id,    // led
 	_forward_id,    // pwm
 	_forward_id,    // rtc
 	_forward_id,    // spi
@@ -29,7 +29,7 @@ const void *const fmr_modules[] PROGMEM = {
 
 const void *lf_std_function(fmr_module module, fmr_function function) {
 	/* Dereference the pointer to the target module. */
-	void *object = (void *)(pgm_read_word(&fmr_modules[module]));
+	void *object = (void *)(fmr_modules[module]);
 	/* Dereference and return a pointer to the target function. */
 	return ((void **)(object))[function];
 }

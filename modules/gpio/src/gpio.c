@@ -4,7 +4,7 @@
 /* Define the virtual interface for this module. */
 const struct _gpio gpio = {
 	gpio_configure,
-	gpio_set_direction,
+	gpio_enable,
 	gpio_write,
 	gpio_read
 };
