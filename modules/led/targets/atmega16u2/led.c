@@ -37,9 +37,6 @@ ISR(TIMER1_COMPA_vect) {
 
 void led_set_rgb(uint8_t r, uint8_t g, uint8_t b) {
 
-	/* Disable interrupts to prevent timing issues. */
-	disable_interrupts();
-
 	/* Create an array to be sent to the LED in GRB format. */
 	uint8_t *data = (uint8_t *)&((uint8_t []){ g, r, b });
 
@@ -72,8 +69,5 @@ void led_set_rgb(uint8_t r, uint8_t g, uint8_t b) {
 						  "r" (~(1 << LED_DI) & LED_PORT));
 
 	}
-
-	/* Enable interrupts again. */
-	enable_interrupts();
 
 }

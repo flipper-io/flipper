@@ -2,28 +2,30 @@
 #include <flipper/uart0.h>
 #include <platform/atmega16u2.h>
 
+/* Interrupt driven USART buffering. */
+uint8_t usart_buffer[32];
+uint8_t usart_index = 0;
+
 void uart0_configure(void) {
-#define BAUD PLATFORM_BAUDRATE
-#include <util/setbaud.h>
-	UBRR1H = UBRRH_VALUE;
-	UBRR1L = UBRRL_VALUE;
-#if USE_2X
-	UCSR1A |= (1 << U2X1);
-#else
+	/* 250k baud. */
+	UBRR1H = 0x00;
+	UBRR1L = 0x03;
 	UCSR1A &= ~(1 << U2X1);
-#endif
-	UCSR1C = (1 << USBS1) | (3 << UCSZ10);
+	/* 8n1 */
+	UCSR1C = (1 << UCSZ10) | (1 << UCSZ11);
+	/* Enable the receiver, transmitter, and receiver interrupt. */
 	UCSR1B = (1 << RXEN1) | (1 << TXEN1);
-	/* Enable the USART interrupt. */
-	// UCSR1B |= (1 << RXCIE1);
+	UCSR1B |= (1 << RXCIE1);
 }
 
 void uart0_enable(void) {
 	UCSR1B = (1 << RXEN1) | (1 << TXEN1);
+	UCSR1B |= (1 << RXCIE1);
 }
 
 void uart0_disable(void) {
 	UCSR1B &= ~((1 << RXEN1) | (1 << TXEN1));
+	UCSR1B &= ~(1 << RXCIE1);
 }
 
 uint8_t uart0_ready(void) {
@@ -36,7 +38,9 @@ void uart0_put(uint8_t byte) {
 }
 
 uint8_t uart0_get(void) {
-	return UDR1;
+	char byte = usart_buffer[0];
+	usart_index = 0;
+	return byte;
 }
 
 void uart0_push(void *source, uint32_t length) {
@@ -44,5 +48,26 @@ void uart0_push(void *source, uint32_t length) {
 }
 
 void uart0_pull(void *destination, uint32_t length) {
-	while (length --) *(uint8_t *)(destination ++) = uart0_get();
+	/* Ensure the length requested is not greater than the length of the USART buffer. */
+	if (length > sizeof(usart_buffer)) {
+		error_raise(E_OVERFLOW, NULL);
+		return;
+	}
+	/* Wait until the incoming data has been buffered. */
+	while ((UCSR1A & (1 << RXC1)));
+	/* Write the UART buffer into the destination. */
+	memcpy(destination, usart_buffer, length);
+	/* Clear the buffer index. */
+	usart_index = 0;
+}
+
+ISR(USART1_RX_vect) {
+	/* Write the byte into the buffer. */
+	while ((UCSR1A & (1 << RXC1))) {
+		if (usart_index < sizeof(usart_buffer)) {
+			usart_buffer[usart_index ++] = UDR1;
+		} else {
+			(void)UDR1;
+		}
+	}
 }

@@ -6,20 +6,22 @@ void uart0_configure(void) {
 	/* Enable the UART0 clock in the PMC. */
 	PMC_EnablePeripheral(ID_UART0);
 	/* Declare a pin map that will configure the appropriate output pins for the UART0. */
-	const Pin usart0_pins[] = { (Pin){ PIO_PA9A_URXD0 | PIO_PA10A_UTXD0, PIOA, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT } };
+	const Pin uart0_pins[] = { (Pin){ PIO_PA9A_URXD0 | PIO_PA10A_UTXD0, PIOA, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT } };
 	/* Write the pinmap into the PIO. */
-	PIO_Configure(usart0_pins, PIO_LISTSIZE(usart0_pins));
+	PIO_Configure(uart0_pins, PIO_LISTSIZE(uart0_pins));
 	/* Configure the UART0. */
-	USART_Configure((Usart *)UART0, USART_MODE_ASYNCHRONOUS, 115200, BOARD_MCK);
-	/* Enable the UART0. */
-	uart0_enable();
-}
-
-void uart0_enable(void) {
+	USART_Configure((Usart *)UART0, USART_MODE_ASYNCHRONOUS, 250000, BOARD_MCK);
 	/* Enable the UART0 IRQ in the NVIC. */
 	NVIC_EnableIRQ(UART0_IRQn);
 	/* Enable the UART0 interrupt on receive. */
 	USART_EnableIt((Usart *)UART0, UART_IER_RXRDY);
+	/* Enable the UART0 transmitter. */
+	USART_SetTransmitterEnabled((Usart *)UART0, 1);
+	/* Enable the UART0 receiver. */
+	USART_SetReceiverEnabled((Usart *)UART0, 1);
+}
+
+void uart0_enable(void) {
 	/* Enable the UART0 transmitter. */
 	USART_SetTransmitterEnabled((Usart *)UART0, 1);
 	/* Enable the UART0 receiver. */
@@ -51,11 +53,11 @@ uint8_t uart0_get(void) {
 }
 
 void uart0_push(void *source, uint32_t length) {
-	while (length --) uart0_put(*(uint8_t *)(source ++));
+	//while (length --) uart0_put(*(uint8_t *)(source ++));
 	//USART_WriteBuffer((Usart *)UART0, source, length);
 }
 
 void uart0_pull(void *destination, uint32_t length) {
-	while (length --) *(uint8_t *)(destination ++) = uart0_get();
-	//USART_ReadBuffer((Usart *)UART0, destination, length);
+	//while (length --) *(uint8_t *)(destination ++) = uart0_get();
+	USART_ReadBuffer((Usart *)UART0, destination, length);
 }

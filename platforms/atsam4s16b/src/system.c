@@ -30,11 +30,26 @@ void fmr_pull(fmr_module module, fmr_function function, lf_size_t length) {
 
 /* Interrupt handler for this device driver. */
 void UART0_IrqHandler(void) {
-	// struct _fmr_packet packet;
-	// uart0_pull(&packet, sizeof(packet));
-	// struct _fmr_result result;
-	// fmr_perform(&packet, &result);
-	// uart0_push(&result, sizeof(struct _fmr_result));
+	struct _fmr_packet packet;
+	uart0_pull((void *)(&packet), sizeof(struct _fmr_packet));
+	/* Wait for the data to be recieved by the PDC. */
+	while (!(UART0 -> UART_SR & UART_SR_RXBUFF));
+	/* Send over the USART bus for debugging. */
+	usart_push(&packet, sizeof(packet));
+	/* Flush the remaining bytes from the buffer. */
+	while (uart0_ready()) {
+		uart0_get();
+	}
+	/* If the packet has the correct magic number, try to execute the packet. */
+	if (packet.header.magic == 0xFE) {
+		struct _fmr_result result;
+		fmr_perform(&packet, &result);
+		/* Send the packet back to the host. */
+		uart0_push(&result, sizeof(struct _fmr_result));
+		usart_push(&result, sizeof(struct _fmr_result));
+		/* Clear any error state generated. */
+		error_clear();
+	}
 }
 
 void delay_ms() {
@@ -44,31 +59,32 @@ void delay_ms() {
 
 void system_task(void) {
 
-	gpio_enable(PIO_PA8, PIO_DEFAULT);
+	// gpio_enable(PIO_PA8, PIO_DEFAULT);
+	//
+	// while (1) {
+	// 	gpio_write(PIO_PA8, 1);
+	// 	delay_ms();
+	// 	gpio_write(PIO_PA8, 0);
+	// 	delay_ms();
+	// }
 
-	while (1) {
-		usart_push(&usart, sizeof(struct _gpio));
-		usart_put('\n');
-		gpio_write(PIO_PA8, 1);
-		delay_ms();
-		gpio_write(PIO_PA8, 0);
-		delay_ms();
-	}
+	while (1);
 
 }
 
 void system_init(void) {
 	/* Allow the reset pin to reset the device. */
 	RSTC -> RSTC_MR |= RSTC_MR_URSTEN;
-	//const void *cfg = lf_std_function(_gpio_id, _gpio_configure);
-	// ((void (*)(void))cfg)();
+	/* Disable the watchdog timer. */
+	WDT_Disable(WDT);
 	/* Configure the UART0 peripheral. */
-	//uart0_configure();
+	uart0_configure();
 	/* Configure the USART0 peripheral. */
 	usart_configure();
 	/* Configure the GPIO peripheral. */
-	gpio_configure();
-	//usart_push(&gpio.configure, sizeof(void *));
+	//gpio_configure();
+	/* Print the configuration. */
+	//usart_push(self.configuration.name, strlen(self.configuration.name));
 }
 
 void system_deinit(void) {

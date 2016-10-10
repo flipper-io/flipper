@@ -20,11 +20,13 @@ int main(int argc, char *argv[]) {
 	};
 	/* Create the SAM4S device. */
 	struct _lf_device sam4s;
+	strcpy(sam4s.configuration.name, "sam4s");
 	sam4s.configuration.attributes = lf_device_little_endian | lf_device_32bit;
 	sam4s.endpoint = &sam4s_ep;
 	/* Construct the GPIO module. */
 	struct _fmr_module _gpio;
 	_gpio.device = &sam4s;
+	_gpio.identifier = _gpio_id;
 	/* Execute the configure function. */
 	uint32_t val = lf_invoke(&_gpio, _gpio_configure, NULL);
 	printf("Got return value 0x%08x\n", val);

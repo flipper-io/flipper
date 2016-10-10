@@ -22,7 +22,7 @@ const void *const fmr_modules[] = {
 	_forward_id,    // temp
 	_forward_id,    // timer
 	&uart0,         // usart0
-	_forward_id,    // usart
+	&usart,		    // usart
 	_forward_id,    // usb
 	_forward_id,    // wdt
 };

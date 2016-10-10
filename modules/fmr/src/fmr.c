@@ -177,7 +177,7 @@ int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *arg
 	memcpy(&(packet -> body), &types, encode_length);
 	/* Calculate the packet checksum. */
 	packet -> header.checksum = lf_checksum(packet, packet -> header.length);
- 	/* Destroy the argument list. */
+	 /* Destroy the argument list. */
 	fmr_free(args);
 	return lf_success;
 }

@@ -67,4 +67,8 @@ void cpu_dfu(void) {
 	set_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
 	/* Deassert the reset pin. */
 	set_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
+	/* 115.2k baud for DFU communication. */
+	UBRR1H = 0x00;
+	UBRR1L = 0x08;
+	UCSR1A &= ~(1 << U2X1);
 }

@@ -65,7 +65,9 @@ _load_done:
 _call:
 	/* Pop the first four arguments off of the stack and into the argument registers. */
 //	ldmda sp, { r0-r4 }
+	ldr r0, =0xdeadbeef;
+	ldr r1, =0xdeadbeef;
 	/* Jump to the function. */
-	bx _function
+	blx _function
 	/* Restore registers and return to the top-level caller. */
 	pop { r4-r8, pc }

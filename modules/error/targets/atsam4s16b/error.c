@@ -19,7 +19,7 @@ void error_clear(void) {
 }
 
 void error_resume(void) {
-	
+
 }
 
 void error_pause(void) {

@@ -32,7 +32,7 @@ check:
 write:
 	# Load the address of the EEFC -> FCR.
 	ldr r0, fcr0
-	# Load the key (0x5a) and EWP command (0x03) into r1.
+	# Load the key (0x5a) and WP command (0x03) into r1.
 	ldr r1, ewp
 	# Load the destination page into r2.
 	ldr r2, page

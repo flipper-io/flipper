@@ -3,6 +3,8 @@
 #include <flipper/modules.h>
 #include <platform/posix.h>
 
+void lf_debug_packet(struct _fmr_packet *packet);
+
 int lf_attach(char *name, struct _lf_endpoint *endpoint) {
 	/* Allocate memory to contain the record of the device. */
 	struct _lf_device *device = (struct _lf_device *)calloc(1, sizeof(struct _lf_device));
@@ -252,6 +254,8 @@ fmr_return lf_invoke(struct _fmr_module *module, fmr_function function, struct _
 	if (_e < lf_success) {
 		return lf_error;
 	}
+	/* Uncomment for detailed printout of the packet contents. */
+	//lf_debug_packet(&packet);
 	/* Send the packet to the target device. */
 	_e = lf_transfer(device, &packet);
 	if (_e < lf_success) {
