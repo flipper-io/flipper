@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
 	_gpio.device = &sam4s;
 	_gpio.identifier = _gpio_id;
 	/* Execute the configure function. */
-	uint32_t val = lf_invoke(&_gpio, _gpio_configure, NULL);
+	uint32_t val = lf_invoke(&_gpio, _gpio_enable, fmr_args(fmr_int32(0xdeadbeef), fmr_int16(0xbabe)));
 	printf("Got return value 0x%08x\n", val);
 
 	return EXIT_SUCCESS;

@@ -8,7 +8,7 @@
 extern const struct _gpio {
 	int (* configure)(void);
 	/* Sets the pin mask and proprties of the PIO array. */
-	void (* direction)(uint32_t mask, uint8_t properties);
+	void (* enable)(uint32_t mask, uint8_t properties);
 	/* Writes a digital value to the specified GPIO pin. */
 	void (* write)(uint32_t mask, uint8_t value);
 	/* Reads a digital value from the specified GPIO pin. */

@@ -46,7 +46,7 @@ void UART0_IrqHandler(void) {
 		fmr_perform(&packet, &result);
 		/* Send the packet back to the host. */
 		uart0_push(&result, sizeof(struct _fmr_result));
-		usart_push(&result, sizeof(struct _fmr_result));
+		//usart_push(&result, sizeof(struct _fmr_result));
 		/* Clear any error state generated. */
 		error_clear();
 	}
