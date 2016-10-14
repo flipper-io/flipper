@@ -33,7 +33,7 @@ void UART0_IrqHandler(void) {
 	struct _fmr_packet packet;
 	uart0_pull((void *)(&packet), sizeof(struct _fmr_packet));
 	/* Wait for the data to be recieved by the PDC. */
-	while (!(UART0 -> UART_SR & UART_SR_RXBUFF));
+	while (!(UART0 -> UART_SR & UART_SR_RXBUFF) && uart0_ready());
 	/* Send over the USART bus for debugging. */
 	usart_push(&packet, sizeof(packet));
 	/* Flush the remaining bytes from the buffer. */

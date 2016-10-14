@@ -101,7 +101,7 @@ void system_init() {
 	uart0_configure();
 	/* Configure the SAM4S. */
 	cpu_configure();
-	led_configure();
+//	led_configure();
 	/* Pulse the LED. */
 	//led_pulse(0, 0, 1);
 	/* Configure reset button and PCINT8 interrupt. */

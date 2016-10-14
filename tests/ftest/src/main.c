@@ -5,7 +5,8 @@
 
 int main(int argc, char *argv[]) {
 
-	flipper.attach();
+	//flipper.attach();
+	flipper_attach_endpoint("fvm", &lf_fvm_ep);
 
 	printf(KGRN "Successfully attached to Flipper device.\n");
 

@@ -5,12 +5,11 @@
 int gpio_configure(void) {
 	/* Enable the PIOA clock in the PMC. */
 	PMC_EnablePeripheral(ID_PIOA);
-	gpio_enable(PIO_PA8, PIO_DEFAULT);
-	gpio_write(PIO_PA8, 1);
-	return 0xdeadbeef;
+	return lf_success;
 }
 
 void gpio_enable(uint32_t mask, uint8_t properties) {
+	/* Print the parameters to the function for debugging. */
 	usart_push(&mask, 4);
 	usart_push(&properties, 4);
 	usart_put('\n');

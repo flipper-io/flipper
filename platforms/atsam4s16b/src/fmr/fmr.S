@@ -2,7 +2,8 @@
 #define argc r5
 #define argt r6
 #define _argv r7
-#define argi r9
+#define argi r8
+#define temp r9
 
 .thumb
 .syntax unified
@@ -13,7 +14,7 @@
 
 fmr_call:
 	/* Save registers. */
-	push { r4-r9, lr }
+	push { _function-temp, lr }
 	/* Save the function address into r4. */
 	mov _function, r0
 	/* Load the argument count into r5. */
@@ -30,30 +31,32 @@ _load:
 	/* If there are no arguments left to load, call the function. */
 	beq _call
 	/* Obtain the argument type from the lowest two bits by masking 0b11. */
-	mov r8, argt
-	and r8, 3
+	mov temp, argt
+	and temp, 3
 	/* Jump to the appropraite code for the argument's type. */
-	cmp r8, #0
+	cmp temp, #0
 	beq _load_8
-	cmp r8, #1
+	cmp temp, #1
 	beq _load_16
-	cmp r8, #2
+	cmp temp, #2
 	beq _load_32
+	/* If the type was encoded improperly, return with error. */
+	b _error
 _load_8:
 	/* Load a byte from the argument list. */
-	ldrb r8, [_argv, #0]
+	ldrb temp, [_argv, #0]
 	/* Increment the argv pointer by one. */
 	add _argv, #1
 	b _load_done
 _load_16:
 	/* Load a halfword from the argument list. */
-	ldrh r8, [_argv, #0]
+	ldrh temp, [_argv, #0]
 	/* Increment the argv pointer by two. */
 	add _argv, #2
 	b _load_done
 _load_32:
 	/* Load a word from the argument list. */
-	ldr r8, [_argv, #0]
+	ldr temp, [_argv, #0]
 	/* Increment the argv pointer by four. */
 	add _argv, #4
 _load_done:
@@ -68,16 +71,16 @@ _load_done:
 	beq _write_r3
 	b _write_stack
 _write_r0:
-	mov r0, r8
+	mov r0, temp
 	b _write_done
 _write_r1:
-	mov r1, r8
+	mov r1, temp
 	b _write_done
 _write_r2:
-	mov r2, r8
+	mov r2, temp
 	b _write_done
 _write_r3:
-	mov r3, r8
+	mov r3, temp
 _write_stack:
 	/* Todo. */
 
@@ -93,5 +96,10 @@ _write_done:
 _call:
 	/* Jump to the function. */
 	blx _function
+	b _done
+_error:
+	/* Return -1 if an error has occured. */
+	mov r0, #-1
+_done:
 	/* Restore registers and return to the top-level caller. */
-	pop { r4-r9, pc }
+	pop { _function-temp, pc }

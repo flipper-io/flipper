@@ -3,7 +3,7 @@
 #include <flipper/fmr.h>
 
 int gpio_configure(void) {
-
+	return lf_success;
 }
 
 void gpio_enable(uint32_t mask, uint8_t properties) {
