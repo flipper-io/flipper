@@ -3,8 +3,6 @@
 #include <flipper/modules.h>
 #include <platform/posix.h>
 
-void lf_debug_packet(struct _fmr_packet *packet);
-
 int lf_attach(char *name, struct _lf_endpoint *endpoint) {
 	/* Allocate memory to contain the record of the device. */
 	struct _lf_device *device = (struct _lf_device *)calloc(1, sizeof(struct _lf_device));
@@ -365,37 +363,38 @@ int lf_pull(struct _fmr_module *module, fmr_function function, void *destination
 
 /* Debugging functions for displaying the contents of various FMR related data structures. */
 
-void lf_debug_packet(struct _fmr_packet *packet) {
-	printf("- Message runtime packet deconstruction. -\n\n");
-	printf("header:\n");
-	printf("\t└─ magic:\t0x%x\n", packet -> header.magic);
-	printf("\t└─ checksum:\t0x%x\n", packet -> header.checksum);
-	printf("\t└─ length:\t%d bytes\n", packet -> header.length);
-	printf("target:\n");
-	printf("\t└─ module:\t0x%x\n", packet -> target.module);
-	printf("\t└─ function:\t0x%x\n", packet -> target.function);
-	printf("\t└─ argc:\t0x%x (%d arguments)\n", packet -> target.argc, packet -> target.argc);
-	printf("arguments:\n");
-	/* Calculate the number of bytes needed to encode the widths of the types. */
-	uint8_t encode_length = lf_ceiling((packet -> target.argc * 2), 8);
-	/* Calculate the offset into the packet at which the arguments will be loaded. */
-	uint8_t *offset = packet -> body + encode_length;
-	/* Create a buffer for encoding argument types. */
-	uint32_t types = 0;
-	memcpy(&types, packet -> body, encode_length);
-	char *typestrs[] = { "fmr_int8", "fmr_int16", "fmr_int32" };
-	for (int i = 0; i < packet -> target.argc; i ++) {
-		fmr_type type = types & 0x3;
-		fmr_arg arg = 0;
-		memcpy(&arg, offset, fmr_sizeof(type));
-		printf("\t└─ %s:\t0x%x\n", typestrs[type], arg);
-		offset += fmr_sizeof(type);
-		types >>= 2;
+void lf_debug_packet(struct _fmr_packet *packet, size_t length) {
+	if (packet -> header.magic == 0xFE) {
+		printf("header:\n");
+		printf("\t└─ magic:\t0x%x\n", packet -> header.magic);
+		printf("\t└─ checksum:\t0x%x\n", packet -> header.checksum);
+		printf("\t└─ length:\t%d bytes (%.02f%%)\n", packet -> header.length, (float) packet -> header.length/sizeof(struct _fmr_packet)*100);
+		printf("target:\n");
+		printf("\t└─ module:\t0x%x\n", packet -> target.module);
+		printf("\t└─ function:\t0x%x\n", packet -> target.function);
+		printf("\t└─ argc:\t0x%x (%d arguments)\n", packet -> target.argc, packet -> target.argc);
+		printf("arguments:\n");
+		/* Calculate the number of bytes needed to encode the widths of the types. */
+		uint8_t encode_length = lf_ceiling((packet -> target.argc * 2), 8);
+		/* Calculate the offset into the packet at which the arguments will be loaded. */
+		uint8_t *offset = packet -> body + encode_length;
+		/* Create a buffer for encoding argument types. */
+		uint32_t types = 0;
+		memcpy(&types, packet -> body, encode_length);
+		char *typestrs[] = { "fmr_int8", "fmr_int16", "fmr_int32" };
+		for (int i = 0; i < packet -> target.argc; i ++) {
+			fmr_type type = types & 0x3;
+			fmr_arg arg = 0;
+			memcpy(&arg, offset, fmr_sizeof(type));
+			printf("\t└─ %s:\t0x%x\n", typestrs[type], arg);
+			offset += fmr_sizeof(type);
+			types >>= 2;
+		}
+		printf("\n");
 	}
-	printf("\nRaw packet data:\n\n");
-	for (int i = 1; i <= sizeof(struct _fmr_packet); i ++) {
+	for (int i = 1; i <= length; i ++) {
 		printf("0x%02x ", ((uint8_t *)packet)[i - 1]);
-		if (i % 8 == 0) printf("\n");
+		if (i % 8 == 0 && i < length - 1) printf("\n");
 	}
-	printf("\n");
+	printf("\n\n-----------\n\n");
 }

@@ -69,5 +69,8 @@ extern int lf_transfer(struct _lf_device *device, struct _fmr_packet *packet);
 /* Retrieves a packet from the specified device. */
 extern int lf_retrieve(struct _lf_device *device, struct _fmr_result *response);
 
+/* Prints verbose information about the packet disassembly. */
+extern void lf_debug_packet(struct _fmr_packet *packet, size_t length);
+
 #endif
 #endif

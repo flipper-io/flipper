@@ -53,6 +53,8 @@ uint8_t fvm_get(void) {
 }
 
 int fvm_push(void *source, lf_size_t length) {
+	/* Clear the virtual packet. */
+	memset(&vpacket, 0, sizeof(struct _fmr_packet));
 	/* Copy the data into the virtual packet. */
 	memcpy(&vpacket, source, length);
 	struct _fmr_result result;
@@ -63,7 +65,7 @@ int fvm_push(void *source, lf_size_t length) {
 	} else {
 #ifdef __lf_debug__
 		/* Print the packet contents for debugging. */
-		lf_debug_packet(&vpacket);
+		lf_debug_packet(&vpacket, length);
 #endif
 		/* Pause side effect generation for errors. */
 		error_pause();
