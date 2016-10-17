@@ -5,13 +5,12 @@
 #define argi r8
 #define temp r9
 
-.thumb
-.syntax unified
-
 /* uint32_t fmr_call(const void *function, uint8_t argc, uint16_t argt, void *argv); */
 
+.syntax unified
 .global fmr_call
-
+.func fmr_call
+.thumb_func
 fmr_call:
 	/* Save registers. */
 	push { _function-temp, lr }
@@ -103,3 +102,6 @@ _error:
 _done:
 	/* Restore registers and return to the top-level caller. */
 	pop { _function-temp, pc }
+
+.endfunc
+.end

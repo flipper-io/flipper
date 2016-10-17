@@ -31,25 +31,29 @@ void fmr_pull(fmr_module module, fmr_function function, lf_size_t length) {
 /* Interrupt handler for this device driver. */
 void UART0_IrqHandler(void) {
 	struct _fmr_packet packet;
+	/* Instantiate the PDMAC of the UART peripheral to asynchronously load a packet. */
 	uart0_pull((void *)(&packet), sizeof(struct _fmr_packet));
 	/* Wait for the data to be recieved by the PDC. */
-	while (!(UART0 -> UART_SR & UART_SR_RXBUFF) && uart0_ready());
+	while (!(UART0 -> UART_SR & UART_SR_RXBUFF));
 	/* Send over the USART bus for debugging. */
 	usart_push(&packet, sizeof(packet));
-	/* Flush the remaining bytes from the buffer. */
-	while (uart0_ready()) {
-		uart0_get();
-	}
 	/* If the packet has the correct magic number, try to execute the packet. */
 	if (packet.header.magic == 0xFE) {
 		struct _fmr_result result;
 		fmr_perform(&packet, &result);
 		/* Send the packet back to the host. */
 		uart0_push(&result, sizeof(struct _fmr_result));
-		//usart_push(&result, sizeof(struct _fmr_result));
+
+		usart_push(&result, sizeof(struct _fmr_result));
+		usart_put(0xF0);
 		/* Clear any error state generated. */
 		error_clear();
 	}
+	/* Flush the remaining bytes from the buffer. */
+	while (uart0_ready()) {
+		uart0_get();
+	}
+	NVIC_ClearPendingIRQ(UART0_IRQn);
 }
 
 void delay_ms() {

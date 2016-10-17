@@ -3,15 +3,15 @@
 import platform
 
 def configure(cfg):
-    pass
+	pass
 
 def build(bld):
-    # Build libflipper.
-    _env = bld.all_envs['platform-posix'].derive()
-    # Even though none of the symbols are used, include them in the shared library.
-    if (platform.system() == 'Darwin'):
-        _env.append_value('LDFLAGS', '-Wl,-all_load')
-    elif (platform.system() == 'Linux'):
-        _env.STLIB_MARKER = '-Wl,--whole-archive'
-        _env.SHLIB_MARKER = '-Wl,--no-whole-archive'
-    bld.shlib(source = bld.path.ant_glob('src/**'), target = 'flipper', use = 'platform-posix modules-posix', env = _env)
+	# Build libflipper.
+	_env = bld.all_envs['platform-posix'].derive()
+	# Even though none of the symbols are used, include them in the shared library.
+	if (platform.system() == 'Darwin'):
+		_env.append_value('LDFLAGS', '-Wl,-all_load')
+	elif (platform.system() == 'Linux'):
+		_env.STLIB_MARKER = '-Wl,--whole-archive'
+		_env.SHLIB_MARKER = '-Wl,--no-whole-archive'
+	bld.shlib(source = bld.path.ant_glob('src/**'), target = 'flipper', use = 'platform-posix platform-fvm modules-posix', env = _env)

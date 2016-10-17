@@ -79,8 +79,7 @@ int flipper_attach(void) {
 
 int flipper_attach_usb(char *name) {
 	struct _lf_endpoint *_ep = &lf_usb_ep;
-	if(_ep -> configure(_ep))
-	{
+	if (_ep -> configure(_ep)) {
 		return lf_error;
 	}
 	return lf_attach(name, _ep);
@@ -88,16 +87,14 @@ int flipper_attach_usb(char *name) {
 
 int flipper_attach_network(char *name, char *hostname) {
 	struct _lf_endpoint *_ep = &lf_network_ep;
-	if(_ep -> configure(_ep, hostname))
-	{
+	if (_ep -> configure(_ep, hostname)) {
 		return lf_error;
 	}
 	return lf_attach(name, _ep);
 }
 
 int flipper_attach_endpoint(char *name, struct _lf_endpoint *endpoint) {
-	if(endpoint -> configure(endpoint))
-	{
+	if (endpoint -> configure(endpoint)) {
 		return lf_error;
 	}
 	return lf_attach(name, endpoint);
@@ -254,8 +251,6 @@ fmr_return lf_invoke(struct _fmr_module *module, fmr_function function, struct _
 	if (_e < lf_success) {
 		return lf_error;
 	}
-	/* Uncomment for detailed printout of the packet contents. */
-	//lf_debug_packet(&packet);
 	/* Send the packet to the target device. */
 	_e = lf_transfer(device, &packet);
 	if (_e < lf_success) {

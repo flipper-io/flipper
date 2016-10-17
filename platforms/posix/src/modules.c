@@ -5,28 +5,31 @@
 
 /* Define the standard modules accessible on this platform. */
 const void *const fmr_modules[] = {
-	_forward_id,
-	&button,
-	_forward_id,
-	_forward_id,
-	_forward_id,
-	_forward_id,
-	_forward_id,
-	_forward_id,
-	&led,
-	_forward_id,
-	_forward_id,
-	_forward_id,
-	_forward_id,
-	_forward_id,
-	_forward_id,
-	_forward_id,    // usart
-	_forward_id,
-	_forward_id,
+	NULL,    // adc
+	&button, // button
+	NULL,    // cpu
+	NULL,    // dac
+	NULL,    // error
+	NULL,    // fmr
+	NULL,    // fs
+	NULL,    // gpio
+	NULL,    // i2c
+	&led,    // led
+	NULL,    // pwm
+	NULL,    // rtc
+	NULL,    // spi
+	NULL,    // swd
+	NULL,    // temp
+	NULL,    // timer
+	NULL,    // usart0
+	NULL,    // usart
+	NULL,    // usb
+	NULL,    // wdt
 };
 
-const void *lf_std_function(fmr_module module, fmr_function function) {
-	return NULL;
+/* Executes a standard module. */
+fmr_return fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, fmr_types types, void *arguments) {
+	return 0;
 }
 
 uint32_t fmr_call(const void *function, uint8_t argc, uint16_t argt, void *argv) {

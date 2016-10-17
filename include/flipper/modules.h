@@ -23,9 +23,7 @@
 #include <flipper/usb.h>
 #include <flipper/wdt.h>
 
-#define _forward_id (const void *)(-1)
-
-/* Create an enumeraion defining all precomputed identifiers for the provided standard modules. */
+/* Create an enumeraion defining all of the precomputed identifiers needed for the standard modules. */
 enum {
 	_adc_id,
 	_button_id,
@@ -47,11 +45,12 @@ enum {
 	_usart_id,
 	_usb_id,
 	_wdt_id,
-	_std_module_id_max,
+	/* Defines the upper bound of the identifiers allocated for the built-in standard modules. */
+	_std_module_id_max
 };
+/* NOTE: The identifiers in this enumeration must match the order of the module addresses store in the 'fmr_modules' array. */
 
 /* Describe a reference to the platform specific module-array. */
 extern const void *const fmr_modules[];
-/* NOTE: The platform specific function 'lf_std_function(lf_id_t module)' should be used to access objects within this array. */
 
 #endif

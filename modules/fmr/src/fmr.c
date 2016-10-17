@@ -182,19 +182,6 @@ int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *arg
 	return lf_success;
 }
 
-/* Executes a standard module. */
-fmr_return fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, fmr_types types, void *arguments) {
-	/* Obtain the address of the function. */
-	const void *address = lf_std_function(module, function);
-	/* Ensure that the function address is valid. */
-	if (!address) {
-		error_raise(E_RESOULTION, NULL);
-		return 0;
-	}
-	/* Perform the function call internally. */
-	return fmr_call(address, argc, types, arguments);
-}
-
 int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
 	/* Temporarily store the packet's checksum. */
 	lf_id_t _cs = packet -> header.checksum;

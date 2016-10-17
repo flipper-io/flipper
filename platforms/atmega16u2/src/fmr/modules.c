@@ -5,31 +5,41 @@
 
 /* Define the standard modules accessible on this platform. */
 const void *const fmr_modules[] PROGMEM = {
-	_forward_id,    // adc
-	&button,        // button
-	&cpu,           // cpu
-	_forward_id,    // dac
-	_forward_id,    // error
-	&fmr,           // fmr
-	_forward_id,    // fs
-	_forward_id,    // gpio
-	_forward_id,    // i2c
-	&led,           // led
-	_forward_id,    // pwm
-	_forward_id,    // rtc
-	_forward_id,    // spi
-	_forward_id,    // swd
-	_forward_id,    // temp
-	_forward_id,    // timer
-	&uart0,         // usart0
-	_forward_id,    // usart
-	_forward_id,    // usb
-	_forward_id,    // wdt
+	NULL,    // adc
+	&button, // button
+	&cpu,    // cpu
+	NULL,    // dac
+	NULL,    // error
+	&fmr,    // fmr
+	NULL,    // fs
+	NULL,    // gpio
+	NULL,    // i2c
+	&led,    // led
+	NULL,    // pwm
+	NULL,    // rtc
+	NULL,    // spi
+	NULL,    // swd
+	NULL,    // temp
+	NULL,    // timer
+	&uart0,  // usart0
+	NULL,    // usart
+	NULL,    // usb
+	NULL,    // wdt
 };
+/* NOTE: PROGMEM is used here to store this array within flash memory of this platform. */
 
-const void *lf_std_function(fmr_module module, fmr_function function) {
+/* Executes a standard module. */
+fmr_return fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, fmr_types types, void *arguments) {
 	/* Dereference the pointer to the target module. */
 	void *object = (void *)(pgm_read_word(&fmr_modules[module]));
 	/* Dereference and return a pointer to the target function. */
-	return ((void **)(object))[function];
+	void *address = ((void **)(object))[function];
+	/* Ensure that the function address is valid. */
+	if (!address) {
+		error_raise(E_RESOULTION, NULL);
+		return 0;
+	}
+	/* Perform the function call internally. */
+	return fmr_call(address, argc, types, arguments);
 }
+/* NOTE: The 'pgm_read_word' function must be used here to access the array due to the fact it is stored in flash. */

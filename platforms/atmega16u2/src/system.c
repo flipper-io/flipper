@@ -31,8 +31,7 @@ void fmr_push(fmr_module module, fmr_function function, lf_size_t length) {
 	}
 	megausb_pull(swap, length);
 	/* Call the function. */
-	const void *address = lf_std_function(module, function);
-	((void (*)(void *, uint32_t))address)(swap, length);
+	fmr_execute(module, function, 0, 0, NULL);
 	free(swap);
 }
 
@@ -43,8 +42,7 @@ void fmr_pull(fmr_module module, fmr_function function, lf_size_t length) {
 		return;
 	}
 	/* Call the function. */
-	const void *address = lf_std_function(module, function);
-	((void (*)(void *, uint32_t))address)(swap, length);
+	fmr_execute(module, function, 0, 0, NULL);
 	megausb_push(swap, length);
 	free(swap);
 }
@@ -55,7 +53,6 @@ struct _lf_configuration *system_configuration(void) {
 
 void system_task(void) {
 	while (1) {
-
 #if 0
 		/* bulk transfer tests. */
 		char buffer[FMR_PACKET_SIZE];
