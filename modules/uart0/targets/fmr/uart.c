@@ -36,9 +36,9 @@ uint8_t uart0_get(void) {
 }
 
 void uart0_push(void *source, uint32_t length) {
-	lf_push(&_uart0, _uart0_push, source, length);
+	lf_push(&_uart0, _uart0_push, source, length, NULL);
 }
 
 void uart0_pull(void *destination, uint32_t length) {
-	lf_pull(&_uart0, _uart0_pull, destination, length);
+	lf_pull(&_uart0, _uart0_pull, destination, length, NULL);
 }

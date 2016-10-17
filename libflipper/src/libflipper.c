@@ -229,7 +229,7 @@ int lf_get_result(struct _lf_device *device, struct _fmr_result *result) {
 	return lf_success;
 }
 
-fmr_return lf_invoke(struct _fmr_module *module, fmr_function function, struct _fmr_list *args) {
+fmr_return lf_invoke(struct _fmr_module *module, fmr_function function, struct _fmr_list *parameters) {
 	/* Ensure that we have a valid module and argument pointer. */
 	if (!module) {
 		error_raise(E_NULL, error_message("No module specified for message runtime invocation."));
@@ -247,7 +247,7 @@ fmr_return lf_invoke(struct _fmr_module *module, fmr_function function, struct _
 	}
 	struct _fmr_packet packet;
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_generate(module -> identifier, function, args, &packet);
+	int _e = fmr_generate(module -> identifier, function, parameters, &packet);
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -285,7 +285,7 @@ int lf_retrieve(struct _lf_device *device, struct _fmr_result *response) {
 	return lf_success;
 }
 
-int lf_push(struct _fmr_module *module, fmr_function function, void *source, lf_size_t length) {
+int lf_push(struct _fmr_module *module, fmr_function function, void *source, lf_size_t length, struct _fmr_list *parameters) {
 	/* Ensure that we have a valid module and argument pointer. */
 	if (!module) {
 		error_raise(E_NULL, error_message("No module specified for message runtime push to module '%s'.", module -> name));
@@ -303,7 +303,7 @@ int lf_push(struct _fmr_module *module, fmr_function function, void *source, lf_
 	}
 	struct _fmr_packet packet;
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_generate(_fmr_id, _fmr_push, fmr_args(fmr_int16(module -> identifier), fmr_int8(function), fmr_int32(length)), &packet);
+	int _e = fmr_generate(_fmr_id, _fmr_push, fmr_merge(fmr_args(fmr_int16(module -> identifier), fmr_int8(function), fmr_int32(length)), parameters), &packet);
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -325,7 +325,7 @@ int lf_push(struct _fmr_module *module, fmr_function function, void *source, lf_
 	return lf_success;
 }
 
-int lf_pull(struct _fmr_module *module, fmr_function function, void *destination, lf_size_t length) {
+int lf_pull(struct _fmr_module *module, fmr_function function, void *destination, lf_size_t length, struct _fmr_list *parameters) {
 	/* Ensure that we have a valid module and argument pointer. */
 	if (!module) {
 		error_raise(E_NULL, error_message("No module specified for message runtime pull from module '%s'.", module -> name));
@@ -342,7 +342,7 @@ int lf_pull(struct _fmr_module *module, fmr_function function, void *destination
 	}
 	struct _fmr_packet packet;
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_generate(_fmr_id, _fmr_pull, fmr_args(fmr_int16(module -> identifier), fmr_int8(function), fmr_int32(length)), &packet);
+	int _e = fmr_generate(_fmr_id, _fmr_pull, fmr_merge(fmr_args(fmr_int16(module -> identifier), fmr_int8(function), fmr_int32(length)), parameters), &packet);
 	if (_e < lf_success) {
 		return lf_error;
 	}

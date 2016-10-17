@@ -36,9 +36,9 @@ uint8_t usart_get(void) {
 }
 
 void usart_push(void *source, uint32_t length) {
-	lf_push(&_usart, _usart_push, source, length);
+	lf_push(&_usart, _usart_push, source, length, NULL);
 }
 
 void usart_pull(void *destination, uint32_t length) {
-	lf_pull(&_usart, _usart_pull, destination, length);
+	lf_pull(&_usart, _usart_pull, destination, length, NULL);
 }

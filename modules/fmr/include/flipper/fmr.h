@@ -143,7 +143,9 @@ enum { _fmr_push, _fmr_pull };
 /* Builds an fmr_list from a set of variadic arguments provided by the fmr_list macro. */
 struct _fmr_list *fmr_build(fmr_argc argc, ...);
 /* Appends an argument to an fmr_list. */
-void fmr_append(struct _fmr_list *list, fmr_type type, fmr_va value);
+void fmr_append(struct _fmr_list *list, struct _fmr_arg *argument);
+/* Concatenates two argument lists. */
+struct _fmr_list *fmr_merge(struct _fmr_list *first, struct _fmr_list *second);
 /* Removes and returns the item at the top of the list. */
 struct _fmr_arg *fmr_pop(struct _fmr_list *list);
 /* Frees an fmr_list. */

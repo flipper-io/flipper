@@ -29,15 +29,31 @@ struct _fmr_list *fmr_build(fmr_argc argc, ...) {
 	while (argc --) {
 		/* Unstage the value of the argument from the variadic argument list. */
 		fmr_va value = va_arg(argv, fmr_va);
+		/* Allocate the memory required to stage the argument into the parent list. */
+		struct _fmr_arg *argument = (struct _fmr_arg *)calloc(1, sizeof(struct _fmr_arg));
+		/* Ensure that the request for memory was satisfied. */
+		if (!argument) {
+			error_raise(E_MALLOC, error_message("Failed to allocate the memory required to append to the argument list located at %p.", list));
+			free(list);
+			/* Nullify the argument list pointer for the failed return. */
+			list = NULL;
+			break;
+		}
+		fmr_type type = (fmr_type)((value >> (sizeof(fmr_arg) * 8)) & 0x7);
+		if (type > fmr_int32_t) {
+			error_raise(E_TYPE, error_message("An invalid type was provided while appending the parameter '0x%08x' to the argument list.", (fmr_arg)value));
+		}
+		/* Write the type and value of the argument into the list. */
+		memcpy(argument, &((struct _fmr_arg){ (fmr_arg)value, type, NULL }), sizeof(struct _fmr_arg));
 		/* Append the argument to the fmr_list. */
-		fmr_append(list, (fmr_type)((value >> (sizeof(fmr_arg) * 8)) & 0x7), value);
+		fmr_append(list, argument);
 	}
 	/* Release the variadic argument list. */
 	va_end(argv);
 	return list;
 }
 
-void fmr_append(struct _fmr_list *list, fmr_type type, fmr_va value) {
+void fmr_append(struct _fmr_list *list, struct _fmr_arg *argument) {
 	/* Ensure that a valid list was provided. */
 	if (!list) {
 		error_raise(E_NULL, error_message("An attempt was made to append to an invalid argument list."));
@@ -56,15 +72,6 @@ void fmr_append(struct _fmr_list *list, fmr_type type, fmr_va value) {
 			tail = tail -> next;
 		}
 	}
-	/* Allocate the memory required to stage the argument into the parent list. */
-	struct _fmr_arg *argument = (struct _fmr_arg *)calloc(1, sizeof(struct _fmr_arg));
-	/* Ensure that the request for memory was satisfied. */
-	if (!argument) {
-		error_raise(E_MALLOC, error_message("Failed to allocate the memory required to append to the argument list located at %p.", list));
-		return;
-	}
-	/* Write the type and value of the argument into the list. */
-	memcpy(argument, &((struct _fmr_arg){ (fmr_arg)value, type, NULL }), sizeof(struct _fmr_arg));
 	/* Save the reference to the new argument into the parent list. */
 	if (tail) {
 		tail -> next = argument;
@@ -74,6 +81,18 @@ void fmr_append(struct _fmr_list *list, fmr_type type, fmr_va value) {
 	}
 	/* Advance the argument count of the list. */
 	list -> argc ++;
+}
+
+struct _fmr_list *fmr_merge(struct _fmr_list *first, struct _fmr_list *second) {
+	if (!second) {
+		goto done;
+	}
+	/* Pop each argument from the second argument list and append it to the first. */
+	while (second -> argc) {
+		fmr_append(first, fmr_pop(second));
+	}
+done:
+	return first;
 }
 
 struct _fmr_arg *fmr_pop(struct _fmr_list *list) {
@@ -88,6 +107,10 @@ struct _fmr_arg *fmr_pop(struct _fmr_list *list) {
 	if (top) {
 		list -> argv = top -> next;
 	}
+	/* Destroy the link to the next argument. */
+	top -> next = NULL;
+	/* Decrement the argument count of the list. */
+	list -> argc --;
 	return top;
 }
 
@@ -126,14 +149,14 @@ int fmr_bind(struct _fmr_module *module, char *name) {
 	return lf_success;
 }
 
-int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *args, struct _fmr_packet *packet) {
+int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *parameters, struct _fmr_packet *packet) {
 	/* Ensure that the pointer to the outgoing packet is valid. */
 	if (!packet) {
 		error_raise(E_NULL, error_message("Invalid packet reference provided during message runtime packet generation."));
 		return lf_error;
-	} else if (!args) {
+	} else if (!parameters) {
 		/* If no arguments are provided, automatically provide an empty argument list. */
-		args = fmr_build(0);
+		parameters = fmr_build(0);
 	}
 	/* Zero the packet. */
 	memset(packet, 0, sizeof(struct _fmr_packet));
@@ -147,9 +170,9 @@ int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *arg
 	/* Store the target module, function, and argument count in the packet. */
 	packet -> target.module = module;
 	packet -> target.function = function;
-	packet -> target.argc = args -> argc;
+	packet -> target.argc = parameters -> argc;
 	/* Calculate the number of bytes needed to encode the widths of the types. */
-	uint8_t encode_length = lf_ceiling((args -> argc * 2), 8);
+	uint8_t encode_length = lf_ceiling((parameters -> argc * 2), 8);
 	/* Compute the initial length of the packet. */
 	packet -> header.length = sizeof(struct _fmr_header) + sizeof(struct _fmr_target) + encode_length;
 	/* Calculate the offset into the packet at which the arguments will be loaded. */
@@ -157,9 +180,10 @@ int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *arg
 	/* Create a buffer for encoding argument types. */
 	uint32_t types = 0;
 	/* Load arguments into the packet, encoding the type of each. */
-	for (int i = 0; i < args -> argc; i ++) {
+	int argc = parameters -> argc;
+	for (int i = 0; i < argc; i ++) {
 		/* Pop the argument from the argument list. */
-		struct _fmr_arg *arg = fmr_pop(args);
+		struct _fmr_arg *arg = fmr_pop(parameters);
 		/* Encode the argument's type. */
 		types |= (arg -> type & 0x3) << (i * 2);
 		/* Calculate the size of the argument. */
@@ -178,7 +202,7 @@ int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *arg
 	/* Calculate the packet checksum. */
 	packet -> header.checksum = lf_checksum(packet, packet -> header.length);
 	 /* Destroy the argument list. */
-	fmr_free(args);
+	fmr_free(parameters);
 	return lf_success;
 }
 
