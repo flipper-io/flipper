@@ -6,21 +6,21 @@
 #define POLY 0x1021
 
 uint16_t calcrc(char *ptr, int32_t count) {
-    int  crc;
-    char i;
-    crc = 0;
-    while (-- count >= 0) {
-        crc = crc ^ (int) *ptr ++ << 8;
-        i = 8;
-        do {
-            if (crc & 0x8000) {
-                crc = crc << 1 ^ POLY;
+	int  crc;
+	char i;
+	crc = 0;
+	while (-- count >= 0) {
+		crc = crc ^ (int) *ptr ++ << 8;
+		i = 8;
+		do {
+			if (crc & 0x8000) {
+				crc = crc << 1 ^ POLY;
 			} else {
 				crc = crc << 1;
 			}
-        } while(-- i);
-    }
-    return crc;
+		} while(-- i);
+	}
+	return crc;
 }
 
 /* This function uses the CCITT crc16 algorithm. */

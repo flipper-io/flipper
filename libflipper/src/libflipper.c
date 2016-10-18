@@ -3,6 +3,21 @@
 #include <flipper/modules.h>
 #include <platform/posix.h>
 
+/* Expose the virtual interface for this driver. */
+struct _flipper flipper = {
+	flipper_attach,
+	flipper_attach_usb,
+	flipper_attach_network,
+	flipper_attach_endpoint,
+	flipper_select,
+	flipper_detach,
+	flipper_exit,
+	E_OK,
+	1,
+	NULL,
+	NULL,
+};
+
 int lf_attach(char *name, struct _lf_endpoint *endpoint) {
 	/* Allocate memory to contain the record of the device. */
 	struct _lf_device *device = (struct _lf_device *)calloc(1, sizeof(struct _lf_device));

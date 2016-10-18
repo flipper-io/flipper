@@ -1,7 +1,7 @@
 #define __private_include__
-#include <private/nvm.h>
 #include <platform/fvm.h>
-#include <flipper/fmr.h>
+#include <flipper/flipper.h>
+#include <private/nvm.h>
 
 /* Pointer to the start of virtual non-volatile memory. */
 uint8_t *v_nvm;
