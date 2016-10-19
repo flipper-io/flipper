@@ -3,18 +3,12 @@
 #include <flipper/modules.h>
 
 /* ~ Provide the definition for this standard module. ~ */
-struct _lf_module _led = {
-    "led",
-    "Controls the on-board RGB status LED.",
-    LF_VERSION,
-    _led_id,
-    NULL
-};
+LF_MODULE(_led, "led", "Interacts with the built-in status LED.", _led_id);
 
 void led_configure(void) {
-    lf_invoke(&_led, _led_configure, NULL);
+	lf_invoke(&_led, _led_configure, NULL);
 }
 
 void led_set_rgb(uint8_t r, uint8_t g, uint8_t b) {
-    lf_invoke(&_led, _led_set_rgb, fmr_args(fmr_int8(r), fmr_int8(g), fmr_int8(b)));
+	lf_invoke(&_led, _led_set_rgb, fmr_args(fmr_int8(r), fmr_int8(g), fmr_int8(b)));
 }

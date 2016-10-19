@@ -7,6 +7,7 @@
 #include <flipper/cpu.h>
 #include <flipper/dac.h>
 #include <flipper/error.h>
+#include <flipper/fld.h>
 #include <flipper/fmr.h>
 #include <flipper/fs.h>
 #include <flipper/gpio.h>
@@ -30,6 +31,7 @@ enum {
 	_cpu_id,
 	_dac_id,
 	_error_id,
+	_fld_id,
 	_fmr_id,
 	_fs_id,
 	_gpio_id,

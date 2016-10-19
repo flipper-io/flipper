@@ -143,6 +143,16 @@ struct _lf_module {
 	struct _lf_device *device;
 };
 
+/* Macro for easily generating module structures. */
+#define LF_MODULE(symbol, name, description, identifier) \
+	struct _lf_module symbol = { \
+		name, \
+		description, \
+		LF_VERSION, \
+		identifier, \
+		NULL \
+	};
+
 /* Provides a checksum for a given block of data. */
 lf_id_t lf_checksum(void *source, lf_size_t length);
 

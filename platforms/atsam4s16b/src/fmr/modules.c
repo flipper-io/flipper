@@ -10,6 +10,7 @@ const void *const fmr_modules[] = {
 	NULL,    // cpu
 	NULL,    // dac
 	NULL,    // error
+	&fld,	 // fld
 	NULL,    // fmr
 	NULL,    // fs
 	&gpio,   // gpio

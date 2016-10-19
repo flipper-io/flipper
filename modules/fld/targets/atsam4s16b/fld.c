@@ -5,3 +5,7 @@
 void fld_configure(void) {
 
 }
+
+int fld_load(lf_id_t identifier) {
+	return lf_success;
+}

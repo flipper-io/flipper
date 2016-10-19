@@ -10,6 +10,7 @@ const void *const fmr_modules[] PROGMEM = {
 	&cpu,    // cpu
 	NULL,    // dac
 	NULL,    // error
+	NULL,	 // fld
 	&fmr,    // fmr
 	NULL,    // fs
 	NULL,    // gpio
