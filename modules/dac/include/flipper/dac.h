@@ -6,7 +6,7 @@
 
 /* Declare the virtual interface for this module. */
 extern const struct _dac {
-	void (* configure)(void);
+	int (* configure)(void);
 } dac;
 
 #ifdef __private_include__
@@ -15,7 +15,7 @@ extern const struct _dac {
 enum { _dac_configure };
 
 /* Declare each prototype for all functions within this driver. */
-void dac_configure(void);
+int dac_configure(void);
 
 #endif
 #endif

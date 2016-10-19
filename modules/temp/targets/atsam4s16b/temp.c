@@ -2,6 +2,6 @@
 #include <flipper/temp.h>
 #include <platform/atsam4s16b.h>
 
-void temp_configure(void) {
-
+int temp_configure(void) {
+	return lf_success;
 }

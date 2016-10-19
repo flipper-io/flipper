@@ -2,6 +2,6 @@
 #include <flipper/adc.h>
 #include <platform/atsam4s16b.h>
 
-void adc_configure(void) {
-
+int adc_configure(void) {
+	return lf_success;
 }

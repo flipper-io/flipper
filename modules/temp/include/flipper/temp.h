@@ -6,7 +6,7 @@
 
 /* Declare the virtual interface for this module. */
 extern const struct _temp {
-	void (* configure)(void);
+	int (* configure)(void);
 } temp;
 
 #ifdef __private_include__
@@ -15,7 +15,7 @@ extern const struct _temp {
 enum { _temp_configure };
 
 /* Declare each prototype for all functions within this driver. */
-void temp_configure(void);
+int temp_configure(void);
 
 #endif
 #endif

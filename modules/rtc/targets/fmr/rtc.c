@@ -2,6 +2,6 @@
 #include <flipper/rtc.h>
 #include <flipper/fmr.h>
 
-void rtc_configure(void) {
-
+int rtc_configure(void) {
+	return lf_success;
 }

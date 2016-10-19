@@ -6,7 +6,7 @@
 
 /* Declare the virtual interface for this module. */
 extern const struct _usb {
-	void (* configure)(void);
+	int (* configure)(void);
 } usb;
 
 #ifdef __private_include__
@@ -15,7 +15,7 @@ extern const struct _usb {
 enum { _usb_configure };
 
 /* Declare each prototype for all functions within this driver. */
-void usb_configure(void);
+int usb_configure(void);
 
 #endif
 #endif

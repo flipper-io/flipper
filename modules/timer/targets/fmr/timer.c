@@ -2,6 +2,6 @@
 #include <flipper/timer.h>
 #include <flipper/fmr.h>
 
-void timer_configure(void) {
-
+int timer_configure(void) {
+	return lf_success;
 }

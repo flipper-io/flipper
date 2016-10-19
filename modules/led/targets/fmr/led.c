@@ -5,8 +5,9 @@
 /* ~ Provide the definition for this standard module. ~ */
 LF_MODULE(_led, "led", "Interacts with the built-in status LED.", _led_id);
 
-void led_configure(void) {
+int led_configure(void) {
 	lf_invoke(&_led, _led_configure, NULL);
+	return lf_success;
 }
 
 void led_set_rgb(uint8_t r, uint8_t g, uint8_t b) {

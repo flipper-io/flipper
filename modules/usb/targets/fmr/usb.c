@@ -2,6 +2,6 @@
 #include <flipper/usb.h>
 #include <flipper/fmr.h>
 
-void usb_configure(void) {
-
+int usb_configure(void) {
+	return lf_success;
 }

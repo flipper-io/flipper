@@ -6,7 +6,7 @@
 
 /* Declare the virtual interface for this module. */
 extern const struct _i2c {
-	void (* configure)(void);
+	int (* configure)(void);
 } i2c;
 
 #ifdef __private_include__
@@ -15,7 +15,7 @@ extern const struct _i2c {
 enum { _i2c_configure };
 
 /* Declare each prototype for all functions within this driver. */
-void i2c_configure(void);
+int i2c_configure(void);
 
 #endif
 #endif

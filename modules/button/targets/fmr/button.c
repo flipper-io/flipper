@@ -2,8 +2,8 @@
 #include <flipper/button.h>
 #include <flipper/fmr.h>
 
-void button_configure(void) {
-
+int button_configure(void) {
+	return lf_success;
 }
 
 uint8_t button_read(void) {

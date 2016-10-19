@@ -2,9 +2,10 @@
 #include <flipper/led.h>
 #include <platform/atmega16u2.h>
 
-void led_configure(void) {
+int led_configure(void) {
 	/* Configure the DI (data in) pin of the LED as an output. */
 	set_bit_in_port(LED_DI, LED_DDR);
+	return lf_success;
 }
 
 

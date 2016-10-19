@@ -2,6 +2,6 @@
 #include <flipper/dac.h>
 #include <flipper/fmr.h>
 
-void dac_configure(void) {
-
+int dac_configure(void) {
+	return lf_success;
 }

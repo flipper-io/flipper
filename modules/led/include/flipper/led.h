@@ -12,7 +12,7 @@
 
 /* Declare the virtual interface for this module. */
 extern const struct _led {
-	void (* configure)(void);
+	int (* configure)(void);
 	/* Write an RGB value to the onboard RGB led. */
 	void (* rgb)(uint8_t r, uint8_t g, uint8_t b);
 } led;
@@ -23,7 +23,7 @@ extern const struct _led {
 enum { _led_configure, _led_set_rgb };
 
 /* Declare each prototype for all functions within this driver. */
-void led_configure(void);
+int led_configure(void);
 void led_set_rgb(uint8_t r, uint8_t g, uint8_t b);
 
 #endif

@@ -2,6 +2,6 @@
 #include <flipper/rtc.h>
 #include <platform/atsam4s16b.h>
 
-void rtc_configure(void) {
-
+int rtc_configure(void) {
+	return lf_success;
 }

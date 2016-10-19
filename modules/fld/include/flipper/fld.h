@@ -8,7 +8,7 @@
 
 /* Declare the virtual interface for this module. */
 extern const struct _fld {
-	void (* configure)(void);
+	int (* configure)(void);
 	/* Loads a module given its identifier. */
 	int (* load)(lf_id_t identifier);
 } fld;
@@ -17,7 +17,7 @@ extern const struct _fld {
 enum { _fld_configure, _fld_load };
 
 /* Declare each prototype for all functions within this driver. */
-void fld_configure(void);
+int fld_configure(void);
 int fld_load(lf_id_t identifier);
 
 #endif

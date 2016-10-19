@@ -2,7 +2,7 @@
 #include <flipper/usart.h>
 #include <platform/atsam4s16b.h>
 
-void usart_configure(void) {
+int usart_configure(void) {
 	/* Enable the USART0 clock in the PMC. */
 	PMC_EnablePeripheral(ID_USART0);
 	/* Declare a pin map that will configure the appropriate output pins for the USART0. */
@@ -13,6 +13,7 @@ void usart_configure(void) {
 	USART_Configure(USART0, USART_MODE_ASYNCHRONOUS, 115200, BOARD_MCK);
 	/* Enable the USART0. */
 	usart_enable();
+	return lf_success;
 }
 
 void usart_enable(void) {

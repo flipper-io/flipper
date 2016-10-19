@@ -3,7 +3,7 @@
 #include <flipper/uart0.h>
 #include <platform/atmega16u2.h>
 
-void cpu_configure(void) {
+int cpu_configure(void) {
 	/* Turn the SAM4S on. */
 	set_bit_in_port(SAM_POWER_PIN, SAM_POWER_PORT);
 	/* Configure the SAM4S's power pin as an output. */
@@ -20,6 +20,7 @@ void cpu_configure(void) {
 	clear_bit_in_port(SAM_ERASE_PIN, SAM_ERASE_PORT);
 	/* Configure the SAM4S's erase pin as an output. */
 	set_bit_in_port(SAM_ERASE_PIN, SAM_ERASE_DDR);
+	return lf_success;
 }
 
 void cpu_reset(void) {

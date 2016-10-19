@@ -2,6 +2,6 @@
 #include <flipper/wdt.h>
 #include <flipper/fmr.h>
 
-void wdt_configure(void) {
-
+int wdt_configure(void) {
+	return lf_success;
 }

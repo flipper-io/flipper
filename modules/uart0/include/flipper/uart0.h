@@ -14,7 +14,7 @@ extern const struct _uart uart0;
 enum { _uart0_configure, _uart0_enable, _uart0_disable, _uart0_ready, _uart0_put, _uart0_get, _uart0_push, _uart0_pull };
 
 /* Declare each prototype for all functions within this driver. */
-void uart0_configure(void);
+int uart0_configure(void);
 void uart0_enable(void);
 void uart0_disable(void);
 uint8_t uart0_ready(void);

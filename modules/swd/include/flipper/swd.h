@@ -7,7 +7,7 @@
 /* Declare the virtual interface for this module. */
 extern const struct _swd {
 
-	void (* configure)(void);
+	int (* configure)(void);
 
 } swd;
 
@@ -17,7 +17,7 @@ extern const struct _swd {
 enum { _swd_configure };
 
 /* Declare each prototype for all functions within this driver. */
-void swd_configure(void);
+int swd_configure(void);
 
 #endif
 #endif

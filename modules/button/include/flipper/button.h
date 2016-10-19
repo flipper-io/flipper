@@ -7,7 +7,7 @@
 /* Declare the virtual interface for this module. */
 extern const struct _button {
 	/* Configures the button hardware. */
-	void (* configure)(void);
+	int (* configure)(void);
 	/* Reads back the button state; returns 0 when released and 1 when pressed. */
 	uint8_t (* read)(void);
 } button;
@@ -18,7 +18,7 @@ extern const struct _button {
 enum { _button_configure, _button_read };
 
 /* Declare each prototype for all functions within this driver. */
-void button_configure(void);
+int button_configure(void);
 uint8_t button_read(void);
 
 #endif

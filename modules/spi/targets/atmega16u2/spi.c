@@ -7,13 +7,14 @@
 #define SPI_DATA_MODE_2 0x08
 #define SPI_DATA_MODE_3 0x0C
 
-void spi_configure() {
+int spi_configure() {
 	/* Configure MOSI and SCK as inputs. */
 	clear_bits_in_port_with_mask(SPI_DDR, (bit(MOSI) | bit(SCK)));
 	/* Put the SPI bus into MODE3. */
 	set_bits_in_port_with_mask(SPCR, SPI_DATA_MODE_3);
 	/* Configure the SPI clock to be 1/2 of the system clock. This is the fastest SCK we can specify.  */
 	set_bits_in_port_with_mask(SPSR, bit(SPI2X));
+	return lf_success;
 }
 
 void spi_enable(void) {

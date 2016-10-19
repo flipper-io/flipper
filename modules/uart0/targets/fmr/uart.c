@@ -5,8 +5,9 @@
 /* ~ Provide the definition for this standard module. ~ */
 LF_MODULE(_uart0, "uart0", "Provides low level access to the device's UART bus.", _uart0_id);
 
-void uart0_configure(void) {
+int uart0_configure(void) {
 	lf_invoke(&_uart0, _uart0_configure, NULL);
+	return lf_success;
 }
 
 void uart0_enable(void) {
