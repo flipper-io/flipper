@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/fld.h>
+#include <flipper/flipper.h>
 #include <flipper/modules.h>
 
 /* ~ Provide the definition for this standard module. ~ */
@@ -10,5 +10,5 @@ int fld_configure(void) {
 }
 
 int fld_load(lf_id_t identifier) {
-	return lf_success;
+	return lf_invoke(&_fld, _fld_load, fmr_args(fmr_cast(lf_id_t, identifier)));
 }

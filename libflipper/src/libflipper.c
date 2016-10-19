@@ -377,6 +377,10 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 }
 
 int lf_bind(struct _lf_module *module) {
+	int _e = fld_load(module -> identifier);
+	if (_e < lf_success) {
+		return lf_error;
+	}
 	printf("Successfully bound the '%s' module.\n", module -> name);
 	return lf_success;
 }

@@ -40,10 +40,12 @@ typedef enum {
 #define fmr_args(...) fmr_build(__fmr_count(__VA_ARGS__), ##__VA_ARGS__)
 
 /* Explicitly describes the width of an argument to the argument parser. */
-#define fmr_intx(type, arg) (((fmr_va)type << (sizeof(fmr_arg) * 8)) | arg)
+#define fmr_intx(type, arg) (((fmr_va)type << (sizeof(fmr_arg) * 8)) | (fmr_arg)arg)
 #define fmr_int8(arg) fmr_intx(fmr_int8_t, (uint8_t)arg)
 #define fmr_int16(arg) fmr_intx(fmr_int16_t, (uint16_t)arg)
 #define fmr_int32(arg) fmr_intx(fmr_int32_t, (uint32_t)arg)
+/* Converts a C type and value into a message runtime type and value. */
+#define fmr_cast(type, arg) fmr_intx((sizeof(type) >> 1), arg)
 /* Wrappers around the above using C names. */
 #define fmr_char(arg) fmr_int8(arg)
 #define fmr_short(arg) fmr_int16(arg)
