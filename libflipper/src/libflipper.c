@@ -376,6 +376,11 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 	return lf_success;
 }
 
+int lf_bind(struct _lf_module *module) {
+	printf("Successfully bound the '%s' module.\n", module -> name);
+	return lf_success;
+}
+
 /* Debugging functions for displaying the contents of various FMR related data structures. */
 
 void lf_debug_packet(struct _fmr_packet *packet, size_t length) {

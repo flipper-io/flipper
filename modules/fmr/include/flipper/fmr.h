@@ -136,8 +136,6 @@ struct _fmr_list *fmr_merge(struct _fmr_list *first, struct _fmr_list *second);
 struct _fmr_arg *fmr_pop(struct _fmr_list *list);
 /* Frees an fmr_list. */
 int fmr_free(struct _fmr_list *list);
-/* Binds a module to its counterpart the selected Flipper device. */
-struct _lf_module *fmr_bind(char *name);
 /* Generates the appropriate data structure needed for the remote procedure call of 'funtion' in 'module'. */
 int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *args, struct _fmr_packet *packet);
 /* Executes a standard module. */

@@ -139,18 +139,6 @@ int fmr_free(struct _fmr_list *list) {
 	return lf_success;
 }
 
-struct _lf_module *fmr_bind(char *name) {
-	/* Allocate the required memory to create the module record. */
-	struct _lf_module *module = calloc(1, sizeof(struct _lf_module));
-	/* Copy the name into the module. */
-	module -> name = name;
-	/* Calculate the module's identifier. */
-	module -> identifier = lf_checksum(name, strlen(name));
-	/* Ask the device if it has a module with the given identifier. */
-
-	return module;
-}
-
 int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *parameters, struct _fmr_packet *packet) {
 	/* Ensure that the pointer to the outgoing packet is valid. */
 	if (!packet) {
