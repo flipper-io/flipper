@@ -3,7 +3,7 @@
 #include <flipper/modules.h>
 
 /* ~ Provide the definition for this standard module. ~ */
-struct _fmr_module _led = {
+struct _lf_module _led = {
     "led",
     "Controls the on-board RGB status LED.",
     LF_VERSION,

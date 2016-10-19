@@ -3,7 +3,7 @@
 #include <flipper/modules.h>
 
 /* ~ Provide the definition for this standard module. ~ */
-struct _fmr_module _cpu = {
+struct _lf_module _cpu = {
     "cpu",
     "Provides control over CPU power, reset, DFU, etc.",
     LF_VERSION,

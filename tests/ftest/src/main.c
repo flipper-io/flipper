@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 	// sam4s.configuration.attributes = lf_device_little_endian | lf_device_32bit;
 	// sam4s.endpoint = &sam4s_ep;
 	// /* Construct the GPIO module. */
-	// struct _fmr_module _gpio;
+	// struct _lf_module _gpio;
 	// _gpio.device = &sam4s;
 	// _gpio.identifier = _gpio_id;
 	// /* Execute the configure function. */

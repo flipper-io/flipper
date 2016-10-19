@@ -52,20 +52,6 @@ typedef enum {
 /* Calculates the length of an FMR type. */
 #define fmr_sizeof(type) (1 << type)
 
-/* Standardizes the notion of a module. */
-struct _fmr_module {
-	/* A string containing the module's name. */
-	char *name;
-	/* A string giving the description of a module. */
-	char *description;
-	/* The version of the module. */
-	lf_version_t version;
-	/* The module's identifier. */
-	lf_id_t identifier;
-	/* The device upon which the module's counterpart is located. */
-	struct _lf_device *device;
-};
-
 /* Standardizes the notion of an argument. */
 struct _fmr_arg {
 	/* The value of the argument. */
@@ -151,7 +137,7 @@ struct _fmr_arg *fmr_pop(struct _fmr_list *list);
 /* Frees an fmr_list. */
 int fmr_free(struct _fmr_list *list);
 /* Binds a module to its counterpart the selected Flipper device. */
-struct _fmr_module *fmr_bind(char *name);
+struct _lf_module *fmr_bind(char *name);
 /* Generates the appropriate data structure needed for the remote procedure call of 'funtion' in 'module'. */
 int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *args, struct _fmr_packet *packet);
 /* Executes a standard module. */

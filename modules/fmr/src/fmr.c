@@ -139,9 +139,9 @@ int fmr_free(struct _fmr_list *list) {
 	return lf_success;
 }
 
-struct _fmr_module *fmr_bind(char *name) {
+struct _lf_module *fmr_bind(char *name) {
 	/* Allocate the required memory to create the module record. */
-	struct _fmr_module *module = calloc(1, sizeof(struct _fmr_module));
+	struct _lf_module *module = calloc(1, sizeof(struct _lf_module));
 	/* Copy the name into the module. */
 	module -> name = name;
 	/* Calculate the module's identifier. */

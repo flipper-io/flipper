@@ -3,7 +3,7 @@
 #include <flipper/modules.h>
 
 /* ~ Provide the definition for this standard module. ~ */
-struct _fmr_module _uart0 = {
+struct _lf_module _uart0 = {
 	"uart0",
 	"Provides low level access to the device's UART bus.",
 	LF_VERSION,

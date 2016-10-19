@@ -10,7 +10,7 @@ extern const struct _adc {
 } adc;
 
 /* Declare the message runtime element for this module. */
-extern struct _fmr_module *_adc;
+extern struct _lf_module *_adc;
 
 #ifdef __private_include__
 
