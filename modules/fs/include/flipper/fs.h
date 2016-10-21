@@ -59,7 +59,7 @@ extern const struct _fs {
 #ifdef __private_include__
 
 /* Declare the message runtime overlay for this driver. */
-enum { _fs_configure, _fs_format, _fs_create, _fs_remove, _fs_rename, _fs_append, _fs_data };
+enum { _fs_configure, _fs_format, _fs_create, _fs_remove, _fs_rename, _fs_write, _fs_put, _fs_read, _fs_get, _fs_data };
 
 /* ~ Define types and macros internal to this driver. ~ */
 #define _FREE_LIST	 32
@@ -73,17 +73,17 @@ extern nvm_p _root_leaf;
 
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
 extern int fs_configure(void);
-void fs_format(void);
-int fs_create(char *name, void *data, size_t length);
-int fs_remove(char *name);
-int fs_rename(char *from, char *to);
-void fs_write(char *name);
+extern void fs_format(void);
+extern int fs_create(char *name, void *data, size_t length);
+extern int fs_remove(char *name);
+extern int fs_rename(char *from, char *to);
+extern void fs_write(char *name);
 /* fs.put maps to nvm_put */
-void fs_read(char *name);
+extern void fs_read(char *name);
 /* fs.get maps to nvm_get */
-nvm_p fs_data(char *name);
-nvm_p fs_transfer(char *path, char *name);
-void fs_receive(char *name, char *path);
+extern nvm_p fs_data(char *name);
+extern nvm_p fs_transfer(char *path, char *name);
+extern void fs_receive(char *name, char *path);
 
 /* ~ Declare the prototypes for the supporting functions belonging to this driver. ~ */
 nvm_p fs_add_leaf_with_key(nvm_p current, uint16_t key);

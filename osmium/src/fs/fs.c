@@ -3,24 +3,6 @@
 #include <private/nvm.h>
 #include <flipper/error.h>
 
-/* Define the virtual interface for this module. */
-const struct _fs fs = {
-	fs_configure,
-	fs_format,
-	fs_create,
-	fs_remove,
-	fs_rename,
-	fs_write,
-	nvm_put,
-	fs_read,
-	nvm_get,
-	fs_data,
-#ifdef __fs_transfer_symbols__
-	fs_transfer,
-	fs_receive
-#endif
-};
-
 int fs_configure(void) {
 	return lf_success;
 }
