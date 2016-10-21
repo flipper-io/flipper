@@ -10,17 +10,19 @@ nvm_p _root_leaf;
 /* Define the virtual interface for this module. */
 const struct _fs fs = {
 	fs_configure,
-	fs_format,
 	fs_create,
-	fs_remove,
-	fs_rename,
+	fs_delete,
+	fs_size,
 	fs_write,
-	nvm_put,
+	fs_put,
 	fs_read,
-	nvm_get,
-	fs_data,
-#ifdef __fs_transfer_symbols__
+	fs_get,
+	fs_push,
+	fs_pull,
+	fs_close,
+	fs_format,
+	#ifdef __fs_transfer_symbols__
 	fs_transfer,
 	fs_receive
-#endif
+	#endif
 };

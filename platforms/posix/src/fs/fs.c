@@ -5,12 +5,12 @@
 
 /* All other FS related symbols are delared in 'osmium/fs/fs.c'. */
 
-nvm_p fs_transfer(char *path, char *name) {
+int fs_transfer(char *path, char *name) {
 	/* Open the file for reading. */
 	FILE *file = fopen(path, "rb");
 	if (!file) {
-		error_raise(E_FS_NO_FILE, error_message("Could not open the file '%s' for reading.", path));
-		return 0;
+		error_raise(E_FS_NO_FILE, error_message("Failed to open the file '%s' for reading.", path));
+		return lf_error;
 	}
 	/* Obtain the size of the file. */
 	fseek(file, 0L, SEEK_END);
@@ -19,55 +19,54 @@ nvm_p fs_transfer(char *path, char *name) {
 	/* Allocate the memory required to load the file into memory. */
 	uint8_t *data = (uint8_t *) malloc(sizeof(uint8_t) * size);
 	if (!data) {
-		error_raise(E_MALLOC, error_message("Failed to obtain the memory required to upload the file '%s'.", name));
-		return 0;
+		error_raise(E_MALLOC, error_message("Failed to obtain the memory required to transfer the file '%s'.", name));
+		return lf_error;
 	}
 	/* Read the file into memory. */
 	fread(data, size, sizeof(uint8_t), file);
 	/* Create the file on the device and load the data. */
-	nvm_p _leaf = fs_create(name, data, size);
+	int _e = fs_create(name);
+	if (_e < lf_success) {
+		return _e;
+	}
+	/* Open a write session to the file. */
+	fs_write(name, 0);
+	/* Push the data into the file. */
+	fs_push(data, size);
+	/* Close the write session. */
+	fs_close();
 	/* Free the memory allocated to load the file. */
 	free(data);
 	/* Close the file. */
 	fclose(file);
-	/* Return a pointer to the file. */
-	return _leaf;
+	return lf_success;
 }
 
-void fs_receive(char *name, char *path) {
+int fs_receive(char *name, char *path) {
 	/* Open the file for writing. */
 	FILE *file = fopen (path, "wb");
 	if (!file) {
-		error_raise(E_FS_NO_FILE, error_message("Could not create local file '%s'.", path));
-		return;
+		error_raise(E_FS_NO_FILE, error_message("Failed to create the file '%s'.", path));
+		return lf_error;
 	}
-	/* Obtain a key for the file given its name. */
-	lf_id_t key = lf_checksum(name, strlen(name));
-
-/* WARNING: ILLEGAL FS ACCESSORS HERE FROM LIBFLIPPER CONTEXT. */
-#if 0
-	/* Obtain the file's leaf, suppressing any errors that occur while doing so. */
-	suppress_errors(nvm_p _leaf = fs_leaf_for_key(_root_leaf, key));
-	if (!_leaf) {
-		error_raise(E_FS_NO_FILE, error_message("Failed to receive the file '%s'.", name));
-		return;
+	lf_size_t size = 0;
+	/* Allocate the memory required to download the file. */
+	uint8_t *data = (uint8_t *) malloc(sizeof(uint8_t) * size);
+	if (!data) {
+		error_raise(E_MALLOC, error_message("Failed to obtain the memory required to receive the file '%s'.", name));
+		return lf_error;
 	}
-	/* Create a locally scoped variable into which we can bring the data pointer. */
-	nvm_p size;
-	/* Read the data pointer to the file's data into the variable above. */
-	nvm_pull(&size, sizeof(nvm_p), lf_forward(_leaf, leaf, size));
-	/* Create a locally scoped variable into which we can bring in the data pointer. */
-	nvm_p _data;
-	/* Read the data pointer to the file's data into the variable above. */
-	nvm_pull(&_data, sizeof(nvm_p), lf_forward(_leaf, leaf, data));
-	/* Load the file's data into memory. */
-	uint8_t *data = nvm_dereference(_data, size);
-	/* Write the data to disk. */
-	fwrite(data, size, sizeof(uint8_t), file);
+	/* Open a read session from the file. */
+	fs_read(name, 0);
+	/* Pull the data from the file. */
+	fs_push(data, size);
+	/* Close the read session. */
+	fs_close();
+	/* Write the data into the filesystem. */
+	fwrite(data, sizeof(uint8_t), size, file);
 	/* Free the memory allocated to load the file. */
 	free(data);
-#endif
-
 	/* Close the file. */
 	fclose(file);
+	return lf_success;
 }

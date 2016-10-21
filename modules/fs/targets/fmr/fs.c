@@ -6,37 +6,49 @@
 LF_MODULE(_fs, "fs", "Provides access to the device's filesystem.", _fs_id);
 
 int fs_configure(void) {
-	return lf_invoke(&_fs, _fs_configure, NULL);
-}
-
-void fs_format(void) {
-	lf_invoke(&_fs, _fs_format, NULL);
-}
-
-int fs_create(char *name, void *data, size_t length) {
 	return lf_success;
 }
 
-int fs_remove(char *name) {
-	return lf_invoke(&_fs, _fs_remove, NULL);
+int fs_create(char *name){
+	return lf_success;
 }
 
-int fs_rename(char *from, char *to) {
-	return lf_invoke(&_fs, _fs_rename, NULL);
+int fs_delete(char *name){
+	return lf_success;
 }
 
-void fs_write(char *name) {
-	lf_invoke(&_fs, _fs_write, NULL);
+lf_size_t fs_size(char *name) {
+	return 0;
 }
 
-/* fs.put maps to nvm_put */
+void fs_write(char *name, lf_size_t offset){
 
-void fs_read(char *name) {
-	lf_invoke(&_fs, _fs_read, NULL);
 }
 
-/* fs.get maps to nvm_get */
+void fs_put(uint8_t byte){
 
-nvm_p fs_data(char *name) {
-	return lf_invoke(&_fs, _fs_data, NULL);
+}
+
+void fs_read(char *name, lf_size_t offset){
+
+}
+
+uint8_t fs_get(void){
+	return 0;
+}
+
+void fs_push(void *source, lf_size_t length){
+
+}
+
+void fs_pull(void *destination, lf_size_t length){
+
+}
+
+void fs_close(void){
+
+}
+
+void fs_format(void){
+
 }

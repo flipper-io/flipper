@@ -10,6 +10,7 @@ int main(int argc, char *argv[]) {
 
 	printf(KGRN "Successfully attached to Flipper device.\n");
 
+#if 0
 	/* Create the SAM4S endpoint using uart0 as the interface. */
 	struct _lf_endpoint sam4s_ep = {
 		uart0_configure,
@@ -31,6 +32,7 @@ int main(int argc, char *argv[]) {
 	/* Execute the configure function. */
 	uint32_t val = lf_invoke(&_gpio, _gpio_enable, fmr_args(fmr_int32(0xdeadbeef), fmr_int16(0xbabe)));
 	printf("Got return value 0x%08x\n", val);
+#endif
 
 	return EXIT_SUCCESS;
 }

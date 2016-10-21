@@ -29,30 +29,34 @@ typedef struct __attribute__((__packed__)) _leaf {
 extern const struct _fs {
 	/* Configures the filesystem. */
 	int (* configure)(void);
+	/* Creates a file with the given name. */
+	int (* create)(char *name);
+	/* Removes a file with the given name. */
+	int (* delete)(char *name);
+	/* Obtains the size of the file with the given name. */
+	lf_size_t (* size)(char *name);
+	/* Opens a write session starting an a specific offset to a file with the given name. */
+	void (* write)(char *name, lf_size_t offset);
+	/* Writes a single byte into the file if a write session is active. */
+	void (* put)(uint8_t byte);
+	/* Opens a read session starting an a specific offset from a file with the given name. */
+	void (* read)(char *name, lf_size_t offset);
+	/* Reads a single byte from the file if a read session is active. */
+	uint8_t (* get)(void);
+	/* Pushes data into a file if a write session is active. */
+	void (* push)(void *source, lf_size_t length);
+	/* Pulls from a file if a read session is active. */
+	void (* pull)(void *destination, lf_size_t length);
+	/* Closes a file that is being written to or read from. */
+	void (* close)(void);
 	/* Permanently destroys all records catalogued by the filesystem. */
 	void (* format)(void);
-	/* Creates a file with the name and data given. */
-	int (* create)(char *name, void *data, size_t length);
-	/* Removes a file with the given name. */
-	int (* remove)(char *name);
-	/* Renames a file. */
-	int (* rename)(char *from, char *to);
-	/* Opens a write session to the beginning of the file with the name given. */
-	void (* write)(char *name);
-	/* Wraps the NVM function used to write a byte to the filesystem. */
-	void (* put)(uint8_t byte);
-	/* Opens a read session from the beginning of the file with the name given. */
-	void (* read)(char *name);
-	/* Wraps the NVM function used to read a byte from the filesystem. */
-	uint8_t (* get)(void);
-	/* Returns a pointer to a file's data within NVM. */
-	nvm_p (* data)(char *name);
 /* If this flag is turned on, symbols to move data from the host's file system to the device's will be enabled. */
 #ifdef __fs_transfer_symbols__
 	/* Copies a file from the host's filesystem to the device's filesystem. */
-	nvm_p (* transfer)(char *path, char *name);
+	int (* transfer)(char *path, char *name);
 	/* Copies a file from the device's filesystem to the host's filesystem. */
-	void (* receive)(char *name, char *path);
+	int (* receive)(char *name, char *path);
 #endif
 } fs;
 
@@ -73,17 +77,22 @@ extern nvm_p _root_leaf;
 
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
 extern int fs_configure(void);
+extern int fs_create(char *name);
+extern int fs_delete(char *name);
+extern lf_size_t fs_size(char *name);
+extern void fs_write(char *name, lf_size_t offset);
+extern void fs_put(uint8_t byte);
+extern void fs_read(char *name, lf_size_t offset);
+extern uint8_t fs_get(void);
+extern void fs_push(void *source, lf_size_t length);
+extern void fs_pull(void *destination, lf_size_t length);
+extern void fs_close(void);
 extern void fs_format(void);
-extern int fs_create(char *name, void *data, size_t length);
-extern int fs_remove(char *name);
-extern int fs_rename(char *from, char *to);
-extern void fs_write(char *name);
-/* fs.put maps to nvm_put */
-extern void fs_read(char *name);
-/* fs.get maps to nvm_get */
-extern nvm_p fs_data(char *name);
-extern nvm_p fs_transfer(char *path, char *name);
-extern void fs_receive(char *name, char *path);
+
+#ifdef __fs_transfer_symbols__
+extern int fs_transfer(char *path, char *name);
+extern int fs_receive(char *name, char *path);
+#endif
 
 /* ~ Declare the prototypes for the supporting functions belonging to this driver. ~ */
 nvm_p fs_add_leaf_with_key(nvm_p current, uint16_t key);
