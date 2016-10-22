@@ -34,22 +34,17 @@ buttonCtx :: ButtonAction -> String
 buttonCtx ButtonRead = "Reading button state."
 
 fsCtx :: FSAction -> String
-fsCtx (FSCreateFromString fn p) = mconcat [ "Creating file "
-                                          , fn
-                                          , " from payload "
-                                          , p
-                                          ]
-fsCtx (FSCreateFromFile fn fp)  = mconcat [ "Creating file "
-                                          , fn
-                                          , " from file "
-                                          , fp
-                                          ]
-fsCtx (FSRemove fn)             = "Removing file " <> fn
-fsCtx (FSRename t f)            = mconcat [ "Moving "
-                                          , t
-                                          , " to "
-                                          , f
-                                          ]
+fsCtx (FSCreate fn)    = "Creating file " <> fn
+fsCtx (FSDelete fn)    = "Deleting file " <> fn
+fsCtx (FSSize fn)      = "Querying size of file " <> fn
+fsCtx (FSOpen fn o)    = mconcat [ "Opening file "
+                                 , fn
+                                 , " at offset "
+                                 , show o
+                                 ]
+fsCtx (FSPushString p) = "Pushing payload " <> p
+fsCtx FSPullString     = "Pulling payload."
+fsCtx FSClose          = "Closing open file."
 
 gpioCtx :: GPIOAction -> String
 gpioCtx (GPIODigitalDirection p d) = mconcat [ "Setting direction of pin "

@@ -59,10 +59,13 @@ execButtonAction :: ButtonAction -> FC ()
 execButtonAction ButtonRead = Button.read >>= printFC
 
 execFSAction :: FSAction -> FC ()
-execFSAction (FSCreateFromString n c) = FS.create n c
-execFSAction (FSCreateFromFile n fp)  = liftFC (BS.readFile fp) >>= FS.create n
-execFSAction (FSRemove n)             = FS.remove n
-execFSAction (FSRename t f)           = FS.rename t f
+execFSAction (FSCreate fn)    = FS.create fn
+execFSAction (FSDelete fn)    = FS.delete fn
+execFSAction (FSSize fn)      = FS.size fn >>= printFC
+execFSAction (FSOpen fn o)    = FS.open fn o
+execFSAction (FSPushString p) = FS.push p
+execFSAction FSPullString     = FS.pull >>= printCStringFC
+execFSAction FSClose          = FS.close
 
 execGPIOAction :: GPIOAction -> FC ()
 execGPIOAction (GPIODigitalDirection p d) = GPIO.digitalDirection p d

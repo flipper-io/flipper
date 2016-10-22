@@ -43,10 +43,13 @@ data Call = -- | Button module call.
 data ButtonAction = ButtonRead
                   deriving (Eq, Ord, Show)
 
-data FSAction = FSCreateFromString String String
-              | FSCreateFromFile String FilePath
-              | FSRemove String
-              | FSRename String String
+data FSAction = FSCreate String
+              | FSDelete String
+              | FSSize String
+              | FSOpen String Word32
+              | FSPushString String
+              | FSPullString
+              | FSClose
               deriving (Eq, Ord, Show)
 
 data GPIOAction = GPIODigitalDirection DigitalPin Direction

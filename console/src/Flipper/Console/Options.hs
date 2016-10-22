@@ -109,10 +109,13 @@ button = info (hsubparser buttonRead) buttonI
 
 fs :: ParserInfo FSAction
 fs = info fsP fsI
-    where fsP = hsubparser $ mconcat [ fsCreateFromString
-                                     , fsCreateFromFile
-                                     , fsRemove
-                                     , fsRename
+    where fsP = hsubparser $ mconcat [ fsCreate
+                                     , fsDelete
+                                     , fsSize
+                                     , fsOpen
+                                     , fsPushString
+                                     , fsPullString
+                                     , fsClose
                                      ]
           fsI = mconcat [ fullDesc
                         , progDesc "Interact with the device's file system."
@@ -164,67 +167,75 @@ buttonRead = command "read" (info (pure ButtonRead) readI)
                           , progDesc "Read the device's button state."
                           ]
 
-fsCreateFromString :: Mod CommandFields FSAction
-fsCreateFromString = command "create" (info ( FSCreateFromString
-                                              <$> strArgument fnameP
-                                              <*> strArgument stringP
-                                            )
-                                            createI
-                                      )
+fsCreate :: Mod CommandFields FSAction
+fsCreate = command "create" (info ( FSCreate
+                                    <$> strArgument fnameP
+                                  )
+                                  createI
+                            )
     where fnameP = mconcat [ help "File name to create."
                            , metavar "FILENAME"
                            ]
-          stringP = mconcat [ help "File contents as quoted string."
-                            , metavar "CONTENTS"
-                            ]
           createI = mconcat [ fullDesc
                             , progDesc "Create a file on the device from a \
                                        \user-provided string."
                             ]
 
-fsCreateFromFile :: Mod CommandFields FSAction
-fsCreateFromFile = command "createfile" ( info ( FSCreateFromString
-                                                 <$> strArgument fnameP
-                                                 <*> strArgument fileP
-                                               )
-                                               createI
-                                        )
-    where fnameP = mconcat [ help "File name to create."
-                           , metavar "DEVICE_FILENAME"
-                           ]
-          fileP = mconcat [ help "Path to local file."
-                          , metavar "LOCAL_FILENAME"
-                          ]
-          createI = mconcat [ fullDesc
-                            , progDesc "Create a file on the device from a \
-                                       \local file."
-                            ]
-
-fsRemove :: Mod CommandFields FSAction
-fsRemove = command "remove" (info (FSRemove <$> strArgument fnameP) removeI)
-    where fnameP = mconcat [ help "File name to remove."
+fsDelete :: Mod CommandFields FSAction
+fsDelete = command "delete" (info (FSDelete <$> strArgument fnameP) deleteI)
+    where fnameP = mconcat [ help "File name to delete."
                            , metavar "FILENAME"
                            ]
-          removeI = mconcat [ fullDesc
-                            , progDesc "Remove a file on the device."
+          deleteI = mconcat [ fullDesc
+                            , progDesc "Delete a file on the device."
                             ]
 
-fsRename :: Mod CommandFields FSAction
-fsRename = command "rename" ( info ( FSRename
-                                     <$> strArgument fromP
-                                     <*> strArgument toP
-                                   )
-                                   renameI
-                            )
-    where fromP = mconcat [ help "Old file name."
-                          , metavar "FROM"
+fsSize :: Mod CommandFields FSAction
+fsSize = command "size" (info (FSSize <$> strArgument fnameP) sizeI)
+    where fnameP = mconcat [ help "File name to delete."
+                           , metavar "FILENAME"
+                           ]
+          sizeI = mconcat [ fullDesc
+                          , progDesc "Query file size."
                           ]
-          toP = mconcat [ help "New file name."
-                        , metavar "TO"
+
+fsOpen :: Mod CommandFields FSAction
+fsOpen = command "open" (info (FSOpen <$> strArgument fnP
+                                      <*> word32 offP)
+                              openI
+                        )
+    where fnP = mconcat [ help "File name to open."
+                        , metavar "FILENAME"
                         ]
-          renameI = mconcat [ fullDesc
-                            , progDesc "Rename a file on the device."
-                            ]
+          offP = mconcat [ help "File cursor offset."
+                         , metavar "OFFSET"
+                         ]
+          openI = mconcat [ fullDesc
+                          , progDesc "Open a file on the device."
+                          ]
+
+fsPushString :: Mod CommandFields FSAction
+fsPushString = command "push" (info (FSPushString <$> strArgument pP) pushI)
+    where pP = mconcat [ help "String payload."
+                       , metavar "PAYLOAD"
+                       ]
+          pushI = mconcat [ fullDesc
+                          , progDesc "Write a null-terminated string to the \
+                                     \file cursor."
+                          ]
+
+fsPullString :: Mod CommandFields FSAction
+fsPullString = command "pull" (info (pure FSPullString) pullI)
+    where pullI = mconcat [ fullDesc
+                          , progDesc "Read a null-terminated string from the \
+                                     \file cursor."
+                          ]
+
+fsClose :: Mod CommandFields FSAction
+fsClose = command "close" (info (pure FSClose) closeI)
+    where closeI = mconcat [ fullDesc
+                           , progDesc "Close the globally open file."
+                           ]
 
 gpioDirection :: Mod CommandFields GPIOAction
 gpioDirection = command "direction" ( info ( digitalDirection
@@ -279,10 +290,10 @@ gpioWrite = command "write" (info (digitalWrite <|> analogWrite) writeI)
                            ]
 
 digitalWrite :: Parser GPIOAction
-digitalWrite = GPIODigitalWrite <$> digitalPin <*> bool
+digitalWrite = GPIODigitalWrite <$> digitalPin <*> bool mempty
 
 analogWrite :: Parser GPIOAction
-analogWrite = GPIOAnalogWrite <$> analogPin <*> word16
+analogWrite = GPIOAnalogWrite <$> analogPin <*> word16 mempty
 
 ledRGB :: Mod CommandFields LEDAction
 ledRGB = command "rgb" (info (LEDSetRGB <$> rgb) rgbI)
@@ -387,14 +398,14 @@ moduleID = argument (readParser parseModuleID) moduleP
                             , help "The module ID."
                             ]
 
-word8 :: Parser Word8
-word8 = argument (readParser parseWord8) mempty
+word16 :: Mod ArgumentFields Word16 -> Parser Word16
+word16 = argument (readParser parseWord16)
 
-word16 :: Parser Word16
-word16 = argument (readParser parseWord16) mempty
+word32 :: Mod ArgumentFields Word32 -> Parser Word32
+word32 = argument (readParser parseWord32)
 
-bool :: Parser Bool
-bool = argument (readParser parseBool) mempty
+bool :: Mod ArgumentFields Bool -> Parser Bool
+bool = argument (readParser parseBool)
 
 rgb :: Parser RGB
 rgb = RGB <$> argument (readParser parseWord8) rP
