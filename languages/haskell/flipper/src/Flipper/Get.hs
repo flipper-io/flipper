@@ -177,27 +177,35 @@ getStorable = Get $ \b@(Buffer p o l) ->
                 else unsafeDupablePerformIO $ withForeignPtr p $ \p' ->
                         val <$> peek (plusPtr (castPtr p') o)
 
+-- | Parse a 'Word8'.
 getWord8 :: Get Word8
 getWord8 = getStorable
 
+-- | Parse a 'Int8'.
 getInt8 :: Get Int8
 getInt8 = getStorable
 
+-- | Parse a 'Word16'.
 getWord16 :: Get Word16
 getWord16 = getStorable
 
+-- | Parse a 'Int16'.
 getInt16 :: Get Int16
 getInt16 = getStorable
 
+-- | Parse a 'Word32'.
 getWord32 :: Get Word32
 getWord32 = getStorable
 
+-- | Parse a 'Int32'.
 getInt32 :: Get Int32
 getInt32 = getStorable
 
+-- | Parse a 'Word64'.
 getWord64 :: Get Word64
 getWord64 = getStorable
 
+-- | Parse a 'Int64'.
 getInt64 :: Get Int64
 getInt64 = getStorable
 

@@ -5,24 +5,39 @@ import Data.Word
 import Flipper.GPIO
 import Flipper.LED
 
-data ConsoleAction = Flash FilePath
+-- | Top-level console action.
+data ConsoleAction = -- | Flash firmware from a file to the device.
+                     Flash FilePath
+                     -- | Install a module from a file on to the device.
                    | Install ModuleID FilePath
+                     -- | Launch a program on the device.
                    | Launch String
+                     -- | Reset the device.
                    | Reset
+                     -- | Suspend the device.
                    | Suspend
+                     -- | Format the flash storage on the device.
                    | Format
+                     -- | Call a standard module function.
                    | ConsoleCall Call
                    deriving (Eq, Ord, Show)
 
 newtype ModuleID = ModuleID { unModuleID :: [String] }
                  deriving (Eq, Ord, Show)
 
-data Call = ButtonCall ButtonAction
+-- | A standard module function call.
+data Call = -- | Button module call.
+            ButtonCall ButtonAction
+            -- | File system module call.
           | FSCall FSAction
+            -- | GPIO module call.
           | GPIOCall GPIOAction
+            -- | LED module call.
           | LEDCall LEDAction
+            -- | SPI module call.
           | SPICall SPIAction
-          | UARTCall UARTAction
+            -- | USART
+          | USARTCall USARTAction
           deriving (Eq, Ord, Show)
 
 data ButtonAction = ButtonRead
@@ -52,9 +67,9 @@ data SPIAction = SPIEnable
                | SPIWriteFromFile FilePath
                deriving (Eq, Ord, Show)
 
-data UARTAction = UARTEnable
-                | UARTDisable
-                | UARTRead
-                | UARTWriteFromString String
-                | UARTWriteFromFile String
-                deriving (Eq, Ord, Show)
+data USARTAction = USARTEnable
+                 | USARTDisable
+                 | USARTRead
+                 | USARTWriteFromString String
+                 | USARTWriteFromFile String
+                 deriving (Eq, Ord, Show)

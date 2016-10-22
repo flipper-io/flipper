@@ -54,7 +54,7 @@ parseCall = choice [ ButtonCall <$> try parseButtonAction
                    , GPIOCall <$> parseGPIOAction
                    , LEDCall <$> parseLEDAction
                    , SPICall <$> parseSPIAction
-                   , UARTCall <$> parseUARTAction
+                   , USARTCall <$> parseUSARTAction
                    ]
 
 parseButtonAction :: Parser ButtonAction
@@ -88,13 +88,13 @@ parseSPIAction = string' "spi" *> spaces *> choice [ try parseSPIEnable
                                                  , try parseSPIWriteFromString
                                                  ]
 
-parseUARTAction :: Parser UARTAction
-parseUARTAction = string' "usart" *> spaces *> choice usarts
-    where usarts = [ try parseUARTEnable
-                  , try parseUARTDisable
-                  , try parseUARTRead
-                  , try parseUARTWriteFromString
-                  ]
+parseUSARTAction :: Parser USARTAction
+parseUSARTAction = string' "usart" *> spaces *> choice usarts
+    where usarts = [ try parseUSARTEnable
+                   , try parseUSARTDisable
+                   , try parseUSARTRead
+                   , try parseUSARTWriteFromString
+                   ]
 
 parseButtonRead :: Parser ButtonAction
 parseButtonRead = string' "read" *> pure ButtonRead
@@ -184,26 +184,26 @@ parseSPIWriteFromFile = SPIWriteFromFile <$> ( string' "writefile"
                                                *> parseEscString
                                              )
 
-parseUARTEnable :: Parser UARTAction
-parseUARTEnable = string' "enable" *> pure UARTEnable
+parseUSARTEnable :: Parser USARTAction
+parseUSARTEnable = string' "enable" *> pure USARTEnable
 
-parseUARTDisable :: Parser UARTAction
-parseUARTDisable = string' "disable" *> pure UARTDisable
+parseUSARTDisable :: Parser USARTAction
+parseUSARTDisable = string' "disable" *> pure USARTDisable
 
-parseUARTRead :: Parser UARTAction
-parseUARTRead = string' "read" *> pure UARTRead
+parseUSARTRead :: Parser USARTAction
+parseUSARTRead = string' "read" *> pure USARTRead
 
-parseUARTWriteFromString :: Parser UARTAction
-parseUARTWriteFromString = UARTWriteFromString <$> ( string' "write"
+parseUSARTWriteFromString :: Parser USARTAction
+parseUSARTWriteFromString = USARTWriteFromString <$> ( string' "write"
                                                      *> spaces
                                                      *> parseEscString
                                                    )
 
-parseUARTWriteFromFile :: Parser UARTAction
-parseUARTWriteFromFile = UARTWriteFromFile <$> ( string' "writefile"
+parseUSARTWriteFromFile :: Parser USARTAction
+parseUSARTWriteFromFile = USARTWriteFromFile <$> ( string' "writefile"
                                                  *> spaces
                                                  *> parseEscString
-                                               )
+                                                 )
 
 parseDigitalPin :: Parser DigitalPin
 parseDigitalPin = choice [ try (string' "10" *> pure IO10)

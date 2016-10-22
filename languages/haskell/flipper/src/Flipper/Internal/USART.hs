@@ -1,6 +1,6 @@
 {-|
-Module      : Flipper.Internal.UART
-Description : Internal UART Module
+Module      : Flipper.Internal.USART
+Description : Internal USART Module
 Copyright   : George Morgan, Travis Whitaker 2016
 License     : All rights reserved.
 Maintainer  : travis@flipper.io
@@ -9,9 +9,10 @@ Portability : Windows, POSIX
 
 -}
 
-module Flipper.Internal.UART (
+module Flipper.Internal.USART (
     usartEnable
   , usartDisable
+  , usartReady
   , usartPut
   , usartGet
   , usartPush
@@ -23,6 +24,7 @@ import Data.Word
 import Flipper.Internal.Buffer
 
 import Foreign.ForeignPtr
+import Foreign.Marshal.Utils
 import Foreign.Ptr
 
 usartEnable :: IO ()
@@ -30,6 +32,9 @@ usartEnable = c_usart_enable
 
 usartDisable :: IO ()
 usartDisable = c_usart_disable
+
+usartReady :: IO Bool
+usartReady = toBool <$> c_usart_ready
 
 usartPut :: Word8 -> IO ()
 usartPut = c_usart_put
@@ -53,6 +58,9 @@ foreign import ccall safe "flipper/usart.h usart_enable"
 
 foreign import ccall safe "flipper/usart.h usart_disable"
     c_usart_disable :: IO ()
+
+foreign import ccall safe "flipper/usart.h usart_ready"
+    c_usart_ready :: IO Word8
 
 foreign import ccall safe "flipper/usart.h usart_put"
     c_usart_put :: Word8 -> IO ()

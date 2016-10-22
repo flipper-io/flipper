@@ -129,27 +129,35 @@ putBufferPascal b@(Buffer _ _ l) = putStorable (fromIntegral l :: Word32)
 putStorable :: Storable a => a -> Put
 putStorable s = Put (\p -> poke (castPtr p) s) (sizeOf s)
 
+-- | Serialize a 'Word8'.
 putWord8 :: Word8 -> Put
 putWord8 = putStorable
 
+-- | Serialize a 'Int8'.
 putInt8 :: Int8 -> Put
 putInt8 = putStorable
 
+-- | Serialize a 'Word16'.
 putWord16 :: Word16 -> Put
 putWord16 = putStorable
 
+-- | Serialize a 'Int16'.
 putInt16 :: Int16 -> Put
 putInt16 = putStorable
 
+-- | Serialize a 'Word32'.
 putWord32 :: Word32 -> Put
 putWord32 = putStorable
 
+-- | Serialize a 'Int32'.
 putInt32 :: Int32 -> Put
 putInt32 = putStorable
 
+-- | Serialize a 'Word64'.
 putWord64 :: Word64 -> Put
 putWord64 = putStorable
 
+-- | Serialize a 'Int64'.
 putInt64 :: Int64 -> Put
 putInt64 = putStorable
 

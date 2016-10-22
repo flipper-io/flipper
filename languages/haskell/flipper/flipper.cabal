@@ -35,7 +35,7 @@ library
                        Flipper.SPI
                        Flipper.Temperature
                        Flipper.Timer
-                       Flipper.UART
+                       Flipper.USART
                        Flipper.USB
                        Flipper.WDT
                        Flipper.Internal.ADC
@@ -55,7 +55,7 @@ library
                        Flipper.Internal.SPI
                        Flipper.Internal.Temperature
                        Flipper.Internal.Timer
-                       Flipper.Internal.UART
+                       Flipper.Internal.USART
                        Flipper.Internal.USB
                        Flipper.Internal.Utils
                        Flipper.Internal.WDT

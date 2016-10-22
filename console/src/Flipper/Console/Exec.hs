@@ -12,7 +12,7 @@ import qualified Flipper.GPIO   as GPIO
 import qualified Flipper.LED    as LED
 import qualified Flipper.CPU    as CPU
 import qualified Flipper.SPI    as SPI
-import qualified Flipper.UART   as UART
+import qualified Flipper.USART  as USART
 
 import Flipper.Console.Action
 import Flipper.Console.FC
@@ -53,7 +53,7 @@ execCall (FSCall f)     = execFSAction f
 execCall (GPIOCall g)   = execGPIOAction g
 execCall (LEDCall l)    = execLEDAction l
 execCall (SPICall s)    = execSPIAction s
-execCall (UARTCall u)   = execUARTAction u
+execCall (USARTCall u)  = execUSARTAction u
 
 execButtonAction :: ButtonAction -> FC ()
 execButtonAction ButtonRead = Button.read >>= printFC
@@ -82,12 +82,12 @@ execSPIAction SPIRead                = SPI.pull >>= printCStringFC
 execSPIAction (SPIWriteFromString s) = SPI.push s
 execSPIAction (SPIWriteFromFile fp)  = liftFC (BS.readFile fp) >>= SPI.push
 
-execUARTAction :: UARTAction -> FC ()
-execUARTAction UARTEnable              = UART.enable
-execUARTAction UARTDisable             = UART.disable
-execUARTAction UARTRead                = UART.pull >>= printCStringFC
-execUARTAction (UARTWriteFromString s) = UART.push s
-execUARTAction (UARTWriteFromFile fp)  = liftFC (BS.readFile fp) >>= UART.push
+execUSARTAction :: USARTAction -> FC ()
+execUSARTAction USARTEnable              = USART.enable
+execUSARTAction USARTDisable             = USART.disable
+execUSARTAction USARTRead                = USART.pull >>= printCStringFC
+execUSARTAction (USARTWriteFromString s) = USART.push s
+execUSARTAction (USARTWriteFromFile fp)  = liftFC (BS.readFile fp) >>= USART.push
 
 fcREPL :: FC ()
 fcREPL = do

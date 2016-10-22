@@ -47,10 +47,10 @@ put = bracketIO . I.put
 get :: MonadFlipper m => m Word8
 get = bracketIO I.get
 
--- Send any 'Bufferable' data over the SPI bus.
+-- | Send any 'Bufferable' data over the SPI bus.
 push :: (B.Bufferable b, MonadFlipper m) => b -> m ()
 push = bracketIO . I.push . runPut . B.put
 
--- Receive any 'Bufferable' data over the SPI bus.
+-- | Receive any 'Bufferable' data over the SPI bus.
 pull :: (B.Bufferable b, MonadFlipper m) => m (Either String b)
 pull = runGetWith B.get (bracketIO . I.pull) emptyBuffer

@@ -25,6 +25,7 @@ import Foreign.Marshal.Utils
 
 import Data.Word
 
+-- | Type for Flipper's digital IO pins.
 data DigitalPin = IO1
                 | IO2
                 | IO3
@@ -46,6 +47,7 @@ data DigitalPin = IO1
                          , Show
                          )
 
+-- | Type for Flipper's analog IO pins.
 data AnalogPin = A1
                | A2
                | A3
@@ -59,6 +61,7 @@ data AnalogPin = A1
                         , Show
                         )
 
+-- | Pin IO direction.
 data Direction = Input
                | Output
                deriving ( Eq
