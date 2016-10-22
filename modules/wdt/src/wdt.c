@@ -3,5 +3,6 @@
 
 /* Define the virtual interface for this module. */
 const struct _wdt wdt = {
-	wdt_configure
+	wdt_configure,
+	wdt_fire
 };

@@ -10,10 +10,12 @@
 
 /* Initializes platform specific periphery and prepares system for kernel configuration. */
 extern void system_init(void);
-/* Deinitializes platform specific periphery and prepares system for shutdown. */
-extern void system_deinit(void);
 /* Performs a variety of system related tasks during idle. */
 extern void system_task(void);
+/* Deinitializes platform specific periphery and prepares system for shutdown. */
+extern void system_deinit(void);
+/* Resets the system. */
+extern void system_reset(void);
 
 #endif
 #endif

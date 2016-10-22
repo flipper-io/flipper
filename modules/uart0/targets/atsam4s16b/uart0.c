@@ -11,14 +11,18 @@ int uart0_configure(void) {
 	PIO_Configure(uart0_pins, PIO_LISTSIZE(uart0_pins));
 	/* Configure the UART0. */
 	USART_Configure((Usart *)UART0, USART_MODE_ASYNCHRONOUS, 250000, BOARD_MCK);
-	/* Enable the UART0 IRQ in the NVIC. */
-	NVIC_EnableIRQ(UART0_IRQn);
 	/* Enable the UART0 interrupt on receive. */
-	USART_EnableIt((Usart *)UART0, UART_IER_RXRDY);
+	USART_EnableIt((Usart *)UART0, UART_IER_RXRDY | UART_IER_RXBUFF);
 	/* Enable the UART0 transmitter. */
 	USART_SetTransmitterEnabled((Usart *)UART0, 1);
 	/* Enable the UART0 receiver. */
 	USART_SetReceiverEnabled((Usart *)UART0, 1);
+	/* Disable the UART0 IRQ in the NVIC and clear its interrupt state. */
+	NVIC_DisableIRQ(UART0_IRQn);
+	NVIC_ClearPendingIRQ(UART0_IRQn);
+	NVIC_SetPriority(UART0_IRQn, 0);
+	/* Enable the UART0 IRQ in the NVIC. */
+	NVIC_EnableIRQ(UART0_IRQn);
 	return lf_success;
 }
 
@@ -54,7 +58,7 @@ uint8_t uart0_get(void) {
 }
 
 void uart0_push(void *source, uint32_t length) {
-	//while (length --) uart0_put(*(uint8_t *)(source ++));
+	while (length --) uart0_put(*(uint8_t *)(source ++));
 	//USART_WriteBuffer((Usart *)UART0, source, length);
 }
 
