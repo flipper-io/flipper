@@ -50,11 +50,15 @@ extern int flipper_exit(void);
 /* ~ User functions. ~ */
 
 /* Performs a proper function invocation on the device associated with the provided module. */
-extern fmr_return lf_invoke(struct _fmr_module *module, fmr_function function, struct _fmr_list *parameters);
+extern fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _fmr_list *parameters);
 /* Moves data from the address space of the host to that of the device. */
-extern int lf_push(struct _fmr_module *module, fmr_function function, void *source, lf_size_t length, struct _fmr_list *parameters);
+extern int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _fmr_list *parameters);
 /* Moves data from the address space of the device to that of the host. */
-extern int lf_pull(struct _fmr_module *module, fmr_function function, void *destination, lf_size_t length, struct _fmr_list *parameters);
+extern int lf_pull(struct _lf_module *module, fmr_function function, void *destination, lf_size_t length, struct _fmr_list *parameters);
+/* Binds the current instance of an 'lf_module' to its counterpart on the device. */
+extern int lf_bind(struct _lf_module *module);
+
+
 /* ~ Helper functions. ~ */
 
 /* Gets the word size of the specified device. */

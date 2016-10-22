@@ -1,51 +1,46 @@
 #define __private_include__
-#include <flipper/fs.h>
-#include <flipper/fmr.h>
+#include <flipper/flipper.h>
+#include <flipper/modules.h>
+
+/* ~ Provide the definition for this standard module. ~ */
+LF_MODULE(_fs, "fs", "Provides access to the device's filesystem.", _fs_id);
 
 int fs_configure(void) {
-    return lf_error;
+	return lf_success;
+}
+
+int fs_create(char *name) {
+	return lf_success;
+}
+
+int fs_delete(char *name) {
+	return lf_success;
+}
+
+lf_size_t fs_size(char *name) {
+	return 0;
+}
+
+int fs_open(char *name, lf_size_t offset) {
+	return lf_success;
+}
+
+uint8_t fs_get(void) {
+	return 0;
+}
+
+void fs_push(void *source, lf_size_t length) {
+
+}
+
+void fs_pull(void *destination, lf_size_t length) {
+
+}
+
+void fs_close(void) {
+
 }
 
 void fs_format(void) {
 
-}
-
-int fs_create(char *name, void *data, size_t length) {
-    return lf_error;
-}
-
-int fs_remove(char *name) {
-    return lf_error;
-}
-
-int fs_rename(char *from, char *to) {
-    return lf_error;
-}
-
-void fs_write(char *name) {
-
-}
-
-/* fs.put maps to nvm_put */
-
-void fs_read(char *name) {
-
-}
-
-/* fs.get maps to nvm_get */
-
-nvm_p fs_data(char *name) {
-    return 0;
-}
-
-// FIX ME
-uint8_t fs_get()
-{
-	return 0;
-}
-
-// FIX ME
-void fs_put(uint8_t c)
-{
-	return;
 }

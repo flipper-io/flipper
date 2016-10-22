@@ -6,7 +6,7 @@
 
 /* Declare the virtual interface for this module. */
 extern const struct _timer {
-	void (* configure)(void);
+	int (* configure)(void);
 } timer;
 
 #ifdef __private_include__
@@ -15,7 +15,7 @@ extern const struct _timer {
 enum { _timer_configure };
 
 /* Declare each prototype for all functions within this driver. */
-void timer_configure(void);
+int timer_configure(void);
 
 #endif
 #endif

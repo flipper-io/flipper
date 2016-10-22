@@ -2,9 +2,10 @@
 #include <flipper/button.h>
 #include <platform/atmega16u2.h>
 
-void button_configure(void) {
+int button_configure(void) {
 	/* Enable the button as an input. */
 	clear_bit_in_port(BUTTON_PIN, BUTTON_DDR);
+	return lf_success;
 }
 
 uint8_t button_read(void) {

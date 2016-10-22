@@ -3,6 +3,21 @@
 #include <flipper/modules.h>
 #include <platform/posix.h>
 
+/* Expose the virtual interface for this driver. */
+struct _flipper flipper = {
+	flipper_attach,
+	flipper_attach_usb,
+	flipper_attach_network,
+	flipper_attach_endpoint,
+	flipper_select,
+	flipper_detach,
+	flipper_exit,
+	E_OK,
+	1,
+	NULL,
+	NULL,
+};
+
 int lf_attach(char *name, struct _lf_endpoint *endpoint) {
 	/* Allocate memory to contain the record of the device. */
 	struct _lf_device *device = (struct _lf_device *)calloc(1, sizeof(struct _lf_device));
@@ -227,7 +242,7 @@ int lf_get_result(struct _lf_device *device, struct _fmr_result *result) {
 	return lf_success;
 }
 
-fmr_return lf_invoke(struct _fmr_module *module, fmr_function function, struct _fmr_list *parameters) {
+fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _fmr_list *parameters) {
 	/* Ensure that we have a valid module and argument pointer. */
 	if (!module) {
 		error_raise(E_NULL, error_message("No module specified for message runtime invocation."));
@@ -283,7 +298,7 @@ int lf_retrieve(struct _lf_device *device, struct _fmr_result *response) {
 	return lf_success;
 }
 
-int lf_push(struct _fmr_module *module, fmr_function function, void *source, lf_size_t length, struct _fmr_list *parameters) {
+int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _fmr_list *parameters) {
 	/* Ensure that we have a valid module and argument pointer. */
 	if (!module) {
 		error_raise(E_NULL, error_message("No module specified for message runtime push to module '%s'.", module -> name));
@@ -323,7 +338,7 @@ int lf_push(struct _fmr_module *module, fmr_function function, void *source, lf_
 	return lf_success;
 }
 
-int lf_pull(struct _fmr_module *module, fmr_function function, void *destination, lf_size_t length, struct _fmr_list *parameters) {
+int lf_pull(struct _lf_module *module, fmr_function function, void *destination, lf_size_t length, struct _fmr_list *parameters) {
 	/* Ensure that we have a valid module and argument pointer. */
 	if (!module) {
 		error_raise(E_NULL, error_message("No module specified for message runtime pull from module '%s'.", module -> name));
@@ -358,6 +373,15 @@ int lf_pull(struct _fmr_module *module, fmr_function function, void *destination
 	struct _fmr_result result;
 	/* Obtain the result of the operation. */
 	lf_get_result(device, &result);
+	return lf_success;
+}
+
+int lf_bind(struct _lf_module *module) {
+	int _e = fld_load(module -> identifier);
+	if (_e < lf_success) {
+		return lf_error;
+	}
+	printf("Successfully bound the '%s' module.\n", module -> name);
 	return lf_success;
 }
 

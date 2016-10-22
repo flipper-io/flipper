@@ -2,8 +2,8 @@
 #include <flipper/led.h>
 #include <platform/atsam4s16b.h>
 
-void led_configure(void) {
-
+int led_configure(void) {
+	return lf_success;
 }
 
 void led_set_rgb(uint8_t r, uint8_t g, uint8_t b) {

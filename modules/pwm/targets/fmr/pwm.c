@@ -2,6 +2,6 @@
 #include <flipper/pwm.h>
 #include <flipper/fmr.h>
 
-void pwm_configure(void) {
-
+int pwm_configure(void) {
+	return lf_success;
 }

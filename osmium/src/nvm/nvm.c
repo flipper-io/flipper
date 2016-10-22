@@ -188,14 +188,6 @@ void nvm_reset_settings(void) {
 
 /* The symbols 'nvm_configure', 'nvm_enable', 'nvm_disable', and 'nvm_reset' are declared in $PLATFORM/nvm/nvm.c. */
 
-void nvm_write(nvm_p address) {
-
-}
-
-void nvm_put(uint8_t byte) {
-
-}
-
 void nvm_read(nvm_p address) {
 	nvm_begin_continuous_read(address / NVM_PAGE_SIZE, address % NVM_PAGE_SIZE);
 }

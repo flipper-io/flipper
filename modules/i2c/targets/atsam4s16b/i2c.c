@@ -2,6 +2,6 @@
 #include <flipper/i2c.h>
 #include <platform/atsam4s16b.h>
 
-void i2c_configure(void) {
-
+int i2c_configure(void) {
+	return lf_success;
 }

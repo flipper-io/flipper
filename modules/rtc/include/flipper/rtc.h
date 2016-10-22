@@ -6,7 +6,7 @@
 
 /* Declare the virtual interface for this module. */
 extern const struct _rtc {
-	void (* configure)(void);
+	int (* configure)(void);
 } rtc;
 
 #ifdef __private_include__
@@ -15,7 +15,7 @@ extern const struct _rtc {
 enum { _rtc_configure };
 
 /* Declare each prototype for all functions within this driver. */
-void rtc_configure(void);
+int rtc_configure(void);
 
 #endif
 #endif

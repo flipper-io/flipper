@@ -21,10 +21,6 @@ void nvm_enable(void);
 void nvm_disable(void);
 /* Resets the external memory device. */
 void nvm_reset(void);
-/* Begins a write session to external memory at a given address. */
-void nvm_write(nvm_p address);
-/* Obtains a byte from external memory during a read session. */
-void nvm_put(uint8_t byte);
 /* Begins a read session from external memory at a given address. */
 void nvm_read(nvm_p address);
 /* Obtains a byte from external memory during a read session. */

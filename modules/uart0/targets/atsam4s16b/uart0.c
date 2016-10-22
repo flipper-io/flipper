@@ -2,7 +2,7 @@
 #include <flipper/uart0.h>
 #include <platform/atsam4s16b.h>
 
-void uart0_configure(void) {
+int uart0_configure(void) {
 	/* Enable the UART0 clock in the PMC. */
 	PMC_EnablePeripheral(ID_UART0);
 	/* Declare a pin map that will configure the appropriate output pins for the UART0. */
@@ -19,6 +19,7 @@ void uart0_configure(void) {
 	USART_SetTransmitterEnabled((Usart *)UART0, 1);
 	/* Enable the UART0 receiver. */
 	USART_SetReceiverEnabled((Usart *)UART0, 1);
+	return lf_success;
 }
 
 void uart0_enable(void) {

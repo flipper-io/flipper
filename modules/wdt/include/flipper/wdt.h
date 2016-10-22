@@ -6,7 +6,7 @@
 
 /* Declare the virtual interface for this module. */
 extern const struct _wdt {
-	void (* configure)(void);
+	int (* configure)(void);
 } wdt;
 
 #ifdef __private_include__
@@ -15,7 +15,7 @@ extern const struct _wdt {
 enum { _wdt_configure };
 
 /* Declare each prototype for all functions within this driver. */
-void wdt_configure(void);
+int wdt_configure(void);
 
 #endif
 #endif

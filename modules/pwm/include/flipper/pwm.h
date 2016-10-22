@@ -7,7 +7,7 @@
 /* Declare the virtual interface for this module. */
 extern const struct _pwm {
 
-	void (* configure)(void);
+	int (* configure)(void);
 
 } pwm;
 
@@ -17,7 +17,7 @@ extern const struct _pwm {
 enum { _pwm_configure };
 
 /* Declare each prototype for all functions within this driver. */
-void pwm_configure(void);
+int pwm_configure(void);
 
 #endif
 #endif

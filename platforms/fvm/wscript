@@ -12,4 +12,4 @@ def configure(cfg):
     cfg.load('compiler_c')
 
 def build(bld):
-    bld.stlib(source = bld.path.ant_glob('src/**'), target = 'platform-fvm', env = bld.all_envs['platform-fvm'])
+	bld.stlib(source = bld.path.ant_glob('src/**'), target = 'platform-fvm', env = bld.all_envs['platform-fvm'])

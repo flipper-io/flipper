@@ -40,10 +40,14 @@ typedef enum {
 #define fmr_args(...) fmr_build(__fmr_count(__VA_ARGS__), ##__VA_ARGS__)
 
 /* Explicitly describes the width of an argument to the argument parser. */
-#define fmr_intx(type, arg) (((fmr_va)type << (sizeof(fmr_arg) * 8)) | arg)
+#define fmr_intx(type, arg) (((fmr_va)type << (sizeof(fmr_arg) * 8)) | (fmr_arg)arg)
 #define fmr_int8(arg) fmr_intx(fmr_int8_t, (uint8_t)arg)
 #define fmr_int16(arg) fmr_intx(fmr_int16_t, (uint16_t)arg)
 #define fmr_int32(arg) fmr_intx(fmr_int32_t, (uint32_t)arg)
+/* Converts a C type into a message runtime type. */
+#define fmr_type(type) (sizeof(type) >> 1)
+/* Converts a C type and value into a message runtime type and value. */
+#define fmr_cast(type, arg) fmr_intx(fmr_type(type), arg)
 /* Wrappers around the above using C names. */
 #define fmr_char(arg) fmr_int8(arg)
 #define fmr_short(arg) fmr_int16(arg)
@@ -51,20 +55,6 @@ typedef enum {
 
 /* Calculates the length of an FMR type. */
 #define fmr_sizeof(type) (1 << type)
-
-/* Standardizes the notion of a module. */
-struct _fmr_module {
-	/* A string containing the module's name. */
-	char *name;
-	/* A string giving the description of a module. */
-	char *description;
-	/* The version of the module. */
-	lf_version_t version;
-	/* The module's identifier. */
-	lf_id_t identifier;
-	/* The device upon which the module's counterpart is located. */
-	struct _lf_device *device;
-};
 
 /* Standardizes the notion of an argument. */
 struct _fmr_arg {
@@ -150,8 +140,6 @@ struct _fmr_list *fmr_merge(struct _fmr_list *first, struct _fmr_list *second);
 struct _fmr_arg *fmr_pop(struct _fmr_list *list);
 /* Frees an fmr_list. */
 int fmr_free(struct _fmr_list *list);
-/* Binds a module to its counterpart the selected Flipper device. */
-int fmr_bind(struct _fmr_module *module, char *name);
 /* Generates the appropriate data structure needed for the remote procedure call of 'funtion' in 'module'. */
 int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *args, struct _fmr_packet *packet);
 /* Executes a standard module. */

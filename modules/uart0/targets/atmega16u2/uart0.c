@@ -6,7 +6,7 @@
 uint8_t usart_buffer[32];
 uint8_t usart_index = 0;
 
-void uart0_configure(void) {
+int uart0_configure(void) {
 	/* 250k baud. */
 	UBRR1H = 0x00;
 	UBRR1L = 0x03;
@@ -16,6 +16,7 @@ void uart0_configure(void) {
 	/* Enable the receiver, transmitter, and receiver interrupt. */
 	UCSR1B = (1 << RXEN1) | (1 << TXEN1);
 	UCSR1B |= (1 << RXCIE1);
+	return lf_success;
 }
 
 void uart0_enable(void) {

@@ -6,11 +6,11 @@
 
 /* Declare the virtual interface for this module. */
 extern const struct _adc {
-	void (* configure)(void);
+	int (* configure)(void);
 } adc;
 
 /* Declare the message runtime element for this module. */
-extern struct _fmr_module *_adc;
+extern struct _lf_module *_adc;
 
 #ifdef __private_include__
 
@@ -18,7 +18,7 @@ extern struct _fmr_module *_adc;
 enum { _adc_configure };
 
 /* Declare each prototype for all functions within this driver. */
-void adc_configure(void);
+int adc_configure(void);
 
 #endif
 #endif

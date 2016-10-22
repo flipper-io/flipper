@@ -2,8 +2,8 @@
 #include <flipper/spi.h>
 #include <flipper/fmr.h>
 
-void spi_configure() {
-
+int spi_configure() {
+	return lf_success;
 }
 
 void spi_enable(void) {
@@ -15,7 +15,7 @@ void spi_disable(void) {
 }
 
 uint8_t spi_ready(void) {
-    return 0;
+	return 0;
 }
 
 void spi_put(uint8_t byte) {
@@ -23,7 +23,7 @@ void spi_put(uint8_t byte) {
 }
 
 uint8_t spi_get(void) {
-    return 0;
+	return 0;
 }
 
 void spi_push(void *source, uint32_t length) {

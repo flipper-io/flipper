@@ -15,11 +15,11 @@ nvm_p fs_empty_branch_for_key(nvm_p _branch, nvm_p current, uint16_t key) {
 	nvm_p _empty = 0;
 	/* If the key of the current leaf is less than the key we are searching for, recursively search its left child. */
 	if (_current -> key < key) {
-		_empty = fs_empty_branch_for_key(lf_forward(current, leaf, left), _current -> left, key);
+		_empty = fs_empty_branch_for_key(fs_access(current, leaf, left), _current -> left, key);
 	}
 	/* If the key of the current leaf is greater than the key we are searching for, recursively search its right child. */
 	else if (_current -> key > key) {
-		_empty = fs_empty_branch_for_key(lf_forward(current, leaf, right), _current -> right, key);
+		_empty = fs_empty_branch_for_key(fs_access(current, leaf, right), _current -> right, key);
 	}
 	/* Free the memory allocated to dereference the current leaf. */
 	free(_current);
@@ -111,32 +111,32 @@ int fs_remove_leaf_with_key(nvm_p parent, uint16_t key) {
 		/* De-index the leaf by replacing its branch pointer with a pointer to its left child. */
 		nvm_push(&(_match -> left), sizeof(nvm_p), _match -> _branch);
 		/* Change the branch pointer of the leaf's left child to match its new index in the filesystem tree. */
-		nvm_push(&(_match -> _branch), sizeof(nvm_p), lf_forward(_match -> left, leaf, _branch));
+		nvm_push(&(_match -> _branch), sizeof(nvm_p), fs_access(_match -> left, leaf, _branch));
 		/* Walk the left child of the leaf to find an empty branch pointer to which the leaf's orphaned right child can be appended. */
-		uint16_t *key = (uint16_t *) nvm_dereference(lf_forward(_match -> right, leaf, key), sizeof(uint16_t));
-		nvm_p *right = (nvm_p *) nvm_dereference(lf_forward(_match -> left, leaf, right), sizeof(nvm_p));
-		nvm_p empty = fs_empty_branch_for_key(lf_forward(_match -> left, leaf, right), *right, *key);
+		uint16_t *key = (uint16_t *) nvm_dereference(fs_access(_match -> right, leaf, key), sizeof(uint16_t));
+		nvm_p *right = (nvm_p *) nvm_dereference(fs_access(_match -> left, leaf, right), sizeof(nvm_p));
+		nvm_p empty = fs_empty_branch_for_key(fs_access(_match -> left, leaf, right), *right, *key);
 		if (!empty) {
 			error_raise(E_FS_EXISTS, error_message("Could not move a child leaf while trying to delete the file with key '0x%04x'.", key));
 		}
 		/* Re-index the orphaned right child by writing its address into the empty branch pointer we found. */
 		nvm_push(&(_match -> right), sizeof(nvm_p), empty);
 		/* Overwrite the branch pointer of the leaf's right child to reflect its new index in the filesystem tree. */
-		nvm_push(&empty, sizeof(nvm_p), lf_forward(_match -> right, leaf, _branch));
+		nvm_push(&empty, sizeof(nvm_p), fs_access(_match -> right, leaf, _branch));
 	}
 	/* Not a bad scenario; the leaf we wish to delete only has a left child. */
 	else if (_match -> left) {
 		/* De-index the leaf by replacing its branch pointer with a pointer to its left child. */
 		nvm_push(&(_match -> left), sizeof(nvm_p), _match -> _branch);
 		/* Change the branch pointer of the leaf's left child to match its new index in the filesystem tree. */
-		nvm_push(&(_match -> _branch), sizeof(nvm_p), lf_forward(_match -> left, leaf, _branch));
+		nvm_push(&(_match -> _branch), sizeof(nvm_p), fs_access(_match -> left, leaf, _branch));
 	}
 	/* Also not a bad scenario; the leaf we wish to delete only has a right child. */
 	else if (_match -> right) {
 		/* De-index the leaf by replacing its branch pointer with a pointer to its right child. */
 		nvm_push(&(_match -> right), sizeof(nvm_p), _match -> _branch);
 		/* Change the branch pointer of the leaf's right child to match its new index in the filesystem tree. */
-		nvm_push(&(_match -> _branch), sizeof(nvm_p), lf_forward(_match -> right, leaf, _branch));
+		nvm_push(&(_match -> _branch), sizeof(nvm_p), fs_access(_match -> right, leaf, _branch));
 	}
 	/* Best case scenario, the leaf to be deleted has no children. */
 	else {

@@ -2,7 +2,7 @@
 #include <flipper/spi.h>
 #include <platform/atsam4s16b.h>
 
-void spi_configure() {
+int spi_configure() {
 
 }
 

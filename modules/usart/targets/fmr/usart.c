@@ -3,16 +3,11 @@
 #include <flipper/modules.h>
 
 /* ~ Provide the definition for this standard module. ~ */
-struct _fmr_module _usart = {
-	"usart",
-	"Provides low level access to the device's UART bus.",
-	LF_VERSION,
-	_usart_id,
-	NULL
-};
+LF_MODULE(_usart, "usart", "Provides low level access to the device's UART bus.", _usart_id);
 
-void usart_configure(void) {
+int usart_configure(void) {
 	lf_invoke(&_usart, _usart_configure, NULL);
+	return lf_success;
 }
 
 void usart_enable(void) {

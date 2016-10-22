@@ -6,7 +6,7 @@
 
 /* Declare the virtual interface for this modules. */
 extern const struct _spi {
-	void (*configure)();
+	int (* configure)(void);
 	void (* enable)(void);
 	void (* disable)(void);
 	uint8_t (* ready)(void);
@@ -22,7 +22,7 @@ extern const struct _spi {
 enum { _spi_configure, _spi_enable, _spi_disable, _spi_ready, _spi_put, _spi_get, _spi_push, _spi_pull };
 
 /* Declare each prototype for all functions within this driver. */
-void spi_configure();
+int spi_configure();
 void spi_enable(void);
 void spi_disable(void);
 uint8_t spi_ready(void);

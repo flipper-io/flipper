@@ -2,6 +2,6 @@
 #include <flipper/temp.h>
 #include <flipper/fmr.h>
 
-void temp_configure(void) {
-
+int temp_configure(void) {
+	return lf_success;
 }

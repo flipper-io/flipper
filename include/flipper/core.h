@@ -129,6 +129,30 @@ struct _lf_device {
 	struct _lf_device *next;
 };
 
+/* Standardizes the notion of a module. */
+struct _lf_module {
+	/* A string containing the module's name. */
+	char *name;
+	/* A string giving the description of a module. */
+	char *description;
+	/* The version of the module. */
+	lf_version_t version;
+	/* The module's identifier. */
+	lf_id_t identifier;
+	/* The device upon which the module's counterpart is located. */
+	struct _lf_device *device;
+};
+
+/* Macro for easily generating module structures. */
+#define LF_MODULE(symbol, name, description, identifier) \
+	struct _lf_module symbol = { \
+		name, \
+		description, \
+		LF_VERSION, \
+		identifier, \
+		NULL \
+	};
+
 /* Provides a checksum for a given block of data. */
 lf_id_t lf_checksum(void *source, lf_size_t length);
 
