@@ -7,7 +7,7 @@ def configure(cfg):
     # Set the platform name.
     cfg.env.TARGET = 'fmr'
     # Set the platform flags.
-    cfg.env.append_value('CFLAGS', ['-std=c99', '-D__lf_debug__'])
+    cfg.env.append_value('CFLAGS', ['-std=c99', '-fpic', '-D__lf_debug__'])
     # Load the appropriate C compiler.
     cfg.load('compiler_c')
 
