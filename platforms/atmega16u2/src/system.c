@@ -1,9 +1,7 @@
 #define __private_include__
 #include <platform/atmega16u2.h>
 #include <private/megausb.h>
-#include <flipper/uart0.h>
-#include <flipper/cpu.h>
-#include <flipper/led.h>
+#include <flipper/modules.h>
 
 /* The fmr_device object containing global state about this device. */
 struct _lf_device self = {
@@ -88,8 +86,8 @@ void system_init() {
 	/* Configure the SAM4S. */
 	cpu_configure();
 	/* Configure reset button and PCINT8 interrupt. */
-	PCMSK1 |= (1 << PCINT8);
-	PCICR |= (1 << PCIE1);
+//	PCMSK1 |= (1 << PCINT8);
+//	PCICR |= (1 << PCIE1);
 	/* Globally enable interrupts. */
 	sei();
 }
@@ -99,12 +97,16 @@ void system_deinit(void) {
 	led_set_rgb(LED_OFF);
 }
 
-/* PCINT8 interrupt service routine; captures reset button press and resets the device. */
-ISR (PCINT1_vect) {
+void system_reset(void) {
 	/* Shutdown the system. */
 	system_deinit();
-	/* Enable the watchdog. */
-	wdt_enable(WDTO_15MS);
+	/* Fire the watchdog timer. */
+	wdt_fire();
 	/* Wait until reset. */
 	while (1);
+}
+
+/* PCINT8 interrupt service routine; captures reset button press and resets the device. */
+ISR (PCINT1_vect) {
+	system_reset();
 }

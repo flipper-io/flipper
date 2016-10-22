@@ -25,7 +25,7 @@ const void *const fmr_modules[] PROGMEM = {
 	&uart0,  // usart0
 	NULL,    // usart
 	NULL,    // usb
-	NULL,    // wdt
+	&wdt,    // wdt
 };
 /* NOTE: PROGMEM is used here to store this array within flash memory of this platform. */
 
