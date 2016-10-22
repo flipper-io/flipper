@@ -29,8 +29,12 @@ void fmr_push(fmr_module module, fmr_function function, lf_size_t length) {
 		return;
 	}
 	megausb_pull(swap, length);
-	/* Call the function. */
-	fmr_execute(module, function, 0, 0, NULL);
+	uint32_t types = fmr_type(lf_size_t) << 2 | fmr_type(void *);
+	struct {
+		void *source;
+		lf_size_t length;
+	} args = { swap, length };
+	fmr_execute(module, function, 2, types, &args);
 	free(swap);
 }
 
@@ -40,8 +44,13 @@ void fmr_pull(fmr_module module, fmr_function function, lf_size_t length) {
 		error_raise(E_MALLOC, NULL);
 		return;
 	}
+	uint32_t types = fmr_type(lf_size_t) << 2 | fmr_type(void *);
+	struct {
+		void *source;
+		lf_size_t length;
+	} args = { swap, length };
 	/* Call the function. */
-	fmr_execute(module, function, 0, 0, NULL);
+	fmr_execute(module, function, 2, types, &args);
 	megausb_push(swap, length);
 	free(swap);
 }

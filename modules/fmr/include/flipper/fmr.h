@@ -44,8 +44,10 @@ typedef enum {
 #define fmr_int8(arg) fmr_intx(fmr_int8_t, (uint8_t)arg)
 #define fmr_int16(arg) fmr_intx(fmr_int16_t, (uint16_t)arg)
 #define fmr_int32(arg) fmr_intx(fmr_int32_t, (uint32_t)arg)
+/* Converts a C type into a message runtime type. */
+#define fmr_type(type) (sizeof(type) >> 1)
 /* Converts a C type and value into a message runtime type and value. */
-#define fmr_cast(type, arg) fmr_intx((sizeof(type) >> 1), arg)
+#define fmr_cast(type, arg) fmr_intx(fmr_type(type), arg)
 /* Wrappers around the above using C names. */
 #define fmr_char(arg) fmr_int8(arg)
 #define fmr_short(arg) fmr_int16(arg)
