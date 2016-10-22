@@ -17,25 +17,6 @@ int fs_create(char *name) {
 		error_raise(error_get(), error_message("Failed to create file named '%s'.", name));
 		return lf_error;
 	}
-	// /* If there is data to copy, perform the necessary actions. */
-	// if (data && length) {
-	// 	/* Ensure that the length is valid. */
-	// 	if (length > LF_SIZE_T_MAX) {
-	// 		error_raise(E_OVERFLOW, "The length provided to the function 'fs_create' exceeds the maximum value FMR is able to convey.");
-	// 		return lf_error;
-	// 	}
-	// 	/* Write the size of the data represented by the leaf. */
-	// 	nvm_push(&length, sizeof(uint32_t), lf_forward(_leaf, leaf, size));
-	// 	/* Allocate the external memory required to hold the file's data. */
-	// 	nvm_p _data = nvm_alloc((lf_size_t)(length));
-	// 	if (!_data) {
-	// 		error_raise(E_MALLOC, error_message("Could not allocate the memory required to save the file '%s'.", name));
-	// 	}
-	// 	/* Copy the file's data into external memory. */
-	// 	nvm_push(data, (lf_size_t)(length), _data);
-	// 	/* Write the file's data pointer into the leaf. */
-	// 	nvm_push(&_data, sizeof(nvm_p), lf_forward(_leaf, leaf, data));
-	// }
 	return lf_success;
 }
 
@@ -51,7 +32,7 @@ int fs_delete(char *name) {
 	/* Create a locally scoped variable into which we can bring the pointer. */
 	nvm_p _data;
 	/* Read the pointer to the file's data into the variable above. */
-	nvm_pull(&_data, sizeof(nvm_p), lf_forward(_leaf, leaf, data));
+	nvm_pull(&_data, sizeof(nvm_p), fs_access(_leaf, leaf, data));
 	/* Free any external memory allocated to store the file's data. */
 	if (_data) {
 		nvm_free(_data);
@@ -64,32 +45,36 @@ lf_size_t fs_size(char *name) {
 	return 0;
 }
 
-void fs_write(char *name, lf_size_t offset) {
-
-}
-
-void fs_put(uint8_t byte){
-
-}
-
-void fs_read(char *name, lf_size_t offset) {
-
+int fs_open(char *name, lf_size_t offset) {
+	/* Obtain a key for the file given its name. */
+	lf_id_t key = lf_checksum(name, strlen(name));
+	/* Obtain the file's leaf, suppressing any errors that occur while doing so. */
+	suppress_errors(nvm_p _leaf = fs_leaf_for_key(_root_leaf, key));
+	if (!_leaf) {
+		error_raise(E_FS_NO_FILE, error_message("Failed to open file '%s'.", name));
+		return -1;
+	}
+	_rw_head = offset;
+	return lf_success;
 }
 
 uint8_t fs_get(void){
-	return 0;
+	return nvm_get();
 }
 
 void fs_push(void *source, lf_size_t length) {
-
+	nvm_push(source, length, _rw_head);
+	_rw_head += length;
 }
 
 void fs_pull(void *destination, lf_size_t length) {
-
+	nvm_pull(destination, length, _rw_head);
+	_rw_head += length;
 }
 
-void fs_close(void){
-
+void fs_close(void) {
+	/* Disable external memory to finish the operation. */
+	nvm_disable();
 }
 
 void fs_format(void) {

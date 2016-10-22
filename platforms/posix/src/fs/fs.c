@@ -1,7 +1,6 @@
 #define __private_include__
 #include <flipper/fs.h>
 #include <flipper/error.h>
-#include <private/nvm.h>
 
 /* All other FS related symbols are delared in 'osmium/fs/fs.c'. */
 
@@ -29,12 +28,8 @@ int fs_transfer(char *path, char *name) {
 	if (_e < lf_success) {
 		return _e;
 	}
-	/* Open a write session to the file. */
-	fs_write(name, 0);
 	/* Push the data into the file. */
 	fs_push(data, size);
-	/* Close the write session. */
-	fs_close();
 	/* Free the memory allocated to load the file. */
 	free(data);
 	/* Close the file. */
@@ -56,12 +51,8 @@ int fs_receive(char *name, char *path) {
 		error_raise(E_MALLOC, error_message("Failed to obtain the memory required to receive the file '%s'.", name));
 		return lf_error;
 	}
-	/* Open a read session from the file. */
-	fs_read(name, 0);
 	/* Pull the data from the file. */
 	fs_push(data, size);
-	/* Close the read session. */
-	fs_close();
 	/* Write the data into the filesystem. */
 	fwrite(data, sizeof(uint8_t), size, file);
 	/* Free the memory allocated to load the file. */

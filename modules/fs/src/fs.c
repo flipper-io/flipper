@@ -6,6 +6,7 @@
 nvm_p _free_list;
 nvm_p _break_value;
 nvm_p _root_leaf;
+nvm_p _rw_head;
 
 /* Define the virtual interface for this module. */
 const struct _fs fs = {
@@ -13,9 +14,7 @@ const struct _fs fs = {
 	fs_create,
 	fs_delete,
 	fs_size,
-	fs_write,
-	fs_put,
-	fs_read,
+	fs_open,
 	fs_get,
 	fs_push,
 	fs_pull,

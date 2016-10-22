@@ -7,7 +7,7 @@
 #include <flipper/core.h>
 
 /* Computes the offset of a member of a data structure located at a given nvm_p. */
-#define lf_forward(address, structure, member) (nvm_p)(address + offsetof(structure, member))
+#define fs_access(address, structure, member) (nvm_p)(address + offsetof(structure, member))
 
 /* An abstract data structure used to represent members of the filesystem tree. */
 typedef struct __attribute__((__packed__)) _leaf {
@@ -35,12 +35,8 @@ extern const struct _fs {
 	int (* delete)(char *name);
 	/* Obtains the size of the file with the given name. */
 	lf_size_t (* size)(char *name);
-	/* Opens a write session starting an a specific offset to a file with the given name. */
-	void (* write)(char *name, lf_size_t offset);
-	/* Writes a single byte into the file if a write session is active. */
-	void (* put)(uint8_t byte);
-	/* Opens a read session starting an a specific offset from a file with the given name. */
-	void (* read)(char *name, lf_size_t offset);
+	/* Opens a r/w session starting an a specific offset from a file with the given name. */
+	int (* open)(char *name, lf_size_t offset);
 	/* Reads a single byte from the file if a read session is active. */
 	uint8_t (* get)(void);
 	/* Pushes data into a file if a write session is active. */
@@ -63,7 +59,7 @@ extern const struct _fs {
 #ifdef __private_include__
 
 /* Declare the message runtime overlay for this driver. */
-enum { _fs_configure, _fs_format, _fs_create, _fs_remove, _fs_rename, _fs_write, _fs_put, _fs_read, _fs_get, _fs_data };
+enum { _fs_configure, _fs_create, _fs_delete, _fs_size, _fs_write, _fs_put, _fs_read, _fs_get, _fs_push, _fs_pull, _fs_close, _fs_format };
 
 /* ~ Define types and macros internal to this driver. ~ */
 #define _FREE_LIST	 32
@@ -74,15 +70,14 @@ enum { _fs_configure, _fs_format, _fs_create, _fs_remove, _fs_rename, _fs_write,
 extern nvm_p _free_list;
 extern nvm_p _break_value;
 extern nvm_p _root_leaf;
+extern nvm_p _rw_head;
 
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
 extern int fs_configure(void);
 extern int fs_create(char *name);
 extern int fs_delete(char *name);
 extern lf_size_t fs_size(char *name);
-extern void fs_write(char *name, lf_size_t offset);
-extern void fs_put(uint8_t byte);
-extern void fs_read(char *name, lf_size_t offset);
+extern int fs_open(char *name, lf_size_t offset);
 extern uint8_t fs_get(void);
 extern void fs_push(void *source, lf_size_t length);
 extern void fs_pull(void *destination, lf_size_t length);

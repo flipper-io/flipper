@@ -9,11 +9,11 @@ int fs_configure(void) {
 	return lf_success;
 }
 
-int fs_create(char *name){
+int fs_create(char *name) {
 	return lf_success;
 }
 
-int fs_delete(char *name){
+int fs_delete(char *name) {
 	return lf_success;
 }
 
@@ -21,34 +21,26 @@ lf_size_t fs_size(char *name) {
 	return 0;
 }
 
-void fs_write(char *name, lf_size_t offset){
-
+int fs_open(char *name, lf_size_t offset) {
+	return lf_success;
 }
 
-void fs_put(uint8_t byte){
-
-}
-
-void fs_read(char *name, lf_size_t offset){
-
-}
-
-uint8_t fs_get(void){
+uint8_t fs_get(void) {
 	return 0;
 }
 
-void fs_push(void *source, lf_size_t length){
+void fs_push(void *source, lf_size_t length) {
 
 }
 
-void fs_pull(void *destination, lf_size_t length){
+void fs_pull(void *destination, lf_size_t length) {
 
 }
 
-void fs_close(void){
+void fs_close(void) {
 
 }
 
-void fs_format(void){
+void fs_format(void) {
 
 }
