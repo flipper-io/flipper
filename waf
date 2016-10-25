@@ -34,7 +34,7 @@ import os, sys, inspect
 
 VERSION="1.9.5"
 REVISION="af38e7e0cae7793eb981dfce96a7f479"
-GIT="0db417ac1a409eb2338c5bb58bc6512ffe07c1d3"
+GIT="54a5ebe46aadd45dab4f013b72cf44d23780065d"
 INSTALL=''
 C1='#.'
 C2='#('
