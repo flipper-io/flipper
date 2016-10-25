@@ -12,14 +12,14 @@ Portability : Windows, POSIX
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 module Flipper.Internal.FS (
-    FSHandle(..)
+    create
+  , delete
+  , size
+  , open
+  , push
+  , pull
+  , close
   , format
-  , create
-  , remove
-  , rename
-  , withGet
-  , withPut
-  , getHandle
   ) where
 
 import Data.Word
@@ -31,71 +31,55 @@ import Foreign.C.String
 import Foreign.ForeignPtr
 import Foreign.Ptr
 
--- | Flipper file system reference.
-newtype FSHandle = FSHandle { unFSHandle :: Word32 }
-                 deriving ( Eq
-                          , Ord
-                          , Show
-                          )
+create :: String -> IO ()
+create n = withCString n c_fs_create
+
+delete :: String -> IO ()
+delete n = withCString n c_fs_delete
+
+size :: String -> IO Word32
+size n = withCString n c_fs_size
+
+open :: String -> Word32 -> IO ()
+open n s = withCString n $ \n' -> c_fs_open n' s
+
+push :: Buffer -> IO ()
+push (Buffer p o l) = withForeignPtr p $ \p' -> c_fs_push (p' `plusPtr` o)
+                                                          (fromIntegral l)
+
+pull :: Int -> IO Buffer
+pull l
+    | l <= 0    = error "FS.pull: length must be greater than zero."
+    | otherwise = do b@(Buffer p _ _) <- allocBufferSafe l
+                     withForeignPtr p (\p' -> c_fs_pull p' (fromIntegral l))
+                     return b
+
+close :: IO ()
+close = c_fs_close
 
 format :: IO ()
 format = c_fs_format
 
-create :: String -> Buffer -> IO ()
-create s (Buffer p o l) = withForeignPtr p $ \p' ->
-                          withCString s $ \s' ->
-                          c_fs_create s' (p' `plusPtr` o) (fromIntegral l)
+foreign import ccall safe "flipper/fs.h fs_create"
+    c_fs_create :: Ptr CChar -> IO ()
 
-remove :: String -> IO ()
-remove s = withCString s c_fs_remove
+foreign import ccall safe "flipper/fs.h fs_delete"
+    c_fs_delete :: Ptr CChar -> IO ()
 
-rename :: String -> String -> IO ()
-rename t f = withCString t $ \t' ->
-             withCString f $ \f' ->
-             c_fs_rename t' f'
+foreign import ccall safe "flipper/fs.h fs_size"
+    c_fs_size :: Ptr CChar -> IO Word32
 
-withGet :: String -> (IO Word8 -> IO a) -> IO a
-withGet s f = withCString s $ \s' -> do
-    c_fs_read s'
-    r <- f c_fs_get
-    error "implement detach!"
-    return r
+foreign import ccall safe "flipper/fs.h fs_open"
+    c_fs_open :: Ptr CChar -> Word32 -> IO ()
 
-withPut :: String -> ((Word8 -> IO ()) -> IO a) -> IO a
-withPut s f = withCString s $ \s' -> do
-    c_fs_write s'
-    r <- f c_fs_put
-    error "implement detach!"
-    return r
+foreign import ccall safe "flipper/fs.h fs_push"
+    c_fs_push :: Ptr Word8 -> Word32 -> IO ()
 
-getHandle :: String -> IO FSHandle
-getHandle s = FSHandle <$> withCString s c_fs_data
+foreign import ccall safe "flipper/fs.h fs_pull"
+    c_fs_pull :: Ptr Word8 -> Word32 -> IO ()
+
+foreign import ccall safe "flipper/fs.h fs_close"
+    c_fs_close :: IO ()
 
 foreign import ccall safe "flipper/fs.h fs_format"
     c_fs_format :: IO ()
-
-foreign import ccall safe "flipper/fs.h fs_create"
-    c_fs_create :: CString -> Ptr Word8 -> CSize -> IO ()
-
-foreign import ccall safe "flipper/fs.h fs_remove"
-    c_fs_remove :: CString -> IO ()
-
-foreign import ccall safe "flipper/fs.h fs_rename"
-    c_fs_rename :: CString -> CString -> IO ()
-
-foreign import ccall safe "flipper/fs.h fs_write"
-    c_fs_write :: CString -> IO ()
-
-foreign import ccall safe "flipper/fs.h fs_read"
-    c_fs_read :: CString -> IO ()
-
--- FIX ME
-foreign import ccall safe "flipper/fs.h fs_get"
-    c_fs_get :: IO Word8
-
--- FIX ME
-foreign import ccall safe "flipper/fs.h fs_put"
-    c_fs_put :: Word8 -> IO ()
-
-foreign import ccall safe "flipper/fs.h fs_data"
-    c_fs_data :: CString -> IO Word32

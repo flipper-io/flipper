@@ -54,7 +54,7 @@ parseCall = choice [ ButtonCall <$> try parseButtonAction
                    , GPIOCall <$> parseGPIOAction
                    , LEDCall <$> parseLEDAction
                    , SPICall <$> parseSPIAction
-                   , UARTCall <$> parseUARTAction
+                   , USARTCall <$> parseUSARTAction
                    ]
 
 parseButtonAction :: Parser ButtonAction
@@ -62,10 +62,14 @@ parseButtonAction = string' "button" *> spaces *> choice [ try parseButtonRead
                                                          ]
 
 parseFSAction :: Parser FSAction
-parseFSAction = string' "fs" *> spaces *> choice [ try parseFSCreateFromString
-                                                , try parseFSRemove
-                                                , try parseFSRename
-                                                ]
+parseFSAction = string' "fs" *> spaces *> choice [ try parseFSCreate
+                                                 , try parseFSDelete
+                                                 , try parseFSSize
+                                                 , try parseFSOpen
+                                                 , try parseFSPushString
+                                                 , try parseFSPullString
+                                                 , try parseFSClose
+                                                 ]
 
 parseGPIOAction :: Parser GPIOAction
 parseGPIOAction = string' "gpio" *> spaces *> choice gpios
@@ -88,37 +92,41 @@ parseSPIAction = string' "spi" *> spaces *> choice [ try parseSPIEnable
                                                  , try parseSPIWriteFromString
                                                  ]
 
-parseUARTAction :: Parser UARTAction
-parseUARTAction = string' "usart" *> spaces *> choice usarts
-    where usarts = [ try parseUARTEnable
-                  , try parseUARTDisable
-                  , try parseUARTRead
-                  , try parseUARTWriteFromString
-                  ]
+parseUSARTAction :: Parser USARTAction
+parseUSARTAction = string' "usart" *> spaces *> choice usarts
+    where usarts = [ try parseUSARTEnable
+                   , try parseUSARTDisable
+                   , try parseUSARTRead
+                   , try parseUSARTWriteFromString
+                   ]
 
 parseButtonRead :: Parser ButtonAction
 parseButtonRead = string' "read" *> pure ButtonRead
 
-parseFSCreateFromString :: Parser FSAction
-parseFSCreateFromString = FSCreateFromString <$> ( string' "create"
-                                                   *> spaces
-                                                   *> parseEscString
-                                                 )
-                                             <*> (spaces *> parseEscString)
+parseFSCreate :: Parser FSAction
+parseFSCreate = FSCreate <$> (string' "create" *> spaces *> parseEscString)
 
-parseFSCreateFromFile :: Parser FSAction
-parseFSCreateFromFile = FSCreateFromFile <$> ( string' "createfile"
-                                               *> spaces
-                                               *> parseEscString
-                                             )
-                                         <*> (spaces *> parseEscString)
+parseFSDelete :: Parser FSAction
+parseFSDelete = FSDelete <$> (string' "remove" *> spaces *> parseEscString)
 
-parseFSRemove :: Parser FSAction
-parseFSRemove = FSRemove <$> (string' "remove" *> spaces *> parseEscString)
+parseFSSize :: Parser FSAction
+parseFSSize = FSSize <$> (string' "size" *> spaces *> parseEscString)
 
-parseFSRename :: Parser FSAction
-parseFSRename = FSRename <$> (string' "rename" *> spaces *> parseEscString)
-                         <*> (spaces *> parseEscString)
+parseFSOpen :: Parser FSAction
+parseFSOpen = FSOpen <$> (string' "open" *> spaces *> parseEscString)
+                     <*> (spaces *> parseWord32)
+
+parseFSPushString :: Parser FSAction
+parseFSPushString = FSPushString <$> ( string' "push"
+                                       *> spaces
+                                       *> parseEscString
+                                     )
+
+parseFSPullString :: Parser FSAction
+parseFSPullString = string' "pull" *> pure FSPullString
+
+parseFSClose :: Parser FSAction
+parseFSClose = string' "close" *> pure FSClose
 
 parseGPIODigitalDirection :: Parser GPIOAction
 parseGPIODigitalDirection = GPIODigitalDirection <$> ( string' "direction"
@@ -184,26 +192,26 @@ parseSPIWriteFromFile = SPIWriteFromFile <$> ( string' "writefile"
                                                *> parseEscString
                                              )
 
-parseUARTEnable :: Parser UARTAction
-parseUARTEnable = string' "enable" *> pure UARTEnable
+parseUSARTEnable :: Parser USARTAction
+parseUSARTEnable = string' "enable" *> pure USARTEnable
 
-parseUARTDisable :: Parser UARTAction
-parseUARTDisable = string' "disable" *> pure UARTDisable
+parseUSARTDisable :: Parser USARTAction
+parseUSARTDisable = string' "disable" *> pure USARTDisable
 
-parseUARTRead :: Parser UARTAction
-parseUARTRead = string' "read" *> pure UARTRead
+parseUSARTRead :: Parser USARTAction
+parseUSARTRead = string' "read" *> pure USARTRead
 
-parseUARTWriteFromString :: Parser UARTAction
-parseUARTWriteFromString = UARTWriteFromString <$> ( string' "write"
+parseUSARTWriteFromString :: Parser USARTAction
+parseUSARTWriteFromString = USARTWriteFromString <$> ( string' "write"
                                                      *> spaces
                                                      *> parseEscString
                                                    )
 
-parseUARTWriteFromFile :: Parser UARTAction
-parseUARTWriteFromFile = UARTWriteFromFile <$> ( string' "writefile"
+parseUSARTWriteFromFile :: Parser USARTAction
+parseUSARTWriteFromFile = USARTWriteFromFile <$> ( string' "writefile"
                                                  *> spaces
                                                  *> parseEscString
-                                               )
+                                                 )
 
 parseDigitalPin :: Parser DigitalPin
 parseDigitalPin = choice [ try (string' "10" *> pure IO10)
@@ -275,6 +283,9 @@ parseWord8 = fromIntegral <$> parseIntegerLit
 
 parseWord16 :: Parser Word16
 parseWord16 = fromIntegral <$> parseIntegerLit
+
+parseWord32 :: Parser Word32
+parseWord32 = fromIntegral <$> parseIntegerLit
 
 parseIntegerLit :: Parser Integer
 parseIntegerLit = choice [ try integer

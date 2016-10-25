@@ -15,6 +15,7 @@ import Options.Applicative
 
 import System.Console.Haskeline
 
+-- | Act on the options obtained during start up.
 runOptions :: Options -> IO ()
 runOptions (Options e o) = (void . runFC) $ do
     s <- catchFlipper (attach e) ((pure False <*) . reportConsoleError Nothing)

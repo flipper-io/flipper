@@ -1,6 +1,6 @@
 {-|
-Module      : Flipper.UART
-Description : UART Interface
+Module      : Flipper.USART
+Description : USART Interface
 Copyright   : George Morgan, Travis Whitaker 2016
 License     : All rights reserved.
 Maintainer  : travis@flipper.io
@@ -8,14 +8,15 @@ Stability   : Provisional
 Portability : Windows, POSIX
 
 This module provides an interface for sending and receiving 'Bufferable' data
-over Flipper's UARTs.
+over Flipper's USARTs.
 -}
 
-module Flipper.UART (
+module Flipper.USART (
     -- * Bus Control
     enable
   , disable
     -- * Sending/Receiving Data
+  , ready
   , put
   , get
   , push
@@ -29,8 +30,8 @@ import Flipper.Get
 import Flipper.Put
 import Flipper.MonadFlipper
 
-import qualified Flipper.Bufferable    as B
-import qualified Flipper.Internal.UART as I
+import qualified Flipper.Bufferable     as B
+import qualified Flipper.Internal.USART as I
 
 -- | Enable the UART bus.
 enable :: MonadFlipper m => m ()
@@ -39,6 +40,10 @@ enable = bracketIO I.usartEnable
 -- | Disable the UART bus.
 disable :: MonadFlipper m => m ()
 disable = bracketIO I.usartDisable
+
+-- | Check if there is data in the USART read buffer.
+ready :: MonadFlipper m => m Bool
+ready = bracketIO I.usartReady
 
 -- | Send a byte over the UART bus.
 put :: MonadFlipper m => Word8 -> m ()

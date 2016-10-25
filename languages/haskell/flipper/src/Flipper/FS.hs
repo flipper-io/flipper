@@ -10,41 +10,46 @@ Portability : Windows, POSIX
 -}
 
 module Flipper.FS (
-    I.FSHandle()
+    create
+  , delete
+  , size
+  , open
+  , push
+  , pull
+  , close
   , format
-  , create
-  , remove
-  , rename
-  , withGet
-  , withPut
-  , getHandle
   ) where
 
 import Data.Word
 
+import Flipper.Buffer
 import Flipper.Bufferable
+import Flipper.Get
 import Flipper.MonadFlipper
 import Flipper.Put
 
 import qualified Flipper.Internal.FS as I
 
+create :: MonadFlipper m => String -> m ()
+create = bracketIO . I.create
+
+delete :: MonadFlipper m => String -> m ()
+delete = bracketIO . I.delete
+
+size :: MonadFlipper m => String -> m Word32
+size = bracketIO . I.size
+
+open :: MonadFlipper m => String -> Word32 -> m ()
+open = (bracketIO .) . I.open
+
+push :: (Bufferable b, MonadFlipper m) => b -> m ()
+push = bracketIO . I.push . runPut . put
+
+pull :: (Bufferable b, MonadFlipper m) => m (Either String b)
+pull = runGetWith get (bracketIO . I.pull) emptyBuffer
+
+close :: MonadFlipper m => m ()
+close = bracketIO I.close
+
 format :: MonadFlipper m => m ()
 format = bracketIO I.format
-
-create :: (Bufferable b, MonadFlipper m) => String -> b -> m ()
-create n b = bracketIO (I.create n (runPut (put b)))
-
-remove :: MonadFlipper m => String -> m ()
-remove = bracketIO . remove
-
-rename :: MonadFlipper m => String -> String -> m ()
-rename = (bracketIO .) . I.rename
-
-withGet :: MonadFlipper m => String -> (IO Word8 -> IO a) -> m a
-withGet = (bracketIO .) . I.withGet
-
-withPut :: MonadFlipper m => String -> ((Word8 -> IO ()) -> IO a) -> m a
-withPut = (bracketIO .) . I.withPut
-
-getHandle :: MonadFlipper m => String -> m I.FSHandle
-getHandle = bracketIO . I.getHandle
