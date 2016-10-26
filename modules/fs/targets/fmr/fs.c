@@ -9,7 +9,7 @@ int fs_configure(void) {
 	return lf_success;
 }
 
-int fs_create(char *name) {
+int fs_create(char *name, lf_size_t size) {
 	return lf_success;
 }
 

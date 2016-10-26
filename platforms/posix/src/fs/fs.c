@@ -23,8 +23,8 @@ int fs_transfer(char *path, char *name) {
 	}
 	/* Read the file into memory. */
 	fread(data, size, sizeof(uint8_t), file);
-	/* Create the file on the device and load the data. */
-	int _e = fs_create(name);
+	/* Create the file on the device. */
+	int _e = fs_create(name, size);
 	if (_e < lf_success) {
 		return _e;
 	}

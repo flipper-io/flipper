@@ -7,16 +7,22 @@ int fs_configure(void) {
 	return lf_success;
 }
 
-int fs_create(char *name) {
+int fs_create(char *name, lf_size_t size) {
 	/* Obtain a key for the file given its name. */
 	lf_id_t key = lf_checksum(name, strlen(name));
 	/* Create a leaf for the key. */
-	suppress_errors(nvm_p _leaf = fs_add_leaf_with_key(_root_leaf, key));
+	nvm_p _leaf = fs_add_leaf_with_key(_root_leaf, key);
 	if (!_leaf) {
-		/* Raise an error with the error code generated from the statement above. */
-		error_raise(error_get(), error_message("Failed to create file named '%s'.", name));
 		return lf_error;
 	}
+	/* Allocate space in external memory for the file's data. */
+	nvm_p _data = nvm_alloc(size);
+	if (!_data) {
+		return lf_error;
+	}
+	/* Write the file metadata into the leaf. */
+	nvm_push(&size, sizeof(lf_size_t), fs_access(_leaf, leaf, size));
+	nvm_push(&_data, sizeof(nvm_p), fs_access(_leaf, leaf, data));
 	return lf_success;
 }
 
@@ -24,12 +30,10 @@ int fs_delete(char *name) {
 	/* Obtain a key for the file given its name. */
 	lf_id_t key = lf_checksum(name, strlen(name));
 	/* Obtain the file's leaf, suppressing any errors that occur while doing so. */
-	suppress_errors(nvm_p _leaf = fs_leaf_for_key(_root_leaf, key));
+	nvm_p _leaf = fs_leaf_for_key(_root_leaf, key);
 	if (!_leaf) {
-		error_raise(E_FS_NO_FILE, error_message("Failed to remove file '%s'.", name));
 		return -1;
 	}
-	/* Create a locally scoped variable into which we can bring the pointer. */
 	nvm_p _data;
 	/* Read the pointer to the file's data into the variable above. */
 	nvm_pull(&_data, sizeof(nvm_p), fs_access(_leaf, leaf, data));
@@ -49,12 +53,13 @@ int fs_open(char *name, lf_size_t offset) {
 	/* Obtain a key for the file given its name. */
 	lf_id_t key = lf_checksum(name, strlen(name));
 	/* Obtain the file's leaf, suppressing any errors that occur while doing so. */
-	suppress_errors(nvm_p _leaf = fs_leaf_for_key(_root_leaf, key));
+	nvm_p _leaf = fs_leaf_for_key(_root_leaf, key);
 	if (!_leaf) {
-		error_raise(E_FS_NO_FILE, error_message("Failed to open file '%s'.", name));
-		return -1;
+		return lf_error;
 	}
-	_rw_head = offset;
+	nvm_p _data;
+	nvm_pull(&_data, sizeof(nvm_p), fs_access(_leaf, leaf, data));
+	_rw_head = _data + offset;
 	return lf_success;
 }
 
@@ -90,7 +95,7 @@ void fs_format(void) {
 	leaf root = { 0 };
 	/* Set the key of the root leaf. */
 	root.key = 0x4321;
-	/* ~ Allocate space externall for the root leaf. ~ */
+	/* ~ Allocate space externally for the root leaf. ~ */
 	_root_leaf = nvm_alloc(sizeof(leaf));
 	if (!_root_leaf) {
 		error_raise(E_MALLOC, error_message("The request for external memory was denied when trying to format the filesystem."));

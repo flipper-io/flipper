@@ -29,8 +29,8 @@ typedef struct __attribute__((__packed__)) _leaf {
 extern const struct _fs {
 	/* Configures the filesystem. */
 	int (* configure)(void);
-	/* Creates a file with the given name. */
-	int (* create)(char *name);
+	/* Creates a file with the given name and file size. */
+	int (* create)(char *name, lf_size_t size);
 	/* Removes a file with the given name. */
 	int (* delete)(char *name);
 	/* Obtains the size of the file with the given name. */
@@ -74,7 +74,7 @@ extern nvm_p _rw_head;
 
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
 extern int fs_configure(void);
-extern int fs_create(char *name);
+extern int fs_create(char *name, lf_size_t size);
 extern int fs_delete(char *name);
 extern lf_size_t fs_size(char *name);
 extern int fs_open(char *name, lf_size_t offset);
