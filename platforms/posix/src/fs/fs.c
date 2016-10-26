@@ -28,8 +28,12 @@ int fs_transfer(char *path, char *name) {
 	if (_e < lf_success) {
 		return _e;
 	}
+	/* Open the newly created file. */
+	fs_open(name, 0);
 	/* Push the data into the file. */
 	fs_push(data, size);
+	/* Close the file on the device. */
+	fs_close();
 	/* Free the memory allocated to load the file. */
 	free(data);
 	/* Close the file. */
@@ -38,13 +42,15 @@ int fs_transfer(char *path, char *name) {
 }
 
 int fs_receive(char *name, char *path) {
-	/* Open the file for writing. */
+	/* Open the file on the device. */
+	fs_open(name, 0);
+	/* Open the file on the host. */
 	FILE *file = fopen (path, "wb");
 	if (!file) {
 		error_raise(E_FS_NO_FILE, error_message("Failed to create the file '%s'.", path));
 		return lf_error;
 	}
-	lf_size_t size = 0;
+	lf_size_t size = fs_size();
 	/* Allocate the memory required to download the file. */
 	uint8_t *data = (uint8_t *) malloc(sizeof(uint8_t) * size);
 	if (!data) {
@@ -52,7 +58,9 @@ int fs_receive(char *name, char *path) {
 		return lf_error;
 	}
 	/* Pull the data from the file. */
-	fs_push(data, size);
+	fs_pull(data, size);
+	/* Close the file on the device. */
+	fs_close();
 	/* Write the data into the filesystem. */
 	fwrite(data, sizeof(uint8_t), size, file);
 	/* Free the memory allocated to load the file. */

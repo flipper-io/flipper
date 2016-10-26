@@ -23,7 +23,7 @@ int __attribute__((weak)) fs_open(char *name, lf_size_t offset) {
 	return lf_success;
 }
 
-lf_size_t __attribute__((weak)) fs_size(char *name) {
+lf_size_t __attribute__((weak)) fs_size(void) {
 	return 0;
 }
 

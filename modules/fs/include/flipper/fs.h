@@ -79,7 +79,7 @@ extern int fs_configure(void);
 extern int fs_create(char *name, lf_size_t size);
 extern int fs_delete(char *name);
 extern int fs_open(char *name, lf_size_t offset);
-extern lf_size_t fs_size(char *name);
+extern lf_size_t fs_size(void);
 extern void fs_seek(lf_size_t offset);
 extern uint8_t fs_get(void);
 extern void fs_push(void *source, lf_size_t length);

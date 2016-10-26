@@ -117,7 +117,7 @@ int fs_remove_leaf_with_key(nvm_p parent, uint16_t key) {
 		nvm_p *right = (nvm_p *) nvm_dereference(fs_access(_match -> left, leaf, right), sizeof(nvm_p));
 		nvm_p empty = fs_empty_branch_for_key(fs_access(_match -> left, leaf, right), *right, *key);
 		if (!empty) {
-			error_raise(E_FS_EXISTS, error_message("Could not move a child leaf while trying to delete the file with key '0x%04x'.", key));
+			error_raise(E_FS_EXISTS, error_message("Could not move a child leaf while trying to delete the file with key '0x%04x'.", *key));
 		}
 		/* Re-index the orphaned right child by writing its address into the empty branch pointer we found. */
 		nvm_push(&(_match -> right), sizeof(nvm_p), empty);
