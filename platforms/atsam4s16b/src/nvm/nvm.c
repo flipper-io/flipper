@@ -6,6 +6,7 @@ int nvm_configure(void) {
 }
 
 void nvm_enable(void) {
+	
 
 }
 
