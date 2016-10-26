@@ -37,6 +37,8 @@ int fvm_configure(struct _lf_endpoint *endpoint) {
 	v_nvm = (uint8_t *)malloc(NVM_SIZE);
 	/* Format NVM. */
 	nvm_format();
+	/* Format the filesytem. */
+	fs_format();
 	return 0;
 }
 

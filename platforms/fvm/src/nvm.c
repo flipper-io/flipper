@@ -38,14 +38,6 @@ uint8_t nvm_get(void) {
 	return 0;
 }
 
-nvm_p nvm_alloc(lf_size_t length) {
-	return 0;
-}
-
-void nvm_free(nvm_p pointer) {
-
-}
-
 void nvm_format(void) {
 	memset(v_nvm, 0xFF, NVM_SIZE);
 }
