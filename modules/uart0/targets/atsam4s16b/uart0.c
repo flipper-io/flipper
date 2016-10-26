@@ -57,12 +57,14 @@ uint8_t uart0_get(void) {
 	return USART_GetChar((Usart *)UART0);
 }
 
-void uart0_push(void *source, uint32_t length) {
+int uart0_push(void *source, lf_size_t length) {
 	while (length --) uart0_put(*(uint8_t *)(source ++));
+	return lf_success;
 	//USART_WriteBuffer((Usart *)UART0, source, length);
 }
 
-void uart0_pull(void *destination, uint32_t length) {
+int uart0_pull(void *destination, lf_size_t length) {
 	//while (length --) *(uint8_t *)(destination ++) = uart0_get();
 	USART_ReadBuffer((Usart *)UART0, destination, length);
+	return lf_success;
 }

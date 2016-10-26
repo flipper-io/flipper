@@ -44,15 +44,16 @@ uint8_t uart0_get(void) {
 	return byte;
 }
 
-void uart0_push(void *source, uint32_t length) {
+int uart0_push(void *source, lf_size_t length) {
 	while (length --) uart0_put(*(uint8_t *)(source ++));
+	return lf_success;
 }
 
-void uart0_pull(void *destination, uint32_t length) {
+int uart0_pull(void *destination, lf_size_t length) {
 	/* Ensure the length requested is not greater than the length of the USART buffer. */
 	if (length > sizeof(usart_buffer)) {
 		error_raise(E_OVERFLOW, NULL);
-		return;
+		return lf_error;
 	}
 	/* Wait until the incoming data has been buffered. */
 	while ((UCSR1A & (1 << RXC1)));
@@ -60,6 +61,7 @@ void uart0_pull(void *destination, uint32_t length) {
 	memcpy(destination, usart_buffer, length);
 	/* Clear the buffer index. */
 	usart_index = 0;
+	return lf_success;
 }
 
 ISR(USART1_RX_vect) {

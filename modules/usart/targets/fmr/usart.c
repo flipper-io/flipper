@@ -23,17 +23,17 @@ uint8_t usart_ready(void) {
 }
 
 void usart_put(uint8_t byte) {
-	lf_invoke(&_usart, _usart_put, fmr_args(fmr_int8(byte)));
+	lf_invoke(&_usart, _usart_put, fmr_args(fmr_infer(byte)));
 }
 
 uint8_t usart_get(void) {
 	return lf_invoke(&_usart, _usart_get, NULL) >> 16;
 }
 
-void usart_push(void *source, uint32_t length) {
-	lf_push(&_usart, _usart_push, source, length, NULL);
+int usart_push(void *source, lf_size_t length) {
+	return lf_push(&_usart, _usart_push, source, length, NULL);
 }
 
-void usart_pull(void *destination, uint32_t length) {
-	lf_pull(&_usart, _usart_pull, destination, length, NULL);
+int usart_pull(void *destination, lf_size_t length) {
+	return lf_pull(&_usart, _usart_pull, destination, length, NULL);
 }

@@ -6,7 +6,7 @@
 LF_MODULE(_fld, "fld", "Loads modules on the target device.", _fld_id);
 
 int fld_configure(void) {
-	return lf_success;
+	return lf_invoke(&_fld, _fld_configure, NULL);
 }
 
 int fld_load(lf_id_t identifier) {

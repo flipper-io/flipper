@@ -9,9 +9,6 @@ extern const struct _adc {
 	int (* configure)(void);
 } adc;
 
-/* Declare the message runtime element for this module. */
-extern struct _lf_module *_adc;
-
 #ifdef __private_include__
 
 /* Declare the FMR overlay for this driver. */

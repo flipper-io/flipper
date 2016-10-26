@@ -1,35 +1,38 @@
 #define __private_include__
-#include <flipper/spi.h>
-#include <flipper/fmr.h>
+#include <flipper/flipper.h>
+#include <flipper/modules.h>
+
+/* ~ Provide the definition for this standard module. ~ */
+LF_MODULE(_spi, "spi", "Provides control over the device's SPI bus.", _spi_id);
 
 int spi_configure() {
-	return lf_success;
+	return lf_invoke(&_spi, _spi_configure, NULL);
 }
 
 void spi_enable(void) {
-
+	lf_invoke(&_spi, _spi_enable, NULL);
 }
 
 void spi_disable(void) {
-
+	lf_invoke(&_spi, _spi_disable, NULL);
 }
 
 uint8_t spi_ready(void) {
-	return 0;
+	return lf_invoke(&_spi, _spi_ready, NULL);
 }
 
 void spi_put(uint8_t byte) {
-
+	lf_invoke(&_spi, _spi_put, fmr_args(fmr_infer(byte)));
 }
 
 uint8_t spi_get(void) {
-	return 0;
+	return lf_invoke(&_spi, _spi_get, NULL);
 }
 
 void spi_push(void *source, uint32_t length) {
-
+	lf_push(&_spi, _spi_push, source, length, NULL);
 }
 
 void spi_pull(void *destination, uint32_t length) {
-
+	lf_pull(&_spi, _spi_pull, destination, length, NULL);
 }

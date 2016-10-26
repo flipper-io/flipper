@@ -48,10 +48,8 @@ typedef enum {
 #define fmr_type(type) (sizeof(type) >> 1)
 /* Converts a C type and value into a message runtime type and value. */
 #define fmr_cast(type, arg) fmr_intx(fmr_type(type), arg)
-/* Wrappers around the above using C names. */
-#define fmr_char(arg) fmr_int8(arg)
-#define fmr_short(arg) fmr_int16(arg)
-#define fmr_int(arg) fmr_int32(arg)
+/* Creates a message runtime argument via type inference. */
+#define fmr_infer(arg) fmr_cast(arg, arg)
 
 /* Calculates the length of an FMR type. */
 #define fmr_sizeof(type) (1 << type)

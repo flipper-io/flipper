@@ -51,12 +51,14 @@ uint8_t usart_get(void) {
 	return USART_GetChar(USART0);
 }
 
-void usart_push(void *source, uint32_t length) {
+int usart_push(void *source, lf_size_t length) {
 	while (length --) usart_put(*(uint8_t *)(source ++));
+	return lf_success;
 	//USART_WriteBuffer(USART0, source, length);
 }
 
-void usart_pull(void *destination, uint32_t length) {
+int usart_pull(void *destination, lf_size_t length) {
 	while (length --) *(uint8_t *)(destination ++) = usart_get();
+	return lf_success;
 	//USART_ReadBuffer(USART0, destination, length);
 }

@@ -12,8 +12,8 @@ extern const struct _uart {
 	uint8_t (* ready)(void);
 	void (* put)(uint8_t byte);
 	uint8_t (* get)(void);
-	void (* push)(void *source, uint32_t length);
-	void (* pull)(void *destination, uint32_t length);
+	int (* push)(void *source, lf_size_t length);
+	int (* pull)(void *destination, lf_size_t length);
 } usart;
 
 #ifdef __private_include__
@@ -28,8 +28,8 @@ void usart_disable(void);
 uint8_t usart_ready(void);
 void usart_put(uint8_t byte);
 uint8_t usart_get();
-void usart_push(void *source, uint32_t length);
-void usart_pull(void *destination, uint32_t length);
+int usart_push(void *source, lf_size_t length);
+int usart_pull(void *destination, lf_size_t length);
 
 #endif
 #endif

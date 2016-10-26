@@ -3,17 +3,10 @@
 #include <flipper/modules.h>
 
 /* ~ Provide the definition for this standard module. ~ */
-struct _lf_module _cpu = {
-	"cpu",
-	"Provides control over CPU power, reset, DFU, etc.",
-	LF_VERSION,
-	_cpu_id,
-	NULL
-};
+LF_MODULE(_cpu, "cpu", "Provides control over the CPU of the device.", _cpu_id);
 
 int cpu_configure(void) {
-	lf_invoke(&_cpu, _cpu_configure, NULL);
-	return lf_success;
+	return lf_invoke(&_cpu, _cpu_configure, NULL);
 }
 
 void cpu_reset(void) {
@@ -25,7 +18,7 @@ void cpu_halt(void) {
 }
 
 void cpu_power(uint8_t power) {
-	lf_invoke(&_cpu, _cpu_power, fmr_args(fmr_int8(power)));
+	lf_invoke(&_cpu, _cpu_power, fmr_args(fmr_infer(power)));
 }
 
 void cpu_dfu(void) {
