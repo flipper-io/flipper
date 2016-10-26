@@ -33,17 +33,19 @@ extern const struct _fs {
 	int (* create)(char *name, lf_size_t size);
 	/* Removes a file with the given name. */
 	int (* delete)(char *name);
-	/* Obtains the size of the file with the given name. */
-	lf_size_t (* size)(char *name);
 	/* Opens a r/w session starting an a specific offset from a file with the given name. */
 	int (* open)(char *name, lf_size_t offset);
+	/* Returns the size of the open file. */
+	lf_size_t (* size)(void);
+	/* Seeks to a given offset in the open file. */
+	void (* seek)(lf_size_t offset);
 	/* Reads a single byte from the file if a read session is active. */
 	uint8_t (* get)(void);
-	/* Pushes data into a file if a write session is active. */
+	/* Pushes data into the open file. */
 	void (* push)(void *source, lf_size_t length);
-	/* Pulls from a file if a read session is active. */
+	/* Pulls from the open file. */
 	void (* pull)(void *destination, lf_size_t length);
-	/* Closes a file that is being written to or read from. */
+	/* Closes the open file. */
 	void (* close)(void);
 	/* Permanently destroys all records catalogued by the filesystem. */
 	void (* format)(void);
@@ -76,8 +78,9 @@ extern nvm_p _rw_head;
 extern int fs_configure(void);
 extern int fs_create(char *name, lf_size_t size);
 extern int fs_delete(char *name);
-extern lf_size_t fs_size(char *name);
 extern int fs_open(char *name, lf_size_t offset);
+extern lf_size_t fs_size(char *name);
+extern void fs_seek(lf_size_t offset);
 extern uint8_t fs_get(void);
 extern void fs_push(void *source, lf_size_t length);
 extern void fs_pull(void *destination, lf_size_t length);

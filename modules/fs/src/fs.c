@@ -8,14 +8,17 @@ nvm_p _free_list;
 nvm_p _break_value;
 nvm_p _root_leaf;
 nvm_p _rw_head;
+nvm_p _open_data;
+lf_size_t open_size;
 
 /* Define the virtual interface for this module. */
 const struct _fs fs = {
 	fs_configure,
 	fs_create,
 	fs_delete,
-	fs_size,
 	fs_open,
+	fs_size,
+	fs_seek,
 	fs_get,
 	fs_push,
 	fs_pull,
@@ -69,10 +72,6 @@ int fs_delete(char *name) {
 	return fs_remove_leaf_with_key(_root_leaf, key);;
 }
 
-lf_size_t fs_size(char *name) {
-	return 0;
-}
-
 int fs_open(char *name, lf_size_t offset) {
 	/* Obtain a key for the file given its name. */
 	lf_id_t key = lf_checksum(name, strlen(name));
@@ -81,14 +80,27 @@ int fs_open(char *name, lf_size_t offset) {
 	if (!_leaf) {
 		return lf_error;
 	}
-	nvm_p _data;
-	nvm_pull(&_data, sizeof(nvm_p), fs_access(_leaf, leaf, data));
-	_rw_head = _data + offset;
+	nvm_pull(&open_size, sizeof(lf_size_t), fs_access(_leaf, leaf, size));
+	nvm_pull(&_open_data, sizeof(nvm_p), fs_access(_leaf, leaf, data));
+	_rw_head = _open_data + offset;
 	return lf_success;
 }
 
+lf_size_t fs_size(char *name) {
+	return open_size;
+}
+
+void fs_seek(lf_size_t offset) {
+	_rw_head = _open_data + offset;
+	if (_rw_head > _open_data + open_size) {
+		error_raise(E_BOUNDARY, error_message("Seeking out of bounds."));
+	}
+}
+
 uint8_t fs_get(void){
-	return nvm_get();
+	uint8_t c = nvm_get();
+	_rw_head ++;
+	return c;
 }
 
 void fs_push(void *source, lf_size_t length) {
@@ -102,6 +114,7 @@ void fs_pull(void *destination, lf_size_t length) {
 }
 
 void fs_close(void) {
+	_rw_head = 0;
 	/* Disable external memory to finish the operation. */
 	nvm_disable();
 }

@@ -30,7 +30,8 @@ enum {
 	E_NAME,
 	E_CONFIGURATION,
 	E_ACK,
-	E_TYPE
+	E_TYPE,
+	E_BOUNDARY
 };
 
 /* If this flag is set, error messages are nullified on platforms that do not need to store error strings. */
@@ -58,7 +59,8 @@ enum {
 								 "invalid name", \
 								 "configuration error", \
 								 "acknowledgement error" \
-								 "type error"
+								 "type error", \
+								 "boundary error"
 
 /* Allow the 'error_message' macro to serve as a passthrough for any variadic arguments supplied to it. */
 #define error_message(...) __VA_ARGS__

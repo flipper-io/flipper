@@ -19,12 +19,16 @@ int __attribute__((weak)) fs_delete(char *name) {
 	return lf_success;
 }
 
+int __attribute__((weak)) fs_open(char *name, lf_size_t offset) {
+	return lf_success;
+}
+
 lf_size_t __attribute__((weak)) fs_size(char *name) {
 	return 0;
 }
 
-int __attribute__((weak)) fs_open(char *name, lf_size_t offset) {
-	return lf_success;
+void __attribute__((weak)) fs_seek(lf_size_t offset) {
+
 }
 
 uint8_t __attribute__((weak)) fs_get(void) {
