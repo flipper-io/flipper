@@ -13,6 +13,13 @@
 typedef struct __attribute__((__packed__)) _leaf {
 	/* A key used to identify the leaf. */
 	lf_id_t key;
+	/* The attributes of the file. */
+	/*
+	   [0]: The object is loadable.
+	   [1]: The object has an entry point.
+	   [2]: The object has been loaded.
+	*/
+	uint8_t attributes;
 	/* The size of the data pointed to by the leaf. */
 	uint32_t size;
 	/* The data pointed to by the leaf. */
@@ -91,6 +98,10 @@ extern void fs_format(void);
 extern int fs_transfer(char *path, char *name);
 extern int fs_receive(char *name, char *path);
 #endif
+
+/* Returns the attribute information of the file. */
+extern uint8_t fs_get_attributes(char *name);
+extern void fs_write_attributes(char *name, uint8_t attributes);
 
 /* ~ Declare the prototypes for the supporting functions belonging to this driver. ~ */
 nvm_p fs_add_leaf_with_key(nvm_p current, uint16_t key);

@@ -2,11 +2,11 @@
 #include <private/nvm.h>
 
 int nvm_configure(void) {
+	
 	return lf_success;
 }
 
 void nvm_enable(void) {
-	
 
 }
 

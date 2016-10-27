@@ -5,7 +5,7 @@
 int spi_configure() {
 	/* Enable the SPI clock in the PMC. */
 	PMC_EnablePeripheral(ID_SPI);
-	/* Declare a pin map that will configure the appropriate output pins for the UART0. */
+	/* Declare a pin map that will configure the appropriate output pins for the SPI peripheral. */
 	const Pin spi_pins[] = { (Pin){ PIO_PA14A_SPCK | PIO_PA13A_MOSI | PIO_PA12A_MISO | PIO_PA11A_NPCS0, PIOA, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT } };
 	/* Write the pinmap into the PIO. */
 	PIO_Configure(spi_pins, PIO_LISTSIZE(spi_pins));

@@ -35,20 +35,26 @@ void UART0_IrqHandler(void) {
 	if (UART0 -> UART_SR & UART_SR_RXBUFF) {
 		/* Send over the USART bus for debugging. */
 		usart_push(&packet, sizeof(struct _fmr_packet));
+		struct _fmr_result result;
 		/* If the packet has the correct magic number, try to execute the packet. */
 		if (packet.header.magic == 0xFE) {
-			struct _fmr_result result;
 			fmr_perform(&packet, &result);
-			/* Send the packet back to the host. */
-			uart0_push(&result, sizeof(struct _fmr_result));
-			usart_push(&result, sizeof(struct _fmr_result));
-			/* Clear any error state generated. */
-			error_clear();
+		} else {
+			result.error = E_FMR;
 		}
-	} else {
+		/* Send the packet back to the host. */
+		uart0_push(&result, sizeof(struct _fmr_result));
+		usart_push(&result, sizeof(struct _fmr_result));
+		/* Clear any error state generated. */
+		error_clear();
+	} else if (UART0 -> UART_SR & UART_SR_RXRDY) {
 		/* Instantiate the PDMAC of the UART peripheral to asynchronously load a packet. */
 		uart0_pull((void *)(&packet), sizeof(struct _fmr_packet));
+	} else {
+		usart_put('i');
 	}
+	/* Clear the buffer. */
+	while (uart0_ready()) uart0_get();
 }
 
 void delay_ms() {
@@ -76,10 +82,10 @@ void system_init(void) {
 	RSTC -> RSTC_MR |= RSTC_MR_URSTEN;
 	/* Disable the watchdog timer. */
 	WDT_Disable(WDT);
-	/* Configure the UART0 peripheral. */
-	uart0_configure();
 	/* Configure the USART0 peripheral. */
 	usart_configure();
+	/* Configure the UART0 peripheral. */
+	uart0_configure();
 	/* Configure the GPIO peripheral. */
 	//gpio_configure();
 	/* Print the configuration. */
