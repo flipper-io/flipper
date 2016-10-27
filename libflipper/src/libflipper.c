@@ -260,7 +260,7 @@ fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _f
 	}
 	struct _fmr_packet packet;
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_generate(module -> identifier, function, parameters, &packet);
+	int _e = fmr_generate(module -> slot, function, parameters, &packet);
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -316,7 +316,7 @@ int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_s
 	}
 	struct _fmr_packet packet;
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_generate(_fmr_id, _fmr_push, fmr_merge(fmr_args(fmr_int16(module -> identifier), fmr_int8(function), fmr_int32(length)), parameters), &packet);
+	int _e = fmr_generate(_fmr_id, _fmr_push, fmr_merge(fmr_args(fmr_int16(module -> slot), fmr_int8(function), fmr_int32(length)), parameters), &packet);
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -355,7 +355,7 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 	}
 	struct _fmr_packet packet;
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_generate(_fmr_id, _fmr_pull, fmr_merge(fmr_args(fmr_int16(module -> identifier), fmr_int8(function), fmr_int32(length)), parameters), &packet);
+	int _e = fmr_generate(_fmr_id, _fmr_pull, fmr_merge(fmr_args(fmr_int16(module -> slot), fmr_int8(function), fmr_int32(length)), parameters), &packet);
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -378,7 +378,13 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 
 int lf_bind(struct _lf_module *module) {
 	/* Calculate the module's identifier. */
-	
+	module -> identifier = lf_checksum(module -> name, strlen(module -> name));
+	/* Bind the module to a slot on the device. */
+	module -> slot = fld_bind(module -> identifier);
+	if (!module -> slot) {
+		error_raise(E_MODULE, error_message("No slot given."));
+		return lf_error;
+	}
 	return lf_success;
 }
 

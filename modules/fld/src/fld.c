@@ -12,7 +12,7 @@ const struct _fld fld = {
 };
 
 fmr_module fld_bind(lf_id_t identifier) {
-	return -1;
+	return 0;
 }
 
 #ifdef __fld_upload_symbols__
@@ -62,7 +62,7 @@ int fld_load(char *path, void **interface) {
 	/* Close the file. */
 	fs_close();
 	/* Set the file attributes. */
-
+	
 	/* Load the interface. */
 	*interface = dlsym(handle, (*module) -> name);
 	if ((error = dlerror()) != NULL)  {

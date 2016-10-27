@@ -17,7 +17,7 @@ extern const struct _fld {
 } fld;
 
 /* Declare the FMR overlay for this driver. */
-enum { _fld_configure, _fld_load };
+enum { _fld_configure, _fld_bind };
 
 /* Declare each prototype for all functions within this driver. */
 int fld_configure(void);

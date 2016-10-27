@@ -139,17 +139,20 @@ struct _lf_module {
 	lf_version_t version;
 	/* The module's identifier. */
 	lf_id_t identifier;
+	/* The module's slot. */
+	uint8_t slot;
 	/* The device upon which the module's counterpart is located. */
 	struct _lf_device *device;
 };
 
 /* Macro for easily generating module structures. */
-#define LF_MODULE(symbol, name, description, identifier) \
+#define LF_MODULE(symbol, name, description, slot) \
 	struct _lf_module symbol = { \
 		name, \
 		description, \
 		LF_VERSION, \
-		identifier, \
+		0, \
+		slot, \
 		NULL \
 	};
 
