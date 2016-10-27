@@ -3,7 +3,7 @@
 .lock-waf*
 .waf*
 build/
-*.xcodeproj
+./*.xcodeproj
 *.module
 *.o
 *.a
