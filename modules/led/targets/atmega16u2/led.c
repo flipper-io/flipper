@@ -8,7 +8,6 @@ int led_configure(void) {
 	return lf_success;
 }
 
-
 uint8_t r_c, g_c, b_c;
 int8_t direction = 1;
 uint8_t ticks;
