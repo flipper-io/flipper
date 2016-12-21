@@ -159,11 +159,10 @@ struct _lf_module {
 /* Provides a checksum for a given block of data. */
 lf_id_t lf_checksum(void *source, lf_size_t length);
 
+#ifdef PLATFORM_HEADER
 /* Include platform specific declarations. */
 #include PLATFORM_HEADER
 /* NOTE: The PLATFORM_HEADER macro is passed as a preprocessor flag during compilation. */
-
-/* Include all message runtime related declarations. */
-#include <flipper/fmr.h>
+#endif
 
 #endif

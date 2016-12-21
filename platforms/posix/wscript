@@ -8,8 +8,6 @@ def configure(cfg):
 	cfg.env.TARGET = 'fmr'
 	# Build modules for this platform.
 	cfg.env.BUILD_MODULES = True
-	# Build libflipper for this platform.
-	cfg.env.BUILD_LIBFLIPPER = True
 	# Set the platform flags.
 	cfg.env.append_value('CFLAGS', ['-std=c99', '-fpic', '-D__flipper_constructors__', '-D__enable_error_side_effects__', '-D__fs_transfer_symbols__', '-D__fld_upload_symbols__', '-g', '-DPLATFORM_HEADER=<platform/posix.h>'])
 	# Load the appropriate C compiler.

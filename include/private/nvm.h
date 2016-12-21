@@ -1,5 +1,5 @@
-#ifndef __lf_nvm_h__
-#define __lf_nvm_h__
+#ifndef __nvm_h__
+#define __nvm_h__
 
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
 #include <flipper/core.h>

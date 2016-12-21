@@ -32,29 +32,7 @@ struct _fmr_packet packet;
 
 /* Interrupt handler for this device driver. */
 void UART0_IrqHandler(void) {
-	if (UART0 -> UART_SR & UART_SR_RXBUFF) {
-		/* Send over the USART bus for debugging. */
-		usart_push(&packet, sizeof(struct _fmr_packet));
-		struct _fmr_result result;
-		/* If the packet has the correct magic number, try to execute the packet. */
-		if (packet.header.magic == 0xFE) {
-			fmr_perform(&packet, &result);
-		} else {
-			result.error = E_FMR;
-		}
-		/* Send the packet back to the host. */
-		uart0_push(&result, sizeof(struct _fmr_result));
-		usart_push(&result, sizeof(struct _fmr_result));
-		/* Clear any error state generated. */
-		error_clear();
-	} else if (UART0 -> UART_SR & UART_SR_RXRDY) {
-		/* Instantiate the PDMAC of the UART peripheral to asynchronously load a packet. */
-		uart0_pull((void *)(&packet), sizeof(struct _fmr_packet));
-	} else {
-		usart_put('i');
-	}
-	/* Clear the buffer. */
-	while (uart0_ready()) uart0_get();
+
 }
 
 void delay_ms() {
@@ -64,13 +42,17 @@ void delay_ms() {
 
 void system_task(void) {
 
-	gpio_enable(PIO_PA8, PIO_DEFAULT);
+	gpio_enable(PIO_PA0, PIO_DEFAULT);
 
 	while (1) {
-		gpio_write(PIO_PA8, 1);
+		gpio_write(PIO_PA0, 1);
 		delay_ms();
-		gpio_write(PIO_PA8, 0);
+		gpio_write(PIO_PA0, 0);
 		delay_ms();
+
+		// while (!uart0_ready());
+		// uart0_pull((void *)(&packet), sizeof(struct _fmr_packet));
+		// usart_push(&packet, sizeof(struct _fmr_packet));
 	}
 
 	while (1);
@@ -85,9 +67,9 @@ void system_init(void) {
 	/* Configure the USART0 peripheral. */
 	usart_configure();
 	/* Configure the UART0 peripheral. */
-	uart0_configure();
+	//uart0_configure();
 	/* Configure the GPIO peripheral. */
-	//gpio_configure();
+	gpio_configure();
 	/* Print the configuration. */
 	//usart_push(self.configuration.name, strlen(self.configuration.name));
 }

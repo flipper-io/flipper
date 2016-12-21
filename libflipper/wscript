@@ -20,3 +20,5 @@ def build(bld):
 			_env.SHLIB_MARKER = '-Wl,--no-whole-archive'
 		if _env.BUILD_LIBFLIPPER:
 			bld.stlib(source = bld.path.ant_glob('src/**'), target = 'flipper-' + name, env = _env)
+	_env = bld.all_envs['platform-posix'].derive()
+	bld.shlib(source = bld.path.ant_glob('src/**'), target = 'flipper', use = 'platform-posix modules-posix', env = _env)

@@ -64,7 +64,7 @@ int uart0_push(void *source, lf_size_t length) {
 }
 
 int uart0_pull(void *destination, lf_size_t length) {
-	//while (length --) *(uint8_t *)(destination ++) = uart0_get();
-	USART_ReadBuffer((Usart *)UART0, destination, length);
+	while (length --) *(uint8_t *)(destination ++) = uart0_get();
+	//USART_ReadBuffer((Usart *)UART0, destination, length);
 	return lf_success;
 }
