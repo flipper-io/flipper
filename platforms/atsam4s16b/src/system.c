@@ -28,52 +28,34 @@ void fmr_pull(fmr_module module, fmr_function function, lf_size_t length) {
 
 }
 
-struct _fmr_packet packet;
-
-/* Interrupt handler for this device driver. */
-void UART0_IrqHandler(void) {
-
-}
-
-void delay_ms() {
-	uint64_t counter = 4000000;
-	while (counter --) __asm__("nop");
-}
-
 void system_task(void) {
 
-	gpio_enable(PIO_PA0, PIO_DEFAULT);
+	/* Blink the LED for activity. */
+
+	PMC -> PMC_PCER0 |= (1 << ID_PIOA);
+	PIOA -> PIO_PER |= (1 << 0);
+	PIOA -> PIO_OER |= (1 << 0);
 
 	while (1) {
-		gpio_write(PIO_PA0, 1);
-		delay_ms();
-		gpio_write(PIO_PA0, 0);
-		delay_ms();
-
-		// while (!uart0_ready());
-		// uart0_pull((void *)(&packet), sizeof(struct _fmr_packet));
-		// usart_push(&packet, sizeof(struct _fmr_packet));
+		PIOA -> PIO_SODR |= (1 << 0);
+		for (uint32_t i = 0; i < 1000000; i ++) __asm__("nop");
+		PIOA -> PIO_CODR |= (1 << 0);
+		for (uint32_t i = 0; i < 1000000; i ++) __asm__("nop");
 	}
 
 	while (1);
-
 }
 
 void system_init(void) {
 	/* Allow the reset pin to reset the device. */
 	RSTC -> RSTC_MR |= RSTC_MR_URSTEN;
-	/* Disable the watchdog timer. */
-	WDT_Disable(WDT);
-	/* Configure the USART0 peripheral. */
-	usart_configure();
-	/* Configure the UART0 peripheral. */
-	//uart0_configure();
-	/* Configure the GPIO peripheral. */
-	gpio_configure();
-	/* Print the configuration. */
-	//usart_push(self.configuration.name, strlen(self.configuration.name));
 }
 
 void system_deinit(void) {
+
+}
+
+/* Interrupt handler for this device driver. */
+void UART0_handler(void) {
 
 }

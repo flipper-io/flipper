@@ -15,7 +15,6 @@ int8_t megausb_interrupt_receive(uint8_t *destination, lf_size_t length) {
 	/* Select the endpoint that has been configured to receive interrupt data. */
 	UENUM = INTERRUPT_OUT_ENDPOINT;
 
-
 	int total = lf_ceiling(length, INTERRUPT_OUT_SIZE);
 	for (int i = 0; i < total; i ++) {
 		/* Wait until data has been received. */

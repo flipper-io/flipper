@@ -75,7 +75,7 @@
  * This includes EFC and master clock configuration.
  * It also enable a low level on the pin NRST triggers a user reset.
  */
-extern WEAK void LowLevelInit( void )
+extern void LowLevelInit( void )
 {
 	uint32_t timeout = 0;
 

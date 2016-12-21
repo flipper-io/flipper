@@ -225,15 +225,15 @@ int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
 		goto done;
 	}
 	/* Calculate the number of bytes needed to dencode the widths of the types. */
-	uint8_t dencode_length = lf_ceiling((packet -> target.argc * 2), 8);
+	uint8_t decode_length = lf_ceiling((packet -> target.argc * 2), 8);
 	/* Create a buffer for decoding argument types. */
 	fmr_types types = 0;
 	/* Copy the encoded type widths into the buffer. */
-	memcpy(&types, (void *)(&(packet -> body)), dencode_length);
+	memcpy(&types, (void *)(&(packet -> body)), decode_length);
 	/* If the module is a standard moudle, obtain it internally. */
 	if (packet -> target.attributes & LF_STANDARD_MODULE) {
 		/* Execute the function. */
-		result -> value = fmr_execute(packet -> target.module, packet -> target.function, packet -> target.argc, types, (void *)(packet -> body + dencode_length));
+		result -> value = fmr_execute(packet -> target.module, packet -> target.function, packet -> target.argc, types, (void *)(packet -> body + decode_length));
 	} else {
 		error_raise(E_MODULE, NULL);
 	}

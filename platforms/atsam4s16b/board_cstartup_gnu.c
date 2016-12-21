@@ -63,6 +63,8 @@ extern void __libc_init_array( void ) ;
  *         Exception Table
  *------------------------------------------------------------------------------*/
 
+ typedef void( *IntFunc )( void ) ;
+
 __attribute__((section(".vectors")))
 IntFunc exception_table[] = {
 
@@ -70,55 +72,55 @@ IntFunc exception_table[] = {
 	(IntFunc)(&_estack),
 	ResetException,
 
-	NMI_Handler,
-	HardFault_Handler,
-	MemManage_Handler,
-	BusFault_Handler,
-	UsageFault_Handler,
-	0, 0, 0, 0,         /* Reserved */
-	SVC_Handler,
-	DebugMon_Handler,
-	0,                  /* Reserved  */
-	PendSV_Handler,
-	SysTick_Handler,
+	nmi_handler,
+	hardfault_handler,
+	memmanage_handler,
+	busfault_handler,
+	usagefault_handler,
+	0, 0, 0, 0,         /* reserved */
+	svc_handler,
+	debugmon_handler,
+	0,                  /* reserved  */
+	pendsv_handler,
+	systick_handler,
 
 	/* Configurable interrupts  */
-	SUPC_IrqHandler,    /* 0  Supply Controller */
-	RSTC_IrqHandler,    /* 1  Reset Controller */
-	RTC_IrqHandler,     /* 2  Real Time Clock */
-	RTT_IrqHandler,     /* 3  Real Time Timer */
-	WDT_IrqHandler,     /* 4  Watchdog Timer */
-	PMC_IrqHandler,     /* 5  PMC */
-	EEFC_IrqHandler,    /* 6  EEFC */
-	IrqHandlerNotUsed,  /* 7  Reserved */
-	UART0_IrqHandler,   /* 8  UART0 */
-	UART1_IrqHandler,   /* 9  UART1 */
-	SMC_IrqHandler,     /* 10 SMC */
-	PIOA_IrqHandler,    /* 11 Parallel IO Controller A */
-	PIOB_IrqHandler,    /* 12 Parallel IO Controller B */
-	PIOC_IrqHandler,    /* 13 Parallel IO Controller C */
-	USART0_IrqHandler,  /* 14 USART 0 */
-	USART1_IrqHandler,  /* 15 USART 1 */
-	USART2_IrqHandler,  /* 16 USART 2 */
-	IrqHandlerNotUsed,  /* 17 Reserved */
-	MCI_IrqHandler,     /* 18 MCI */
-	TWI0_IrqHandler,    /* 19 TWI 0 */
-	TWI1_IrqHandler,    /* 20 TWI 1 */
-	SPI_IrqHandler,     /* 21 SPI */
-	SSC_IrqHandler,     /* 22 SSC */
-	TC0_IrqHandler,     /* 23 Timer Counter 0 */
-	TC1_IrqHandler,     /* 24 Timer Counter 1 */
-	TC2_IrqHandler,     /* 25 Timer Counter 2 */
-	TC3_IrqHandler,     /* 26 Timer Counter 3 */
-	TC4_IrqHandler,     /* 27 Timer Counter 4 */
-	TC5_IrqHandler,     /* 28 Timer Counter 5 */
-	ADC_IrqHandler,     /* 29 ADC controller */
-	DAC_IrqHandler,     /* 30 DAC controller */
-	PWM_IrqHandler,     /* 31 PWM */
-	CRCCU_IrqHandler,   /* 32 CRC Calculation Unit */
-	ACC_IrqHandler,     /* 33 Analog Comparator */
-	USBD_IrqHandler,    /* 34 USB Device Port */
-	IrqHandlerNotUsed   /* 35 not used */
+	supc_handler,    /* 0  supply controller */
+	rstc_handler,    /* 1  reset controller */
+	rtc_handler,     /* 2  real time clock */
+	rtt_handler,     /* 3  real time timer */
+	wdt_handler,     /* 4  watchdog timer */
+	pmc_handler,     /* 5  pmc */
+	eefc_handler,    /* 6  eefc */
+	null_handler,  /* 7  reserved */
+	uart0_handler,   /* 8  uart0 */
+	uart1_handler,   /* 9  uart1 */
+	smc_handler,     /* 10 smc */
+	pioa_handler,    /* 11 parallel io controller a */
+	piob_handler,    /* 12 parallel io controller b */
+	pioc_handler,    /* 13 parallel io controller c */
+	usart0_handler,  /* 14 usart 0 */
+	usart1_handler,  /* 15 usart 1 */
+	usart2_handler,  /* 16 usart 2 */
+	null_handler,  /* 17 reserved */
+	mci_handler,     /* 18 mci */
+	twi0_handler,    /* 19 twi 0 */
+	twi1_handler,    /* 20 twi 1 */
+	spi_handler,     /* 21 spi */
+	ssc_handler,     /* 22 ssc */
+	tc0_handler,     /* 23 timer counter 0 */
+	tc1_handler,     /* 24 timer counter 1 */
+	tc2_handler,     /* 25 timer counter 2 */
+	tc3_handler,     /* 26 timer counter 3 */
+	tc4_handler,     /* 27 timer counter 4 */
+	tc5_handler,     /* 28 timer counter 5 */
+	adc_handler,     /* 29 adc controller */
+	dac_handler,     /* 30 dac controller */
+	pwm_handler,     /* 31 pwm */
+	crccu_handler,   /* 32 crc calculation unit */
+	acc_handler,     /* 33 analog comparator */
+	usbd_handler,    /* 34 usb device port */
+	null_handler   /* 35 not used */
 };
 
 /**
@@ -151,13 +153,13 @@ void ResetException( void )
 	}
 
 	/* Set the vector table base address */
-	pSrc = (uint32_t *)&_sfixed;
-	SCB->VTOR = ( (uint32_t)pSrc & SCB_VTOR_TBLOFF_Msk ) ;
-
-	if ( ((uint32_t)pSrc >= IRAM_ADDR) && ((uint32_t)pSrc < IRAM_ADDR+IRAM_SIZE) )
-	{
-		SCB->VTOR |= 1 << SCB_VTOR_TBLBASE_Pos ;
-	}
+	// pSrc = (uint32_t *)&_sfixed;
+	// SCB->VTOR = ( (uint32_t)pSrc & SCB_VTOR_TBLOFF_Msk ) ;
+	//
+	// if ( ((uint32_t)pSrc >= IRAM_ADDR) && ((uint32_t)pSrc < IRAM_ADDR+IRAM_SIZE) )
+	// {
+	// 	SCB->VTOR |= 1 << SCB_VTOR_TBLBASE_Pos ;
+	// }
 
 	/* Initialize the C library */
 	//__libc_init_array() ;
