@@ -8,6 +8,8 @@ def configure(cfg):
 	cfg.env.TARGET = 'atsam4s16b'
 	# Build osmium for the platform.
 	cfg.env.BUILD_OSMIUM = True
+	# Build libflipper for this platform.
+	cfg.env.BUILD_LIBFLIPPER = True
 	# Build modules for this platform.
 	cfg.env.BUILD_MODULES = True
 	# Set the platform flags.

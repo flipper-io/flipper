@@ -15,7 +15,7 @@ def build(bld):
 			STARTFILE = []
 			if (_env.STARTFILES):
 				STARTFILE = [bld.path.parent.find_node(_env.STARTFILES)]
-			bld.program(source = bld.path.ant_glob('src/**') + STARTFILE, target = 'osmium-' + name + '.elf', use = 'platform-' + name + ' modules-' + name, install_path = None, env = _env)
+			bld.program(source = bld.path.ant_glob('src/**') + STARTFILE, target = 'osmium-' + name + '.elf', use = 'platform-' + name + ' modules-' + name + ' flipper-' + name, install_path = None, env = _env)
 			bld.add_group()
 			bld(rule = '${OBJCOPY} -O ihex ${SRC} ${TGT}', source = 'osmium-' + name + '.elf', target = 'osmium-' + name + '.hex', use = 'osmium-' + name + '.elf', env = _env)
 			bld(rule = '${OBJCOPY} -O binary ${SRC} ${TGT}', source = 'osmium-' + name + '.elf', target = 'osmium-' + name + '.bin', use = 'osmium-' + name + '.elf', env = _env)

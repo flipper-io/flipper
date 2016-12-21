@@ -39,10 +39,10 @@ def build(bld):
 	bld.recurse('modules')
 	# Build all of the supported platforms.
 	_platforms(bld)
-	# Build Osmium.
-	bld.recurse('osmium')
 	# Build libflipper.
 	bld.recurse('libflipper')
+	# Build Osmium.
+	bld.recurse('osmium')
 	# Build the tests.
 	for test in [os.path.basename(test) for test in map(str, bld.path.ant_glob('tests/*', dir=True, src=False))]:
 		bld.recurse('tests/' + test)
