@@ -8,9 +8,7 @@ int main(int argc, char *argv[]) {
 	flipper.attach();
 	//flipper_attach_endpoint("fvm", &lf_fvm_ep);
 
-	printf(KGRN "Successfully attached to Flipper device.\n");
-
-#if 1
+#if 0
 	/* Create the SAM4S endpoint using uart0 as the interface. */
 	struct _lf_endpoint sam4s_ep = {
 		uart0_configure,

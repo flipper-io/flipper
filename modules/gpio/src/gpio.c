@@ -1,6 +1,7 @@
 #define __private_include__
 #include <flipper/gpio.h>
 
+#ifdef __use_gpio__
 /* Define the virtual interface for this module. */
 const struct _gpio gpio = {
 	gpio_configure,
@@ -8,3 +9,4 @@ const struct _gpio gpio = {
 	gpio_write,
 	gpio_read
 };
+#endif

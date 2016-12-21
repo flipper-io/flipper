@@ -11,6 +11,7 @@ nvm_p _rw_head;
 nvm_p _open_data;
 lf_size_t open_size;
 
+#ifdef __use_fs__
 /* Define the virtual interface for this module. */
 const struct _fs fs = {
 	fs_configure,
@@ -29,6 +30,7 @@ const struct _fs fs = {
 	fs_receive
 	#endif
 };
+#endif
 
 int fs_configure(void) {
 	return lf_success;

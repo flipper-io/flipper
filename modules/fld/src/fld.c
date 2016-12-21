@@ -2,6 +2,7 @@
 #include <flipper/fld.h>
 #include <flipper/fs.h>
 
+#ifdef __use_fld__
 /* Define the virtual interface for this module. */
 const struct _fld fld = {
 	fld_configure,
@@ -10,6 +11,7 @@ const struct _fld fld = {
 	fld_load
 #endif
 };
+#endif
 
 fmr_module fld_bind(lf_id_t identifier) {
 	return 0;
@@ -62,7 +64,7 @@ int fld_load(char *path, void **interface) {
 	/* Close the file. */
 	fs_close();
 	/* Set the file attributes. */
-	
+
 	/* Load the interface. */
 	*interface = dlsym(handle, (*module) -> name);
 	if ((error = dlerror()) != NULL)  {

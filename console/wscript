@@ -1,10 +1,8 @@
 def configure(cfg):
-    cfg.find_program('realpath')
-    cfg.find_program('ghc')
-    cfg.find_program('stack')
+	cfg.find_program('realpath')
+	cfg.find_program('ghc')
+	cfg.find_program('stack')
 
 def build(bld):
-    x = ""
-    for p in bld.env.INCLUDES:
-        x = x + ("--extra-include-dirs=`realpath " + p + "` ")
-    bld(rule='mkdir console; cd ../console; stack build --extra-lib-dirs=`realpath ../build/libflipper` ' + x + ' --copy-bins --local-bin-path ../build/console', use='flipper', target='flipper', name='console') #, always=True)
+	x = ""
+	

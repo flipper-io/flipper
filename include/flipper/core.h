@@ -83,7 +83,7 @@ typedef uint16_t lf_version_t;
 #define hi(x) ((uint8_t)(x >> 8))
 #define lo16(x) ((uint16_t)(((uint32_t)(x))))
 #define hi16(x) ((uint16_t)(((uint32_t)(x)) >> 16))
-#define little(x)	((((uint16_t)(x)) << 8 ) | (((uint16_t)(x)) >> 8))
+#define little(x) ((((uint16_t)(x)) << 8 ) | (((uint16_t)(x)) >> 8))
 #define little32(x) ((((uint32_t)(x)) << 16 ) | (((uint32_t)(x)) >> 16))
 
 /* Standardizes a way to obtain the name, version, and attributes of a Flipper device. */
@@ -158,6 +158,10 @@ struct _lf_module {
 
 /* Provides a checksum for a given block of data. */
 lf_id_t lf_checksum(void *source, lf_size_t length);
+
+/* Include platform specific declarations. */
+#include PLATFORM_HEADER
+/* NOTE: The PLATFORM_HEADER macro is passed as a preprocessor flag during compilation. */
 
 /* Include all message runtime related declarations. */
 #include <flipper/fmr.h>

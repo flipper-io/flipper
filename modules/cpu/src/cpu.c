@@ -1,6 +1,7 @@
 #define __private_include__
 #include <flipper/cpu.h>
 
+#ifdef __use_cpu__
 /* Define the virtual interface for this module. */
 const struct _cpu cpu = {
 	cpu_configure,
@@ -9,3 +10,4 @@ const struct _cpu cpu = {
 	cpu_power,
 	cpu_dfu
 };
+#endif

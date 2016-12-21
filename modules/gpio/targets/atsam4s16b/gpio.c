@@ -9,10 +9,6 @@ int gpio_configure(void) {
 }
 
 void gpio_enable(uint32_t mask, uint8_t properties) {
-	/* Print the parameters to the function for debugging. */
-	usart_push(&mask, 4);
-	usart_push(&properties, 4);
-	usart_put('\n');
 	/* Declare a pin map that will configure the appropriate output pins for the the configuration. */
 	Pin pins[] = { (Pin){ mask, PIOA, ID_PIOA, PIO_OUTPUT_0, properties } };
 	/* Write the pinmap into the PIO. */

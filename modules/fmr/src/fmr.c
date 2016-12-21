@@ -3,11 +3,13 @@
 #include <flipper/error.h>
 #include <flipper/modules.h>
 
+#ifdef __use_fmr__
 /* Define the virtual interface for this module. */
 const struct _fmr fmr = {
 	fmr_push,
 	fmr_pull
 };
+#endif
 
 struct _fmr_list *fmr_build(fmr_argc argc, ...) {
 	/* Ensure that the argument count is within bounds. */
@@ -154,7 +156,7 @@ int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *par
 	packet -> header.magic = 0xfe;
 	packet -> header.checksum = 0x00;
 	/* If the module's identifier is in the range of identifiers reserved for the standard modules, make this packet invoke a standard module. */
-	if (module < _std_module_id_max) {
+	if (module < FMR_STD_MODULE_COUNT) {
 		packet -> target.attributes |= LF_STANDARD_MODULE;
 	}
 	/* Store the target module, function, and argument count in the packet. */
@@ -194,6 +196,20 @@ int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *par
 	 /* Destroy the argument list. */
 	fmr_free(parameters);
 	return lf_success;
+}
+
+fmr_return fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, fmr_types types, void *arguments) {
+	/* Dereference the pointer to the target module. */
+	void *object = (void *)(fmr_modules[module]);
+	/* Dereference and return a pointer to the target function. */
+	void *address = ((void **)(object))[function];
+	/* Ensure that the function address is valid. */
+	if (!address) {
+		error_raise(E_RESOULTION, NULL);
+		return 0;
+	}
+	/* Perform the function call internally. */
+	return fmr_call(address, argc, types, arguments);
 }
 
 int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {

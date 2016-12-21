@@ -1,6 +1,8 @@
 #ifndef __lf_modules_h__
 #define __lf_modules_h__
 
+/* NOTE: This header file should only be included once by modules.c for each platform. */
+
 /* Include the header files for all of the standard modules exposed by the toolbox. */
 #include <flipper/adc.h>
 #include <flipper/button.h>
@@ -47,12 +49,139 @@ enum {
 	_usart_id,
 	_usb_id,
 	_wdt_id,
-	/* Defines the upper bound of the identifiers allocated for the built-in standard modules. */
-	_std_module_id_max
+	/* The last element in a zero-indexed enumeration will be equal in value to its number of elements. */
+	FMR_STD_MODULE_COUNT
 };
-/* NOTE: The identifiers in this enumeration must match the order of the module addresses store in the 'fmr_modules' array. */
+/* NOTE: The identifiers in this enumeration must match the order of the module addresses stored in the 'fmr_modules' array. */
 
-/* Describe a reference to the platform specific module-array. */
-extern const void *const fmr_modules[];
+/* Define the standard modules based on platform specific usage declarations. */
+static const void *const fmr_modules[FMR_STD_MODULE_COUNT] = {
+	/* adc */
+#ifdef __use_adc__
+	&adc,
+#else
+	NULL,
+#endif
+	/* button */
+#ifdef __use_button__
+	&button,
+#else
+	NULL,
+#endif
+	/* cpu */
+#ifdef __use_cpu__
+	&cpu,
+#else
+	NULL,
+#endif
+	/* dac */
+#ifdef __use_dac__
+	&dac,
+#else
+	NULL,
+#endif
+	/* error */
+#ifdef __use_error__
+	&error,
+#else
+	NULL,
+#endif
+	/* fld */
+#ifdef __use_fld__
+	&fld,
+#else
+	NULL,
+#endif
+	/* fmr */
+#ifdef __use_fmr__
+	&fmr,
+#else
+	NULL,
+#endif
+	/* fs */
+#ifdef __use_fs__
+	&fs,
+#else
+	NULL,
+#endif
+	/* gpio */
+#ifdef __use_gpio__
+	&gpio,
+#else
+	NULL,
+#endif
+	/* i2c */
+#ifdef __use_i2c__
+	&i2c,
+#else
+	NULL,
+#endif
+	/* led */
+#ifdef __use_led__
+	&led,
+#else
+	NULL,
+#endif
+	/* pwm */
+#ifdef __use_pwm__
+	&pwm,
+#else
+	NULL,
+#endif
+	/* rtc */
+#ifdef __use_rtc__
+	&rtc,
+#else
+	NULL,
+#endif
+	/* spi */
+#ifdef __use_spi__
+	&spi,
+#else
+	NULL,
+#endif
+	/* swd */
+#ifdef __use_swd__
+	&swd,
+#else
+	NULL,
+#endif
+	/* temp */
+#ifdef __use_temp__
+	&temp,
+#else
+	NULL,
+#endif
+	/* timer */
+#ifdef __use_timer__
+	&timer,
+#else
+	NULL,
+#endif
+	/* uart0 */
+#ifdef __use_uart0__
+	&uart0,
+#else
+	NULL,
+#endif
+	/* usart */
+#ifdef __use_usart__
+	&usart,
+#else
+	NULL,
+#endif
+	/* usb */
+#ifdef __use_usb__
+	&usb,
+#else
+	NULL,
+#endif
+	/* wdt */
+#ifdef __use_wdt__
+	&wdt,
+#else
+	NULL,
+#endif
+};
 
 #endif

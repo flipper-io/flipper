@@ -1,6 +1,7 @@
 #define __private_include__
 #include <flipper/uart0.h>
 
+#ifdef __use_uart0__
 /* Define the virtual interface for this module. */
 const struct _uart uart0 = {
 	uart0_configure,
@@ -12,3 +13,4 @@ const struct _uart uart0 = {
 	uart0_push,
 	uart0_pull,
 };
+#endif

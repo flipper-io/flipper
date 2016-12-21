@@ -1,6 +1,7 @@
 #define __private_include__
 #include <flipper/spi.h>
 
+#ifdef __use_spi__
 /* Define the virtual interface for this module. */
 const struct _spi spi = {
 	spi_configure,
@@ -12,3 +13,4 @@ const struct _spi spi = {
 	spi_push,
 	spi_pull,
 };
+#endif

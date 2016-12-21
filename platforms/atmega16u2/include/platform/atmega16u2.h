@@ -1,5 +1,5 @@
-#ifndef __platform_h__
-#define __platform_h__
+#ifndef __atmega16u2_h__
+#define __atmega16u2_h__
 
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
 #include <flipper/core.h>
@@ -18,6 +18,14 @@
 /* A flipper device object which the target can use to keep track of state specific to itself. */
 extern struct _lf_device self;
 
+/* Define which standard modules are supported on this platform. */
+#define __use_button__
+#define __use_cpu__
+#define __use_fmr__
+#define __use_led__
+#define __use_uart0__
+#define __use_wdt__
+
 /* These macros are defined in platform specific header files. */
 #define enable_interrupts() sei()
 #define disable_interrupts() cli()
@@ -25,7 +33,6 @@ extern struct _lf_device self;
 #define PLATFORM_BAUDRATE 115200
 
 #define delay_ms(ms) _delay_ms(ms)
-#define delay_seconds(sec) delay_ms(sec * 1000)
 
 /* Pin definition macros for F3 hardware. */
 #define FLASH_CS_DDR            DDRB
