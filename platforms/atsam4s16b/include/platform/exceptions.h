@@ -1,10 +1,13 @@
 #ifndef __exceptions_h__
 #define __exceptions_h__
 
+typedef void (* isr_t)(void);
+
 /* Null handler. */
 extern void null_isr(void);
 
 /* Cortex-M4 exception handlers. */
+extern void reset_exception(void);
 extern void nmi_exception(void);
 extern void hardfault_exception(void);
 extern void memmanage_exception(void);

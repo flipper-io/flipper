@@ -10,13 +10,9 @@ extern uint32_t _ezero;
 extern uint32_t _sstack;
 extern uint32_t _estack;
 
-extern void reset_exception(void);
+__attribute__((section(".vectors"))) isr_t vector_table[] = {
 
-typedef void (* handler_t)(void);
-
-__attribute__((section(".vectors"))) handler_t vector_table[] = {
-
-	(handler_t)(&_estack),
+	(isr_t)(&_estack),
 	reset_exception,
 
 	nmi_exception,
