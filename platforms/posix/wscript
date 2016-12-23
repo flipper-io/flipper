@@ -12,6 +12,7 @@ def configure(cfg):
 	cfg.env.append_value('CFLAGS', ['-std=c99', '-fpic', '-D__flipper_constructors__', '-D__enable_error_side_effects__', '-D__fs_transfer_symbols__', '-D__fld_upload_symbols__', '-g', '-DPLATFORM_HEADER=<platform/posix.h>'])
 	# Load the appropriate C compiler.
 	cfg.load('compiler_c')
+	cfg.check(lib='dl', uselib_store='dl')
 	# Check for and import libusb-1.0.
 	cfg.check_cfg(package = 'libusb-1.0', args = ['--cflags', '--libs'], mandatory = True, uselib_store = 'libusb-1.0')
 

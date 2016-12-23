@@ -21,4 +21,8 @@ def build(bld):
 	elif (platform.system() == 'Linux'):
 		_env.STLIB_MARKER = '-Wl,--whole-archive'
 		_env.SHLIB_MARKER = '-Wl,--no-whole-archive'
+<<<<<<< HEAD
 	bld.shlib(source = bld.path.ant_glob('src/**'), target = 'flipper', use = 'platform-fvm platform-posix modules-posix', env = _env)
+=======
+	bld.shlib(source = bld.path.ant_glob('src/**'), target = 'flipper', use = 'dl platform-posix modules-posix', env = _env)
+>>>>>>> f96598f691818eea1ad9d14db3ef0808b9cfd52c

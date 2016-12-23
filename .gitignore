@@ -15,6 +15,7 @@ build/
 *.swp
 *.nix
 **/.stack-work
+.stack-root
 **/.hi
 .shake
 *.jdebug
