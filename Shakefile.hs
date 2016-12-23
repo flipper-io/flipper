@@ -507,8 +507,8 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
                          modSharedSrc
                          -- Finds modules/*/targets/fmr/*.c
                        , modFMRSrc
-                       , getDirectoryFiles "" [ "libflipper/src/*.c"
-                                              , "platforms/posix/src/*.c"
+                       , getDirectoryFiles "" [ "libflipper/src//*.c"
+                                              , "platforms/posix/src//*.c"
                                               ]
                        ]
 

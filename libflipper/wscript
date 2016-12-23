@@ -16,13 +16,11 @@ def build(bld):
 			bld.stlib(source = bld.path.ant_glob('src/**'), target = 'flipper-' + name, env = _env)
 	_env = bld.all_envs['platform-posix'].derive()
 	# Even though none of the symbols are used, include them in the shared library.
+	_use = 'platform-fvm platform-posix modules-posix'
 	if (platform.system() == 'Darwin'):
 		_env.append_value('LDFLAGS', '-Wl,-all_load')
 	elif (platform.system() == 'Linux'):
+		use += ' dl'
 		_env.STLIB_MARKER = '-Wl,--whole-archive'
 		_env.SHLIB_MARKER = '-Wl,--no-whole-archive'
-<<<<<<< HEAD
-	bld.shlib(source = bld.path.ant_glob('src/**'), target = 'flipper', use = 'platform-fvm platform-posix modules-posix', env = _env)
-=======
-	bld.shlib(source = bld.path.ant_glob('src/**'), target = 'flipper', use = 'dl platform-posix modules-posix', env = _env)
->>>>>>> f96598f691818eea1ad9d14db3ef0808b9cfd52c
+	bld.shlib(source = bld.path.ant_glob('src/**'), target = 'flipper', use = _use, env = _env)
