@@ -38,12 +38,11 @@ void system_task(void) {
 
 	while (1) {
 		PIOA -> PIO_SODR |= (1 << 0);
-		for (uint32_t i = 0; i < 1000000; i ++) __asm__("nop");
+		for (uint32_t i = 0; i < 10000000; i ++) __asm__("nop");
 		PIOA -> PIO_CODR |= (1 << 0);
-		for (uint32_t i = 0; i < 1000000; i ++) __asm__("nop");
+		for (uint32_t i = 0; i < 10000000; i ++) __asm__("nop");
 	}
 
-	while (1);
 }
 
 void system_init(void) {

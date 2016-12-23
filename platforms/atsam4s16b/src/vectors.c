@@ -30,7 +30,6 @@ __attribute__((section(".vectors"))) isr_t vector_table[] = {
 	pendsv_exception,
 	systick_exception,
 
-	/* Configurable interrupts  */
 	supc_isr,    /* 0  supply controller */
 	rstc_isr,    /* 1  reset controller */
 	rtc_isr,     /* 2  real time clock */
@@ -38,7 +37,7 @@ __attribute__((section(".vectors"))) isr_t vector_table[] = {
 	wdt_isr,     /* 4  watchdog timer */
 	pmc_isr,     /* 5  pmc */
 	eefc_isr,    /* 6  eefc */
-	null_isr,  /* 7  reserved */
+	null_isr,    /* 7  reserved */
 	uart0_isr,   /* 8  uart0 */
 	uart1_isr,   /* 9  uart1 */
 	smc_isr,     /* 10 smc */
@@ -48,7 +47,7 @@ __attribute__((section(".vectors"))) isr_t vector_table[] = {
 	usart0_isr,  /* 14 usart 0 */
 	usart1_isr,  /* 15 usart 1 */
 	usart2_isr,  /* 16 usart 2 */
-	null_isr,  /* 17 reserved */
+	null_isr,    /* 17 reserved */
 	mci_isr,     /* 18 mci */
 	twi0_isr,    /* 19 twi 0 */
 	twi1_isr,    /* 20 twi 1 */
@@ -66,7 +65,7 @@ __attribute__((section(".vectors"))) isr_t vector_table[] = {
 	crccu_isr,   /* 32 crc calculation unit */
 	acc_isr,     /* 33 analog comparator */
 	usbd_isr,    /* 34 usb device port */
-	null_isr   /* 35 not used */
+	null_isr     /* 35 not used */
 };
 
 
@@ -74,26 +73,22 @@ extern void system_init(void);
 extern int main(void);
 
 void reset_exception(void) {
-	uint32_t *pSrc, *pDest ;
 
+	uint32_t *_src, *_dest;
+
+	/* Initialize the platform hardware. */
 	system_init();
 
-	/* Initialize the relocate segment */
-	pSrc = &_etext ;
-	pDest = &_srelocate ;
-
-	if ( pSrc != pDest )
-	{
-		for ( ; pDest < &_erelocate ; )
-		{
-			*pDest++ = *pSrc++ ;
-		}
+	/* Copy the data section from ROM to RAM. */
+	_src = &_etext, _dest = &_srelocate;
+	while (_dest < &_erelocate) {
+		*_dest ++ = *_src ++ ;
 	}
 
-	/* Clear the zero segment */
-	for ( pDest = &_szero ; pDest < &_ezero ; )
-	{
-		*pDest++ = 0;
+	/* Zero the BSS. */
+	_dest = &_szero;
+	while (_dest < &_ezero) {
+		*_dest ++ = 0;
 	}
 
 	/* Set the vector table base address */
@@ -108,9 +103,9 @@ void reset_exception(void) {
 	/* Initialize the C library */
 	//__libc_init_array() ;
 
-	/* Branch to main function */
+	/* Branch to the kernel main. */
 	main();
 
-	/* Infinite loop */
+	/* Loop if main were ever to return. */
 	while (1);
 }
