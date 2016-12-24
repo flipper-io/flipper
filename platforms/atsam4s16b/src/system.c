@@ -30,6 +30,10 @@ void fmr_pull(fmr_module module, fmr_function function, lf_size_t length) {
 
 }
 
+char incoming[4];
+/* Create an outgoing DMA transfer. */
+char outgoing[] = "LEONARD EULER";
+
 void system_task(void) {
 
 	/* ~ Configure the LED that exists on PA0. ~ */
@@ -38,36 +42,37 @@ void system_task(void) {
 	PIOA -> PIO_OER |= PIO_PA0;
 
 	/* ~ Configure the USART peripheral. ~ */
-
-	/* Create a pinmask for the peripheral pins. */
-	const unsigned int USART0_PIN_MASK = (PIO_PA5A_RXD0 | PIO_PA6A_TXD0);
-	/* Enable the peripheral clock. */
-	PMC -> PMC_PCER0 |= (1 << ID_USART0);
-	/* Disable PIOA interrupts on the peripheral pins. */
-	PIOA -> PIO_IDR |= USART0_PIN_MASK;
-	/* Disable the peripheral pins from use by the PIOA. */
-	PIOA -> PIO_PDR |= USART0_PIN_MASK;
-	/* Hand control of the peripheral pins to peripheral A. */
-	PIOA -> PIO_ABCDSR[0] &= ~USART0_PIN_MASK;
-	PIOA -> PIO_ABCDSR[1] &= ~USART0_PIN_MASK;
-	/* Reset the peripheral and disable the transmitter and receiver. */
-	USART0 -> US_CR = UART_CR_RSTRX | UART_CR_RSTTX | UART_CR_TXDIS | UART_CR_RXDIS;
-	/* Set the mode to 8n1. */
-	USART0 -> US_MR = US_MR_CHRL_8_BIT | US_MR_PAR_NO | US_MR_NBSTOP_1_BIT;
-	/* Set the baudrate. */
-	USART0 -> US_BRGR = (F_CPU / PLATFORM_BAUDRATE / 16);
-	/* Enable the character receive interrupt. */
-	USART0 -> US_IER = US_IER_RXRDY;
-	/* Enable the transmitter and receiver. */
-	USART0 -> US_CR = UART_CR_TXEN | UART_CR_RXEN;
+	usart_configure();
 	/* Enable the USART0 interrupt. */
 	NVIC_EnableIRQ(USART0_IRQn);
 
+	/* Reset the transmitter. */
+	USART0 -> US_PTCR = US_PTCR_TXTDIS;
+	/* Enable the PDC transmit interrupt. */
+	USART0 -> US_IER = US_IER_ENDTX;
+	/* Set both transmitter channels. */
+	USART0 -> US_TCR = sizeof(outgoing);
+	USART0 -> US_TPR = outgoing;
+	USART0 -> US_TNCR = 0;
+	USART0 -> US_TNPR = NULL;
+	/* Enable the transmitter. */
+	USART0 -> US_PTCR = US_PTCR_TXTEN;
+
+	/* Reset the receiver. */
+	USART0 -> US_PTCR = US_PTCR_RXTDIS;
+	/* Enable the PDC receive interrupt. */
+	USART0 -> US_IER = US_IER_ENDRX;
+	/* Clear both receiver channels. */
+	USART0 -> US_RCR = 0;
+	USART0 -> US_RPR = NULL;
+	USART0 -> US_RNCR = 0;
+	USART0 -> US_RNPR = NULL;
+
 	/* ~ Configure the timer/counter peripheral. */
 
-	PMC -> PMC_PCER0 |= (1 << ID_TC0);
-	TC0 -> TC_CHANNEL[0].TC_CCR |= TC_CCR_CLKDIS;
-	TC0 -> TC_CHANNEL[0].TC_IER = 0;
+	// PMC -> PMC_PCER0 |= (1 << ID_TC0);
+	// TC0 -> TC_CHANNEL[0].TC_CCR |= TC_CCR_CLKDIS;
+	// TC0 -> TC_CHANNEL[0].TC_IER = 0;
 
 
 	while (1) {
@@ -80,10 +85,38 @@ void system_task(void) {
 }
 
 void usart0_isr(void) {
-	/* Wait until USART0 is ready to transmit. */
-	while (!(USART0 -> US_CSR & US_CSR_TXEMPTY));
-	/* Write the character into the transmit buffer. */
-	USART0 -> US_THR = USART0 -> US_RHR;
+	if (USART0 -> US_CSR & US_CSR_ENDRX) {
+		/* Disable the receiver. */
+		USART0 -> US_PTCR = US_PTCR_RXTDIS;
+		/* A non-zero value needs to be written here to clear the interrupt flag? */
+		USART0 -> US_RCR = 1;
+
+		/* Copy the incoming data to the outging data. */
+		memcpy(outgoing, incoming, sizeof(outgoing));
+
+		/* Start an outgoing DMA transfer. */
+		USART0 -> US_TCR = sizeof(outgoing);
+		USART0 -> US_TPR = outgoing;
+		/* Enable the transmitter. */
+		USART0 -> US_PTCR = US_PTCR_TXTEN;
+
+		usart_put('*');
+	} else if (USART0 -> US_CSR & US_CSR_ENDTX) {
+		/* Disable the transmitter. */
+		USART0 -> US_PTCR = US_PTCR_TXTDIS;
+		/* A non-zero value needs to be written here to clear the interrupt flag? */
+		USART0 -> US_TCR = 1;
+
+		/* Create an incoming DMA transfer. */
+		USART0 -> US_RCR = sizeof(incoming);
+		USART0 -> US_RPR = incoming;
+		/* Enable the receiver. */
+		USART0 -> US_PTCR = US_PTCR_RXTEN;
+
+		usart_put('!');
+	} else {
+		usart_put('?');
+	}
 }
 
 void system_init(void) {
