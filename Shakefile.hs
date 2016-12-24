@@ -195,13 +195,6 @@ pkgs = do
               "linux"  -> return ["libusb-1.0"]
               _        -> error "libs: unknown target"
 
--- | Who am I?
-whoami :: Action String
-whoami = do
-    (Stdout a) <- instCmd [EchoStdout False, EchoStderr False, Traced ""]
-                          ["whoami"]
-    return (filter (/= '\n') a)
-
 -- * Building Stuff
 
 -- | Drop the fully qualified object file extension from a file name.
@@ -340,13 +333,19 @@ instCmd :: CmdResult r => [CmdOption] -> [String] -> Action r
 instCmd os (c:cs) = do
     t <- target
     case t of "darwin" -> command os c cs
-              _        -> do w <- whoami
-                             case w of "root" -> command os c cs
-                                       _      -> command os "sudo" (c:cs)
+              _        -> do (Stdout a) <- command [ EchoStdout False
+                                                   , EchoStderr False
+                                                   , Traced ""
+                                                   ]
+                                                   "whoami"
+                                                   []
+                             case filter (/= '\n') a of
+                                 "root" -> command os c cs
+                                 _      -> command os "sudo" (c:cs)
 
 -- | Like 'instCmd' but discards the result.
 instCmd_ :: [CmdOption] -> [String] -> Action ()
-instCmd_ = (unit .) . instCmd
+instCmd_ os cs = unit $ instCmd os cs
 
 main :: IO ()
 main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
@@ -376,13 +375,12 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         lp <- realpath "build/libflipper"
 
         -- Build the console with stack:
-        command_ [] "stack" [ "--stack-yaml=./console/stack.yaml"
+        command_ [] "stack" [ "--stack-yaml=languages/haskell/console/stack.yaml"
                             , "--extra-lib-dirs=" ++ lp
-                            , "build"
+                            , "install"
+                            , "--local-bin-path"
+                            , "../build/console/"
                             ]
-
-        -- Copy the console into the build folder:
-        --copyFile' "?" "build/console/flipper"
 
     -- Builds osmium for all targets:
     phony "flipper-osmium" $ need [ "build/osmium/osmium-atmega16u2.hex"
@@ -396,46 +394,63 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     phony "clean" $ do
 
         -- Stack cleans up after itself:
---        command_ [] "stack" [ "--stack-yaml=./console/stack.yaml"
---                            , "clean"
---                            ]
+        command_ [] "stack" [ "--stack-yaml=languages/haskell/console/stack.yaml"
+                            , "clean"
+                            ]
 
         -- Delete everything in the build directory:
         removeFilesAfter "build" ["//*"]
 
     -- Install libflipper and the console:
-    --phony "install" $ need ["install-libflipper", "install-console"]
+    phony "install" $ do
+        need ["flipper-library", "flipper-console"]
+        need ["install-libflipper"]
+        need ["install-console"]
 
     -- Uninstall libflipper and the console:
-    --phony "uninstall" $ do
-    --    p   <- prefix
-    --    dyn <- dynlib
+    phony "uninstall" $ do
+        p   <- prefix
+        dyn <- dynlib
 
-    --    nstCmd_ [] ["rm", "-f", p </> "lib" </> dyn]
-    --    nstCmd_ [] ["rm", "-f", p </> "include/flipper"]
-    --    nstCmd_ [] ["rm", "-f", p </> "include/flipper.h"]
+        instCmd_ [] ["rm", "-f", p </> "lib" </> dyn]
+        instCmd_ [] ["rm", "-rf", p </> "include/flipper"]
+        instCmd_ [] ["rm", "-f", p </> "include/flipper.h"]
+        instCmd_ [] ["rm", "-f", p </> "bin/flipper"]
 
     -- Install libflipper and the flipper header files:
-    --phony "install-libflipper" $ do
-    --    p   <- prefix
-    --    dyn <- dynlib
+    phony "install-libflipper" $ do
+        -- libflipper needs to be built before we can install it:
+        need ["flipper-library"]
 
-    --    -- libflipper needs to be built before we can install it:
-    --    need ["flipper-library"]
+        p   <- prefix
+        dyn <- dynlib
 
-    --    -- Install the shared library:
-    --    instCmd_ [] ["cp", "build/libflipper" </> dyn, p </> "lib"]
+        -- Make the @$PREFIX/lib@ directory:
+        instCmd_ [] ["mkdir", "-p", p </> "lib"]
 
-    --    -- Combinator to install all the headers in a directory:
-    --    let insth hp = do
-    --        hs <- map (hp <>) <$> getDirectoryContents hp
-    --        mapM (\h -> unit $ instCmd_ [] ["cp", "-R", h, p </> "include/"]) hs
+        -- Install the shared library:
+        instCmd_ [] ["cp",  "build/libflipper" </> dyn, p </> "lib/"]
 
-    --    -- Make the @$PREFIX/include/flipper@ directory:
-    --    instCmd _[] ["mkdir", "-p", p </> "include/flipper"]
+        -- Make the @$PREFIX/include/flipper@ directory:
+        instCmd_ [] ["mkdir", "-p", p </> "include/flipper"]
 
-    --    -- Install headers:
-    --    ((["include", "platforms/posix/include"] ++) <$> modIncludes) >>= mapM_ insth
+        -- Install the top-level headers:
+        instCmd_ [] ["cp", "include/flipper.h", p </> "include/"]
+        instCmd_ [] ["cp", "-R", "include/flipper", p </> "include/"]
+
+        -- Install module headers:
+        modIncludes >>= mapM_ (\h -> instCmd_ [] [ "cp"
+                                                 , "-R"
+                                                 , h </> "flipper"
+                                                 , p </> "include/"
+                                                 ])
+
+        -- Install POSIX platform headers:
+        instCmd_ [] ["cp"
+                    , "-R"
+                    , "platforms/posix/include/platform"
+                    , p </> "include/flipper/"
+                    ]
 
     -- Install the console:
     phony "install-console" $ do
@@ -445,6 +460,9 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
 
         -- The console needs to be built before we can install it:
         need ["flipper-console"]
+
+        -- Make the @$PREFIX/bin@ directory:
+        instCmd_ [] ["mkdir", "-p", p </> "bin"]
 
         -- Copy the console to the installation target:
         instCmd_ [] ["cp", "build/console/flipper", p </> "bin/"]
