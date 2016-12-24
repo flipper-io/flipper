@@ -178,9 +178,18 @@ dynlib = do
               _        -> error ("dynlib: unknown target " ++ t)
 
 -- | Determine the dynamically linked libraries appropriate for the target and
---   architecture.
+--   architecture. For @pkg-config@ packages, use 'pkgs' instead.
 libs :: Action [String]
 libs = do
+    t <- target
+    case t of "darwin" -> return []
+              "linux"  -> return ["-ldl"]
+              _        -> error "libs: unknown target"
+
+-- | Determine the dynamically linked libraries appropriate for the target and
+--   architecture.
+pkgs :: Action [String]
+pkgs = do
     t <- target
     case t of "darwin" -> return ["libusb-1.0"]
               "linux"  -> return ["libusb-1.0"]
@@ -473,8 +482,8 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
                                      , "--no-reset"
                                      ]
 
-    -- Build @libflipper.so@ (Linux only):
-    "build/libflipper/libflipper.so" %> \o -> do
+    -- Build libflipper:
+    "build/libflipper/libflipper.*" %> \o -> do
 
         -- Find the sources needed to build libflipper:
         ss <- findDeps [ -- Finds modules/*/src/*.c
@@ -486,44 +495,21 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
                                                ]
                        ]
 
+        -- Find out what packages we need to link against on this platform:
+        ps <- pkgs
+
         -- Find out what libraries we need to link against on this platform:
         ls <- libs
 
         -- Get the linker flags with @pkg-config@:
-        ldfs <- (>>= ldflags) <$> mapM (askOracle . PkgConfigQuery) ls
+        ldfs <- (>>= ldflags) <$> mapM (askOracle . PkgConfigQuery) ps
 
         -- Build the list of necessary object files from the list of necessary
         -- source files:
         let os = map (buildpref . (<.> ".native.o")) ss
 
         -- Run the linker:
-        ldRule cc ("-shared" : ldfs) os o
-
-    -- Build @libflipper.dylib@ (macOS only):
-    "build/libflipper/libflipper.dylib" %> \o -> do
-
-        -- Find the sources needed to build libflipper:
-        ss <- findDeps [ -- Finds modules/*/src/*.c
-                         modSharedSrc
-                         -- Finds modules/*/targets/fmr/*.c
-                       , modFMRSrc
-                       , getDirectoryFiles "" [ "libflipper/src//*.c"
-                                              , "platforms/posix/src//*.c"
-                                              ]
-                       ]
-
-        -- Find out what libraries we need to link against on this platform:
-        ls <- libs
-
-        -- Get the linker flags with @pkg-config@:
-        ldfs <- (>>= ldflags) <$> mapM (askOracle . PkgConfigQuery) ls
-
-        -- Build the list of necessary object files from the list of necessary
-        -- source files:
-        let os = map (buildpref . (<.> ".native.o")) ss
-
-        -- Run the linker:
-        ldRule cc ("-shared" : ldfs) os o
+        ldRule cc ("-shared" : (ls ++ ldfs)) os o
 
     -- Build the osmium hex image for the ATMEGA16U2:
     "build/osmium/osmium-atmega16u2.hex" %> \o -> do
