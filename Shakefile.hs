@@ -379,7 +379,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
                             , "--extra-lib-dirs=" ++ lp
                             , "install"
                             , "--local-bin-path"
-                            , "../build/console/"
+                            , "../../../build/console/"
                             ]
 
     -- Builds osmium for all targets:
