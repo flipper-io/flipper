@@ -20,6 +20,14 @@ int usart_configure(void) {
 	USART0 -> US_MR = US_MR_CHRL_8_BIT | US_MR_PAR_NO | US_MR_NBSTOP_1_BIT;
 	/* Set the baudrate. */
 	USART0 -> US_BRGR = (F_CPU / PLATFORM_BAUDRATE / 16);
+	/* Disable the secondary PDC transmitter channel. */
+	USART0 -> US_TNCR = 0;
+	USART0 -> US_TNPR = NULL;
+	/* Disable the secondary PDC receiver channel. */
+	USART0 -> US_RNCR = 0;
+	USART0 -> US_RNPR = NULL;
+	/* Disable the PDC transmitter and receiver. */
+	USART0 -> US_PTCR = US_PTCR_TXTDIS | US_PTCR_RXTDIS;
 	/* Enable the transmitter and receiver. */
 	USART0 -> US_CR = UART_CR_TXEN | UART_CR_RXEN;
 	return lf_success;
@@ -52,13 +60,33 @@ uint8_t usart_get(void) {
 }
 
 int usart_push(void *source, lf_size_t length) {
-	/* NOTE: Implement DMA here. */
-	while (length --) usart_put(*(uint8_t *)(source ++));
+	/* Set the transmission length and source pointer. */
+	USART0 -> US_TCR = length;
+	USART0 -> US_TPR = source;
+	/* Enable the PDC transmitter. */
+	USART0 -> US_PTCR = US_PTCR_TXTEN;
+	/* Wait until the transfer has finished; */
+	while (!(USART0 -> US_CSR & US_CSR_ENDTX));
+	/* Disable the PDC transmitter. */
+	USART0 -> US_PTCR = US_PTCR_TXTDIS;
 	return lf_success;
 }
 
 int usart_pull(void *destination, lf_size_t length) {
-	/* NOTE: Implement DMA here. */
-	while (length --) *(uint8_t *)(destination ++) = usart_get();
+	/* Set the transmission length and destination pointer. */
+	USART0 -> US_RCR = length;
+	USART0 -> US_RPR = destination;
+	/* Enable the receiver. */
+	USART0 -> US_PTCR = US_PTCR_RXTEN;
+	/* Wait until the transfer has finished. */
+	while (!(USART0 -> US_CSR & US_CSR_ENDRX));
+	/* Disable the PDC receiver. */
+	USART0 -> US_PTCR = US_PTCR_RXTDIS;
 	return lf_success;
+}
+
+/* - Unexposed driver implementation. - */
+
+void usart0_isr(void) {
+
 }

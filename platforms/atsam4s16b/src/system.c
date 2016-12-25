@@ -30,10 +30,6 @@ void fmr_pull(fmr_module module, fmr_function function, lf_size_t length) {
 
 }
 
-char incoming[4];
-/* Create an outgoing DMA transfer. */
-char outgoing[] = "LEONARD EULER";
-
 void system_task(void) {
 
 	/* ~ Configure the LED that exists on PA0. ~ */
@@ -46,27 +42,10 @@ void system_task(void) {
 	/* Enable the USART0 interrupt. */
 	NVIC_EnableIRQ(USART0_IRQn);
 
-	/* Reset the transmitter. */
-	USART0 -> US_PTCR = US_PTCR_TXTDIS;
 	/* Enable the PDC transmit interrupt. */
-	USART0 -> US_IER = US_IER_ENDTX;
-	/* Set both transmitter channels. */
-	USART0 -> US_TCR = sizeof(outgoing);
-	USART0 -> US_TPR = outgoing;
-	USART0 -> US_TNCR = 0;
-	USART0 -> US_TNPR = NULL;
-	/* Enable the transmitter. */
-	USART0 -> US_PTCR = US_PTCR_TXTEN;
-
-	/* Reset the receiver. */
-	USART0 -> US_PTCR = US_PTCR_RXTDIS;
+	// USART0 -> US_IER = US_IER_ENDTX;
 	/* Enable the PDC receive interrupt. */
-	USART0 -> US_IER = US_IER_ENDRX;
-	/* Clear both receiver channels. */
-	USART0 -> US_RCR = 0;
-	USART0 -> US_RPR = NULL;
-	USART0 -> US_RNCR = 0;
-	USART0 -> US_RNPR = NULL;
+	// USART0 -> US_IER = US_IER_ENDRX;
 
 	/* ~ Configure the timer/counter peripheral. */
 
@@ -74,49 +53,19 @@ void system_task(void) {
 	// TC0 -> TC_CHANNEL[0].TC_CCR |= TC_CCR_CLKDIS;
 	// TC0 -> TC_CHANNEL[0].TC_IER = 0;
 
+	PIOA -> PIO_SODR |= PIO_PA0;
 
+	usart_push("Hello world!\n\n", 12);
 	while (1) {
-		PIOA -> PIO_SODR |= PIO_PA0;
-		for (uint32_t i = 0; i < 10000000; i ++) __asm__("nop");
-		PIOA -> PIO_CODR |= PIO_PA0;
-		for (uint32_t i = 0; i < 10000000; i ++) __asm__("nop");
+		// PIOA -> PIO_SODR |= PIO_PA0;
+		// for (uint32_t i = 0; i < 10000000; i ++) __asm__("nop");
+		// PIOA -> PIO_CODR |= PIO_PA0;
+		// for (uint32_t i = 0; i < 10000000; i ++) __asm__("nop");
+		char incoming[5];
+		usart_pull(incoming, sizeof(incoming));
+		usart_push(incoming, sizeof(incoming));
 	}
 
-}
-
-void usart0_isr(void) {
-	if (USART0 -> US_CSR & US_CSR_ENDRX) {
-		/* Disable the receiver. */
-		USART0 -> US_PTCR = US_PTCR_RXTDIS;
-		/* A non-zero value needs to be written here to clear the interrupt flag? */
-		USART0 -> US_RCR = 1;
-
-		/* Copy the incoming data to the outging data. */
-		memcpy(outgoing, incoming, sizeof(outgoing));
-
-		/* Start an outgoing DMA transfer. */
-		USART0 -> US_TCR = sizeof(outgoing);
-		USART0 -> US_TPR = outgoing;
-		/* Enable the transmitter. */
-		USART0 -> US_PTCR = US_PTCR_TXTEN;
-
-		usart_put('*');
-	} else if (USART0 -> US_CSR & US_CSR_ENDTX) {
-		/* Disable the transmitter. */
-		USART0 -> US_PTCR = US_PTCR_TXTDIS;
-		/* A non-zero value needs to be written here to clear the interrupt flag? */
-		USART0 -> US_TCR = 1;
-
-		/* Create an incoming DMA transfer. */
-		USART0 -> US_RCR = sizeof(incoming);
-		USART0 -> US_RPR = incoming;
-		/* Enable the receiver. */
-		USART0 -> US_PTCR = US_PTCR_RXTEN;
-
-		usart_put('!');
-	} else {
-		usart_put('?');
-	}
 }
 
 void system_init(void) {
@@ -148,7 +97,7 @@ void system_init(void) {
 	for (timeout = 0; !(PMC -> PMC_SR & PMC_SR_MCKRDY) && (timeout++ < CLOCK_TIMEOUT););
 
 	/* Allow the reset pin to reset the device. */
-	RSTC -> RSTC_MR |= RSTC_MR_URSTEN;
+	RSTC -> RSTC_MR = RSTC_MR_KEY(0xA5) | RSTC_MR_URSTEN;
 }
 
 void system_deinit(void) {

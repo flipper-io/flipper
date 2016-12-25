@@ -374,11 +374,7 @@ done:
 	free(pagedata);
 
 	printf("Resetting the CPU.\n");
-	/* Reset the CPU. */
-	cpu.power(0);
-	usleep(1000000);
-	cpu.power(1);
-	//cpu.reset();
+	cpu.reset();
 	printf(KGRN " Successfully reset the CPU.\n" KNRM "----------------------");
 
 	/* If there were no errors, offer to flash again. */
