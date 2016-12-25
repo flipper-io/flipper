@@ -4,6 +4,7 @@
 #include <platform/posix.h>
 #include <platform/fvm.h>
 #include <platform/atsam4s16b.h>
+#include <stdio.h>
 
 /* Defines the XMODEM flow control bytes. */
 #define SOH 0x01
@@ -380,15 +381,20 @@ done:
 	/* If there were no errors, offer to flash again. */
 	if (!(_e < lf_success)) {
 		printf("\n\nWould you like to place the CPU in update mode again? ([y]/n): ");
-		size_t len;
-		char *c = fgetln(stdin, &len);
-		if (*c == 'y' || *c == '\n') {
+		size_t len = 0;
+		// Probably need to free this but I can't test it(travis):
+		char *line = NULL;
+		getline(&line, &len, stdin);
+		if (len == 0 || (*line == 'y' || *line == '\n' || *line == '\0')) {
 			printf("\n");
 			/* Enter update mode again. */
 			enter_update_mode();
 			printf("\nWould you like to reload the target file and flash it? ([y]/n): ");
-			c = fgetln(stdin, &len);
-			if (*c == 'y' || *c == '\n') {
+			len = 0;
+			line = NULL;
+			// Probably need to free line again but I can't test it(travis):
+			getline(&line, &len, stdin);
+			if (len == 0 || (*line == 'y' || *line == '\n' || *line == '\0')) {
 				printf("\n");
 				/* Repeat the whole process. */
 				goto begin;
