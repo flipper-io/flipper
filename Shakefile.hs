@@ -519,7 +519,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     -- Install osmium on the ATSAM4S:
     phony "flash-atsam4s16b" $ do
 
-        need ["build/utils/fdfu/fdfu", "build/osmium/osmium-atsam4s16b.bin"]]
+        need ["build/utils/fdfu/fdfu", "build/osmium/osmium-atsam4s16b.bin"]
 
         command_ [] "build/utils/fdfu/fdfu" ["build/osmium/osmium-atsam4s16b.bin"]
 
