@@ -519,11 +519,9 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     -- Install osmium on the ATSAM4S:
     phony "flash-atsam4s16b" $ do
 
-        -- We need the console and the osmium image to upload to the device:
-        need ["console", "build/osmium/osmium-atsam4s16b.bin"]
+        need ["build/utils/fdfu/fdfu", "build/osmium/osmium-atsam4s16b.bin"]]
 
-        -- Use the console to flash the image to the device:
-        command_ [] "build/console/flipper" ["flash", "build/osmium/osmium-atsam4s16b.bin"]
+        command_ [] "build/utils/fdfu/fdfu" ["build/osmium/osmium-atsam4s16b.bin"]
 
     -- Install osmium on the ATMEGA16U2:
     phony "flash-atmega16u2" $ do
