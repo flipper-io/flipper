@@ -50,7 +50,6 @@ void system_task(void) {
 	/* ~ Configure the timer/counter peripheral. */
 	// timer_configure();
 
-	usart_push("Hello world!\n\n", 12);
 	while (1) {
 		PIOA -> PIO_ODSR ^= PIO_PA0;
 		for (int i = 0; i < 10000000; i ++);

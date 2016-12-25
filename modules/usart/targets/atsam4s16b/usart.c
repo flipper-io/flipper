@@ -24,10 +24,10 @@ int usart_configure(void) {
 	USART0 -> US_BRGR = (F_CPU / USART0_BAUDRATE / 16);
 	/* Disable the secondary PDC transmitter channel. */
 	USART0 -> US_TNCR = 0;
-	USART0 -> US_TNPR = NULL;
+	USART0 -> US_TNPR = (uintptr_t)(NULL);
 	/* Disable the secondary PDC receiver channel. */
 	USART0 -> US_RNCR = 0;
-	USART0 -> US_RNPR = NULL;
+	USART0 -> US_RNPR = (uintptr_t)(NULL);
 	/* Disable the PDC transmitter and receiver. */
 	USART0 -> US_PTCR = US_PTCR_TXTDIS | US_PTCR_RXTDIS;
 	/* Enable the USART0 interrupt. */
@@ -66,7 +66,7 @@ uint8_t usart_get(void) {
 int usart_push(void *source, lf_size_t length) {
 	/* Set the transmission length and source pointer. */
 	USART0 -> US_TCR = length;
-	USART0 -> US_TPR = source;
+	USART0 -> US_TPR = (uintptr_t)(source);
 	/* Enable the PDC transmitter. */
 	USART0 -> US_PTCR = US_PTCR_TXTEN;
 	/* Wait until the transfer has finished. */
@@ -80,7 +80,7 @@ int usart_push(void *source, lf_size_t length) {
 int usart_pull(void *destination, lf_size_t length) {
 	/* Set the transmission length and destination pointer. */
 	USART0 -> US_RCR = length;
-	USART0 -> US_RPR = destination;
+	USART0 -> US_RPR = (uintptr_t)(destination);
 	/* Enable the receiver. */
 	USART0 -> US_PTCR = US_PTCR_RXTEN;
 	/* If defined, usart_pull will not use interrupts. */
