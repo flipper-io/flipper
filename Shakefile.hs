@@ -89,7 +89,7 @@ realpath p = do
     Stdout p' <- command [EchoStdout False, EchoStderr False, Traced ""]
                          "realpath"
                          [p]
-    return p'
+    return $ init p'
 
 -- | The prefix for installation directories, read from the @PREFIX@
 --   environment variable if present or defaulting to @/usr/local@ otherwise.
