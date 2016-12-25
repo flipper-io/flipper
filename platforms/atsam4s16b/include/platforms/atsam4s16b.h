@@ -25,6 +25,6 @@ extern struct _lf_device self;
 #define CLOCK_TIMEOUT 5000
 
 #define F_CPU 48000000
-#define PLATFORM_BAUDRATE 230400
+#define PLATFORM_BAUDRATE 250000
 
 #endif

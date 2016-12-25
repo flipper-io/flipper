@@ -32,16 +32,16 @@ struct _fmr_packet packet;
 
 void system_task(void) {
 
-	/* ~ Configure the GPIO peripheral. */
-	gpio_configure();
-	/* Enable PIO_PA0. */
-	gpio_enable(PIO_PA0, 0);
-	/* Enable single write control of PIO_PA0. */
-	PIOA -> PIO_OWER = PIO_PA0;
-
 	/* ~ Configure the USART peripheral. ~ */
 	usart_configure();
 	uart0_configure();
+	/* ~ Configure the GPIO peripheral. */
+	gpio.configure();
+	/* Enable PIO_PA0. */
+	gpio.enable(PIO_PA0, 0);
+	/* Enable single write control of PIO_PA0. */
+	PIOA -> PIO_OWER = PIO_PA0;
+
 	/* Enable the PDC receive complete interrupt. */
 	UART0 -> UART_IER = UART_IER_ENDRX;
 	/* Pull an FMR packet. */
@@ -70,6 +70,8 @@ void uart0_isr(void) {
 		struct _fmr_result result = { 0 };
 		/* Process the packet. */
 		fmr_perform(&packet, &result);
+		/* Push the result for debug. */
+		usart_push(&result, sizeof(struct _fmr_result));
 		/* Give the result back. */
 		uart0_push(&result, sizeof(struct _fmr_result));
 		/* Pull the next packet. */

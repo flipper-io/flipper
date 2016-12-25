@@ -35,6 +35,8 @@
 
 /* If defined, uses bulk for all USB transfers. */
 #define __ALL_BULK__
+/* If defined, prints debugging information about each packet. */
+#define __lf_debug__
 
 /* Terminal colors. */
 #define KNRM  "\x1B[0m"
