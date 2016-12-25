@@ -8,11 +8,11 @@
 extern const struct _gpio {
 	int (* configure)(void);
 	/* Sets the pin mask and proprties of the PIO array. */
-	void (* enable)(uint32_t mask, uint8_t properties);
+	void (* enable)(uint32_t enable, uint32_t disable);
 	/* Writes a digital value to the specified GPIO pin. */
-	void (* write)(uint32_t mask, uint8_t value);
+	void (* write)(uint32_t set, uint32_t clear);
 	/* Reads a digital value from the specified GPIO pin. */
-	uint16_t (* read)(uint8_t pin);
+	uint32_t (* read)(uint32_t mask);
 } gpio;
 
 #ifdef __private_include__
@@ -22,9 +22,9 @@ enum { _gpio_configure, _gpio_enable, _gpio_write, _gpio_read };
 
 /* Declare each prototype for all functgpions within this driver. */
 int gpio_configure(void);
-void gpio_enable(uint32_t mask, uint8_t properties);
-void gpio_write(uint32_t mask, uint8_t value);
-uint16_t gpio_read(uint8_t pin);
+void gpio_enable(uint32_t enable, uint32_t disable);
+void gpio_write(uint32_t set, uint32_t clear);
+uint32_t gpio_read(uint32_t mask);
 
 #endif
 #endif

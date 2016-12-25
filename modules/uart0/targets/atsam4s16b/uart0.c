@@ -3,68 +3,89 @@
 #include <platform/atsam4s16b.h>
 
 int uart0_configure(void) {
-	// /* Enable the UART0 clock in the PMC. */
-	// PMC_EnablePeripheral(ID_UART0);
-	// /* Declare a pin map that will configure the appropriate output pins for the UART0. */
-	// const Pin uart0_pins[] = { (Pin){ PIO_PA9A_URXD0 | PIO_PA10A_UTXD0, PIOA, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT } };
-	// /* Write the pinmap into the PIO. */
-	// PIO_Configure(uart0_pins, PIO_LISTSIZE(uart0_pins));
-	// /* Configure the UART0. */
-	// USART_Configure((Usart *)UART0, USART_MODE_ASYNCHRONOUS, 250000, BOARD_MCK);
-	// /* Enable the UART0 interrupt on receive. */
-	// USART_EnableIt((Usart *)UART0, UART_IER_RXRDY | UART_IER_RXBUFF);
-	// /* Enable the UART0 transmitter. */
-	// USART_SetTransmitterEnabled((Usart *)UART0, 1);
-	// /* Enable the UART0 receiver. */
-	// USART_SetReceiverEnabled((Usart *)UART0, 1);
-	// /* Disable the UART0 IRQ in the NVIC and clear its interrupt state. */
-	// NVIC_DisableIRQ(UART0_IRQn);
-	// NVIC_ClearPendingIRQ(UART0_IRQn);
-	// NVIC_SetPriority(UART0_IRQn, 0);
-	// /* Enable the UART0 IRQ in the NVIC. */
-	// NVIC_EnableIRQ(UART0_IRQn);
+	/* Create a pinmask for the peripheral pins. */
+	const unsigned int UART0_PIN_MASK = (PIO_PA5A_RXD0 | PIO_PA6A_TXD0);
+	/* Enable the peripheral clock. */
+	PMC -> PMC_PCER0 |= (1 << ID_UART0);
+	/* Disable PIOA interrupts on the peripheral pins. */
+	PIOA -> PIO_IDR |= UART0_PIN_MASK;
+	/* Disable the peripheral pins from use by the PIOA. */
+	PIOA -> PIO_PDR |= UART0_PIN_MASK;
+	/* Hand control of the peripheral pins to peripheral A. */
+	PIOA -> PIO_ABCDSR[0] &= ~UART0_PIN_MASK;
+	PIOA -> PIO_ABCDSR[1] &= ~UART0_PIN_MASK;
+	/* Reset the peripheral and disable the transmitter and receiver. */
+	UART0 -> UART_CR = UART_CR_RSTRX | UART_CR_RSTTX | UART_CR_TXDIS | UART_CR_RXDIS;
+	/* Set the mode to 8n1. */
+	UART0 -> UART_MR = UART_MR_CHMODE_NORMAL | UART_MR_PAR_NO;
+	/* Set the baudrate. */
+	UART0 -> UART_BRGR = (F_CPU / PLATFORM_BAUDRATE / 16);
+	/* Disable the secondary PDC transmitter channel. */
+	UART0 -> UART_TNCR = 0;
+	UART0 -> UART_TNPR = NULL;
+	/* Disable the secondary PDC receiver channel. */
+	UART0 -> UART_RNCR = 0;
+	UART0 -> UART_RNPR = NULL;
+	/* Disable the PDC transmitter and receiver. */
+	UART0 -> UART_PTCR = UART_PTCR_TXTDIS | UART_PTCR_RXTDIS;
+	/* Enable the UART0 interrupt. */
+	NVIC_EnableIRQ(UART0_IRQn);
+	/* Enable the transmitter and receiver. */
+	UART0 -> UART_CR = UART_CR_TXEN | UART_CR_RXEN;
 	return lf_success;
 }
 
 void uart0_enable(void) {
-	// /* Enable the UART0 transmitter. */
-	// USART_SetTransmitterEnabled((Usart *)UART0, 1);
-	// /* Enable the UART0 receiver. */
-	// USART_SetReceiverEnabled((Usart *)UART0, 1);
+	/* Enable the transmitter and receiver. */
+	UART0 -> UART_CR = UART_CR_TXEN | UART_CR_RXEN;
 }
 
 void uart0_disable(void) {
-	// /* Enable the UART0 IRQ in the NVIC. */
-	// NVIC_DisableIRQ(UART0_IRQn);
-	// /* Enable the UART0 interrupt on receive. */
-	// USART_DisableIt((Usart *)UART0, UART_IER_RXRDY);
-	// /* Enable the UART0 transmitter. */
-	// USART_SetTransmitterEnabled((Usart *)UART0, 0);
-	// /* Enable the UART0 receiver. */
-	// USART_SetReceiverEnabled((Usart *)UART0, 0);
+	/* Disable the transmitter and receiver. */
+	UART0 -> UART_CR = UART_CR_TXDIS | UART_CR_RXDIS;
 }
 
 uint8_t uart0_ready(void) {
-	return 0; // USART_IsDataAvailable((Usart *)UART0);
+	/* Return the empty condition of the transmitter FIFO. */
+	return (UART0 -> UART_SR & UART_SR_TXEMPTY);
 }
 
 void uart0_put(uint8_t byte) {
-	// USART_PutChar((Usart *)UART0, byte);
+	/* Load the byte into the transmitter FIFO. */
+	UART0 -> UART_THR = byte;
 }
 
 
 uint8_t uart0_get(void) {
-	return 0; // USART_GetChar((Usart *)UART0);
+	/* Retrieve a byte from the receiver FIFO. */
+	return UART0 -> UART_RHR;
 }
 
 int uart0_push(void *source, lf_size_t length) {
-	while (length --) uart0_put(*(uint8_t *)(source ++));
-	//USART_WriteBuffer((Usart *)UART0, source, length);
+	/* Set the transmission length and source pointer. */
+	UART0 -> UART_TCR = length;
+	UART0 -> UART_TPR = source;
+	/* Enable the PDC transmitter. */
+	UART0 -> UART_PTCR = UART_PTCR_TXTEN;
+	/* Wait until the transfer has finished. */
+	while (!(UART0 -> UART_SR & UART_SR_ENDTX));
+	/* Disable the PDC transmitter. */
+	UART0 -> UART_PTCR = UART_PTCR_TXTDIS;
 	return lf_success;
 }
 
 int uart0_pull(void *destination, lf_size_t length) {
-	while (length --) *(uint8_t *)(destination ++) = uart0_get();
-	//USART_ReadBuffer((Usart *)UART0, destination, length);
+	/* Set the transmission length and destination pointer. */
+	UART0 -> UART_RCR = length;
+	UART0 -> UART_RPR = destination;
+	/* Enable the receiver. */
+	UART0 -> UART_PTCR = UART_PTCR_RXTEN;
+	/* If defined, uart0_pull will not use interrupts. */
+#ifdef __uart0_pull_async__
+	/* Wait until the transfer has finished. */
+	while (!(UART0 -> UART_SR & UART_SR_ENDRX));
+	/* Disable the PDC receiver. */
+	UART0 -> UART_PTCR = UART_PTCR_RXTDIS;
+#endif
 	return lf_success;
 }

@@ -67,28 +67,26 @@ int usart_push(void *source, lf_size_t length) {
 	USART0 -> US_TPR = source;
 	/* Enable the PDC transmitter. */
 	USART0 -> US_PTCR = US_PTCR_TXTEN;
-	/* Wait until the transfer has finished; */
+	/* Wait until the transfer has finished. */
 	while (!(USART0 -> US_CSR & US_CSR_ENDTX));
 	/* Disable the PDC transmitter. */
 	USART0 -> US_PTCR = US_PTCR_TXTDIS;
 	return lf_success;
 }
 
+#define __usart_pull_async__
 int usart_pull(void *destination, lf_size_t length) {
 	/* Set the transmission length and destination pointer. */
 	USART0 -> US_RCR = length;
 	USART0 -> US_RPR = destination;
 	/* Enable the receiver. */
 	USART0 -> US_PTCR = US_PTCR_RXTEN;
+	/* If defined, usart_pull will not use interrupts. */
+#ifdef __usart_pull_async__
 	/* Wait until the transfer has finished. */
 	while (!(USART0 -> US_CSR & US_CSR_ENDRX));
 	/* Disable the PDC receiver. */
 	USART0 -> US_PTCR = US_PTCR_RXTDIS;
+#endif
 	return lf_success;
-}
-
-/* - Unexposed driver implementation. - */
-
-void usart0_isr(void) {
-
 }

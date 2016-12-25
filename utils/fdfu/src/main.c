@@ -380,18 +380,15 @@ done:
 	/* If there were no errors, offer to flash again. */
 	if (!(_e < lf_success)) {
 		printf("\n\nWould you like to place the CPU in update mode again? ([y]/n): ");
-		/* Purge standard in. */
-		fpurge(stdin);
-		char c = getchar();
-		if (c == 'y' || c == '\n') {
+		size_t len;
+		char *c = fgetln(stdin, &len);
+		if (*c == 'y' || *c == '\n') {
 			printf("\n");
 			/* Enter update mode again. */
 			enter_update_mode();
 			printf("\nWould you like to reload the target file and flash it? ([y]/n): ");
-			/* Purge standard in. */
-			fpurge(stdin);
-			c = getchar();
-			if (c == 'y' || c == '\n') {
+			c = fgetln(stdin, &len);
+			if (*c == 'y' || *c == '\n') {
 				printf("\n");
 				/* Repeat the whole process. */
 				goto begin;

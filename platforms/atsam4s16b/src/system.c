@@ -28,16 +28,24 @@ void fmr_pull(fmr_module module, fmr_function function, lf_size_t length) {
 
 }
 
+struct _fmr_packet packet;
+
 void system_task(void) {
 
-	/* ~ Configure the LED that exists on PA0. ~ */
-	PMC -> PMC_PCER0 |= (1 << ID_PIOA);
-	PIOA -> PIO_PER |= PIO_PA0;
-	PIOA -> PIO_OER |= PIO_PA0;
+	/* ~ Configure the GPIO peripheral. */
+	gpio_configure();
+	/* Enable PIO_PA0. */
+	gpio_enable(PIO_PA0, 0);
+	/* Enable single write control of PIO_PA0. */
 	PIOA -> PIO_OWER = PIO_PA0;
 
 	/* ~ Configure the USART peripheral. ~ */
 	usart_configure();
+	uart0_configure();
+	/* Enable the PDC receive complete interrupt. */
+	UART0 -> UART_IER = UART_IER_ENDRX;
+	/* Pull an FMR packet. */
+	uart0_pull(&packet, sizeof(struct _fmr_packet));
 
 	/* ~ Configure the timer/counter peripheral. */
 	// timer_configure();
@@ -50,8 +58,31 @@ void system_task(void) {
 
 }
 
+void uart0_isr(void) {
+	if (UART0 -> UART_SR & UART_SR_ENDRX) {
+		/* Disable the PDC receiver. */
+		UART0 -> UART_PTCR = UART_PTCR_RXTDIS;
+		/* Clear the PDC RX interrupt flag. */
+		UART0 -> UART_RCR = 1;
+		/* We have an FMR packet, push it for debug. */
+		usart_push(&packet, sizeof(struct _fmr_packet));
+		/* Create a result. */
+		struct _fmr_result result = { 0 };
+		/* Process the packet. */
+		fmr_perform(&packet, &result);
+		/* Give the result back. */
+		uart0_push(&result, sizeof(struct _fmr_result));
+		/* Pull the next packet. */
+		uart0_pull(&packet, sizeof(struct _fmr_packet));
+	}
+}
+
 void system_init(void) {
+
 	uint32_t timeout;
+
+	/* Disable the watchdog timer. */
+	WDT -> WDT_MR = WDT_MR_WDDIS;
 
 	/* Configure the EFC for 3 wait states. */
 	EFC -> EEFC_FMR = EEFC_FMR_FWS(3);
