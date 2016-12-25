@@ -2,6 +2,8 @@
 #include <flipper/usart.h>
 #include <platform/atsam4s16b.h>
 
+#define USART0_BAUDRATE 115200
+
 int usart_configure(void) {
 	/* Create a pinmask for the peripheral pins. */
 	const unsigned int USART0_PIN_MASK = (PIO_PA5A_RXD0 | PIO_PA6A_TXD0);
@@ -19,7 +21,7 @@ int usart_configure(void) {
 	/* Set the mode to 8n1. */
 	USART0 -> US_MR = US_MR_CHRL_8_BIT | US_MR_PAR_NO | US_MR_NBSTOP_1_BIT;
 	/* Set the baudrate. */
-	USART0 -> US_BRGR = (F_CPU / PLATFORM_BAUDRATE / 16);
+	USART0 -> US_BRGR = (F_CPU / USART0_BAUDRATE / 16);
 	/* Disable the secondary PDC transmitter channel. */
 	USART0 -> US_TNCR = 0;
 	USART0 -> US_TNPR = NULL;

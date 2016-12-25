@@ -264,6 +264,9 @@ fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _f
 	if (_e < lf_success) {
 		return lf_error;
 	}
+#ifdef __lf_debug__
+	lf_debug_packet(&packet, sizeof(struct _fmr_packet));
+#endif
 	/* Send the packet to the target device. */
 	_e = lf_transfer(device, &packet);
 	if (_e < lf_success) {

@@ -74,22 +74,28 @@ extern int main(void);
 
 void reset_exception(void) {
 
-	uint32_t *_src, *_dest;
+	uint32_t *pSrc, *pDest ;
 
 	/* Initialize the platform hardware. */
 	system_init();
 
-	/* Copy the data section from ROM to RAM. */
-	_src = &_etext, _dest = &_srelocate;
-	while (_dest < &_erelocate) {
-		*_dest ++ = *_src ++ ;
-	}
+	/* Initialize the relocate segment */
+    pSrc = &_etext ;
+    pDest = &_srelocate ;
 
-	/* Zero the BSS. */
-	_dest = &_szero;
-	while (_dest < &_ezero) {
-		*_dest ++ = 0;
-	}
+    if ( pSrc != pDest )
+    {
+        for ( ; pDest < &_erelocate ; )
+        {
+            *pDest++ = *pSrc++ ;
+        }
+    }
+
+    /* Clear the zero segment */
+    for ( pDest = &_szero ; pDest < &_ezero ; )
+    {
+        *pDest++ = 0;
+    }
 
 	/* Set the vector table base address */
 	// pSrc = (uint32_t *)&_sfixed;
