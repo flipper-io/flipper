@@ -359,7 +359,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     addOracle pkgconfig
 
     -- By default we build libflipper, the console, and osmium for all targets:
-    want ["libflipper", "console", "osmium", "utils"]
+    want ["libflipper", "osmium", "utils"]
 
     -- Builds libflipper:
     phony "libflipper" $ do
@@ -523,6 +523,9 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
 
         command_ [] "build/utils/fdfu/fdfu" ["build/osmium/osmium-atsam4s16b.bin"]
 
+    -- Shortcut:
+    phony "f4s" $ need ["flash-atsam4s16b"]
+
     -- Install osmium on the ATMEGA16U2:
     phony "flash-atmega16u2" $ do
 
@@ -530,22 +533,25 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         need ["build/osmium/osmium-atmega16u2.hex"]
 
         -- Erase the device:
-        command_ [] "dfu_programmer" [ "at90usb162"
+        command_ [] "dfu-programmer" [ "at90usb162"
                                      , "erase"
                                      , "--force"
                                      ]
 
         -- Flash the image to the device:
-        command_ [] "dfu_programmer" [ "at90usb162"
+        command_ [] "dfu-programmer" [ "at90usb162"
                                      , "flash"
                                      , "build/osmium/osmium-atmega16u2.hex"
                                      ]
 
         -- Launch osmium on the ATMEGA16U2:
-        command_ [] "dfu_programmer" [ "at90usb162"
+        command_ [] "dfu-programmer" [ "at90usb162"
                                      , "launch"
                                      , "--no-reset"
                                      ]
+
+    -- Shortcut:
+    phony "fu2" $ need ["flash-atmega16u2"]
 
     -- Build libflipper:
     "build/libflipper/libflipper.*" %> \o -> do
