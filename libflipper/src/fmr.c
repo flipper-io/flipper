@@ -200,9 +200,9 @@ int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *par
 
 fmr_return fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, fmr_types types, void *arguments) {
 	/* Dereference the pointer to the target module. */
-	void *object = (void *)(fmr_modules[module]);
+	const void *object = (const void *)(fmr_modules[module]);
 	/* Dereference and return a pointer to the target function. */
-	void *address = ((void **)(object))[function];
+	const void *address = ((const void **)(object))[function];
 	/* Ensure that the function address is valid. */
 	if (!address) {
 		error_raise(E_RESOULTION, NULL);
