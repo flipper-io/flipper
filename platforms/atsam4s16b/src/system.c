@@ -2,7 +2,7 @@
 #include <flipper/gpio.h>
 #include <flipper/uart0.h>
 #include <flipper/modules.h>
-#include <platform/atsam4s16b.h>
+#include <platforms/atsam4s16b.h>
 
 /* The fmr_device object containing global state about this device. */
 struct _lf_device self = {

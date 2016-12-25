@@ -1,6 +1,6 @@
 #define __private_include__
 #include <private/nvm.h>
-#include <platform/fvm.h>
+#include <platforms/fvm.h>
 
 /* Define global state used for benchmarking. */
 size_t nvm_read_ops, nvm_write_ops, nvm_read_bytes, nvm_written_bytes;

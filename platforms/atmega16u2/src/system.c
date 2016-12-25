@@ -1,5 +1,5 @@
 #define __private_include__
-#include <platform/atmega16u2.h>
+#include <platforms/atmega16u2.h>
 #include <private/megausb.h>
 #include <flipper/modules.h>
 

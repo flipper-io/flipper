@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/led.h>
-#include <platform/atsam4s16b.h>
+#include <platforms/atsam4s16b.h>
 
 int led_configure(void) {
 	return lf_success;

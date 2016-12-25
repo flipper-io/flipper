@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/spi.h>
-#include <platform/atmega16u2.h>
+#include <platforms/atmega16u2.h>
 
 #define SPI_DATA_MODE_0 0x00
 #define SPI_DATA_MODE_1 0x04

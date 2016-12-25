@@ -1,6 +1,6 @@
 #define __private_include__
 #include <private/megausb.h>
-#include <platform/atmega16u2.h>
+#include <platforms/atmega16u2.h>
 
 const struct _lf_endpoint megausb = {
 	megausb_configure,

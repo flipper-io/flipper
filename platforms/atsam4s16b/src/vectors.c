@@ -1,4 +1,4 @@
-#include <platform/atsam4s16b.h>
+#include <platforms/atsam4s16b.h>
 
 extern uint32_t _sfixed;
 extern uint32_t _efixed;

@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/gpio.h>
-#include <platform/atsam4s16b.h>
+#include <platforms/atsam4s16b.h>
 
 int gpio_configure(void) {
 	/* Enable the PIOA clock in the PMC. */

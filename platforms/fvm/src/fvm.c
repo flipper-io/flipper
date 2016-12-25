@@ -1,5 +1,5 @@
 #define __private_include__
-#include <platform/fvm.h>
+#include <platforms/fvm.h>
 #include <flipper/flipper.h>
 #include <flipper/modules.h>
 #include <private/nvm.h>

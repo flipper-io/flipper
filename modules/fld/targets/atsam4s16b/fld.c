@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/fld.h>
-#include <platform/atsam4s16b.h>
+#include <platforms/atsam4s16b.h>
 
 int fld_configure(void) {
 	return lf_success;

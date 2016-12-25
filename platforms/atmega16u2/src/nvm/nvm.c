@@ -1,6 +1,6 @@
 #define __private_include__
 #include <private/nvm.h>
-#include <platform/atmega16u2.h>
+#include <platforms/atmega16u2.h>
 #include <flipper/spi.h>
 
 int nvm_configure(void) {

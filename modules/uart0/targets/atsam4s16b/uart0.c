@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/uart0.h>
-#include <platform/atsam4s16b.h>
+#include <platforms/atsam4s16b.h>
 
 int uart0_configure(void) {
 	/* Create a pinmask for the peripheral pins. */

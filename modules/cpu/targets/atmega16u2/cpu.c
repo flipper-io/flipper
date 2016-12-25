@@ -1,7 +1,7 @@
 #define __private_include__
 #include <flipper/cpu.h>
 #include <flipper/uart0.h>
-#include <platform/atmega16u2.h>
+#include <platforms/atmega16u2.h>
 
 int cpu_configure(void) {
 	/* Turn the SAM4S on. */

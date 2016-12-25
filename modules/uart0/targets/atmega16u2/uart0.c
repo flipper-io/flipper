@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/uart0.h>
-#include <platform/atmega16u2.h>
+#include <platforms/atmega16u2.h>
 #include <flipper/error.h>
 
 /* Interrupt driven USART buffering. */

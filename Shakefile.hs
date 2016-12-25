@@ -714,7 +714,6 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
                        , platformIncludes
                        , pure [ "include"
                               , "osmium/include"
-                              , "platforms/atsam4s16b/include"
                               ]
                        ]
 

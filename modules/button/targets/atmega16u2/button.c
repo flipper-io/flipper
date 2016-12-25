@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/button.h>
-#include <platform/atmega16u2.h>
+#include <platforms/atmega16u2.h>
 
 int button_configure(void) {
 	/* Enable the button as an input. */
