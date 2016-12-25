@@ -193,7 +193,7 @@ pkgs = do
     t <- target
     case t of "darwin" -> return ["libusb-1.0"]
               "linux"  -> return ["libusb-1.0"]
-              _        -> error "libs: unknown target"
+              _        -> error "pkgs: unknown target"
 
 -- * Building Stuff
 
@@ -378,6 +378,9 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
 
         -- We need an absolute path to libflipper to pass to stack:
         lp <- realpath "build/libflipper"
+
+        -- Make the destination directory (macOS):
+        command_ [] "mkdir" [ "-p", "build/console"]
 
         -- Build the console with stack:
         command_ [] "stack" [ "--stack-yaml=languages/haskell/console/stack.yaml"
@@ -584,6 +587,9 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
 
     -- Generic rule for building utilities:
     "build/utils/*/*" %> \o -> do
+
+        -- We need libflipper to build the utilities:
+        need ["libflipper"]
 
         -- Root folder for this utility:
         let rt = dropFileName (dropDirectory1 o)
