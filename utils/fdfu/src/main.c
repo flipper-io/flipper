@@ -1,9 +1,9 @@
 #define __private_include__
 #include <unistd.h>
 #include <flipper.h>
-#include <platform/posix.h>
-#include <platform/fvm.h>
-#include <platform/atsam4s16b.h>
+#include <platforms/posix.h>
+#include <platforms/fvm.h>
+#include <platforms/atsam4s16b.h>
 #include <stdio.h>
 
 /* Defines the XMODEM flow control bytes. */

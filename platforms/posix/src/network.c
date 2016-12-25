@@ -1,5 +1,5 @@
 #define __private_include__
-#include <platform/posix/network.h>
+#include <platforms/posix/network.h>
 #include <flipper/error.h>
 #include <flipper/flipper.h>
 #include <unistd.h>

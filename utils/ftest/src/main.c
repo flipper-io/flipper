@@ -1,7 +1,7 @@
 #define __private_include__
 #include <flipper.h>
-#include <platform/posix.h>
-#include <platform/fvm.h>
+#include <platforms/posix.h>
+#include <platforms/fvm.h>
 
 int main(int argc, char *argv[]) {
 
