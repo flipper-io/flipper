@@ -28,6 +28,8 @@ int usart_configure(void) {
 	USART0 -> US_RNPR = NULL;
 	/* Disable the PDC transmitter and receiver. */
 	USART0 -> US_PTCR = US_PTCR_TXTDIS | US_PTCR_RXTDIS;
+	/* Enable the USART0 interrupt. */
+	NVIC_EnableIRQ(USART0_IRQn);
 	/* Enable the transmitter and receiver. */
 	USART0 -> US_CR = UART_CR_TXEN | UART_CR_RXEN;
 	return lf_success;

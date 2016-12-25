@@ -5,6 +5,7 @@
 
 #include "SAM4S16.h"
 #include "exceptions.h"
+#include <cmsis/core_cm3.h>
 
 /* A flipper device object which the target can use to keep track of state specific to itself. */
 extern struct _lf_device self;
