@@ -1,6 +1,9 @@
 #define __private_include__
 #include <flipper/timer.h>
 
+/* Expose channel A within TC0. */
+TcChannel *TCA = &(TC0 -> TC_CHANNEL[0]);
+
 int timer_configure(void) {
 	/* Enable the TC0 peripheral clock. */
 	PMC -> PMC_PCER0 |= (1 << ID_TC0);

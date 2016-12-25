@@ -28,9 +28,6 @@ void fmr_pull(fmr_module module, fmr_function function, lf_size_t length) {
 
 }
 
-/* Expose channel A within TC0. */
-TcChannel *TCA = &(TC0 -> TC_CHANNEL[0]);
-
 void system_task(void) {
 
 	/* ~ Configure the LED that exists on PA0. ~ */
