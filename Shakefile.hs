@@ -1,7 +1,6 @@
 #!/usr/bin/env runhaskell
 
-{-# LANGUAGE DeriveDataTypeable
-           , DeriveGeneric
+{-# LANGUAGE DeriveDataTypeable , DeriveGeneric
            , GeneralizedNewtypeDeriving
            #-}
 
@@ -41,7 +40,7 @@ avr_c_prep = [ -- Use C99:
              , -- MCU is ATMEGA16U2:
                "-mmcu=atmega16u2"
              , -- Platform header:
-             "-DPLATFORM_HEADER=<platform/atmega16u2.h>"
+             "-DPLATFORM_HEADER=<platforms/atmega16u2.h>"
              ]
 
 -- | Preprocessor options for ARM targets.
@@ -59,7 +58,7 @@ arm_c_prep = [ -- Use C99.
              , -- Include debugging metadata:
                "-g"
              , -- Platform header:
-               "-DPLATFORM_HEADER=<platform/atsam4s16b.h>"
+               "-DPLATFORM_HEADER=<platforms/atsam4s16b.h>"
              ]
 
 -- | Preprocessor options for native C targets.
@@ -79,7 +78,7 @@ native_prep = [ -- Use C99:
               , -- Include debugging metadata:
                 "-g"
               , -- Platform header:
-                "-DPLATFORM_HEADER=<platform/posix.h>"
+                "-DPLATFORM_HEADER=<platforms/posix.h>"
               ]
 
 -- * Querying The Environment
@@ -420,9 +419,8 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
 
     -- Install libflipper and the console:
     phony "install" $ do
-        need ["libflipper", "console", "utils"]
+        need ["libflipper", "utils"]
         need ["install-libflipper"]
-        need ["install-console"]
         need ["install-utils"]
 
     -- Uninstall libflipper and the console:
@@ -472,16 +470,9 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         -- Install platform headers:
         platformIncludes >>= mapM_ (\h -> instCmd_ [] [ "cp"
                                                       , "-R"
-                                                      , h
-                                                      , p </> "include/flipper"
+                                                      , h </> "platforms"
+                                                      , p </> "include/flipper/"
                                                       ])
-
-        -- Install POSIX platform headers:
-        instCmd_ [] ["cp"
-                    , "-R"
-                    , "platforms/posix/include/platform"
-                    , p </> "include/flipper/"
-                    ]
 
     -- Install the console:
     phony "install-console" $ do

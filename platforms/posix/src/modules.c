@@ -1,5 +1,5 @@
 #define __private_include__
-#include <platform/posix.h>
+#include <platforms/posix.h>
 #include <flipper/modules.h>
 
 uint32_t fmr_call(const void *function, uint8_t argc, uint16_t argt, void *argv) {

@@ -1,7 +1,7 @@
 #define __private_include__
 #include <flipper/flipper.h>
 #include <flipper/modules.h>
-#include <platform/posix.h>
+#include <platforms/posix.h>
 
 /* Expose the virtual interface for this driver. */
 struct _flipper flipper = {
