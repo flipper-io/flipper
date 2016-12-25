@@ -2,7 +2,7 @@ resolver: lts-7.14
 
 packages:
 - '.'
-- '../languages/haskell/flipper'
+- '../flipper'
 
 extra-deps: []
 

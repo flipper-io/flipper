@@ -14,7 +14,7 @@ cabal-version:       >=1.10
 
 executable flipper
   hs-source-dirs:      src
-  c-sources:           cbits/dfu.c
+  --c-sources:           cbits/dfu.c
   main-is:             Main.hs
   other-modules:       Flipper.Console.Action
                      , Flipper.Console.Error

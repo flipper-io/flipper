@@ -178,20 +178,22 @@ dynlib = do
               _        -> error ("dynlib: unknown target " ++ t)
 
 -- | Determine the dynamically linked libraries appropriate for the target and
---   architecture.
+--   architecture. For @pkg-config@ packages, use 'pkgs' instead.
 libs :: Action [String]
 libs = do
+    t <- target
+    case t of "darwin" -> return []
+              "linux"  -> return ["-ldl"]
+              _        -> error "libs: unknown target"
+
+-- | Determine the dynamically linked libraries appropriate for the target and
+--   architecture.
+pkgs :: Action [String]
+pkgs = do
     t <- target
     case t of "darwin" -> return ["libusb-1.0"]
               "linux"  -> return ["libusb-1.0"]
               _        -> error "libs: unknown target"
-
--- | Who am I?
-whoami :: Action String
-whoami = do
-    (Stdout a) <- instCmd [EchoStdout False, EchoStderr False, Traced ""]
-                          ["whoami"]
-    return (filter (/= '\n') a)
 
 -- * Building Stuff
 
@@ -240,6 +242,11 @@ modFMRSrc = modules >>= ( getDirectoryFiles ""
 -- | Include directories for all modules.
 modIncludes :: Action [FilePath]
 modIncludes = map (</> "include") <$> modules
+
+-- | Include directories for all platforms.
+platformIncludes :: Action [FilePath]
+platformIncludes = map (\p -> "platforms" </> p </> "include")
+               <$> getDirectoryDirs "platforms"
 
 -- | Prefix a path with @build@, used for translating a source file path to a
 --   build artifact path.
@@ -320,10 +327,10 @@ ldRule :: Action FilePath -- ^ Action returning linker path.
        -> [FilePath]      -- ^ Object files.
        -> FilePath        -- ^ Target.
        -> Action ()
-ldRule lda ops os so = do
+ldRule lda ops os o = do
     need os
     ld <- lda
-    command_ [] ld (os ++ ["-o", so] ++ ops)
+    command_ [] ld (os ++ ["-o", o] ++ ops)
 
 -- | Combinator for installation commands. Use @sudo@ if we're on Linux and
 --   aren't root, otherwise, don't.
@@ -331,13 +338,19 @@ instCmd :: CmdResult r => [CmdOption] -> [String] -> Action r
 instCmd os (c:cs) = do
     t <- target
     case t of "darwin" -> command os c cs
-              _        -> do w <- whoami
-                             case w of "root" -> command os c cs
-                                       _      -> command os "sudo" (c:cs)
+              _        -> do (Stdout a) <- command [ EchoStdout False
+                                                   , EchoStderr False
+                                                   , Traced ""
+                                                   ]
+                                                   "whoami"
+                                                   []
+                             case filter (/= '\n') a of
+                                 "root" -> command os c cs
+                                 _      -> command os "sudo" (c:cs)
 
 -- | Like 'instCmd' but discards the result.
 instCmd_ :: [CmdOption] -> [String] -> Action ()
-instCmd_ = (unit .) . instCmd
+instCmd_ os cs = unit $ instCmd os cs
 
 main :: IO ()
 main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
@@ -346,10 +359,10 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     addOracle pkgconfig
 
     -- By default we build libflipper, the console, and osmium for all targets:
-    want ["flipper-library", "flipper-console", "flipper-osmium"]
+    want ["libflipper", "console", "osmium", "utils"]
 
     -- Builds libflipper:
-    phony "flipper-library" $ do
+    phony "libflipper" $ do
 
         -- Find out how to name dynamic libraries on this platform:
         dyn <- dynlib
@@ -358,75 +371,114 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         need ["build/libflipper" </> dyn]
 
     -- Builds the console:
-    phony "flipper-console" $ do
+    phony "console" $ do
 
         -- We need libflipper to build the console:
-        need ["flipper-library"]
+        need ["libflipper"]
 
         -- We need an absolute path to libflipper to pass to stack:
         lp <- realpath "build/libflipper"
 
         -- Build the console with stack:
-        command_ [] "stack" [ "--stack-yaml=./console/stack.yaml"
+        command_ [] "stack" [ "--stack-yaml=languages/haskell/console/stack.yaml"
                             , "--extra-lib-dirs=" ++ lp
-                            , "build"
+                            , "install"
+                            , "--local-bin-path"
+                            , "../../../build/console/"
                             ]
 
-        -- Copy the console into the build folder:
-        --copyFile' "?" "build/console/flipper"
-
     -- Builds osmium for all targets:
-    phony "flipper-osmium" $ need [ "build/osmium/osmium-atmega16u2.hex"
-                                  , "build/osmium/osmium-atsam4s16b.bin"
-                                  ]
+    phony "osmium" $ need [ "build/osmium/osmium-atmega16u2.hex"
+                          , "build/osmium/osmium-atsam4s16b.bin"
+                          ]
+
+    -- Build command line utilities:
+    phony "utils" $ do
+
+        -- List all of the utilities:
+        us <- getDirectoryDirs "utils"
+
+        -- Build them:
+        need $ map (\u -> "build/utils/" </> u </> u) us
 
     -- Build all native code, i.e. libflipper and the console:
-    phony "native" $ need ["flipper-library", "flipper-console"]
+    phony "native" $ need ["libflipper", "console"]
 
     -- Remove all build artifacts:
     phony "clean" $ do
 
         -- Stack cleans up after itself:
---        command_ [] "stack" [ "--stack-yaml=./console/stack.yaml"
---                            , "clean"
---                            ]
+        command_ [] "stack" [ "--stack-yaml=languages/haskell/console/stack.yaml"
+                            , "clean"
+                            ]
 
         -- Delete everything in the build directory:
         removeFilesAfter "build" ["//*"]
 
     -- Install libflipper and the console:
-    --phony "install" $ need ["install-libflipper", "install-console"]
+    phony "install" $ do
+        need ["libflipper", "console", "utils"]
+        need ["install-libflipper"]
+        need ["install-console"]
+        need ["install-utils"]
 
     -- Uninstall libflipper and the console:
-    --phony "uninstall" $ do
-    --    p   <- prefix
-    --    dyn <- dynlib
+    phony "uninstall" $ do
+        p   <- prefix
+        dyn <- dynlib
 
-    --    nstCmd_ [] ["rm", "-f", p </> "lib" </> dyn]
-    --    nstCmd_ [] ["rm", "-f", p </> "include/flipper"]
-    --    nstCmd_ [] ["rm", "-f", p </> "include/flipper.h"]
+        instCmd_ [] ["rm", "-f", p </> "lib" </> dyn]
+        instCmd_ [] ["rm", "-rf", p </> "include/flipper"]
+        instCmd_ [] ["rm", "-f", p </> "include/flipper.h"]
+        instCmd_ [] ["rm", "-f", p </> "bin/flipper"]
+
+        us <- getDirectoryDirs "utils"
+        mapM_ (\u -> instCmd_ [] [ "rm"
+                                 , "-f"
+                                 , p </> "bin" </> u
+                                 ]) us
 
     -- Install libflipper and the flipper header files:
-    --phony "install-libflipper" $ do
-    --    p   <- prefix
-    --    dyn <- dynlib
+    phony "install-libflipper" $ do
+        -- libflipper needs to be built before we can install it:
+        need ["libflipper"]
 
-    --    -- libflipper needs to be built before we can install it:
-    --    need ["flipper-library"]
+        p   <- prefix
+        dyn <- dynlib
 
-    --    -- Install the shared library:
-    --    instCmd_ [] ["cp", "build/libflipper" </> dyn, p </> "lib"]
+        -- Make the @$PREFIX/lib@ directory:
+        instCmd_ [] ["mkdir", "-p", p </> "lib"]
 
-    --    -- Combinator to install all the headers in a directory:
-    --    let insth hp = do
-    --        hs <- map (hp <>) <$> getDirectoryContents hp
-    --        mapM (\h -> unit $ instCmd_ [] ["cp", "-R", h, p </> "include/"]) hs
+        -- Install the shared library:
+        instCmd_ [] ["cp",  "build/libflipper" </> dyn, p </> "lib/"]
 
-    --    -- Make the @$PREFIX/include/flipper@ directory:
-    --    instCmd _[] ["mkdir", "-p", p </> "include/flipper"]
+        -- Make the @$PREFIX/include/flipper@ directory:
+        instCmd_ [] ["mkdir", "-p", p </> "include/flipper"]
 
-    --    -- Install headers:
-    --    ((["include", "platforms/posix/include"] ++) <$> modIncludes) >>= mapM_ insth
+        -- Install the top-level headers:
+        instCmd_ [] ["cp", "include/flipper.h", p </> "include/"]
+        instCmd_ [] ["cp", "-R", "include/flipper", p </> "include/"]
+
+        -- Install module headers:
+        modIncludes >>= mapM_ (\h -> instCmd_ [] [ "cp"
+                                                 , "-R"
+                                                 , h </> "flipper"
+                                                 , p </> "include/"
+                                                 ])
+
+        -- Install platform headers:
+        platformIncludes >>= mapM_ (\h -> instCmd_ [] [ "cp"
+                                                      , "-R"
+                                                      , h
+                                                      , p </> "include/flipper"
+                                                      ])
+
+        -- Install POSIX platform headers:
+        instCmd_ [] ["cp"
+                    , "-R"
+                    , "platforms/posix/include/platform"
+                    , p </> "include/flipper/"
+                    ]
 
     -- Install the console:
     phony "install-console" $ do
@@ -435,19 +487,41 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         p <- prefix
 
         -- The console needs to be built before we can install it:
-        need ["flipper-console"]
+        need ["console"]
+
+        -- Make the @$PREFIX/bin@ directory:
+        instCmd_ [] ["mkdir", "-p", p </> "bin"]
 
         -- Copy the console to the installation target:
         instCmd_ [] ["cp", "build/console/flipper", p </> "bin/"]
 
+    -- Install command line utilities:
+    phony "install-utils" $ do
+
+        -- Find out what the installation prefix is:
+        p <- prefix
+
+        -- Utils need to be built before we can install them:
+        need ["utils"]
+
+        -- Make the @$PREFIX/bin@ directory:
+        instCmd_ [] ["mkdir", "-p", p </> "bin"]
+
+        -- Find out which utils exist:
+        us <- getDirectoryDirs "utils"
+
+        -- Install each utility:
+        mapM_ (\u -> instCmd_ [] [ "cp"
+                                 , "build/utils" </> u </> u
+                                 , p </> "bin" </> u
+                                 ]) us
+
     -- Install osmium on the ATSAM4S:
     phony "flash-atsam4s16b" $ do
 
-        -- We need the console and the osmium image to upload to the device:
-        need ["flipper-console", "build/osmium/osmium-atsam4s16b.bin"]
+        need ["build/utils/fdfu/fdfu", "build/osmium/osmium-atsam4s16b.bin"]
 
-        -- Use the console to flash the image to the device:
-        command_ [] "build/console/flipper" ["flash", "build/osmium/osmium-atsam4s16b.bin"]
+        command_ [] "build/utils/fdfu/fdfu" ["build/osmium/osmium-atsam4s16b.bin"]
 
     -- Install osmium on the ATMEGA16U2:
     phony "flash-atmega16u2" $ do
@@ -473,57 +547,50 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
                                      , "--no-reset"
                                      ]
 
-    -- Build @libflipper.so@ (Linux only):
-    "build/libflipper/libflipper.so" %> \o -> do
+    -- Build libflipper:
+    "build/libflipper/libflipper.*" %> \o -> do
 
         -- Find the sources needed to build libflipper:
         ss <- findDeps [ -- Finds modules/*/src/*.c
                          modSharedSrc
                          -- Finds modules/*/targets/fmr/*.c
                        , modFMRSrc
-                       , getDirectoryFiles ""  [ "libflipper/src/*.c"
-                                               , "platforms/posix/src/*.c"
+                       , getDirectoryFiles ""  [ "libflipper/src//*.c"
+                                               , "platforms/posix/src//*.c"
                                                ]
                        ]
 
+        -- Find out what packages we need to link against on this platform:
+        ps <- pkgs
+
         -- Find out what libraries we need to link against on this platform:
         ls <- libs
 
         -- Get the linker flags with @pkg-config@:
-        ldfs <- (>>= ldflags) <$> mapM (askOracle . PkgConfigQuery) ls
+        ldfs <- (>>= ldflags) <$> mapM (askOracle . PkgConfigQuery) ps
 
         -- Build the list of necessary object files from the list of necessary
         -- source files:
         let os = map (buildpref . (<.> ".native.o")) ss
 
         -- Run the linker:
-        ldRule cc ("-shared" : ldfs) os o
+        ldRule cc ("-shared" : (ls ++ ldfs)) os o
 
-    -- Build @libflipper.dylib@ (macOS only):
-    "build/libflipper/libflipper.dylib" %> \o -> do
+    -- Generic rule for building utilities:
+    "build/utils/*/*" %> \o -> do
 
-        -- Find the sources needed to build libflipper:
-        ss <- findDeps [ -- Finds modules/*/src/*.c
-                         modSharedSrc
-                         -- Finds modules/*/targets/fmr/*.c
-                       , modFMRSrc
-                       , getDirectoryFiles "" [ "libflipper/src//*.c"
-                                              , "platforms/posix/src//*.c"
-                                              ]
-                       ]
+        -- Root folder for this utility:
+        let rt = dropFileName (dropDirectory1 o)
 
-        -- Find out what libraries we need to link against on this platform:
-        ls <- libs
-
-        -- Get the linker flags with @pkg-config@:
-        ldfs <- (>>= ldflags) <$> mapM (askOracle . PkgConfigQuery) ls
+        -- Find the sources needed to build the utility:
+        ss <- getDirectoryFiles "" [ rt <//> "*.c" ]
 
         -- Build the list of necessary object files from the list of necessary
         -- source files:
         let os = map (buildpref . (<.> ".native.o")) ss
 
         -- Run the linker:
-        ldRule cc ("-shared" : ldfs) os o
+        ldRule cc ["-lflipper", "-Lbuild/libflipper"] os o
 
     -- Build the osmium hex image for the ATMEGA16U2:
     "build/osmium/osmium-atmega16u2.hex" %> \o -> do
@@ -625,9 +692,9 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         -- the ATMEGA16U2:
         is <- findDeps [ -- Finds modules/*/include/
                          modIncludes
+                       , platformIncludes
                        , pure [ "include/"
                               , "osmium/include"
-                              , "platforms/atmega16u2/include"
                               ]
                        ]
 
@@ -641,6 +708,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         -- the ATSAM4S16B:
         is <- findDeps [ --Finds modules/*/include/
                          modIncludes
+                       , platformIncludes
                        , pure [ "include"
                               , "osmium/include"
                               , "platforms/atsam4s16b/include"
@@ -656,9 +724,8 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         -- Find the include files necessary for compiling C for the native
         -- platform:
         is <- findDeps [ modIncludes
-                       , pure [ "include"
-                              , "platforms/posix/include"
-                              ]
+                       , platformIncludes
+                       , pure ["include"]
                        ]
 
         -- Get the C flags for @libusb-1.0@ with @pkg-config@:
