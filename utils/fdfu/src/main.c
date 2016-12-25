@@ -181,29 +181,7 @@ void *load_page_data(FILE *firmware, size_t size) {
 	return raw;
 }
 
-int main(int argc, char *argv[]) {
-
-	/* Ensure the correct argument count. */
-	if (argc < 2) {
-		fprintf(stderr, "Please provide a path to the firmware.\n");
-		return EXIT_FAILURE;
-	}
-
-	/* Attach to a Flipper device. */
-	flipper.attach();
-
-	/* Open the firmware image. */
-	FILE *firmware = fopen(argv[1], "rb");
-	if (!firmware) {
-		fprintf(stderr, "The file being opened, '%s', does not exist.\n", argv[1]);
-		return EXIT_FAILURE;
-	}
-
-	/* Determine the size of the file. */
-	fseek(firmware, 0L, SEEK_END);
-	size_t firmware_size = ftell(firmware);
-	fseek(firmware, 0L, SEEK_SET);
-
+int enter_update_mode(void) {
 	printf("Entering update mode.\n");
 	uint8_t retries = 0;
 retry_dfu:
@@ -214,13 +192,13 @@ retry_dfu:
 	uart0.pull(d_ack, sizeof(d_ack));
 	if (!memcmp(d_ack, (char []){ 0x0a, 0x0d, 0x3e }, sizeof(d_ack))) {
 		fprintf(stderr, KGRN " Successfully entered update mode.\n" KNRM);
-		goto connected;
+		return lf_success;
 	}
 
 	if (retries > RETRIES) {
 		/* If no acknowledgement was received, throw and error. */
 		fprintf(stderr, KRED "Failed to enter update mode.\n");
-		return EXIT_FAILURE;
+		return lf_error;
 	}
 
 	/* Enter DFU mode. */
@@ -235,15 +213,45 @@ retry_dfu:
 
 	retries ++;
 	goto retry_dfu;
+}
 
-connected:
+int main(int argc, char *argv[]) {
+
+	/* Ensure the correct argument count. */
+	if (argc < 2) {
+		fprintf(stderr, "Please provide a path to the firmware.\n");
+		return EXIT_FAILURE;
+	}
+
+	/* Attach to a Flipper device. */
+	flipper.attach();
+
+begin: ;
+
+	/* Open the firmware image. */
+	FILE *firmware = fopen(argv[1], "rb");
+	if (!firmware) {
+		fprintf(stderr, "The file being opened, '%s', does not exist.\n", argv[1]);
+		return EXIT_FAILURE;
+	}
+
+	/* Determine the size of the file. */
+	fseek(firmware, 0L, SEEK_END);
+	size_t firmware_size = ftell(firmware);
+	fseek(firmware, 0L, SEEK_SET);
+
+	/* Put the CPU in update mode. */
+	int _e = enter_update_mode();
+	if (_e < lf_success) {
+		return EXIT_FAILURE;
+	}
 
 	/* Set normal mode. */
 	printf("Entering normal mode.\n");
 	uart0.push("N#", 2);
 	char n_ack[2];
 	uart0.pull(n_ack, sizeof(n_ack));
-	retries = 0;
+	uint8_t retries = 0;
 	while(!uart0.ready() && retries ++ < 8);
 	retries = 0;
 	if (memcmp(n_ack, (char []){ 0x0A, 0x0D }, sizeof(n_ack))) {
@@ -262,7 +270,7 @@ connected:
 
 	printf("Uploading copy applet.\n");
 	/* Move the copy applet into RAM. */
-	int _e = sam_ba_copy(_APPLET, applet, sizeof(applet));
+	_e = sam_ba_copy(_APPLET, applet, sizeof(applet));
 	if (_e < lf_success) {
 		fprintf(stderr, KRED "Failed to upload copy applet.\n" KNRM);
 		return EXIT_FAILURE;
@@ -360,19 +368,38 @@ connected:
 		}
 	}
 
+done:
+
+	/* Free the memory allocated to store the page data. */
+	free(pagedata);
+
 	printf("Resetting the CPU.\n");
-	/* Reset the CPU. */
-	cpu.power(0);
-	usleep(1000000);
-	cpu.power(1);
-	//cpu.reset();
+	cpu.reset();
 	printf(KGRN " Successfully reset the CPU.\n" KNRM "----------------------");
 
-	printf(KGRN "\nSuccessfully uploaded new firmware.\n" KNRM);
+	/* If there were no errors, offer to flash again. */
+	if (!(_e < lf_success)) {
+		printf("\n\nWould you like to place the CPU in update mode again? ([y]/n): ");
+		/* Purge standard in. */
+		fpurge(stdin);
+		char c = getchar();
+		if (c == 'y' || c == '\n') {
+			printf("\n");
+			/* Enter update mode again. */
+			enter_update_mode();
+			printf("\nWould you like to reload the target file and flash it? ([y]/n): ");
+			/* Purge standard in. */
+			fpurge(stdin);
+			c = getchar();
+			if (c == 'y' || c == '\n') {
+				printf("\n");
+				/* Repeat the whole process. */
+				goto begin;
+			}
+		}
 
-done:
-	/* Free the memory allocated to hold the page data. */
-	free(pagedata);
+		printf(KGRN "\nSuccessfully uploaded new firmware.\n" KNRM);
+	}
 
 	return EXIT_SUCCESS;
 }

@@ -585,9 +585,6 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     -- Generic rule for building utilities:
     "build/utils/*/*" %> \o -> do
 
-        -- We need libflipper to build the utilities:
-        need ["libflipper"]
-
         -- Root folder for this utility:
         let rt = dropFileName (dropDirectory1 o)
 

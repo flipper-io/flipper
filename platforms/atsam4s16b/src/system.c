@@ -30,20 +30,24 @@ void fmr_pull(fmr_module module, fmr_function function, lf_size_t length) {
 
 void system_task(void) {
 
-	/* Blink the LED for activity. */
-
+	/* ~ Configure the LED that exists on PA0. ~ */
 	PMC -> PMC_PCER0 |= (1 << ID_PIOA);
-	PIOA -> PIO_PER |= (1 << 0);
-	PIOA -> PIO_OER |= (1 << 0);
+	PIOA -> PIO_PER |= PIO_PA0;
+	PIOA -> PIO_OER |= PIO_PA0;
+	PIOA -> PIO_OWER = PIO_PA0;
 
+	/* ~ Configure the USART peripheral. ~ */
+	usart_configure();
+
+	/* ~ Configure the timer/counter peripheral. */
+	// timer_configure();
+
+	usart_push("Hello world!\n\n", 12);
 	while (1) {
-		PIOA -> PIO_SODR |= (1 << 0);
-		for (uint32_t i = 0; i < 1000000; i ++) __asm__("nop");
-		PIOA -> PIO_CODR |= (1 << 0);
-		for (uint32_t i = 0; i < 1000000; i ++) __asm__("nop");
+		PIOA -> PIO_ODSR ^= PIO_PA0;
+		for (int i = 0; i < 10000000; i ++);
 	}
 
-	while (1);
 }
 
 void system_init(void) {
@@ -75,14 +79,9 @@ void system_init(void) {
 	for (timeout = 0; !(PMC -> PMC_SR & PMC_SR_MCKRDY) && (timeout++ < CLOCK_TIMEOUT););
 
 	/* Allow the reset pin to reset the device. */
-	RSTC -> RSTC_MR |= RSTC_MR_URSTEN;
+	RSTC -> RSTC_MR = RSTC_MR_KEY(0xA5) | RSTC_MR_URSTEN;
 }
 
 void system_deinit(void) {
-
-}
-
-/* Interrupt handler for this device driver. */
-void UART0_isr(void) {
 
 }

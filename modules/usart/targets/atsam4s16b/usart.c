@@ -3,62 +3,92 @@
 #include <platform/atsam4s16b.h>
 
 int usart_configure(void) {
-	// /* Enable the USART0 clock in the PMC. */
-	// PMC_EnablePeripheral(ID_USART0);
-	// /* Declare a pin map that will configure the appropriate output pins for the USART0. */
-	// const Pin usart0_pins[] = { (Pin){ PIO_PA5A_RXD0 | PIO_PA6A_TXD0, PIOA, ID_PIOA, PIO_PERIPH_A, PIO_DEFAULT } };
-	// /* Write the pinmap into the PIO. */
-	// PIO_Configure(usart0_pins, PIO_LISTSIZE(usart0_pins));
-	// /* Configure the USART0. */
-	// USART_Configure(USART0, USART_MODE_ASYNCHRONOUS, 115200, BOARD_MCK);
-	// /* Enable the USART0. */
-	// usart_enable();
+	/* Create a pinmask for the peripheral pins. */
+	const unsigned int USART0_PIN_MASK = (PIO_PA5A_RXD0 | PIO_PA6A_TXD0);
+	/* Enable the peripheral clock. */
+	PMC -> PMC_PCER0 |= (1 << ID_USART0);
+	/* Disable PIOA interrupts on the peripheral pins. */
+	PIOA -> PIO_IDR |= USART0_PIN_MASK;
+	/* Disable the peripheral pins from use by the PIOA. */
+	PIOA -> PIO_PDR |= USART0_PIN_MASK;
+	/* Hand control of the peripheral pins to peripheral A. */
+	PIOA -> PIO_ABCDSR[0] &= ~USART0_PIN_MASK;
+	PIOA -> PIO_ABCDSR[1] &= ~USART0_PIN_MASK;
+	/* Reset the peripheral and disable the transmitter and receiver. */
+	USART0 -> US_CR = UART_CR_RSTRX | UART_CR_RSTTX | UART_CR_TXDIS | UART_CR_RXDIS;
+	/* Set the mode to 8n1. */
+	USART0 -> US_MR = US_MR_CHRL_8_BIT | US_MR_PAR_NO | US_MR_NBSTOP_1_BIT;
+	/* Set the baudrate. */
+	USART0 -> US_BRGR = (F_CPU / PLATFORM_BAUDRATE / 16);
+	/* Disable the secondary PDC transmitter channel. */
+	USART0 -> US_TNCR = 0;
+	USART0 -> US_TNPR = NULL;
+	/* Disable the secondary PDC receiver channel. */
+	USART0 -> US_RNCR = 0;
+	USART0 -> US_RNPR = NULL;
+	/* Disable the PDC transmitter and receiver. */
+	USART0 -> US_PTCR = US_PTCR_TXTDIS | US_PTCR_RXTDIS;
+	/* Enable the USART0 interrupt. */
+	NVIC_EnableIRQ(USART0_IRQn);
+	/* Enable the transmitter and receiver. */
+	USART0 -> US_CR = UART_CR_TXEN | UART_CR_RXEN;
 	return lf_success;
 }
 
 void usart_enable(void) {
-	// /* Enable the USART0 IRQ in the NVIC. */
-	// //NVIC_EnableIRQ(USART0_IRQn);
-	// /* Enable the USART0 interrupt on receive. */
-	// //USART_EnableIt(USART0, UART_IER_RXRDY);
-	// /* Enable the USART0 transmitter. */
-	// USART_SetTransmitterEnabled(USART0, 1);
-	// /* Enable the USART0 receiver. */
-	// USART_SetReceiverEnabled(USART0, 1);
+	/* Enable the transmitter and receiver. */
+	USART0 -> US_CR = UART_CR_TXEN | UART_CR_RXEN;
 }
 
 void usart_disable(void) {
-	// /* Enable the USART0 IRQ in the NVIC. */
-	// //NVIC_DisableIRQ(USART0_IRQn);
-	// /* Enable the USART0 interrupt on receive. */
-	// //USART_DisableIt(USART0, UART_IER_RXRDY);
-	// /* Enable the USART0 transmitter. */
-	// USART_SetTransmitterEnabled(USART0, 0);
-	// /* Enable the USART0 receiver. */
-	// USART_SetReceiverEnabled(USART0, 0);
+	/* Disable the transmitter and receiver. */
+	USART0 -> US_CR = UART_CR_TXDIS | UART_CR_RXDIS;
 }
 
 uint8_t usart_ready(void) {
-	return 0; // USART_IsDataAvailable(USART0);
+	/* Return the empty condition of the transmitter FIFO. */
+	return (USART0 -> US_CSR & US_CSR_TXEMPTY);
 }
 
 void usart_put(uint8_t byte) {
-	// USART_PutChar(USART0, byte);
+	/* Load the byte into the transmitter FIFO. */
+	USART0 -> US_THR = byte;
 }
 
 
 uint8_t usart_get(void) {
-	return 0; // USART_GetChar(USART0);
+	/* Retrieve a byte from the receiver FIFO. */
+	return USART0 -> US_RHR;
 }
 
 int usart_push(void *source, lf_size_t length) {
-	while (length --) usart_put(*(uint8_t *)(source ++));
-	//USART_WriteBuffer(USART0, source, length);
+	/* Set the transmission length and source pointer. */
+	USART0 -> US_TCR = length;
+	USART0 -> US_TPR = source;
+	/* Enable the PDC transmitter. */
+	USART0 -> US_PTCR = US_PTCR_TXTEN;
+	/* Wait until the transfer has finished; */
+	while (!(USART0 -> US_CSR & US_CSR_ENDTX));
+	/* Disable the PDC transmitter. */
+	USART0 -> US_PTCR = US_PTCR_TXTDIS;
 	return lf_success;
 }
 
 int usart_pull(void *destination, lf_size_t length) {
-	while (length --) *(uint8_t *)(destination ++) = usart_get();
-	//USART_ReadBuffer(USART0, destination, length);
+	/* Set the transmission length and destination pointer. */
+	USART0 -> US_RCR = length;
+	USART0 -> US_RPR = destination;
+	/* Enable the receiver. */
+	USART0 -> US_PTCR = US_PTCR_RXTEN;
+	/* Wait until the transfer has finished. */
+	while (!(USART0 -> US_CSR & US_CSR_ENDRX));
+	/* Disable the PDC receiver. */
+	USART0 -> US_PTCR = US_PTCR_RXTDIS;
 	return lf_success;
+}
+
+/* - Unexposed driver implementation. - */
+
+void usart0_isr(void) {
+
 }
