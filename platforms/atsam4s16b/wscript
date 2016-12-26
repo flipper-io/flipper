@@ -13,10 +13,10 @@ def configure(cfg):
 	# Build modules for this platform.
 	cfg.env.BUILD_MODULES = True
 	# Set the platform flags.
-	cfg.env.append_value('CFLAGS', ['-std=c99', '-Os', '-mcpu=cortex-m4', '-march=armv7e-m', '-mthumb', '-g', '-DPLATFORM_HEADER=<platform/atsam4s16b.h>'])
+	cfg.env.append_value('CFLAGS', ['-std=c99', '-Os', '-mcpu=cortex-m4', '-march=armv7e-m', '-mthumb', '-g', '-DPLATFORM_HEADER=<platforms/atsam4s16b.h>'])
 	cfg.env.append_value('LDFLAGS', ['-Wl,-T' + cfg.path.abspath() + '/sam4s16.ld', '-nostartfiles'])
 	# Catalog the start files
-	cfg.env.STARTFILES = str(cfg.path.find_node('src/vectors.c').relpath())
+        cfg.env.STARTFILES = str(cfg.path.find_node('src/system/vectors.c').relpath())
 	#print "Startfiles are: " + str(cfg.env.STARTFILES)
 	# Load the appropriate binary utilities.
 	cfg.env.OBJCOPY = cfg.find_program('arm-none-eabi-objcopy')

@@ -186,7 +186,7 @@ void nvm_reset_settings(void) {
 
 /* - Common NVM driver implementation. - */
 
-/* The symbols 'nvm_configure', 'nvm_enable', 'nvm_disable', and 'nvm_reset' are declared in $PLATFORM/nvm/nvm.c. */
+/* The symbols 'nvm_configure', 'nvm_enable', 'nvm_disable', and 'nvm_reset' are declared in $platforms/nvm/nvm.c. */
 
 void nvm_read(nvm_p address) {
 	nvm_begin_continuous_read(address / NVM_PAGE_SIZE, address % NVM_PAGE_SIZE);
@@ -198,7 +198,7 @@ uint8_t nvm_get(void) {
 
 /* The symbols 'nvm_alloc' and 'nvm_free' are declared in alloc.c. */
 
-/* The symbol 'nvm_format' is declared in $PLATFORM/nvm/nvm.c. */
+/* The symbol 'nvm_format' is declared in $platforms/nvm/nvm.c. */
 
 void nvm_copy(nvm_p destination, nvm_p source, lf_size_t length) {
 
