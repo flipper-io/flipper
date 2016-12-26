@@ -1,6 +1,7 @@
 #!/usr/bin/env runhaskell
 
-{-# LANGUAGE DeriveDataTypeable , DeriveGeneric
+{-# LANGUAGE DeriveDataTypeable
+           , DeriveGeneric
            , GeneralizedNewtypeDeriving
            #-}
 
@@ -335,7 +336,8 @@ arRule ara os a = do
     arc <- ara
     command_ [EchoStdout False, EchoStderr False] arc ("rvs" : a : os)
 
--- | Generic combinator for building dynamic libraries.
+-- | Generic combinator for linking native code. This function incorporates
+--   target-specific behavior. Use 'elfRule' for building ELFs for the hardware.
 ldRule :: Action FilePath -- ^ Action returning linker path.
        -> [String]        -- ^ Linker options.
        -> [FilePath]      -- ^ Archive files.
@@ -360,7 +362,7 @@ ldRule lda ops as o = do
             _        -> error "ldRule: unknown target"
     command_ [] ld args
 
--- | Generic combinator for building ELFs.
+-- | Generic combinator for linking device code into ELFs.
 elfRule :: Action FilePath -- ^ Action returning linker path.
         -> [String]        -- ^ Linker options.
         -> [FilePath]      -- ^ Archive files.
@@ -630,6 +632,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         -- source files:
         let os = map (buildpref . (<.> ".native.o")) ss
 
+        -- Run the archiver:
         arRule ar os o
 
     -- Build module object code for POSIX:
@@ -646,6 +649,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         -- source files:
         let os = map (buildpref . (<.> ".native.o")) ss
 
+        -- Run the archiver:
         arRule ar os o
 
     -- Generic rule for building utilities:
@@ -704,7 +708,12 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
 
         -- Find the sources needed to build osmium ATMEGA16U2 object code:
         ss <- findDeps [ getDirectoryFiles "" ["osmium//*.c"]
-                       , pure [ "libflipper/src/crc.c"
+                         -- A few kludges are necessary to prevent parts of
+                         -- libflipper from being treated as dead code by the
+                         -- linker:
+                       , pure [ -- This is a kludge to include parts of
+                                -- libflipper in osmium:
+                                "libflipper/src/crc.c"
                               , "libflipper/src/fmr.c"
                               ]
                        ]
@@ -738,6 +747,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         -- source files:
         let os = map (buildpref . (<.> ".avr.o")) ss
 
+        -- Run the archiver:
         arRule avr_ar os o
 
     -- Build module object code for the ATMEGA16U2:
@@ -754,6 +764,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         -- source files:
         let os = map (buildpref . (<.> ".avr.o")) ss
 
+        -- Run the archiver:
         arRule avr_ar os o
 
     -- Build the osmium ELF for the ATSAM4S16B:
@@ -762,9 +773,18 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         -- Find the sources needed to build the libflipper ATSAM4S16B object
         -- code:
         ss <- findDeps [ getDirectoryFiles "" ["osmium//*.c"]
-                       , pure [ "libflipper/src/crc.c"
+                         -- A few kludges are necessary to prevent parts of
+                         -- libflipper and platform code from being treated as
+                         -- dead code by the linker:
+                       , pure [ -- This is a kludge to include parts of
+                                -- libflipper in osmium:
+                                "libflipper/src/crc.c"
                               , "libflipper/src/fmr.c"
+                                -- This is a kludge to include symbols needed by
+                                -- newlib in osmium:
                               , "platforms/atsam4s16b/src/system/syscalls.c"
+                                -- This is a kludge to include the vector table
+                                -- in osmium:
                               , "platforms/atsam4s16b/src/system/vectors.c"
                               ]
                        ]
@@ -802,6 +822,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         -- source files:
         let os = map (buildpref . (<.> ".arm.o")) ss
 
+        -- Run the archiver:
         arRule arm_ar os o
 
     -- Build module object code for the ATSAM4S16B:
@@ -818,6 +839,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         -- source files:
         let os = map (buildpref . (<.> ".arm.o")) ss
 
+        -- Run the archiver:
         arRule arm_ar os o
 
     -- Generic rule for compiling C or assembling for the ATMEGA16U2:
