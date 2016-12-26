@@ -1,6 +1,6 @@
 {-|
-Module      : Flipper.USART
-Description : USART Interface
+Module      : Flipper.UART0
+Description : UART0 Interface
 Copyright   : George Morgan, Travis Whitaker 2016
 License     : All rights reserved.
 Maintainer  : travis@flipper.io
@@ -8,10 +8,10 @@ Stability   : Provisional
 Portability : Windows, POSIX
 
 This module provides an interface for sending and receiving 'Bufferable' data
-over Flipper's USARTs.
+over Flipper's UART0.
 -}
 
-module Flipper.USART (
+module Flipper.UART0 (
     -- * Bus Control
     configure
   , enable
@@ -32,7 +32,7 @@ import Flipper.Put
 import Flipper.MonadFlipper
 
 import qualified Flipper.Bufferable     as B
-import qualified Flipper.Internal.USART as I
+import qualified Flipper.Internal.UART0 as I
 
 -- | Configure the USART
 configure :: MonadFlipper m => m Bool

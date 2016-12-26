@@ -9,6 +9,16 @@ Portability : Windows, POSIX
 
 -}
 
-module Flipper.Internal.Timer where
+module Flipper.Internal.Timer (
+    configure
+  ) where
 
--- Not implemented.
+import Data.Word
+
+import Flipper.Internal.Utils
+
+configure :: IO Bool
+configure = retSuc <$> c_timer_configure
+
+foreign import ccall safe "flipper/timer/timer.h timer_configure"
+    c_timer_configure :: IO Word32

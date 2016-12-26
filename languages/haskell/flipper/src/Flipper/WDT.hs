@@ -9,4 +9,14 @@ Portability : Windows, POSIX
 
 -}
 
-module Flipper.WDT where
+module Flipper.WDT (
+    configure
+  ) where
+
+import Flipper.MonadFlipper
+
+import qualified Flipper.Internal.WDT as I
+
+-- | Configure the watchdog timer.
+configure :: MonadFlipper m => m Bool
+configure = bracketIO I.configure

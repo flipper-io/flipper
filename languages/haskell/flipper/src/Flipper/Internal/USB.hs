@@ -9,4 +9,16 @@ Portability : Windows, POSIX
 
 -}
 
-module Flipper.Internal.USB where
+module Flipper.Internal.USB (
+    configure
+  ) where
+
+import Data.Word
+
+import Flipper.Internal.Utils
+
+configure :: IO Bool
+configure = retSuc <$> c_usb_configure
+
+foreign import ccall safe "flipper/usb/usb.h usb_configure"
+    c_usb_configure :: IO Word32

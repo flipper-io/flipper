@@ -11,4 +11,14 @@ This module provides an interface for sending data to and receiving data from a
 Flipper device over USB.
 -}
 
-module Flipper.USB where
+module Flipper.USB (
+    configure
+  ) where
+
+import Flipper.MonadFlipper
+
+import qualified Flipper.Internal.USB as I
+
+-- | Configure the USB.
+configure :: MonadFlipper m => m Bool
+configure = bracketIO I.configure

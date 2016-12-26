@@ -10,7 +10,8 @@ Portability : Windows, POSIX
 -}
 
 module Flipper.FS (
-    create
+    configure
+  , create
   , delete
   , size
   , open
@@ -29,6 +30,10 @@ import Flipper.MonadFlipper
 import Flipper.Put
 
 import qualified Flipper.Internal.FS as I
+
+-- | Configure the file system.
+configure :: MonadFlipper m => m Bool
+configure = bracketIO I.configure
 
 create :: MonadFlipper m => String -> m ()
 create = bracketIO . I.create

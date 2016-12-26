@@ -10,7 +10,8 @@ Portability : Windows, POSIX
 -}
 
 module Flipper.Internal.SPI (
-    enable
+    configure
+  , enable
   , disable
   , put
   , get
@@ -21,9 +22,13 @@ module Flipper.Internal.SPI (
 import Data.Word
 
 import Flipper.Internal.Buffer
+import Flipper.Internal.Utils
 
 import Foreign.ForeignPtr
 import Foreign.Ptr
+
+configure :: IO Bool
+configure = retSuc <$> c_spi_configure
 
 enable :: IO ()
 enable = c_spi_enable
@@ -47,6 +52,9 @@ pull l
     | otherwise = do b@(Buffer p _ _) <- allocBufferSafe l
                      withForeignPtr p (\p' -> c_spi_pull p' (fromIntegral l))
                      return b
+
+foreign import ccall safe "flipper/spi/spi.h spi_configure"
+    c_spi_configure :: IO Word32
 
 foreign import ccall safe "flipper/spi.h spi_enable"
     c_spi_enable :: IO ()

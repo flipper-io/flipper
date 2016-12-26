@@ -9,4 +9,14 @@ Portability : Windows, POSIX
 
 -}
 
-module Flipper.Timer where
+module Flipper.Timer (
+    configure
+  ) where
+
+import Flipper.MonadFlipper
+
+import qualified Flipper.Internal.Timer as I
+
+-- | Configure the timers.
+configure :: MonadFlipper m => m Bool
+configure = bracketIO I.configure

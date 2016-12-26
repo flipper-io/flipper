@@ -9,4 +9,14 @@ Portability : Windows, POSIX
 
 -}
 
-module Flipper.I2C where
+module Flipper.I2C (
+    configure
+  ) where
+
+import Flipper.MonadFlipper
+
+import qualified Flipper.Internal.I2C as I
+
+-- | Configure the I2C.
+configure :: MonadFlipper m => m Bool
+configure = bracketIO I.configure

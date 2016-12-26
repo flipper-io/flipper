@@ -13,12 +13,17 @@ LED is ideal for displaying status information.
 
 module Flipper.LED (
     I.RGB(..)
+  , configure
   , setRGB
   ) where
 
 import Flipper.MonadFlipper
 
 import qualified Flipper.Internal.LED as I
+
+-- | Configure the LED.
+configure :: MonadFlipper m => m Bool
+configure = bracketIO I.configure
 
 -- | Set the RGB LED color.
 setRGB :: MonadFlipper m => I.RGB -> m ()

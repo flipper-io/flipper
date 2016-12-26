@@ -12,7 +12,8 @@ Portability : Windows, POSIX
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 module Flipper.Internal.FS (
-    create
+    configure
+  , create
   , delete
   , size
   , open
@@ -25,11 +26,15 @@ module Flipper.Internal.FS (
 import Data.Word
 
 import Flipper.Internal.Buffer
+import Flipper.Internal.Utils
 
 import Foreign.C.Types
 import Foreign.C.String
 import Foreign.ForeignPtr
 import Foreign.Ptr
+
+configure :: IO Bool
+configure = retSuc <$> c_fs_configure
 
 create :: String -> IO ()
 create n = withCString n c_fs_create
@@ -59,6 +64,9 @@ close = c_fs_close
 
 format :: IO ()
 format = c_fs_format
+
+foreign import ccall safe "flipper/fs/fs.h fs_configure"
+    c_fs_configure :: IO Word32
 
 foreign import ccall safe "flipper/fs.h fs_create"
     c_fs_create :: Ptr CChar -> IO ()

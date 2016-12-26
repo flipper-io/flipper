@@ -9,6 +9,16 @@ Portability : Windows, POSIX
 
 -}
 
-module Flipper.Internal.I2C where
+module Flipper.Internal.I2C (
+    configure
+  ) where
 
--- Not implemented yet.
+import Data.Word
+
+import Flipper.Internal.Utils
+
+configure :: IO Bool
+configure = retSuc <$> c_i2c_configure
+
+foreign import ccall safe "flipper/i2c/i2c.h i2c_configure"
+    c_i2c_configure :: IO Word32

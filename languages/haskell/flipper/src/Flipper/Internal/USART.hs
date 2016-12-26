@@ -10,48 +10,56 @@ Portability : Windows, POSIX
 -}
 
 module Flipper.Internal.USART (
-    usartEnable
-  , usartDisable
-  , usartReady
-  , usartPut
-  , usartGet
-  , usartPush
-  , usartPull
+    configure
+  , enable
+  , disable
+  , ready
+  , put
+  , get
+  , push
+  , pull
   ) where
 
 import Data.Word
 
 import Flipper.Internal.Buffer
+import Flipper.Internal.Utils
 
 import Foreign.ForeignPtr
 import Foreign.Marshal.Utils
 import Foreign.Ptr
 
-usartEnable :: IO ()
-usartEnable = c_usart_enable
+configure :: IO Bool
+configure = retSuc <$> c_usart_configure
 
-usartDisable :: IO ()
-usartDisable = c_usart_disable
+enable :: IO ()
+enable = c_usart_enable
 
-usartReady :: IO Bool
-usartReady = toBool <$> c_usart_ready
+disable :: IO ()
+disable = c_usart_disable
 
-usartPut :: Word8 -> IO ()
-usartPut = c_usart_put
+ready :: IO Bool
+ready = toBool <$> c_usart_ready
 
-usartGet :: IO Word8
-usartGet = c_usart_get
+put :: Word8 -> IO ()
+put = c_usart_put
 
-usartPush :: Buffer -> IO ()
-usartPush (Buffer p o l) = withForeignPtr p $ \p' ->
+get :: IO Word8
+get = c_usart_get
+
+push :: Buffer -> IO ()
+push (Buffer p o l) = withForeignPtr p $ \p' ->
    c_usart_push (plusPtr p' o) (fromIntegral l)
 
-usartPull :: Int -> IO Buffer
-usartPull l
-    | l <= 0    = error "usartPull: length must be greater than zero."
+pull :: Int -> IO Buffer
+pull l
+    | l <= 0    = error "pull: length must be greater than zero."
     | otherwise = do b@(Buffer p _ _) <- allocBufferSafe l
                      withForeignPtr p (\p' -> c_usart_pull p' (fromIntegral l))
                      return b
+
+foreign import ccall safe "flipper/usart/usart.h usart_configure"
+    c_usart_configure :: IO Word32
 
 foreign import ccall safe "flipper/usart.h usart_enable"
     c_usart_enable :: IO ()

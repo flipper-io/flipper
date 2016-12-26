@@ -9,6 +9,16 @@ Portability : Windows, POSIX
 
 -}
 
-module Flipper.Internal.Temperature where
+module Flipper.Internal.Temperature (
+    configure
+  ) where
 
--- Not implemented.
+import Data.Word
+
+import Flipper.Internal.Utils
+
+configure :: IO Bool
+configure = retSuc <$> c_temp_configure
+
+foreign import ccall safe "flipper/temp/temp.h temp_configure"
+    c_temp_configure :: IO Word32
