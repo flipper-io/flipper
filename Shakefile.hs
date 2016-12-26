@@ -765,6 +765,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
                        , pure [ "libflipper/src/crc.c"
                               , "libflipper/src/fmr.c"
                               , "platforms/atsam4s16b/src/system/syscalls.c"
+                              , "platforms/atsam4s16b/src/system/vectors.c"
                               ]
                        ]
 

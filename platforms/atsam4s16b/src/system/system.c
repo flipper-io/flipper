@@ -81,6 +81,56 @@ void system_task(void) {
 	/* ~ Configure the GPIO peripheral. */
 	gpio_configure();
 
+	/* ~ Configure the SPI peripheral. ~ */
+
+	/* Enable the SPI clock. */
+	PMC -> PMC_PCER0 = (1 << ID_SPI);
+	/* Create a pinmask for the peripheral pins. */
+	const unsigned int SPI_PIN_MASK = (PIO_PA14A_SPCK | PIO_PA13A_MOSI | PIO_PA12A_MISO | PIO_PA11A_NPCS0 | PIO_PA31A_NPCS1);
+	/* Disable PIOA interrupts on the peripheral pins. */
+	PIOA -> PIO_IDR = SPI_PIN_MASK;
+	/* Disable the peripheral pins from use by the PIOA. */
+	PIOA -> PIO_PDR = SPI_PIN_MASK;
+	/* Hand control of the peripheral pins to peripheral A. */
+	PIOA -> PIO_ABCDSR[0] &= ~SPI_PIN_MASK;
+	PIOA -> PIO_ABCDSR[1] &= ~SPI_PIN_MASK;
+	/* Reset the SPI. */
+	SPI -> SPI_CR = SPI_CR_SWRST;
+	/* Reset the SPI again. Eratta. */
+	SPI -> SPI_CR = SPI_CR_SWRST;
+	/* Enter master mode, no mode fault detection, user chip select. */
+	SPI -> SPI_MR = SPI_MR_MSTR | SPI_MR_MODFDIS | SPI_MR_PCS(1);
+	/* Configure the user SPI peripheral. 8 bits per transfer. SPI mode 3. Fastest possible clock. */
+	SPI -> SPI_CSR[1] = SPI_CSR_SCBR(0xC8) | SPI_CSR_BITS_8_BIT | SPI_CSR_NCPHA | SPI_CSR_CPOL;
+	/* Enable the SPI. */
+	SPI -> SPI_CR = SPI_CR_SPIEN;
+	/* Clear the secondary PDC channel. */
+	SPI -> SPI_TNCR = 0;
+	SPI -> SPI_TNPR = (uintptr_t)(NULL);
+
+	/* Insantiate an outgoing PDC transfer. */
+	const char outgoing[] = "Hello!";
+
+	gpio_enable(PIO_PA0, 0);
+	PIOA -> PIO_OWER = PIO_PA0;
+	while (1) {
+		PIOA -> PIO_ODSR ^= PIO_PA0;
+
+		// /* Queue the PDC transfer. */
+		// SPI -> SPI_TCR = sizeof(outgoing);
+		// SPI -> SPI_TPR = (uintptr_t)(outgoing);
+		// /* Enable the PDC transmitter to start the transmission. */
+		// SPI -> SPI_PTCR = SPI_PTCR_TXTEN;
+		// /* Wait until the transfer has finished. */
+		// while (!(SPI -> SPI_SR & SPI_SR_ENDTX));
+		// /* Disable the PDC transmitter. */
+		// SPI -> SPI_PTCR = SPI_PTCR_TXTDIS;
+
+		SPI -> SPI_TDR = 'a';
+
+		for (int i = 0; i < 5000000; i ++);
+	}
+
 	/* Enable the PDC receive complete interrupt. */
 	UART0 -> UART_IER = UART_IER_ENDRX;
 	/* Pull an FMR packet asynchronously. */

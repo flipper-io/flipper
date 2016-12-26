@@ -6,11 +6,11 @@ int uart0_configure(void) {
 	/* Create a pinmask for the peripheral pins. */
 	const unsigned int UART0_PIN_MASK = (PIO_PA5A_RXD0 | PIO_PA6A_TXD0);
 	/* Enable the peripheral clock. */
-	PMC -> PMC_PCER0 |= (1 << ID_UART0);
+	PMC -> PMC_PCER0 = (1 << ID_UART0);
 	/* Disable PIOA interrupts on the peripheral pins. */
-	PIOA -> PIO_IDR |= UART0_PIN_MASK;
+	PIOA -> PIO_IDR = UART0_PIN_MASK;
 	/* Disable the peripheral pins from use by the PIOA. */
-	PIOA -> PIO_PDR |= UART0_PIN_MASK;
+	PIOA -> PIO_PDR = UART0_PIN_MASK;
 	/* Hand control of the peripheral pins to peripheral A. */
 	PIOA -> PIO_ABCDSR[0] &= ~UART0_PIN_MASK;
 	PIOA -> PIO_ABCDSR[1] &= ~UART0_PIN_MASK;
