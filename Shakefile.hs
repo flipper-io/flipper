@@ -333,9 +333,9 @@ arRule :: Action FilePath -- ^ Action returning archiver path.
 arRule ara os a = do
     need os
     arc <- ara
-    command_ [EchoStdout False] arc ("rvs" : a : os)
+    command_ [EchoStdout False, EchoStderr False] arc ("rvs" : a : os)
 
--- | Generic combinator for defining linker rules.
+-- | Generic combinator for building dynamic libraries.
 ldRule :: Action FilePath -- ^ Action returning linker path.
        -> [String]        -- ^ Linker options.
        -> [FilePath]      -- ^ Archive files.
@@ -344,13 +344,38 @@ ldRule :: Action FilePath -- ^ Action returning linker path.
 ldRule lda ops as o = do
     need as
     ld <- lda
+    t <- target
+    let args = case t of
+            "linux"  -> mconcat [ ["-Wl,--whole-archive", "-Wl,--start-group"]
+                                , as
+                                , ["-Wl,--end-group",  "-Wl,--no-whole-archive"]
+                                , ["-o", o]
+                                , ops
+                                ]
+            "darwin" -> mconcat [ ["-Wl,-all_load"]
+                                , as
+                                , ["-o", o]
+                                , ops
+                                ]
+            _        -> error "ldRule: unknown target"
+    command_ [] ld args
+
+-- | Generic combinator for building ELFs.
+elfRule :: Action FilePath -- ^ Action returning linker path.
+        -> [String]        -- ^ Linker options.
+        -> [FilePath]      -- ^ Archive files.
+        -> FilePath        -- ^ Target.
+        -> Action ()
+elfRule lda ops as o = do
+    need as
+    ld <- lda
     let args = mconcat [ ["-Wl,--start-group"]
                        , as
                        , ["-Wl,--end-group"]
                        , ["-o", o]
                        , ops
                        ]
-    command_ [] ld args
+    command [] ld args
 
 -- | Combinator for installation commands. Use @sudo@ if we're on Linux and
 --   aren't root, otherwise, don't.
@@ -568,8 +593,8 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     -- Shortcut:
     phony "fu2" $ need ["flash-atmega16u2"]
 
-    -- Build libflipper.so (Linux):
-    "build/libflipper/libflipper.so" %> \o -> do
+    -- Build libflipper:
+    "build/libflipper/libflipper.*" %> \o -> do
 
         -- We need the native object code to build libflipper:
         let as = [ "build/libflipper/libflipper-posix.a"
@@ -587,45 +612,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         -- Get the linker flags with @pkg-config@:
         ldfs <- (>>= ldflags) <$> mapM (askOracle . PkgConfigQuery) ps
 
-        ld <- cc
-
-        let args = mconcat [ ["-shared"]
-                           , ls
-                           , ldfs
-                           , [ "-Wl,--whole-archive"
-                             , "-Wl,--start-group"
-                             ]
-                           , as
-                           , [ "-Wl,--end-group"
-                             , "-Wl,--no-whole-archive"
-                             ]
-                           , [ "-o"
-                             , o
-                             ]
-                           ]
-
-        command_ [] ld args
-
-    -- Build libflipper.dylib (macOS):
-    "build/libflipper/libflipper.dylib" %> \o -> do
-
-        -- We need the native object code to build libflipper:
-        let as = [ "build/libflipper/libflipper-posix.a"
-                 , "build/platforms/platforms-posix.a"
-                 , "build/modules/modules-posix.a"
-                 ]
-
-        -- Find out what packages we need to link against on this platform:
-        ps <- pkgs
-
-        -- Find out what linker options we need on this platform:
-        ls <- libs
-
-        -- Get the linker flags with @pkg-config@:
-        ldfs <- (>>= ldflags) <$> mapM (askOracle . PkgConfigQuery) ps
-
-        -- Run the linker:
-        ldRule cc ("-shared" : "-Wl,-all_load" : (ls ++ ldfs)) as o
+        ldRule cc ("-shared" : (ls ++ ldfs)) as o
 
     -- Build libflipper object code for POSIX:
     "build/libflipper/libflipper-posix.a" %> \o -> do
@@ -734,7 +721,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
                  ]
 
         -- Run the linker:
-        ldRule avr_gcc ls as o
+        elfRule avr_gcc ls as o
 
     -- Build libflipper object code for the ATMEGA16U2:
     "build/libflipper/libflipper-atmega16u2.a" %> \o -> do
@@ -813,7 +800,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
                         ]
 
         -- Run the linker:
-        ldRule arm_gcc ls as o
+        elfRule arm_gcc ls as o
 
     -- Build libflipper object code for the ATSAM4S16B:
     "build/libflipper/libflipper-atsam4s16b.a" %> \o -> do
