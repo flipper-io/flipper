@@ -13,7 +13,7 @@ def configure(cfg):
 	# Build modules for this platform.
 	cfg.env.BUILD_MODULES = True
 	# Set the platform flags.
-	cfg.env.append_value('CFLAGS', ['-std=c99', '-Os', '-DARCH=ARCH_AVR8', '-D__AVR_ATMEGA16U2__', '-DF_CPU=16000000UL', '-DPLATFORM_HEADER=<platform/atmega16u2.h>', '-Wno-pragmas', '-mmcu=atmega16u2'])
+	cfg.env.append_value('CFLAGS', ['-std=c99', '-Os', '-DARCH=ARCH_AVR8', '-D__AVR_ATMEGA16U2__', '-DF_CPU=16000000UL', '-DPLATFORM_HEADER=<platforms/atmega16u2.h>', '-Wno-pragmas', '-mmcu=atmega16u2'])
 	cfg.env.append_value('LDFLAGS', '-mmcu=atmega16u2')
 	# Load the appropriate binary utilities.
 	objcopy = cfg.find_program('avr-objcopy')
