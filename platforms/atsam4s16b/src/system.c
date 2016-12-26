@@ -31,30 +31,17 @@ void fmr_pull(fmr_module module, fmr_function function, lf_size_t length) {
 struct _fmr_packet packet;
 
 void system_task(void) {
-
 	/* ~ Configure the USART peripheral. ~ */
 	usart_configure();
+	/* ~ Configure the UART peripheral. */
 	uart0_configure();
 	/* ~ Configure the GPIO peripheral. */
-	gpio.configure();
-	/* Enable PIO_PA0. */
-	gpio.enable(PIO_PA0, 0);
-	/* Enable single write control of PIO_PA0. */
-	PIOA -> PIO_OWER = PIO_PA0;
+	gpio_configure();
 
 	/* Enable the PDC receive complete interrupt. */
 	UART0 -> UART_IER = UART_IER_ENDRX;
 	/* Pull an FMR packet. */
 	uart0_pull(&packet, sizeof(struct _fmr_packet));
-
-	/* ~ Configure the timer/counter peripheral. */
-	// timer_configure();
-
-	while (1) {
-		PIOA -> PIO_ODSR ^= PIO_PA0;
-		for (int i = 0; i < 10000000; i ++);
-	}
-
 }
 
 void uart0_isr(void) {
@@ -63,14 +50,10 @@ void uart0_isr(void) {
 		UART0 -> UART_PTCR = UART_PTCR_RXTDIS;
 		/* Clear the PDC RX interrupt flag. */
 		UART0 -> UART_RCR = 1;
-		/* We have an FMR packet, push it for debug. */
-		usart_push(&packet, sizeof(struct _fmr_packet));
 		/* Create a result. */
 		struct _fmr_result result = { 0 };
 		/* Process the packet. */
 		fmr_perform(&packet, &result);
-		/* Push the result for debug. */
-		usart_push(&result, sizeof(struct _fmr_result));
 		/* Give the result back. */
 		uart0_push(&result, sizeof(struct _fmr_result));
 		/* Pull the next packet. */
