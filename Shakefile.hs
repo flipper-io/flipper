@@ -596,12 +596,18 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     -- Build libflipper:
     "build/libflipper/libflipper.*" %> \o -> do
 
+        -- Find the sources needed to build the libflipper POSIX object code:
+        ss <- findDeps [getDirectoryFiles "" ["libflipper//*.c"]]
+
+        -- Build the list of necessary object files from the list of necessary
+        -- source files:
+
+        let os = map (buildpref . (<.> ".native.o")) ss
+
         -- We need the native object code to build libflipper:
-        let as = [ "build/libflipper/libflipper-posix.a"
-                 , "build/platforms/platforms-posix.a"
+        let as = [ "build/platforms/platforms-posix.a"
                  , "build/modules/modules-posix.a"
                  ]
-        need as
 
         -- Find out what packages we need to link against on this platform:
         ps <- pkgs
@@ -612,19 +618,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         -- Get the linker flags with @pkg-config@:
         ldfs <- (>>= ldflags) <$> mapM (askOracle . PkgConfigQuery) ps
 
-        ldRule cc ("-shared" : (ls ++ ldfs)) as o
-
-    -- Build libflipper object code for POSIX:
-    "build/libflipper/libflipper-posix.a" %> \o -> do
-
-        -- Find the sources needed to build the libflipper POSIX object code:
-        ss <- findDeps [getDirectoryFiles "" ["libflipper//*.c"]]
-
-        -- Build the list of necessary object files from the list of necessary
-        -- source files:
-        let os = map (buildpref . (<.> ".native.o")) ss
-
-        arRule ar os o
+        ldRule cc ("-shared" : (ls ++ ldfs)) (as ++ os) o
 
     -- Build platform object code for POSIX:
     "build/platforms/platforms-posix.a" %> \o -> do
@@ -708,11 +702,20 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     -- Build the osmium ELF for the ATMEGA16U2:
     "build/osmium/osmium-atmega16u2.elf" %> \o -> do
 
+        -- Find the sources needed to build osmium ATMEGA16U2 object code:
+        ss <- findDeps [ getDirectoryFiles "" ["osmium//*.c"]
+                       , pure [ "libflipper/src/crc.c"
+                              , "libflipper/src/fmr.c"
+                              ]
+                       ]
+
+        -- Build the list of necessary object files from the list of necessary
+        -- source files:
+        let os = map (buildpref . (<.> ".avr.o")) ss
+
         -- We need the ATMEGA16U2 object code to build osmium:
-        let as = [ "build/libflipper/libflipper-atmega16u2.a"
-                 , "build/modules/modules-atmega16u2.a"
+            as = [ "build/modules/modules-atmega16u2.a"
                  , "build/platforms/platforms-atmega16u2.a"
-                 , "build/osmium/osmium-atmega16u2.a"
                  ]
 
             -- Linker flags:
@@ -721,22 +724,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
                  ]
 
         -- Run the linker:
-        elfRule avr_gcc ls as o
-
-    -- Build libflipper object code for the ATMEGA16U2:
-    "build/libflipper/libflipper-atmega16u2.a" %> \o -> do
-
-        -- Find the sources needed to build the libflipper ATMEGA16U2 object
-        -- code:
-        ss <- findDeps [getDirectoryFiles "" [ "libflipper/src/crc.c"
-                                             , "libflipper/src/fmr.c"
-                                             ]]
-
-        -- Build the list of necessary object files from the list of necessary
-        -- source files:
-        let os = map (buildpref . (<.> ".avr.o")) ss
-
-        arRule avr_ar os o
+        elfRule avr_gcc ls (as ++ os) o
 
     -- Build platform object code for the ATMEGA16U2:
     "build/platforms/platforms-atmega16u2.a" %> \o -> do
@@ -768,26 +756,25 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
 
         arRule avr_ar os o
 
-    -- Build osmium object code for the ATMEGA16U2:
-    "build/osmium/osmium-atmega16u2.a" %> \o -> do
-
-        -- Find the sources needed to build osmium ATMEGA16U2 object code:
-        ss <- findDeps [getDirectoryFiles "" ["osmium//*.c"]]
-
-        -- Build the list of necessary object files from the list of necessary
-        -- source files:
-        let os = map (buildpref . (<.> ".avr.o")) ss
-
-        arRule avr_ar os o
-
     -- Build the osmium ELF for the ATSAM4S16B:
     "build/osmium/osmium-atsam4s16b.elf" %> \o -> do
 
+        -- Find the sources needed to build the libflipper ATSAM4S16B object
+        -- code:
+        ss <- findDeps [ getDirectoryFiles "" ["osmium//*.c"]
+                       , pure [ "libflipper/src/crc.c"
+                              , "libflipper/src/fmr.c"
+                              , "platforms/atsam4s16b/src/system/syscalls.c"
+                              ]
+                       ]
+
+        -- Build the list of necessary object files from the list of necessary
+        -- source files:
+        let os = map (buildpref . (<.> ".arm.o")) ss
+
         -- We need the ATSAM4S16B object code to build osmium:
-        let as = [ "build/libflipper/libflipper-atsam4s16b.a"
-                 , "build/platforms/platforms-atsam4s16b.a"
+            as = [ "build/platforms/platforms-atsam4s16b.a"
                  , "build/modules/modules-atsam4s16b.a"
-                 , "build/osmium/osmium-atmega16u2.a"
                  ]
 
         -- Find the linker scripts needed to build osmium for the ATSAM4S16B:
@@ -800,22 +787,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
                         ]
 
         -- Run the linker:
-        elfRule arm_gcc ls as o
-
-    -- Build libflipper object code for the ATSAM4S16B:
-    "build/libflipper/libflipper-atsam4s16b.a" %> \o -> do
-
-        -- Find the sources needed to build the libflipper ATMEGA16U2 object
-        -- code:
-        ss <- findDeps [getDirectoryFiles "" [ "libflipper/src/crc.c"
-                                             , "libflipper/src/fmr.c"
-                                             ]]
-
-        -- Build the list of necessary object files from the list of necessary
-        -- source files:
-        let os = map (buildpref . (<.> ".arm.o")) ss
-
-        arRule arm_ar os o
+        elfRule arm_gcc ls (as ++ os) o
 
     -- Build platform object code for the ATSAM4S16B:
     "build/platforms/platforms-atsam4s16b.a" %> \o -> do
@@ -840,18 +812,6 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
                          -- Finds modules/*/targets/atsam4s16b/*.c
                        , modARMSrc
                        ]
-
-        -- Build the list of necessary object files from the list of necessary
-        -- source files:
-        let os = map (buildpref . (<.> ".arm.o")) ss
-
-        arRule arm_ar os o
-
-    -- Build osmium object code for the ATSAM4S16B:
-    "build/osmium/osmium-atsam4s16b.a" %> \o -> do
-
-        -- Find the sources needed to build osmium ATSAM4S16B object code:
-        ss <- findDeps [getDirectoryFiles "" ["osmium//*.c"]]
 
         -- Build the list of necessary object files from the list of necessary
         -- source files:
