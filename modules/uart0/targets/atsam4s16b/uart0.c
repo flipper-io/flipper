@@ -22,10 +22,10 @@ int uart0_configure(void) {
 	UART0 -> UART_BRGR = (F_CPU / PLATFORM_BAUDRATE / 16);
 	/* Disable the secondary PDC transmitter channel. */
 	UART0 -> UART_TNCR = 0;
-	UART0 -> UART_TNPR = NULL;
+	UART0 -> UART_TNPR = (uintptr_t)(NULL);
 	/* Disable the secondary PDC receiver channel. */
 	UART0 -> UART_RNCR = 0;
-	UART0 -> UART_RNPR = NULL;
+	UART0 -> UART_RNPR = (uintptr_t)(NULL);
 	/* Disable the PDC transmitter and receiver. */
 	UART0 -> UART_PTCR = UART_PTCR_TXTDIS | UART_PTCR_RXTDIS;
 	/* Enable the UART0 interrupt. */
@@ -64,7 +64,7 @@ uint8_t uart0_get(void) {
 int uart0_push(void *source, lf_size_t length) {
 	/* Set the transmission length and source pointer. */
 	UART0 -> UART_TCR = length;
-	UART0 -> UART_TPR = source;
+	UART0 -> UART_TPR = (uintptr_t)(source);
 	/* Enable the PDC transmitter. */
 	UART0 -> UART_PTCR = UART_PTCR_TXTEN;
 	/* Wait until the transfer has finished. */
@@ -77,11 +77,11 @@ int uart0_push(void *source, lf_size_t length) {
 int uart0_pull(void *destination, lf_size_t length) {
 	/* Set the transmission length and destination pointer. */
 	UART0 -> UART_RCR = length;
-	UART0 -> UART_RPR = destination;
+	UART0 -> UART_RPR = (uintptr_t)(destination);
 	/* Enable the receiver. */
 	UART0 -> UART_PTCR = UART_PTCR_RXTEN;
 	/* If defined, uart0_pull will not use interrupts. */
-#ifdef __uart0_pull_async__
+#ifdef __uart0_pull_sync__
 	/* Wait until the transfer has finished. */
 	while (!(UART0 -> UART_SR & UART_SR_ENDRX));
 	/* Disable the PDC receiver. */

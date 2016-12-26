@@ -30,6 +30,8 @@ void cpu_reset(void) {
 	delay_ms(500);
 	/* Release the simulated reset button. */
 	set_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
+	/* Reset the USART bus. */
+	uart0_configure();
 }
 
 void cpu_halt(void) {

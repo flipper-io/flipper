@@ -4,7 +4,7 @@
 extern int errno;
 extern int _end;
 
-extern caddr_t _sbrk (int incr) {
+extern caddr_t _sbrk(int incr) {
 	return 0;
 }
 
@@ -32,7 +32,7 @@ extern int _read(int file, char *ptr, int len) {
 	return 0 ;
 }
 
-extern int _write( int file, char *ptr, int len ) {
+extern int _write(int file, char *ptr, int len) {
 	return 0;
 }
 
@@ -44,7 +44,7 @@ extern void _kill(int pid, int sig) {
 	return;
 }
 
-extern int _getpid (void) {
+extern int _getpid(void) {
 	return -1;
 }
 

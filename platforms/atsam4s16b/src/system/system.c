@@ -18,44 +18,73 @@ struct _lf_device self = {
 	NULL
 };
 
+void uart0_pull_wait(void *destination, lf_size_t length) {
+	/* Set the transmission length and destination pointer. */
+	UART0 -> UART_RCR = length;
+	UART0 -> UART_RPR = (uintptr_t)(destination);
+	/* Disable the PDC receive complete interrupt. */
+	UART0 -> UART_IDR = UART_IDR_ENDRX;
+	/* Enable the receiver. */
+	UART0 -> UART_PTCR = UART_PTCR_RXTEN;
+	/* Wait until the transfer has finished. */
+	while (!(UART0 -> UART_SR & UART_SR_ENDRX));
+	/* Clear the PDC RX interrupt flag. */
+	UART0 -> UART_RCR = 1;
+	/* Disable the PDC receiver. */
+	UART0 -> UART_PTCR = UART_PTCR_RXTDIS;
+	/* Enable the PDC receive complete interrupt. */
+	UART0 -> UART_IER = UART_IER_ENDRX;
+}
+
 /* Helper functions to libflipper. */
-
 void fmr_push(fmr_module module, fmr_function function, lf_size_t length) {
-
+	void *swap = malloc(length);
+	if (!swap) {
+		error_raise(E_MALLOC, NULL);
+		return;
+	}
+	/* Pull, not asynchronously. */
+	uart0_pull_wait(swap, length);
+	uint32_t types = fmr_type(lf_size_t) << 2 | fmr_type(void *);
+	struct {
+		void *source;
+		lf_size_t length;
+	} args = { swap, length };
+	fmr_execute(module, function, 2, types, &args);
+	free(swap);
 }
 
 void fmr_pull(fmr_module module, fmr_function function, lf_size_t length) {
-
+	void *swap = malloc(length);
+	if (!swap) {
+		error_raise(E_MALLOC, NULL);
+		return;
+	}
+	uint32_t types = fmr_type(lf_size_t) << 2 | fmr_type(void *);
+	struct {
+		void *source;
+		lf_size_t length;
+	} args = { swap, length };
+	/* Call the function. */
+	fmr_execute(module, function, 2, types, &args);
+	uart0_push(swap, length);
+	free(swap);
 }
 
 struct _fmr_packet packet;
 
 void system_task(void) {
-
 	/* ~ Configure the USART peripheral. ~ */
 	usart_configure();
+	/* ~ Configure the UART peripheral. */
 	uart0_configure();
 	/* ~ Configure the GPIO peripheral. */
-	gpio.configure();
-	/* Enable PIO_PA0. */
-	gpio.enable(PIO_PA0, 0);
-	/* Enable single write control of PIO_PA0. */
-	PIOA -> PIO_OWER = PIO_PA0;
+	gpio_configure();
 
 	/* Enable the PDC receive complete interrupt. */
 	UART0 -> UART_IER = UART_IER_ENDRX;
-	/* Pull an FMR packet. */
+	/* Pull an FMR packet asynchronously. */
 	uart0_pull(&packet, sizeof(struct _fmr_packet));
-
-	/* ~ Configure the timer/counter peripheral. */
-	// timer_configure();
-
-	usart_push("Hello world!\n\n", 12);
-	while (1) {
-		PIOA -> PIO_ODSR ^= PIO_PA0;
-		for (int i = 0; i < 10000000; i ++);
-	}
-
 }
 
 void uart0_isr(void) {
@@ -64,17 +93,13 @@ void uart0_isr(void) {
 		UART0 -> UART_PTCR = UART_PTCR_RXTDIS;
 		/* Clear the PDC RX interrupt flag. */
 		UART0 -> UART_RCR = 1;
-		/* We have an FMR packet, push it for debug. */
-		usart_push(&packet, sizeof(struct _fmr_packet));
 		/* Create a result. */
 		struct _fmr_result result = { 0 };
 		/* Process the packet. */
 		fmr_perform(&packet, &result);
-		/* Push the result for debug. */
-		usart_push(&result, sizeof(struct _fmr_result));
 		/* Give the result back. */
 		uart0_push(&result, sizeof(struct _fmr_result));
-		/* Pull the next packet. */
+		/* Pull the next packet asynchronously. */
 		uart0_pull(&packet, sizeof(struct _fmr_packet));
 	}
 }
