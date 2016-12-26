@@ -22,7 +22,6 @@ library
                        Flipper.CPU
                        Flipper.DAC
                        Flipper.Error
-                       Flipper.FMR
                        Flipper.FS
                        Flipper.Get
                        Flipper.GPIO
@@ -32,6 +31,7 @@ library
                        Flipper.Put
                        Flipper.PWM
                        Flipper.RTC
+                       Flipper.SWD
                        Flipper.SPI
                        Flipper.Temperature
                        Flipper.Timer
@@ -45,7 +45,6 @@ library
                        Flipper.Internal.DAC
                        Flipper.Internal.Error
                        Flipper.Internal.Flipper
-                       Flipper.Internal.FMR
                        Flipper.Internal.FS
                        Flipper.Internal.GPIO
                        Flipper.Internal.I2C
@@ -53,6 +52,7 @@ library
                        Flipper.Internal.PWM
                        Flipper.Internal.RTC
                        Flipper.Internal.SPI
+                       Flipper.Internal.SWD
                        Flipper.Internal.Temperature
                        Flipper.Internal.Timer
                        Flipper.Internal.USART

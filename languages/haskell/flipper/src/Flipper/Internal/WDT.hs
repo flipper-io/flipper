@@ -9,4 +9,16 @@ Portability : Windows, POSIX
 
 -}
 
-module Flipper.Internal.WDT where
+module Flipper.Internal.WDT (
+    configure
+  ) where
+
+import Data.Word
+
+import Flipper.Internal.Utils
+
+configure :: IO Bool
+configure = retSuc <$> c_wdt_configure
+
+foreign import ccall safe "flipper/wdt/wdt.h wdt_configure"
+    c_wdt_configure :: IO Word32

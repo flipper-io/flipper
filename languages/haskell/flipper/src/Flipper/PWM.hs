@@ -9,4 +9,14 @@ Portability : Windows, POSIX
 
 -}
 
-module Flipper.PWM where
+module Flipper.PWM (
+    configure
+  ) where
+
+import Flipper.MonadFlipper
+
+import qualified Flipper.Internal.PWM as I
+
+-- | Configure the PWM.
+configure :: MonadFlipper m => m Bool
+configure = bracketIO I.configure

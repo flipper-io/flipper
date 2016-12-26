@@ -13,6 +13,7 @@ module Flipper.Internal.GPIO (
     DigitalPin(..)
   , AnalogPin(..)
   , Direction(..)
+  , configure
   , digitalDirection
   , analogDirection
   , digitalRead
@@ -24,6 +25,8 @@ module Flipper.Internal.GPIO (
 import Foreign.Marshal.Utils
 
 import Data.Word
+
+import Flipper.Internal.Utils
 
 -- | Type for Flipper's digital IO pins.
 data DigitalPin = IO1
@@ -101,6 +104,9 @@ directionCode :: Direction -> Word8
 directionCode Input  = 0
 directionCode Output = 1
 
+configure :: IO Bool
+configure = retSuc <$> c_gpio_configure
+
 digitalDirection :: DigitalPin -> Direction -> IO ()
 digitalDirection p d = c_gpio_enable (digPinCode p) (directionCode d)
 
@@ -118,6 +124,9 @@ digitalWrite p v = c_gpio_write (digPinCode p) (fromBool v)
 
 analogWrite :: AnalogPin -> Word16 -> IO ()
 analogWrite p = c_gpio_write (anPinCode p)
+
+foreign import ccall safe "flipper/gpio/gpio.h gpio_configure"
+    c_gpio_configure :: IO Word32
 
 foreign import ccall safe "flipper/gpio.h gpio_enable"
     c_gpio_enable :: Word8 -> Word8 -> IO ()

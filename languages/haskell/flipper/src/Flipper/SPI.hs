@@ -13,7 +13,8 @@ device's SPI bus.
 
 module Flipper.SPI (
     -- * SPI Control
-    enable
+    configure
+  , enable
   , disable
     -- * Sending/Receiving Data
   , put
@@ -30,6 +31,10 @@ import Flipper.MonadFlipper
 
 import qualified Flipper.Bufferable   as B
 import qualified Flipper.Internal.SPI as I
+
+-- | Configure the SPI.
+configure :: MonadFlipper m => m Bool
+configure = bracketIO I.configure
 
 -- | Enable the SPI bus.
 enable :: MonadFlipper m => m ()

@@ -9,4 +9,14 @@ Portability : Windows, POSIX
 
 -}
 
-module Flipper.Temperature where
+module Flipper.Temperature (
+    configure
+  ) where
+
+import Flipper.MonadFlipper
+
+import qualified Flipper.Internal.Temperature as I
+
+-- | Configure the thermal hardware.
+configure :: MonadFlipper m => m Bool
+configure = bracketIO I.configure

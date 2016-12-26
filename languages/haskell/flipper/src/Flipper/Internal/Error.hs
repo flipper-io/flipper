@@ -11,6 +11,7 @@ Portability : Windows, POSIX
 
 module Flipper.Internal.Error (
     FlipperError(..)
+  , configure
   , pause
   , resume
   , raise
@@ -23,6 +24,8 @@ import Data.Word
 
 import Foreign.C.String
 import Foreign.Ptr
+
+import Flipper.Internal.Utils
 
 -- | An error condition, reported by the device or occuring within the
 --   @libflipper@ library.
@@ -105,6 +108,9 @@ codeError 20 = Configuration
 codeError 21 = Acknowledge
 codeError _  = Unknown
 
+configure :: IO Bool
+configure = retSuc <$> c_error_configure
+
 pause :: IO ()
 pause = c_error_pause
 
@@ -119,6 +125,9 @@ get = codeError <$> c_error_get
 
 clear :: IO ()
 clear = c_error_clear
+
+foreign import ccall safe "flipper/error/error.h error_configure"
+    c_error_configure :: IO Word32
 
 foreign import ccall safe "flipper/error/error.h error_resume"
     c_error_resume :: IO ()

@@ -15,6 +15,8 @@ module Flipper.GPIO (
     I.DigitalPin(..)
   , I.AnalogPin(..)
   , I.Direction(..)
+    -- * Configuration
+  , configure
     -- * Reading/Writing Pin State
   , digitalDirection
   , digitalRead
@@ -29,6 +31,10 @@ import Data.Word
 import Flipper.MonadFlipper
 
 import qualified Flipper.Internal.GPIO as I
+
+-- | Configure the GPIO.
+configure :: MonadFlipper m => m Bool
+configure = bracketIO I.configure
 
 -- | Set the IO direction of a digital pin.
 digitalDirection :: MonadFlipper m => I.DigitalPin -> I.Direction -> m ()

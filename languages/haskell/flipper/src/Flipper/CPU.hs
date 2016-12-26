@@ -12,7 +12,8 @@ CPU on the Flipper device.
 -}
 
 module Flipper.CPU (
-    reset
+    configure
+  , reset
   , halt
   , power
   , dfu
@@ -21,6 +22,10 @@ module Flipper.CPU (
 import Flipper.MonadFlipper
 
 import qualified Flipper.Internal.CPU as I
+
+-- | Configure the CPU.
+configure :: MonadFlipper m => m Bool
+configure = bracketIO I.configure
 
 -- | Reset the SAM.
 reset :: MonadFlipper m => m ()

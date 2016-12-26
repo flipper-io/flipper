@@ -9,6 +9,16 @@ Portability : Windows, POSIX
 
 -}
 
-module Flipper.Internal.RTC where
+module Flipper.Internal.RTC (
+    configure
+  ) where
 
--- Not implemented yet.
+import Data.Word
+
+import Flipper.Internal.Utils
+
+configure :: IO Bool
+configure = retSuc <$> c_rtc_configure
+
+foreign import ccall safe "flipper/rtc/rtc.h rtc_configure"
+    c_rtc_configure :: IO Word32

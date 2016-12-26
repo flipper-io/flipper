@@ -11,7 +11,8 @@ This module provides an interface to Flipper's on-board button.
 -}
 
 module Flipper.Button (
-    read
+    configure
+  , read
   ) where
 
 import Prelude hiding (read)
@@ -19,6 +20,10 @@ import Prelude hiding (read)
 import Flipper.MonadFlipper
 
 import qualified Flipper.Internal.Button as I
+
+-- | Configure the button.
+configure :: MonadFlipper m => m Bool
+configure = bracketIO I.configure
 
 -- | Read the button state.
 read :: MonadFlipper m => m Bool

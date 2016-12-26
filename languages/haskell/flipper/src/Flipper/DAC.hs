@@ -9,4 +9,14 @@ Portability : Windows, POSIX
 
 -}
 
-module Flipper.DAC where
+module Flipper.DAC (
+    configure
+  ) where
+
+import Flipper.MonadFlipper
+
+import qualified Flipper.Internal.DAC as I
+
+-- | Configure the DAC.
+configure :: MonadFlipper m => m Bool
+configure = bracketIO I.configure

@@ -9,4 +9,14 @@ Portability : Windows, POSIX
 
 -}
 
-module Flipper.RTC where
+module Flipper.RTC (
+    configure
+  ) where
+
+import Flipper.MonadFlipper
+
+import qualified Flipper.Internal.RTC as I
+
+-- | Configure the RTC.
+configure :: MonadFlipper m => m Bool
+configure = bracketIO I.configure

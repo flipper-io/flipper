@@ -1,6 +1,6 @@
 {-|
-Module      : Flipper.Internal.ADC
-Description : Internal Analog to Digital Converter Module
+Module      : Flipper.Internal.SWD
+Description : Internal SWD Module
 Copyright   : George Morgan, Travis Whitaker 2016
 License     : All rights reserved.
 Maintainer  : travis@flipper.io
@@ -9,7 +9,7 @@ Portability : Windows, POSIX
 
 -}
 
-module Flipper.Internal.ADC (
+module Flipper.Internal.SWD (
     configure
   ) where
 
@@ -18,7 +18,7 @@ import Data.Word
 import Flipper.Internal.Utils
 
 configure :: IO Bool
-configure = retSuc <$> c_adc_configure
+configure = retSuc <$> c_swd_configure
 
-foreign import ccall safe "flipper/adc/adc.h adc_configure"
-    c_adc_configure :: IO Word32
+foreign import ccall safe "flipper/swd/swd.h swd_configure"
+    c_swd_configure :: IO Word32

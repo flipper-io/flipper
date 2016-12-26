@@ -9,6 +9,16 @@ Portability : Windows, POSIX
 
 -}
 
-module Flipper.Internal.PWM where
+module Flipper.Internal.PWM (
+    configure
+  ) where
 
--- Not implemented yet.
+import Data.Word
+
+import Flipper.Internal.Utils
+
+configure :: IO Bool
+configure = retSuc <$> c_pwm_configure
+
+foreign import ccall safe "flipper/pwm/pwm.h pwm_configure"
+    c_pwm_configure :: IO Word32
