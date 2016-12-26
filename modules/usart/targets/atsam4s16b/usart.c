@@ -76,7 +76,7 @@ int usart_push(void *source, lf_size_t length) {
 	return lf_success;
 }
 
-#define __usart_pull_async__
+#define __usart_pull_sync__
 int usart_pull(void *destination, lf_size_t length) {
 	/* Set the transmission length and destination pointer. */
 	USART0 -> US_RCR = length;
@@ -84,7 +84,7 @@ int usart_pull(void *destination, lf_size_t length) {
 	/* Enable the receiver. */
 	USART0 -> US_PTCR = US_PTCR_RXTEN;
 	/* If defined, usart_pull will not use interrupts. */
-#ifdef __usart_pull_async__
+#ifdef __usart_pull_sync__
 	/* Wait until the transfer has finished. */
 	while (!(USART0 -> US_CSR & US_CSR_ENDRX));
 	/* Disable the PDC receiver. */

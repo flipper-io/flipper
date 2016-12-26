@@ -81,7 +81,7 @@ int uart0_pull(void *destination, lf_size_t length) {
 	/* Enable the receiver. */
 	UART0 -> UART_PTCR = UART_PTCR_RXTEN;
 	/* If defined, uart0_pull will not use interrupts. */
-#ifdef __uart0_pull_async__
+#ifdef __uart0_pull_sync__
 	/* Wait until the transfer has finished. */
 	while (!(UART0 -> UART_SR & UART_SR_ENDRX));
 	/* Disable the PDC receiver. */
