@@ -48,12 +48,23 @@ action = hsubparser (mconcat builtins <> mconcat calls)
                      , command "suspend" suspend
                      , command "format" format
                      ]
-          calls = [ command "button" ((ConsoleCall . ButtonCall) <$> button)
+          calls = [ command "adc" ((ConsoleCall . ADCCall) <$> adc)
+                  , command "button" ((ConsoleCall . ButtonCall) <$> button)
+                  , command "dac" ((ConsoleCall . DACCall) <$> dac)
                   , command "fs" ((ConsoleCall . FSCall) <$> fs)
                   , command "gpio" ((ConsoleCall . GPIOCall) <$> gpio)
+                  , command "i2c" ((ConsoleCall . I2CCall) <$> i2c)
                   , command "led" ((ConsoleCall . LEDCall) <$> led)
+                  , command "pwm" ((ConsoleCall . PWMCall) <$> pwm)
+                  , command "rtc" ((ConsoleCall . RTCCall) <$> rtc)
                   , command "spi" ((ConsoleCall . SPICall) <$> spi)
+                  , command "swd" ((ConsoleCall . SWDCall) <$> swd)
+                  , command "temp" ((ConsoleCall . TempCall) <$> temp)
+                  , command "timer" ((ConsoleCall . TimerCall) <$> timer)
+                  , command "uart0" ((ConsoleCall . UART0Call) <$> uart0)
                   , command "usart" ((ConsoleCall . USARTCall) <$> usart)
+                  , command "usb" ((ConsoleCall . USBCall) <$> usb)
+                  , command "wdt" ((ConsoleCall . WDTCall) <$> wdt)
                   ]
 
 flash :: ParserInfo ConsoleAction
@@ -101,15 +112,35 @@ format = info (pure Format) formatI
                             , progDesc "Format the flash memory on the device."
                             ]
 
+adc :: ParserInfo ADCAction
+adc = info adcP adcI
+    where adcP = hsubparser $ mconcat [ adcConfigure
+                                      ]
+          adcI = mconcat [ fullDesc
+                         , progDesc "Read the device's ADC."
+                         ]
+
 button :: ParserInfo ButtonAction
-button = info (hsubparser buttonRead) buttonI
-    where buttonI = mconcat [ fullDesc
+button = info buttonP buttonI
+    where buttonP = hsubparser $ mconcat [ buttonConfigure
+                                         , buttonRead
+                                         ]
+          buttonI = mconcat [ fullDesc
                             , progDesc "Read the device's button state."
                             ]
 
+dac :: ParserInfo DACAction
+dac = info dacP dacI
+    where dacP = hsubparser $ mconcat [ dacConfigure
+                                      ]
+          dacI = mconcat [ fullDesc
+                         , progDesc "Manipulate the device's DAC."
+                         ]
+
 fs :: ParserInfo FSAction
 fs = info fsP fsI
-    where fsP = hsubparser $ mconcat [ fsCreate
+    where fsP = hsubparser $ mconcat [ fsConfigure
+                                     , fsCreate
                                      , fsDelete
                                      , fsSize
                                      , fsOpen
@@ -123,7 +154,8 @@ fs = info fsP fsI
 
 gpio :: ParserInfo GPIOAction
 gpio = info gpioP gpioI
-    where gpioP = hsubparser $ mconcat [ gpioDirection
+    where gpioP = hsubparser $ mconcat [ gpioConfigure
+                                       , gpioDirection
                                        , gpioRead
                                        , gpioWrite
                                        ]
@@ -131,10 +163,37 @@ gpio = info gpioP gpioI
                            , progDesc "Interact with the device's GPIO pins."
                            ]
 
+i2c :: ParserInfo I2CAction
+i2c = info i2cP i2cI
+    where i2cP = hsubparser $ mconcat [ i2cConfigure
+                                      ]
+          i2cI = mconcat [ fullDesc
+                         , progDesc "Interact with the device's I2C bus."
+                         ]
+
 led :: ParserInfo LEDAction
-led = info (hsubparser ledRGB) ledI
-    where ledI = mconcat [ fullDesc
+led = info ledP ledI
+    where ledP = hsubparser $ mconcat [ ledConfigure
+                                      , ledRGB
+                                      ]
+          ledI = mconcat [ fullDesc
                          , progDesc "Set the device's RGB LED state."
+                         ]
+
+pwm :: ParserInfo PWMAction
+pwm = info pwmP pwmI
+    where pwmP = hsubparser $ mconcat [ pwmConfigure
+                                      ]
+          pwmI = mconcat [ fullDesc
+                         , progDesc "Manipulate the device's PWM ouput."
+                         ]
+
+rtc :: ParserInfo RTCAction
+rtc = info rtcP rtcI
+    where rtcP = hsubparser $ mconcat [ rtcConfigure
+                                      ]
+          rtcI = mconcat [ fullDesc
+                         , progDesc "Manipulate the device's RTC."
                          ]
 
 spi :: ParserInfo SPIAction
@@ -142,30 +201,109 @@ spi = info spiP spiI
     where spiI = mconcat [ fullDesc
                          , progDesc "Interact with the device's SPI bus."
                          ]
-          spiP = hsubparser $ mconcat [ spiEnable
+          spiP = hsubparser $ mconcat [ spiConfigure
+                                      , spiEnable
                                       , spiDisable
                                       , spiRead
                                       , spiWriteFromString
                                       , spiWriteFromFile
                                       ]
 
+swd :: ParserInfo SWDAction
+swd = info swdP swdI
+    where swdP = hsubparser $ mconcat [ swdConfigure
+                                      ]
+          swdI = mconcat [ fullDesc
+                         , progDesc "Interact with the device's SWD."
+                         ]
+
+temp :: ParserInfo TempAction
+temp = info tempP tempI
+    where tempP = hsubparser $ mconcat [ tempConfigure
+                                       ]
+          tempI = mconcat [ fullDesc
+                          , progDesc "Read the device's thermal hardware."
+                          ]
+
+timer :: ParserInfo TimerAction
+timer = info timerP timerI
+    where timerP = hsubparser $ mconcat [ timerConfigure
+                                        ]
+          timerI = mconcat [ fullDesc
+                           , progDesc "Interact with the device's timers."
+                           ]
+
+uart0 :: ParserInfo UART0Action
+uart0 = info uart0P uart0I
+    where uart0I = mconcat [ fullDesc
+                          , progDesc "Interact with the device's UART0 bus."
+                          ]
+          uart0P = hsubparser $ mconcat [ uart0Configure
+                                        , uart0Enable
+                                        , uart0Disable
+                                        , uart0Read
+                                        , uart0WriteFromString
+                                        , uart0WriteFromFile
+                                        ]
+
 usart :: ParserInfo USARTAction
 usart = info usartP usartI
     where usartI = mconcat [ fullDesc
                           , progDesc "Interact with the device's USART bus."
                           ]
-          usartP = hsubparser $ mconcat [ usartEnable
-                                       , usartDisable
-                                       , usartRead
-                                       , usartWriteFromString
-                                       , usartWriteFromFile
-                                       ]
+          usartP = hsubparser $ mconcat [ usartConfigure
+                                        , usartEnable
+                                        , usartDisable
+                                        , usartRead
+                                        , usartWriteFromString
+                                        , usartWriteFromFile
+                                        ]
+
+usb :: ParserInfo USBAction
+usb = info usbP usbI
+    where usbP = hsubparser $ mconcat [ usbConfigure
+                                      ]
+          usbI = mconcat [ fullDesc
+                         , progDesc "Interact with the device's USB."
+                         ]
+
+wdt :: ParserInfo WDTAction
+wdt = info wdtP wdtI
+    where wdtP = hsubparser $ mconcat [ wdtConfigure
+                                      ]
+          wdtI = mconcat [ fullDesc
+                         , progDesc "Interact with the device's WDT."
+                         ]
+
+adcConfigure :: Mod CommandFields ADCAction
+adcConfigure = command "configure" (info (pure ADCConfigure) configureI)
+    where configureI = mconcat [ fullDesc
+                               , progDesc "Configure the ADC."
+                               ]
+
+buttonConfigure :: Mod CommandFields ButtonAction
+buttonConfigure = command "configure" (info (pure ButtonConfigure) configureI)
+    where configureI = mconcat [ fullDesc
+                               , progDesc "Configure the button."
+                               ]
 
 buttonRead :: Mod CommandFields ButtonAction
 buttonRead = command "read" (info (pure ButtonRead) readI)
     where readI = mconcat [ fullDesc
                           , progDesc "Read the device's button state."
                           ]
+
+dacConfigure :: Mod CommandFields DACAction
+dacConfigure = command "configure" (info (pure DACConfigure) configureI)
+    where configureI = mconcat [ fullDesc
+                               , progDesc "Configure the DAC."
+                               ]
+
+fsConfigure :: Mod CommandFields FSAction
+fsConfigure = command "configure" (info (pure FSConfigure) configureI)
+    where configureI = mconcat [ fullDesc
+                               , progDesc "Configure the file system."
+                               ]
 
 fsCreate :: Mod CommandFields FSAction
 fsCreate = command "create" (info ( FSCreate
@@ -237,6 +375,12 @@ fsClose = command "close" (info (pure FSClose) closeI)
                            , progDesc "Close the globally open file."
                            ]
 
+gpioConfigure :: Mod CommandFields GPIOAction
+gpioConfigure = command "configure" (info (pure GPIOConfigure) configureI)
+    where configureI = mconcat [ fullDesc
+                               , progDesc "Configure the GPIO."
+                               ]
+
 gpioDirection :: Mod CommandFields GPIOAction
 gpioDirection = command "direction" ( info ( digitalDirection
                                              <|> analogDirection
@@ -295,11 +439,41 @@ digitalWrite = GPIODigitalWrite <$> digitalPin <*> bool mempty
 analogWrite :: Parser GPIOAction
 analogWrite = GPIOAnalogWrite <$> analogPin <*> word16 mempty
 
+i2cConfigure :: Mod CommandFields I2CAction
+i2cConfigure = command "configure" (info (pure I2CConfigure) configureI)
+    where configureI = mconcat [ fullDesc
+                               , progDesc "Configure the I2C bus."
+                               ]
+
+ledConfigure :: Mod CommandFields LEDAction
+ledConfigure = command "configure" (info (pure LEDConfigure) configureI)
+    where configureI = mconcat [ fullDesc
+                               , progDesc "Configure the LED."
+                               ]
+
 ledRGB :: Mod CommandFields LEDAction
 ledRGB = command "rgb" (info (LEDSetRGB <$> rgb) rgbI)
     where rgbI = mconcat [ fullDesc
                          , progDesc "Set the device's LED RGB state."
                          ]
+
+pwmConfigure :: Mod CommandFields PWMAction
+pwmConfigure = command "configure" (info (pure PWMConfigure) configureI)
+    where configureI = mconcat [ fullDesc
+                               , progDesc "Configure the PWM output."
+                               ]
+
+rtcConfigure :: Mod CommandFields RTCAction
+rtcConfigure = command "configure" (info (pure RTCConfigure) configureI)
+    where configureI = mconcat [ fullDesc
+                               , progDesc "Configure the RTC."
+                               ]
+
+spiConfigure :: Mod CommandFields SPIAction
+spiConfigure = command "configure" (info (pure SPIConfigure) configureI)
+    where configureI = mconcat [ fullDesc
+                               , progDesc "Configure the SPI bus."
+                               ]
 
 spiEnable :: Mod CommandFields SPIAction
 spiEnable = command "enable" (info (pure SPIEnable) enableI)
@@ -346,6 +520,81 @@ spiWriteFromFile = command "writefile" ( info ( SPIWriteFromString
                            , progDesc "Write a local file to the SPI bus."
                            ]
 
+swdConfigure :: Mod CommandFields SWDAction
+swdConfigure = command "configure" (info (pure SWDConfigure) configureI)
+    where configureI = mconcat [ fullDesc
+                               , progDesc "Configure the SWD."
+                               ]
+
+tempConfigure :: Mod CommandFields TempAction
+tempConfigure = command "configure" (info (pure TempConfigure) configureI)
+    where configureI = mconcat [ fullDesc
+                               , progDesc "Configure the thermal hardware."
+                               ]
+timerConfigure :: Mod CommandFields TimerAction
+timerConfigure = command "configure" (info (pure TimerConfigure) configureI)
+    where configureI = mconcat [ fullDesc
+                               , progDesc "Configure the timers."
+                               ]
+
+uart0Configure :: Mod CommandFields UART0Action
+uart0Configure = command "configure" (info (pure UART0Configure) configureI)
+    where configureI = mconcat [ fullDesc
+                               , progDesc "Configure the UART0 bus."
+                               ]
+
+uart0Enable :: Mod CommandFields UART0Action
+uart0Enable = command "enable" (info (pure UART0Enable) enableI)
+    where enableI = mconcat [ fullDesc
+                            , progDesc "Enable the UART0 bus."
+                            ]
+
+uart0Disable :: Mod CommandFields UART0Action
+uart0Disable = command "disable" (info (pure UART0Disable) disableI)
+    where disableI = mconcat [ fullDesc
+                             , progDesc "Disable the UART0 bus."
+                             ]
+
+uart0Read :: Mod CommandFields UART0Action
+uart0Read = command "read" (info (pure UART0Read) readI)
+    where readI = mconcat [ fullDesc
+                          , progDesc "Read a null-terminated string from the \
+                                     \UART0 bus."
+                          ]
+
+uart0WriteFromString :: Mod CommandFields UART0Action
+uart0WriteFromString = command "write" ( info ( UART0WriteFromString
+                                               <$> strArgument stringP
+                                             )
+                                             writeI
+                                      )
+    where stringP = mconcat [ metavar "PAYLOAD"
+                            , help "The string to send over UART0."
+                            ]
+          writeI = mconcat [ fullDesc
+                           , progDesc "Write a null-terminated string to the \
+                                      \UART0 bus."
+                           ]
+
+uart0WriteFromFile :: Mod CommandFields UART0Action
+uart0WriteFromFile = command "writefile" ( info ( UART0WriteFromString
+                                                 <$> strArgument fileP
+                                               )
+                                               writeI
+                                        )
+    where fileP = mconcat [ metavar "FILEPATH"
+                          , help "Path to local file."
+                          ]
+          writeI = mconcat [ fullDesc
+                           , progDesc "Write a local file to the UART0 bus."
+                           ]
+
+usartConfigure :: Mod CommandFields USARTAction
+usartConfigure = command "configure" (info (pure USARTConfigure) configureI)
+    where configureI = mconcat [ fullDesc
+                               , progDesc "Configure the USART bus."
+                               ]
+
 usartEnable :: Mod CommandFields USARTAction
 usartEnable = command "enable" (info (pure USARTEnable) enableI)
     where enableI = mconcat [ fullDesc
@@ -391,6 +640,18 @@ usartWriteFromFile = command "writefile" ( info ( USARTWriteFromString
           writeI = mconcat [ fullDesc
                            , progDesc "Write a local file to the USART bus."
                            ]
+
+usbConfigure :: Mod CommandFields USBAction
+usbConfigure = command "configure" (info (pure USBConfigure) configureI)
+    where configureI = mconcat [ fullDesc
+                               , progDesc "Configure the USB."
+                               ]
+
+wdtConfigure :: Mod CommandFields WDTAction
+wdtConfigure = command "configure" (info (pure WDTConfigure) configureI)
+    where configureI = mconcat [ fullDesc
+                               , progDesc "Configure the WDT."
+                               ]
 
 moduleID :: Parser ModuleID
 moduleID = argument (readParser parseModuleID) moduleP

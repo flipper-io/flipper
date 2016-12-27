@@ -49,20 +49,41 @@ parseFormat :: Parser ConsoleAction
 parseFormat = string' "format" *> pure Format
 
 parseCall :: Parser Call
-parseCall = choice [ ButtonCall <$> try parseButtonAction
-                   , FSCall <$> parseFSAction
-                   , GPIOCall <$> parseGPIOAction
-                   , LEDCall <$> parseLEDAction
-                   , SPICall <$> parseSPIAction
-                   , USARTCall <$> parseUSARTAction
+parseCall = choice [ ADCCall <$> try parseADCAction
+                   , ButtonCall <$> try parseButtonAction
+                   , DACCall <$> try parseDACAction
+                   , FSCall <$> try parseFSAction
+                   , GPIOCall <$> try parseGPIOAction
+                   , I2CCall <$> try parseI2CAction
+                   , LEDCall <$> try parseLEDAction
+                   , PWMCall <$> try parsePWMAction
+                   , RTCCall <$> try parseRTCAction
+                   , SPICall <$> try parseSPIAction
+                   , SWDCall <$> try parseSWDAction
+                   , TempCall <$> try parseTempAction
+                   , TimerCall <$> try parseTimerAction
+                   , UART0Call <$> try parseUART0Action
+                   , USARTCall <$> try parseUSARTAction
+                   , USBCall <$> try parseUSBAction
+                   , WDTCall <$> try parseWDTAction
                    ]
 
+parseADCAction :: Parser ADCAction
+parseADCAction = string' "adc" *> spaces *> choice [ try parseADCAction
+                                                   ]
+
 parseButtonAction :: Parser ButtonAction
-parseButtonAction = string' "button" *> spaces *> choice [ try parseButtonRead
+parseButtonAction = string' "button" *> spaces *> choice [ try parseButtonConfigure
+                                                         , try parseButtonRead
                                                          ]
 
+parseDACAction :: Parser DACAction
+parseDACAction = string' "dac" *> spaces *> choice [ try parseDACConfigure
+                                                   ]
+
 parseFSAction :: Parser FSAction
-parseFSAction = string' "fs" *> spaces *> choice [ try parseFSCreate
+parseFSAction = string' "fs" *> spaces *> choice [ try parseFSConfigure
+                                                 , try parseFSCreate
                                                  , try parseFSDelete
                                                  , try parseFSSize
                                                  , try parseFSOpen
@@ -73,7 +94,8 @@ parseFSAction = string' "fs" *> spaces *> choice [ try parseFSCreate
 
 parseGPIOAction :: Parser GPIOAction
 parseGPIOAction = string' "gpio" *> spaces *> choice gpios
-    where gpios = [ try parseGPIODigitalDirection
+    where gpios = [ try parseGPIOConfigure
+                  , try parseGPIODigitalDirection
                   , try parseGPIODigitalRead
                   , try parseGPIODigitalWrite
                   , try parseGPIOAnalogDirection
@@ -81,27 +103,83 @@ parseGPIOAction = string' "gpio" *> spaces *> choice gpios
                   , try parseGPIOAnalogWrite
                   ]
 
-parseLEDAction :: Parser LEDAction
-parseLEDAction = string' "led" *> spaces *> choice [ try parseLEDsetRGB
+parseI2CAction :: Parser I2CAction
+parseI2CAction = string' "i2c" *> spaces *> choice [ try parseI2CConfigure
                                                    ]
 
+parseLEDAction :: Parser LEDAction
+parseLEDAction = string' "led" *> spaces *> choice [ try parseLEDConfigure
+                                                   , try parseLEDsetRGB
+                                                   ]
+
+parsePWMAction :: Parser PWMAction
+parsePWMAction = string "pwm" *> spaces *> choice [ try parsePWMConfigure
+                                                  ]
+
+parseRTCAction :: Parser RTCAction
+parseRTCAction = string "rtc" *> spaces *> choice [ try parseRTCConfigure
+                                                  ]
+
 parseSPIAction :: Parser SPIAction
-parseSPIAction = string' "spi" *> spaces *> choice [ try parseSPIEnable
-                                                 , try parseSPIDisable
-                                                 , try parseSPIRead
-                                                 , try parseSPIWriteFromString
-                                                 ]
+parseSPIAction = string' "spi" *> spaces *> choice [ try parseSPIConfigure
+                                                   , try parseSPIEnable
+                                                   , try parseSPIDisable
+                                                   , try parseSPIRead
+                                                   , try parseSPIWriteFromString
+                                                   ]
+
+parseSWDAction :: Parser SWDAction
+parseSWDAction = string' "swd" *> spaces *> choice [ try parseSWDConfigure
+                                                   ]
+
+parseTempAction :: Parser TempAction
+parseTempAction = string' "temp" *> spaces *> choice [ try parseTempConfigure
+                                                     ]
+
+parseTimerAction :: Parser TimerAction
+parseTimerAction = string' "timer" *> spaces *> choice [ try parseTimerConfigure
+                                                     ]
+
+parseUART0Action :: Parser UART0Action
+parseUART0Action = string' "uart0" *> spaces *> choice uart0s
+    where uart0s = [ try parseUART0Configure
+                   , try parseUART0Enable
+                   , try parseUART0Disable
+                   , try parseUART0Read
+                   , try parseUART0WriteFromString
+                   ]
 
 parseUSARTAction :: Parser USARTAction
 parseUSARTAction = string' "usart" *> spaces *> choice usarts
-    where usarts = [ try parseUSARTEnable
+    where usarts = [ try parseUSARTConfigure
+                   , try parseUSARTEnable
                    , try parseUSARTDisable
                    , try parseUSARTRead
                    , try parseUSARTWriteFromString
                    ]
 
+parseUSBAction :: Parser USBAction
+parseUSBAction = string' "usb" *> spaces *> choice [ try parseUSBConfigure
+                                                   ]
+
+parseWDTAction :: Parser WDTAction
+parseWDTAction = string' "wdt" *> spaces *> choice [ try parseWDTConfigure
+                                                   ]
+
+parseADCConfigure :: Parser ADCAction
+parseADCConfigure = string' "configure" *> pure ADCConfigure
+
+parseButtonConfigure :: Parser ButtonAction
+parseButtonConfigure = string' "configure" *> pure ButtonConfigure
+
 parseButtonRead :: Parser ButtonAction
 parseButtonRead = string' "read" *> pure ButtonRead
+
+parseDACConfigure :: Parser DACAction
+parseDACConfigure = string' "configure" *> pure DACConfigure
+
+parseFSConfigure :: Parser FSAction
+parseFSConfigure = string' "configure" *> pure FSConfigure
 
 parseFSCreate :: Parser FSAction
 parseFSCreate = FSCreate <$> (string' "create" *> spaces *> parseEscString)
@@ -127,6 +205,9 @@ parseFSPullString = string' "pull" *> pure FSPullString
 
 parseFSClose :: Parser FSAction
 parseFSClose = string' "close" *> pure FSClose
+
+parseGPIOConfigure :: Parser GPIOAction
+parseGPIOConfigure = string' "configure" *> pure GPIOConfigure
 
 parseGPIODigitalDirection :: Parser GPIOAction
 parseGPIODigitalDirection = GPIODigitalDirection <$> ( string' "direction"
@@ -168,8 +249,23 @@ parseGPIOAnalogWrite = GPIOAnalogWrite <$> ( string' "write"
                                            )
                                        <*> (spaces *> parseWord16)
 
+parseI2CConfigure :: Parser I2CAction
+parseI2CConfigure = string' "configure" *> pure I2CConfigure
+
+parseLEDConfigure :: Parser LEDAction
+parseLEDConfigure = string' "configure" *> pure LEDConfigure
+
 parseLEDsetRGB :: Parser LEDAction
 parseLEDsetRGB = LEDSetRGB <$> (string' "set" *> spaces *> parseRGB)
+
+parsePWMConfigure :: Parser PWMAction
+parsePWMConfigure = string' "configure" *> pure PWMConfigure
+
+parseRTCConfigure :: Parser RTCAction
+parseRTCConfigure = string' "configure" *> pure RTCConfigure
+
+parseSPIConfigure :: Parser SPIAction
+parseSPIConfigure = string' "configure" *> pure SPIConfigure
 
 parseSPIEnable :: Parser SPIAction
 parseSPIEnable = string' "enable" *> pure SPIEnable
@@ -192,6 +288,42 @@ parseSPIWriteFromFile = SPIWriteFromFile <$> ( string' "writefile"
                                                *> parseEscString
                                              )
 
+parseSWDConfigure :: Parser SWDAction
+parseSWDConfigure = string' "configure" *> pure SWDConfigure
+
+parseTempConfigure :: Parser TempAction
+parseTempConfigure = string' "configure" *> pure TempConfigure
+
+parseTimerConfigure :: Parser TimerAction
+parseTimerConfigure = string' "configure" *> pure TimerConfigure
+
+parseUART0Configure :: Parser UART0Action
+parseUART0Configure = string' "configure" *> pure UART0Configure
+
+parseUART0Enable :: Parser UART0Action
+parseUART0Enable = string' "enable" *> pure UART0Enable
+
+parseUART0Disable :: Parser UART0Action
+parseUART0Disable = string' "disable" *> pure UART0Disable
+
+parseUART0Read :: Parser UART0Action
+parseUART0Read = string' "read" *> pure UART0Read
+
+parseUART0WriteFromString :: Parser UART0Action
+parseUART0WriteFromString = UART0WriteFromString <$> ( string' "write"
+                                                     *> spaces
+                                                     *> parseEscString
+                                                   )
+
+parseUART0WriteFromFile :: Parser UART0Action
+parseUART0WriteFromFile = UART0WriteFromFile <$> ( string' "writefile"
+                                                 *> spaces
+                                                 *> parseEscString
+                                                 )
+
+parseUSARTConfigure :: Parser USARTAction
+parseUSARTConfigure = string' "configure" *> pure USARTConfigure
+
 parseUSARTEnable :: Parser USARTAction
 parseUSARTEnable = string' "enable" *> pure USARTEnable
 
@@ -212,6 +344,12 @@ parseUSARTWriteFromFile = USARTWriteFromFile <$> ( string' "writefile"
                                                  *> spaces
                                                  *> parseEscString
                                                  )
+
+parseUSBConfigure :: Parser USBAction
+parseUSBConfigure = string' "configure" *> pure USBConfigure
+
+parseWDTConfigure :: Parser WDTAction
+parseWDTConfigure = string' "configure" *> pure WDTConfigure
 
 parseDigitalPin :: Parser DigitalPin
 parseDigitalPin = choice [ try (string' "10" *> pure IO10)
