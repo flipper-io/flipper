@@ -69,7 +69,7 @@ parseCall = choice [ ADCCall <$> try parseADCAction
                    ]
 
 parseADCAction :: Parser ADCAction
-parseADCAction = string' "adc" *> spaces *> choice [ try parseADCAction
+parseADCAction = string' "adc" *> spaces *> choice [ try parseADCConfigure
                                                    ]
 
 parseButtonAction :: Parser ButtonAction
