@@ -405,7 +405,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     -- Set up the @pkg-config@ oracle:
     addOracle pkgconfig
 
-    -- By default we build libflipper, the console, and osmium for all targets:
+    -- By default we build libflipper, osmium, and command line utilities:
     want ["libflipper", "osmium", "utils"]
 
     -- Builds libflipper:
@@ -599,11 +599,10 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     "build/libflipper/libflipper.*" %> \o -> do
 
         -- Find the sources needed to build the libflipper POSIX object code:
-        ss <- findDeps [getDirectoryFiles "" ["libflipper//*.c"]]
+        ss <- getDirectoryFiles "" ["libflipper//*.c"]
 
         -- Build the list of necessary object files from the list of necessary
         -- source files:
-
         let os = map (buildpref . (<.> ".native.o")) ss
 
         -- We need the native object code to build libflipper:
@@ -626,7 +625,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     "build/platforms/platforms-posix.a" %> \o -> do
 
         -- Find the sources needed to build the platform POSIX object code:
-        ss <- findDeps [getDirectoryFiles "" ["platforms/posix//*.c"]]
+        ss <- getDirectoryFiles "" ["platforms/posix//*.c"]
 
         -- Build the list of necessary object files from the list of necessary
         -- source files:
