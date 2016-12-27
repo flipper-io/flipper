@@ -92,3 +92,9 @@ int usart_pull(void *destination, lf_size_t length) {
 #endif
 	return lf_success;
 }
+
+/* Interrupt hander for this peripheral. */
+
+void usart0_isr(void) {
+
+}

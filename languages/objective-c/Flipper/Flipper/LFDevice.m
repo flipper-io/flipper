@@ -7,7 +7,6 @@
 //
 
 #import "LFDevice.h"
-#define __private_include__
 #import "flipper.h"
 
 @implementation LFDevice

@@ -12,8 +12,8 @@ extern const struct _spi {
 	uint8_t (* ready)(void);
 	void (* put)(uint8_t byte);
 	uint8_t (* get)(void);
-	void (* push)(void *source, uint32_t length);
-	void (* pull)(void *destination, uint32_t length);
+	int (* push)(void *source, uint32_t length);
+	int (* pull)(void *destination, uint32_t length);
 } spi;
 
 #ifdef __private_include__
@@ -28,8 +28,8 @@ void spi_disable(void);
 uint8_t spi_ready(void);
 void spi_put(uint8_t byte);
 uint8_t spi_get(void);
-void spi_push(void *source, uint32_t length);
-void spi_pull(void *destination, uint32_t length);
+int spi_push(void *source, uint32_t length);
+int spi_pull(void *destination, uint32_t length);
 
 #endif
 #endif

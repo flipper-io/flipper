@@ -80,73 +80,24 @@ void system_task(void) {
 	uart0_configure();
 	/* ~ Configure the GPIO peripheral. */
 	gpio_configure();
-
 	/* ~ Configure the SPI peripheral. ~ */
-
-	/* Enable the SPI clock. */
-	PMC -> PMC_PCER0 = (1 << ID_SPI);
-	/* Create a pinmask for the peripheral pins. */
-	const unsigned int SPI_PIN_MASK = (PIO_PA14A_SPCK | PIO_PA13A_MOSI | PIO_PA12A_MISO | PIO_PA31A_NPCS1);
-	/* Disable PIOA interrupts on the peripheral pins. */
-	PIOA -> PIO_IDR = SPI_PIN_MASK;
-	/* Disable the peripheral pins from use by the PIOA. */
-	PIOA -> PIO_PDR = SPI_PIN_MASK;
-	/* Hand control of the peripheral pins to peripheral A. */
-	PIOA -> PIO_ABCDSR[0] &= ~SPI_PIN_MASK;
-	PIOA -> PIO_ABCDSR[1] &= ~SPI_PIN_MASK;
-	/* Reset the SPI. */
-	SPI -> SPI_CR = SPI_CR_SWRST;
-	/* Reset the SPI again. Eratta. */
-	SPI -> SPI_CR = SPI_CR_SWRST;
-	/* Enable the mode fault interrupt. */
-	SPI -> SPI_IER = SPI_IER_MODF;
-	/* Enter master mode, no mode fault detection, activate user SPI peripheral. */
-	SPI -> SPI_MR = SPI_MR_MSTR | SPI_MR_PCS(1);
-	/* Configure the user SPI peripheral. 8 bits per transfer. SPI mode 3. SCK = MCK / 8. */
-	SPI -> SPI_CSR[1] = SPI_CSR_SCBR(8) | SPI_CSR_DLYBCT(1) | SPI_CSR_BITS_8_BIT | SPI_CSR_NCPHA | SPI_CSR_CPOL;
-	/* Disable the PDC channels. */
-	SPI -> SPI_PTCR = SPI_PTCR_TXTDIS | SPI_PTCR_RXTDIS;
-	/* Clear the secondary PDC channel. */
-	SPI -> SPI_TNCR = 0;
-	SPI -> SPI_TNPR = (uintptr_t)(NULL);
-	/* Enable the SPI interrupt. */
-	NVIC_EnableIRQ(SPI_IRQn);
-	/* Enable the SPI. */
-	SPI -> SPI_CR = SPI_CR_SPIEN;
-
-	/* Insantiate an outgoing PDC transfer. */
-	const char hello[] = "Hello!";
+	spi_configure();
 
 	gpio_enable(PIO_PA0, 0);
 	PIOA -> PIO_OWER = PIO_PA0;
 	while (1) {
 		PIOA -> PIO_ODSR ^= PIO_PA0;
 
-		/* Disable the PDC transmitter. */
-		SPI -> SPI_PTCR = SPI_PTCR_TXTDIS;
-		/* Queue the PDC transfer. */
-		SPI -> SPI_TCR = sizeof(hello);
-		SPI -> SPI_TPR = (uintptr_t)(hello);
-		/* Enable the PDC transmitter to start the transmission. */
-		SPI -> SPI_PTCR = SPI_PTCR_TXTEN;
-		/* Wait until the transfer has finished. */
-		while (!(SPI -> SPI_SR & SPI_SR_ENDTX));
+		char hello[] = "hello";
+		spi_push(hello, sizeof(hello));
 
-		for (int i = 0; i < 5000000; i ++);
+		for (int i = 0; i < 5000000; i ++) __NOP();
 	}
 
 	/* Enable the PDC receive complete interrupt. */
 	UART0 -> UART_IER = UART_IER_ENDRX;
 	/* Pull an FMR packet asynchronously. */
 	uart0_pull(&packet, sizeof(struct _fmr_packet));
-}
-
-void spi_isr(void) {
-	/* Falls through if a mode fault has occured. This fires when the masters drive the slave out of sync. */
-	if (SPI -> SPI_SR & SPI_SR_MODF) {
-		/* Re-enable the SPI bus. */
-		SPI -> SPI_CR = SPI_CR_SPIEN;
-	}
 }
 
 void uart0_isr(void) {

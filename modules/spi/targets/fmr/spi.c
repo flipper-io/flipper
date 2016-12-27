@@ -29,10 +29,10 @@ uint8_t spi_get(void) {
 	return lf_invoke(&_spi, _spi_get, NULL);
 }
 
-void spi_push(void *source, uint32_t length) {
-	lf_push(&_spi, _spi_push, source, length, NULL);
+int spi_push(void *source, uint32_t length) {
+	return lf_push(&_spi, _spi_push, source, length, NULL);
 }
 
-void spi_pull(void *destination, uint32_t length) {
-	lf_pull(&_spi, _spi_pull, destination, length, NULL);
+int spi_pull(void *destination, uint32_t length) {
+	return lf_pull(&_spi, _spi_pull, destination, length, NULL);
 }
