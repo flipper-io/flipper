@@ -1,6 +1,7 @@
 #!/usr/bin/env runhaskell
 
-{-# LANGUAGE DeriveDataTypeable , DeriveGeneric
+{-# LANGUAGE DeriveDataTypeable
+           , DeriveGeneric
            , GeneralizedNewtypeDeriving
            #-}
 
@@ -335,7 +336,8 @@ arRule ara os a = do
     arc <- ara
     command_ [EchoStdout False, EchoStderr False] arc ("rvs" : a : os)
 
--- | Generic combinator for building dynamic libraries.
+-- | Generic combinator for linking native code. This function incorporates
+--   target-specific behavior. Use 'elfRule' for building ELFs for the hardware.
 ldRule :: Action FilePath -- ^ Action returning linker path.
        -> [String]        -- ^ Linker options.
        -> [FilePath]      -- ^ Archive files.
@@ -360,7 +362,7 @@ ldRule lda ops as o = do
             _        -> error "ldRule: unknown target"
     command_ [] ld args
 
--- | Generic combinator for building ELFs.
+-- | Generic combinator for linking device code into ELFs.
 elfRule :: Action FilePath -- ^ Action returning linker path.
         -> [String]        -- ^ Linker options.
         -> [FilePath]      -- ^ Archive files.
@@ -403,8 +405,41 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     -- Set up the @pkg-config@ oracle:
     addOracle pkgconfig
 
-    -- By default we build libflipper, the console, and osmium for all targets:
-    want ["libflipper", "osmium", "utils"]
+    -- By default we build libflipper, osmium, and command line utilities:
+    want ["libflipper", "libflipper-headers", "osmium", "utils"]
+
+    -- Copy headers into build artifacts target:
+    phony "libflipper-headers" $ do
+
+        -- It's actually rather difficult to do this the "right way," since we
+        -- can't easily recover a header's path in the source tree from it's
+        -- path in the build directory (or it's installation path). Since this
+        -- rule is so cheap to run, we simply depend on all of the headers in
+        -- the source tree and always re-run this rule.
+        hs <- getDirectoryFiles "" [ "include//*.h"
+                                   , "modules/*/include//*.h"
+                                   , "platforms/*/include//*.h"
+                                   ]
+        need hs
+
+        -- Make the target directory:
+        command_ [] "mkdir" ["-p", "build/include/flipper"]
+
+        -- Copy the top-level headers:
+        command_ [] "cp" ["include/flipper.h", "build/include/"]
+        command_ [] "cp" ["-R", "include/flipper", "build/include/"]
+
+        -- Copy module headers:
+        modIncludes >>= mapM_ (\h -> command_ [] "cp" [ "-R"
+                                                     , h </> "flipper"
+                                                     , "build/include/"
+                                                     ])
+
+        -- Copy platform headers:
+        platformIncludes >>= mapM_ (\h -> command_ [] "cp" ["-R"
+                                                           , h </> "platforms"
+                                                           , "build/include/flipper/"
+                                                           ])
 
     -- Builds libflipper:
     phony "libflipper" $ do
@@ -465,7 +500,8 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
 
     -- Install libflipper and the console:
     phony "install" $ do
-        need ["libflipper", "utils"]
+        need ["libflipper", "libflipper-headers", "utils"]
+        need ["install-libflipper-headers"]
         need ["install-libflipper"]
         need ["install-utils"]
 
@@ -485,8 +521,26 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
                                  , p </> "bin" </> u
                                  ]) us
 
-    -- Install libflipper and the flipper header files:
+    -- Install the header files:
+    phony "install-libflipper-headers" $ do
+
+        -- We need the headers in order to install:
+        need ["libflipper-headers"]
+
+        p <- prefix
+
+        -- Make the @$PREFIX/include@ directory:
+        instCmd_ [] ["mkdir", "-p", p </> "include"]
+
+        -- Install the top-level header:
+        instCmd_ [] ["cp", "build/include/flipper.h", p </> "include/"]
+
+        -- Install the rest of the headers:
+        instCmd_ [] ["cp", "-R", "build/include/flipper", p </> "include/"]
+
+    -- Install libflipper:
     phony "install-libflipper" $ do
+
         -- libflipper needs to be built before we can install it:
         need ["libflipper"]
 
@@ -498,27 +552,6 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
 
         -- Install the shared library:
         instCmd_ [] ["cp",  "build/libflipper" </> dyn, p </> "lib/"]
-
-        -- Make the @$PREFIX/include/flipper@ directory:
-        instCmd_ [] ["mkdir", "-p", p </> "include/flipper"]
-
-        -- Install the top-level headers:
-        instCmd_ [] ["cp", "include/flipper.h", p </> "include/"]
-        instCmd_ [] ["cp", "-R", "include/flipper", p </> "include/"]
-
-        -- Install module headers:
-        modIncludes >>= mapM_ (\h -> instCmd_ [] [ "cp"
-                                                 , "-R"
-                                                 , h </> "flipper"
-                                                 , p </> "include/"
-                                                 ])
-
-        -- Install platform headers:
-        platformIncludes >>= mapM_ (\h -> instCmd_ [] [ "cp"
-                                                      , "-R"
-                                                      , h </> "platforms"
-                                                      , p </> "include/flipper/"
-                                                      ])
 
     -- Install the console:
     phony "install-console" $ do
@@ -597,11 +630,10 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     "build/libflipper/libflipper.*" %> \o -> do
 
         -- Find the sources needed to build the libflipper POSIX object code:
-        ss <- findDeps [getDirectoryFiles "" ["libflipper//*.c"]]
+        ss <- getDirectoryFiles "" ["libflipper//*.c"]
 
         -- Build the list of necessary object files from the list of necessary
         -- source files:
-
         let os = map (buildpref . (<.> ".native.o")) ss
 
         -- We need the native object code to build libflipper:
@@ -624,12 +656,13 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     "build/platforms/platforms-posix.a" %> \o -> do
 
         -- Find the sources needed to build the platform POSIX object code:
-        ss <- findDeps [getDirectoryFiles "" ["platforms/posix//*.c"]]
+        ss <- getDirectoryFiles "" ["platforms/posix//*.c"]
 
         -- Build the list of necessary object files from the list of necessary
         -- source files:
         let os = map (buildpref . (<.> ".native.o")) ss
 
+        -- Run the archiver:
         arRule ar os o
 
     -- Build module object code for POSIX:
@@ -646,6 +679,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         -- source files:
         let os = map (buildpref . (<.> ".native.o")) ss
 
+        -- Run the archiver:
         arRule ar os o
 
     -- Generic rule for building utilities:
@@ -704,7 +738,12 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
 
         -- Find the sources needed to build osmium ATMEGA16U2 object code:
         ss <- findDeps [ getDirectoryFiles "" ["osmium//*.c"]
-                       , pure [ "libflipper/src/crc.c"
+                         -- A few kludges are necessary to prevent parts of
+                         -- libflipper from being treated as dead code by the
+                         -- linker:
+                       , pure [ -- This is a kludge to include parts of
+                                -- libflipper in osmium:
+                                "libflipper/src/crc.c"
                               , "libflipper/src/fmr.c"
                               ]
                        ]
@@ -738,6 +777,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         -- source files:
         let os = map (buildpref . (<.> ".avr.o")) ss
 
+        -- Run the archiver:
         arRule avr_ar os o
 
     -- Build module object code for the ATMEGA16U2:
@@ -754,6 +794,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         -- source files:
         let os = map (buildpref . (<.> ".avr.o")) ss
 
+        -- Run the archiver:
         arRule avr_ar os o
 
     -- Build the osmium ELF for the ATSAM4S16B:
@@ -762,9 +803,18 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         -- Find the sources needed to build the libflipper ATSAM4S16B object
         -- code:
         ss <- findDeps [ getDirectoryFiles "" ["osmium//*.c"]
-                       , pure [ "libflipper/src/crc.c"
+                         -- A few kludges are necessary to prevent parts of
+                         -- libflipper and platform code from being treated as
+                         -- dead code by the linker:
+                       , pure [ -- This is a kludge to include parts of
+                                -- libflipper in osmium:
+                                "libflipper/src/crc.c"
                               , "libflipper/src/fmr.c"
+                                -- This is a kludge to include symbols needed by
+                                -- newlib in osmium:
                               , "platforms/atsam4s16b/src/system/syscalls.c"
+                                -- This is a kludge to include the vector table
+                                -- in osmium:
                               , "platforms/atsam4s16b/src/system/vectors.c"
                               ]
                        ]
@@ -802,6 +852,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         -- source files:
         let os = map (buildpref . (<.> ".arm.o")) ss
 
+        -- Run the archiver:
         arRule arm_ar os o
 
     -- Build module object code for the ATSAM4S16B:
@@ -818,6 +869,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         -- source files:
         let os = map (buildpref . (<.> ".arm.o")) ss
 
+        -- Run the archiver:
         arRule arm_ar os o
 
     -- Generic rule for compiling C or assembling for the ATMEGA16U2:
