@@ -9,8 +9,6 @@ Portability : Windows, POSIX
 
 -}
 
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-
 module Flipper.Internal.FS (
     configure
   , create

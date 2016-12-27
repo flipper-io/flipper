@@ -13,7 +13,6 @@ module Flipper.Internal.Buffer (
     Buffer(..)
   , emptyBuffer
   , allocBufferSafe
-  , allocBuffer
   , toByteString
   , fromByteString
   , append
@@ -52,12 +51,15 @@ instance Show Buffer where
 emptyBuffer :: Buffer
 emptyBuffer = Buffer (error "nullForeignPtr") 0 0
 
-allocBufferSafe :: Int -> IO Buffer
+-- | Allocate a buffer. Throws 'ErrorCall' if the buffer size is less than zero.
+allocBufferSafe :: Int -- ^ Byte count.
+                -> IO Buffer
 allocBufferSafe l
     | l <= 0    = error "allocBuffer: length must be greater than zero."
     | otherwise = (\p -> Buffer (castForeignPtr p) 0 l)
               <$> mallocPlainForeignPtrBytes l
 
+-- | Unsafe variant of 'allocBufferSafe'.
 allocBuffer :: Int -> Buffer
 allocBuffer = unsafePerformIO . allocBufferSafe
 

@@ -9,7 +9,7 @@ Portability : Windows, POSIX
 
 -}
 
-{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveDataTypeable #-}
 
 module Flipper.Error (
     FlipperError(..)

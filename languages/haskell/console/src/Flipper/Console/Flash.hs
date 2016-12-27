@@ -1,3 +1,16 @@
+{-|
+Module      : Flipper.Console.Flash
+Description : Firmare flashing.
+Copyright   : George Morgan, Travis Whitaker 2016
+License     : All rights reserved.
+Maintainer  : travis@flipper.io
+Stability   : Provisional
+Portability : Windows, POSIX
+
+This module provides access to a C routine for flashing firmware to the
+ATSAM4S16B.
+-}
+
 module Flipper.Console.Flash where
 
 import Control.Monad.Trans.Class
@@ -14,6 +27,8 @@ import Foreign.Ptr
 
 import System.Console.Haskeline
 
+-- | Flash a firmware file to the device.
+--   TODO: do some sanity checks on the file before flashing.
 execFlash :: FilePath -> FC ()
 execFlash fp = do
     f <- liftFC $ BS.readFile fp

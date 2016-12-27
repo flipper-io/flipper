@@ -1,4 +1,39 @@
-module Flipper.Console.Action where
+{-|
+Module      : Flipper.Console.Action
+Description : Console AST.
+Copyright   : George Morgan, Travis Whitaker 2016
+License     : All rights reserved.
+Maintainer  : travis@flipper.io
+Stability   : Provisional
+Portability : Windows, POSIX
+
+This module provides data types for representing console actions. The console
+simply parses command line arguments or REPL lines into 'ConsoleActions', then
+executes them.
+-}
+
+module Flipper.Console.Action (
+    ConsoleAction(..)
+  , ModuleID(..)
+  , Call(..)
+  , ADCAction(..)
+  , ButtonAction(..)
+  , DACAction(..)
+  , FSAction(..)
+  , GPIOAction(..)
+  , I2CAction(..)
+  , LEDAction(..)
+  , PWMAction(..)
+  , RTCAction(..)
+  , SPIAction(..)
+  , SWDAction(..)
+  , TempAction(..)
+  , TimerAction(..)
+  , UART0Action(..)
+  , USARTAction(..)
+  , USBAction(..)
+  , WDTAction(..)
+  ) where
 
 import Data.Word
 
