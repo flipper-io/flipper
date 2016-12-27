@@ -626,6 +626,14 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     -- Shortcut:
     phony "fu2" $ need ["flash-atmega16u2"]
 
+    -- Shortcut for @dfu-programmer at90usb162 launch --no-reset@:
+    phony "boot" $ do
+        -- Launch osmium on the ATMEGA16U2:
+        command_ [] "dfu-programmer" [ "at90usb162"
+                                     , "launch"
+                                     , "--no-reset"
+                                     ]
+
     -- Build libflipper:
     "build/libflipper/libflipper.*" %> \o -> do
 
