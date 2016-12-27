@@ -10,8 +10,8 @@ int main() {
 
 	/* Initialize peripheral hardware. */
 	//button_configure();
-	//led_configure();
-	//led_set_rgb(LED_COLOR_SUCCESS);
+	led_configure();
+	led_set_rgb(LED_COLOR_SUCCESS);
 	// spi_configure();
 	// nvm_configure();
 

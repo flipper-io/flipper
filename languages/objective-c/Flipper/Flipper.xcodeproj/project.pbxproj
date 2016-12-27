@@ -7,6 +7,33 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5E2A4BF41E12FF4400BA0084 /* adc.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4BBD1E12FED600BA0084 /* adc.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		5E2A4BF51E12FF4400BA0084 /* button.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4BBE1E12FED600BA0084 /* button.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		5E2A4BF61E12FF4400BA0084 /* core.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4BBF1E12FED600BA0084 /* core.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		5E2A4BF71E12FF4400BA0084 /* cpu.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4BC01E12FED600BA0084 /* cpu.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		5E2A4BF81E12FF4400BA0084 /* dac.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4BC11E12FED600BA0084 /* dac.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		5E2A4BF91E12FF4400BA0084 /* error.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4BC21E12FED600BA0084 /* error.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		5E2A4BFA1E12FF4400BA0084 /* fld.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4BC31E12FED600BA0084 /* fld.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		5E2A4BFB1E12FF4400BA0084 /* flipper.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4BC41E12FED600BA0084 /* flipper.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		5E2A4BFC1E12FF4400BA0084 /* fmr.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4BC51E12FED600BA0084 /* fmr.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		5E2A4BFD1E12FF4400BA0084 /* fs.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4BC61E12FED600BA0084 /* fs.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		5E2A4BFE1E12FF4400BA0084 /* gpio.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4BC71E12FED600BA0084 /* gpio.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		5E2A4BFF1E12FF4400BA0084 /* i2c.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4BC81E12FED600BA0084 /* i2c.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		5E2A4C001E12FF4400BA0084 /* led.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4BC91E12FED600BA0084 /* led.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		5E2A4C011E12FF4400BA0084 /* modules.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4BCA1E12FED600BA0084 /* modules.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		5E2A4C021E12FF4400BA0084 /* pwm.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4BDA1E12FED600BA0084 /* pwm.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		5E2A4C031E12FF4400BA0084 /* rtc.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4BDB1E12FED600BA0084 /* rtc.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		5E2A4C041E12FF4400BA0084 /* spi.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4BDC1E12FED600BA0084 /* spi.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		5E2A4C051E12FF4400BA0084 /* swd.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4BDD1E12FED600BA0084 /* swd.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		5E2A4C061E12FF4400BA0084 /* temp.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4BDE1E12FED600BA0084 /* temp.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		5E2A4C071E12FF4400BA0084 /* timer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4BDF1E12FED600BA0084 /* timer.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		5E2A4C081E12FF4400BA0084 /* uart0.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4BE01E12FED600BA0084 /* uart0.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		5E2A4C091E12FF4400BA0084 /* usart.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4BE11E12FED600BA0084 /* usart.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		5E2A4C0A1E12FF4400BA0084 /* usb.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4BE21E12FED600BA0084 /* usb.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		5E2A4C0B1E12FF4400BA0084 /* wdt.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4BE31E12FED600BA0084 /* wdt.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		5E2A4C111E13046D00BA0084 /* libflipper.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E2A4C0D1E1303E900BA0084 /* libflipper.dylib */; };
+		5E2A4C141E1304BE00BA0084 /* LFDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E2A4C121E1304BE00BA0084 /* LFDevice.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5E2A4C151E1304BE00BA0084 /* LFDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E2A4C131E1304BE00BA0084 /* LFDevice.m */; };
 		5E7F1AB01DC2541A0041E048 /* Flipper.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E7F1AAE1DC2541A0041E048 /* Flipper.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5E7F1AB81DC254920041E048 /* LED.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E7F1AB61DC254920041E048 /* LED.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5E7F1AB91DC254920041E048 /* LED.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E7F1AB71DC254920041E048 /* LED.m */; };
@@ -27,6 +54,44 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5E2A4BBD1E12FED600BA0084 /* adc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = adc.h; path = /usr/local/include/flipper/adc.h; sourceTree = "<absolute>"; };
+		5E2A4BBE1E12FED600BA0084 /* button.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = button.h; path = /usr/local/include/flipper/button.h; sourceTree = "<absolute>"; };
+		5E2A4BBF1E12FED600BA0084 /* core.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = core.h; path = /usr/local/include/flipper/core.h; sourceTree = "<absolute>"; };
+		5E2A4BC01E12FED600BA0084 /* cpu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = cpu.h; path = /usr/local/include/flipper/cpu.h; sourceTree = "<absolute>"; };
+		5E2A4BC11E12FED600BA0084 /* dac.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = dac.h; path = /usr/local/include/flipper/dac.h; sourceTree = "<absolute>"; };
+		5E2A4BC21E12FED600BA0084 /* error.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = error.h; path = /usr/local/include/flipper/error.h; sourceTree = "<absolute>"; };
+		5E2A4BC31E12FED600BA0084 /* fld.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = fld.h; path = /usr/local/include/flipper/fld.h; sourceTree = "<absolute>"; };
+		5E2A4BC41E12FED600BA0084 /* flipper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = flipper.h; path = /usr/local/include/flipper/flipper.h; sourceTree = "<absolute>"; };
+		5E2A4BC51E12FED600BA0084 /* fmr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = fmr.h; path = /usr/local/include/flipper/fmr.h; sourceTree = "<absolute>"; };
+		5E2A4BC61E12FED600BA0084 /* fs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = fs.h; path = /usr/local/include/flipper/fs.h; sourceTree = "<absolute>"; };
+		5E2A4BC71E12FED600BA0084 /* gpio.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = gpio.h; path = /usr/local/include/flipper/gpio.h; sourceTree = "<absolute>"; };
+		5E2A4BC81E12FED600BA0084 /* i2c.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = i2c.h; path = /usr/local/include/flipper/i2c.h; sourceTree = "<absolute>"; };
+		5E2A4BC91E12FED600BA0084 /* led.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = led.h; path = /usr/local/include/flipper/led.h; sourceTree = "<absolute>"; };
+		5E2A4BCA1E12FED600BA0084 /* modules.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = modules.h; path = /usr/local/include/flipper/modules.h; sourceTree = "<absolute>"; };
+		5E2A4BCC1E12FED600BA0084 /* atmega16u2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = atmega16u2.h; sourceTree = "<group>"; };
+		5E2A4BCF1E12FED600BA0084 /* core_cm3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = core_cm3.h; sourceTree = "<group>"; };
+		5E2A4BD01E12FED600BA0084 /* exceptions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = exceptions.h; sourceTree = "<group>"; };
+		5E2A4BD11E12FED600BA0084 /* SAM4S16.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SAM4S16.h; sourceTree = "<group>"; };
+		5E2A4BD21E12FED600BA0084 /* atsam4s16b.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = atsam4s16b.h; sourceTree = "<group>"; };
+		5E2A4BD31E12FED600BA0084 /* esp8266ex.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = esp8266ex.h; sourceTree = "<group>"; };
+		5E2A4BD41E12FED600BA0084 /* fvm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = fvm.h; sourceTree = "<group>"; };
+		5E2A4BD61E12FED600BA0084 /* libusb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libusb.h; sourceTree = "<group>"; };
+		5E2A4BD71E12FED600BA0084 /* network.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = network.h; sourceTree = "<group>"; };
+		5E2A4BD81E12FED600BA0084 /* posix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = posix.h; sourceTree = "<group>"; };
+		5E2A4BD91E12FED600BA0084 /* windows.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = windows.h; sourceTree = "<group>"; };
+		5E2A4BDA1E12FED600BA0084 /* pwm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = pwm.h; path = /usr/local/include/flipper/pwm.h; sourceTree = "<absolute>"; };
+		5E2A4BDB1E12FED600BA0084 /* rtc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = rtc.h; path = /usr/local/include/flipper/rtc.h; sourceTree = "<absolute>"; };
+		5E2A4BDC1E12FED600BA0084 /* spi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = spi.h; path = /usr/local/include/flipper/spi.h; sourceTree = "<absolute>"; };
+		5E2A4BDD1E12FED600BA0084 /* swd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = swd.h; path = /usr/local/include/flipper/swd.h; sourceTree = "<absolute>"; };
+		5E2A4BDE1E12FED600BA0084 /* temp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = temp.h; path = /usr/local/include/flipper/temp.h; sourceTree = "<absolute>"; };
+		5E2A4BDF1E12FED600BA0084 /* timer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = timer.h; path = /usr/local/include/flipper/timer.h; sourceTree = "<absolute>"; };
+		5E2A4BE01E12FED600BA0084 /* uart0.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = uart0.h; path = /usr/local/include/flipper/uart0.h; sourceTree = "<absolute>"; };
+		5E2A4BE11E12FED600BA0084 /* usart.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = usart.h; path = /usr/local/include/flipper/usart.h; sourceTree = "<absolute>"; };
+		5E2A4BE21E12FED600BA0084 /* usb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = usb.h; path = /usr/local/include/flipper/usb.h; sourceTree = "<absolute>"; };
+		5E2A4BE31E12FED600BA0084 /* wdt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = wdt.h; path = /usr/local/include/flipper/wdt.h; sourceTree = "<absolute>"; };
+		5E2A4C0D1E1303E900BA0084 /* libflipper.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libflipper.dylib; path = ../../../../../../../usr/local/lib/libflipper.dylib; sourceTree = "<group>"; };
+		5E2A4C121E1304BE00BA0084 /* LFDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFDevice.h; sourceTree = "<group>"; };
+		5E2A4C131E1304BE00BA0084 /* LFDevice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFDevice.m; sourceTree = "<group>"; };
 		5E7F1AAB1DC2541A0041E048 /* Flipper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Flipper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5E7F1AAE1DC2541A0041E048 /* Flipper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Flipper.h; sourceTree = "<group>"; };
 		5E7F1AAF1DC2541A0041E048 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -41,6 +106,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5E2A4C111E13046D00BA0084 /* libflipper.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -55,12 +121,97 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5E2A4BCB1E12FED600BA0084 /* platforms */ = {
+			isa = PBXGroup;
+			children = (
+				5E2A4BCC1E12FED600BA0084 /* atmega16u2.h */,
+				5E2A4BCD1E12FED600BA0084 /* atsam4s16b */,
+				5E2A4BD21E12FED600BA0084 /* atsam4s16b.h */,
+				5E2A4BD31E12FED600BA0084 /* esp8266ex.h */,
+				5E2A4BD41E12FED600BA0084 /* fvm.h */,
+				5E2A4BD51E12FED600BA0084 /* posix */,
+				5E2A4BD81E12FED600BA0084 /* posix.h */,
+				5E2A4BD91E12FED600BA0084 /* windows.h */,
+			);
+			name = platforms;
+			path = /usr/local/include/flipper/platforms;
+			sourceTree = "<absolute>";
+		};
+		5E2A4BCD1E12FED600BA0084 /* atsam4s16b */ = {
+			isa = PBXGroup;
+			children = (
+				5E2A4BCE1E12FED600BA0084 /* cmsis */,
+				5E2A4BD01E12FED600BA0084 /* exceptions.h */,
+				5E2A4BD11E12FED600BA0084 /* SAM4S16.h */,
+			);
+			path = atsam4s16b;
+			sourceTree = "<group>";
+		};
+		5E2A4BCE1E12FED600BA0084 /* cmsis */ = {
+			isa = PBXGroup;
+			children = (
+				5E2A4BCF1E12FED600BA0084 /* core_cm3.h */,
+			);
+			path = cmsis;
+			sourceTree = "<group>";
+		};
+		5E2A4BD51E12FED600BA0084 /* posix */ = {
+			isa = PBXGroup;
+			children = (
+				5E2A4BD61E12FED600BA0084 /* libusb.h */,
+				5E2A4BD71E12FED600BA0084 /* network.h */,
+			);
+			path = posix;
+			sourceTree = "<group>";
+		};
+		5E2A4BE41E12FEFE00BA0084 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				5E2A4BBD1E12FED600BA0084 /* adc.h */,
+				5E2A4BBE1E12FED600BA0084 /* button.h */,
+				5E2A4BBF1E12FED600BA0084 /* core.h */,
+				5E2A4BC01E12FED600BA0084 /* cpu.h */,
+				5E2A4BC11E12FED600BA0084 /* dac.h */,
+				5E2A4BC21E12FED600BA0084 /* error.h */,
+				5E2A4BC31E12FED600BA0084 /* fld.h */,
+				5E2A4BC41E12FED600BA0084 /* flipper.h */,
+				5E2A4BC51E12FED600BA0084 /* fmr.h */,
+				5E2A4BC61E12FED600BA0084 /* fs.h */,
+				5E2A4BC71E12FED600BA0084 /* gpio.h */,
+				5E2A4BC81E12FED600BA0084 /* i2c.h */,
+				5E2A4BC91E12FED600BA0084 /* led.h */,
+				5E2A4BCA1E12FED600BA0084 /* modules.h */,
+				5E2A4BCB1E12FED600BA0084 /* platforms */,
+				5E2A4BDA1E12FED600BA0084 /* pwm.h */,
+				5E2A4BDB1E12FED600BA0084 /* rtc.h */,
+				5E2A4BDC1E12FED600BA0084 /* spi.h */,
+				5E2A4BDD1E12FED600BA0084 /* swd.h */,
+				5E2A4BDE1E12FED600BA0084 /* temp.h */,
+				5E2A4BDF1E12FED600BA0084 /* timer.h */,
+				5E2A4BE01E12FED600BA0084 /* uart0.h */,
+				5E2A4BE11E12FED600BA0084 /* usart.h */,
+				5E2A4BE21E12FED600BA0084 /* usb.h */,
+				5E2A4BE31E12FED600BA0084 /* wdt.h */,
+			);
+			name = include;
+			sourceTree = "<group>";
+		};
+		5E2A4C0C1E1303E900BA0084 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5E2A4C0D1E1303E900BA0084 /* libflipper.dylib */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		5E7F1AA11DC254190041E048 = {
 			isa = PBXGroup;
 			children = (
+				5E2A4BE41E12FEFE00BA0084 /* include */,
 				5E7F1AAD1DC2541A0041E048 /* Flipper */,
 				5E7F1AD91DC255F20041E048 /* FlipperTest */,
 				5E7F1AAC1DC2541A0041E048 /* Products */,
+				5E2A4C0C1E1303E900BA0084 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -78,6 +229,8 @@
 			children = (
 				5E7F1AAE1DC2541A0041E048 /* Flipper.h */,
 				5E7F1AAF1DC2541A0041E048 /* Info.plist */,
+				5E2A4C121E1304BE00BA0084 /* LFDevice.h */,
+				5E2A4C131E1304BE00BA0084 /* LFDevice.m */,
 				5E7F1AB61DC254920041E048 /* LED.h */,
 				5E7F1AB71DC254920041E048 /* LED.m */,
 			);
@@ -99,8 +252,33 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5E2A4C141E1304BE00BA0084 /* LFDevice.h in Headers */,
 				5E7F1AB81DC254920041E048 /* LED.h in Headers */,
 				5E7F1AB01DC2541A0041E048 /* Flipper.h in Headers */,
+				5E2A4BF41E12FF4400BA0084 /* adc.h in Headers */,
+				5E2A4BF51E12FF4400BA0084 /* button.h in Headers */,
+				5E2A4BF61E12FF4400BA0084 /* core.h in Headers */,
+				5E2A4BF71E12FF4400BA0084 /* cpu.h in Headers */,
+				5E2A4BF81E12FF4400BA0084 /* dac.h in Headers */,
+				5E2A4BF91E12FF4400BA0084 /* error.h in Headers */,
+				5E2A4BFA1E12FF4400BA0084 /* fld.h in Headers */,
+				5E2A4BFB1E12FF4400BA0084 /* flipper.h in Headers */,
+				5E2A4BFC1E12FF4400BA0084 /* fmr.h in Headers */,
+				5E2A4BFD1E12FF4400BA0084 /* fs.h in Headers */,
+				5E2A4BFE1E12FF4400BA0084 /* gpio.h in Headers */,
+				5E2A4BFF1E12FF4400BA0084 /* i2c.h in Headers */,
+				5E2A4C001E12FF4400BA0084 /* led.h in Headers */,
+				5E2A4C011E12FF4400BA0084 /* modules.h in Headers */,
+				5E2A4C021E12FF4400BA0084 /* pwm.h in Headers */,
+				5E2A4C031E12FF4400BA0084 /* rtc.h in Headers */,
+				5E2A4C041E12FF4400BA0084 /* spi.h in Headers */,
+				5E2A4C051E12FF4400BA0084 /* swd.h in Headers */,
+				5E2A4C061E12FF4400BA0084 /* temp.h in Headers */,
+				5E2A4C071E12FF4400BA0084 /* timer.h in Headers */,
+				5E2A4C081E12FF4400BA0084 /* uart0.h in Headers */,
+				5E2A4C091E12FF4400BA0084 /* usart.h in Headers */,
+				5E2A4C0A1E12FF4400BA0084 /* usb.h in Headers */,
+				5E2A4C0B1E12FF4400BA0084 /* wdt.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -148,7 +326,7 @@
 		5E7F1AA21DC254190041E048 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0800;
+				LastUpgradeCheck = 0820;
 				ORGANIZATIONNAME = Flipper;
 				TargetAttributes = {
 					5E7F1AAA1DC254190041E048 = {
@@ -195,6 +373,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5E7F1AB91DC254920041E048 /* LED.m in Sources */,
+				5E2A4C151E1304BE00BA0084 /* LFDevice.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -227,6 +406,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -277,6 +457,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -312,9 +493,15 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					__private_include__,
+				);
 				INFOPLIST_FILE = Flipper/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				PRODUCT_BUNDLE_IDENTIFIER = io.flipper.Flipper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -331,9 +518,11 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
+				GCC_PREPROCESSOR_DEFINITIONS = __private_include__;
 				INFOPLIST_FILE = Flipper/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				PRODUCT_BUNDLE_IDENTIFIER = io.flipper.Flipper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -373,6 +562,7 @@
 				5E7F1AB51DC2541A0041E048 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		5E7F1ADC1DC255F20041E048 /* Build configuration list for PBXNativeTarget "FlipperTest" */ = {
 			isa = XCConfigurationList;
@@ -381,6 +571,7 @@
 				5E7F1ADE1DC255F20041E048 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

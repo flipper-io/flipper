@@ -50,6 +50,15 @@ extern int flipper_exit(void);
 /* ~ User functions. ~ */
 
 /* Performs a proper function invocation on the device associated with the provided module. */
+
+/**
+ * @brief Invokes a function in a module with a list of parameters.
+ *
+ * @param module The module in which the function resides.
+ * @param function The function to be invoked.
+ * @param paramters The list of parameters to be passed to the function.
+ *
+ */
 extern fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _fmr_list *parameters);
 /* Moves data from the address space of the host to that of the device. */
 extern int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _fmr_list *parameters);
