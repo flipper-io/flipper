@@ -11,6 +11,7 @@ Portability : Windows, POSIX
 
 module Flipper.WDT (
     configure
+  , fire
   ) where
 
 import Flipper.MonadFlipper
@@ -20,3 +21,7 @@ import qualified Flipper.Internal.WDT as I
 -- | Configure the watchdog timer.
 configure :: MonadFlipper m => m Bool
 configure = bracketIO I.configure
+
+-- | Fire the watchdog timer.
+fire :: MonadFlipper m => m ()
+fire = bracketIO I.fire

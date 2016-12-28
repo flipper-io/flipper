@@ -213,6 +213,7 @@ parseUSBAction = string' "usb" *> spaces *> choice [ try parseUSBConfigure
 -- | WDT command parser.
 parseWDTAction :: Parser WDTAction
 parseWDTAction = string' "wdt" *> spaces *> choice [ try parseWDTConfigure
+                                                   , try parseWDTFire
                                                    ]
 
 -- | ADC configure command parser.
@@ -446,6 +447,10 @@ parseUSBConfigure = string' "configure" *> pure USBConfigure
 -- | WDT configure command parser.
 parseWDTConfigure :: Parser WDTAction
 parseWDTConfigure = string' "configure" *> pure WDTConfigure
+
+-- | WDT fire command parser.
+parseWDTFire :: Parser WDTAction
+parseWDTFire = string' "fire" *> pure WDTFire
 
 -- | Digital pin identifier parser.
 parseDigitalPin :: Parser DigitalPin

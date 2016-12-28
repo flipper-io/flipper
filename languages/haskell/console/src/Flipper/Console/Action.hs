@@ -224,3 +224,5 @@ data USBAction = -- | Configure the USB module.
 -- | WDT moduel call.
 data WDTAction = -- | Configure the WDT module.
                  WDTConfigure
+               | -- | Fire the WDT.
+                 WDTFire
