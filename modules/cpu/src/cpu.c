@@ -6,6 +6,7 @@
 const struct _cpu cpu = {
 	cpu_configure,
 	cpu_reset,
+	cpu_cycle,
 	cpu_halt,
 	cpu_power,
 	cpu_dfu

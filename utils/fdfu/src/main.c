@@ -184,36 +184,14 @@ void *load_page_data(FILE *firmware, size_t size) {
 
 int enter_update_mode(void) {
 	printf("Entering update mode.\n");
-	uint8_t retries = 0;
-retry_dfu:
-	/* Send the synchronization character. */
-	uart0.put('#');
-	char d_ack[3];
-	/* Check for acknowledgement. */
-	uart0.pull(d_ack, sizeof(d_ack));
-	if (!memcmp(d_ack, (char []){ 0x0a, 0x0d, 0x3e }, sizeof(d_ack))) {
-		fprintf(stderr, KGRN " Successfully entered update mode.\n" KNRM);
-		return lf_success;
-	}
-
-	if (retries > RETRIES) {
-		/* If no acknowledgement was received, throw and error. */
-		fprintf(stderr, KRED "Failed to enter update mode.\n");
+	/* Enter DFU mode. */
+	int _e = cpu.dfu();
+	if (_e < lf_success) {
+		fprintf(stderr, KRED "Failed to enter update mode. (0x%08x)\n", _e);
 		return lf_error;
 	}
-
-	/* Enter DFU mode. */
-	cpu.dfu();
-
-	for (int i = 0; i < 20; i ++) {
-		printf(".");
-		fflush(stdout);
-		usleep(250000);
-	}
-	printf("\n");
-
-	retries ++;
-	goto retry_dfu;
+	fprintf(stderr, KGRN " Successfully entered update mode.\n" KNRM);
+	return lf_success;
 }
 
 int main(int argc, char *argv[]) {
@@ -375,7 +353,8 @@ done:
 	free(pagedata);
 
 	printf("Resetting the CPU.\n");
-	cpu.reset();
+	/* Power cycle the CPU. */
+	cpu.cycle();
 	printf(KGRN " Successfully reset the CPU.\n" KNRM "----------------------");
 
 	/* If there were no errors, offer to flash again. */

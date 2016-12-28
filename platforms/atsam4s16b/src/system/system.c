@@ -83,6 +83,9 @@ void system_task(void) {
 	/* Configure the SPI peripheral. */
 	spi_configure();
 
+	char message[] = "Reset.\n";
+	usart_push(message, sizeof(message));
+
 	gpio_enable(PIO_PA0, 0);
 	PIOA -> PIO_OWER = PIO_PA0;
 	while (1) {
