@@ -1,4 +1,16 @@
-module Main where
+{-|
+Module      : Main
+Description : Flipper Console
+Copyright   : George Morgan, Travis Whitaker 2016
+License     : All rights reserved.
+Maintainer  : travis@flipper.io
+Stability   : Provisional
+Portability : Windows, POSIX
+-}
+
+module Main (
+    main
+  ) where
 
 import Control.Monad
 
@@ -15,16 +27,16 @@ import Options.Applicative
 
 import System.Console.Haskeline
 
--- | Act on the options obtained during start up.
+-- | Act on the options obtained during start up. If the user provided a
+--   'ConsoleAction' on the command line, run that. Otherwise, start the REPL.
 runOptions :: Options -> IO ()
 runOptions (Options e o) = (void . runFC) $ do
     s <- catchFlipper (attach e) ((pure False <*) . reportConsoleError Nothing)
-    case s of
-        False -> lift $ outputStrLn "No device found at that endpoint."
-        True  -> case o of
-            Nothing  -> fcREPL
-            (Just c) -> catchFlipper (execConsoleAction c)
-                                     (reportConsoleError (Just c))
+    if s then (case o of
+                   Nothing  -> fcREPL
+                   (Just c) -> catchFlipper (execConsoleAction c)
+                                            (reportConsoleError (Just c)))
+         else lift $ outputStrLn "No device found at that endpoint."
 
 main :: IO ()
 main = execParser opts >>= runOptions

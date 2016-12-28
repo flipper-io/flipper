@@ -28,58 +28,58 @@ import System.Exit
 avr_c_prep :: [String]
 avr_c_prep = [ -- Use C99:
                "-std=c99"
-             , -- Optimize for size:
-               "-Os"
-             , -- Arch is AVR8:
-               "-DARCH=ARCH_AVR8"
-             , -- CPU is ATMEGA16U2:
-               "-D__AVR_ATMEGA16U2__"
-             , -- Clock freq is 16 MHz:
-               "-DF_CPU=16000000UL"
-             , -- Don't warn about pragmas:
-               "-Wno-pragmas"
-             , -- MCU is ATMEGA16U2:
-               "-mmcu=atmega16u2"
-             , -- Platform header:
-             "-DPLATFORM_HEADER=<platforms/atmega16u2.h>"
+               -- Optimize for size:
+             , "-Os"
+               -- Arch is AVR8:
+             , "-DARCH=ARCH_AVR8"
+               -- CPU is ATMEGA16U2:
+             , "-D__AVR_ATMEGA16U2__"
+               -- Clock freq is 16 MHz:
+             , "-DF_CPU=16000000UL"
+               -- Don't warn about pragmas:
+             , "-Wno-pragmas"
+               -- MCU is ATMEGA16U2:
+             , "-mmcu=atmega16u2"
+               -- Platform header:
+             , "-DPLATFORM_HEADER=<platforms/atmega16u2.h>"
              ]
 
 -- | Preprocessor options for ARM targets.
 arm_c_prep :: [String]
 arm_c_prep = [ -- Use C99.
                "-std=c99"
-             , -- Optimize for size:
-               "-Os"
-             , -- CPU is ARM Cortex M4:
-               "-mcpu=cortex-m4"
-             , -- Arch is ARMv7E-M:
-               "-march=armv7e-m"
-             , -- Use Thumb ISA:
-               "-mthumb"
-             , -- Include debugging metadata:
-               "-g"
-             , -- Platform header:
-               "-DPLATFORM_HEADER=<platforms/atsam4s16b.h>"
+               -- Optimize for size:
+             , "-Os"
+               -- CPU is ARM Cortex M4:
+             , "-mcpu=cortex-m4"
+               -- Arch is ARMv7E-M:
+             , "-march=armv7e-m"
+               -- Use Thumb ISA:
+             , "-mthumb"
+               -- Include debugging metadata:
+             , "-g"
+               -- Platform header:
+             , "-DPLATFORM_HEADER=<platforms/atsam4s16b.h>"
              ]
 
 -- | Preprocessor options for native C targets.
 native_prep :: [String]
 native_prep = [ -- Use C99:
                 "-std=c99"
-              , -- Generate relocatable code:
-                "-fpic"
-              , -- Enable flipper constructors:
-                "-D__flipper_constructors__"
-              , -- libflipper errors abort the calling program by default:
-                "-D__enable_error_side_effects__"
-              , -- Enables FS transfers:
-                "-D__fs_transfer_symbols__"
-              , -- Enables FDL stuff:
-                "-D__fld_upload_symbols__"
-              , -- Include debugging metadata:
-                "-g"
-              , -- Platform header:
-                "-DPLATFORM_HEADER=<platforms/posix.h>"
+                -- Generate relocatable code:
+              , "-fpic"
+                -- Enable flipper constructors:
+              , "-D__flipper_constructors__"
+                -- libflipper errors abort the calling program by default:
+              , "-D__enable_error_side_effects__"
+                -- Enables FS transfers:
+              , "-D__fs_transfer_symbols__"
+                -- Enables FDL stuff:
+              , "-D__fld_upload_symbols__"
+                -- Include debugging metadata:
+              , "-g"
+                -- Platform header:
+              , "-DPLATFORM_HEADER=<platforms/posix.h>"
               ]
 
 -- * Querying The Environment
@@ -316,14 +316,15 @@ cRule comp inc prec o = do
         m = buildpref (c -<.> "mk")
         includes = mkIncFlags inc
     cc <- comp
-    command_ [] cc (prec ++ includes ++ [ "-c"
-                                        , c
-                                        , "-o"
-                                        , o
-                                        , "-MMD"
-                                        , "-MF"
-                                        , m
-                                        ])
+    let cmdopts = [Traced (cc ++ " (compiling)")]
+    command_ cmdopts cc (prec ++ includes ++ [ "-c"
+                                             , c
+                                             , "-o"
+                                             , o
+                                             , "-MMD"
+                                             , "-MF"
+                                             , m
+                                             ])
     needMakefileDependencies m
 
 -- | Generic combinator for defining archiver rules.
@@ -340,7 +341,7 @@ arRule ara os a = do
 --   target-specific behavior. Use 'elfRule' for building ELFs for the hardware.
 ldRule :: Action FilePath -- ^ Action returning linker path.
        -> [String]        -- ^ Linker options.
-       -> [FilePath]      -- ^ Archive files.
+       -> [FilePath]      -- ^ Object/Archive files.
        -> FilePath        -- ^ Target.
        -> Action ()
 ldRule lda ops as o = do
@@ -360,12 +361,13 @@ ldRule lda ops as o = do
                                 , ops
                                 ]
             _        -> error "ldRule: unknown target"
-    command_ [] ld args
+    let cmdopts = [Traced (ld ++ " (linking)")]
+    command_ cmdopts ld args
 
 -- | Generic combinator for linking device code into ELFs.
 elfRule :: Action FilePath -- ^ Action returning linker path.
         -> [String]        -- ^ Linker options.
-        -> [FilePath]      -- ^ Archive files.
+        -> [FilePath]      -- ^ Object/Archive files.
         -> FilePath        -- ^ Target.
         -> Action ()
 elfRule lda ops as o = do
@@ -377,7 +379,8 @@ elfRule lda ops as o = do
                        , ["-o", o]
                        , ops
                        ]
-    command [] ld args
+    let cmdopts = [Traced (ld ++ " (linking)")]
+    command cmdopts ld args
 
 -- | Combinator for installation commands. Use @sudo@ if we're on Linux and
 --   aren't root, otherwise, don't.
@@ -626,6 +629,14 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     -- Shortcut:
     phony "fu2" $ need ["flash-atmega16u2"]
 
+    -- Shortcut for @dfu-programmer at90usb162 launch --no-reset@:
+    phony "boot" $ do
+        -- Launch osmium on the ATMEGA16U2:
+        command_ [] "dfu-programmer" [ "at90usb162"
+                                     , "launch"
+                                     , "--no-reset"
+                                     ]
+
     -- Build libflipper:
     "build/libflipper/libflipper.*" %> \o -> do
 
@@ -686,7 +697,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     "build/utils/*/*" %> \o -> do
 
         -- We need libflipper to build the utilities:
-        need ["libflipper"]
+        lf <- ("build/libflipper" </>) <$> dynlib
 
         -- Root folder for this utility:
         let rt = dropFileName (dropDirectory1 o)
@@ -699,7 +710,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         let os = map (buildpref . (<.> ".native.o")) ss
 
         -- Run the linker:
-        ldRule cc ["-lflipper", "-Lbuild/libflipper"] os o
+        ldRule cc [] (lf : os) o
 
     -- Build the osmium hex image for the ATMEGA16U2:
     "build/osmium/osmium-atmega16u2.hex" %> \o -> do
