@@ -10,7 +10,10 @@ Portability : Windows, POSIX
 This module defines package version numbers and version range predicates.
 -}
 
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving
+           , DeriveDataTypeable
+           , DeriveGeneric
+           , TypeFamilies #-}
 
 module Flipper.Distribution.Version (
     Version()
@@ -30,16 +33,32 @@ module Flipper.Distribution.Version (
   , inRange
   ) where
 
+import Control.DeepSeq
+
+import Data.Binary
+
+import Data.Data
+
 import Data.Maybe
 
 import GHC.Exts
+import GHC.Generics
 
 -- | A legal package version is any sequence of one or more positive integers
 --   separated by periods. Versions are compared lexicographically, i.e.
 --   3.0 > 2.9, 2.1 > 2.0, 1.2.3 > 1.2.2, etc.
 newtype Version = Version { unVersion :: [Int] }
-                deriving (Eq, Ord, Show)
+                deriving ( Eq
+                         , Ord
+                         , Show
+                         , Data
+                         , Typeable
+                         , Generic
+                         , NFData
+                         , Binary
+                         )
 
+-- | Returns 'Nothing' if any of the 'Int's are less than zero.
 mkVersion :: [Int] -> Maybe Version
 mkVersion = fmap Version . mapM notNeg
     where notNeg n
@@ -54,14 +73,28 @@ instance IsList Version where
         where e = "fromList: version numbers must be >= 0."
     toList = unVersion
 
--- | A 'Version' range predicate.
+-- | A 'Version' range predicate. Beware of this type's 'Eq' instance; ranges
+--   are not canonicalized, so 'VersionRange's describing identical intervals
+--   won't necessary be equal according to `(==)`. Constructors aren't exported
+--   because we might change to an interval-based representation later (which
+--   would solve the canonicalization problem and make it possible to warn the
+--   user about unsatisfiable predicates).
 data VersionRange = Any
                   | This Version
                   | Later Version
                   | Earlier Version
                   | Union VersionRange VersionRange
                   | Intersection VersionRange VersionRange
-                  deriving (Eq, Show)
+                  deriving ( Eq
+                           , Ord
+                           , Show
+                           , Data
+                           , Typeable
+                           , Generic
+                           )
+
+instance NFData VersionRange
+instance Binary VersionRange
 
 -- | Any version.
 anyVersion :: VersionRange
