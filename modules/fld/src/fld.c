@@ -13,7 +13,7 @@ const struct _fld fld = {
 };
 #endif
 
-fmr_module fld_bind(lf_id_t identifier) {
+fmr_module fld_bind(lf_crc_t identifier) {
 	return 0;
 }
 

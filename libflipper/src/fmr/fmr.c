@@ -141,7 +141,7 @@ int fmr_free(struct _fmr_list *list) {
 	return lf_success;
 }
 
-int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *parameters, struct _fmr_packet *packet) {
+int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *parameters, struct _fmr_invocation_packet *packet) {
 	/* Ensure that the pointer to the outgoing packet is valid. */
 	if (!packet) {
 		error_raise(E_NULL, error_message("Invalid packet reference provided during message runtime packet generation."));
@@ -153,22 +153,23 @@ int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *par
 	/* Zero the packet. */
 	memset(packet, 0, sizeof(struct _fmr_packet));
 	/* Set the magic number. */
-	packet -> header.magic = 0xfe;
-	packet -> header.checksum = 0x00;
+	packet -> header.magic = FMR_MAGIC_NUMBER;
 	/* If the module's identifier is in the range of identifiers reserved for the standard modules, make this packet invoke a standard module. */
 	if (module < FMR_STD_MODULE_COUNT) {
-		packet -> target.attributes |= LF_STANDARD_MODULE;
+		packet -> header.class = fmr_standard_invocation_class;
+	} else {
+		packet -> header.class = fmr_user_invocation_class;
 	}
 	/* Store the target module, function, and argument count in the packet. */
-	packet -> target.module = module;
-	packet -> target.function = function;
-	packet -> target.argc = parameters -> argc;
+	packet -> call.index = module;
+	packet -> call.function = function;
+	packet -> call.argc = parameters -> argc;
 	/* Calculate the number of bytes needed to encode the widths of the types. */
 	uint8_t encode_length = lf_ceiling((parameters -> argc * 2), 8);
 	/* Compute the initial length of the packet. */
-	packet -> header.length = sizeof(struct _fmr_header) + sizeof(struct _fmr_target) + encode_length;
+	packet -> header.length = sizeof(struct _fmr_header) + sizeof(struct _fmr_call) + encode_length;
 	/* Calculate the offset into the packet at which the arguments will be loaded. */
-	uint8_t *offset = (uint8_t *)&(packet -> body) + encode_length;
+	uint8_t *offset = (uint8_t *)&(packet -> parameters) + encode_length;
 	/* Create a buffer for encoding argument types. */
 	uint32_t types = 0;
 	/* Load arguments into the packet, encoding the type of each. */
@@ -180,7 +181,7 @@ int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *par
 		types |= (arg -> type & 0x3) << (i * 2);
 		/* Calculate the size of the argument. */
 		uint8_t size = fmr_sizeof(arg -> type);
-		/* Copy the argument into the packet body. */
+		/* Copy the argument into the parameter segment. */
 		memcpy(offset, &(arg -> value), size);
 		/* Increment the offset appropriately. */
 		offset += size;
@@ -190,9 +191,9 @@ int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *par
 		free(arg);
 	}
 	/* Copy the encoded type widths into the packet. */
-	memcpy(&(packet -> body), &types, encode_length);
+	memcpy(&(packet -> parameters), &types, encode_length);
 	/* Calculate the packet checksum. */
-	packet -> header.checksum = lf_checksum(packet, packet -> header.length);
+	packet -> header.checksum = lf_crc(packet, packet -> header.length);
 	 /* Destroy the argument list. */
 	fmr_free(parameters);
 	return lf_success;
@@ -212,31 +213,53 @@ fmr_return fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, 
 	return fmr_call(address, argc, types, arguments);
 }
 
+fmr_return fmr_perform_invocation(struct _fmr_invocation_packet *packet) {
+	/* Calculate the number of bytes needed to decode the widths of the types. */
+	uint8_t decode_length = lf_ceiling((packet -> call.argc * 2), 8);
+	/* Create a buffer for decoding argument types. */
+	fmr_types types = 0;
+	/* Copy the decided type widths into the buffer. */
+	memcpy(&types, (void *)(&(packet -> parameters)), decode_length);
+	/* Perform the function invocation. */
+	return fmr_execute(packet -> call.index, packet -> call.function, packet -> call.argc, types, (void *)(packet -> parameters + decode_length));
+}
+
 int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
-	/* Temporarily store the packet's checksum. */
-	lf_id_t _cs = packet -> header.checksum;
-	/* Zero the checksum of the packet. */
+	/* Create a copy of the packet's checksum. */
+	lf_crc_t _crc = packet -> header.checksum;
+	/* Clear the checksum of the packet. */
 	packet -> header.checksum = 0x00;
 	/* Calculate our checksum of the packet. */
-	uint16_t cs = lf_checksum(packet, packet -> header.length);
+	uint16_t crc = lf_crc(packet, packet -> header.length);
 	/* Ensure that the checksums of the packets match. */
-	if (_cs != cs) {
+	if (_crc != crc) {
 		error_raise(E_CHECKSUM, NULL);
 		goto done;
 	}
-	/* Calculate the number of bytes needed to dencode the widths of the types. */
-	uint8_t decode_length = lf_ceiling((packet -> target.argc * 2), 8);
-	/* Create a buffer for decoding argument types. */
-	fmr_types types = 0;
-	/* Copy the encoded type widths into the buffer. */
-	memcpy(&types, (void *)(&(packet -> body)), decode_length);
-	/* If the module is a standard moudle, obtain it internally. */
-	if (packet -> target.attributes & LF_STANDARD_MODULE) {
-		/* Execute the function. */
-		result -> value = fmr_execute(packet -> target.module, packet -> target.function, packet -> target.argc, types, (void *)(packet -> body + decode_length));
-	} else {
-		error_raise(E_MODULE, NULL);
-	}
+	/* Switch through the classes of packets. */
+	switch (packet -> header.class) {
+		/* NOTE: Right now this class is handled in the system_task FMR implementation. */
+		case fmr_configuration_class:
+			/* Send the configuration information back. */
+			// ---------- insert call to for config
+			// -> push (config)...
+		break;
+		/* NOTE: Right now standard invocations and user invocations are done the same way. This should change. */
+		case fmr_standard_invocation_class:
+			/* Perform an invocation on a standard module. */
+			result -> value = fmr_perform_invocation((struct _fmr_invocation_packet *)(packet));
+		break;
+		case fmr_user_invocation_class:
+			/* Call into user invocation machienery. */
+		break;
+		case fmr_event_class:
+			/* Handle an event. */
+			// Call into event subsystem
+		break;
+		default:
+			/* Bad class value. */
+		break;
+	};
 done:
 	/* Catalogue any error state generated by the procedure. */
 	result -> error = error_get();

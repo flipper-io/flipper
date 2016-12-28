@@ -17,7 +17,7 @@ int fs_configure(void) {
 
 int fs_create(char *name, lf_size_t size) {
 	/* Obtain a key for the file given its name. */
-	lf_id_t key = lf_checksum(name, strlen(name));
+	lf_crc_t key = lf_crc(name, strlen(name));
 	/* Create a leaf for the key. */
 	nvm_p _leaf = fs_add_leaf_with_key(_root_leaf, key);
 	if (!_leaf) {
@@ -36,7 +36,7 @@ int fs_create(char *name, lf_size_t size) {
 
 int fs_delete(char *name) {
 	/* Obtain a key for the file given its name. */
-	lf_id_t key = lf_checksum(name, strlen(name));
+	lf_crc_t key = lf_crc(name, strlen(name));
 	/* Obtain the file's leaf, suppressing any errors that occur while doing so. */
 	nvm_p _leaf = fs_leaf_for_key(_root_leaf, key);
 	if (!_leaf) {
@@ -55,7 +55,7 @@ int fs_delete(char *name) {
 
 int fs_open(char *name, lf_size_t offset) {
 	/* Obtain a key for the file given its name. */
-	lf_id_t key = lf_checksum(name, strlen(name));
+	lf_crc_t key = lf_crc(name, strlen(name));
 	/* Obtain the file's leaf, suppressing any errors that occur while doing so. */
 	nvm_p _leaf = fs_leaf_for_key(_root_leaf, key);
 	if (!_leaf) {

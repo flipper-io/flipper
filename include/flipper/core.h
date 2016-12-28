@@ -36,7 +36,10 @@
 /* If defined, uses bulk for all USB transfers. */
 #define __ALL_BULK__
 /* If defined, prints debugging information about each packet. */
-//#define __lf_debug__
+#define __lf_debug__
+
+/* Packed attribute. */
+#define LF_PACKED __attribute__((__packed__))
 
 /* Terminal colors. */
 #define KNRM  "\x1B[0m"
@@ -46,7 +49,7 @@
 #define KYEL  "\x1B[33m"
 
 /* Used to contain the result of checksumming operations. */
-typedef uint16_t lf_id_t;
+typedef uint16_t lf_crc_t;
 /* Describes a type used to contain libflipper error codes. */
 typedef uint32_t lf_error_t;
 /* Describes a pointer to an address within non-volatile memory. */
@@ -93,7 +96,7 @@ struct __attribute__((__packed__)) _lf_configuration {
 	/* The human readable name of the device. */
 	char name[16];
 	/* An identifier unique to the device. */
-	lf_id_t identifier;
+	lf_crc_t identifier;
 	/* The device's firmware version. */
 	lf_version_t version;
 	/* The attributes of the device. 3 (attach by default), 2:1 (word length), 0 (endianness) */
@@ -140,7 +143,7 @@ struct _lf_module {
 	/* The version of the module. */
 	lf_version_t version;
 	/* The module's identifier. */
-	lf_id_t identifier;
+	lf_crc_t identifier;
 	/* The module's slot. */
 	uint8_t slot;
 	/* The device upon which the module's counterpart is located. */
@@ -170,7 +173,7 @@ void *lf_ll_match(struct _lf_ll *_ll, _ll_match_routine routine);
 int lf_ll_destroy(struct _lf_ll *_ll);
 
 /* Provides a checksum for a given block of data. */
-lf_id_t lf_checksum(void *source, lf_size_t length);
+lf_crc_t lf_crc(void *source, lf_size_t length);
 
 #ifdef PLATFORM_HEADER
 /* Include platform specific declarations. */

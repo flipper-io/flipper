@@ -12,7 +12,7 @@
 /* An abstract data structure used to represent members of the filesystem tree. */
 typedef struct __attribute__((__packed__)) _leaf {
 	/* A key used to identify the leaf. */
-	lf_id_t key;
+	lf_crc_t key;
 	/* The attributes of the file. */
 	/*
 	   [0]: The object is loadable.
