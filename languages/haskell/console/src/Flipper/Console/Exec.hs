@@ -210,6 +210,6 @@ fcREPL = do
 --   TODO: pretty print the parse error.
 execUserInput :: String -> FC ()
 execUserInput l = case M.runParser parseConsoleAction "<interactive>" l of
-    (Left e)  -> lift (outputStrLn (show e))
+    (Left e)  -> lift (outputStrLn (M.parseErrorPretty e))
     (Right c) -> catchFlipper (execConsoleAction c)
                               (reportConsoleError (Just c))

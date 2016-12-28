@@ -10,17 +10,17 @@ license:             AllRightsReserved
 license-file:        LICENSE
 author:              Travis Whitaker
 maintainer:          travis@flipper.io
--- copyright:           
--- category:            
+copyright:           2016 George Morgan, Travis Whitaker
+category:            Flipper
 build-type:          Simple
 cabal-version:       >=1.10
 
 library
-  exposed-modules:     Flipper.Distribution.License
+  exposed-modules:     Flipper.Distribution.Language
+                       Flipper.Distribution.License
+                       Flipper.Distribution.Module
                        Flipper.Distribution.Package
                        Flipper.Distribution.Version
-  -- other-modules:       
-  -- other-extensions:    
   build-depends:       base
                      , binary
                      , bytestring

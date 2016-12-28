@@ -9,24 +9,41 @@ Portability : Windows, POSIX
 
 -}
 
+{-# LANGUAGE DeriveAnyClass
+           , DeriveDataTypeable
+           , DeriveGeneric
+           #-}
+
 module Flipper.Internal.LED (
     RGB(..)
   , configure
   , setRGB
   ) where
 
+import Control.DeepSeq
+
+import Data.Data
+
 import Data.Word
 
 import Flipper.Internal.Utils
 
+import GHC.Generics
+
 -- | RGB value.
+--   TODO: Provide an actual algebra and vector space for this.
 data RGB = RGB {
     red   :: Word8 -- ^ Red value.
   , green :: Word8 -- ^ Green value.
   , blue  :: Word8 -- ^ Blue value.
   } deriving ( Eq
              , Ord
+             , Read
              , Show
+             , Data
+             , Typeable
+             , Generic
+             , NFData
              )
 
 configure :: IO Bool

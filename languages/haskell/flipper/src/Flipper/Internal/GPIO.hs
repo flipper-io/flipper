@@ -9,6 +9,11 @@ Portability : Windows, POSIX
 
 -}
 
+{-# LANGUAGE DeriveAnyClass
+           , DeriveDataTypeable
+           , DeriveGeneric
+           #-}
+
 module Flipper.Internal.GPIO (
     DigitalPin(..)
   , AnalogPin(..)
@@ -22,11 +27,17 @@ module Flipper.Internal.GPIO (
   , analogWrite
   ) where
 
-import Foreign.Marshal.Utils
+import Control.DeepSeq
+
+import Data.Data
 
 import Data.Word
 
+import Foreign.Marshal.Utils
+
 import Flipper.Internal.Utils
+
+import GHC.Generics
 
 -- | Type for Flipper's digital IO pins.
 data DigitalPin = IO1
@@ -47,7 +58,13 @@ data DigitalPin = IO1
                 | IO16
                 deriving ( Eq
                          , Ord
+                         , Read
                          , Show
+                         , Enum
+                         , Data
+                         , Typeable
+                         , Generic
+                         , NFData
                          )
 
 -- | Type for Flipper's analog IO pins.
@@ -61,7 +78,13 @@ data AnalogPin = A1
                | A8
                deriving ( Eq
                         , Ord
+                        , Read
                         , Show
+                        , Enum
+                        , Data
+                        , Typeable
+                        , Generic
+                        , NFData
                         )
 
 -- | Pin IO direction.
@@ -69,7 +92,13 @@ data Direction = Input
                | Output
                deriving ( Eq
                         , Ord
+                        , Read
                         , Show
+                        , Enum
+                        , Data
+                        , Typeable
+                        , Generic
+                        , NFData
                         )
 
 digPinCode :: DigitalPin -> Word8

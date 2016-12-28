@@ -19,12 +19,25 @@ Please read the text of the licenses and consult a lawyer for any advice
 regarding software licensing.
 -}
 
+{-# LANGUAGE DeriveAnyClass
+           , DeriveDataTypeable
+           , DeriveGeneric
+           #-}
+
 module Flipper.Distribution.License (
     License(..)
   , licenseText
   ) where
 
+import Control.DeepSeq
+
+import Data.Binary
+
+import Data.Data
+
 import qualified Data.Text as T
+
+import GHC.Generics
 
 -- | Licenses for source code release.
 data License =
@@ -72,7 +85,17 @@ data License =
   | AllRightsReserved
     -- | Any other software license.
   | Other
-  deriving (Eq, Ord, Show)
+  deriving ( Eq
+           , Ord
+           , Read
+           , Show
+           , Enum
+           , Data
+           , Typeable
+           , Generic
+           , NFData
+           , Binary
+           )
 
 -- | A license's body text, for automatically generating a LICENSE file.
 licenseText :: License -> T.Text

@@ -24,6 +24,8 @@ import Data.Word
 
 import GHC.ForeignPtr
 
+import GHC.Read
+
 import Foreign.Ptr
 import Foreign.ForeignPtr
 import Foreign.Marshal.Utils
@@ -43,9 +45,17 @@ instance Eq Buffer where
 instance Ord Buffer where
     compare a b = compare (toByteString a) (toByteString b)
 
+-- Just use the strict 'ByteString' implementation
+instance Read Buffer where
+    readPrec = fromByteString <$> readPrec
+
 -- Just use the strict 'ByteString' implementation.
 instance Show Buffer where
     show = show . toByteString
+
+instance Monoid Buffer where
+    mempty = emptyBuffer
+    mappend = append
 
 -- | The empty buffer.
 emptyBuffer :: Buffer

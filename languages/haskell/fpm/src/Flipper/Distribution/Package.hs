@@ -6,34 +6,77 @@ License     : All rights reserved.
 Maintainer  : travis@flipper.io
 Stability   : Provisional
 Portability : Windows, POSIX
+
+This module provides package specifications.
 -}
 
-{-# LANGUAGE GeneralizedNewtypeDeriving
-           , TypeFamilies
+{-# LANGUAGE DeriveDataTypeable
+           , DeriveGeneric
+           , GeneralizedNewtypeDeriving
            #-}
 
 module Flipper.Distribution.Package where
 
+import Control.DeepSeq
+
+import Data.Binary
+
+import Data.Data
+
 import qualified Data.Text as T
 
+import Flipper.Distribution.Language
 import Flipper.Distribution.License
+import Flipper.Distribution.Module
 import Flipper.Distribution.Version
+
+import GHC.Generics
 
 -- | A legal package name is something I still need to think more about...
 newtype PackageName = PackageName { unPackageName :: T.Text }
-                    deriving (Eq, Ord, Show)
+                    deriving ( Eq
+                             , Ord
+                             , Show
+                             , Monoid
+                             , Data
+                             , Typeable
+                             , NFData
+                             , Binary
+                             )
 
 -- | A name and version uniquely identifies a package.
 data PackageID = PackageID {
+    -- | Package name.
     pkgName    :: PackageName
+    -- | Package version.
   , pkgVersion :: Version
-  } deriving (Eq, Ord, Show)
+  } deriving ( Eq
+             , Ord
+             , Show
+             , Data
+             , Typeable
+             , Generic
+             )
+
+instance NFData PackageID
+instance Binary PackageID
 
 -- | A name and version range identifies a package dependency.
 data Dependency = Dependency {
+    -- | Dependency package name.
     depName  :: PackageName
+    -- | Dependency package version.
   , depRange :: VersionRange
-  } deriving (Eq, Show)
+  } deriving ( Eq
+             , Ord
+             , Show
+             , Data
+             , Typeable
+             , Generic
+             )
+
+instance NFData Dependency
+instance Binary Dependency
 
 -- | The internal representation of a @pkg.fpm@ file. This includes metadata
 --   such as the package name, version, description, and license, as well as
@@ -62,15 +105,22 @@ data PackageDescription = PackageDescription {
     --   package server and displayed on the fpm.flipper.io package page.
   , description  :: T.Text
     -- | Package dependencies as listed in the @pkg.fpm@ file, not to be
-    --   confused the package dependency closure computed by dependency
+    --   confused with the package dependency closure computed by dependency
     --   resolution.
   , dependencies :: [Dependency]
     -- | Package specification version.
   , specVersion  :: Version
     -- | Exposed modules.
   , modules      :: [Module]
-  } deriving (Eq, Show)
+    -- | Language bindings.
+  , bindings     :: [Binding]
+  } deriving ( Eq
+             , Ord
+             , Show
+             , Data
+             , Typeable
+             , Generic
+             )
 
--- | A module.
-data Module = Module
-            deriving (Eq, Ord, Show)
+instance NFData PackageDescription
+instance Binary PackageDescription
