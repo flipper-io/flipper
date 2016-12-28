@@ -26,18 +26,21 @@ struct _lf_timer timers[] = { { &(TC0 -> TC_CHANNEL[0]), false, NULL },
 						  	  { &(TC0 -> TC_CHANNEL[5]), false, NULL } };
 
 int timer_configure(void) {
-	/* Enable the TC0 peripheral clock. */
-	PMC -> PMC_PCER0 |= (1 << ID_TC0);
-	/* Disable the source clock to TCA. */
-	TCA -> TC_CCR = TC_CCR_CLKDIS;
-	/* Select the incoming clock signal as MCK / 128. */
-	TCA -> TC_CMR = TC_CMR_TCCLKS_TIMER_CLOCK4;
-	/* Enable the TCA C compare interrupt. */
-	TCA -> TC_IER = TC_IER_CPCS;
-	/* Set the compare value into C. */
-	TCA -> TC_RC = 0xFFFF;
-	/* Enable the TC0 interrupt. */
-	NVIC_EnableIRQ(TC0_IRQn);
+	/* Iterate through the timers and configure their defaults. */
+	for (int i = 0; i < sizeof(timers); i ++) {
+		/* Enable the timer's peripheral clock. */
+		PMC -> PMC_PCER0 |= (1 << ID_TC0 + i);
+		/* Disable the source clock to TCA. */
+		timers[i].CH -> TC_CCR = TC_CCR_CLKDIS;
+		/* Select the incoming clock signal as MCK / 128. */
+		timers[i].CH -> TC_CMR = TC_CMR_TCCLKS_TIMER_CLOCK4;
+		/* Enable the TCA C compare interrupt. */
+		timers[i].CH -> TC_IER = TC_IER_CPCS;
+		/* Set the compare value into C. */
+		timers[i].CH -> TC_RC = 0xFFFF;
+		/* Enable the timer's interrupt. */
+		NVIC_EnableIRQ(TC0_IRQn + i);
+	}
 	return lf_success;
 }
 
