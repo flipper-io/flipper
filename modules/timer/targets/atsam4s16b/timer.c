@@ -1,8 +1,29 @@
 #define __private_include__
 #include <flipper/timer.h>
+#include <flipper/error.h>
+
+/* NOTE: TC0 is reserved by the system scheduler. */
 
 /* Expose channel A within TC0. */
 TcChannel *TCA = &(TC0 -> TC_CHANNEL[0]);
+
+/* A data structure to hold information pertainent to each timer. */
+struct _lf_timer {
+	/* A pointer to the timer channel. */
+	TcChannel *CH;
+	/* Whether or not the timer is in use. */
+	bool available;
+	/* The callback function registered to the timer event. */
+	void (* callback)(void);
+};
+
+/* Initialize an array of all the timers. */
+struct _lf_timer timers[] = { { &(TC0 -> TC_CHANNEL[0]), false, NULL },
+							  { &(TC0 -> TC_CHANNEL[1]), false, NULL },
+							  { &(TC0 -> TC_CHANNEL[2]), false, NULL },
+						  	  { &(TC0 -> TC_CHANNEL[3]), false, NULL },
+						  	  { &(TC0 -> TC_CHANNEL[4]), false, NULL },
+						  	  { &(TC0 -> TC_CHANNEL[5]), false, NULL } };
 
 int timer_configure(void) {
 	/* Enable the TC0 peripheral clock. */
@@ -17,12 +38,56 @@ int timer_configure(void) {
 	TCA -> TC_RC = 0xFFFF;
 	/* Enable the TC0 interrupt. */
 	NVIC_EnableIRQ(TC0_IRQn);
-	/* Enable the clock and start the timer.*/
-	TCA -> TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;
 	return lf_success;
 }
 
-void tc0_isr(void) {
+/* Registers a callback with the next available timer. */
+int timer_register(uint32_t ticks, void *callback) {
+	/* Loop through the timers until a free timer is found. */
+	for (int i = 0; i < sizeof(timers); i ++) {
+		if (timers[i].available) {
+			/* Set the callback address. */
+			timers[i].callback = callback;
+			/* Enable the clock and start the timer. */
+			timers[i].CH -> TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;
+			return lf_success;
+		}
+	}
+	error_raise(E_TIMER, error_message("No timer is available to register a callback."));
+	return lf_error;
+}
+
+void tcx_isr(uint8_t timer) {
 	/* Read the interrupt flag to clear it. */
-	TCA -> TC_SR;
+	timers[timer].CH -> TC_SR;
+	/* Perform the timer callback. */
+	timers[timer].callback();
+	/* Stop the timer. */
+	timers[timer].CH -> TC_CCR = TC_CCR_CLKDIS;
+	/* Release the timer. */
+	timers[timer].available = true;
+}
+
+void tc0_isr(void) {
+	tcx_isr(0);
+}
+
+void tc1_isr(void) {
+	tcx_isr(1);
+}
+
+void tc2_isr(void) {
+	tcx_isr(2);
+}
+
+void tc3_isr(void) {
+	tcx_isr(3);
+}
+
+void tc4_isr(void) {
+	tcx_isr(4);
+}
+
+void tc5_isr(void) {
+	tcx_isr(5);
 }

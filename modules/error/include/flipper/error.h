@@ -31,7 +31,8 @@ enum {
 	E_CONFIGURATION,
 	E_ACK,
 	E_TYPE,
-	E_BOUNDARY
+	E_BOUNDARY,
+	E_TIMER
 };
 
 /* If this flag is set, error messages are nullified on platforms that do not need to store error strings. */

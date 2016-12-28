@@ -74,13 +74,13 @@ void fmr_pull(fmr_module module, fmr_function function, lf_size_t length) {
 struct _fmr_packet packet;
 
 void system_task(void) {
-	/* ~ Configure the USART peripheral. ~ */
+	/* Configure the USART peripheral. */
 	usart_configure();
-	/* ~ Configure the UART peripheral. */
+	/* Configure the UART peripheral. */
 	uart0_configure();
-	/* ~ Configure the GPIO peripheral. */
+	/* Configure the GPIO peripheral. */
 	gpio_configure();
-	/* ~ Configure the SPI peripheral. ~ */
+	/* Configure the SPI peripheral. */
 	spi_configure();
 
 	gpio_enable(PIO_PA0, 0);
@@ -119,8 +119,6 @@ void uart0_isr(void) {
 
 void system_init(void) {
 
-	uint32_t timeout;
-
 	/* Disable the watchdog timer. */
 	WDT -> WDT_MR = WDT_MR_WDDIS;
 
@@ -130,24 +128,24 @@ void system_init(void) {
 	/* Configure the primary clock source. */
 	if (!(PMC -> CKGR_MOR & CKGR_MOR_MOSCSEL)) {
 		PMC -> CKGR_MOR = CKGR_MOR_KEY(0x37) | BOARD_OSCOUNT | CKGR_MOR_MOSCRCEN | CKGR_MOR_MOSCXTEN;
-		for (timeout = 0; !(PMC -> PMC_SR & PMC_SR_MOSCXTS) && (timeout ++ < CLOCK_TIMEOUT););
+		for (uint32_t timeout = 0; !(PMC -> PMC_SR & PMC_SR_MOSCXTS) && (timeout ++ < CLOCK_TIMEOUT););
 	}
 
 	/* Select external 20MHz oscillator. */
 	PMC -> CKGR_MOR = CKGR_MOR_KEY(0x37) | BOARD_OSCOUNT | CKGR_MOR_MOSCRCEN | CKGR_MOR_MOSCXTEN | CKGR_MOR_MOSCSEL;
-	for (timeout = 0; !(PMC -> PMC_SR & PMC_SR_MOSCSELS) && (timeout ++ < CLOCK_TIMEOUT););
+	for (uint32_t timeout = 0; !(PMC -> PMC_SR & PMC_SR_MOSCSELS) && (timeout ++ < CLOCK_TIMEOUT););
 	PMC -> PMC_MCKR = (PMC -> PMC_MCKR & ~(uint32_t)PMC_MCKR_CSS_Msk) | PMC_MCKR_CSS_MAIN_CLK;
-	for (timeout = 0; !(PMC -> PMC_SR & PMC_SR_MCKRDY) && (timeout++ < CLOCK_TIMEOUT););
+	for (uint32_t timeout = 0; !(PMC -> PMC_SR & PMC_SR_MCKRDY) && (timeout++ < CLOCK_TIMEOUT););
 
 	/* Configure PLLB as the master clock PLL. */
 	PMC -> CKGR_PLLBR = BOARD_PLLBR;
-	for (timeout = 0; !(PMC -> PMC_SR & PMC_SR_LOCKB) && (timeout++ < CLOCK_TIMEOUT););
+	for (uint32_t timeout = 0; !(PMC -> PMC_SR & PMC_SR_LOCKB) && (timeout++ < CLOCK_TIMEOUT););
 
 	/* Switch to the main clock. */
 	PMC -> PMC_MCKR = (BOARD_MCKR & ~PMC_MCKR_CSS_Msk) | PMC_MCKR_CSS_MAIN_CLK;
-	for (timeout = 0; !(PMC -> PMC_SR & PMC_SR_MCKRDY) && (timeout++ < CLOCK_TIMEOUT););
+	for (uint32_t timeout = 0; !(PMC -> PMC_SR & PMC_SR_MCKRDY) && (timeout++ < CLOCK_TIMEOUT););
 	PMC -> PMC_MCKR = BOARD_MCKR;
-	for (timeout = 0; !(PMC -> PMC_SR & PMC_SR_MCKRDY) && (timeout++ < CLOCK_TIMEOUT););
+	for (uint32_t timeout = 0; !(PMC -> PMC_SR & PMC_SR_MCKRDY) && (timeout++ < CLOCK_TIMEOUT););
 
 	/* Allow the reset pin to reset the device. */
 	RSTC -> RSTC_MR = RSTC_MR_KEY(0xA5) | RSTC_MR_URSTEN;
