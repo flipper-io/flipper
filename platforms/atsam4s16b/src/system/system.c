@@ -74,61 +74,24 @@ void fmr_pull(fmr_module module, fmr_function function, lf_size_t length) {
 struct _fmr_packet packet;
 
 void system_task(void) {
-	/* ~ Configure the USART peripheral. ~ */
+	/* Configure the USART peripheral. */
 	usart_configure();
-	/* ~ Configure the UART peripheral. */
+	/* Configure the UART peripheral. */
 	uart0_configure();
-	/* ~ Configure the GPIO peripheral. */
+	/* Configure the GPIO peripheral. */
 	gpio_configure();
-
-	/* ~ Configure the SPI peripheral. ~ */
-
-	/* Enable the SPI clock. */
-	PMC -> PMC_PCER0 = (1 << ID_SPI);
-	/* Create a pinmask for the peripheral pins. */
-	const unsigned int SPI_PIN_MASK = (PIO_PA14A_SPCK | PIO_PA13A_MOSI | PIO_PA12A_MISO | PIO_PA11A_NPCS0 | PIO_PA31A_NPCS1);
-	/* Disable PIOA interrupts on the peripheral pins. */
-	PIOA -> PIO_IDR = SPI_PIN_MASK;
-	/* Disable the peripheral pins from use by the PIOA. */
-	PIOA -> PIO_PDR = SPI_PIN_MASK;
-	/* Hand control of the peripheral pins to peripheral A. */
-	PIOA -> PIO_ABCDSR[0] &= ~SPI_PIN_MASK;
-	PIOA -> PIO_ABCDSR[1] &= ~SPI_PIN_MASK;
-	/* Reset the SPI. */
-	SPI -> SPI_CR = SPI_CR_SWRST;
-	/* Reset the SPI again. Eratta. */
-	SPI -> SPI_CR = SPI_CR_SWRST;
-	/* Enter master mode, no mode fault detection, user chip select. */
-	SPI -> SPI_MR = SPI_MR_MSTR | SPI_MR_MODFDIS | SPI_MR_PCS(1);
-	/* Configure the user SPI peripheral. 8 bits per transfer. SPI mode 3. Fastest possible clock. */
-	SPI -> SPI_CSR[1] = SPI_CSR_SCBR(0xC8) | SPI_CSR_BITS_8_BIT | SPI_CSR_NCPHA | SPI_CSR_CPOL;
-	/* Enable the SPI. */
-	SPI -> SPI_CR = SPI_CR_SPIEN;
-	/* Clear the secondary PDC channel. */
-	SPI -> SPI_TNCR = 0;
-	SPI -> SPI_TNPR = (uintptr_t)(NULL);
-
-	/* Insantiate an outgoing PDC transfer. */
-	const char outgoing[] = "Hello!";
+	/* Configure the SPI peripheral. */
+	spi_configure();
 
 	gpio_enable(PIO_PA0, 0);
 	PIOA -> PIO_OWER = PIO_PA0;
 	while (1) {
 		PIOA -> PIO_ODSR ^= PIO_PA0;
 
-		// /* Queue the PDC transfer. */
-		// SPI -> SPI_TCR = sizeof(outgoing);
-		// SPI -> SPI_TPR = (uintptr_t)(outgoing);
-		// /* Enable the PDC transmitter to start the transmission. */
-		// SPI -> SPI_PTCR = SPI_PTCR_TXTEN;
-		// /* Wait until the transfer has finished. */
-		// while (!(SPI -> SPI_SR & SPI_SR_ENDTX));
-		// /* Disable the PDC transmitter. */
-		// SPI -> SPI_PTCR = SPI_PTCR_TXTDIS;
+		char hello[] = "hello";
+		spi_push(hello, sizeof(hello));
 
-		SPI -> SPI_TDR = 'a';
-
-		for (int i = 0; i < 5000000; i ++);
+		for (int i = 0; i < 5000000; i ++) __NOP();
 	}
 
 	/* Enable the PDC receive complete interrupt. */
@@ -156,8 +119,6 @@ void uart0_isr(void) {
 
 void system_init(void) {
 
-	uint32_t timeout;
-
 	/* Disable the watchdog timer. */
 	WDT -> WDT_MR = WDT_MR_WDDIS;
 
@@ -167,24 +128,24 @@ void system_init(void) {
 	/* Configure the primary clock source. */
 	if (!(PMC -> CKGR_MOR & CKGR_MOR_MOSCSEL)) {
 		PMC -> CKGR_MOR = CKGR_MOR_KEY(0x37) | BOARD_OSCOUNT | CKGR_MOR_MOSCRCEN | CKGR_MOR_MOSCXTEN;
-		for (timeout = 0; !(PMC -> PMC_SR & PMC_SR_MOSCXTS) && (timeout ++ < CLOCK_TIMEOUT););
+		for (uint32_t timeout = 0; !(PMC -> PMC_SR & PMC_SR_MOSCXTS) && (timeout ++ < CLOCK_TIMEOUT););
 	}
 
 	/* Select external 20MHz oscillator. */
 	PMC -> CKGR_MOR = CKGR_MOR_KEY(0x37) | BOARD_OSCOUNT | CKGR_MOR_MOSCRCEN | CKGR_MOR_MOSCXTEN | CKGR_MOR_MOSCSEL;
-	for (timeout = 0; !(PMC -> PMC_SR & PMC_SR_MOSCSELS) && (timeout ++ < CLOCK_TIMEOUT););
+	for (uint32_t timeout = 0; !(PMC -> PMC_SR & PMC_SR_MOSCSELS) && (timeout ++ < CLOCK_TIMEOUT););
 	PMC -> PMC_MCKR = (PMC -> PMC_MCKR & ~(uint32_t)PMC_MCKR_CSS_Msk) | PMC_MCKR_CSS_MAIN_CLK;
-	for (timeout = 0; !(PMC -> PMC_SR & PMC_SR_MCKRDY) && (timeout++ < CLOCK_TIMEOUT););
+	for (uint32_t timeout = 0; !(PMC -> PMC_SR & PMC_SR_MCKRDY) && (timeout++ < CLOCK_TIMEOUT););
 
 	/* Configure PLLB as the master clock PLL. */
 	PMC -> CKGR_PLLBR = BOARD_PLLBR;
-	for (timeout = 0; !(PMC -> PMC_SR & PMC_SR_LOCKB) && (timeout++ < CLOCK_TIMEOUT););
+	for (uint32_t timeout = 0; !(PMC -> PMC_SR & PMC_SR_LOCKB) && (timeout++ < CLOCK_TIMEOUT););
 
 	/* Switch to the main clock. */
 	PMC -> PMC_MCKR = (BOARD_MCKR & ~PMC_MCKR_CSS_Msk) | PMC_MCKR_CSS_MAIN_CLK;
-	for (timeout = 0; !(PMC -> PMC_SR & PMC_SR_MCKRDY) && (timeout++ < CLOCK_TIMEOUT););
+	for (uint32_t timeout = 0; !(PMC -> PMC_SR & PMC_SR_MCKRDY) && (timeout++ < CLOCK_TIMEOUT););
 	PMC -> PMC_MCKR = BOARD_MCKR;
-	for (timeout = 0; !(PMC -> PMC_SR & PMC_SR_MCKRDY) && (timeout++ < CLOCK_TIMEOUT););
+	for (uint32_t timeout = 0; !(PMC -> PMC_SR & PMC_SR_MCKRDY) && (timeout++ < CLOCK_TIMEOUT););
 
 	/* Allow the reset pin to reset the device. */
 	RSTC -> RSTC_MR = RSTC_MR_KEY(0xA5) | RSTC_MR_URSTEN;

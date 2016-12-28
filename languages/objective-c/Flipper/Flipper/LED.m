@@ -7,11 +7,12 @@
 //
 
 #import "LED.h"
+#import "led.h"
 
 @implementation LFLED
 
-- (void) setR:(int)r G:(int)g B:(int)b {
-
+- (void) setR:(uint8_t)r G:(uint8_t)g B:(uint8_t)b {
+    led_set_rgb(r, g, b);
 }
 
 @end

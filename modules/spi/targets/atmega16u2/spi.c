@@ -54,10 +54,12 @@ uint8_t spi_get(void) {
 	return SPDR;
 }
 
-void spi_push(void *source, lf_size_t length) {
+int spi_push(void *source, lf_size_t length) {
 	while (length --) spi_put(*(uint8_t *)(source ++));
+	return lf_success;
 }
 
-void spi_pull(void *destination, lf_size_t length) {
+int spi_pull(void *destination, lf_size_t length) {
 	while (length --) *(uint8_t *)(destination ++) = spi_get();
+	return lf_success;
 }
