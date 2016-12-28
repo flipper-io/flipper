@@ -134,6 +134,9 @@ struct _lf_device {
 	struct _lf_device *next;
 };
 
+/* All devices must implement a self referential interface. */
+extern struct _lf_device lf_self;
+
 /* Standardizes the notion of a module. */
 struct _lf_module {
 	/* A string containing the module's name. */

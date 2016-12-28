@@ -5,7 +5,7 @@
 #include <platforms/atsam4s16b.h>
 
 /* The fmr_device object containing global state about this device. */
-struct _lf_device self = {
+struct _lf_device lf_self = {
 	{
 		"flipper",
 		0xc713,

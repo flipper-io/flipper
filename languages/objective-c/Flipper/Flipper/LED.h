@@ -8,7 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
-@interface LFLED : NSObject
+@interface LFLED : NSObject {
+    
+}
 
 - (void) setR:(uint8_t)r G:(uint8_t)g B:(uint8_t)b;
 
