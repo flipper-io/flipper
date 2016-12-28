@@ -32,7 +32,7 @@ int lf_attach(char *name, struct _lf_endpoint *endpoint) {
 	/* Set the device's name. */
 	strcpy(device -> configuration.name, name);
 	/* Set the device's identifier. */
-	device -> configuration.identifier = lf_checksum(name, strlen(name));
+	device -> configuration.identifier = lf_crc(name, strlen(name));
 	/* Obtain the head of the linked list of attached devices. */
 	struct _lf_device *last, *head = flipper.attached;
 	last = head;
@@ -66,7 +66,7 @@ int lf_attach(char *name, struct _lf_endpoint *endpoint) {
 	/* Set the current device. */
 	flipper.device = device;
 	/* Save the test identifier. */
-	lf_id_t _identifier = device -> configuration.identifier;
+	lf_crc_t _identifier = device -> configuration.identifier;
 	/* Broadcast a packet to the device over the default endpoint to verify the identifier. */
 	int _e = lf_load_configuration(device);
 	if (_e < lf_success) {
@@ -201,13 +201,18 @@ fmr_type lf_word_size(struct _lf_device *device) {
 }
 
 int lf_load_configuration(struct _lf_device *device) {
-	struct _fmr_packet packet;
-	/* Generate the a null procedure call in the outgoing packet. */
-	int _e = fmr_generate(0, 0, NULL, &packet);
-	/* Set the configuration bit in the target attributes. */
-	packet.target.attributes |= LF_CONFIGURATION;
+	/* Create a configuration packet. */
+	struct _fmr_configuration_packet packet = { 0 };
+	/* Set the magic number. */
+	packet.header.magic = FMR_MAGIC_NUMBER;
+	/* Compute the length of the packet. */
+	packet.header.length = sizeof(struct _fmr_header);
+	/* Make the outgoing packet a configuration packet. */
+	packet.header.class = fmr_configuration_class;
+	/* Calculate the packet checksum. */
+	packet.header.checksum = lf_crc(&packet, packet.header.length);
 	/* Send the packet to the target device. */
-	_e = lf_transfer(device, &packet);
+	int _e = lf_transfer(device, (struct _fmr_packet *)(&packet));
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -258,17 +263,14 @@ fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _f
 			return lf_error;
 		}
 	}
-	struct _fmr_packet packet;
+	struct _fmr_invocation_packet packet = { 0 };
 	/* Generate the function call in the outgoing packet. */
 	int _e = fmr_generate(module -> slot, function, parameters, &packet);
 	if (_e < lf_success) {
 		return lf_error;
 	}
-#ifdef __lf_debug__
-	lf_debug_packet(&packet, sizeof(struct _fmr_packet));
-#endif
 	/* Send the packet to the target device. */
-	_e = lf_transfer(device, &packet);
+	_e = lf_transfer(device, (struct _fmr_packet *)(&packet));
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -280,6 +282,9 @@ fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _f
 }
 
 int lf_transfer(struct _lf_device *device, struct _fmr_packet *packet) {
+#ifdef __lf_debug__
+	lf_debug_packet(packet, sizeof(struct _fmr_packet));
+#endif
 	/* Transfer the packet buffer through its registered endpoint. */
 	int _e = device -> endpoint -> push(packet, sizeof(struct _fmr_packet));
 	/* Ensure that the packet was successfully transferred to the device. */
@@ -317,14 +322,14 @@ int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_s
 	if (!device) {
 		device = lf_device();
 	}
-	struct _fmr_packet packet;
+	struct _fmr_invocation_packet packet = { 0 };
 	/* Generate the function call in the outgoing packet. */
 	int _e = fmr_generate(_fmr_id, _fmr_push, fmr_merge(fmr_args(fmr_int16(module -> slot), fmr_int8(function), fmr_int32(length)), parameters), &packet);
 	if (_e < lf_success) {
 		return lf_error;
 	}
 	/* Send the packet to the target device. */
-	_e = lf_transfer(device, &packet);
+	_e = lf_transfer(device, (struct _fmr_packet *)(&packet));
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -356,14 +361,14 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 	if (!device) {
 		device = lf_device();
 	}
-	struct _fmr_packet packet;
+	struct _fmr_invocation_packet packet = { 0 };
 	/* Generate the function call in the outgoing packet. */
 	int _e = fmr_generate(_fmr_id, _fmr_pull, fmr_merge(fmr_args(fmr_int16(module -> slot), fmr_int8(function), fmr_int32(length)), parameters), &packet);
 	if (_e < lf_success) {
 		return lf_error;
 	}
 	/* Send the packet to the target device. */
-	_e = lf_transfer(device, &packet);
+	_e = lf_transfer(device, (struct _fmr_packet *)(&packet));
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -381,7 +386,7 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 
 int lf_bind(struct _lf_module *module) {
 	/* Calculate the module's identifier. */
-	module -> identifier = lf_checksum(module -> name, strlen(module -> name));
+	module -> identifier = lf_crc(module -> name, strlen(module -> name));
 	/* Bind the module to a slot on the device. */
 	module -> slot = fld_bind(module -> identifier);
 	if (!module -> slot) {
@@ -394,37 +399,49 @@ int lf_bind(struct _lf_module *module) {
 /* Debugging functions for displaying the contents of various FMR related data structures. */
 
 void lf_debug_packet(struct _fmr_packet *packet, size_t length) {
-	if (packet -> header.magic == 0xFE) {
+	if (packet -> header.magic == FMR_MAGIC_NUMBER) {
 		printf("header:\n");
 		printf("\t└─ magic:\t0x%x\n", packet -> header.magic);
 		printf("\t└─ checksum:\t0x%x\n", packet -> header.checksum);
 		printf("\t└─ length:\t%d bytes (%.02f%%)\n", packet -> header.length, (float) packet -> header.length/sizeof(struct _fmr_packet)*100);
-		printf("target:\n");
-		printf("\t└─ module:\t0x%x\n", packet -> target.module);
-		printf("\t└─ function:\t0x%x\n", packet -> target.function);
-		printf("\t└─ argc:\t0x%x (%d arguments)\n", packet -> target.argc, packet -> target.argc);
-		printf("arguments:\n");
-		/* Calculate the number of bytes needed to encode the widths of the types. */
-		uint8_t encode_length = lf_ceiling((packet -> target.argc * 2), 8);
-		/* Calculate the offset into the packet at which the arguments will be loaded. */
-		uint8_t *offset = packet -> body + encode_length;
-		/* Create a buffer for encoding argument types. */
-		uint32_t types = 0;
-		memcpy(&types, packet -> body, encode_length);
-		char *typestrs[] = { "fmr_int8", "fmr_int16", "fmr_int32" };
-		for (int i = 0; i < packet -> target.argc; i ++) {
-			fmr_type type = types & 0x3;
-			fmr_arg arg = 0;
-			memcpy(&arg, offset, fmr_sizeof(type));
-			printf("\t└─ %s:\t0x%x\n", typestrs[type], arg);
-			offset += fmr_sizeof(type);
-			types >>= 2;
+        char *classstrs[] = { "configuration", "std_call", "user_call", "event" };
+        printf("\t└─ class:\t%s\n", classstrs[packet -> header.class]);
+		/* Print different information depending on the packet class. */
+		if (packet -> header.class == fmr_configuration_class) {
+
+        } else if (packet -> header.class == fmr_standard_invocation_class) {
+			struct _fmr_invocation_packet *invocation = (struct _fmr_invocation_packet *)(packet);
+			printf("target:\n");
+			printf("\t└─ module:\t0x%x\n", invocation -> call.index);
+			printf("\t└─ function:\t0x%x\n", invocation -> call.function);
+			printf("\t└─ argc:\t0x%x (%d arguments)\n", invocation -> call.argc, invocation -> call.argc);
+			printf("arguments:\n");
+			/* Calculate the number of bytes needed to encode the widths of the types. */
+			uint8_t encode_length = lf_ceiling((invocation -> call.argc * 2), 8);
+			/* Calculate the offset into the packet at which the arguments will be loaded. */
+			uint8_t *offset = invocation -> parameters + encode_length;
+			/* Create a buffer for encoding argument types. */
+			uint32_t types = 0;
+			memcpy(&types, invocation -> parameters, encode_length);
+			char *typestrs[] = { "fmr_int8", "fmr_int16", "fmr_int32" };
+			for (int i = 0; i < invocation -> call.argc; i ++) {
+				fmr_type type = types & 0x3;
+				fmr_arg arg = 0;
+				memcpy(&arg, offset, fmr_sizeof(type));
+				printf("\t└─ %s:\t0x%x\n", typestrs[type], arg);
+				offset += fmr_sizeof(type);
+				types >>= 2;
+			}
+			printf("\n");
+		} else {
+			printf("Invalid packet.\n");
 		}
-		printf("\n");
-	}
-	for (int i = 1; i <= length; i ++) {
-		printf("0x%02x ", ((uint8_t *)packet)[i - 1]);
-		if (i % 8 == 0 && i < length - 1) printf("\n");
+		for (int i = 1; i <= length; i ++) {
+			printf("0x%02x ", ((uint8_t *)packet)[i - 1]);
+			if (i % 8 == 0 && i < length - 1) printf("\n");
+		}
+	} else {
+		printf("Invalid magic number (0x%02x).\n", packet -> header.magic);
 	}
 	printf("\n\n-----------\n\n");
 }

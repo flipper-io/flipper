@@ -60,8 +60,8 @@ void system_task(void) {
 		if (!(_e < lf_success)) {
 			/* Create a buffer to the result of the operation. */
 			struct _fmr_result result;
-			/* If the host is asking for the device attributes, return them. */
-			if (packet.target.attributes & LF_CONFIGURATION) {
+			/* If the host is asking for the device's configuration, return it. */
+			if (packet.header.class == fmr_configuration_class) {
 				/* Send the configuration information back to the host. */
 				megausb_push(&self.configuration, sizeof(struct _lf_configuration));
 			} else {

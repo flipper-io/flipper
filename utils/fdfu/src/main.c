@@ -140,7 +140,7 @@ retry:
 		/* Copy the chunk of data into the packet. */
 		memcpy(_packet.data, (void *)(source + (packet * XLEN)), _len);
 		/* Calculate the checksum of the data and write it to the packet in little endian format. */
-		_packet.checksum = little(lf_checksum(_packet.data, sizeof(_packet.data)));
+		_packet.checksum = little(lf_crc(_packet.data, sizeof(_packet.data)));
 		/* Transfer the packet to the SAM-BA. */
 		uart0.push(&_packet, sizeof(struct _xpacket));
 		/* Obtain acknowledgement. */

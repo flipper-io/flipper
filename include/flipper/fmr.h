@@ -11,14 +11,15 @@
 
 /* Defines the size (in bytes) of a single FMR packet. */
 #define FMR_PACKET_SIZE 64
-
 /* Define the upper limit of the number of arguments a function can be invoked using. */
 #define FMR_MAX_ARGC 16
+/* The magic number. */
+#define FMR_MAGIC_NUMBER 0xFE
 
 /* Define types exposed by the FMR API. */
 typedef uint64_t fmr_va;
 typedef uint32_t fmr_arg;
-typedef lf_id_t fmr_module;
+typedef lf_crc_t fmr_module;
 typedef uint8_t fmr_function;
 typedef uint8_t fmr_argc;
 typedef uint16_t fmr_types;
@@ -54,6 +55,32 @@ typedef enum {
 /* Calculates the length of an FMR type. */
 #define fmr_sizeof(type) (1 << type)
 
+/* Exposes all message runtime packet classes. */
+enum {
+	/* Asks a device for its configuration information. */
+	fmr_configuration_class,
+	/* Invokes a function in a standard module. */
+	fmr_standard_invocation_class,
+	/* Invokes a function in user module. */
+	fmr_user_invocation_class,
+	/* Signals the occurance an event. */
+	fmr_event_class
+};
+
+typedef uint8_t fmr_class;
+
+/* Contains the information required to obtain, verify, and route the packet. */
+struct LF_PACKED _fmr_header {
+	/* A magic number indicating the start of the packet. */
+	uint8_t magic;
+	/* The checksum of the packet's contents. */
+	lf_crc_t checksum;
+	/* The length of the packet expressed in bytes. */
+	uint16_t length;
+	/* The packet's class. */
+	fmr_class class;
+};
+
 /* Standardizes the notion of an argument. */
 struct _fmr_arg {
 	/* The value of the argument. */
@@ -72,44 +99,50 @@ struct _fmr_list {
 	struct _fmr_arg *argv;
 };
 
-/* Contains the information required to obtain and verify the packet body. */
-struct __attribute__((__packed__)) _fmr_header {
-	/* A magic number indicating the start of the packet. */
-	uint8_t magic;
-	/* The checksum of the packet's contents. */
-	lf_id_t checksum;
-	/* The length of the packet expressed in bytes. */
-	uint16_t length;
-};
 #define LF_CONFIGURATION 0x20
 #define LF_STANDARD_MODULE 0x80
 #define LF_PUSH_PULL_FUNCTION 0x40
 
-/* Describes the target module with which the packet will be interacting.  */
-struct __attribute__((__packed__)) _fmr_target {
-	/* Attributes of the target module and function. */
-	uint8_t attributes;
-	/* The identifier of the module. */
-	lf_id_t module;
-	/* The identifier of the function or variable. */
-	fmr_function function;
-	/* The number of arguments encoded in the packet. */
-	fmr_argc argc;
-};
-
-/* Organizes the sub-components of an FMR packet into a single data structure. */
-struct __attribute__((__packed__)) _fmr_packet {
+/* Generic packet data type that can be passed around by packet parsing equipment. */
+struct LF_PACKED _fmr_packet {
+	/* The header shared by all packet classes. */
 	struct _fmr_header header;
-	struct _fmr_target target;
-	uint8_t body[(FMR_PACKET_SIZE - sizeof(struct _fmr_header) - sizeof(struct _fmr_target))];
+	/* A generic payload that is designed to be casted against the class specific data structures. */
+	uint8_t payload[(FMR_PACKET_SIZE - sizeof(struct _fmr_header))];
 };
 
-/* Describes the results obtained from parsing a packet. */
-struct _fmr_result {
+/* Contains metadata needed to query a device about its configuration. */
+struct LF_PACKED _fmr_configuration_packet {
+	/* The packet header programmed with 'fmr_configuration_class'. */
+	struct _fmr_header header;
+	/* Padding for the unused section of the packet. */
+	uint8_t padding[(sizeof(struct _fmr_packet) - sizeof(struct _fmr_header))];
+};
+
+/* Contains metadata needed to perform a remote procedure call on a device. */
+struct LF_PACKED _fmr_invocation_packet {
+	/* The packet header programmed with 'fmr_standard_invocation_class' or 'fmr_user_invocation_class'. */
+	struct _fmr_header header;
+	/* The procedure call information carried by the invocation packet. */
+	struct LF_PACKED _fmr_call {
+		/* The index of the module in which the target routine resides. */
+		uint8_t index;
+		/* The index of the function within the module. */
+		uint8_t function;
+		/* The number of parameters encoded into the packet. */
+		fmr_argc argc;
+	} call;
+	/* The encoded values of the parameters to be passed to the callee. */
+	uint8_t parameters[(sizeof(struct _fmr_packet) - sizeof(struct _fmr_header) - sizeof(struct _fmr_call))];
+};
+
+/* A generic datastructure that is sent back following any message runtime transaction. */
+struct LF_PACKED _fmr_result {
 	/* The return value of the function called (if any). */
 	fmr_arg value;
-	/* The error code generated as a result of the parse (if any). */
+	/* The error code generated on the device. */
 	lf_error_t error;
+	/* NOTE: Add bitfield indicating the need to poll for updates. */
 };
 
 /* Declare the virtual interface for this module. */
@@ -139,7 +172,7 @@ struct _fmr_arg *fmr_pop(struct _fmr_list *list);
 /* Frees an fmr_list. */
 int fmr_free(struct _fmr_list *list);
 /* Generates the appropriate data structure needed for the remote procedure call of 'funtion' in 'module'. */
-int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *args, struct _fmr_packet *packet);
+int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *args, struct _fmr_invocation_packet *packet);
 /* Executes a standard module. */
 fmr_return fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, fmr_types types, void *arguments);
 /* Executes an fmr_packet and stores the result of the operation in the result buffer provided. */

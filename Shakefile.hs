@@ -755,8 +755,9 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
                        , pure [ -- This is a kludge to include parts of
                                 -- libflipper in osmium:
                                 "libflipper/src/crc.c"
-                              , "libflipper/src/fmr.c"
                               ]
+                          -- This sucks:
+                       , getDirectoryFiles "" ["libflipper/src/fmr//*.c"]
                        ]
 
         -- Build the list of necessary object files from the list of necessary
@@ -820,7 +821,6 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
                        , pure [ -- This is a kludge to include parts of
                                 -- libflipper in osmium:
                                 "libflipper/src/crc.c"
-                              , "libflipper/src/fmr.c"
                                 -- This is a kludge to include symbols needed by
                                 -- newlib in osmium:
                               , "platforms/atsam4s16b/src/system/syscalls.c"
@@ -828,6 +828,8 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
                                 -- in osmium:
                               , "platforms/atsam4s16b/src/system/vectors.c"
                               ]
+                         -- This sucks:
+                       , getDirectoryFiles "" ["libflipper/src/fmr//*c"]
                        ]
 
         -- Build the list of necessary object files from the list of necessary
