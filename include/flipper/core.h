@@ -36,7 +36,7 @@
 /* If defined, uses bulk for all USB transfers. */
 #define __ALL_BULK__
 /* If defined, prints debugging information about each packet. */
-#define __lf_debug__
+//#define __lf_debug__
 
 /* Packed attribute. */
 #define LF_PACKED __attribute__((__packed__))
@@ -133,6 +133,9 @@ struct _lf_device {
 	/* The next device in the list of attached devices. */
 	struct _lf_device *next;
 };
+
+/* All devices must implement a self referential interface. */
+extern struct _lf_device lf_self;
 
 /* Standardizes the notion of a module. */
 struct _lf_module {

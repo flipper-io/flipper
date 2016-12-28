@@ -5,7 +5,7 @@
 #include <platforms/atsam4s16b.h>
 
 /* The fmr_device object containing global state about this device. */
-struct _lf_device self = {
+struct _lf_device lf_self = {
 	{
 		"flipper",
 		0xc713,
@@ -82,6 +82,9 @@ void system_task(void) {
 	gpio_configure();
 	/* Configure the SPI peripheral. */
 	spi_configure();
+
+	char message[] = "Reset.\n";
+	usart_push(message, sizeof(message));
 
 	gpio_enable(PIO_PA0, 0);
 	PIOA -> PIO_OWER = PIO_PA0;

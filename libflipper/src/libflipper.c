@@ -221,7 +221,14 @@ int lf_load_configuration(struct _lf_device *device) {
 	if (_e < lf_success) {
 		return lf_error;
 	}
-	return lf_success;
+	/* Obtain the result from the device. */
+	struct _fmr_result result;
+	/* Obtain the result of the operation. */
+	lf_get_result(device, &result);
+	if (result.error == E_OK) {
+		return lf_success;
+	}
+	return lf_error;
 }
 
 struct _lf_device *lf_device(void) {

@@ -7,15 +7,15 @@ int error_configure(void) {
 }
 
 void error_raise(lf_error_t error, const char *format, ...) {
-	self.error = error;
+	lf_self.error = error;
 }
 
 lf_error_t error_get(void) {
-	return self.error;
+	return lf_self.error;
 }
 
 void error_clear(void) {
-	self.error = E_OK;
+	lf_self.error = E_OK;
 }
 
 void error_resume(void) {
