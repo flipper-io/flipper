@@ -12,15 +12,22 @@ This module provides the REPL command parsers.
 
 module Flipper.Console.Parsers (
     parseConsoleAction
+  , parseDigitalPin
+  , parseAnalogPin
+  , parseDirection
+  , parseEndpoint
+  , parseModuleID
+  , parseBool
+  , parseWord8
+  , parseWord16
+  , parseWord32
   ) where
-
-import Control.Applicative
 
 import Data.Word
 
-import Flipper
-
 import Flipper.Console.Action
+
+import Flipper
 
 import Flipper.GPIO
 import Flipper.LED
@@ -158,6 +165,7 @@ parseSPIAction = string' "spi" *> spaces *> choice [ try parseSPIConfigure
                                                    , try parseSPIDisable
                                                    , try parseSPIRead
                                                    , try parseSPIWriteFromString
+                                                   , try parseSPIWriteFromFile
                                                    ]
 
 -- | SWD command parser.
@@ -183,6 +191,7 @@ parseUART0Action = string' "uart0" *> spaces *> choice uart0s
                    , try parseUART0Disable
                    , try parseUART0Read
                    , try parseUART0WriteFromString
+                   , try parseUART0WriteFromFile
                    ]
 
 -- | USART command parser.
@@ -193,6 +202,7 @@ parseUSARTAction = string' "usart" *> spaces *> choice usarts
                    , try parseUSARTDisable
                    , try parseUSARTRead
                    , try parseUSARTWriteFromString
+                   , try parseUSARTWriteFromFile
                    ]
 
 -- | USB command parser.
@@ -507,8 +517,8 @@ parseBool = choice [ try (string' "0" *> pure False)
                    ]
 
 -- | 'Int' parser.
-parseAllocSize :: Parser Int
-parseAllocSize = fromIntegral <$> parseIntegerLit
+--parseAllocSize :: Parser Int
+--parseAllocSize = fromIntegral <$> parseIntegerLit
 
 -- | 'Word8' parser.
 parseWord8 :: Parser Word8

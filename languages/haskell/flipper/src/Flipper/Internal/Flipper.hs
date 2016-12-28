@@ -9,6 +9,11 @@ Portability : Windows, POSIX
 
 -}
 
+{-# LANGUAGE DeriveAnyClass
+           , DeriveDataTypeable
+           , DeriveGeneric
+           #-}
+
 module Flipper.Internal.Flipper (
     Endpoint(..)
   , select
@@ -16,11 +21,17 @@ module Flipper.Internal.Flipper (
   , detach
   ) where
 
+import Control.DeepSeq
+
+import Data.Data
+
 import Flipper.Internal.Error (pause)
 import Flipper.Internal.Utils
 
 import Foreign.C.String
 import Foreign.C.Types
+
+import GHC.Generics
 
 -- | An endpoint via which a Flipper device may be attached.
 data Endpoint = USB (Maybe String)    -- ^ Local connection via USB.
@@ -28,7 +39,12 @@ data Endpoint = USB (Maybe String)    -- ^ Local connection via USB.
               | FVM                   -- ^ Flipper simulation via FVM.
               deriving ( Eq
                        , Ord
+                       , Read
                        , Show
+                       , Data
+                       , Typeable
+                       , Generic
+                       , NFData
                        )
 
 select :: String -> IO Bool

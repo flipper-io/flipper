@@ -9,12 +9,17 @@ Portability : Windows, POSIX
 
 -}
 
-{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveAnyClass
+           , DeriveDataTypeable
+           , DeriveGeneric
+           #-}
 
 module Flipper.Error (
     FlipperError(..)
   , FlipperException(..)
   ) where
+
+import Control.DeepSeq
 
 import Control.Exception
 
@@ -22,8 +27,17 @@ import Data.Typeable
 
 import Flipper.Internal.Error
 
+import GHC.Generics
+
 -- | An exception providing a 'FlipperError'.
 data FlipperException = FlipperException FlipperError
-                      deriving (Eq, Show, Typeable)
+                      deriving ( Eq
+                               , Ord
+                               , Read
+                               , Show
+                               , Typeable
+                               , Generic
+                               , NFData
+                               )
 
 instance Exception FlipperException

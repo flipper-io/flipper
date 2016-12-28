@@ -9,6 +9,11 @@ Portability : Windows, POSIX
 
 -}
 
+{-# LANGUAGE DeriveAnyClass
+           , DeriveDataTypeable
+           , DeriveGeneric
+           #-}
+
 module Flipper.Internal.Error (
     FlipperError(..)
   , configure
@@ -19,6 +24,9 @@ module Flipper.Internal.Error (
   , clear
   ) where
 
+import Control.DeepSeq
+
+import Data.Data
 
 import Data.Word
 
@@ -26,6 +34,8 @@ import Foreign.C.String
 import Foreign.Ptr
 
 import Flipper.Internal.Utils
+
+import GHC.Generics
 
 -- | An error condition, reported by the device or occuring within the
 --   @libflipper@ library.
@@ -55,7 +65,13 @@ data FlipperError = OK                -- ^ All clear.
                   | Unknown           -- ^ Unknown error.
                   deriving ( Eq
                            , Ord
+                           , Read
                            , Show
+                           , Enum
+                           , Generic
+                           , NFData
+                           , Data
+                           , Typeable
                            )
 
 errorCode :: FlipperError -> Word16

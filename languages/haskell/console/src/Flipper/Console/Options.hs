@@ -37,7 +37,10 @@ data Options = Options {
     optEndpoint :: Endpoint
     -- | One-off action provided on the command line.
   , optOneoff   :: Maybe ConsoleAction
-  } deriving (Eq, Ord, Show)
+  } --deriving ( Eq
+    --         , Ord
+    --         , Show
+    --         )
 
 -- | Top-level option parser.
 options :: Parser Options
@@ -56,8 +59,8 @@ endpoint = option (readParser parseEndpoint) opt
 -- | Run a megaparsec parser as a command line option parser.
 readParser :: M.Parser a -> ReadM a
 readParser p = eitherReader (showLeft . M.runParser p "")
-    where showLeft Right x = Right x
-          showLeft Left e  = Left (show e)
+    where showLeft (Right x) = Right x
+          showLeft (Left e)  = Left (show e)
 
 -- | Top-level action parser.
 action :: Parser ConsoleAction

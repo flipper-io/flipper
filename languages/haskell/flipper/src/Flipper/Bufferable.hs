@@ -137,7 +137,7 @@ The related type 'SizedByteString' provides the same behavior for
            , DeriveFoldable
            , DeriveGeneric
            , DeriveTraversable
-           , DeriveAnyClass
+           , GeneralizedNewtypeDeriving
            #-}
 
 module Flipper.Bufferable (
@@ -203,7 +203,7 @@ instance (GBufferable f, GBufferable g) => GBufferable (f :*: g) where
     gput (f :*: g) = gput f <> gput g
     gget           = (:*:) <$> gget <*> gget
 
--- | Instance for metadata
+-- | Instance for metadata.
 instance GBufferable a => GBufferable (M1 i t a) where
     gput (M1 x) = gput x
     gget        = M1 <$> gget
@@ -221,6 +221,7 @@ newtype SentinelSequence a s = SentinelSequence { unSentinelSequence :: [a] }
                                       , Read
                                       , Show
                                       , Functor
+                                      , Monoid
                                       , Foldable
                                       , Traversable
                                       )
@@ -242,6 +243,7 @@ newtype SizedSequence a l = SizedSequence { unSizedSequence :: [a] }
                                    , Read
                                    , Show
                                    , Functor
+                                   , Monoid
                                    , Foldable
                                    , Traversable
                                    )
@@ -255,6 +257,7 @@ newtype CBlock = CBlock { unCBlock :: B.ByteString }
                         , Show
                         , Generic
                         , NFData
+                        , Monoid
                         )
 
 -- | Provides a 'Bufferable' instance for arrays of bytes accompanied by a
@@ -266,6 +269,7 @@ newtype SizedByteString l = SizedByteString { unSizedByteString :: B.ByteString 
                                    , Show
                                    , Generic
                                    , NFData
+                                   , Monoid
                                    )
 
 -- | A type for encoding struct padding at the Haskell type level. Use of this
@@ -275,7 +279,9 @@ newtype SizedByteString l = SizedByteString { unSizedByteString :: B.ByteString 
 --   (i.e. 'undefined' or ⊥ is the only value of any 'Padding' type), degenerate
 --   instances are provided for common typeclasses so that they may be derived
 --   for data types containing padding.
-data Padding (s :: Nat) deriving (Generic, NFData)
+data Padding (s :: Nat) deriving (Generic)
+
+instance NFData (Padding s)
 
 -- | '(==)' always returns 'True'.
 instance Eq (Padding s) where
