@@ -16,10 +16,13 @@ build-type:          Simple
 cabal-version:       >=1.10
 
 library
-  exposed-modules:     Flipper.Distribution.Language
+  exposed-modules:     Flipper.Distribution.Binding
+                       Flipper.Distribution.Language
                        Flipper.Distribution.License
+                       Flipper.Distribution.Manifest
                        Flipper.Distribution.Module
                        Flipper.Distribution.Package
+                       Flipper.Distribution.Parser
                        Flipper.Distribution.Version
   build-depends:       base
                      , binary
