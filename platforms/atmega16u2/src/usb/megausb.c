@@ -2,7 +2,7 @@
 #include <private/megausb.h>
 #include <platforms/atmega16u2.h>
 
-const struct _lf_endpoint megausb = {
+struct _lf_endpoint megausb = {
 	megausb_configure,
 	megausb_ready,
 	megausb_put,
@@ -12,23 +12,23 @@ const struct _lf_endpoint megausb = {
 	megausb_destroy
 };
 
-int megausb_configure(struct _lf_endpoint *endpoint) {
+int megausb_configure(void) {
 	return lf_success;
 }
 
-uint8_t megausb_ready(void) {
+uint8_t megausb_ready(struct _lf_endpoint *this) {
 	return 0;
 }
 
-void megausb_put(uint8_t byte) {
+void megausb_put(struct _lf_endpoint *this, uint8_t byte) {
 
 }
 
-uint8_t megausb_get(void) {
+uint8_t megausb_get(struct _lf_endpoint *this) {
 	return 0;
 }
 
-int megausb_push(void *source, lf_size_t length) {
+int megausb_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
 	int8_t bytes;
 #ifndef __ALL_BULK__
 	if (length <= INTERRUPT_IN_SIZE) {
@@ -45,7 +45,7 @@ int megausb_push(void *source, lf_size_t length) {
 	return lf_success;
 }
 
-int megausb_pull(void *destination, lf_size_t length) {
+int megausb_pull(struct _lf_endpoint *this, void *destination, lf_size_t length) {
 	int8_t bytes;
 #ifndef __ALL_BULK__
 	if (length <= INTERRUPT_OUT_SIZE) {
@@ -62,6 +62,6 @@ int megausb_pull(void *destination, lf_size_t length) {
 	return 	lf_success;
 }
 
-int megausb_destroy(struct _lf_endpoint *endpoint) {
+int megausb_destroy(void) {
 	return lf_success;
 }

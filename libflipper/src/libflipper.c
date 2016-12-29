@@ -14,16 +14,20 @@ struct _flipper flipper = {
 	flipper_exit,
 	E_OK,
 	1,
-	NULL,
-	NULL,
+	NULL
 };
 
-int lf_attach(char *name, struct _lf_endpoint *endpoint) {
+struct _lf_device *lf_attach(char *name, struct _lf_endpoint *endpoint) {
+	/* Ensure a valid endpoint was provided. */
+	if (!endpoint) {
+		error_raise(E_ENDPOINT, error_message("No endpoint provided for the device '%s'.", name));
+		goto  failure;
+	}
 	/* Allocate memory to contain the record of the device. */
 	struct _lf_device *device = (struct _lf_device *)calloc(1, sizeof(struct _lf_device));
 	if (!device) {
 		error_raise(E_MALLOC, error_message("Failed to allocate the memory required to create a new fmr_device."));
-		return lf_error;
+		return NULL;
 	}
 	if (strlen(name) > sizeof(device -> configuration.name)) {
 		error_raise(E_NAME, error_message("The name '%s' is too long. Please choose a name with %lu characters or less.", name, sizeof(device -> configuration.name)));
@@ -31,43 +35,11 @@ int lf_attach(char *name, struct _lf_endpoint *endpoint) {
 	}
 	/* Set the device's name. */
 	strcpy(device -> configuration.name, name);
-	/* Set the device's identifier. */
-	device -> configuration.identifier = lf_crc(name, strlen(name));
-	/* Obtain the head of the linked list of attached devices. */
-	struct _lf_device *last, *head = flipper.attached;
-	last = head;
-	/* Check if any devices have been attached. */
-	if (!head) {
-		/* If we don't yet have a head, make this device the head of the linked list. */
-		flipper.attached = device;
-	}
-	else {
-		/* Walk the list of attached devices until the desired device is found. */
-		while (head) {
-			/* Compare the name of the attached device with the name of the new device. */
-			if (!strcmp(head -> configuration.name, device -> configuration.name)) {
-				/* If a device with the given name has already been attached, raise an error. */
-				error_raise(E_ALREADY_ATTACHED, error_message("Could not attach a device named '%s'. A device with that name has already been attached.", device -> configuration.name));
-				goto failure;
-			}
-			/* Advance to the next attached device. */
-			last = head;
-			head = head -> next;
-		}
-		/* Stage the device into the list of attached devices. */
-		last -> next = device;
-	}
 	/* Set the device's endpoint. */
 	device -> endpoint = endpoint;
-	if (!endpoint) {
-		error_raise(E_ENDPOINT, error_message("No endpoint provided for the device '%s'.", name));
-		goto  failure;
-	}
-	/* Set the current device. */
-	flipper.device = device;
-	/* Save the test identifier. */
-	lf_crc_t _identifier = device -> configuration.identifier;
-	/* Broadcast a packet to the device over the default endpoint to verify the identifier. */
+	/* Create the device's identifier. */
+	lf_crc_t _identifier = lf_crc(name, strlen(name));
+	/* Broadcast a packet to the device over its endpoint to verify the identifier. */
 	int _e = lf_load_configuration(device);
 	if (_e < lf_success) {
 		error_raise(E_CONFIGURATION, error_message("Failed to obtain configuration for device '%s'.", name));
@@ -78,115 +50,69 @@ int lf_attach(char *name, struct _lf_endpoint *endpoint) {
 		error_raise(E_NO_DEVICE, error_message("Identifier mismatch for device '%s'. (0x%04x instead of 0x%04x)", name, device -> configuration.identifier, _identifier));
 		goto failure;
 	}
-	/* Return with success. */
-	return lf_success;
+	/* Set the current device. */
+	flipper.device = device;
+	return device;
 failure:
 	free(device);
-	return lf_error;
+	return NULL;
 }
 
-int flipper_attach(void) {
+struct _lf_device *flipper_attach(void) {
 	/* Attach a device over USB with the factory default name. */
 	return flipper_attach_usb("flipper");
 }
 
-int flipper_attach_usb(char *name) {
+struct _lf_device *flipper_attach_usb(char *name) {
 	struct _lf_endpoint *_ep = &lf_usb_ep;
-	if (_ep -> configure(_ep)) {
-		return lf_error;
+	if (_ep -> configure(_ep) < lf_success) {
+		return NULL;
 	}
 	return lf_attach(name, _ep);
 }
 
-int flipper_attach_network(char *name, char *hostname) {
+struct _lf_device *flipper_attach_network(char *name, char *hostname) {
 	struct _lf_endpoint *_ep = &lf_network_ep;
-	if (_ep -> configure(_ep, hostname)) {
-		return lf_error;
+	if (_ep -> configure(_ep, hostname) < lf_success) {
+		return NULL;
 	}
 	return lf_attach(name, _ep);
 }
 
-int flipper_attach_endpoint(char *name, struct _lf_endpoint *endpoint) {
-	if (endpoint -> configure(endpoint)) {
-		return lf_error;
+struct _lf_device *flipper_attach_endpoint(char *name, struct _lf_endpoint *endpoint) {
+	if (endpoint -> configure(endpoint) < lf_success) {
+		return NULL;
 	}
 	return lf_attach(name, endpoint);
 }
 
-int flipper_select(char *name) {
-	/* Obtain the head of the linked list of attached devices. */
-	struct _lf_device *head = flipper.attached;
-	/* Walk the list of attached devices until the desired device is found. */
-	while (head) {
-		/* Compare the name of the attached device with the name provided. */
-		if (!strcmp(head -> configuration.name, name)) {
-			/* If we have a match, set the current device. */
-			flipper.device = head;
-			return lf_success;
-		}
-		/* Advance to the next attached device. */
-		head = head -> next;
+int flipper_select(struct _lf_device *device) {
+	if (!device) {
+		error_raise(E_NULL, error_message("No device provided for selection."));
+		return lf_error;
 	}
-	/* If we get here, no device with the name provided could be found. */
-	error_raise(E_NOT_ATTACHED, error_message("Failed to select device named '%s'.", name));
-	return lf_error;
+	flipper.device = device;
+	return lf_success;
 }
 
-int flipper_release(struct _lf_device *device) {
+int flipper_detach(struct _lf_device *device) {
 	if (!device) {
 		error_raise(E_NULL, error_message("No device provided for release."));
 		return lf_error;
-	}
-	/* If the device has an endpoint, deallocate it. */
-	if (device -> endpoint) {
-		device -> endpoint -> destroy(device -> endpoint);
-		/* If the device's endpoint previously allocated memory to contain a record, release it. */
-		if (device -> endpoint -> record) {
-			free(device -> endpoint -> record);
-		}
-	}
-	/* If the device we are detaching is the actively selected device, nullify it. */
-	if (device == flipper.attached) {
-		flipper.attached = device -> next;
 	}
 	if (device == flipper.device) {
 		flipper.device = NULL;
 	}
 	/* Free the device record structure. */
 	free(device);
-	return lf_error;
-}
-
-int flipper_detach(char *name) {
-	/* Obtain the head of the linked list of attached devices. */
-	struct _lf_device *device = flipper.attached;
-	/* Walk the list of attached devices until the desired device is found. */
-	while (device) {
-		/* Compare the name of the attached device with the name provided. */
-		if (!strcmp(device -> configuration.name, name)) {
-			/* If we have isolated the device to detach, release it. */
-			return flipper_release(device);
-		}
-		/* Advance to the next device. */
-		device = device -> next;
-	}
-	/* If we get here, no device with the name provided could be found. */
-	error_raise(E_NOT_ATTACHED, error_message("Failed to detach a device named '%s'.", name));
-	return lf_error;
+	return lf_success;
 }
 
 int __attribute__((__destructor__)) flipper_exit(void) {
-	/* Walk the attached list and detach all attached devices. */
-	struct _lf_device *head = flipper.attached;
-	/* Walk the list of attached devices until the desired device is found. */
-	while (head) {
-		struct _lf_device *next = head -> next;
-		/* Release the device. */
-		flipper_release(head);
-		/* Advance to the next attached device. */
-		head = next;
+	/* If there is a device attached, free it. */
+	if (flipper.device) {
+		free(flipper.device);
 	}
-	flipper.attached = NULL;
 	return lf_success;
 }
 
