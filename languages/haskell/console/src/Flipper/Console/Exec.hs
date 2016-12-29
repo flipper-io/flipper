@@ -196,6 +196,7 @@ execUSBAction USBConfigure = USB.configure >>= printFC
 -- | Run a WDT module call in the 'FC' monad.
 execWDTAction :: WDTAction -> FC ()
 execWDTAction WDTConfigure = WDT.configure >>= printFC
+execWDTAction WDTFire      = WDT.fire
 
 -- | The top-level console REPL. Parses input lines into 'ConsoleAction's and
 --   executes them until the user hits Ctrl-D.

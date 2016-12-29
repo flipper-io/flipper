@@ -317,6 +317,7 @@ usb = info usbP usbI
 wdt :: ParserInfo WDTAction
 wdt = info wdtP wdtI
     where wdtP = hsubparser $ mconcat [ wdtConfigure
+                                      , wdtFire
                                       ]
           wdtI = mconcat [ fullDesc
                          , progDesc "Interact with the device's WDT."
@@ -753,6 +754,14 @@ wdtConfigure = command "configure" (info (pure WDTConfigure) configureI)
     where configureI = mconcat [ fullDesc
                                , progDesc "Configure the WDT."
                                ]
+
+-- | WDT fire command parser.
+wdtFire :: Mod CommandFields WDTAction
+wdtFire = command "fire" (info (pure WDTFire) fireI)
+    where fireI = mconcat [ fullDesc
+                          , progDesc "Fire the WDT."
+                          ]
+
 -- | Deprecate this.
 moduleID :: Parser ModuleID
 moduleID = argument (readParser parseModuleID) moduleP

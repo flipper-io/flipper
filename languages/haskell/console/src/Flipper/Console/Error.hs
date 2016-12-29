@@ -208,6 +208,7 @@ usbCtx USBConfigure = "Configuring USB."
 --   have occured.
 wdtCtx :: WDTAction -> String
 wdtCtx WDTConfigure = "Configuring WDT."
+wdtCtx WDTFire      = "Firing WDT."
 
 -- | Map a 'FlipperError' to a string describing the error in detail.
 errorMsg :: FlipperError -> String
