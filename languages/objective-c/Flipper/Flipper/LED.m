@@ -7,9 +7,13 @@
 //
 
 #import "LED.h"
-#import "led.h"
+#import <flipper/led.h>
 
 @implementation LFLED
+
+- (void) configure {
+    led_configure();
+}
 
 - (void) setR:(uint8_t)r G:(uint8_t)g B:(uint8_t)b {
     led_set_rgb(r, g, b);

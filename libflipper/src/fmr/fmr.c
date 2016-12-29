@@ -225,6 +225,10 @@ fmr_return fmr_perform_invocation(struct _fmr_invocation_packet *packet) {
 }
 
 int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
+	/* Check that the magic number matches. */
+	if (packet -> header.magic != FMR_MAGIC_NUMBER) {
+		goto done;
+	}
 	/* Create a copy of the packet's checksum. */
 	lf_crc_t _crc = packet -> header.checksum;
 	/* Clear the checksum of the packet. */

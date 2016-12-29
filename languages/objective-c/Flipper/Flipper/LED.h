@@ -12,6 +12,7 @@
     
 }
 
+- (void) configure;
 - (void) setR:(uint8_t)r G:(uint8_t)g B:(uint8_t)b;
 
 @end

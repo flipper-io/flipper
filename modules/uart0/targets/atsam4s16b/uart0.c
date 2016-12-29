@@ -55,7 +55,6 @@ void uart0_put(uint8_t byte) {
 	UART0 -> UART_THR = byte;
 }
 
-
 uint8_t uart0_get(void) {
 	/* Retrieve a byte from the receiver FIFO. */
 	return UART0 -> UART_RHR;

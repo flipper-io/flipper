@@ -15,42 +15,6 @@
 		5E7F1AB91DC254920041E048 /* LED.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E7F1AB71DC254920041E048 /* LED.m */; };
 		5E7F1ADB1DC255F20041E048 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E7F1ADA1DC255F20041E048 /* main.m */; };
 		5E7F1ADF1DC256A60041E048 /* Flipper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E7F1AAB1DC2541A0041E048 /* Flipper.framework */; };
-		5E94A31B1E147AF500D5DD83 /* adc.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A2F31E147AF500D5DD83 /* adc.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A31C1E147AF500D5DD83 /* button.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A2F41E147AF500D5DD83 /* button.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A31D1E147AF500D5DD83 /* core.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A2F51E147AF500D5DD83 /* core.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A31E1E147AF500D5DD83 /* cpu.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A2F61E147AF500D5DD83 /* cpu.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A31F1E147AF500D5DD83 /* dac.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A2F71E147AF500D5DD83 /* dac.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A3201E147AF500D5DD83 /* error.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A2F81E147AF500D5DD83 /* error.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A3211E147AF500D5DD83 /* fld.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A2F91E147AF500D5DD83 /* fld.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A3221E147AF500D5DD83 /* flipper.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A2FA1E147AF500D5DD83 /* flipper.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A3231E147AF500D5DD83 /* fmr.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A2FB1E147AF500D5DD83 /* fmr.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A3241E147AF500D5DD83 /* fs.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A2FC1E147AF500D5DD83 /* fs.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A3251E147AF500D5DD83 /* gpio.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A2FD1E147AF500D5DD83 /* gpio.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A3261E147AF500D5DD83 /* i2c.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A2FE1E147AF500D5DD83 /* i2c.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A3271E147AF500D5DD83 /* led.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A2FF1E147AF500D5DD83 /* led.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A3281E147AF500D5DD83 /* modules.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A3001E147AF500D5DD83 /* modules.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A3291E147AF500D5DD83 /* atmega16u2.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A3021E147AF500D5DD83 /* atmega16u2.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A32A1E147AF500D5DD83 /* core_cm3.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A3051E147AF500D5DD83 /* core_cm3.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A32B1E147AF500D5DD83 /* exceptions.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A3061E147AF500D5DD83 /* exceptions.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A32C1E147AF500D5DD83 /* SAM4S16.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A3071E147AF500D5DD83 /* SAM4S16.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A32D1E147AF500D5DD83 /* atsam4s16b.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A3081E147AF500D5DD83 /* atsam4s16b.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A32E1E147AF500D5DD83 /* esp8266ex.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A3091E147AF500D5DD83 /* esp8266ex.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A32F1E147AF500D5DD83 /* fvm.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A30A1E147AF500D5DD83 /* fvm.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A3301E147AF500D5DD83 /* libusb.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A30C1E147AF500D5DD83 /* libusb.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A3311E147AF500D5DD83 /* network.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A30D1E147AF500D5DD83 /* network.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A3321E147AF500D5DD83 /* posix.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A30E1E147AF500D5DD83 /* posix.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A3331E147AF500D5DD83 /* windows.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A30F1E147AF500D5DD83 /* windows.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A3341E147AF500D5DD83 /* pwm.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A3101E147AF500D5DD83 /* pwm.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A3351E147AF500D5DD83 /* rtc.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A3111E147AF500D5DD83 /* rtc.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A3361E147AF500D5DD83 /* spi.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A3121E147AF500D5DD83 /* spi.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A3371E147AF500D5DD83 /* swd.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A3131E147AF500D5DD83 /* swd.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A3381E147AF500D5DD83 /* temp.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A3141E147AF500D5DD83 /* temp.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A3391E147AF500D5DD83 /* timer.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A3151E147AF500D5DD83 /* timer.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A33A1E147AF500D5DD83 /* uart0.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A3161E147AF500D5DD83 /* uart0.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A33B1E147AF500D5DD83 /* usart.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A3171E147AF500D5DD83 /* usart.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A33C1E147AF500D5DD83 /* usb.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A3181E147AF500D5DD83 /* usb.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A33D1E147AF500D5DD83 /* wdt.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A3191E147AF500D5DD83 /* wdt.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		5E94A33E1E147AF500D5DD83 /* flipper.h in Headers */ = {isa = PBXBuildFile; fileRef = 5E94A31A1E147AF500D5DD83 /* flipper.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -76,42 +40,6 @@
 		5E7F1AB71DC254920041E048 /* LED.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LED.m; sourceTree = "<group>"; };
 		5E7F1AD81DC255F20041E048 /* FlipperTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FlipperTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5E7F1ADA1DC255F20041E048 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		5E94A2F31E147AF500D5DD83 /* adc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = adc.h; sourceTree = "<group>"; };
-		5E94A2F41E147AF500D5DD83 /* button.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = button.h; sourceTree = "<group>"; };
-		5E94A2F51E147AF500D5DD83 /* core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = core.h; sourceTree = "<group>"; };
-		5E94A2F61E147AF500D5DD83 /* cpu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpu.h; sourceTree = "<group>"; };
-		5E94A2F71E147AF500D5DD83 /* dac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dac.h; sourceTree = "<group>"; };
-		5E94A2F81E147AF500D5DD83 /* error.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = error.h; sourceTree = "<group>"; };
-		5E94A2F91E147AF500D5DD83 /* fld.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fld.h; sourceTree = "<group>"; };
-		5E94A2FA1E147AF500D5DD83 /* flipper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flipper.h; sourceTree = "<group>"; };
-		5E94A2FB1E147AF500D5DD83 /* fmr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fmr.h; sourceTree = "<group>"; };
-		5E94A2FC1E147AF500D5DD83 /* fs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fs.h; sourceTree = "<group>"; };
-		5E94A2FD1E147AF500D5DD83 /* gpio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gpio.h; sourceTree = "<group>"; };
-		5E94A2FE1E147AF500D5DD83 /* i2c.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = i2c.h; sourceTree = "<group>"; };
-		5E94A2FF1E147AF500D5DD83 /* led.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = led.h; sourceTree = "<group>"; };
-		5E94A3001E147AF500D5DD83 /* modules.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = modules.h; sourceTree = "<group>"; };
-		5E94A3021E147AF500D5DD83 /* atmega16u2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = atmega16u2.h; sourceTree = "<group>"; };
-		5E94A3051E147AF500D5DD83 /* core_cm3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = core_cm3.h; sourceTree = "<group>"; };
-		5E94A3061E147AF500D5DD83 /* exceptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = exceptions.h; sourceTree = "<group>"; };
-		5E94A3071E147AF500D5DD83 /* SAM4S16.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SAM4S16.h; sourceTree = "<group>"; };
-		5E94A3081E147AF500D5DD83 /* atsam4s16b.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = atsam4s16b.h; sourceTree = "<group>"; };
-		5E94A3091E147AF500D5DD83 /* esp8266ex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = esp8266ex.h; sourceTree = "<group>"; };
-		5E94A30A1E147AF500D5DD83 /* fvm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fvm.h; sourceTree = "<group>"; };
-		5E94A30C1E147AF500D5DD83 /* libusb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libusb.h; sourceTree = "<group>"; };
-		5E94A30D1E147AF500D5DD83 /* network.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = network.h; sourceTree = "<group>"; };
-		5E94A30E1E147AF500D5DD83 /* posix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = posix.h; sourceTree = "<group>"; };
-		5E94A30F1E147AF500D5DD83 /* windows.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = windows.h; sourceTree = "<group>"; };
-		5E94A3101E147AF500D5DD83 /* pwm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pwm.h; sourceTree = "<group>"; };
-		5E94A3111E147AF500D5DD83 /* rtc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rtc.h; sourceTree = "<group>"; };
-		5E94A3121E147AF500D5DD83 /* spi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spi.h; sourceTree = "<group>"; };
-		5E94A3131E147AF500D5DD83 /* swd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = swd.h; sourceTree = "<group>"; };
-		5E94A3141E147AF500D5DD83 /* temp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = temp.h; sourceTree = "<group>"; };
-		5E94A3151E147AF500D5DD83 /* timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timer.h; sourceTree = "<group>"; };
-		5E94A3161E147AF500D5DD83 /* uart0.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uart0.h; sourceTree = "<group>"; };
-		5E94A3171E147AF500D5DD83 /* usart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = usart.h; sourceTree = "<group>"; };
-		5E94A3181E147AF500D5DD83 /* usb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = usb.h; sourceTree = "<group>"; };
-		5E94A3191E147AF500D5DD83 /* wdt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wdt.h; sourceTree = "<group>"; };
-		5E94A31A1E147AF500D5DD83 /* flipper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flipper.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,7 +73,6 @@
 		5E7F1AA11DC254190041E048 = {
 			isa = PBXGroup;
 			children = (
-				5E94A2F11E147AF500D5DD83 /* include */,
 				5E7F1AAD1DC2541A0041E048 /* Flipper */,
 				5E7F1AD91DC255F20041E048 /* FlipperTest */,
 				5E7F1AAC1DC2541A0041E048 /* Products */,
@@ -183,90 +110,6 @@
 			path = FlipperTest;
 			sourceTree = "<group>";
 		};
-		5E94A2F11E147AF500D5DD83 /* include */ = {
-			isa = PBXGroup;
-			children = (
-				5E94A2F21E147AF500D5DD83 /* flipper */,
-				5E94A31A1E147AF500D5DD83 /* flipper.h */,
-			);
-			name = include;
-			path = ../../../build/include;
-			sourceTree = "<group>";
-		};
-		5E94A2F21E147AF500D5DD83 /* flipper */ = {
-			isa = PBXGroup;
-			children = (
-				5E94A2F31E147AF500D5DD83 /* adc.h */,
-				5E94A2F41E147AF500D5DD83 /* button.h */,
-				5E94A2F51E147AF500D5DD83 /* core.h */,
-				5E94A2F61E147AF500D5DD83 /* cpu.h */,
-				5E94A2F71E147AF500D5DD83 /* dac.h */,
-				5E94A2F81E147AF500D5DD83 /* error.h */,
-				5E94A2F91E147AF500D5DD83 /* fld.h */,
-				5E94A2FA1E147AF500D5DD83 /* flipper.h */,
-				5E94A2FB1E147AF500D5DD83 /* fmr.h */,
-				5E94A2FC1E147AF500D5DD83 /* fs.h */,
-				5E94A2FD1E147AF500D5DD83 /* gpio.h */,
-				5E94A2FE1E147AF500D5DD83 /* i2c.h */,
-				5E94A2FF1E147AF500D5DD83 /* led.h */,
-				5E94A3001E147AF500D5DD83 /* modules.h */,
-				5E94A3011E147AF500D5DD83 /* platforms */,
-				5E94A3101E147AF500D5DD83 /* pwm.h */,
-				5E94A3111E147AF500D5DD83 /* rtc.h */,
-				5E94A3121E147AF500D5DD83 /* spi.h */,
-				5E94A3131E147AF500D5DD83 /* swd.h */,
-				5E94A3141E147AF500D5DD83 /* temp.h */,
-				5E94A3151E147AF500D5DD83 /* timer.h */,
-				5E94A3161E147AF500D5DD83 /* uart0.h */,
-				5E94A3171E147AF500D5DD83 /* usart.h */,
-				5E94A3181E147AF500D5DD83 /* usb.h */,
-				5E94A3191E147AF500D5DD83 /* wdt.h */,
-			);
-			path = flipper;
-			sourceTree = "<group>";
-		};
-		5E94A3011E147AF500D5DD83 /* platforms */ = {
-			isa = PBXGroup;
-			children = (
-				5E94A3021E147AF500D5DD83 /* atmega16u2.h */,
-				5E94A3031E147AF500D5DD83 /* atsam4s16b */,
-				5E94A3081E147AF500D5DD83 /* atsam4s16b.h */,
-				5E94A3091E147AF500D5DD83 /* esp8266ex.h */,
-				5E94A30A1E147AF500D5DD83 /* fvm.h */,
-				5E94A30B1E147AF500D5DD83 /* posix */,
-				5E94A30E1E147AF500D5DD83 /* posix.h */,
-				5E94A30F1E147AF500D5DD83 /* windows.h */,
-			);
-			path = platforms;
-			sourceTree = "<group>";
-		};
-		5E94A3031E147AF500D5DD83 /* atsam4s16b */ = {
-			isa = PBXGroup;
-			children = (
-				5E94A3041E147AF500D5DD83 /* cmsis */,
-				5E94A3061E147AF500D5DD83 /* exceptions.h */,
-				5E94A3071E147AF500D5DD83 /* SAM4S16.h */,
-			);
-			path = atsam4s16b;
-			sourceTree = "<group>";
-		};
-		5E94A3041E147AF500D5DD83 /* cmsis */ = {
-			isa = PBXGroup;
-			children = (
-				5E94A3051E147AF500D5DD83 /* core_cm3.h */,
-			);
-			path = cmsis;
-			sourceTree = "<group>";
-		};
-		5E94A30B1E147AF500D5DD83 /* posix */ = {
-			isa = PBXGroup;
-			children = (
-				5E94A30C1E147AF500D5DD83 /* libusb.h */,
-				5E94A30D1E147AF500D5DD83 /* network.h */,
-			);
-			path = posix;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -274,42 +117,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5E94A33B1E147AF500D5DD83 /* usart.h in Headers */,
-				5E94A3321E147AF500D5DD83 /* posix.h in Headers */,
-				5E94A32E1E147AF500D5DD83 /* esp8266ex.h in Headers */,
-				5E94A32B1E147AF500D5DD83 /* exceptions.h in Headers */,
-				5E94A3271E147AF500D5DD83 /* led.h in Headers */,
-				5E94A33C1E147AF500D5DD83 /* usb.h in Headers */,
-				5E94A3231E147AF500D5DD83 /* fmr.h in Headers */,
-				5E94A3201E147AF500D5DD83 /* error.h in Headers */,
-				5E94A3391E147AF500D5DD83 /* timer.h in Headers */,
-				5E94A3311E147AF500D5DD83 /* network.h in Headers */,
-				5E94A3211E147AF500D5DD83 /* fld.h in Headers */,
-				5E94A3241E147AF500D5DD83 /* fs.h in Headers */,
-				5E94A33E1E147AF500D5DD83 /* flipper.h in Headers */,
-				5E94A3371E147AF500D5DD83 /* swd.h in Headers */,
-				5E94A3331E147AF500D5DD83 /* windows.h in Headers */,
-				5E94A32A1E147AF500D5DD83 /* core_cm3.h in Headers */,
-				5E94A3351E147AF500D5DD83 /* rtc.h in Headers */,
-				5E94A3281E147AF500D5DD83 /* modules.h in Headers */,
-				5E94A31C1E147AF500D5DD83 /* button.h in Headers */,
-				5E94A32C1E147AF500D5DD83 /* SAM4S16.h in Headers */,
-				5E94A32F1E147AF500D5DD83 /* fvm.h in Headers */,
-				5E94A3261E147AF500D5DD83 /* i2c.h in Headers */,
-				5E94A3361E147AF500D5DD83 /* spi.h in Headers */,
-				5E94A3291E147AF500D5DD83 /* atmega16u2.h in Headers */,
-				5E94A33D1E147AF500D5DD83 /* wdt.h in Headers */,
-				5E94A33A1E147AF500D5DD83 /* uart0.h in Headers */,
-				5E94A31F1E147AF500D5DD83 /* dac.h in Headers */,
-				5E94A31D1E147AF500D5DD83 /* core.h in Headers */,
-				5E94A3341E147AF500D5DD83 /* pwm.h in Headers */,
-				5E94A3221E147AF500D5DD83 /* flipper.h in Headers */,
-				5E94A3381E147AF500D5DD83 /* temp.h in Headers */,
-				5E94A31E1E147AF500D5DD83 /* cpu.h in Headers */,
-				5E94A31B1E147AF500D5DD83 /* adc.h in Headers */,
-				5E94A32D1E147AF500D5DD83 /* atsam4s16b.h in Headers */,
-				5E94A3251E147AF500D5DD83 /* gpio.h in Headers */,
-				5E94A3301E147AF500D5DD83 /* libusb.h in Headers */,
 				5E2A4C141E1304BE00BA0084 /* LFDevice.h in Headers */,
 				5E7F1AB81DC254920041E048 /* LED.h in Headers */,
 				5E7F1AB01DC2541A0041E048 /* Flipper.h in Headers */,
@@ -533,6 +340,7 @@
 					"$(inherited)",
 					__private_include__,
 				);
+				HEADER_SEARCH_PATHS = /usr/local/include;
 				INFOPLIST_FILE = Flipper/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/local/lib;
@@ -556,6 +364,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
 				GCC_PREPROCESSOR_DEFINITIONS = __private_include__;
+				HEADER_SEARCH_PATHS = /usr/local/include;
 				INFOPLIST_FILE = Flipper/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/local/lib;
