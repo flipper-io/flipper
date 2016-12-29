@@ -6,20 +6,20 @@
 #include <platforms/atmega16u2.h>
 
 /* ~ Declare the virtual interface for this driver. ~ */
-extern const struct _lf_endpoint megausb;
+extern struct _lf_endpoint megausb;
 
 extern volatile uint8_t megausb_configured;
 
 #ifdef __private_include__
 
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
-extern int megausb_configure(struct _lf_endpoint *endpoint);
-extern uint8_t megausb_ready(void);
-extern void megausb_put(uint8_t byte);
-extern uint8_t megausb_get(void);
-extern int megausb_push(void *source, lf_size_t length);
-extern int megausb_pull(void *destination, lf_size_t length);
-extern int megausb_destroy(struct _lf_endpoint *endpoint);
+extern int megausb_configure();
+extern uint8_t megausb_ready(struct _lf_endpoint *this);
+extern void megausb_put(struct _lf_endpoint *this, uint8_t byte);
+extern uint8_t megausb_get(struct _lf_endpoint *this);
+extern int megausb_push(struct _lf_endpoint *this, void *source, lf_size_t length);
+extern int megausb_pull(struct _lf_endpoint *this, void *destination, lf_size_t length);
+extern int megausb_destroy();
 
 #define DEFAULT_TIMEOUT                 50
 #define MANUFACTURER_STRING             L"flipper.io"

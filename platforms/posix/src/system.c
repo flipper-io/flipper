@@ -11,6 +11,4 @@ struct _lf_device lf_self = {
 	},
 	NULL,
 	E_OK,
-	false,
-	NULL
 };

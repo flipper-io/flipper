@@ -13,38 +13,47 @@
 /* ~ Declare the virtual interface for this driver. ~ */
 extern struct _flipper {
 	/* Attaches the current instance of libflipper to the first available device over the default endpoint. */
-	int (* attach)(void);
+	struct _lf_device *(* attach)(void);
 	/* Attaches to a Flipper device by name over the USB endpoint. */
-	int (* attach_usb)(char *name);
+	struct _lf_device *(* attach_usb)(char *name);
 	/* Attaches to a Flipper device by name and hostname/IP over the network endpoint. */
-	int (* attach_network)(char *name, char *hostname);
+	struct _lf_device *(* attach_network)(char *name, char *hostname);
 	/* Attaches to a Flipper device by name over an arbitrary endpoint. */
-	int (* attach_endpoint)(char *name, struct _lf_endpoint *endpoint);
-	/* Finds a previously attached Flipper device and routes all calls to it. */
-	int (* select)(char *name);
+	struct _lf_device *(* attach_endpoint)(char *name, struct _lf_endpoint *endpoint);
+	/* Selects a previously attached Flipper device and routes all calls to it. */
+	int (* select)(struct _lf_device *device);
 	/* Disconnects a previously attached Flipper device from libflipper. */
-	int (* detach)(char *name);
+	int (* detach)(struct _lf_device *device);
 	/* Safely destroys all libflipper state before termination. */
 	int (* exit)(void);
 	/* Stores the last observed error code. */
 	lf_error_t error_code;
 	/* Global flag that indicates whether or not error_raise() should print to stderr and call exit(). */
 	uint8_t errors_cause_side_effects;
-	/* The head of a linked list that aggregates all attached devices. */
-	struct _lf_device *attached;
 	/* Points to the actively selected device with which interaction will take place. */
 	struct _lf_device *device;
 } flipper;
 
 #ifdef __private_include__
 
+/* NOTE: Probably move this? */
+extern struct _lf_endpoint lf_bridge_ep;
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
-extern int flipper_attach(void);
-extern int flipper_attach_usb(char *name);
-extern int flipper_attach_network(char *name, char *hostname);
-extern int flipper_attach_endpoint(char *name, struct _lf_endpoint *endpoint);
-extern int flipper_select(char *name);
-extern int flipper_detach(char *name);
+int lf_bridge_configure(struct _lf_endpoint *this);
+uint8_t lf_bridge_ready(struct _lf_endpoint *this);
+void lf_bridge_put(struct _lf_endpoint *this, uint8_t byte);
+uint8_t lf_bridge_get(struct _lf_endpoint *this);
+int lf_bridge_push(struct _lf_endpoint *this, void *source, lf_size_t length);
+int lf_bridge_pull(struct _lf_endpoint *this, void *destination, lf_size_t length);
+int lf_bridge_destroy(struct _lf_endpoint *this);
+
+/* ~ Declare the prototypes for all functions exposed by this driver. ~ */
+extern struct _lf_device *flipper_attach(void);
+extern struct _lf_device *flipper_attach_usb(char *name);
+extern struct _lf_device *flipper_attach_network(char *name, char *hostname);
+extern struct _lf_device *flipper_attach_endpoint(char *name, struct _lf_endpoint *endpoint);
+extern int flipper_select(struct _lf_device *device);
+extern int flipper_detach(struct _lf_device *device);
 extern int flipper_exit(void);
 
 /* ~ User functions. ~ */
@@ -74,8 +83,6 @@ extern int lf_bind(struct _lf_module *module);
 extern fmr_type lf_word_size(struct _lf_device *device);
 /* Load the device's configuration information. */
 int lf_load_configuration(struct _lf_device *device);
-/* Returns the globally selected device. */
-struct _lf_device *lf_device(void);
 
 /* Obtains a result from a device. */
 int lf_get_result(struct _lf_device *device, struct _fmr_result *result);

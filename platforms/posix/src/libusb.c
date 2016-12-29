@@ -6,31 +6,31 @@
 #include <libusb.h>
 #include <flipper/error.h>
 
-struct _lf_endpoint lf_usb_ep = {
-	lf_usb_configure,
-	lf_usb_ready,
-	lf_usb_put,
-	lf_usb_get,
-	lf_usb_push,
-	lf_usb_pull,
-	lf_usb_destroy
+struct _lf_endpoint lf_libusb_ep = {
+	lf_libusb_configure,
+	lf_libusb_ready,
+	lf_libusb_put,
+	lf_libusb_get,
+	lf_libusb_push,
+	lf_libusb_pull,
+	lf_libusb_destroy
 };
 
-struct _lf_usb_record {
+struct _lf_libusb_record {
 	struct libusb_device_handle *handle;
 	struct libusb_context *context;
 };
 
-int lf_usb_configure(struct _lf_endpoint *this) {
+int lf_libusb_configure(struct _lf_endpoint *this) {
 	if (!this) {
 		error_raise(E_NULL, error_message("No endpoint record provided for libusb configuration. Reattach your device and try again."));
 		return lf_error;
 	}
 	/* Allocate memory for the USB record if it has not yet been allocated. */
 	if (!(this -> record)) {
-		this -> record = malloc(sizeof(struct _lf_usb_record));
+		this -> record = malloc(sizeof(struct _lf_libusb_record));
 	}
-	struct _lf_usb_record *record = this -> record;
+	struct _lf_libusb_record *record = this -> record;
 	/* Initialize the libusb context associated with this endpoint. */
 	int _e = libusb_init(&(record -> context));
 	if (_e < 0) {
@@ -55,20 +55,20 @@ int lf_usb_configure(struct _lf_endpoint *this) {
 	return lf_success;
 }
 
-uint8_t lf_usb_ready(struct _lf_endpoint *this) {
+uint8_t lf_libusb_ready(struct _lf_endpoint *this) {
 	return 0;
 }
 
-void lf_usb_put(struct _lf_endpoint *this, uint8_t byte) {
+void lf_libusb_put(struct _lf_endpoint *this, uint8_t byte) {
 	return;
 }
 
-uint8_t lf_usb_get(struct _lf_endpoint *this) {
+uint8_t lf_libusb_get(struct _lf_endpoint *this) {
 	return 0;
 }
 
-int lf_usb_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
-	struct _lf_usb_record *record = this -> record;
+int lf_libusb_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
+	struct _lf_libusb_record *record = this -> record;
 	int _length;
 	int _e;
 #ifndef __ALL_BULK__
@@ -87,8 +87,8 @@ int lf_usb_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
 	return lf_success;
 }
 
-int lf_usb_pull(struct _lf_endpoint *this, void *destination, lf_size_t length) {
-	struct _lf_usb_record *record = this -> record;
+int lf_libusb_pull(struct _lf_endpoint *this, void *destination, lf_size_t length) {
+	struct _lf_libusb_record *record = this -> record;
 	int _length;
 	int _e;
 #ifndef __ALL_BULK__
@@ -107,8 +107,8 @@ int lf_usb_pull(struct _lf_endpoint *this, void *destination, lf_size_t length) 
 	return lf_success;
 }
 
-int lf_usb_destroy(struct _lf_endpoint *this, struct _lf_endpoint *endpoint) {
-	struct _lf_usb_record *record = this -> record;
+int lf_libusb_destroy(struct _lf_endpoint *this) {
+	struct _lf_libusb_record *record = this -> record;
 	if (!record) {
 		error_raise(E_ENDPOINT, error_message("No libusb record associated with the USB endpoint."));
 		return lf_error;
@@ -117,5 +117,7 @@ int lf_usb_destroy(struct _lf_endpoint *this, struct _lf_endpoint *endpoint) {
 	libusb_close(record -> handle);
 	/* Destroy the libusb context. */
 	libusb_exit(record -> context);
+	/* Free the record. */
+	free(record);
 	return lf_success;
 }
