@@ -184,12 +184,19 @@ void *load_page_data(FILE *firmware, size_t size) {
 
 int enter_update_mode(void) {
 	printf("Entering update mode.\n");
+	uint8_t ack[3];
+	uart0.put('#');
+	uart0.pull(ack, sizeof(ack));
+	if (!memcmp(ack, (const uint8_t []){ '\n', '\r', '>' }, sizeof(ack))) {
+		goto done;
+	}
 	/* Enter DFU mode. */
 	int _e = cpu.dfu();
 	if (_e < lf_success) {
 		fprintf(stderr, KRED "Failed to enter update mode. (0x%08x)\n", _e);
 		return lf_error;
 	}
+done:
 	fprintf(stderr, KGRN " Successfully entered update mode.\n" KNRM);
 	return lf_success;
 }

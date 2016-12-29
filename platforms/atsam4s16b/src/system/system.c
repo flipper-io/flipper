@@ -19,17 +19,15 @@ struct _lf_device lf_self = {
 };
 
 void uart0_pull_wait(void *destination, lf_size_t length) {
+	/* Disable the PDC receive complete interrupt. */
+	UART0 -> UART_IDR = UART_IDR_ENDRX;
 	/* Set the transmission length and destination pointer. */
 	UART0 -> UART_RCR = length;
 	UART0 -> UART_RPR = (uintptr_t)(destination);
-	/* Disable the PDC receive complete interrupt. */
-	UART0 -> UART_IDR = UART_IDR_ENDRX;
 	/* Enable the receiver. */
 	UART0 -> UART_PTCR = UART_PTCR_RXTEN;
 	/* Wait until the transfer has finished. */
 	while (!(UART0 -> UART_SR & UART_SR_ENDRX));
-	/* Clear the PDC RX interrupt flag. */
-	UART0 -> UART_RCR = 1;
 	/* Disable the PDC receiver. */
 	UART0 -> UART_PTCR = UART_PTCR_RXTDIS;
 	/* Enable the PDC receive complete interrupt. */
@@ -83,6 +81,13 @@ void system_task(void) {
 	/* Configure the SPI peripheral. */
 	spi_configure();
 
+	/* Enable the PDC receive complete interrupt. */
+	UART0 -> UART_IER = UART_IER_ENDRX;
+	/* Pull an FMR packet asynchronously. */
+	uart0_pull(&packet, sizeof(struct _fmr_packet));
+
+	/* -------- USER TASK -------- */
+
 	char message[] = "Reset.\n";
 	usart_push(message, sizeof(message));
 
@@ -97,10 +102,6 @@ void system_task(void) {
 		for (int i = 0; i < 5000000; i ++) __NOP();
 	}
 
-	/* Enable the PDC receive complete interrupt. */
-	UART0 -> UART_IER = UART_IER_ENDRX;
-	/* Pull an FMR packet asynchronously. */
-	uart0_pull(&packet, sizeof(struct _fmr_packet));
 }
 
 void uart0_isr(void) {

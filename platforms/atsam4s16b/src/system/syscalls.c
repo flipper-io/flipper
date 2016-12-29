@@ -4,8 +4,19 @@
 extern int errno;
 extern int _end;
 
-extern caddr_t _sbrk(int incr) {
-	return 0;
+extern caddr_t _sbrk(int increment) {
+	static unsigned char *heap = NULL ;
+	unsigned char *previous;
+
+	if (heap == NULL) {
+		heap = (unsigned char *)&_end;
+	}
+
+	previous = heap;
+
+	heap += increment;
+
+	return (caddr_t)(previous);
 }
 
 extern int link(char *old, char *new) {

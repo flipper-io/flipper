@@ -15,5 +15,4 @@ FOUNDATION_EXPORT double FlipperVersionNumber;
 FOUNDATION_EXPORT const unsigned char FlipperVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <Flipper/PublicHeader.h>
-#import <Flipper/LED.h>
 #import <Flipper/LFDevice.h>

@@ -12,7 +12,9 @@
 int main(int argc, const char * argv[]) {
 	@autoreleasepool {
         LFDevice *flipper = [[LFDevice alloc] initWithName:@"flipper"];
-        [[flipper led] setR:5 G:0 B:0];
+        LFLED *led = [flipper led];
+        [led configure];
+        [led setR:0 G:0 B:0];
 	}
     return 0;
 }
