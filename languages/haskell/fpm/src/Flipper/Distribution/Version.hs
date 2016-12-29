@@ -14,7 +14,6 @@ This module defines package version numbers and version range predicates.
            , DeriveDataTypeable
            , DeriveGeneric
            , FlexibleInstances
-           , OverloadedLists
            , TypeFamilies
            #-}
 
@@ -123,7 +122,8 @@ anyVersion = Any
 
 -- | Unsatisfiable version range.
 noVersion :: VersionRange
-noVersion = Intersection (Later [1]) (Earlier [1])
+noVersion = Intersection (Later v) (Earlier v)
+    where v = Version (1 :| [])
 
 -- | Version range @== v@.
 thisVersion :: Version -> VersionRange
@@ -187,24 +187,26 @@ parseVersion :: M.Parser Version
 parseVersion = (Version . NE.fromList) -- sepBy1 will return non-empty list.
            <$> M.sepBy1 M.decimal (M.char '.')
 
--- | Bare versions are parsed as 'This v'. This partial function unwraps them so
---   they can be passed to predicate constructors.
-that :: VersionRange -> Version
-that (This v) = v
-that _        = error "unThis: impossible!"
+parseWildVersion :: M.Parser Version
+parseWildVersion = (Version . NE.fromList) -- endBy1 will return non-empty list.
+               <$> (M.endBy1 M.decimal (M.char '.') <* M.char '*')
 
 parseVersionRange :: M.Parser VersionRange
 parseVersionRange = expr
-    where expr    = M.makeExprParser term table
-          term    = parens expr <|> (thisVersion <$> lexed parseVersion)
-          table   = [preds, conj, disj]
-          preds   = [ M.Prefix (symb "==" *> pure id)
-                    , M.Prefix (symb "!=" *> pure (notThisVersion . that))
-                    , M.Prefix (symb ">=" *> pure (orLaterVersion . that))
-                    , M.Prefix (symb ">" *> pure (laterVersion . that))
-                    , M.Prefix (symb "<=" *> pure (orEarlierVersion . that))
-                    , M.Prefix (symb "<" *> pure (earlierVersion . that))
-                    ]
-          conj   = [M.InfixL (symb "&&" *> pure intersection)]
-          disj   = [M.InfixL (symb "||" *> pure union)]
+    where expr = M.makeExprParser term table
+          term = M.choice [ parens expr
+                          , symb "==" *> M.choice [ M.try (thisVersion <$> vers)
+                                                  , within <$> wild
+                                                  ]
+                          , symb "!=" *> (notThisVersion <$> vers)
+                          , symb ">=" *> (orLaterVersion <$> vers)
+                          , symb ">" *> (laterVersion <$> vers)
+                          , symb "<=" *> (orEarlierVersion <$> vers)
+                          , symb "<" *> (earlierVersion <$> vers)
+                          ]
+          table = [ [M.InfixL (symb "&&" *> pure intersection)]
+                  , [M.InfixL (symb "||" *> pure union)]
+                  ]
           parens = M.between (symb "(") (symb ")")
+          vers = lexed parseVersion
+          wild = lexed parseWildVersion
