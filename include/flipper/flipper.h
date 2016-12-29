@@ -77,6 +77,8 @@ int lf_load_configuration(struct _lf_device *device);
 /* Returns the globally selected device. */
 struct _lf_device *lf_device(void);
 
+/* Obtains a result from a device. */
+int lf_get_result(struct _lf_device *device, struct _fmr_result *result);
 /* Sends a packet to the specified device. */
 extern int lf_transfer(struct _lf_device *device, struct _fmr_packet *packet);
 /* Retrieves a packet from the specified device. */

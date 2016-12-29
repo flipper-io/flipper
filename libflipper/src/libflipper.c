@@ -139,7 +139,7 @@ int flipper_release(struct _lf_device *device) {
 	}
 	/* If the device has an endpoint, deallocate it. */
 	if (device -> endpoint) {
-		device -> endpoint -> destroy();
+		device -> endpoint -> destroy(device -> endpoint);
 		/* If the device's endpoint previously allocated memory to contain a record, release it. */
 		if (device -> endpoint -> record) {
 			free(device -> endpoint -> record);
@@ -217,7 +217,7 @@ int lf_load_configuration(struct _lf_device *device) {
 		return lf_error;
 	}
 	/* Obtain a response packet from the device. */
-	_e = device -> endpoint -> pull(&(device -> configuration), sizeof(struct _lf_configuration));
+	_e = device -> endpoint -> pull(device -> endpoint, &(device -> configuration), sizeof(struct _lf_configuration));
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -229,14 +229,6 @@ int lf_load_configuration(struct _lf_device *device) {
 		return lf_success;
 	}
 	return lf_error;
-}
-
-struct _lf_device *lf_device(void) {
-	if (!flipper.device) {
-		error_raise(E_NO_DEVICE, error_message("No device selected. Please attach a device."));
-		return NULL;
-	}
-	return flipper.device;
 }
 
 /* -- Packet manipulation functions. -- */
@@ -261,18 +253,15 @@ fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _f
 		return lf_error;
 	}
 	/* Ensure that the device pointer is valid. */
-	struct _lf_device *device = module -> device;
-	/* If no device is provided, send the request to the actively selected device. */
+	struct _lf_device *device = *(module -> device);
+	/* If no device is provided, raise an error. */
 	if (!device) {
-		device = lf_device();
-		/* If we still don't have a device, return with error. */
-		if (!device) {
-			return lf_error;
-		}
+		error_raise(E_NO_DEVICE, error_message("Failed to invoke on device."));
+		return lf_error;
 	}
 	struct _fmr_invocation_packet packet = { 0 };
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_generate(module -> slot, function, parameters, &packet);
+	int _e = fmr_generate(module -> index, function, parameters, &packet);
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -293,7 +282,7 @@ int lf_transfer(struct _lf_device *device, struct _fmr_packet *packet) {
 	lf_debug_packet(packet, sizeof(struct _fmr_packet));
 #endif
 	/* Transfer the packet buffer through its registered endpoint. */
-	int _e = device -> endpoint -> push(packet, sizeof(struct _fmr_packet));
+	int _e = device -> endpoint -> push(device -> endpoint, packet, sizeof(struct _fmr_packet));
 	/* Ensure that the packet was successfully transferred to the device. */
 	if (_e < lf_success) {
 		error_raise(E_ENDPOINT, error_message("Failed to transfer packet to device '%s'.", device -> configuration.name));
@@ -304,7 +293,7 @@ int lf_transfer(struct _lf_device *device, struct _fmr_packet *packet) {
 
 int lf_retrieve(struct _lf_device *device, struct _fmr_result *response) {
 	/* Receive the packet through the device's endpoint. */
-	int _e = device -> endpoint -> pull(response, sizeof(struct _fmr_result));
+	int _e = device -> endpoint -> pull(device -> endpoint, response, sizeof(struct _fmr_result));
 	/* Ensure that the packet was successfully obtained from the device. */
 	if (_e < lf_success) {
 		error_raise(E_ENDPOINT, error_message("Failed to retrieve packet from the device '%s'.", device -> configuration.name));
@@ -324,14 +313,15 @@ int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_s
 		return lf_success;
 	}
 	/* Ensure that the device pointer is valid. */
-	struct _lf_device *device = module -> device;
-	/* If no device is provided, send the request to the actively selected device. */
+	struct _lf_device *device = *(module -> device);
+	/* If no device is provided, throw an error. */
 	if (!device) {
-		device = lf_device();
+		error_raise(E_NO_DEVICE, error_message("Failed to push to device."));
+		return lf_error;
 	}
 	struct _fmr_invocation_packet packet = { 0 };
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_generate(_fmr_id, _fmr_push, fmr_merge(fmr_args(fmr_int16(module -> slot), fmr_int8(function), fmr_int32(length)), parameters), &packet);
+	int _e = fmr_generate(_fmr_id, _fmr_push, fmr_merge(fmr_args(fmr_int16(module -> index), fmr_int8(function), fmr_int32(length)), parameters), &packet);
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -341,7 +331,7 @@ int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_s
 		return lf_error;
 	}
 	/* Transfer the data through to the address space of the device. */
-	_e = device -> endpoint -> push(source, length);
+	_e = device -> endpoint -> push(device -> endpoint, source, length);
 	/* Ensure that the data was successfully transferred to the device. */
 	if (_e < lf_success) {
 		return lf_error;
@@ -363,14 +353,15 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 	} else if (!length) {
 		return lf_success;
 	}
-	struct _lf_device *device = module -> device;
-	/* If no device is provided, send the request to the actively selected device. */
+	struct _lf_device *device = *(module -> device);
+	/* If no device is provided, throw an error. */
 	if (!device) {
-		device = lf_device();
+		error_raise(E_NO_DEVICE, error_message("Failed to pull from device."));
+		return lf_error;
 	}
 	struct _fmr_invocation_packet packet = { 0 };
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_generate(_fmr_id, _fmr_pull, fmr_merge(fmr_args(fmr_int16(module -> slot), fmr_int8(function), fmr_int32(length)), parameters), &packet);
+	int _e = fmr_generate(_fmr_id, _fmr_pull, fmr_merge(fmr_args(fmr_int16(module -> index), fmr_int8(function), fmr_int32(length)), parameters), &packet);
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -380,7 +371,7 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 		return lf_error;
 	}
 	/* Obtain the data from the address space of the device. */
-	_e = device -> endpoint -> pull(destination, length);
+	_e = device -> endpoint -> pull(device -> endpoint, destination, length);
 	/* Ensure that the data was successfully transferred to the device. */
 	if (_e < lf_success) {
 		return lf_error;
@@ -395,8 +386,8 @@ int lf_bind(struct _lf_module *module) {
 	/* Calculate the module's identifier. */
 	module -> identifier = lf_crc(module -> name, strlen(module -> name));
 	/* Bind the module to a slot on the device. */
-	module -> slot = fld_bind(module -> identifier);
-	if (!module -> slot) {
+	module -> index = fld_bind(module -> identifier);
+	if (!module -> index) {
 		error_raise(E_MODULE, error_message("No slot given."));
 		return lf_error;
 	}
