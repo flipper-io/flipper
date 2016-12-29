@@ -409,7 +409,11 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     addOracle pkgconfig
 
     -- By default we build libflipper, osmium, and command line utilities:
-    want ["libflipper", "libflipper-headers", "osmium", "utils"]
+    want ["core"]
+
+    -- Core Flipper functionality, i.e libflipper, osmium, and command line
+    -- utilities:
+    phony "core" $ need ["libflipper", "libflipper-headers", "osmium", "utils"]
 
     -- Copy headers into build artifacts target:
     phony "libflipper-headers" $ do
