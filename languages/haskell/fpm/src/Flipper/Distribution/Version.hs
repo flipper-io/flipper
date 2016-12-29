@@ -31,6 +31,8 @@ module Flipper.Distribution.Version (
   , inverse
   , within
   , inRange
+  , parseVersion
+  , parseVersionRange
   ) where
 
 import Control.DeepSeq
@@ -44,10 +46,15 @@ import Data.Maybe
 import GHC.Exts
 import GHC.Generics
 
+import qualified Text.Megaparsec            as M
+import qualified Text.Megaparsec.Combinator as M
+import qualified Text.Megaparsec.Lexer      as M
+import qualified Text.Megaparsec.Text       as M
+
 -- | A legal package version is any sequence of one or more positive integers
 --   separated by periods. Versions are compared lexicographically, i.e.
 --   3.0 > 2.9, 2.1 > 2.0, 1.2.3 > 1.2.2, etc.
-newtype Version = Version { unVersion :: [Int] }
+newtype Version = Version { unVersion :: [Integer] }
                 deriving ( Eq
                          , Ord
                          , Show
@@ -59,8 +66,8 @@ newtype Version = Version { unVersion :: [Int] }
                          )
 
 -- | Returns 'Nothing' if any of the 'Int's are less than zero.
-mkVersion :: [Int] -> Maybe Version
-mkVersion = fmap Version . mapM notNeg
+mkVersion :: Integral a => [a] -> Maybe Version
+mkVersion = fmap Version . mapM (notNeg . toInteger)
     where notNeg n
             | n < 0     = Nothing
             | otherwise = Just n
@@ -68,7 +75,7 @@ mkVersion = fmap Version . mapM notNeg
 -- | Careful, this lazily checks whether or not the list literal's integers are
 --   non-negative.
 instance IsList Version where
-    type Item Version = Int
+    type Item Version = Integer
     fromList = fromMaybe (error e) . mkVersion
         where e = "fromList: version numbers must be >= 0."
     toList = unVersion
@@ -163,3 +170,9 @@ inRange (Later v)          = (> v)
 inRange (Earlier v)        = (< v)
 inRange (Union a b)        = (\v -> inRange a v || inRange b v)
 inRange (Intersection a b) = (\v -> inRange a v && inRange b v)
+
+parseVersion :: M.Parser Version
+parseVersion = Version <$> M.sepBy1 M.decimal (M.char '.')
+
+parseVersionRange :: M.Parser VersionRange
+parseVersionRange = undefined

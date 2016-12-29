@@ -27,6 +27,7 @@ regarding software licensing.
 module Flipper.Distribution.License (
     License(..)
   , licenseText
+  , parseLicense
   ) where
 
 import Control.DeepSeq
@@ -37,7 +38,12 @@ import Data.Data
 
 import qualified Data.Text as T
 
+import Flipper.Distribution.Parser
+
 import GHC.Generics
+
+import qualified Text.Megaparsec      as M
+import qualified Text.Megaparsec.Text as M
 
 -- | Licenses for source code release.
 data License =
@@ -87,7 +93,6 @@ data License =
   | Other
   deriving ( Eq
            , Ord
-           , Read
            , Show
            , Enum
            , Data
@@ -100,3 +105,21 @@ data License =
 -- | A license's body text, for automatically generating a LICENSE file.
 licenseText :: License -> T.Text
 licenseText = error "Implement me!"
+
+parseLicense :: M.Parser License
+parseLicense = M.choice lics
+    where lics = [ lexed (M.string "GPL2" *> pure GPL2)
+                 , lexed (M.string "GPL3" *> pure GPL3)
+                 , lexed (M.string "AGPL" *> pure AGPL)
+                 , lexed (M.string "LGPL2.1" *> pure LGPL21)
+                 , lexed (M.string "LGPL3" *> pure LGPL3)
+                 , lexed (M.string "BSD2" *> pure BSD2)
+                 , lexed (M.string "BSD3" *> pure BSD3)
+                 , lexed (M.string "BSD4" *> pure BSD4)
+                 , lexed (M.string "MIT" *> pure MIT)
+                 , lexed (M.string "MPL2" *> pure MPL2)
+                 , lexed (M.string "Apache2" *> pure MPL2)
+                 , lexed (M.string "PublicDomain" *> pure PublicDomain)
+                 , lexed (M.string "AllRightsReserved" *> pure AllRightsReserved)
+                 , lexed (M.string "Other" *> pure Other)
+                 ]

@@ -25,6 +25,7 @@ import Data.Data
 
 import qualified Data.Text as T
 
+import Flipper.Distribution.Binding
 import Flipper.Distribution.Language
 import Flipper.Distribution.License
 import Flipper.Distribution.Module
