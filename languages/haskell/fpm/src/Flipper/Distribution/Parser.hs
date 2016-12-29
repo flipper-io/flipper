@@ -31,6 +31,9 @@ spaceEater = M.space (M.skipSome (MC.char ' ' <|> MC.tab))
 lexed :: M.Parser a -> M.Parser a
 lexed = M.lexeme spaceEater
 
+symb :: String -> M.Parser String
+symb = M.symbol spaceEater
+
 visible :: M.Parser Char
 visible = M.choice [ MC.alphaNumChar
                    , MC.punctuationChar

@@ -38,6 +38,8 @@ module Flipper.Distribution.Version (
   , parseVersionRange
   ) where
 
+import Control.Applicative
+
 import Control.DeepSeq
 
 import Data.Binary
@@ -48,11 +50,14 @@ import Data.List.NonEmpty as NE
 
 import Data.Maybe
 
+import Flipper.Distribution.Parser
+
 import GHC.Exts
 import GHC.Generics
 
 import qualified Text.Megaparsec            as M
 import qualified Text.Megaparsec.Combinator as M
+import qualified Text.Megaparsec.Expr       as M
 import qualified Text.Megaparsec.Lexer      as M
 import qualified Text.Megaparsec.Text       as M
 
@@ -126,7 +131,7 @@ thisVersion = This
 
 -- | Version range @!= v@.
 notThisVersion :: Version -> VersionRange
-notThisVersion v = Union (Earlier v) (Later v)
+notThisVersion v = Intersection (Earlier v) (Later v)
 
 -- | Version range @> v@.
 laterVersion :: Version -> VersionRange
@@ -182,5 +187,24 @@ parseVersion :: M.Parser Version
 parseVersion = (Version . NE.fromList) -- sepBy1 will return non-empty list.
            <$> M.sepBy1 M.decimal (M.char '.')
 
+-- | Bare versions are parsed as 'This v'. This partial function unwraps them so
+--   they can be passed to predicate constructors.
+that :: VersionRange -> Version
+that (This v) = v
+that _        = error "unThis: impossible!"
+
 parseVersionRange :: M.Parser VersionRange
-parseVersionRange = undefined
+parseVersionRange = expr
+    where expr    = M.makeExprParser term table
+          term    = parens expr <|> (thisVersion <$> lexed parseVersion)
+          table   = [preds, conj, disj]
+          preds   = [ M.Prefix (symb "==" *> pure id)
+                    , M.Prefix (symb "!=" *> pure (notThisVersion . that))
+                    , M.Prefix (symb ">=" *> pure (orLaterVersion . that))
+                    , M.Prefix (symb ">" *> pure (laterVersion . that))
+                    , M.Prefix (symb "<=" *> pure (orEarlierVersion . that))
+                    , M.Prefix (symb "<" *> pure (earlierVersion . that))
+                    ]
+          conj   = [M.InfixL (symb "&&" *> pure intersection)]
+          disj   = [M.InfixL (symb "||" *> pure union)]
+          parens = M.between (symb "(") (symb ")")
