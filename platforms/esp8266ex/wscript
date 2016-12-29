@@ -1,9 +1,0 @@
-# Platform build script.
-
-# Target: Espressif ESP8266EX
-
-def configure(cfg):
-    cfg.setenv('platform-esp8266ex')
-
-def build(bld):
-    pass

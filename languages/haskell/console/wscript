@@ -1,8 +1,0 @@
-def configure(cfg):
-	cfg.find_program('realpath')
-	cfg.find_program('ghc')
-	cfg.find_program('stack')
-
-def build(bld):
-	x = ""
-	

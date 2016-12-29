@@ -1,8 +1,0 @@
-# Test build script.
-
-def configure(cfg):
-	pass
-
-def build(bld):
-	_env = bld.all_envs['platform-posix'].derive()
-	bld.program(source = bld.path.ant_glob('src/**'), target = 'fdfu', use = 'dl flipper platform-fvm', rpath = _env['LIBDIR'], env = _env)
