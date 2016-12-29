@@ -149,8 +149,8 @@ struct _lf_module {
 	lf_crc_t identifier;
 	/* The module's index. */
 	uint8_t index;
-	/* The device upon which the module's counterpart is located. */
-	struct _lf_device *device;
+	/* The pointer to a pointer to the device upon which the module's counterpart is located. */
+	struct _lf_device **device;
 };
 
 /* Explicit macro for modules targeting the top-level device. */
@@ -164,7 +164,7 @@ struct _lf_module {
 		LF_VERSION, \
 		0, \
 		index, \
-		NULL \
+		&flipper.device \
 	};
 
 struct _lf_ll {

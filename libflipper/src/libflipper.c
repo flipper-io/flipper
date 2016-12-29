@@ -253,7 +253,7 @@ fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _f
 		return lf_error;
 	}
 	/* Ensure that the device pointer is valid. */
-	struct _lf_device *device = module -> device;
+	struct _lf_device *device = *(module -> device);
 	/* If no device is provided, raise an error. */
 	if (!device) {
 		error_raise(E_NO_DEVICE, error_message("Failed to invoke on device."));
@@ -313,7 +313,7 @@ int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_s
 		return lf_success;
 	}
 	/* Ensure that the device pointer is valid. */
-	struct _lf_device *device = module -> device;
+	struct _lf_device *device = *(module -> device);
 	/* If no device is provided, throw an error. */
 	if (!device) {
 		error_raise(E_NO_DEVICE, error_message("Failed to push to device."));
@@ -353,7 +353,7 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 	} else if (!length) {
 		return lf_success;
 	}
-	struct _lf_device *device = module -> device;
+	struct _lf_device *device = *(module -> device);
 	/* If no device is provided, throw an error. */
 	if (!device) {
 		error_raise(E_NO_DEVICE, error_message("Failed to pull from device."));
