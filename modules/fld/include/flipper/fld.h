@@ -22,7 +22,7 @@ enum { _fld_configure, _fld_bind };
 
 /* Declare each prototype for all functions within this driver. */
 int fld_configure(void);
-/* Loads a module instance on the device and returns its module slot. */
+/* Loads a module instance on the device and returns its module index. */
 fmr_module fld_bind(lf_crc_t identifier);
 
 #ifdef __fld_upload_symbols__

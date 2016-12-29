@@ -21,13 +21,13 @@ struct _network_record {
 	struct sockaddr_in device;
 };
 
-int network_configure(struct _lf_endpoint *endpoint, char *hostname) {
+int network_configure(struct _lf_endpoint *this, char *hostname) {
 	/* Allocate memory for the network record if it has not yet been allocated. */
-	if (!(endpoint -> record)) {
-		endpoint -> record = malloc(sizeof(struct _network_record));
+	if (!(this -> record)) {
+		this -> record = malloc(sizeof(struct _network_record));
 	}
 	/* Obtain a pointer to and cast to the network record associated with the provided endpoint. */
-	struct _network_record *record = endpoint -> record;
+	struct _network_record *record = this -> record;
 	/* Create a new socket. */
 	record -> fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (record -> fd < 0) {
@@ -55,21 +55,21 @@ int network_configure(struct _lf_endpoint *endpoint, char *hostname) {
 	return lf_success;
 }
 
-uint8_t network_ready(void) {
+uint8_t network_ready(struct _lf_endpoint *this) {
 	return true;
 }
 
-void network_put(uint8_t byte) {
-
+void network_put(struct _lf_endpoint *this, uint8_t byte) {
+	return;
 }
 
-uint8_t network_get(void) {
+uint8_t network_get(struct _lf_endpoint *this) {
 	return 0;
 }
 
-int network_push(void *source, lf_size_t length) {
+int network_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
 	/* Obtain a pointer to and cast to the network record associated with the active endpoint. */
-	struct _network_record *record = lf_device() -> endpoint -> record;
+	struct _network_record *record = this -> record;
 	char derp[length];
 	memcpy(derp, source, length);
 	printf("'%s' to %s\n", derp, inet_ntoa(record -> device.sin_addr));
@@ -82,9 +82,9 @@ int network_push(void *source, lf_size_t length) {
 	return lf_success;
 }
 
-int network_pull(void *destination, lf_size_t length) {
+int network_pull(struct _lf_endpoint *this, void *destination, lf_size_t length) {
 	/* Obtain a pointer to and cast to the network record associated with the active endpoint. */
-	struct _network_record *record = lf_device() -> endpoint -> record;
+	struct _network_record *record = this -> record;
 	socklen_t _length;
 	ssize_t _e = recvfrom(record -> fd, destination, length, 0, (struct sockaddr *)&(record -> device), &_length);
 	if (_e < 0) {
@@ -94,9 +94,9 @@ int network_pull(void *destination, lf_size_t length) {
 	return lf_success;
 }
 
-int network_destroy(struct _lf_endpoint *endpoint) {
+int network_destroy(struct _lf_endpoint *this) {
 	/* Obtain a pointer to and cast to the network record associated with the provided endpoint. */
-	struct _network_record *record = endpoint -> record;
+	struct _network_record *record = this -> record;
 	/* If a file descriptor has been opened for the associated socket, close it. */
 	if (record -> fd) {
 		close(record -> fd);

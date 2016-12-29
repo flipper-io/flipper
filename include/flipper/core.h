@@ -108,15 +108,15 @@ struct _lf_endpoint {
 	/* Configures the endpoint record given an arbitrary set of parameters. */
 	int (* configure)();
 	/* Indicates whether or not the endpoint is ready to send or receive data. */
-	uint8_t (* ready)(void);
+	uint8_t (* ready)(struct _lf_endpoint *this);
 	/* Sends a single byte through the endpoint. */
-	void (* put)(uint8_t byte);
+	void (* put)(struct _lf_endpoint *this, uint8_t byte);
 	/* Retrieves a single byte from the endpoint. */
-	uint8_t (* get)(void);
+	uint8_t (* get)(struct _lf_endpoint *this);
 	/* Transmits a block of data through the endpoint. */
-	int (* push)(void *source, lf_size_t length);
+	int (* push)(struct _lf_endpoint *this, void *source, lf_size_t length);
 	/* Receives a block of data from the endpoint. */
-	int (* pull)(void *destination, lf_size_t length);
+	int (* pull)(struct _lf_endpoint *this, void *destination, lf_size_t length);
 	/* Destroys any state associated with the endpoint. */
 	int (* destroy)();
 	/* The only state associated with an endpoint; tracks endpoint specific configuration information. */
@@ -127,7 +127,7 @@ struct _lf_endpoint {
 struct _lf_device {
 	struct _lf_configuration configuration;
 	/* A pointer to the endpoint through which packets will be transferred. */
-	const struct _lf_endpoint *endpoint;
+	struct _lf_endpoint *endpoint;
 	/* The current error state of the device. */
 	lf_error_t error;
 	/* The next device in the list of attached devices. */
@@ -147,20 +147,23 @@ struct _lf_module {
 	lf_version_t version;
 	/* The module's identifier. */
 	lf_crc_t identifier;
-	/* The module's slot. */
-	uint8_t slot;
+	/* The module's index. */
+	uint8_t index;
 	/* The device upon which the module's counterpart is located. */
 	struct _lf_device *device;
 };
 
+/* Explicit macro for modules targeting the top-level device. */
+
+
 /* Macro for easily generating module structures. */
-#define LF_MODULE(symbol, name, description, slot) \
+#define LF_MODULE(symbol, name, description, index) \
 	struct _lf_module symbol = { \
 		name, \
 		description, \
 		LF_VERSION, \
 		0, \
-		slot, \
+		index, \
 		NULL \
 	};
 

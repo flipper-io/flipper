@@ -244,7 +244,7 @@ int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
 	switch (packet -> header.class) {
 		case fmr_configuration_class:
 			/* Send the configuration information back. */
-			lf_self.endpoint -> push(&lf_self.configuration, sizeof(struct _lf_configuration));
+			lf_self.endpoint -> push(lf_self.endpoint, &lf_self.configuration, sizeof(struct _lf_configuration));
 		break;
 		/* NOTE: Right now standard invocations and user invocations are done the same way. This should change. */
 		case fmr_standard_invocation_class:

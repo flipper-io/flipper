@@ -116,6 +116,8 @@ void uart0_isr(void) {
 		fmr_perform(&packet, &result);
 		/* Give the result back. */
 		uart0_push(&result, sizeof(struct _fmr_result));
+		/* Flush any remaining data that has been buffered. */
+		while (UART0 -> UART_SR & UART_SR_RXRDY) UART0 -> UART_RHR;
 		/* Pull the next packet asynchronously. */
 		uart0_pull(&packet, sizeof(struct _fmr_packet));
 	}
