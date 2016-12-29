@@ -5,10 +5,10 @@
 #include <flipper/core.h>
 #include <flipper/usart.h>
 
+#ifdef __private_include__
+
 /* Declare the virtual interface for this modules. */
 extern const struct _uart uart0;
-
-#ifdef __private_include__
 
 /* Declare the FMR overlay for this driver. */
 enum { _uart0_configure, _uart0_enable, _uart0_disable, _uart0_ready, _uart0_put, _uart0_get, _uart0_push, _uart0_pull };

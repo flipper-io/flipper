@@ -98,8 +98,9 @@ int network_destroy(struct _lf_endpoint *this) {
 	/* Obtain a pointer to and cast to the network record associated with the provided endpoint. */
 	struct _network_record *record = this -> record;
 	/* If a file descriptor has been opened for the associated socket, close it. */
-	if (record -> fd) {
+	if (record) {
 		close(record -> fd);
+		free(record);
 	}
-	return lf_error;
+	return lf_success;
 }

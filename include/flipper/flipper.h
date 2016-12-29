@@ -36,6 +36,17 @@ extern struct _flipper {
 
 #ifdef __private_include__
 
+/* NOTE: Probably move this? */
+extern struct _lf_endpoint lf_bridge_ep;
+/* ~ Declare the prototypes for all functions exposed by this driver. ~ */
+int lf_bridge_configure(struct _lf_endpoint *this);
+uint8_t lf_bridge_ready(struct _lf_endpoint *this);
+void lf_bridge_put(struct _lf_endpoint *this, uint8_t byte);
+uint8_t lf_bridge_get(struct _lf_endpoint *this);
+int lf_bridge_push(struct _lf_endpoint *this, void *source, lf_size_t length);
+int lf_bridge_pull(struct _lf_endpoint *this, void *destination, lf_size_t length);
+int lf_bridge_destroy(struct _lf_endpoint *this);
+
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
 extern struct _lf_device *flipper_attach(void);
 extern struct _lf_device *flipper_attach_usb(char *name);

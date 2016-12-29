@@ -37,19 +37,19 @@ struct _lf_device *lf_attach(char *name, struct _lf_endpoint *endpoint) {
 	strcpy(device -> configuration.name, name);
 	/* Set the device's endpoint. */
 	device -> endpoint = endpoint;
-	/* Create the device's identifier. */
-	lf_crc_t _identifier = lf_crc(name, strlen(name));
-	/* Broadcast a packet to the device over its endpoint to verify the identifier. */
-	int _e = lf_load_configuration(device);
-	if (_e < lf_success) {
-		error_raise(E_CONFIGURATION, error_message("Failed to obtain configuration for device '%s'.", name));
-		goto failure;
-	}
-	/* Compare the device identifiers. */
-	if (device -> configuration.identifier != _identifier) {
-		error_raise(E_NO_DEVICE, error_message("Identifier mismatch for device '%s'. (0x%04x instead of 0x%04x)", name, device -> configuration.identifier, _identifier));
-		goto failure;
-	}
+	// /* Create the device's identifier. */
+	// lf_crc_t _identifier = lf_crc(name, strlen(name));
+	// /* Broadcast a packet to the device over its endpoint to verify the identifier. */
+	// int _e = lf_load_configuration(device);
+	// if (_e < lf_success) {
+	// 	error_raise(E_CONFIGURATION, error_message("Failed to obtain configuration for device '%s'.", name));
+	// 	goto failure;
+	// }
+	// /* Compare the device identifiers. */
+	// if (device -> configuration.identifier != _identifier) {
+	// 	error_raise(E_NO_DEVICE, error_message("Identifier mismatch for device '%s'. (0x%04x instead of 0x%04x)", name, device -> configuration.identifier, _identifier));
+	// 	goto failure;
+	// }
 	/* Set the current device. */
 	flipper.device = device;
 	return device;
@@ -63,8 +63,9 @@ struct _lf_device *flipper_attach(void) {
 	return flipper_attach_usb("flipper");
 }
 
+/* Attaches a USB device to the bridge endpoint. */
 struct _lf_device *flipper_attach_usb(char *name) {
-	struct _lf_endpoint *_ep = &lf_usb_ep;
+	struct _lf_endpoint *_ep = &lf_bridge_ep;
 	if (_ep -> configure(_ep) < lf_success) {
 		return NULL;
 	}

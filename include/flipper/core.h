@@ -130,8 +130,6 @@ struct _lf_device {
 	struct _lf_endpoint *endpoint;
 	/* The current error state of the device. */
 	lf_error_t error;
-	/* The next device in the list of attached devices. */
-	struct _lf_device *next;
 };
 
 /* All devices must implement a self referential interface. */
