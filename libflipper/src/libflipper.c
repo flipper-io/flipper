@@ -308,18 +308,6 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 	return lf_success;
 }
 
-int lf_bind(struct _lf_module *module) {
-	/* Calculate the module's identifier. */
-	module -> identifier = lf_crc(module -> name, strlen(module -> name));
-	/* Bind the module to a slot on the device. */
-	module -> index = fld_bind(module -> identifier);
-	if (!module -> index) {
-		error_raise(E_MODULE, error_message("No slot given."));
-		return lf_error;
-	}
-	return lf_success;
-}
-
 /* Debugging functions for displaying the contents of various FMR related data structures. */
 
 void lf_debug_packet(struct _fmr_packet *packet, size_t length) {

@@ -13,9 +13,7 @@ struct _lf_device lf_self = {
 		(lf_device_32bit | lf_device_little_endian)
 	},
 	NULL,
-	E_OK,
-	false,
-	NULL
+	E_OK
 };
 
 void uart0_pull_wait(void *destination, lf_size_t length) {
