@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/flipper.h>
+#include <flipper/libflipper.h>
 #include <flipper/carbon/button.h>
 
 int button_configure(void) {

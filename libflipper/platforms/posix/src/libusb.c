@@ -1,7 +1,7 @@
 /* libusb.c - USB endpoint wrapper using libusb. */
 
 #define __private_include__
-#include <flipper/flipper.h>
+#include <flipper/libflipper.h>
 #include <flipper/platforms/posix/libusb.h>
 #include <libusb.h>
 #include <flipper/carbon/error.h>

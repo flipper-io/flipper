@@ -1,5 +1,4 @@
-/* Top-level Flipper header. */
-
-#include "flipper/core.h"
-#include "flipper/flipper.h"
+/* Include the top-level libflipper header. */
+#include "flipper/libflipper.h"
+/* Include the 'Flipper: Carbon Edition' device support header. */
 #include "flipper/carbon/modules.h"

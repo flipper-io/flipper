@@ -151,9 +151,6 @@ struct _lf_module {
 	struct _lf_device **device;
 };
 
-/* Explicit macro for modules targeting the top-level device. */
-
-
 /* Macro for easily generating module structures. */
 #define LF_MODULE(symbol, name, description, index) \
 	struct _lf_module symbol = { \
@@ -164,17 +161,6 @@ struct _lf_module {
 		index, \
 		&flipper.device \
 	};
-
-struct _lf_ll {
-	void *_item;
-	struct _lf_ll *_next;
-};
-
-struct _lf_ll *lf_ll_init(void);
-int lf_ll_append(struct _lf_ll *_ll, void *_item);
-typedef bool (* _ll_match_routine)(void *_item);
-void *lf_ll_match(struct _lf_ll *_ll, _ll_match_routine routine);
-int lf_ll_destroy(struct _lf_ll *_ll);
 
 /* Provides a checksum for a given block of data. */
 lf_crc_t lf_crc(void *source, lf_size_t length);

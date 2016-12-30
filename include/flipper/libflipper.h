@@ -1,7 +1,12 @@
-/* flipper.h - Provides an interface for attaching and detaching devices. */
+/*
+ * libflipper.h
+ *
+ * Core API specifications for interaction with Flipper hardware.
+ *
+ */
 
-#ifndef __flipper_h__
-#define __flipper_h__
+#ifndef __libflipper_h__
+#define __libflipper_h__
 
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
 #include <flipper/core.h>
@@ -73,9 +78,6 @@ extern fmr_return lf_invoke(struct _lf_module *module, fmr_function function, st
 extern int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _fmr_list *parameters);
 /* Moves data from the address space of the device to that of the host. */
 extern int lf_pull(struct _lf_module *module, fmr_function function, void *destination, lf_size_t length, struct _fmr_list *parameters);
-/* Binds the current instance of an 'lf_module' to its counterpart on the device. */
-extern int lf_bind(struct _lf_module *module);
-
 
 /* ~ Helper functions. ~ */
 

@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/flipper.h>
+#include <flipper/libflipper.h>
 #include <flipper/fmr.h>
 
 /* Expose the virtual interface for this driver. */
@@ -305,18 +305,6 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 	struct _fmr_result result;
 	/* Obtain the result of the operation. */
 	lf_get_result(device, &result);
-	return lf_success;
-}
-
-int lf_bind(struct _lf_module *module) {
-	/* Calculate the module's identifier. */
-	module -> identifier = lf_crc(module -> name, strlen(module -> name));
-	/* Bind the module to a slot on the device. */
-	module -> index = fld_bind(module -> identifier);
-	if (!module -> index) {
-		error_raise(E_MODULE, error_message("No slot given."));
-		return lf_error;
-	}
 	return lf_success;
 }
 
