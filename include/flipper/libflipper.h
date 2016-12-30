@@ -79,7 +79,6 @@ extern int lf_push(struct _lf_module *module, fmr_function function, void *sourc
 /* Moves data from the address space of the device to that of the host. */
 extern int lf_pull(struct _lf_module *module, fmr_function function, void *destination, lf_size_t length, struct _fmr_list *parameters);
 
-
 /* ~ Helper functions. ~ */
 
 /* Gets the word size of the specified device. */
