@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/carbon/error.h>
+#include <flipper/carbon/modules/error.h>
 
 /* Define the virtual interface for this module. */
 const struct _error error = {

@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/carbon/uart0.h>
+#include <flipper/carbon/modules/uart0.h>
 
 #ifdef __use_uart0__
 /* Define the virtual interface for this module. */

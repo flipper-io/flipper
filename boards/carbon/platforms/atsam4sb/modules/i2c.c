@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/carbon/i2c.h>
+#include <flipper/carbon/modules/i2c.h>
 #include <flipper/carbon/platforms/atsam4s16b.h>
 
 int i2c_configure(void) {

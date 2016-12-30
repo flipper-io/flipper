@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/libflipper.h>
-#include <flipper/carbon/cpu.h>
+#include <flipper/carbon/modules/cpu.h>
 
 int cpu_configure(void) {
 	return lf_invoke(&_cpu, _cpu_configure, NULL);

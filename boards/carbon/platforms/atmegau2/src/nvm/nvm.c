@@ -1,7 +1,7 @@
 #define __private_include__
 #include <nvm.h>
 #include <flipper/carbon/platforms/atmega16u2.h>
-#include <flipper/carbon/spi.h>
+#include <flipper/carbon/modules/spi.h>
 
 int nvm_configure(void) {
 	/* Enable the internal pull up resistor for the CS pin. */

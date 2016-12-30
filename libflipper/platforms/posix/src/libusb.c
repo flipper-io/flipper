@@ -4,7 +4,7 @@
 #include <flipper/libflipper.h>
 #include <flipper/platforms/posix/libusb.h>
 #include <libusb.h>
-#include <flipper/carbon/error.h>
+#include <flipper/carbon/modules/error.h>
 
 struct _lf_endpoint lf_libusb_ep = {
 	lf_libusb_configure,

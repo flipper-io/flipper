@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/carbon/gpio.h>
+#include <flipper/carbon/modules/gpio.h>
 
 #ifdef __use_gpio__
 /* Define the virtual interface for this module. */

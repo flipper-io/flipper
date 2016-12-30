@@ -5,27 +5,27 @@
 #include <flipper/core.h>
 
 /* Include all of the module headers. */
-#include <flipper/carbon/adc.h>
-#include <flipper/carbon/button.h>
-#include <flipper/carbon/cpu.h>
-#include <flipper/carbon/dac.h>
-#include <flipper/carbon/error.h>
-#include <flipper/carbon/fld.h>
+#include <flipper/carbon/modules/adc.h>
+#include <flipper/carbon/modules/button.h>
+#include <flipper/carbon/modules/cpu.h>
+#include <flipper/carbon/modules/dac.h>
+#include <flipper/carbon/modules/error.h>
+#include <flipper/carbon/modules/fld.h>
 #include <flipper/fmr.h>
-#include <flipper/carbon/fs.h>
-#include <flipper/carbon/gpio.h>
-#include <flipper/carbon/i2c.h>
-#include <flipper/carbon/led.h>
-#include <flipper/carbon/pwm.h>
-#include <flipper/carbon/rtc.h>
-#include <flipper/carbon/spi.h>
-#include <flipper/carbon/swd.h>
-#include <flipper/carbon/temp.h>
-#include <flipper/carbon/timer.h>
-#include <flipper/carbon/uart0.h>
-#include <flipper/carbon/usart.h>
-#include <flipper/carbon/usb.h>
-#include <flipper/carbon/wdt.h>
+#include <flipper/carbon/modules/fs.h>
+#include <flipper/carbon/modules/gpio.h>
+#include <flipper/carbon/modules/i2c.h>
+#include <flipper/carbon/modules/led.h>
+#include <flipper/carbon/modules/pwm.h>
+#include <flipper/carbon/modules/rtc.h>
+#include <flipper/carbon/modules/spi.h>
+#include <flipper/carbon/modules/swd.h>
+#include <flipper/carbon/modules/temp.h>
+#include <flipper/carbon/modules/timer.h>
+#include <flipper/carbon/modules/uart0.h>
+#include <flipper/carbon/modules/usart.h>
+#include <flipper/carbon/modules/usb.h>
+#include <flipper/carbon/modules/wdt.h>
 
 #ifdef __private_include__
 

@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/carbon/spi.h>
+#include <flipper/carbon/modules/spi.h>
 #include <flipper/carbon/platforms/atmega16u2.h>
 
 #define SPI_DATA_MODE_0 0x00

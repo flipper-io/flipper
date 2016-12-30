@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/libflipper.h>
-#include <flipper/carbon/led.h>
+#include <flipper/carbon/modules/led.h>
 
 int led_configure(void) {
 	lf_invoke(&_led, _led_configure, NULL);

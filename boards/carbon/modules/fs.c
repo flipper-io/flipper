@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/carbon/fs.h>
+#include <flipper/carbon/modules/fs.h>
 
 #ifdef __use_fs__
 /* Define the virtual interface for this module. */

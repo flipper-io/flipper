@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/libflipper.h>
-#include <flipper/carbon/spi.h>
+#include <flipper/carbon/modules/spi.h>
 
 int spi_configure() {
 	return lf_invoke(&_spi, _spi_configure, NULL);

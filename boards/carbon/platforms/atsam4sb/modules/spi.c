@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/carbon/spi.h>
+#include <flipper/carbon/modules/spi.h>
 #include <flipper/carbon/platforms/atsam4s16b.h>
 
 int spi_configure() {

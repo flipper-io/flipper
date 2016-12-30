@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/carbon/cpu.h>
+#include <flipper/carbon/modules/cpu.h>
 
 #ifdef __use_cpu__
 /* Define the virtual interface for this module. */

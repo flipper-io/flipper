@@ -7,7 +7,7 @@
 //
 
 #import "LFDevice.h"
-#include <flipper/carbon/led.h>
+#include <flipper/carbon/modules/led.h>
 
 @implementation LFDevice
 

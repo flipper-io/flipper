@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/carbon/button.h>
+#include <flipper/carbon/modules/button.h>
 #include <flipper/carbon/platforms/atmega16u2.h>
 
 int button_configure(void) {

@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/carbon/button.h>
+#include <flipper/carbon/modules/button.h>
 #include <flipper/carbon/platforms/atsam4s16b.h>
 
 int button_configure(void) {

@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/carbon/led.h>
+#include <flipper/carbon/modules/led.h>
 
 #ifdef __use_led__
 /* Define the virtual interface for this module. */

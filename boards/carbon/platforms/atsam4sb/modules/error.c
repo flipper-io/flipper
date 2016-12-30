@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/carbon/error.h>
+#include <flipper/carbon/modules/error.h>
 #include <flipper/carbon/platforms/atsam4s16b.h>
 
 int error_configure(void) {

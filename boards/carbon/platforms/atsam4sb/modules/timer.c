@@ -1,6 +1,6 @@
 #define __private_include__
-#include <flipper/carbon/timer.h>
-#include <flipper/carbon/error.h>
+#include <flipper/carbon/modules/timer.h>
+#include <flipper/carbon/modules/error.h>
 
 /* NOTE: TC0 is reserved by the system scheduler. */
 

@@ -7,7 +7,7 @@
 #include <flipper/core.h>
 
 /* Include all supporting header files. */
-#include <flipper/carbon/error.h>
+#include <flipper/carbon/modules/error.h>
 
 /* Defines the size (in bytes) of a single FMR packet. */
 #define FMR_PACKET_SIZE 64

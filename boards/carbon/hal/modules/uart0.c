@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/libflipper.h>
-#include <flipper/carbon/uart0.h>
+#include <flipper/carbon/modules/uart0.h>
 
 int uart0_configure(void) {
 	lf_invoke(&_uart0, _uart0_configure, NULL);

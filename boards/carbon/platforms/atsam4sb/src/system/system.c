@@ -1,6 +1,6 @@
 #define __private_include__
-#include <flipper/carbon/gpio.h>
-#include <flipper/carbon/uart0.h>
+#include <flipper/carbon/modules/gpio.h>
+#include <flipper/carbon/modules/uart0.h>
 #include <flipper/carbon/modules.h>
 #include <flipper/carbon/platforms/atsam4s16b.h>
 

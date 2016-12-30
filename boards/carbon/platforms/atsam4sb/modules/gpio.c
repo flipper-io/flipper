@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/carbon/gpio.h>
+#include <flipper/carbon/modules/gpio.h>
 #include <flipper/carbon/platforms/atsam4s16b.h>
 
 int gpio_configure(void) {

@@ -1,6 +1,6 @@
 #define __private_include__
 #include <nvm.h>
-#include <flipper/carbon/fs.h>
+#include <flipper/carbon/modules/fs.h>
 
 typedef struct _block {
 	uint32_t size;

@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/libflipper.h>
-#include <flipper/carbon/gpio.h>
+#include <flipper/carbon/modules/gpio.h>
 
 int gpio_configure(void) {
 	return lf_invoke(&_gpio, _gpio_configure, NULL);

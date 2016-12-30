@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/libflipper.h>
-#include <flipper/carbon/button.h>
+#include <flipper/carbon/modules/button.h>
 
 int button_configure(void) {
 	return lf_invoke(&_button, _button_configure, NULL);

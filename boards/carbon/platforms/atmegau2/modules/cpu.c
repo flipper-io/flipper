@@ -1,6 +1,6 @@
 #define __private_include__
-#include <flipper/carbon/cpu.h>
-#include <flipper/carbon/uart0.h>
+#include <flipper/carbon/modules/cpu.h>
+#include <flipper/carbon/modules/uart0.h>
 #include <flipper/carbon/platforms/atmega16u2.h>
 
 int cpu_configure(void) {

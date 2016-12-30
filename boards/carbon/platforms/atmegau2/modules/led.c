@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/carbon/led.h>
+#include <flipper/carbon/modules/led.h>
 #include <flipper/carbon/platforms/atmega16u2.h>
 
 int led_configure(void) {

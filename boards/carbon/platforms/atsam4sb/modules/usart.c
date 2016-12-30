@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/carbon/usart.h>
+#include <flipper/carbon/modules/usart.h>
 #include <flipper/carbon/platforms/atsam4s16b.h>
 
 #define USART0_BAUDRATE 115200

@@ -1,6 +1,6 @@
 #define __private_include__
-#include <flipper/carbon/fld.h>
-#include <flipper/carbon/fs.h>
+#include <flipper/carbon/modules/fld.h>
+#include <flipper/carbon/modules/fs.h>
 
 #ifdef __use_fld__
 /* Define the virtual interface for this module. */

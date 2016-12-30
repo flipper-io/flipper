@@ -3,7 +3,7 @@
 
 /* Include all types and macros exposed by the Flipper Toolbox. */
 #include <flipper/core.h>
-#include <flipper/carbon/usart.h>
+#include <flipper/carbon/modules/usart.h>
 
 #ifdef __private_include__
 
