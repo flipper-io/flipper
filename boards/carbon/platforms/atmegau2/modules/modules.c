@@ -5,9 +5,9 @@
 const void *const fmr_modules[] = {
     &button,
     &cpu,
-    &fmr,
     &fs,
     &led,
     &uart0,
-    &wdt
+    &wdt,
+    &fmr
 };

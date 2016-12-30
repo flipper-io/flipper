@@ -7,7 +7,6 @@ const void *const fmr_modules[] = {
     &button,
     &dac,
     &fld,
-    &fmr,
     &fs,
     &gpio,
     &i2c,
@@ -20,5 +19,6 @@ const void *const fmr_modules[] = {
     &timer,
     &usart,
     &usb,
-    &wdt
+    &wdt,
+    &fmr
 };
