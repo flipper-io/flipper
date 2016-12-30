@@ -1,7 +1,12 @@
-/* flipper.h - Provides an interface for attaching and detaching devices. */
+/*
+ * libflipper.h
+ *
+ * Core API specifications for interaction with Flipper hardware.
+ *
+ */
 
-#ifndef __flipper_h__
-#define __flipper_h__
+#ifndef __libflipper_h__
+#define __libflipper_h__
 
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
 #include <flipper/core.h>

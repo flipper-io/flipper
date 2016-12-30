@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/flipper.h>
+#include <flipper/libflipper.h>
 #include <flipper/carbon/swd.h>
 
 int swd_configure(void) {

@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/flipper.h>
+#include <flipper/libflipper.h>
 #include <flipper/fmr.h>
 
 /* Expose the virtual interface for this driver. */

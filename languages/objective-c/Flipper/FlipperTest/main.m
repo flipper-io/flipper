@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <Flipper/Flipper.h>
+#import <flipper/libflipper.h>
 
 int main(int argc, const char * argv[]) {
 	@autoreleasepool {

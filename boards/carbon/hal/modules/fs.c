@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/flipper.h>
+#include <flipper/libflipper.h>
 #include <flipper/carbon/fs.h>
 
 /* NOTE: All functions in this module are declared as weak so they can be overwritten in the presence of FVM. */
