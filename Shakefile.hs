@@ -228,41 +228,6 @@ mkLinkFlags = map ("-Wl,-T" ++)
 findDeps :: [Action [FilePath]] -> Action [FilePath]
 findDeps = fmap join . sequence
 
--- | All module directories.
-modules :: Action [FilePath]
-modules = map ("modules" </>) <$> getDirectoryDirs "modules"
-
--- | All module shared sources.
-modSharedSrc :: Action [FilePath]
-modSharedSrc = modules >>= (getDirectoryFiles "" . map (</> "src/*.c"))
-
--- | All module AVR sources.
-modAVRSrc :: Action [FilePath]
-modAVRSrc = modules >>= ( getDirectoryFiles ""
-                        . map (</> "targets/atmega16u2/*.c")
-                        )
-
--- | All module ARM sources.
-modARMSrc :: Action [FilePath]
-modARMSrc = modules >>= ( getDirectoryFiles ""
-                        . map (</> "targets/atsam4s16b/*.c")
-                        )
-
--- | All module FMR sources.
-modFMRSrc :: Action [FilePath]
-modFMRSrc = modules >>= ( getDirectoryFiles ""
-                        . map (</> "targets/fmr/*.c")
-                        )
-
--- | Include directories for all modules.
-modIncludes :: Action [FilePath]
-modIncludes = map (</> "include") <$> modules
-
--- | Include directories for all platforms.
-platformIncludes :: Action [FilePath]
-platformIncludes = map (\p -> "platforms" </> p </> "include")
-               <$> getDirectoryDirs "platforms"
-
 -- | Prefix a path with @build@, used for translating a source file path to a
 --   build artifact path.
 buildpref :: FilePath -> FilePath
@@ -402,6 +367,21 @@ instCmd os (c:cs) = do
 instCmd_ :: [CmdOption] -> [String] -> Action ()
 instCmd_ os cs = unit $ instCmd os cs
 
+-- | List all of the board roots.
+boards :: Action [FilePath]
+boards = map ("boards" </>) <$> getDirectoryDirs "boards"
+
+-- | List all board include directories.
+boardIncs :: Action [FilePath]
+boardIncs = join <$> (boards >>= mapM incs)
+    where incs b = (( (b </> "include") :)
+                   . map (\p -> b </> "platforms" </> p </> "include")
+                   ) <$> getDirectoryDirs (b </> "platforms")
+
+-- | Copy an include directory's public headers to the build artifacts folder.
+cpHeader :: FilePath -> Action ()
+cpHeader i = command_ [] "cp" ["-R", i </> "flipper", "build/include/"]
+
 main :: IO ()
 main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
 
@@ -418,15 +398,11 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     -- Copy headers into build artifacts target:
     phony "libflipper-headers" $ do
 
-        -- It's actually rather difficult to do this the "right way," since we
-        -- can't easily recover a header's path in the source tree from it's
-        -- path in the build directory (or it's installation path). Since this
-        -- rule is so cheap to run, we simply depend on all of the headers in
-        -- the source tree and always re-run this rule.
-        hs <- getDirectoryFiles "" [ "include//*.h"
-                                   , "modules/*/include//*.h"
-                                   , "platforms/*/include//*.h"
+        hs <- getDirectoryFiles "" [ "boards/*/include/flipper//*.h"
+                                   , "boards/*/platforms/*/include/flipper//*.h"
+                                   , "include//*.h"
                                    ]
+
         need hs
 
         -- Make the target directory:
@@ -434,19 +410,19 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
 
         -- Copy the top-level headers:
         command_ [] "cp" ["include/flipper.h", "build/include/"]
+        cpHeader "include"
+
+        -- Copy the board headers:
+        boardIncs >>= mapM_ cpHeader
+
         command_ [] "cp" ["-R", "include/flipper", "build/include/"]
 
-        -- Copy module headers:
-        modIncludes >>= mapM_ (\h -> command_ [] "cp" [ "-R"
-                                                     , h </> "flipper"
-                                                     , "build/include/"
-                                                     ])
-
-        -- Copy platform headers:
-        platformIncludes >>= mapM_ (\h -> command_ [] "cp" ["-R"
-                                                           , h </> "platforms"
-                                                           , "build/include/flipper/"
-                                                           ])
+        -- Copy the board headers:
+        boards >>= mapM_ (\b -> do
+            cpHeader (b </> "include")
+            ps <- getDirectoryDirs (b </> "platforms")
+            mapM_ (cpHeader . ((b </> "platforms") </>) . (</> "include")) ps
+            )
 
     -- Builds libflipper:
     phony "libflipper" $ do
@@ -528,133 +504,18 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
                                  , p </> "bin" </> u
                                  ]) us
 
-    -- Install the header files:
-    phony "install-libflipper-headers" $ do
-
-        -- We need the headers in order to install:
-        need ["libflipper-headers"]
-
-        p <- prefix
-
-        -- Make the @$PREFIX/include@ directory:
-        instCmd_ [] ["mkdir", "-p", p </> "include"]
-
-        -- Install the top-level header:
-        instCmd_ [] ["cp", "build/include/flipper.h", p </> "include/"]
-
-        -- Install the rest of the headers:
-        instCmd_ [] ["cp", "-R", "build/include/flipper", p </> "include/"]
-
-    -- Install libflipper:
-    phony "install-libflipper" $ do
-
-        -- libflipper needs to be built before we can install it:
-        need ["libflipper"]
-
-        p   <- prefix
-        dyn <- dynlib
-
-        -- Make the @$PREFIX/lib@ directory:
-        instCmd_ [] ["mkdir", "-p", p </> "lib"]
-
-        -- Install the shared library:
-        instCmd_ [] ["cp",  "build/libflipper" </> dyn, p </> "lib/"]
-
-    -- Install the console:
-    phony "install-console" $ do
-
-        -- Find out what the installation prefix is:
-        p <- prefix
-
-        -- The console needs to be built before we can install it:
-        need ["console"]
-
-        -- Make the @$PREFIX/bin@ directory:
-        instCmd_ [] ["mkdir", "-p", p </> "bin"]
-
-        -- Copy the console to the installation target:
-        instCmd_ [] ["cp", "build/console/flipper", p </> "bin/"]
-
-    -- Install command line utilities:
-    phony "install-utils" $ do
-
-        -- Find out what the installation prefix is:
-        p <- prefix
-
-        -- Utils need to be built before we can install them:
-        need ["utils"]
-
-        -- Make the @$PREFIX/bin@ directory:
-        instCmd_ [] ["mkdir", "-p", p </> "bin"]
-
-        -- Find out which utils exist:
-        us <- getDirectoryDirs "utils"
-
-        -- Install each utility:
-        mapM_ (\u -> instCmd_ [] [ "cp"
-                                 , "build/utils" </> u </> u
-                                 , p </> "bin" </> u
-                                 ]) us
-
-    -- Install osmium on the ATSAM4S:
-    phony "flash-atsam4s16b" $ do
-
-        need ["build/utils/fdfu/fdfu", "build/osmium/osmium-atsam4s16b.bin"]
-
-        command_ [] "build/utils/fdfu/fdfu" ["build/osmium/osmium-atsam4s16b.bin"]
-
-    -- Shortcut:
-    phony "f4s" $ need ["flash-atsam4s16b"]
-
-    -- Install osmium on the ATMEGA16U2:
-    phony "flash-atmega16u2" $ do
-
-        -- We need the osmium image to upload to the device:
-        need ["build/osmium/osmium-atmega16u2.hex"]
-
-        -- Erase the device:
-        command_ [] "dfu-programmer" [ "at90usb162"
-                                     , "erase"
-                                     , "--force"
-                                     ]
-
-        -- Flash the image to the device:
-        command_ [] "dfu-programmer" [ "at90usb162"
-                                     , "flash"
-                                     , "build/osmium/osmium-atmega16u2.hex"
-                                     ]
-
-        -- Launch osmium on the ATMEGA16U2:
-        command_ [] "dfu-programmer" [ "at90usb162"
-                                     , "launch"
-                                     , "--no-reset"
-                                     ]
-
-    -- Shortcut:
-    phony "fu2" $ need ["flash-atmega16u2"]
-
-    -- Shortcut for @dfu-programmer at90usb162 launch --no-reset@:
-    phony "boot" $ do
-        -- Launch osmium on the ATMEGA16U2:
-        command_ [] "dfu-programmer" [ "at90usb162"
-                                     , "launch"
-                                     , "--no-reset"
-                                     ]
-
     -- Build libflipper:
     "build/libflipper/libflipper.*" %> \o -> do
 
-        -- Find the sources needed to build the libflipper POSIX object code:
-        ss <- getDirectoryFiles "" ["libflipper//*.c"]
+        -- Find the source files needed to build libflipper:
+        ss <- getDirectoryFiles "" [ "boards/*/hal//*.c"
+                                   , "libflipper/platforms/posix//*.c"
+                                   , "libflipper/src//*.c"
+                                   ]
 
         -- Build the list of necessary object files from the list of necessary
         -- source files:
         let os = map (buildpref . (<.> ".native.o")) ss
-
-        -- We need the native object code to build libflipper:
-        let as = [ "build/platforms/platforms-posix.a"
-                 , "build/modules/modules-posix.a"
-                 ]
 
         -- Find out what packages we need to link against on this platform:
         ps <- pkgs
@@ -665,37 +526,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         -- Get the linker flags with @pkg-config@:
         ldfs <- (>>= ldflags) <$> mapM (askOracle . PkgConfigQuery) ps
 
-        ldRule cc ("-shared" : (ls ++ ldfs)) (as ++ os) o
-
-    -- Build platform object code for POSIX:
-    "build/platforms/platforms-posix.a" %> \o -> do
-
-        -- Find the sources needed to build the platform POSIX object code:
-        ss <- getDirectoryFiles "" ["platforms/posix//*.c"]
-
-        -- Build the list of necessary object files from the list of necessary
-        -- source files:
-        let os = map (buildpref . (<.> ".native.o")) ss
-
-        -- Run the archiver:
-        arRule ar os o
-
-    -- Build module object code for POSIX:
-    "build/modules/modules-posix.a" %> \o -> do
-
-        -- Find the sources needed to build the module POSIX object code:
-        ss <- findDeps [ -- Finds modules/*/src/*.c
-                         modSharedSrc
-                         -- Finds modules/*/targets/fmr/*.c
-                       , modFMRSrc
-                       ]
-
-        -- Build the list of necessary object files from the list of necessary
-        -- source files:
-        let os = map (buildpref . (<.> ".native.o")) ss
-
-        -- Run the archiver:
-        arRule ar os o
+        ldRule cc ("-shared" : (ls ++ ldfs)) os o
 
     -- Generic rule for building utilities:
     "build/utils/*/*" %> \o -> do
@@ -751,27 +582,19 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     -- Build the osmium ELF for the ATMEGA16U2:
     "build/osmium/osmium-atmega16u2.elf" %> \o -> do
 
-        -- Find the sources needed to build osmium ATMEGA16U2 object code:
-        ss <- findDeps [ getDirectoryFiles "" ["osmium//*.c"]
-                         -- A few kludges are necessary to prevent parts of
-                         -- libflipper from being treated as dead code by the
-                         -- linker:
-                       , pure [ -- This is a kludge to include parts of
-                                -- libflipper in osmium:
-                                "libflipper/src/crc.c"
-                              ]
-                          -- This sucks:
-                       , getDirectoryFiles "" ["libflipper/src/fmr//*.c"]
-                       ]
+        -- Find the sources needed to build osmium for the ATMEGA16U2:
+        ss <- getDirectoryFiles "" [ "boards/carbon/modules//*.c"
+                                   , "boards/carbon/platforms/atmegau2//*.c"
+                                   , "boards/carbon/platforms/atmegau2//*.S"
+                                   , "board/carbon/src//*.c"
+                                     -- Find a better way to do this:
+                                   , "libflipper/src/crc.c"
+                                   , "libflipper/src/fmr//*.c"
+                                   ]
 
         -- Build the list of necessary object files from the list of necessary
         -- source files:
         let os = map (buildpref . (<.> ".avr.o")) ss
-
-        -- We need the ATMEGA16U2 object code to build osmium:
-            as = [ "build/modules/modules-atmega16u2.a"
-                 , "build/platforms/platforms-atmega16u2.a"
-                 ]
 
             -- Linker flags:
             ls = [ "-Wl,-Bdynamic"
@@ -779,128 +602,46 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
                  ]
 
         -- Run the linker:
-        elfRule avr_gcc ls (as ++ os) o
-
-    -- Build platform object code for the ATMEGA16U2:
-    "build/platforms/platforms-atmega16u2.a" %> \o -> do
-
-        -- Find the sources needed to build the platform POSIX object code:
-        ss <- findDeps [getDirectoryFiles "" [ "platforms/atmega16u2//*.c"
-                                             , "platforms/atmega16u2//*.S"
-                                             ]]
-
-        -- Build the list of necessary object files from the list of necessary
-        -- source files:
-        let os = map (buildpref . (<.> ".avr.o")) ss
-
-        -- Run the archiver:
-        arRule avr_ar os o
-
-    -- Build module object code for the ATMEGA16U2:
-    "build/modules/modules-atmega16u2.a" %> \o -> do
-
-        -- Find the sources needed to build the module ATMEGA16U2 object code:
-        ss <- findDeps [ -- Finds modules/*/src/*.c
-                         modSharedSrc
-                         -- Finds modules/*/targets/atmega16u2/*.c
-                       , modAVRSrc
-                       ]
-
-        -- Build the list of necessary object files from the list of necessary
-        -- source files:
-        let os = map (buildpref . (<.> ".avr.o")) ss
-
-        -- Run the archiver:
-        arRule avr_ar os o
+        elfRule avr_gcc ls os o
 
     -- Build the osmium ELF for the ATSAM4S16B:
     "build/osmium/osmium-atsam4s16b.elf" %> \o -> do
 
-        -- Find the sources needed to build the libflipper ATSAM4S16B object
-        -- code:
-        ss <- findDeps [ getDirectoryFiles "" ["osmium//*.c"]
-                         -- A few kludges are necessary to prevent parts of
-                         -- libflipper and platform code from being treated as
-                         -- dead code by the linker:
-                       , pure [ -- This is a kludge to include parts of
-                                -- libflipper in osmium:
-                                "libflipper/src/crc.c"
-                                -- This is a kludge to include symbols needed by
-                                -- newlib in osmium:
-                              , "platforms/atsam4s16b/src/system/syscalls.c"
-                                -- This is a kludge to include the vector table
-                                -- in osmium:
-                              , "platforms/atsam4s16b/src/system/vectors.c"
-                              ]
-                         -- This sucks:
-                       , getDirectoryFiles "" ["libflipper/src/fmr//*c"]
-                       ]
+        -- Find the sources needed to build osmium for the ATMEGA16U2:
+        ss <- getDirectoryFiles "" [ "boards/carbon/modules//*.c"
+                                   , "boards/carbon/platforms/atsam4sb//*.c"
+                                   , "boards/carbon/platforms/atsam4sb//*.S"
+                                   , "board/carbon/src//*.c"
+                                     -- Find a better way to do this:
+                                   , "libflipper/src/crc.c"
+                                   , "libflipper/src/fmr//*.c"
+                                   ]
+
+        -- Find the linker scripts needed to build osmium for the ATSAM4S16B:
+        lds <- mkLinkFlags
+            <$> getDirectoryFiles "" ["boards/carbon/platforms/atsam4sb//*.ld"]
 
         -- Build the list of necessary object files from the list of necessary
         -- source files:
         let os = map (buildpref . (<.> ".arm.o")) ss
 
-        -- We need the ATSAM4S16B object code to build osmium:
-            as = [ "build/platforms/platforms-atsam4s16b.a"
-                 , "build/modules/modules-atsam4s16b.a"
-                 ]
-
-        -- Find the linker scripts needed to build osmium for the ATSAM4S16B:
-        lds <- mkLinkFlags <$> getDirectoryFiles "" ["platforms/atsam4s16b//*.ld"]
-
-
         -- Linker flags:
-        let ls = lds ++ [ "-Wl,-Bdynamic"
+            ls = lds ++ [ "-Wl,-Bdynamic"
                         , "-nostartfiles"
                         ]
 
         -- Run the linker:
-        elfRule arm_gcc ls (as ++ os) o
-
-    -- Build platform object code for the ATSAM4S16B:
-    "build/platforms/platforms-atsam4s16b.a" %> \o -> do
-
-        -- Find the sources needed to build the platform ATSAM4S16B object code:
-        ss <- findDeps [getDirectoryFiles "" [ "platforms/atsam4s16b//*.c"
-                                             , "platforms/atsam4s16b//*.S"
-                                             ]]
-
-        -- Build the list of necessary object files from the list of necessary
-        -- source files:
-        let os = map (buildpref . (<.> ".arm.o")) ss
-
-        -- Run the archiver:
-        arRule arm_ar os o
-
-    -- Build module object code for the ATSAM4S16B:
-    "build/modules/modules-atsam4s16b.a" %> \o -> do
-
-        -- Find the sources needed to build the module ATSAM4S16B object code:
-        ss <- findDeps [ -- Finds modules/*/src/*.c
-                         modSharedSrc
-                         -- Finds modules/*/targets/atsam4s16b/*.c
-                       , modARMSrc
-                       ]
-
-        -- Build the list of necessary object files from the list of necessary
-        -- source files:
-        let os = map (buildpref . (<.> ".arm.o")) ss
-
-        -- Run the archiver:
-        arRule arm_ar os o
+        elfRule arm_gcc ls os o
 
     -- Generic rule for compiling C or assembling for the ATMEGA16U2:
     ["build//*.c.avr.o", "build//*.S.avr.o"] |%> \o -> do
 
         -- Find the include files necessary for compiling C or assembling for
         -- the ATMEGA16U2:
-        is <- findDeps [ -- Finds modules/*/include/
-                         modIncludes
-                       , platformIncludes
-                       , pure [ "include/"
-                              , "osmium/include"
-                              ]
-                       ]
+        let is = [ "boards/carbon/include"
+                 , "boards/carbon/platforms/atmegau2/include"
+                 , "include"
+                 ]
 
         -- Run the C compiler:
         cRule avr_gcc is avr_c_prep o
@@ -910,13 +651,10 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
 
         -- Find the include files necessary for compiling C or assembling for
         -- the ATSAM4S16B:
-        is <- findDeps [ --Finds modules/*/include/
-                         modIncludes
-                       , platformIncludes
-                       , pure [ "include"
-                              , "osmium/include"
-                              ]
-                       ]
+        let is = [ "boards/carbon/include"
+                 , "boards/carbon/platforms/atsam4s/include"
+                 , "include"
+                 ]
 
         -- Run the C compiler:
         cRule arm_gcc is arm_c_prep o
@@ -926,10 +664,11 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
 
         -- Find the include files necessary for compiling C for the native
         -- platform:
-        is <- findDeps [ modIncludes
-                       , platformIncludes
-                       , pure ["include"]
-                       ]
+        let is = [ "boards/carbon/include"
+                 , "boards/carbon/platforms/atmegau2/include"
+                 , "boards/carbon/platforms/atsam4s/include"
+                 , "include"
+                 ]
 
         -- Get the C flags for @libusb-1.0@ with @pkg-config@:
         (PkgConfigFlags cf _) <- askOracle $ PkgConfigQuery "libusb-1.0"
