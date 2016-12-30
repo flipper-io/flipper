@@ -40,7 +40,7 @@ Arguably the easiest, this step builds and installs the binary utilites of the t
 ```
 mkdir binutils-build
 cd binutils-build
-./../binutils-*/configure --prefix=$PREFIX --target=$TARGET
+./../binutils-*/configure --prefix=$PREFIX --target=$TARGET --disable-werror
 make -j8
 make install
 cd ..
