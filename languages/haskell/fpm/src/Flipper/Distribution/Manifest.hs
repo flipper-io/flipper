@@ -28,7 +28,7 @@ import qualified Data.Map as M
 import qualified Data.Text as T
 
 import Flipper.Distribution.Language
-import Flipper.Distribution.Module
+import Flipper.Distribution.SymbolName
 
 import GHC.Generics
 
