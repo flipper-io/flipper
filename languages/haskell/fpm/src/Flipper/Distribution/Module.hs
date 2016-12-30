@@ -15,7 +15,10 @@ This module provides module specifications.
            , GeneralizedNewtypeDeriving
            #-}
 
-module Flipper.Distribution.Module where
+module Flipper.Distribution.Module (
+    Module(..)
+  , manifestModules
+  ) where
 
 import Control.DeepSeq
 
@@ -23,21 +26,10 @@ import Data.Binary
 
 import Data.Data
 
-import qualified Data.Text as T
-
 import GHC.Generics
 
--- | A module symbol name. This must be a legal C symbol token.
-newtype SymbolName = SymbolName { unSymbolName :: T.Text }
-                   deriving ( Eq
-                            , Ord
-                            , Show
-                            , Monoid
-                            , Data
-                            , Typeable
-                            , NFData
-                            , Binary
-                            )
+import Flipper.Distribution.Manifest
+import Flipper.Distribution.SymbolName
 
 -- | A module.
 data Module = Module {
@@ -57,3 +49,6 @@ data Module = Module {
 
 instance NFData Module
 instance Binary Module
+
+manifestModules :: Manifest -> [Module]
+manifestModules = undefined

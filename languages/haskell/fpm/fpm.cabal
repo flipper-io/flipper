@@ -23,6 +23,7 @@ library
                        Flipper.Distribution.Module
                        Flipper.Distribution.Package
                        Flipper.Distribution.Parser
+                       Flipper.Distribution.SymbolName
                        Flipper.Distribution.Version
   build-depends:       base
                      , binary
