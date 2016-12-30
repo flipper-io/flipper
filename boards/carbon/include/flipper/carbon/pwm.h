@@ -13,6 +13,9 @@ extern const struct _pwm {
 
 #ifdef __private_include__
 
+/* The fmr_module structure for this module. */
+extern struct _lf_module _pwm;
+
 /* Declare the FMR overlay for this driver. */
 enum { _pwm_configure };
 

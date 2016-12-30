@@ -8,7 +8,7 @@
 
 /* Include all supporting header files. */
 #include <flipper/fmr.h>
-#include <flipper/error.h>
+#include <flipper/carbon/error.h>
 
 /* ~ Declare the virtual interface for this driver. ~ */
 extern struct _flipper {

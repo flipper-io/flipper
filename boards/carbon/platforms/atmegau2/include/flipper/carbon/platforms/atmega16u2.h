@@ -15,16 +15,11 @@
 #include <avr/sleep.h>
 #include <avr/wdt.h>
 
+/* Include the module declarations for this platform. */
+#include "atmega16u2/modules.h"
+
 /* A flipper device object which the target can use to keep track of state specific to itself. */
 extern struct _lf_device self;
-
-/* Define which standard modules are supported on this platform. */
-#define __use_button__
-#define __use_cpu__
-#define __use_fmr__
-#define __use_led__
-#define __use_uart0__
-#define __use_wdt__
 
 /* These macros are defined in platform specific header files. */
 #define enable_interrupts() sei()

@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/fmr.h>
-#include <platforms/posix.h>
+#include <flipper/platforms/posix.h>
 
 struct _lf_device lf_self = {
 	{

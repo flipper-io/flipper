@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/i2c.h>
+#include <flipper/carbon/i2c.h>
 
 #ifdef __use_i2c__
 /* Define the virtual interface for this module. */

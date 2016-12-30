@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/adc.h>
+#include <flipper/carbon/adc.h>
 
 #ifdef __use_adc__
 /* Define the virtual interface for this module. */

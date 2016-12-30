@@ -19,6 +19,9 @@ extern const struct _led {
 
 #ifdef __private_include__
 
+/* The fmr_module structure for this module. */
+extern struct _lf_module _led;
+
 /* Declare the FMR overlay for this driver. */
 enum { _led_configure, _led_set_rgb };
 

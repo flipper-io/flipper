@@ -7,7 +7,7 @@
 #include <flipper/core.h>
 
 /* Include all supporting header files. */
-#include <flipper/error.h>
+#include <flipper/carbon/error.h>
 
 /* Defines the size (in bytes) of a single FMR packet. */
 #define FMR_PACKET_SIZE 64
@@ -155,8 +155,13 @@ extern const struct _fmr {
 
 #ifdef __private_include__
 
-/* ~ Declare the FMR overlay for this driver. ~ */
+/* A reference to the fmr_modules array. */
+extern const void *const fmr_modules[];
 
+/* The fmr_module structure for this module. */
+extern struct _lf_module _fmr;
+
+/* ~ Declare the FMR overlay for this driver. ~ */
 enum { _fmr_push, _fmr_pull };
 
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */

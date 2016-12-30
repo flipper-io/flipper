@@ -1,6 +1,6 @@
 #define __private_include__
-#include <flipper/usb.h>
-#include <flipper/fmr.h>
+#include <flipper/flipper.h>
+#include <flipper/carbon/usb.h>
 
 int usb_configure(void) {
 	return lf_success;

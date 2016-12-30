@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/dac.h>
+#include <flipper/carbon/dac.h>
 
 #ifdef __use_dac__
 /* Define the virtual interface for this module. */

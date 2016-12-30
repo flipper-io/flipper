@@ -1,7 +1,6 @@
 #define __private_include__
 #include <osmium.h>
-#include <flipper/modules.h>
-#include <private/nvm.h>
+#include <nvm.h>
 
 int main() {
 
@@ -10,8 +9,8 @@ int main() {
 
 	/* Initialize peripheral hardware. */
 	//button_configure();
-	//led_configure();
-	//led_set_rgb(LED_COLOR_SUCCESS);
+	led_configure();
+	led_set_rgb(LED_COLOR_SUCCESS);
 	// spi_configure();
 	// nvm_configure();
 

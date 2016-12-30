@@ -11,6 +11,9 @@ extern const struct _i2c {
 
 #ifdef __private_include__
 
+/* The fmr_module structure for this module. */
+extern struct _lf_module _i2c;
+
 /* Declare the FMR overlay for this driver. */
 enum { _i2c_configure };
 

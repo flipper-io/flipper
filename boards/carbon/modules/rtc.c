@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/rtc.h>
+#include <flipper/carbon/rtc.h>
 
 #ifdef __use_rtc__
 /* Define the virtual interface for this module. */

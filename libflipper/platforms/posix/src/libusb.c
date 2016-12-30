@@ -2,9 +2,9 @@
 
 #define __private_include__
 #include <flipper/flipper.h>
-#include <platforms/posix/libusb.h>
+#include <flipper/platforms/posix/libusb.h>
 #include <libusb.h>
-#include <flipper/error.h>
+#include <flipper/carbon/error.h>
 
 struct _lf_endpoint lf_libusb_ep = {
 	lf_libusb_configure,

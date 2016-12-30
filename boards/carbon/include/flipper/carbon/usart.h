@@ -18,6 +18,9 @@ extern const struct _uart {
 
 #ifdef __private_include__
 
+/* The fmr_module structure for this module. */
+extern struct _lf_module _usart;
+
 /* Declare the FMR overlay for this driver. */
 enum { _usart_configure, _usart_enable, _usart_disable, _usart_ready, _usart_put, _usart_get, _usart_push, _usart_pull };
 

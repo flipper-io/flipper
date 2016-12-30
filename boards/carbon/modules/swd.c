@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/swd.h>
+#include <flipper/carbon/swd.h>
 
 #ifdef __use_swd__
 /* Define the virtual interface for this module. */

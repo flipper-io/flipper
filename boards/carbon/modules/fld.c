@@ -1,6 +1,6 @@
 #define __private_include__
-#include <flipper/fld.h>
-#include <flipper/fs.h>
+#include <flipper/carbon/fld.h>
+#include <flipper/carbon/fs.h>
 
 #ifdef __use_fld__
 /* Define the virtual interface for this module. */
@@ -13,7 +13,7 @@ const struct _fld fld = {
 };
 #endif
 
-fmr_module fld_bind(lf_crc_t identifier) {
+int fld_bind(lf_crc_t identifier) {
 	return 0;
 }
 

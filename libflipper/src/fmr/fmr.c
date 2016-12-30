@@ -1,7 +1,5 @@
 #define __private_include__
 #include <flipper/fmr.h>
-#include <flipper/error.h>
-#include <flipper/modules.h>
 
 #ifdef __use_fmr__
 /* Define the virtual interface for this module. */
@@ -155,11 +153,7 @@ int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *par
 	/* Set the magic number. */
 	packet -> header.magic = FMR_MAGIC_NUMBER;
 	/* If the module's identifier is in the range of identifiers reserved for the standard modules, make this packet invoke a standard module. */
-	if (module < FMR_STD_MODULE_COUNT) {
-		packet -> header.class = fmr_standard_invocation_class;
-	} else {
-		packet -> header.class = fmr_user_invocation_class;
-	}
+	packet -> header.class = fmr_standard_invocation_class;
 	/* Store the target module, function, and argument count in the packet. */
 	packet -> call.index = module;
 	packet -> call.function = function;

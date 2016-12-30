@@ -12,6 +12,9 @@ extern const struct _wdt {
 
 #ifdef __private_include__
 
+/* The fmr_module structure for this module. */
+extern struct _lf_module _wdt;
+
 /* Declare the FMR overlay for this driver. */
 enum { _wdt_configure, _wdt_fire };
 

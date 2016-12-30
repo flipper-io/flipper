@@ -1,6 +1,6 @@
 #define __private_include__
-#include <flipper/spi.h>
-#include <platforms/atsam4s16b.h>
+#include <flipper/carbon/spi.h>
+#include <flipper/carbon/platforms/atsam4s16b.h>
 
 int spi_configure() {
 	/* Enable the SPI clock. */

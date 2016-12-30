@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/pwm.h>
+#include <flipper/carbon/pwm.h>
 
 #ifdef __use_pwm__
 /* Define the virtual interface for this module. */

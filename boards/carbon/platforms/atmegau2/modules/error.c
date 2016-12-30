@@ -1,6 +1,6 @@
 #define __private_include__
-#include <flipper/error.h>
-#include <platforms/atmega16u2.h>
+#include <flipper/carbon/error.h>
+#include <flipper/carbon/platforms/atmega16u2.h>
 
 int error_configure(void) {
     return lf_success;

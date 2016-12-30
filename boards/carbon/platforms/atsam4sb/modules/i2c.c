@@ -1,6 +1,6 @@
 #define __private_include__
-#include <flipper/i2c.h>
-#include <platforms/atsam4s16b.h>
+#include <flipper/carbon/i2c.h>
+#include <flipper/carbon/platforms/atsam4s16b.h>
 
 int i2c_configure(void) {
 	/* Enable the TWI clock. */

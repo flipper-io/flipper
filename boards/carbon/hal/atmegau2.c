@@ -22,12 +22,16 @@
 
 #define __private_include__
 #include <flipper/flipper.h>
-#include <flipper/modules.h>
-#include <platforms/posix.h>
+#include <flipper/carbon/platforms/atmega16u2/modules.h>
 
 /* Declare any standard modules with functionality specific to this device. */
-extern struct _lf_module _cpu;
-extern struct _lf_module _uart0;
+LF_MODULE(_button, "button", "Interacts with the onboard button.", _button_id);
+LF_MODULE(_cpu, "cpu", "Provides control over the CPU of the device.", _cpu_id);
+/* NOTE: Remove this module. */
+LF_MODULE(_fmr, "fmr", "Provides a way to access push and pull.", _fmr_id);
+LF_MODULE(_fs, "fs", "Provides access to the device's filesystem.", _fs_id);
+LF_MODULE(_led, "led", "Interacts with the built-in status LED.", _led_id);
+LF_MODULE(_uart0, "uart0", "Provides low level access to the device's UART bus.", _uart0_id);
 
 struct _lf_endpoint lf_bridge_ep = {
     lf_bridge_configure,
@@ -49,6 +53,8 @@ struct _lf_bridge_record {
     struct _lf_module _uart0_bridge;
 };
 
+#define LF_ASSIGN_MODULE(module) module.device = &(record -> _atmega16u2);
+
 int lf_bridge_configure(struct _lf_endpoint *this) {
     if (!this) {
 		error_raise(E_NULL, error_message("No endpoint record provided for libusb configuration. Reattach your device and try again."));
@@ -66,8 +72,12 @@ int lf_bridge_configure(struct _lf_endpoint *this) {
     /* Set the bridge device pointer. */
     record -> _atmega16u2 = &(record -> atmega16u2);
     /* Assign the functionality of the device specific modules to this device. */
-    _cpu.device = &(record -> _atmega16u2);
-    _uart0.device = &(record -> _atmega16u2);
+    LF_ASSIGN_MODULE(_button);
+    LF_ASSIGN_MODULE(_cpu);
+    LF_ASSIGN_MODULE(_fmr);
+    LF_ASSIGN_MODULE(_fs);
+    LF_ASSIGN_MODULE(_led);
+    LF_ASSIGN_MODULE(_uart0);
     /* Set the bridge module's index. */
     record -> _uart0_bridge.index = _uart0_id;
     /* Set the bridge module's device pointer pointer. */

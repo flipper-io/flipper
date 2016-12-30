@@ -1,9 +1,6 @@
 #define __private_include__
 #include <flipper/flipper.h>
-#include <flipper/modules.h>
-
-/* ~ Provide the definition for this standard module. ~ */
-LF_MODULE(_usart, "usart", "Provides low level access to the device's UART bus.", _usart_id);
+#include <flipper/carbon/usart.h>
 
 int usart_configure(void) {
 	lf_invoke(&_usart, _usart_configure, NULL);

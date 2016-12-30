@@ -1,6 +1,6 @@
 #define __private_include__
-#include <private/nvm.h>
-#include <flipper/spi.h>
+#include <nvm.h>
+#include <flipper/carbon/spi.h>
 
 /* Define the opcodes for the flash device. */
 #define FLASH_OPCODE_GET_STATUS_REGISTER						0xD7

@@ -61,23 +61,23 @@ pull l
 foreign import ccall safe "flipper/uart0/uart0.h uart0_configure"
     c_uart0_configure :: IO Word32
 
-foreign import ccall safe "flipper/uart0.h uart0_enable"
+foreign import ccall safe "flipper/carbon/uart0.h uart0_enable"
     c_uart0_enable :: IO ()
 
-foreign import ccall safe "flipper/uart0.h uart0_disable"
+foreign import ccall safe "flipper/carbon/uart0.h uart0_disable"
     c_uart0_disable :: IO ()
 
-foreign import ccall safe "flipper/uart0.h uart0_ready"
+foreign import ccall safe "flipper/carbon/uart0.h uart0_ready"
     c_uart0_ready :: IO Word8
 
-foreign import ccall safe "flipper/uart0.h uart0_put"
+foreign import ccall safe "flipper/carbon/uart0.h uart0_put"
     c_uart0_put :: Word8 -> IO ()
 
-foreign import ccall safe "flipper/uart0.h uart0_get"
+foreign import ccall safe "flipper/carbon/uart0.h uart0_get"
     c_uart0_get :: IO Word8
 
-foreign import ccall safe "flipper/uart0.h uart0_push"
+foreign import ccall safe "flipper/carbon/uart0.h uart0_push"
     c_uart0_push :: Ptr Word8 -> Word32 -> IO ()
 
-foreign import ccall safe "flipper/uart0.h uart0_pull"
+foreign import ccall safe "flipper/carbon/uart0.h uart0_pull"
     c_uart0_pull :: Ptr Word8 -> Word32 -> IO ()

@@ -1,6 +1,6 @@
 #define __private_include__
-#include <private/megausb.h>
-#include <platforms/atmega16u2.h>
+#include <megausb.h>
+#include <flipper/carbon/platforms/atmega16u2.h>
 
 struct _lf_endpoint megausb = {
 	megausb_configure,

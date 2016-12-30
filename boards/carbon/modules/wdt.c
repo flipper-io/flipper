@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/wdt.h>
+#include <flipper/carbon/wdt.h>
 
 #ifdef __use_wdt__
 /* Define the virtual interface for this module. */

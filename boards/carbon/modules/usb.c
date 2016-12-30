@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/usb.h>
+#include <flipper/carbon/usb.h>
 
 #ifdef __use_usb__
 /* Define the virtual interface for this module. */

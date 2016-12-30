@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/spi.h>
+#include <flipper/carbon/spi.h>
 
 #ifdef __use_spi__
 /* Define the virtual interface for this module. */

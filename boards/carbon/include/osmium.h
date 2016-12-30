@@ -4,6 +4,29 @@
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
 #include <flipper/core.h>
 
+/* Include all of the module headers. */
+#include <flipper/carbon/adc.h>
+#include <flipper/carbon/button.h>
+#include <flipper/carbon/cpu.h>
+#include <flipper/carbon/dac.h>
+#include <flipper/carbon/error.h>
+#include <flipper/carbon/fld.h>
+#include <flipper/fmr.h>
+#include <flipper/carbon/fs.h>
+#include <flipper/carbon/gpio.h>
+#include <flipper/carbon/i2c.h>
+#include <flipper/carbon/led.h>
+#include <flipper/carbon/pwm.h>
+#include <flipper/carbon/rtc.h>
+#include <flipper/carbon/spi.h>
+#include <flipper/carbon/swd.h>
+#include <flipper/carbon/temp.h>
+#include <flipper/carbon/timer.h>
+#include <flipper/carbon/uart0.h>
+#include <flipper/carbon/usart.h>
+#include <flipper/carbon/usb.h>
+#include <flipper/carbon/wdt.h>
+
 #ifdef __private_include__
 
 #define OS_UART_BAUDRATE 115200

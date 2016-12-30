@@ -18,6 +18,9 @@ extern const struct _spi {
 
 #ifdef __private_include__
 
+/* The fmr_module structure for this module. */
+extern struct _lf_module _spi;
+
 /* Declare the FMR overlay for this driver. */
 enum { _spi_configure, _spi_enable, _spi_disable, _spi_ready, _spi_put, _spi_get, _spi_push, _spi_pull };
 

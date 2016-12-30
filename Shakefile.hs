@@ -79,7 +79,7 @@ native_prep = [ -- Use C99:
                 -- Include debugging metadata:
               , "-g"
                 -- Platform header:
-              , "-DPLATFORM_HEADER=<platforms/posix.h>"
+              , "-DPLATFORM_HEADER=<flipper/platforms/posix.h>"
               ]
 
 -- * Querying The Environment
@@ -488,6 +488,59 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         need ["install-libflipper"]
         need ["install-utils"]
 
+    -- Install the header files:
+    phony "install-libflipper-headers" $ do
+
+        -- We need the headers in order to install:
+        need ["libflipper-headers"]
+
+        p <- prefix
+
+        -- Make the @$PREFIX/include@ directory:
+        instCmd_ [] ["mkdir", "-p", p </> "include"]
+
+        -- Install the top-level header:
+        instCmd_ [] ["cp", "build/include/flipper.h", p </> "include/"]
+
+        -- Install the rest of the headers:
+        instCmd_ [] ["cp", "-R", "build/include/flipper", p </> "include/"]
+
+    -- Install libflipper:
+    phony "install-libflipper" $ do
+
+        -- libflipper needs to be built before we can install it:
+        need ["libflipper"]
+
+        p   <- prefix
+        dyn <- dynlib
+
+        -- Make the @$PREFIX/lib@ directory:
+        instCmd_ [] ["mkdir", "-p", p </> "lib"]
+
+        -- Install the shared library:
+        instCmd_ [] ["cp",  "build/libflipper" </> dyn, p </> "lib/"]
+
+    -- Install command line utilities:
+    phony "install-utils" $ do
+
+        -- Find out what the installation prefix is:
+        p <- prefix
+
+        -- Utils need to be built before we can install them:
+        need ["utils"]
+
+        -- Make the @$PREFIX/bin@ directory:
+        instCmd_ [] ["mkdir", "-p", p </> "bin"]
+
+        -- Find out which utils exist:
+        us <- getDirectoryDirs "utils"
+
+        -- Install each utility:
+        mapM_ (\u -> instCmd_ [] [ "cp"
+                                 , "build/utils" </> u </> u
+                                 , p </> "bin" </> u
+                                 ]) us
+
     -- Uninstall libflipper and the console:
     phony "uninstall" $ do
         p   <- prefix
@@ -509,6 +562,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
 
         -- Find the source files needed to build libflipper:
         ss <- getDirectoryFiles "" [ "boards/*/hal//*.c"
+                                   , "boards/*/modules//*.c"
                                    , "libflipper/platforms/posix//*.c"
                                    , "libflipper/src//*.c"
                                    ]
@@ -547,6 +601,51 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         -- Run the linker:
         ldRule cc [] (lf : os) o
 
+    -- Install osmium on the ATSAM4S:
+    phony "flash-atsam4s16b" $ do
+
+       need ["build/utils/fdfu/fdfu", "build/osmium/osmium-atsam4s16b.bin"]
+
+       command_ [] "build/utils/fdfu/fdfu" ["build/osmium/osmium-atsam4s16b.bin"]
+
+    -- Shortcut:
+    phony "f4s" $ need ["flash-atsam4s16b"]
+
+    -- Install osmium on the ATMEGA16U2:
+    phony "flash-atmega16u2" $ do
+
+       -- We need the osmium image to upload to the device:
+       need ["build/osmium/osmium-atmega16u2.hex"]
+
+       -- Erase the device:
+       command_ [] "dfu-programmer" [ "at90usb162"
+                                    , "erase"
+                                    , "--force"
+                                    ]
+
+       -- Flash the image to the device:
+       command_ [] "dfu-programmer" [ "at90usb162"
+                                    , "flash"
+                                    , "build/osmium/osmium-atmega16u2.hex"
+                                    ]
+
+       -- Launch osmium on the ATMEGA16U2:
+       command_ [] "dfu-programmer" [ "at90usb162"
+                                    , "launch"
+                                    , "--no-reset"
+                                    ]
+
+    -- Shortcut:
+    phony "fu2" $ need ["flash-atmega16u2"]
+
+    -- Shortcut for @dfu-programmer at90usb162 launch --no-reset@:
+    phony "boot" $ do
+       -- Launch osmium on the ATMEGA16U2:
+       command_ [] "dfu-programmer" [ "at90usb162"
+                                    , "launch"
+                                    , "--no-reset"
+                                    ]
+
     -- Build the osmium hex image for the ATMEGA16U2:
     "build/osmium/osmium-atmega16u2.hex" %> \o -> do
 
@@ -584,6 +683,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
 
         -- Find the sources needed to build osmium for the ATMEGA16U2:
         ss <- getDirectoryFiles "" [ "boards/carbon/modules//*.c"
+                                   , "boards/carbon/src//*.c"
                                    , "boards/carbon/platforms/atmegau2//*.c"
                                    , "boards/carbon/platforms/atmegau2//*.S"
                                    , "board/carbon/src//*.c"
@@ -609,6 +709,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
 
         -- Find the sources needed to build osmium for the ATMEGA16U2:
         ss <- getDirectoryFiles "" [ "boards/carbon/modules//*.c"
+                                   , "boards/carbon/src//*.c"
                                    , "boards/carbon/platforms/atsam4sb//*.c"
                                    , "boards/carbon/platforms/atsam4sb//*.S"
                                    , "board/carbon/src//*.c"
@@ -652,7 +753,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         -- Find the include files necessary for compiling C or assembling for
         -- the ATSAM4S16B:
         let is = [ "boards/carbon/include"
-                 , "boards/carbon/platforms/atsam4s/include"
+                 , "boards/carbon/platforms/atsam4sb/include"
                  , "include"
                  ]
 
@@ -666,7 +767,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         -- platform:
         let is = [ "boards/carbon/include"
                  , "boards/carbon/platforms/atmegau2/include"
-                 , "boards/carbon/platforms/atsam4s/include"
+                 , "boards/carbon/platforms/atsam4sb/include"
                  , "include"
                  , "libflipper/platforms/posix/include"
                  ]

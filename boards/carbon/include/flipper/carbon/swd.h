@@ -13,6 +13,9 @@ extern const struct _swd {
 
 #ifdef __private_include__
 
+/* The fmr_module structure for this module. */
+extern struct _lf_module _swd;
+
 /* Declare the FMR overlay for this driver. */
 enum { _swd_configure };
 

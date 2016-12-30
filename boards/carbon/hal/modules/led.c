@@ -1,9 +1,6 @@
 #define __private_include__
 #include <flipper/flipper.h>
-#include <flipper/modules.h>
-
-/* ~ Provide the definition for this standard module. ~ */
-LF_MODULE(_led, "led", "Interacts with the built-in status LED.", _led_id);
+#include <flipper/carbon/led.h>
 
 int led_configure(void) {
 	lf_invoke(&_led, _led_configure, NULL);

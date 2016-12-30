@@ -1,7 +1,7 @@
 #define __private_include__
-#include <flipper/uart0.h>
-#include <platforms/atmega16u2.h>
-#include <flipper/error.h>
+#include <flipper/carbon/uart0.h>
+#include <flipper/carbon/platforms/atmega16u2.h>
+#include <flipper/carbon/error.h>
 
 /* Interrupt driven USART buffering. */
 uint8_t usart_buffer[32];

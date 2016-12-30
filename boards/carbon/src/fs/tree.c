@@ -1,7 +1,7 @@
 #define __private_include__
-#include <flipper/fs.h>
-#include <private/nvm.h>
-#include <flipper/error.h>
+#include <flipper/carbon/fs.h>
+#include <nvm.h>
+#include <flipper/carbon/error.h>
 
 /* This function traverses the filesystem tree starting at a leaf pointed to by the 'current' argument until an empty branch pointer corresponding to the given key is found. */
 nvm_p fs_empty_branch_for_key(nvm_p _branch, nvm_p current, uint16_t key) {

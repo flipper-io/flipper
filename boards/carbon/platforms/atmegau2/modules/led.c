@@ -1,6 +1,6 @@
 #define __private_include__
-#include <flipper/led.h>
-#include <platforms/atmega16u2.h>
+#include <flipper/carbon/led.h>
+#include <flipper/carbon/platforms/atmega16u2.h>
 
 int led_configure(void) {
 	/* Configure the DI (data in) pin of the LED as an output. */

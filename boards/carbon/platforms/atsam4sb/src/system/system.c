@@ -1,8 +1,8 @@
 #define __private_include__
-#include <flipper/gpio.h>
-#include <flipper/uart0.h>
-#include <flipper/modules.h>
-#include <platforms/atsam4s16b.h>
+#include <flipper/carbon/gpio.h>
+#include <flipper/carbon/uart0.h>
+#include <flipper/carbon/modules.h>
+#include <flipper/carbon/platforms/atsam4s16b.h>
 
 /* The fmr_device object containing global state about this device. */
 struct _lf_device lf_self = {

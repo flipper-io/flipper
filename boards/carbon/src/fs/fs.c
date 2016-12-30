@@ -1,7 +1,7 @@
 #define __private_include__
-#include <flipper/fs.h>
-#include <private/nvm.h>
-#include <flipper/error.h>
+#include <flipper/carbon/fs.h>
+#include <nvm.h>
+#include <flipper/carbon/error.h>
 
 /* Declare all of the global variables for this module. */
 nvm_p _free_list;

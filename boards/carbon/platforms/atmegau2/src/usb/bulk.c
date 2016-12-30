@@ -1,5 +1,5 @@
 #define __private_include__
-#include <private/megausb.h>
+#include <megausb.h>
 
 /* Receive a packet using the appropriate bulk endpoint. */
 int8_t megausb_bulk_receive(uint8_t *destination, lf_size_t length) {

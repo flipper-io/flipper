@@ -1,9 +1,6 @@
 #define __private_include__
 #include <flipper/flipper.h>
-#include <flipper/modules.h>
-
-/* ~ Provide the definition for this standard module. ~ */
-LF_MODULE(_fs, "fs", "Provides access to the device's filesystem.", _fs_id);
+#include <flipper/carbon/fs.h>
 
 /* NOTE: All functions in this module are declared as weak so they can be overwritten in the presence of FVM. */
 

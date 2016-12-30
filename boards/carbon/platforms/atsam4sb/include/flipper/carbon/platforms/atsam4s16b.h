@@ -7,32 +7,13 @@
 #include "atsam4s16b/exceptions.h"
 #include "atsam4s16b/cmsis/core_cm3.h"
 
+/* Include the module declarations for this platform. */
+#include "atsam4s16b/modules.h"
+
 /* A flipper device object which the target can use to keep track of state specific to itself. */
 extern struct _lf_device self;
 
 #define WEAK __attribute__((weak))
-
-#define __use_adc__
-#define __use_button__
-// #define __use_cpu__
-#define __use_dac__
-#define __use_error__
-#define __use_fld__
-#define __use_fmr__
-#define __use_fs__
-#define __use_gpio__
-#define __use_i2c__
-#define __use_led__
-#define __use_pwm__
-#define __use_rtc__
-#define __use_spi__
-#define __use_swd__
-#define __use_temp__
-#define __use_timer__
-#define __use_uart0__
-#define __use_usart__
-#define __use_usb__
-#define __use_wdt__
 
 /* Clock generator settings for 48MHz master clock. */
 #define BOARD_OSCOUNT (CKGR_MOR_MOSCXTST(8))

@@ -3,7 +3,7 @@
 
 /* Include all types and macros exposed by the Flipper Toolbox. */
 #include <flipper/core.h>
-#include <platforms/atmega16u2.h>
+#include <flipper/carbon/platforms/atmega16u2.h>
 
 /* ~ Declare the virtual interface for this driver. ~ */
 extern struct _lf_endpoint megausb;

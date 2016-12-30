@@ -1,6 +1,6 @@
 #define __private_include__
-#include <platforms/posix/network.h>
-#include <flipper/error.h>
+#include <flipper/platforms/posix/network.h>
+#include <flipper/carbon/error.h>
 #include <flipper/flipper.h>
 #include <unistd.h>
 #include <arpa/inet.h>

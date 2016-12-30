@@ -1,7 +1,6 @@
 #define __private_include__
 #include <flipper/flipper.h>
-#include <flipper/modules.h>
-#include <platforms/posix.h>
+#include <flipper/fmr.h>
 
 /* Expose the virtual interface for this driver. */
 struct _flipper flipper = {
@@ -248,7 +247,7 @@ int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_s
 	}
 	struct _fmr_invocation_packet packet = { 0 };
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_generate(_fmr_id, _fmr_push, fmr_merge(fmr_args(fmr_int16(module -> index), fmr_int8(function), fmr_int32(length)), parameters), &packet);
+	int _e = fmr_generate(_fmr.index, _fmr_push, fmr_merge(fmr_args(fmr_int16(module -> index), fmr_int8(function), fmr_int32(length)), parameters), &packet);
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -288,7 +287,7 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 	}
 	struct _fmr_invocation_packet packet = { 0 };
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_generate(_fmr_id, _fmr_pull, fmr_merge(fmr_args(fmr_int16(module -> index), fmr_int8(function), fmr_int32(length)), parameters), &packet);
+	int _e = fmr_generate(_fmr.index, _fmr_pull, fmr_merge(fmr_args(fmr_int16(module -> index), fmr_int8(function), fmr_int32(length)), parameters), &packet);
 	if (_e < lf_success) {
 		return lf_error;
 	}

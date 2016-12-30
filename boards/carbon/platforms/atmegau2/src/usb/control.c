@@ -1,5 +1,5 @@
 #define __private_include__
-#include <private/megausb.h>
+#include <megausb.h>
 
 volatile uint8_t megausb_configured = 0;
 

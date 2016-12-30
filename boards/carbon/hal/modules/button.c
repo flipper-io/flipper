@@ -1,9 +1,6 @@
 #define __private_include__
 #include <flipper/flipper.h>
-#include <flipper/modules.h>
-
-/* ~ Provide the definition for this standard module. ~ */
-LF_MODULE(_button, "button", "Interacts with the onboard button.", _button_id);
+#include <flipper/carbon/button.h>
 
 int button_configure(void) {
 	return lf_invoke(&_button, _button_configure, NULL);

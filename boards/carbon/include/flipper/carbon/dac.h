@@ -11,6 +11,9 @@ extern const struct _dac {
 
 #ifdef __private_include__
 
+/* The fmr_module structure for this module. */
+extern struct _lf_module _dac;
+
 /* Declare the FMR overlay for this driver. */
 enum { _dac_configure };
 

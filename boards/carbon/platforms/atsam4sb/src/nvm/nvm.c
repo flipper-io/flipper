@@ -1,5 +1,5 @@
 #define __private_include__
-#include <private/nvm.h>
+#include <nvm.h>
 
 int nvm_configure(void) {
 	/* Create a pinmask for the NVM pins. */

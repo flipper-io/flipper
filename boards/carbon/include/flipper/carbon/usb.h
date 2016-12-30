@@ -11,6 +11,9 @@ extern const struct _usb {
 
 #ifdef __private_include__
 
+/* The fmr_module structure for this module. */
+extern struct _lf_module _usb;
+
 /* Declare the FMR overlay for this driver. */
 enum { _usb_configure };
 

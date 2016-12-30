@@ -92,6 +92,9 @@ extern const struct _error {
 
 #ifdef __private_include__
 
+/* The fmr_module structure for this module. */
+extern struct _lf_module _error;
+
 /* Configures the error module. */
 extern int error_configure(void);
 /* Raises an error internally to the current context of libflipper. */

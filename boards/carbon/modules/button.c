@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/button.h>
+#include <flipper/carbon/button.h>
 
 #ifdef __use_button__
 /* Define the virtual interface for this module. */

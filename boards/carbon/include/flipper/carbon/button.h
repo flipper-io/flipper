@@ -14,6 +14,9 @@ extern const struct _button {
 
 #ifdef __private_include__
 
+/* The fmr_module structure for this module. */
+extern struct _lf_module _button;
+
 /* Declare the FMR overlay for this driver. */
 enum { _button_configure, _button_read };
 

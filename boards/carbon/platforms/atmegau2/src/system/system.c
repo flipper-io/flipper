@@ -1,7 +1,7 @@
 #define __private_include__
-#include <platforms/atmega16u2.h>
-#include <private/megausb.h>
-#include <flipper/modules.h>
+#include <flipper/carbon/platforms/atmega16u2.h>
+#include <megausb.h>
+#include <flipper/carbon/modules.h>
 
 /* The fmr_device object containing global state about this device. */
 struct _lf_device lf_self = {

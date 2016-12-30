@@ -1,9 +1,6 @@
 #define __private_include__
 #include <flipper/flipper.h>
-#include <flipper/modules.h>
-
-/* ~ Provide the definition for this standard module. ~ */
-LF_MODULE(_spi, "spi", "Provides control over the device's SPI bus.", _spi_id);
+#include <flipper/carbon/spi.h>
 
 int spi_configure() {
 	return lf_invoke(&_spi, _spi_configure, NULL);
