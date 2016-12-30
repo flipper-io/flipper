@@ -41,7 +41,7 @@ avr_c_prep = [ -- Use C99:
                -- MCU is ATMEGA16U2:
              , "-mmcu=atmega16u2"
                -- Platform header:
-             , "-DPLATFORM_HEADER=<platforms/atmega16u2.h>"
+             , "-DPLATFORM_HEADER=<flipper/carbon/platforms/atmega16u2.h>"
              ]
 
 -- | Preprocessor options for ARM targets.
@@ -59,7 +59,7 @@ arm_c_prep = [ -- Use C99.
                -- Include debugging metadata:
              , "-g"
                -- Platform header:
-             , "-DPLATFORM_HEADER=<platforms/atsam4s16b.h>"
+             , "-DPLATFORM_HEADER=<flipper/carbon/platforms/atsam4s16b.h>"
              ]
 
 -- | Preprocessor options for native C targets.
@@ -668,6 +668,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
                  , "boards/carbon/platforms/atmegau2/include"
                  , "boards/carbon/platforms/atsam4s/include"
                  , "include"
+                 , "libflipper/platforms/posix/include"
                  ]
 
         -- Get the C flags for @libusb-1.0@ with @pkg-config@:
