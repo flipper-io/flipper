@@ -1,13 +1,13 @@
 #define __private_include__
-#include <flipper/carbon/modules/error.h>
-#include <flipper/carbon/platforms/atsam4s16b.h>
+#include <flipper/error.h>
+#include <flipper/carbon/platforms/atmega16u2.h>
 
 int error_configure(void) {
-	return lf_success;
+    return lf_success;
 }
 
 void error_raise(lf_error_t error, const char *format, ...) {
-	lf_self.error = error;
+    lf_self.error = error;
 }
 
 lf_error_t error_get(void) {

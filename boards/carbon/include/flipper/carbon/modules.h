@@ -1,8 +1,9 @@
+/* Include all of the headers for the modules supported by Flipper: Carbon Edition. */
+
 #include "modules/adc.h"
 #include "modules/button.h"
 #include "modules/cpu.h"
 #include "modules/dac.h"
-#include "modules/error.h"
 #include "modules/fld.h"
 #include "modules/fs.h"
 #include "modules/gpio.h"

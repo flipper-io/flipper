@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/libflipper.h>
-#include <flipper/carbon/modules/error.h>
+#include <flipper/error.h>
 
 /* Expose the error message strings. */
 char *messages[] = { LF_ERROR_MESSAGE_STRINGS };

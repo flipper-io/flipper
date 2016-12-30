@@ -9,7 +9,7 @@
 #include <flipper/carbon/modules/button.h>
 #include <flipper/carbon/modules/cpu.h>
 #include <flipper/carbon/modules/dac.h>
-#include <flipper/carbon/modules/error.h>
+#include <flipper/error.h>
 #include <flipper/carbon/modules/fld.h>
 #include <flipper/fmr.h>
 #include <flipper/carbon/modules/fs.h>

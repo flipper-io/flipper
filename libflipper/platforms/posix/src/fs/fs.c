@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/carbon/modules/fs.h>
-#include <flipper/carbon/modules/error.h>
+#include <flipper/error.h>
 
 /* All other FS related symbols are delared in 'osmium/fs/fs.c'. */
 

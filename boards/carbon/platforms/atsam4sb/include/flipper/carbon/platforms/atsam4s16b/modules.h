@@ -1,16 +1,12 @@
 #ifndef __lf_modules_h__
 #define __lf_modules_h__
 
-/* NOTE: This header file should only be included once by modules.c for each platform. */
-
 /* Include the header files for all of the standard modules exposed by the toolbox. */
 #include <flipper/carbon/modules/adc.h>
 #include <flipper/carbon/modules/button.h>
 #include <flipper/carbon/modules/cpu.h>
 #include <flipper/carbon/modules/dac.h>
-#include <flipper/carbon/modules/error.h>
 #include <flipper/carbon/modules/fld.h>
-#include <flipper/fmr.h>
 #include <flipper/carbon/modules/fs.h>
 #include <flipper/carbon/modules/gpio.h>
 #include <flipper/carbon/modules/i2c.h>
@@ -25,6 +21,9 @@
 #include <flipper/carbon/modules/usart.h>
 #include <flipper/carbon/modules/usb.h>
 #include <flipper/carbon/modules/wdt.h>
+
+/* NOTE: This include should only be here until FMR is removed as a module. */
+#include <flipper/fmr.h>
 
 /* Create an enumeraion defining all of the precomputed identifiers needed for the standard modules. */
 enum {

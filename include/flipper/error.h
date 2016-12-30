@@ -73,28 +73,6 @@ enum {
 /* Prevents the execution of a statement from producing error-related side effects. */
 #define suppress_errors(statement) error_pause(); statement; error_resume();
 
-/* Declare the virtual interface for this module. */
-extern const struct _error {
-	/* Configures the error module. */
-	int (* configure)(void);
-	/* Causes errors to produce side effects, exiting if fatal. */
-	void (* resume)(void);
-	/* Prevents errors from producing side effects of any kind. */
-	void (* pause)(void);
-	/* Generates an error accross the entire FMR heirarchy. */
-	void (* raise)(lf_error_t error, const char *format, ...) __attribute__ ((format (printf, 2, 3)));
-	/* Returns the current error (if any). */
-	lf_error_t (* get)(void);
-	/* Returns the device to an error-free state. */
-	void (* clear)(void);
-
-} error;
-
-#ifdef __private_include__
-
-/* The fmr_module structure for this module. */
-extern struct _lf_module _error;
-
 /* Configures the error module. */
 extern int error_configure(void);
 /* Raises an error internally to the current context of libflipper. */
@@ -108,5 +86,4 @@ extern lf_error_t error_get(void);
 /* Clear the current error state. */
 extern void error_clear(void);
 
-#endif
 #endif
