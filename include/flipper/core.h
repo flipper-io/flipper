@@ -40,6 +40,8 @@
 
 /* Packed attribute. */
 #define LF_PACKED __attribute__((__packed__))
+/* Weak attribute. */
+#define LF_WEAK __attribute__((weak))
 
 /* Terminal colors. */
 #define KNRM  "\x1B[0m"
@@ -92,7 +94,7 @@ typedef uint16_t lf_version_t;
 #define little32(x) ((((uint32_t)(x)) << 16 ) | (((uint32_t)(x)) >> 16))
 
 /* Standardizes a way to obtain the name, version, and attributes of a Flipper device. */
-struct __attribute__((__packed__)) _lf_configuration {
+struct LF_PACKED _lf_configuration {
 	/* The human readable name of the device. */
 	char name[16];
 	/* An identifier unique to the device. */

@@ -1,3 +1,4 @@
+#define __private_include__
 #include <flipper/carbon/platforms/atsam4s16b.h>
 
 extern uint32_t _sfixed;
