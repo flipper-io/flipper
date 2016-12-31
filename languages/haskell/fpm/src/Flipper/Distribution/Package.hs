@@ -15,7 +15,12 @@ This module provides package specifications.
            , GeneralizedNewtypeDeriving
            #-}
 
-module Flipper.Distribution.Package where
+module Flipper.Distribution.Package (
+    PackageName()
+  , parsePackageName
+  ) where
+
+import Control.Applicative
 
 import Control.DeepSeq
 
@@ -28,14 +33,17 @@ import qualified Data.Text as T
 import Flipper.Distribution.Binding
 import Flipper.Distribution.Language
 import Flipper.Distribution.License
+import Flipper.Distribution.Manifest
 import Flipper.Distribution.Module
 import Flipper.Distribution.Version
 
 import GHC.Generics
 
--- | A legal package name is something I still need to think more about...
+import qualified Text.Megaparsec      as M
+import qualified Text.Megaparsec.Text as M
 
--- | A legal package name is any string of letters, numbers, 
+-- | A legal package name is any string of non-whitespace non-control Unicode
+--   characters.
 newtype PackageName = PackageName { unPackageName :: T.Text }
                     deriving ( Eq
                              , Ord
@@ -46,6 +54,14 @@ newtype PackageName = PackageName { unPackageName :: T.Text }
                              , NFData
                              , Binary
                              )
+
+parsePackageName :: M.Parser PackageName
+parsePackageName = (PackageName . T.pack) <$> some (M.choice cs)
+    where cs = [ M.alphaNumChar
+               , M.numberChar
+               , M.punctuationChar
+               , M.symbolChar
+               ]
 
 -- | A name and version uniquely identifies a package.
 data PackageID = PackageID {
@@ -64,6 +80,9 @@ data PackageID = PackageID {
 instance NFData PackageID
 instance Binary PackageID
 
+manifestPackageID :: Manifest -> PackageID
+manifestPackageID = undefined
+
 -- | A name and version range identifies a package dependency.
 data Dependency = Dependency {
     -- | Dependency package name.
@@ -80,6 +99,9 @@ data Dependency = Dependency {
 
 instance NFData Dependency
 instance Binary Dependency
+
+manifestDependencies :: Manifest -> [Dependency]
+manifestDependencies = undefined
 
 -- | The internal representation of a @pkg.fpm@ file. This includes metadata
 --   such as the package name, version, description, and license, as well as
@@ -127,3 +149,6 @@ data PackageDescription = PackageDescription {
 
 instance NFData PackageDescription
 instance Binary PackageDescription
+
+manifestPackageDescription :: Manifest -> PackageDescription
+manifestPackageDescription = undefined

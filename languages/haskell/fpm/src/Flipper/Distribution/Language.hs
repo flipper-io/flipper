@@ -89,54 +89,64 @@ data Language = -- | FPM can fetch C bindings with Git.
                        , Binary
                        )
 
--- | 'Language' parser
+-- | 'Language' parser. This parser is lazy and doesn't know how the language
+--   string should be terminated, so it can't parse an 'Unknown' language. To do
+--   so, simply combine this parser with an alternative that accepts any
+--   'M.word' in the failure case. For example, here's a 'Language' parser that
+--   consumes the entire input (i.e. delimited by EOF):
+--
+-- > knownOrUknown = try (parseLanguage <* eof) <|> Unknown <$> (word <* eof)
+--
+-- >>> parseTest knownOrUnknown "python"
+-- Python
+-- >>> parseTest knownOrUnknown "APL"
+-- Unknwon "APL"
 parseLanguage :: Parser Language
-parseLanguage = choice [ lexed (string' "c" *> pure C)
-                       , lexed (string' "commonlisp" *> pure CommonLisp)
-                       , lexed (string' "cl" *> pure CommonLisp)
-                       , lexed (string' "common-lisp" *> pure CommonLisp)
-                       , lexed (string' "common_lisp" *> pure CommonLisp)
-                       , lexed (string' "common lisp" *> pure CommonLisp)
-                       , lexed (string' "c++" *> pure CPP)
-                       , lexed (string' "cpp" *> pure CPP)
-                       , lexed (string' "cplusplus" *> pure CPP)
-                       , lexed (string' "c#" *> pure CS)
-                       , lexed (string' "cs" *> pure CS)
-                       , lexed (string' "csharp" *> pure CS)
-                       , lexed (string' "c-sharp" *> pure CS)
-                       , lexed (string' "c_sharp" *> pure CS)
-                       , lexed (string' "microsoft java" *> pure CS)
-                       , lexed (string' "d" *> pure D)
-                       , lexed (string' "f#" *> pure FS)
-                       , lexed (string' "fs" *> pure FS)
-                       , lexed (string' "fsharp" *> pure CS)
-                       , lexed (string' "f-sharp" *> pure CS)
-                       , lexed (string' "f_sharp" *> pure CS)
-                       , lexed (string' "microsoft ml" *> pure CS)
-                       , lexed (string' "haskell" *> pure Haskell)
-                       , lexed (string' "astronaut" *> pure Haskell)
-                       , lexed (string' "java" *> pure Java)
-                       , lexed (string' "js" *> pure NodeJS)
-                       , lexed (string' "node" *> pure NodeJS)
-                       , lexed (string' "nodejs" *> pure NodeJS)
-                       , lexed (string' "objectivec" *> pure ObjC)
-                       , lexed (string' "objective-c" *> pure ObjC)
-                       , lexed (string' "objective_c" *> pure ObjC)
-                       , lexed (string' "obj-c" *> pure ObjC)
-                       , lexed (string' "obj_c" *> pure ObjC)
-                       , lexed (string' "apple java" *> pure ObjC)
-                       , lexed (string' "ocaml" *> pure OCaml)
-                       , lexed (string' "perl" *> pure Perl)
-                       , lexed (string' "moonspeak" *> pure Perl)
-                       , lexed (string' "python" *> pure Python)
-                       , lexed (string' "r" *> pure R)
-                       , lexed (string' "ruby" *> pure Ruby)
-                       , lexed (string' "rust" *> pure Rust)
-                       , lexed (string' "cosmonaut" *> pure Rust)
-                       , lexed (string' "scala" *> pure Rust)
-                       , lexed (string' "scheme" *> pure Scheme)
-                       , lexed (string' "swift" *> pure Swift)
-                       , lexed (Unknown <$> word)
+parseLanguage = choice [ string' "commonlisp" *> pure CommonLisp
+                       , string' "cl" *> pure CommonLisp
+                       , string' "common-lisp" *> pure CommonLisp
+                       , string' "common_lisp" *> pure CommonLisp
+                       , string' "common lisp" *> pure CommonLisp
+                       , string' "c++" *> pure CPP
+                       , string' "cpp" *> pure CPP
+                       , string' "cplusplus" *> pure CPP
+                       , string' "c#" *> pure CS
+                       , string' "cs" *> pure CS
+                       , string' "csharp" *> pure CS
+                       , string' "c-sharp" *> pure CS
+                       , string' "c_sharp" *> pure CS
+                       , string' "cosmonaut" *> pure Rust
+                       , string' "c" *> pure C
+                       , string' "microsoft java" *> pure CS
+                       , string' "d" *> pure D
+                       , string' "f#" *> pure FS
+                       , string' "fs" *> pure FS
+                       , string' "fsharp" *> pure CS
+                       , string' "f-sharp" *> pure CS
+                       , string' "f_sharp" *> pure CS
+                       , string' "microsoft ml" *> pure CS
+                       , string' "haskell" *> pure Haskell
+                       , string' "astronaut" *> pure Haskell
+                       , string' "java" *> pure Java
+                       , string' "js" *> pure NodeJS
+                       , string' "nodejs" *> pure NodeJS
+                       , string' "node" *> pure NodeJS
+                       , string' "objectivec" *> pure ObjC
+                       , string' "objective-c" *> pure ObjC
+                       , string' "objective_c" *> pure ObjC
+                       , string' "obj-c" *> pure ObjC
+                       , string' "obj_c" *> pure ObjC
+                       , string' "apple java" *> pure ObjC
+                       , string' "ocaml" *> pure OCaml
+                       , string' "perl" *> pure Perl
+                       , string' "moonspeak" *> pure Perl
+                       , string' "python" *> pure Python
+                       , string' "ruby" *> pure Ruby
+                       , string' "rust" *> pure Rust
+                       , string' "r" *> pure R
+                       , string' "scala" *> pure Rust
+                       , string' "scheme" *> pure Scheme
+                       , string' "swift" *> pure Swift
                        ]
 
 -- | A binding source. FPM knows how to install (or at least fetch) from these
