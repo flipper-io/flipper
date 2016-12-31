@@ -34,6 +34,8 @@ import Flipper.Distribution.Version
 import GHC.Generics
 
 -- | A legal package name is something I still need to think more about...
+
+-- | A legal package name is any string of letters, numbers, 
 newtype PackageName = PackageName { unPackageName :: T.Text }
                     deriving ( Eq
                              , Ord

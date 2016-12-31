@@ -39,6 +39,7 @@ import qualified Text.Megaparsec.Text as M
 -- | A module symbol name. This must be a legal C identifier. A legal C
 --   identifier is any string recognized by the following grammer that is not
 --   equal to a C reserved word.
+--
 -- > identifier = nondigit
 -- >            | identifier digit
 -- >            | identifier nondigit
@@ -50,39 +51,41 @@ import qualified Text.Megaparsec.Text as M
 -- >          | 'w' | 'W' | 'x' | 'X' | 'y' | 'Y  | 'z' | 'Z'
 -- >
 -- > digit = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+--
 --   C keywords:
--- - @auto@
--- - @break@
--- - @case@
--- - @char@
--- - @const@
--- - @continue@
--- - @default@
--- - @do@
--- - @double@
--- - @else@
--- - @enum@
--- - @extern@
--- - @float@
--- - @for@
--- - @goto@
--- - @if@
--- - @int@
--- - @long@
--- - @register@
--- - @return@
--- - @short@
--- - @signed@
--- - @sizeof@
--- - @static@
--- - @struct@
--- - @switch@
--- - @typedef@
--- - @union@
--- - @unsigned@
--- - @void@
--- - @volatile@
--- - @while@
+--
+-- - auto
+-- - break
+-- - case
+-- - char
+-- - const
+-- - continue
+-- - default
+-- - do
+-- - double
+-- - else
+-- - enum
+-- - extern
+-- - float
+-- - for
+-- - goto
+-- - if
+-- - int
+-- - long
+-- - register
+-- - return
+-- - short
+-- - signed
+-- - sizeof
+-- - static
+-- - struct
+-- - switch
+-- - typedef
+-- - union
+-- - unsigned
+-- - void
+-- - volatile
+-- - while
 newtype SymbolName = SymbolName { unSymbolName :: T.Text }
                    deriving ( Eq
                             , Ord
