@@ -3115,17 +3115,17 @@ licenseText Other             = ""
 
 parseLicense :: M.Parser License
 parseLicense = M.choice lics
-    where lics = [ lexed (M.string "GPL2" *> pure GPL2)
-                 , lexed (M.string "GPL3" *> pure GPL3)
-                 , lexed (M.string "AGPL" *> pure AGPL)
-                 , lexed (M.string "LGPL2.1" *> pure LGPL21)
-                 , lexed (M.string "LGPL3" *> pure LGPL3)
-                 , lexed (M.string "BSD2" *> pure BSD2)
-                 , lexed (M.string "BSD3" *> pure BSD3)
-                 , lexed (M.string "MIT" *> pure MIT)
-                 , lexed (M.string "MPL2" *> pure MPL2)
-                 , lexed (M.string "Apache2" *> pure MPL2)
-                 , lexed (M.string "PublicDomain" *> pure PublicDomain)
-                 , lexed (M.string "AllRightsReserved" *> pure AllRightsReserved)
-                 , lexed (M.string "Other" *> pure Other)
+    where lics = [ M.string "GPL2" *> pure GPL2
+                 , M.string "GPL3" *> pure GPL3
+                 , M.string "AGPL" *> pure AGPL
+                 , M.string "LGPL2.1" *> pure LGPL21
+                 , M.string "LGPL3" *> pure LGPL3
+                 , M.string "BSD2" *> pure BSD2
+                 , M.string "BSD3" *> pure BSD3
+                 , M.string "MIT" *> pure MIT
+                 , M.string "MPL2" *> pure MPL2
+                 , M.string "Apache2" *> pure MPL2
+                 , M.string "PublicDomain" *> pure PublicDomain
+                 , M.string "AllRightsReserved" *> pure AllRightsReserved
+                 , M.string "Other" *> pure Other
                  ]
