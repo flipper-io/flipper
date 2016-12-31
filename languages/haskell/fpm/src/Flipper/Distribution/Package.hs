@@ -76,7 +76,7 @@ data PackageID = PackageID {
 instance NFData PackageID
 instance Binary PackageID
 
-manifestPackageID :: Manifest -> PackageID
+manifestPackageID :: ManifestP PackageID
 manifestPackageID = undefined
 
 -- | A name and version range identifies a package dependency.
@@ -96,7 +96,7 @@ data Dependency = Dependency {
 instance NFData Dependency
 instance Binary Dependency
 
-manifestDependencies :: Manifest -> [Dependency]
+manifestDependencies :: ManifestP [Dependency]
 manifestDependencies = undefined
 
 -- | The internal representation of a @pkg.fpm@ file. This includes metadata
@@ -146,5 +146,5 @@ data PackageDescription = PackageDescription {
 instance NFData PackageDescription
 instance Binary PackageDescription
 
-manifestPackageDescription :: Manifest -> PackageDescription
+manifestPackageDescription :: ManifestP PackageDescription
 manifestPackageDescription = undefined

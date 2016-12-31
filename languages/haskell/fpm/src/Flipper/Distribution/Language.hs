@@ -18,6 +18,7 @@ This module provides tools for working with other language's packaging tools.
 module Flipper.Distribution.Language (
     Language(..)
   , parseLanguage
+  , languagePretty
   , LangSrc(..)
   , parseLangSrc
   ) where
@@ -27,6 +28,8 @@ import Control.DeepSeq
 import Data.Binary
 
 import Data.Data
+
+import Data.Monoid
 
 import qualified Data.Text as T
 
@@ -148,6 +151,28 @@ parseLanguage = choice [ string' "commonlisp" *> pure CommonLisp
                        , string' "scheme" *> pure Scheme
                        , string' "swift" *> pure Swift
                        ]
+
+languagePretty :: Language -> String
+languagePretty C           = "C"
+languagePretty CommonLisp  = "Common Lisp"
+languagePretty CPP         = "C++"
+languagePretty CS          = "C#"
+languagePretty D           = "D"
+languagePretty FS          = "F#"
+languagePretty Haskell     = "Haskell"
+languagePretty Java        = "Java"
+languagePretty NodeJS      = "NodejS"
+languagePretty ObjC        = "Objective C"
+languagePretty OCaml       = "OCaml"
+languagePretty Perl        = "Perl"
+languagePretty Python      = "Python"
+languagePretty R           = "R"
+languagePretty Ruby        = "Ruby"
+languagePretty Rust        = "Rust"
+languagePretty Scala       = "Scala"
+languagePretty Scheme      = "Scheme"
+languagePretty Swift       = "Swift"
+languagePretty (Unknown l) = (T.unpack l) <> " (unsupported)"
 
 -- | A binding source. FPM knows how to install (or at least fetch) from these
 --   sources on the user's behalf.

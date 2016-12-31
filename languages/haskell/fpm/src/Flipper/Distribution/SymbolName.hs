@@ -17,6 +17,7 @@ Portability : Windows, POSIX
 module Flipper.Distribution.SymbolName (
     SymbolName()
   , parseSymbolName
+  , symbolNamePretty
   ) where
 
 import Control.Applicative
@@ -138,3 +139,6 @@ parseSymbolName = (SymbolName . T.pack) <$> (ident >>= notReserved)
                 , "volatile"
                 , "while"
                 ]
+
+symbolNamePretty :: SymbolName -> String
+symbolNamePretty = T.unpack . unSymbolName

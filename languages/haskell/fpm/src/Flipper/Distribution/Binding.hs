@@ -46,5 +46,5 @@ data Binding = Binding {
              , Binary
              )
 
-manifestBindings :: Manifest -> [Binding]
+manifestBindings :: ManifestP [Binding]
 manifestBindings = undefined
