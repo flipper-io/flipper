@@ -35,6 +35,7 @@ import Flipper.Distribution.Language
 import Flipper.Distribution.License
 import Flipper.Distribution.Manifest
 import Flipper.Distribution.Module
+import Flipper.Distribution.Parser
 import Flipper.Distribution.Version
 
 import GHC.Generics
@@ -56,12 +57,7 @@ newtype PackageName = PackageName { unPackageName :: T.Text }
                              )
 
 parsePackageName :: M.Parser PackageName
-parsePackageName = (PackageName . T.pack) <$> some (M.choice cs)
-    where cs = [ M.alphaNumChar
-               , M.numberChar
-               , M.punctuationChar
-               , M.symbolChar
-               ]
+parsePackageName = PackageName <$> word
 
 -- | A name and version uniquely identifies a package.
 data PackageID = PackageID {
