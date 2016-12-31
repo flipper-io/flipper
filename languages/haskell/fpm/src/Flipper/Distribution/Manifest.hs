@@ -16,7 +16,20 @@ monad for accessing the resulting keys and sections.
            , GeneralizedNewtypeDeriving
            #-}
 
-module Flipper.Distribution.Manifest where
+module Flipper.Distribution.Manifest (
+    ManifestError(..)
+  , manifestErrorPretty
+  , ManifestP()
+  , liftParser
+  , headerKey
+  , optionalHeaderKey
+  , procModuleSections
+  , moduleKey
+  , optionalModuleKey
+  , procBindingSections
+  , bindingKey
+  , optionalBindingKey
+  ) where
 
 import Control.DeepSeq
 
@@ -158,11 +171,12 @@ optionalHeaderKey k = do
     modME (\s -> s { header = m' })
     pure v
 
-moduleSections :: ManifestP (NonEmpty SymbolName)
-moduleSections = do
+procModuleSections :: (SymbolName -> ManifestP a)
+                   -> ManifestP (NonEmpty a)
+procModuleSections f = do
     ks <- (nonEmpty . M.keys) <$> getME modSections
     case ks of Nothing  -> throwME NoModules
-               (Just l) -> pure l
+               (Just l) -> traverse f l
 
 moduleKey :: SymbolName -> T.Text -> ManifestP T.Text
 moduleKey m k = do
@@ -188,8 +202,9 @@ optionalModuleKey m k = do
                    in do modME (\s -> s { modSections = sm' })
                          pure v
 
-bindingSections :: ManifestP [Language]
-bindingSections = M.keys <$> getME bindSections
+procBindingSections :: (Language -> ManifestP a)
+                    -> ManifestP [a]
+procBindingSections f = (M.keys <$> getME bindSections) >>= traverse f
 
 bindingKey :: Language -> T.Text -> ManifestP T.Text
 bindingKey b k = do
