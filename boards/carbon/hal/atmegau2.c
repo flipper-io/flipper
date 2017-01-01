@@ -27,11 +27,11 @@
 /* Declare any standard modules with functionality specific to this device. */
 LF_MODULE(_button, "button", "Interacts with the onboard button.", _button_id);
 LF_MODULE(_cpu, "cpu", "Provides control over the CPU of the device.", _cpu_id);
-/* NOTE: Remove this module. */
-LF_MODULE(_fmr, "fmr", "Provides a way to access push and pull.", _fmr_id);
 LF_MODULE(_fs, "fs", "Provides access to the device's filesystem.", _fs_id);
 LF_MODULE(_led, "led", "Interacts with the built-in status LED.", _led_id);
 LF_MODULE(_uart0, "uart0", "Provides low level access to the device's UART bus.", _uart0_id);
+/* NOTE: Remove this module. */
+LF_MODULE(_fmr, "fmr", "Provides a way to access push and pull.", _fmr_id);
 
 struct _lf_endpoint lf_bridge_ep = {
     lf_bridge_configure,
@@ -55,16 +55,20 @@ struct _lf_bridge_record {
 
 #define LF_ASSIGN_MODULE(module) module.device = &(record -> _atmega16u2);
 
-int lf_bridge_configure(struct _lf_endpoint *this, struct _lf_device *device) {
-    if (!this) {
-		error_raise(E_NULL, error_message("No endpoint record provided for libusb configuration. Reattach your device and try again."));
+int lf_bridge_configure(struct _lf_device *device) {
+    if (!device) {
+		error_raise(E_NULL, error_message("No device or endpoint record provided for libusb configuration. Reattach your device and try again."));
 		return lf_error;
 	}
 	/* Allocate memory for the bridge record if it has not yet been allocated. */
-	if (!(this -> record)) {
-		this -> record = malloc(sizeof(struct _lf_bridge_record));
+	if (!(device -> endpoint -> record)) {
+		device -> endpoint -> record = malloc(sizeof(struct _lf_bridge_record));
+        if (!(device -> endpoint -> record)) {
+            error_raise(E_MALLOC, error_message("Failed to allocate the memory needed to create a bridge endpoint record."));
+            goto failure;
+        }
 	}
-	struct _lf_bridge_record *record = this -> record;
+	struct _lf_bridge_record *record = device -> endpoint -> record;
     /* Set the bridge device pointer. */
     record -> _atmega16u2 = &(record -> atmega16u2);
     /* Copy the initial configuration. (name and identifier) */
@@ -85,6 +89,9 @@ int lf_bridge_configure(struct _lf_endpoint *this, struct _lf_device *device) {
     /* Set the bridge module's device pointer pointer. */
     record -> _uart0_bridge.device = &(record -> _atmega16u2);
     return lf_success;
+failure:
+    lf_bridge_destroy(device -> endpoint);
+    return lf_error;
 }
 
 uint8_t lf_bridge_ready(struct _lf_endpoint *this) {

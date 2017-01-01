@@ -44,19 +44,20 @@ struct _lf_device *flipper_attach(void) {
 
 /* Attaches a USB device to the bridge endpoint. */
 struct _lf_device *flipper_attach_usb(char *name) {
+	/* Create a device with the name provided. */
 	struct _lf_device *device = lf_create_device(name);
 	if (!device) {
 		return NULL;
 	}
-	struct _lf_endpoint *endpoint = &lf_bridge_ep;
-	if (endpoint -> configure(endpoint, device) < lf_success) {
+	/* Set the device's endpoint. */
+	device -> endpoint = &lf_bridge_ep;
+	/* Configure the device's endpoint. */
+	if (device -> endpoint -> configure(device) < lf_success) {
 		error_raise(E_ENDPOINT, error_message("Failed to initialize bridge endpoint for usb device."));
 		/* Detach the device in the event of an endpoint configuration failure. */
 		flipper_detach(device);
 		return NULL;
 	}
-	/* Set the device's endpoint. */
-	device -> endpoint = endpoint;
 	/* Set the current device. */
 	flipper.device = device;
 	return device;
@@ -67,18 +68,17 @@ struct _lf_device *flipper_attach_network(char *name, char *hostname) {
 	if (!device) {
 		return NULL;
 	}
-	struct _lf_endpoint *endpoint = &lf_network_ep;
-	if (endpoint -> configure(endpoint, hostname) < lf_success) {
-		error_raise(E_ENDPOINT, error_message("Failed to initialize bridge endpoint for usb device."));
+	/* Set the device's endpoint. */
+	device -> endpoint = &lf_network_ep;
+	if (device -> endpoint -> configure(device -> endpoint, hostname) < lf_success) {
+		error_raise(E_ENDPOINT, error_message("Failed to initialize endpoint for networked Flipper device."));
 		/* Detach the device in the event of an endpoint configuration failure. */
 		flipper_detach(device);
 		return NULL;
 	}
-	/* Set the device's endpoint. */
-	device -> endpoint = endpoint;
 	/* Set the current device. */
 	flipper.device = device;
-	return NULL;
+	return device;
 }
 
 struct _lf_device *flipper_attach_endpoint(char *name, struct _lf_endpoint *endpoint) {
@@ -90,6 +90,7 @@ struct _lf_device *flipper_attach_endpoint(char *name, struct _lf_endpoint *endp
 	device -> endpoint = endpoint;
 	/* Set the current device. */
 	flipper.device = device;
+	return device;
 }
 
 int flipper_select(struct _lf_device *device) {
