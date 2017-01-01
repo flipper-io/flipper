@@ -73,8 +73,7 @@ newtype Version = Version { unVersion :: NonEmpty Integer }
                          , NFData
                          )
 
--- Orphan instance :(
--- TODO: Patch the binary package upstream.
+-- TODO: Remove this when the Stackage LTS moves to binary version 0.8.4.0 >=
 instance Binary (NonEmpty Integer)
 instance Binary Version
 
@@ -95,7 +94,7 @@ instance IsList Version where
 
 -- | A 'Version' range predicate. Beware of this type's 'Eq' instance; ranges
 --   are not canonicalized, so 'VersionRange's describing identical intervals
---   won't necessary be equal according to `(==)`. Constructors aren't exported
+--   won't necessary be equal according to '(==)'. Constructors aren't exported
 --   because we might change to an interval-based representation later (which
 --   would solve the canonicalization problem and make it possible to warn the
 --   user about unsatisfiable predicates).
@@ -158,6 +157,7 @@ intersection :: VersionRange -> VersionRange -> VersionRange
 intersection = Intersection
 
 -- | Invert a range.
+--
 -- > inRange r v == not (inRange (inverse r) v)
 inverse :: VersionRange -> VersionRange
 inverse Any                = noVersion

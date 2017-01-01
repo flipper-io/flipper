@@ -36,6 +36,7 @@ symb = M.symbol spaceEater
 
 visible :: M.Parser Char
 visible = M.choice [ MC.alphaNumChar
+                   , MC.numberChar
                    , MC.punctuationChar
                    , MC.symbolChar
                    ]

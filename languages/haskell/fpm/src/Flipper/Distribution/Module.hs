@@ -50,5 +50,5 @@ data Module = Module {
 instance NFData Module
 instance Binary Module
 
-manifestModules :: Manifest -> [Module]
+manifestModules :: ManifestP [Module]
 manifestModules = undefined
