@@ -17,6 +17,9 @@
 #define USB_USAGE_PAGE	0xFFAB
 #define USB_USAGE		0x0200
 
+/* The name of the default device to attach to. */
+#define LF_DEFAULT_NAME "flipper"
+
 /* NOTE: Summing the size parameters of each endpoints below should be less than or equal to 160. */
 #define USB_IN_MASK            0x80
 #define INTERRUPT_IN_ENDPOINT  (0x01 | USB_IN_MASK)
@@ -172,7 +175,7 @@ extern struct _flipper {
 /* NOTE: Definitely move this. */
 extern struct _lf_endpoint lf_bridge_ep;
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
-int lf_bridge_configure(struct _lf_endpoint *this);
+int lf_bridge_configure();
 uint8_t lf_bridge_ready(struct _lf_endpoint *this);
 void lf_bridge_put(struct _lf_endpoint *this, uint8_t byte);
 uint8_t lf_bridge_get(struct _lf_endpoint *this);

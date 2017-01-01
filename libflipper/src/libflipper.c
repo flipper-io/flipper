@@ -16,12 +16,7 @@ struct _flipper flipper = {
 	NULL
 };
 
-struct _lf_device *lf_attach(char *name, struct _lf_endpoint *endpoint) {
-	/* Ensure a valid endpoint was provided. */
-	if (!endpoint) {
-		error_raise(E_ENDPOINT, error_message("No endpoint provided for the device '%s'.", name));
-		goto  failure;
-	}
+struct _lf_device *lf_create_device(char *name) {
 	/* Allocate memory to contain the record of the device. */
 	struct _lf_device *device = (struct _lf_device *)calloc(1, sizeof(struct _lf_device));
 	if (!device) {
@@ -34,23 +29,8 @@ struct _lf_device *lf_attach(char *name, struct _lf_endpoint *endpoint) {
 	}
 	/* Set the device's name. */
 	strcpy(device -> configuration.name, name);
-	/* Set the device's endpoint. */
-	device -> endpoint = endpoint;
-	// /* Create the device's identifier. */
-	// lf_crc_t _identifier = lf_crc(name, strlen(name));
-	// /* Broadcast a packet to the device over its endpoint to verify the identifier. */
-	// int _e = lf_load_configuration(device);
-	// if (_e < lf_success) {
-	// 	error_raise(E_CONFIGURATION, error_message("Failed to obtain configuration for device '%s'.", name));
-	// 	goto failure;
-	// }
-	// /* Compare the device identifiers. */
-	// if (device -> configuration.identifier != _identifier) {
-	// 	error_raise(E_NO_DEVICE, error_message("Identifier mismatch for device '%s'. (0x%04x instead of 0x%04x)", name, device -> configuration.identifier, _identifier));
-	// 	goto failure;
-	// }
-	/* Set the current device. */
-	flipper.device = device;
+	/* Set the device's identifier. */
+	device -> configuration.identifier = lf_crc(name, strlen(name));
 	return device;
 failure:
 	free(device);
@@ -59,31 +39,57 @@ failure:
 
 struct _lf_device *flipper_attach(void) {
 	/* Attach a device over USB with the factory default name. */
-	return flipper_attach_usb("flipper");
+	return flipper_attach_usb(LF_DEFAULT_NAME);
 }
 
 /* Attaches a USB device to the bridge endpoint. */
 struct _lf_device *flipper_attach_usb(char *name) {
-	struct _lf_endpoint *_ep = &lf_bridge_ep;
-	if (_ep -> configure(_ep) < lf_success) {
+	struct _lf_device *device = lf_create_device(name);
+	if (!device) {
 		return NULL;
 	}
-	return lf_attach(name, _ep);
+	struct _lf_endpoint *endpoint = &lf_bridge_ep;
+	if (endpoint -> configure(endpoint, device) < lf_success) {
+		error_raise(E_ENDPOINT, error_message("Failed to initialize bridge endpoint for usb device."));
+		/* Detach the device in the event of an endpoint configuration failure. */
+		flipper_detach(device);
+		return NULL;
+	}
+	/* Set the device's endpoint. */
+	device -> endpoint = endpoint;
+	/* Set the current device. */
+	flipper.device = device;
+	return device;
 }
 
 struct _lf_device *flipper_attach_network(char *name, char *hostname) {
-	struct _lf_endpoint *_ep = &lf_network_ep;
-	if (_ep -> configure(_ep, hostname) < lf_success) {
+	struct _lf_device *device = lf_create_device(name);
+	if (!device) {
 		return NULL;
 	}
-	return lf_attach(name, _ep);
+	struct _lf_endpoint *endpoint = &lf_network_ep;
+	if (endpoint -> configure(endpoint, hostname) < lf_success) {
+		error_raise(E_ENDPOINT, error_message("Failed to initialize bridge endpoint for usb device."));
+		/* Detach the device in the event of an endpoint configuration failure. */
+		flipper_detach(device);
+		return NULL;
+	}
+	/* Set the device's endpoint. */
+	device -> endpoint = endpoint;
+	/* Set the current device. */
+	flipper.device = device;
+	return NULL;
 }
 
 struct _lf_device *flipper_attach_endpoint(char *name, struct _lf_endpoint *endpoint) {
-	if (endpoint -> configure(endpoint) < lf_success) {
+	struct _lf_device *device = lf_create_device(name);
+	if (!device) {
 		return NULL;
 	}
-	return lf_attach(name, endpoint);
+	/* Set the device's endpoint. */
+	device -> endpoint = endpoint;
+	/* Set the current device. */
+	flipper.device = device;
 }
 
 int flipper_select(struct _lf_device *device) {
@@ -102,6 +108,10 @@ int flipper_detach(struct _lf_device *device) {
 	}
 	if (device == flipper.device) {
 		flipper.device = NULL;
+	}
+	if (device -> endpoint) {
+		/* If the device has an endpoint, destroy it. */
+		device -> endpoint -> destroy(device -> endpoint);
 	}
 	/* Free the device record structure. */
 	free(device);
@@ -132,8 +142,9 @@ int lf_load_configuration(struct _lf_device *device) {
 	if (_e < lf_success) {
 		return lf_error;
 	}
+	struct _lf_configuration configuration;
 	/* Obtain a response packet from the device. */
-	_e = device -> endpoint -> pull(device -> endpoint, &(device -> configuration), sizeof(struct _lf_configuration));
+	_e = device -> endpoint -> pull(device -> endpoint, &configuration, sizeof(struct _lf_configuration));
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -141,10 +152,17 @@ int lf_load_configuration(struct _lf_device *device) {
 	struct _fmr_result result;
 	/* Obtain the result of the operation. */
 	lf_get_result(device, &result);
-	if (result.error == E_OK) {
-		return lf_success;
+	if (result.error != E_OK) {
+		return lf_error;
 	}
-	return lf_error;
+	/* Compare the device identifiers. */
+	if (device -> configuration.identifier != configuration.identifier) {
+		error_raise(E_NO_DEVICE, error_message("Identifier mismatch for device '%s'. (0x%04x instead of 0x%04x)", device -> configuration.name, configuration.identifier, device -> configuration.identifier));
+		return lf_error;
+	}
+	/* Copy the returned configuration into the device. */
+	memcpy(&(device -> configuration), &configuration, sizeof(struct _lf_configuration));
+	return lf_success;
 }
 
 /* -- Packet manipulation functions. -- */

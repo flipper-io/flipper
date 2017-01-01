@@ -10,7 +10,7 @@ extern struct _lf_endpoint lf_libusb_ep;
 #ifdef __private_include__
 
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
-int lf_libusb_configure(struct _lf_endpoint *this);
+int lf_libusb_configure();
 uint8_t lf_libusb_ready(struct _lf_endpoint *this);
 void lf_libusb_put(struct _lf_endpoint *this, uint8_t byte);
 uint8_t lf_libusb_get(struct _lf_endpoint *this);

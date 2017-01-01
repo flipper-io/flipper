@@ -55,7 +55,7 @@ struct _lf_bridge_record {
 
 #define LF_ASSIGN_MODULE(module) module.device = &(record -> _atmega16u2);
 
-int lf_bridge_configure(struct _lf_endpoint *this) {
+int lf_bridge_configure(struct _lf_endpoint *this, struct _lf_device *device) {
     if (!this) {
 		error_raise(E_NULL, error_message("No endpoint record provided for libusb configuration. Reattach your device and try again."));
 		return lf_error;
@@ -65,12 +65,14 @@ int lf_bridge_configure(struct _lf_endpoint *this) {
 		this -> record = malloc(sizeof(struct _lf_bridge_record));
 	}
 	struct _lf_bridge_record *record = this -> record;
+    /* Set the bridge device pointer. */
+    record -> _atmega16u2 = &(record -> atmega16u2);
+    /* Copy the initial configuration. (name and identifier) */
+    memcpy(record -> _atmega16u2, &(device -> configuration), sizeof(struct _lf_configuration));
     /* Set the endpoint. */
     record -> atmega16u2.endpoint = &lf_libusb_ep;
     /* Configure the endpoint. */
-    record -> atmega16u2.endpoint -> configure(record -> atmega16u2.endpoint);
-    /* Set the bridge device pointer. */
-    record -> _atmega16u2 = &(record -> atmega16u2);
+    record -> atmega16u2.endpoint -> configure(record -> atmega16u2.endpoint, record -> _atmega16u2);
     /* Assign the functionality of the device specific modules to this device. */
     LF_ASSIGN_MODULE(_button);
     LF_ASSIGN_MODULE(_cpu);
@@ -110,9 +112,9 @@ int lf_bridge_pull(struct _lf_endpoint *this, void *destination, lf_size_t lengt
     return lf_pull(&(record -> _uart0_bridge), _uart0_pull, destination, length, NULL);
 }
 
-int lf_bridge_destroy(struct _lf_endpoint *endpoint) {
-    if (endpoint -> record) {
-        free(endpoint -> record);
+int lf_bridge_destroy(struct _lf_endpoint *this) {
+    if (this -> record) {
+        free(this -> record);
     }
     return lf_success;
 }
