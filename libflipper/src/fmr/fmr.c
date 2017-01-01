@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/fmr.h>
+#include <flipper/libflipper.h>
 
 #ifdef __use_fmr__
 /* Define the virtual interface for this module. */

@@ -2,7 +2,7 @@
 #define __nvm_h__
 
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
-#include <flipper/core.h>
+#include <flipper/libflipper.h>
 
 /* ~ Define types and macros exposed by this driver. ~ */
 

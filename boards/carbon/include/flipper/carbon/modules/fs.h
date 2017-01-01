@@ -4,7 +4,7 @@
 #define __lf_fs_h__
 
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
-#include <flipper/core.h>
+#include <flipper/libflipper.h>
 
 /* Computes the offset of a member of a data structure located at a given nvm_p. */
 #define fs_access(address, structure, member) (nvm_p)(address + offsetof(structure, member))

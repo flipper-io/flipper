@@ -2,7 +2,7 @@
 #define __uart0_h__
 
 /* Include all types and macros exposed by the Flipper Toolbox. */
-#include <flipper/core.h>
+#include <flipper/libflipper.h>
 #include <flipper/carbon/modules/usart.h>
 
 #ifdef __private_include__
@@ -17,14 +17,14 @@ extern struct _lf_module _uart0;
 enum { _uart0_configure, _uart0_enable, _uart0_disable, _uart0_ready, _uart0_put, _uart0_get, _uart0_push, _uart0_pull };
 
 /* Declare each prototype for all functions within this driver. */
-int uart0_configure(void);
-void uart0_enable(void);
-void uart0_disable(void);
-uint8_t uart0_ready(void);
-void uart0_put(uint8_t byte);
-uint8_t uart0_get();
-int uart0_push(void *source, lf_size_t length);
-int uart0_pull(void *destination, lf_size_t length);
+extern int uart0_configure(void);
+extern void uart0_enable(void);
+extern void uart0_disable(void);
+extern uint8_t uart0_ready(void);
+extern void uart0_put(uint8_t byte);
+extern uint8_t uart0_get();
+extern int uart0_push(void *source, lf_size_t length);
+extern int uart0_pull(void *destination, lf_size_t length);
 
 #endif
 #endif

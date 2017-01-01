@@ -116,16 +116,6 @@ int __attribute__((__destructor__)) flipper_exit(void) {
 	return lf_success;
 }
 
-fmr_type lf_word_size(struct _lf_device *device) {
-	/* If no device is selected, raise an error. */
-	if (!device) {
-		error_raise(E_NO_DEVICE, error_message("Failed to determine word size."));
-		return 0;
-	}
-	/* Extract and return the device's word size from its attributes. */
-	return (device -> configuration.attributes >> 1) & 0x7;
-}
-
 int lf_load_configuration(struct _lf_device *device) {
 	/* Create a configuration packet. */
 	struct _fmr_configuration_packet packet = { 0 };

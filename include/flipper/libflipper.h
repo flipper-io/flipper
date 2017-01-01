@@ -8,12 +8,140 @@
 #ifndef __libflipper_h__
 #define __libflipper_h__
 
-/* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
-#include <flipper/core.h>
+/* The current version of libflipper. */
+#define LF_VERSION 0x0001
 
-/* Include all supporting header files. */
-#include <flipper/fmr.h>
+/* Identification information for the USB controller. */
+#define USB_VENDOR_ID	0x16C0
+#define USB_PRODUCT_ID	0x0480
+#define USB_USAGE_PAGE	0xFFAB
+#define USB_USAGE		0x0200
+
+/* NOTE: Summing the size parameters of each endpoints below should be less than or equal to 160. */
+#define USB_IN_MASK            0x80
+#define INTERRUPT_IN_ENDPOINT  (0x01 | USB_IN_MASK)
+#define INTERRUPT_IN_SIZE      16
+#define INTERRUPT_OUT_ENDPOINT 0x02
+#define INTERRUPT_OUT_SIZE     16
+#define BULK_IN_ENDPOINT       (0x03 | USB_IN_MASK)
+#define BULK_IN_SIZE           64
+#define BULK_OUT_ENDPOINT      0x04
+#define BULK_OUT_SIZE          64
+
+/* If defined, uses bulk for all USB transfers. */
+#define __ALL_BULK__
+/* If defined, prints debugging information about each packet. */
+//#define __lf_debug__
+
+/* Computes the greatest integer from the result of the division of x by y. */
+#define lf_ceiling(x, y) ((x + y - 1) / y)
+
+/* Define bit manipulation macros. */
+#define bit(b)								(0x01 << (b))
+#define get_bit_from_port(b, p)				((p) & bit(b))
+#define set_bit_in_port(b, p)				((p) |= bit(b))
+#define set_bits_in_port_with_mask(p, m)	((p) |= (m))
+#define clear_bit_in_port(b, p)				((p) &= ~(bit(b)))
+#define clear_bits_in_port_with_mask(p, m)	((p) &= ~(m))
+#define flip_bit_in_port(b, p)				((p) ^= bit(b))
+#define flip_bits_in_port_with_mask(p, m)	((p) ^= (m))
+#define lo(x) ((uint8_t)(x))
+#define hi(x) ((uint8_t)(x >> 8))
+#define lo16(x) ((uint16_t)(((uint32_t)(x))))
+#define hi16(x) ((uint16_t)(((uint32_t)(x)) >> 16))
+#define little(x) ((((uint16_t)(x)) << 8 ) | (((uint16_t)(x)) >> 8))
+#define little32(x) ((((uint32_t)(x)) << 16 ) | (((uint32_t)(x)) >> 16))
+
+/* Include all types needed by libflipper. */
+#include <flipper/types.h>
+/* Include the error primitives needed by libflipper. */
 #include <flipper/error.h>
+/* Include the message runtime primitives needed by libflipper. */
+#include <flipper/fmr.h>
+
+/* Macros that quantify device attributes. */
+#define lf_device_8bit (fmr_int8_t << 1)
+#define lf_device_16bit (fmr_int16_t << 1)
+#define lf_device_32bit (fmr_int32_t << 1)
+#define lf_device_big_endian    1
+#define lf_device_little_endian 0
+
+/* Standardizes a way to obtain the name, version, and attributes of a Flipper device. */
+struct LF_PACKED _lf_configuration {
+	/* The human readable name of the device. */
+	char name[16];
+	/* An identifier unique to the device. */
+	lf_crc_t identifier;
+	/* The device's firmware version. */
+	lf_version_t version;
+	/* The attributes of the device. 3 (attach by default), 2:1 (word length), 0 (endianness) */
+	uint8_t attributes;
+};
+
+/* Standardizes interaction with a physical hardware bus for the transmission of arbitrary data. */
+struct _lf_endpoint {
+	/* Configures the endpoint record given an arbitrary set of parameters. */
+	int (* configure)();
+	/* Indicates whether or not the endpoint is ready to send or receive data. */
+	uint8_t (* ready)(struct _lf_endpoint *this);
+	/* Sends a single byte through the endpoint. */
+	void (* put)(struct _lf_endpoint *this, uint8_t byte);
+	/* Retrieves a single byte from the endpoint. */
+	uint8_t (* get)(struct _lf_endpoint *this);
+	/* Transmits a block of data through the endpoint. */
+	int (* push)(struct _lf_endpoint *this, void *source, lf_size_t length);
+	/* Receives a block of data from the endpoint. */
+	int (* pull)(struct _lf_endpoint *this, void *destination, lf_size_t length);
+	/* Destroys any state associated with the endpoint. */
+	int (* destroy)();
+	/* The only state associated with an endpoint; tracks endpoint specific configuration information. */
+	void *record;
+};
+
+/* Describes a device capible of responding to FMR packets. */
+struct _lf_device {
+	struct _lf_configuration configuration;
+	/* A pointer to the endpoint through which packets will be transferred. */
+	struct _lf_endpoint *endpoint;
+	/* The current error state of the device. */
+	lf_error_t error;
+};
+
+/* All devices must implement a self referential interface. */
+extern struct _lf_device lf_self;
+
+/* Standardizes the notion of a module. */
+struct _lf_module {
+	/* A string containing the module's name. */
+	char *name;
+	/* A string giving the description of a module. */
+	char *description;
+	/* The version of the module. */
+	lf_version_t version;
+	/* The module's identifier. */
+	lf_crc_t identifier;
+	/* The module's index. */
+	uint8_t index;
+	/* The pointer to a pointer to the device upon which the module's counterpart is located. */
+	struct _lf_device **device;
+};
+
+/* Macro for easily generating module structures. */
+#define LF_MODULE(symbol, name, description, index) \
+	struct _lf_module symbol = { \
+		name, \
+		description, \
+		LF_VERSION, \
+		0, \
+		index, \
+		&flipper.device \
+	};
+
+#ifdef PLATFORM_HEADER
+/* Include platform specific declarations. */
+#include PLATFORM_HEADER
+/* NOTE: The PLATFORM_HEADER macro is passed as a preprocessor flag during compilation. */
+#endif
 
 /* ~ Declare the virtual interface for this driver. ~ */
 extern struct _flipper {
@@ -41,7 +169,7 @@ extern struct _flipper {
 
 #ifdef __private_include__
 
-/* NOTE: Probably move this? */
+/* NOTE: Definitely move this. */
 extern struct _lf_endpoint lf_bridge_ep;
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
 int lf_bridge_configure(struct _lf_endpoint *this);
@@ -61,10 +189,6 @@ extern int flipper_select(struct _lf_device *device);
 extern int flipper_detach(struct _lf_device *device);
 extern int flipper_exit(void);
 
-/* ~ User functions. ~ */
-
-/* Performs a proper function invocation on the device associated with the provided module. */
-
 /**
  * @brief Invokes a function in a module with a list of parameters.
  *
@@ -79,15 +203,13 @@ extern int lf_push(struct _lf_module *module, fmr_function function, void *sourc
 /* Moves data from the address space of the device to that of the host. */
 extern int lf_pull(struct _lf_module *module, fmr_function function, void *destination, lf_size_t length, struct _fmr_list *parameters);
 
-/* ~ Helper functions. ~ */
-
-/* Gets the word size of the specified device. */
-extern fmr_type lf_word_size(struct _lf_device *device);
 /* Load the device's configuration information. */
-int lf_load_configuration(struct _lf_device *device);
+extern int lf_load_configuration(struct _lf_device *device);
+/* Provides a checksum for a given block of data. */
+extern lf_crc_t lf_crc(void *source, lf_size_t length);
 
 /* Obtains a result from a device. */
-int lf_get_result(struct _lf_device *device, struct _fmr_result *result);
+extern int lf_get_result(struct _lf_device *device, struct _fmr_result *result);
 /* Sends a packet to the specified device. */
 extern int lf_transfer(struct _lf_device *device, struct _fmr_packet *packet);
 /* Retrieves a packet from the specified device. */

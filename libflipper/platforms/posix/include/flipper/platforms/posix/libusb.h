@@ -2,7 +2,7 @@
 #define __lf_libusb_h__
 
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
-#include <flipper/core.h>
+#include <flipper/libflipper.h>
 
 /* ~ Declare the virtual interface for this driver. ~ */
 extern struct _lf_endpoint lf_libusb_ep;

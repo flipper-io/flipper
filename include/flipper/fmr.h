@@ -4,9 +4,7 @@
 #define __lf_fmr_h__
 
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
-#include <flipper/core.h>
-
-/* Include all supporting header files. */
+#include <flipper/types.h>
 #include <flipper/error.h>
 
 /* Defines the size (in bytes) of a single FMR packet. */
@@ -19,7 +17,7 @@
 /* Define types exposed by the FMR API. */
 typedef uint64_t fmr_va;
 typedef uint32_t fmr_arg;
-typedef lf_crc_t fmr_module;
+typedef uint32_t fmr_module;
 typedef uint8_t fmr_function;
 typedef uint8_t fmr_argc;
 typedef uint16_t fmr_types;

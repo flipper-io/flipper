@@ -2,7 +2,7 @@
 #define __led_h__
 
 /* Include all types and macros exposed by the Flipper Toolbox. */
-#include <flipper/core.h>
+#include <flipper/libflipper.h>
 
 /* Declare all public macros for this driver. */
 #define LED_OFF 0, 0, 0

@@ -1,7 +1,7 @@
 #ifndef __atsam4s16b_h__
 #define __atsam4s16b_h__
 
-#include <flipper/core.h>
+#include <flipper/libflipper.h>
 
 #include "atsam4s16b/SAM4S16.h"
 #include "atsam4s16b/cmsis/core_cm3.h"

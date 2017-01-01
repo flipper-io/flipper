@@ -2,7 +2,7 @@
 
 #ifndef __lf_network_h__
 #define __lf_network_h__
-#include <flipper/core.h>
+#include <flipper/libflipper.h>
 
 extern struct _lf_endpoint lf_network_ep;
 

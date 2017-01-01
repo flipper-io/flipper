@@ -1,2 +1,2 @@
 /* Flipper: Carbon Edition board header file. */
-#include <flipper/core.h>
+#include <flipper/libflipper.h>

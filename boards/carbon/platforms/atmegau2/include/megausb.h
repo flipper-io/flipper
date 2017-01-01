@@ -2,7 +2,7 @@
 #define __megausb_h__
 
 /* Include all types and macros exposed by the Flipper Toolbox. */
-#include <flipper/core.h>
+#include <flipper/libflipper.h>
 #include <flipper/carbon/platforms/atmega16u2.h>
 
 /* ~ Declare the virtual interface for this driver. ~ */

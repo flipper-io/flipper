@@ -2,7 +2,7 @@
 #define __atmega16u2_h__
 
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
-#include <flipper/core.h>
+#include <flipper/libflipper.h>
 
 /* Include the avr-libc standard library headers. */
 #include <avr/common.h>

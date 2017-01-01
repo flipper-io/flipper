@@ -3,8 +3,15 @@
 #ifndef __lf_error_h__
 #define __lf_error_h__
 
-/* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
-#include <flipper/core.h>
+/* Include all types exposed by libflipper. */
+#include <flipper/types.h>
+
+/* Success code macros. */
+#define lf_success 0
+#define lf_error -1
+
+/* Describes a type used to contain libflipper error codes. */
+typedef uint32_t lf_error_t;
 
 /* Enumerate all of the error codes. */
 enum {
