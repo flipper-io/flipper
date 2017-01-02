@@ -9,6 +9,9 @@ const struct _fmr fmr = {
 };
 #endif
 
+/* If defined, the symbols needed to create FMR packets will be defined. */
+#ifdef __fmr_generators__
+
 struct _fmr_list *fmr_build(fmr_argc argc, ...) {
 	/* Ensure that the argument count is within bounds. */
 	if (argc > FMR_MAX_ARGC) {
@@ -192,6 +195,8 @@ int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *par
 	fmr_free(parameters);
 	return lf_success;
 }
+
+#endif
 
 fmr_return fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, fmr_types types, void *arguments) {
 	/* Dereference the pointer to the target module. */

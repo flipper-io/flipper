@@ -70,6 +70,8 @@ native_prep = [ -- Use C99:
               , "-fpic"
                 -- Enable flipper constructors:
               , "-D__flipper_constructors__"
+                -- Enable FMR constructors.
+              , "-D__fmr_generators__"
                 -- libflipper errors abort the calling program by default:
               , "-D__enable_error_side_effects__"
                 -- Enables FS transfers:

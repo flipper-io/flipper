@@ -68,7 +68,8 @@ enum {
 								 "configuration error", \
 								 "acknowledgement error" \
 								 "type error", \
-								 "boundary error"
+								 "boundary error", \
+								 "timer error"
 
 /* Allow the 'error_message' macro to serve as a passthrough for any variadic arguments supplied to it. */
 #define error_message(...) __VA_ARGS__
