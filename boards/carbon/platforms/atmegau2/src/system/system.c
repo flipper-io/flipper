@@ -34,6 +34,30 @@ void system_task(void) {
 	}
 }
 
+void fmr_push(struct _fmr_push_pull_packet *packet) {
+	void *swap = malloc(packet -> length);
+	if (!swap) {
+		error_raise(E_MALLOC, NULL);
+		return;
+	}
+	lf_self.endpoint -> pull(lf_self.endpoint, swap, packet -> length);
+	*(uintptr_t *)(packet -> call.parameters) = (uintptr_t)swap;
+	fmr_execute(packet -> call.index, packet -> call.function, packet -> call.argc, packet -> call.types, (void *)(packet -> call.parameters));
+	free(swap);
+}
+
+void fmr_pull(struct _fmr_push_pull_packet *packet) {
+	void *swap = malloc(packet -> length);
+	if (!swap) {
+		error_raise(E_MALLOC, NULL);
+		return;
+	}
+	*(uintptr_t *)(packet -> call.parameters) = (uintptr_t)swap;
+	fmr_execute(packet -> call.index, packet -> call.function, packet -> call.argc, packet -> call.types, (void *)(packet -> call.parameters));
+	lf_self.endpoint -> push(lf_self.endpoint, swap, packet -> length);
+	free(swap);
+}
+
 void system_init() {
 	/* Prescale CPU for maximum clock. */
 	cpu_prescale(0);

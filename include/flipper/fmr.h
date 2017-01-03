@@ -175,9 +175,9 @@ fmr_return fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, 
 int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result);
 
 /* Helper function for lf_push. */
-void fmr_push(fmr_module module, fmr_function function, lf_size_t length);
+void fmr_push(struct _fmr_push_pull_packet *packet);
 /* Helper function for lf_pull. */
-void fmr_pull(fmr_module module, fmr_function function, lf_size_t length);
+void fmr_pull(struct _fmr_push_pull_packet *packet);
 
 /* ~ Functions with platform specific implementation. ~ */
 

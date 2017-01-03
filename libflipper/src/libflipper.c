@@ -250,6 +250,18 @@ int lf_retrieve(struct _lf_device *device, struct _fmr_result *result) {
 	return lf_success;
 }
 
+/* Hacky way to compute the appropriate pointer argument for a device. */
+fmr_va fmr_ptr(struct _lf_device *device, void *ptr) {
+	if (device -> configuration.attributes & lf_device_32bit) {
+		return fmr_int32(ptr);
+	} else if (device -> configuration.attributes & lf_device_16bit) {
+		return fmr_int16(ptr);
+	} else {
+		error_raise(E_FMR, error_message("No pointer size specified for the target architecture."));
+	}
+	return 0;
+}
+
 int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _fmr_list *parameters) {
 	/* Ensure that we have a valid module and argument pointer. */
 	if (!module) {
@@ -276,7 +288,7 @@ int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_s
 	/* Set the push length. */
 	packet -> length = length;
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_create_call(module -> index, function, fmr_merge(fmr_args(fmr_int16(source), fmr_infer(length)), parameters), &_packet.header, &packet -> call);
+	int _e = fmr_create_call(module -> index, function, fmr_merge(fmr_args(fmr_ptr(device, source), fmr_infer(length)), parameters), &_packet.header, &packet -> call);
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -326,7 +338,7 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 	/* Set the pull length. */
 	packet -> length = length;
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_create_call(module -> index, function, fmr_merge(fmr_args(fmr_int16(destination), fmr_infer(length)), parameters), &_packet.header, &packet -> call);
+	int _e = fmr_create_call(module -> index, function, fmr_merge(fmr_args(fmr_ptr(device, destination), fmr_infer(length)), parameters), &_packet.header, &packet -> call);
 	if (_e < lf_success) {
 		return lf_error;
 	}

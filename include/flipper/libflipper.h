@@ -68,9 +68,9 @@
 #include <flipper/fmr.h>
 
 /* Macros that quantify device attributes. */
-#define lf_device_8bit (fmr_int8_t << 1)
-#define lf_device_16bit (fmr_int16_t << 1)
-#define lf_device_32bit (fmr_int32_t << 1)
+#define lf_device_8bit (1 << 1)
+#define lf_device_16bit (1 << 2)
+#define lf_device_32bit (1 << 3)
 #define lf_device_big_endian    1
 #define lf_device_little_endian 0
 

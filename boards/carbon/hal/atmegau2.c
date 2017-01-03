@@ -25,12 +25,9 @@
 #include <flipper/carbon/platforms/atmega16u2/modules.h>
 
 /* Declare any standard modules with functionality specific to this device. */
-LF_MODULE(_button, "button", "Interacts with the onboard button.", _button_id);
 LF_MODULE(_cpu, "cpu", "Provides control over the CPU of the device.", _cpu_id);
 LF_MODULE(_fs, "fs", "Provides access to the device's filesystem.", _fs_id);
-LF_MODULE(_led, "led", "Interacts with the built-in status LED.", _led_id);
 LF_MODULE(_uart0, "uart0", "Provides low level access to the device's UART bus.", _uart0_id);
-LF_MODULE(_wdt, "wdt", "Handles interaction with the internal watchdog timer.", _wdt_id);
 
 struct _lf_endpoint lf_bridge_ep = {
     lf_bridge_configure,
@@ -71,7 +68,7 @@ int lf_bridge_configure(struct _lf_device *device) {
     /* Set the bridge device pointer. */
     record -> _atmega16u2 = &(record -> atmega16u2);
     /* Copy the initial configuration. (name and identifier) */
-    memcpy(record -> _atmega16u2, &(device -> configuration), sizeof(struct _lf_configuration));
+    memcpy(&(record -> atmega16u2.configuration), &(device -> configuration), sizeof(struct _lf_configuration));
     /* Set the endpoint. */
     record -> atmega16u2.endpoint = &lf_libusb_ep;
     /* Configure the endpoint. */
@@ -87,6 +84,8 @@ int lf_bridge_configure(struct _lf_device *device) {
     record -> _uart0_bridge.index = _uart0_id;
     /* Set the bridge module's device pointer pointer. */
     record -> _uart0_bridge.device = &(record -> _atmega16u2);
+    /* Set the bridged device's attributes. */
+    device -> configuration.attributes = (lf_device_32bit | lf_device_little_endian);
     return lf_success;
 failure:
     lf_bridge_destroy(device -> endpoint);

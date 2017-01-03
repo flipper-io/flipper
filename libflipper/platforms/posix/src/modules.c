@@ -10,14 +10,10 @@ uint32_t fmr_call(const void *function, uint8_t argc, uint16_t argt, void *argv)
 
 /* TEMP */
 
-void fmr_push(fmr_module module, fmr_function function, lf_size_t length) {
-	void *swap = malloc(length);
-	if (!swap) {
-		error_raise(E_MALLOC, NULL);
-	}
-
+void fmr_push(struct _fmr_push_pull_packet *packet) {
+	
 }
 
-void fmr_pull(fmr_module module, fmr_function function, lf_size_t length) {
+void fmr_pull(struct _fmr_push_pull_packet *packet) {
 
 }
