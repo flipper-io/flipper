@@ -37,7 +37,7 @@ void system_handle_push() {
 }
 
 void system_handle_pull() {
-	
+
 }
 
 struct _fmr_packet packet;
@@ -52,10 +52,10 @@ void system_task(void) {
 	/* Configure the SPI peripheral. */
 	spi_configure();
 
-	// /* Enable the PDC receive complete interrupt. */
-	// UART0 -> UART_IER = UART_IER_ENDRX;
-	// /* Pull an FMR packet asynchronously. */
-	// uart0_pull(&packet, sizeof(struct _fmr_packet));
+	/* Pull an FMR packet asynchronously. */
+	uart0_pull(&packet, sizeof(struct _fmr_packet));
+	/* Enable the PDC receive complete interrupt. */
+	UART0 -> UART_IER = UART_IER_ENDRX;
 
 	/* -------- USER TASK -------- */
 
