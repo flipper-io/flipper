@@ -32,6 +32,14 @@ void uart0_pull_wait(void *destination, lf_size_t length) {
 	UART0 -> UART_IER = UART_IER_ENDRX;
 }
 
+void system_handle_push() {
+
+}
+
+void system_handle_pull() {
+	
+}
+
 struct _fmr_packet packet;
 
 void system_task(void) {

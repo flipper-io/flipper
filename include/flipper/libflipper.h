@@ -39,7 +39,7 @@
 /* If defined, uses bulk for all USB transfers. */
 #define __ALL_BULK__
 /* If defined, prints debugging information about each packet. */
-//#define __lf_debug__
+#define __lf_debug__
 
 /* Computes the greatest integer from the result of the division of x by y. */
 #define lf_ceiling(x, y) ((x + y - 1) / y)
@@ -225,6 +225,7 @@ extern int lf_retrieve(struct _lf_device *device, struct _fmr_result *response);
 
 /* Prints verbose information about the packet disassembly. */
 extern void lf_debug_packet(struct _fmr_packet *packet, size_t length);
+extern void lf_debug_result(struct _fmr_result *result);
 
 #endif
 #endif

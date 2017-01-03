@@ -3,7 +3,7 @@
 #include <flipper/error.h>
 
 /* Expose the error message strings. */
-char *messages[] = { LF_ERROR_MESSAGE_STRINGS };
+char *lf_error_messages[] = { LF_ERROR_MESSAGE_STRINGS };
 
 int error_configure(void) {
 	return lf_success;
@@ -20,7 +20,7 @@ void error_raise(lf_error_t error, const char *format, ...) {
 		va_list argv;
 		/* Initialize the va_list that we created above. */
 		va_start(argv, format);
-		if (_error > (sizeof(messages) / sizeof(char *))) {
+		if (_error > (sizeof(lf_error_messages) / sizeof(char *))) {
 			_error = E_STRING;
 		}
 		/* Print the exception if a message is provided. */
@@ -34,7 +34,7 @@ void error_raise(lf_error_t error, const char *format, ...) {
 			}
 		}
 		/* Print the error code. */
-		fprintf(stderr, KNRM "Error code (%i): '" KBLU "%s" KNRM "'\n\n", _error, messages[_error]);
+		fprintf(stderr, KNRM "Error code (%i): '" KBLU "%s" KNRM "'\n\n", _error, lf_error_messages[_error]);
 		/* Release the va_list. */
 		va_end(argv);
 		/* Exit. */

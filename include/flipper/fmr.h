@@ -168,7 +168,7 @@ struct _fmr_arg *fmr_pop(struct _fmr_list *list);
 /* Frees an fmr_list. */
 int fmr_free(struct _fmr_list *list);
 /* Generates the appropriate data structure needed for the remote procedure call of 'funtion' in 'module'. */
-int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *args, struct _fmr_header *header, struct _fmr_call *call);
+int fmr_create_call(fmr_module module, fmr_function function, struct _fmr_list *args, struct _fmr_header *header, struct _fmr_call *call);
 /* Executes a standard module. */
 fmr_return fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, fmr_types types, void *arguments);
 /* Executes an fmr_packet and stores the result of the operation in the result buffer provided. */

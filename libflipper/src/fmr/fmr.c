@@ -134,7 +134,7 @@ int fmr_free(struct _fmr_list *list) {
 	return lf_success;
 }
 
-int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *parameters, struct _fmr_header *header, struct _fmr_call *call) {
+int fmr_create_call(fmr_module module, fmr_function function, struct _fmr_list *parameters, struct _fmr_header *header, struct _fmr_call *call) {
 	/* Ensure that the pointer to the outgoing packet is valid. */
 	if (!header || !call) {
 		error_raise(E_NULL, error_message("Invalid header or call reference provided during message runtime packet generation."));

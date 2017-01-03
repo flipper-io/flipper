@@ -188,21 +188,23 @@ fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _f
 		error_raise(E_NULL, error_message("No module specified for message runtime invocation."));
 		return lf_error;
 	}
-	/* Ensure that the device pointer is valid. */
+	/* Obtain the target device from the module. */
 	struct _lf_device *device = *(module -> device);
 	/* If no device is provided, raise an error. */
 	if (!device) {
 		error_raise(E_NO_DEVICE, error_message("Failed to invoke on device."));
 		return lf_error;
 	}
+	/* The raw packet into which the invocation information will be loaded .*/
 	struct _fmr_packet _packet = { 0 };
+	/* A packet cast that exposes the data structures specific to this packet subclass. */
 	struct _fmr_invocation_packet *packet = (struct _fmr_invocation_packet *)(&_packet);
 	/* Compute the initial length of the packet. */
 	_packet.header.length = sizeof(struct _fmr_invocation_packet);
 	/* Set the packet class. */
 	_packet.header.class = fmr_standard_invocation_class;
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_generate(module -> index, function, parameters, &_packet.header, &packet -> call);
+	int _e = fmr_create_call(module -> index, function, parameters, &_packet.header, &packet -> call);
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -234,14 +236,17 @@ int lf_transfer(struct _lf_device *device, struct _fmr_packet *packet) {
 	return lf_success;
 }
 
-int lf_retrieve(struct _lf_device *device, struct _fmr_result *response) {
+int lf_retrieve(struct _lf_device *device, struct _fmr_result *result) {
 	/* Receive the packet through the device's endpoint. */
-	int _e = device -> endpoint -> pull(device -> endpoint, response, sizeof(struct _fmr_result));
+	int _e = device -> endpoint -> pull(device -> endpoint, result, sizeof(struct _fmr_result));
 	/* Ensure that the packet was successfully obtained from the device. */
 	if (_e < lf_success) {
 		error_raise(E_ENDPOINT, error_message("Failed to retrieve packet from the device '%s'.", device -> configuration.name));
 		return lf_error;
 	}
+#ifdef __lf_debug__
+	lf_debug_result(result);
+#endif
 	return lf_success;
 }
 
@@ -255,7 +260,7 @@ int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_s
 	} else if (!length) {
 		return lf_success;
 	}
-	/* Ensure that the device pointer is valid. */
+	/* Obtain the target device from the module. */
 	struct _lf_device *device = *(module -> device);
 	/* If no device is provided, throw an error. */
 	if (!device) {
@@ -271,7 +276,7 @@ int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_s
 	/* Set the push length. */
 	packet -> length = length;
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_generate(module -> index, function, fmr_merge(fmr_args(fmr_int16(source), fmr_infer(length)), parameters), &_packet.header, &packet -> call);
+	int _e = fmr_create_call(module -> index, function, fmr_merge(fmr_args(fmr_int16(source), fmr_infer(length)), parameters), &_packet.header, &packet -> call);
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -305,6 +310,7 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 	} else if (!length) {
 		return lf_success;
 	}
+	/* Obtain the target device from the module. */
 	struct _lf_device *device = *(module -> device);
 	/* If no device is provided, throw an error. */
 	if (!device) {
@@ -320,7 +326,7 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 	/* Set the pull length. */
 	packet -> length = length;
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_generate(module -> index, function, fmr_merge(fmr_args(fmr_int16(destination), fmr_infer(length)), parameters), &_packet.header, &packet -> call);
+	int _e = fmr_create_call(module -> index, function, fmr_merge(fmr_args(fmr_int16(destination), fmr_infer(length)), parameters), &_packet.header, &packet -> call);
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -403,4 +409,11 @@ void lf_debug_packet(struct _fmr_packet *packet, size_t length) {
 		printf("Invalid magic number (0x%02x).\n", packet -> header.magic);
 	}
 	printf("\n\n-----------\n\n");
+}
+
+void lf_debug_result(struct _fmr_result *result) {
+	printf("response:\n");
+	printf("\t└─ value:\t0x%x\n", result -> value);
+	printf("\t└─ error:\t0x%x\n", result -> error);
+	printf("\n-----------\n\n");
 }
