@@ -2,6 +2,9 @@
 #include <flipper/libflipper.h>
 #include <flipper/fmr.h>
 
+/* Include the Carbon board file. */
+#include <flipper/carbon.h>
+
 /* Expose the virtual interface for this driver. */
 struct _flipper flipper = {
 	flipper_attach,

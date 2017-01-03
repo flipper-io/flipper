@@ -1,5 +1,6 @@
 #define __private_include__
 #include <flipper/libflipper.h>
+#include <flipper/carbon.h>
 #include <flipper/carbon/platforms/atsam4s16b/modules.h>
 
 LF_MODULE(_adc, "adc", "Interfaces with the device's internal analog to digital converter.", _adc_id);

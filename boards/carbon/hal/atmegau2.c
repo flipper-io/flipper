@@ -22,6 +22,7 @@
 
 #define __private_include__
 #include <flipper/libflipper.h>
+#include <flipper/carbon.h>
 #include <flipper/carbon/platforms/atmega16u2/modules.h>
 
 /* Declare any standard modules with functionality specific to this device. */
