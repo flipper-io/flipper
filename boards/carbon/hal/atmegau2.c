@@ -30,6 +30,7 @@ LF_MODULE(_cpu, "cpu", "Provides control over the CPU of the device.", _cpu_id);
 LF_MODULE(_fs, "fs", "Provides access to the device's filesystem.", _fs_id);
 LF_MODULE(_led, "led", "Interacts with the built-in status LED.", _led_id);
 LF_MODULE(_uart0, "uart0", "Provides low level access to the device's UART bus.", _uart0_id);
+LF_MODULE(_wdt, "wdt", "Handles interaction with the internal watchdog timer.", _wdt_id);
 /* NOTE: Remove this module. */
 LF_MODULE(_fmr, "fmr", "Provides a way to access push and pull.", _fmr_id);
 
@@ -80,10 +81,11 @@ int lf_bridge_configure(struct _lf_device *device) {
     /* Assign the functionality of the device specific modules to this device. */
     LF_ASSIGN_MODULE(_button);
     LF_ASSIGN_MODULE(_cpu);
-    LF_ASSIGN_MODULE(_fmr);
     LF_ASSIGN_MODULE(_fs);
     LF_ASSIGN_MODULE(_led);
     LF_ASSIGN_MODULE(_uart0);
+    LF_ASSIGN_MODULE(_wdt);
+    LF_ASSIGN_MODULE(_fmr);
     /* Set the bridge module's index. */
     record -> _uart0_bridge.index = _uart0_id;
     /* Set the bridge module's device pointer pointer. */

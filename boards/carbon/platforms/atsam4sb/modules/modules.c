@@ -19,6 +19,5 @@ const void *const fmr_modules[] = {
     &timer,
     &usart,
     &usb,
-    &wdt,
-    &fmr
+    &wdt
 };

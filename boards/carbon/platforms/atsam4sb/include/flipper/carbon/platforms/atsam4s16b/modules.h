@@ -63,9 +63,6 @@ enum {
 	_usb_id,
 	#define __use_wdt__
 	_wdt_id,
-	/* NOTE: Remove FMR as a module. */
-	#define __use_fmr__
-	_fmr_id,
 };
 /* NOTE: The identifiers in this enumeration must match the order of the module addresses stored in the 'fmr_modules' array. */
 

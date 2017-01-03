@@ -15,4 +15,3 @@ LF_MODULE(_temp, "temp", "Interfaces with the device's temperature sensor.", _te
 LF_MODULE(_timer, "timer", "Interfaces with the device's timer peripheral.", _timer_id);
 LF_MODULE(_usart, "usart", "Provides low level access to the device's UART bus.", _usart_id);
 LF_MODULE(_usb, "usart", "Provides low level access to the device's USB bus.", _usb_id);
-LF_MODULE(_wdt, "wdt", "Handles interaction with the internal watchdog timer.", _wdt_id);

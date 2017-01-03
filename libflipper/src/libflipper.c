@@ -129,7 +129,7 @@ int __attribute__((__destructor__)) flipper_exit(void) {
 
 int lf_load_configuration(struct _lf_device *device) {
 	/* Create a configuration packet. */
-	struct _fmr_configuration_packet packet = { 0 };
+	struct _fmr_packet packet = { 0 };
 	/* Set the magic number. */
 	packet.header.magic = FMR_MAGIC_NUMBER;
 	/* Compute the length of the packet. */
@@ -139,7 +139,7 @@ int lf_load_configuration(struct _lf_device *device) {
 	/* Calculate the packet checksum. */
 	packet.header.checksum = lf_crc(&packet, packet.header.length);
 	/* Send the packet to the target device. */
-	int _e = lf_transfer(device, (struct _fmr_packet *)(&packet));
+	int _e = lf_transfer(device, &packet);
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -154,6 +154,7 @@ int lf_load_configuration(struct _lf_device *device) {
 	/* Obtain the result of the operation. */
 	lf_get_result(device, &result);
 	if (result.error != E_OK) {
+		error_raise(result.error, error_message("Error encountered during configuration."));
 		return lf_error;
 	}
 	/* Compare the device identifiers. */

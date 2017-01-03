@@ -4,7 +4,6 @@
 #include <flipper/libflipper.h>
 #include <flipper/platforms/posix/libusb.h>
 #include <libusb.h>
-#include <flipper/error.h>
 
 struct _lf_endpoint lf_libusb_ep = {
 	lf_libusb_configure,
@@ -42,7 +41,7 @@ int lf_libusb_configure(struct _lf_endpoint *this, struct _lf_device *device) {
 		goto failure;
 	}
 	/* Attach a physical device to this endpoint. */
-	record -> handle = libusb_open_device_with_vid_pid(record -> context, USB_VENDOR_ID, USB_PRODUCT_ID);
+	record -> handle = libusb_open_device_with_vid_pid(record -> context, LF_USB_VENDOR_ID, LF_USB_PRODUCT_ID);
 	if (!(record -> handle)) {
 		error_raise(E_NO_DEVICE, error_message("Could not find any devices connected via USB. Ensure that a device is connected."));
 		goto failure;
@@ -98,7 +97,10 @@ int lf_libusb_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
 #ifndef __ALL_BULK__
 	}
 #endif
-	if (_e < 0 || _length != length) {
+	if (_e < 0) {
+		error_raise(E_COMMUNICATION, error_message("Error during libusb transfer."));
+		return lf_error;
+	} else if (_length != length) {
 		error_raise(E_COMMUNICATION, error_message("Failed to transmit complete USB packet."));
 		return lf_error;
 	}
@@ -118,8 +120,11 @@ int lf_libusb_pull(struct _lf_endpoint *this, void *destination, lf_size_t lengt
 #ifndef __ALL_BULK__
 	}
 #endif
-	if (_e < 0 || _length != length) {
-		error_raise(E_COMMUNICATION, error_message("Failed to receive complete USB packet."));
+	if (_e < 0) {
+		error_raise(E_COMMUNICATION, error_message("Error during libusb transfer."));
+		return lf_error;
+	} else if (_length != length) {
+		error_raise(E_COMMUNICATION, error_message("Failed to receive complete USB packet. (%d bytes / %d bytes)", _length, length));
 		return lf_error;
 	}
 	return lf_success;

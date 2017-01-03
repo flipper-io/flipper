@@ -10,7 +10,7 @@ int8_t megausb_bulk_receive(uint8_t *destination, lf_size_t length) {
 	}
 
 	/* Calculate the timeout value using the frame counter. */
-	uint8_t timeout = UDFNUML + DEFAULT_TIMEOUT;
+	uint8_t timeout = UDFNUML + LF_USB_TIMEOUT_MS;
 
 	/* Select the endpoint that has been configured to receive bulk data. */
 	UENUM = BULK_OUT_ENDPOINT;
@@ -23,10 +23,13 @@ int8_t megausb_bulk_receive(uint8_t *destination, lf_size_t length) {
 			if (!megausb_configured) {
 				return -1;
 			}
+/* If defined, USB transactions will time out after a specified period of time. */
+#ifdef __lf_usb_timeout__
 			/* If a timeout has occured, return 0 bytes sent. */
 			else if (UDFNUML == timeout) {
 				return 0;
 			}
+#endif
 		}
 
 		/* Transfer the buffered data to the destination. */
@@ -57,7 +60,7 @@ int8_t megausb_bulk_transmit(uint8_t *source, lf_size_t length) {
 	}
 
 	/* Calculate the timeout value using the frame counter. */
-	uint8_t timeout = UDFNUML + DEFAULT_TIMEOUT;
+	uint8_t timeout = UDFNUML + LF_USB_TIMEOUT_MS;
 
 	/* Select the endpoint that has been configured to receive bulk data. */
 	UENUM = BULK_IN_ENDPOINT & ~USB_IN_MASK;
@@ -70,10 +73,13 @@ int8_t megausb_bulk_transmit(uint8_t *source, lf_size_t length) {
 			if (!megausb_configured) {
 				return -1;
 			}
+/* If defined, USB transactions will time out after a specified period of time. */
+#ifdef __lf_usb_timeout__
 			/* If a timeout has occured, return 0 bytes sent. */
 			else if (UDFNUML == timeout) {
 				return 0;
 			}
+#endif
 		}
 
 		/* Transfer the buffered data to the destination. */

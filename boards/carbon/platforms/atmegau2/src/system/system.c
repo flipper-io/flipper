@@ -12,9 +12,7 @@ struct _lf_device lf_self = {
 		(lf_device_16bit | lf_device_little_endian)
 	},
 	&megausb,
-	E_OK,
-	false,
-	NULL
+	E_OK
 };
 
 #define cpu_prescale(clock) (CLKPR = 0x80, CLKPR = clock)

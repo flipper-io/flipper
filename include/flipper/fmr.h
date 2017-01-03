@@ -97,24 +97,12 @@ struct _fmr_list {
 	struct _fmr_arg *argv;
 };
 
-#define LF_CONFIGURATION 0x20
-#define LF_STANDARD_MODULE 0x80
-#define LF_PUSH_PULL_FUNCTION 0x40
-
 /* Generic packet data type that can be passed around by packet parsing equipment. */
 struct LF_PACKED _fmr_packet {
 	/* The header shared by all packet classes. */
 	struct _fmr_header header;
 	/* A generic payload that is designed to be casted against the class specific data structures. */
 	uint8_t payload[(FMR_PACKET_SIZE - sizeof(struct _fmr_header))];
-};
-
-/* Contains metadata needed to query a device about its configuration. */
-struct LF_PACKED _fmr_configuration_packet {
-	/* The packet header programmed with 'fmr_configuration_class'. */
-	struct _fmr_header header;
-	/* Padding for the unused section of the packet. */
-	uint8_t padding[(sizeof(struct _fmr_packet) - sizeof(struct _fmr_header))];
 };
 
 /* Contains metadata needed to perform a remote procedure call on a device. */

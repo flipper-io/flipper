@@ -18,8 +18,8 @@ static const uint8_t PROGMEM device_descriptor[] = {
 	0,					// bDeviceSubClass
 	0,					// bDeviceProtocol
 	USB_CONTROL_SIZE,	// bMaxPacketSize
-	lo(USB_VENDOR_ID), hi(USB_VENDOR_ID),	// idVendor
-	lo(USB_PRODUCT_ID), hi(USB_PRODUCT_ID),	// idProduct
+	lo(LF_USB_VENDOR_ID), hi(LF_USB_VENDOR_ID),	// idVendor
+	lo(LF_USB_PRODUCT_ID), hi(LF_USB_PRODUCT_ID),	// idProduct
 	0x00, 0x01,			// bcdDevice
 	1,					// iManufacturer
 	2,					// iProduct
@@ -107,17 +107,17 @@ static const struct usb_string PROGMEM language = {
 };
 
 static const struct usb_string PROGMEM manufacturer = {
-	sizeof(MANUFACTURER_STRING), 0x03, MANUFACTURER_STRING
+	sizeof(LF_USB_MANUFACTURER), 0x03, LF_USB_MANUFACTURER
 };
 
 static const struct usb_string PROGMEM product = {
-	sizeof(PRODUCT_STRING), 0x03, PRODUCT_STRING
+	sizeof(LF_USB_PRODUCT), 0x03, LF_USB_PRODUCT
 };
 
 const struct descriptor PROGMEM descriptors[] = {
 	{ 0x0100, 0x0000, device_descriptor, sizeof(device_descriptor) },
 	{ 0x0200, 0x0000, configuration, sizeof(configuration) },
 	{ 0x0300, 0x0000, (const uint8_t *)(&language), 4 },
-	{ 0x0301, 0x0409, (const uint8_t *)(&manufacturer), sizeof(MANUFACTURER_STRING) },
-	{ 0x0302, 0x0409, (const uint8_t *)(&product), sizeof(PRODUCT_STRING) },
+	{ 0x0301, 0x0409, (const uint8_t *)(&manufacturer), sizeof(LF_USB_MANUFACTURER) },
+	{ 0x0302, 0x0409, (const uint8_t *)(&product), sizeof(LF_USB_PRODUCT) },
 };

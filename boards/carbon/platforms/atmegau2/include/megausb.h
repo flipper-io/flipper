@@ -21,10 +21,6 @@ extern int megausb_push(struct _lf_endpoint *this, void *source, lf_size_t lengt
 extern int megausb_pull(struct _lf_endpoint *this, void *destination, lf_size_t length);
 extern int megausb_destroy();
 
-#define DEFAULT_TIMEOUT                 50
-#define MANUFACTURER_STRING             L"flipper.io"
-#define PRODUCT_STRING                  L"Flipper: Carbon"
-
 /* USB endpoint configuration macros. */
 
 #define USB_CONTROL_ENDPOINT			0x00

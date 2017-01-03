@@ -11,14 +11,12 @@
 /* The current version of libflipper. */
 #define LF_VERSION 0x0001
 
-/* Identification information for the USB controller. */
-#define USB_VENDOR_ID	0x16C0
-#define USB_PRODUCT_ID	0x0480
-#define USB_USAGE_PAGE	0xFFAB
-#define USB_USAGE		0x0200
-
-/* The name of the default device to attach to. */
-#define LF_DEFAULT_NAME "flipper"
+/* Configuration information for USB. */
+#define LF_USB_TIMEOUT_MS      100
+#define LF_USB_MANUFACTURER    L"flipper.io"
+#define LF_USB_PRODUCT         L"Flipper: Carbon"
+#define LF_USB_VENDOR_ID       0x16C0
+#define LF_USB_PRODUCT_ID      0x0480
 
 /* NOTE: Summing the size parameters of each endpoints below should be less than or equal to 160. */
 #define USB_IN_MASK            0x80
@@ -30,6 +28,9 @@
 #define BULK_IN_SIZE           64
 #define BULK_OUT_ENDPOINT      0x04
 #define BULK_OUT_SIZE          64
+
+/* The name of the default device to attach to. */
+#define LF_DEFAULT_NAME "flipper"
 
 /* If defined, uses bulk for all USB transfers. */
 #define __ALL_BULK__
