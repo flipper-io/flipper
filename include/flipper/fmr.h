@@ -61,6 +61,10 @@ enum {
 	fmr_standard_invocation_class,
 	/* Invokes a function in user module. */
 	fmr_user_invocation_class,
+	/* Causes a push operation to begin. */
+	fmr_push_class,
+	/* Causes a pull operation to begin. */
+	fmr_pull_class,
 	/* Signals the occurance an event. */
 	fmr_event_class
 };
@@ -105,21 +109,36 @@ struct LF_PACKED _fmr_packet {
 	uint8_t payload[(FMR_PACKET_SIZE - sizeof(struct _fmr_header))];
 };
 
+/* Procedure call information carried by a packet. */
+struct LF_PACKED _fmr_call {
+	/* The index of the module in which the target routine resides. */
+	uint8_t index;
+	/* The index of the function within the module. */
+	uint8_t function;
+	/* The types of the parameters encoded into the packet. */
+	fmr_types types;
+	/* The number of parameters encoded into the packet. */
+	fmr_argc argc;
+	/* The encoded values of the parameters to be passed to the callee. */
+	uint8_t parameters[];
+};
+
 /* Contains metadata needed to perform a remote procedure call on a device. */
 struct LF_PACKED _fmr_invocation_packet {
 	/* The packet header programmed with 'fmr_standard_invocation_class' or 'fmr_user_invocation_class'. */
 	struct _fmr_header header;
-	/* The procedure call information carried by the invocation packet. */
-	struct LF_PACKED _fmr_call {
-		/* The index of the module in which the target routine resides. */
-		uint8_t index;
-		/* The index of the function within the module. */
-		uint8_t function;
-		/* The number of parameters encoded into the packet. */
-		fmr_argc argc;
-	} call;
-	/* The encoded values of the parameters to be passed to the callee. */
-	uint8_t parameters[(sizeof(struct _fmr_packet) - sizeof(struct _fmr_header) - sizeof(struct _fmr_call))];
+	/* The procedure call information of the invocation. */
+	struct _fmr_call call;
+};
+
+/* Contains metadata needed to perform a push/pull operation. */
+struct LF_PACKED _fmr_push_pull_packet {
+	/* The packet header programmed with 'fmr_push_class' or 'fmr_pull_class'. */
+	struct _fmr_header header;
+	/* The amount of data to be transferred. */
+	lf_size_t length;
+	/* The procedure call information of the invocation. */
+	struct _fmr_call call;
 };
 
 /* A generic datastructure that is sent back following any message runtime transaction. */
@@ -131,24 +150,10 @@ struct LF_PACKED _fmr_result {
 	/* NOTE: Add bitfield indicating the need to poll for updates. */
 };
 
-/* Declare the virtual interface for this module. */
-extern const struct _fmr {
-	/* Configures the button hardware. */
-	void (* push)(fmr_module module, fmr_function function, lf_size_t length);
-	/* Reads back the button state; returns 0 when released and 1 when pressed. */
-	void (* pull)(fmr_module module, fmr_function function, lf_size_t length);
-} fmr;
-
 #ifdef __private_include__
 
 /* A reference to the fmr_modules array. */
 extern const void *const fmr_modules[];
-
-/* The fmr_module structure for this module. */
-extern struct _lf_module _fmr;
-
-/* ~ Declare the FMR overlay for this driver. ~ */
-enum { _fmr_push, _fmr_pull };
 
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
 
@@ -163,7 +168,7 @@ struct _fmr_arg *fmr_pop(struct _fmr_list *list);
 /* Frees an fmr_list. */
 int fmr_free(struct _fmr_list *list);
 /* Generates the appropriate data structure needed for the remote procedure call of 'funtion' in 'module'. */
-int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *args, struct _fmr_invocation_packet *packet);
+int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *args, struct _fmr_header *header, struct _fmr_call *call);
 /* Executes a standard module. */
 fmr_return fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, fmr_types types, void *arguments);
 /* Executes an fmr_packet and stores the result of the operation in the result buffer provided. */

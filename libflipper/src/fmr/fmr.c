@@ -1,14 +1,6 @@
 #define __private_include__
 #include <flipper/libflipper.h>
 
-#ifdef __use_fmr__
-/* Define the virtual interface for this module. */
-const struct _fmr fmr = {
-	fmr_push,
-	fmr_pull
-};
-#endif
-
 /* If defined, the symbols needed to create FMR packets will be defined. */
 #ifdef __fmr_generators__
 
@@ -142,40 +134,30 @@ int fmr_free(struct _fmr_list *list) {
 	return lf_success;
 }
 
-int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *parameters, struct _fmr_invocation_packet *packet) {
+int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *parameters, struct _fmr_header *header, struct _fmr_call *call) {
 	/* Ensure that the pointer to the outgoing packet is valid. */
-	if (!packet) {
-		error_raise(E_NULL, error_message("Invalid packet reference provided during message runtime packet generation."));
+	if (!header || !call) {
+		error_raise(E_NULL, error_message("Invalid header or call reference provided during message runtime packet generation."));
 		return lf_error;
 	} else if (!parameters) {
 		/* If no arguments are provided, automatically provide an empty argument list. */
 		parameters = fmr_build(0);
 	}
-	/* Zero the packet. */
-	memset(packet, 0, sizeof(struct _fmr_packet));
 	/* Set the magic number. */
-	packet -> header.magic = FMR_MAGIC_NUMBER;
-	/* If the module's identifier is in the range of identifiers reserved for the standard modules, make this packet invoke a standard module. */
-	packet -> header.class = fmr_standard_invocation_class;
+	header -> magic = FMR_MAGIC_NUMBER;
 	/* Store the target module, function, and argument count in the packet. */
-	packet -> call.index = module;
-	packet -> call.function = function;
-	packet -> call.argc = parameters -> argc;
-	/* Calculate the number of bytes needed to encode the widths of the types. */
-	uint8_t encode_length = lf_ceiling((parameters -> argc * 2), 8);
-	/* Compute the initial length of the packet. */
-	packet -> header.length = sizeof(struct _fmr_header) + sizeof(struct _fmr_call) + encode_length;
+	call -> index = module;
+	call -> function = function;
+	call -> argc = parameters -> argc;
 	/* Calculate the offset into the packet at which the arguments will be loaded. */
-	uint8_t *offset = (uint8_t *)&(packet -> parameters) + encode_length;
-	/* Create a buffer for encoding argument types. */
-	uint32_t types = 0;
+	uint8_t *offset = (uint8_t *)&(call -> parameters);
 	/* Load arguments into the packet, encoding the type of each. */
 	int argc = parameters -> argc;
 	for (int i = 0; i < argc; i ++) {
 		/* Pop the argument from the argument list. */
 		struct _fmr_arg *arg = fmr_pop(parameters);
 		/* Encode the argument's type. */
-		types |= (arg -> type & 0x3) << (i * 2);
+		call -> types |= (arg -> type & 0x3) << (i * 2);
 		/* Calculate the size of the argument. */
 		uint8_t size = fmr_sizeof(arg -> type);
 		/* Copy the argument into the parameter segment. */
@@ -183,14 +165,10 @@ int fmr_generate(fmr_module module, fmr_function function, struct _fmr_list *par
 		/* Increment the offset appropriately. */
 		offset += size;
 		/* Increment the size of the packet. */
-		packet -> header.length += size;
+		header -> length += size;
 		/* Release the argument. */
 		free(arg);
 	}
-	/* Copy the encoded type widths into the packet. */
-	memcpy(&(packet -> parameters), &types, encode_length);
-	/* Calculate the packet checksum. */
-	packet -> header.checksum = lf_crc(packet, packet -> header.length);
 	 /* Destroy the argument list. */
 	fmr_free(parameters);
 	return lf_success;
@@ -213,14 +191,8 @@ fmr_return fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, 
 }
 
 fmr_return fmr_perform_invocation(struct _fmr_invocation_packet *packet) {
-	/* Calculate the number of bytes needed to decode the widths of the types. */
-	uint8_t decode_length = lf_ceiling((packet -> call.argc * 2), 8);
-	/* Create a buffer for decoding argument types. */
-	fmr_types types = 0;
-	/* Copy the decided type widths into the buffer. */
-	memcpy(&types, (void *)(&(packet -> parameters)), decode_length);
 	/* Perform the function invocation. */
-	return fmr_execute(packet -> call.index, packet -> call.function, packet -> call.argc, types, (void *)(packet -> parameters + decode_length));
+	return fmr_execute(packet -> call.index, packet -> call.function, packet -> call.argc, packet -> call.types, (void *)(packet -> call.parameters));
 }
 
 int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
@@ -240,6 +212,10 @@ int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
 		error_raise(E_CHECKSUM, NULL);
 		goto failure;
 	}
+	/* Swap space for push/pull transfers. */
+	void *swap = NULL;
+	/* Packet cast for the push pull packet. */
+	struct _fmr_push_pull_packet *ppacket = (struct _fmr_push_pull_packet *)(packet);
 	/* Switch through the classes of packets. */
 	switch (packet -> header.class) {
 		case fmr_configuration_class:
@@ -252,7 +228,31 @@ int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
 			result -> value = fmr_perform_invocation((struct _fmr_invocation_packet *)(packet));
 		break;
 		case fmr_user_invocation_class:
-			/* Call into user invocation machienery. */
+
+		break;
+		case fmr_push_class:
+			swap = malloc(ppacket -> length);
+			if (!swap) {
+				error_raise(E_MALLOC, NULL);
+				break;
+			}
+			lf_self.endpoint -> pull(lf_self.endpoint, swap, ppacket -> length);
+			/* Insert the swap address. NOTE: This is not cross platform. REMOVE THIS */
+			*(uint16_t *)(ppacket -> call.parameters) = (uintptr_t)swap;
+			fmr_execute(ppacket -> call.index, ppacket -> call.function, ppacket -> call.argc, ppacket -> call.types, (void *)(ppacket -> call.parameters));
+			free(swap);
+		break;
+		case fmr_pull_class:
+			swap = malloc(ppacket -> length);
+			if (!swap) {
+				error_raise(E_MALLOC, NULL);
+				break;
+			}
+			/* Insert the swap address. NOTE: This is not cross platform. REMOVE THIS */
+			*(uint16_t *)(ppacket -> call.parameters) = (uintptr_t)swap;
+			fmr_execute(ppacket -> call.index, ppacket -> call.function, ppacket -> call.argc, ppacket -> call.types, (void *)(ppacket -> call.parameters));
+			lf_self.endpoint -> push(lf_self.endpoint, swap, ppacket -> length);
+			free(swap);
 		break;
 		case fmr_event_class:
 			/* Handle an event. */

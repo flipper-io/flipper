@@ -32,41 +32,6 @@ void uart0_pull_wait(void *destination, lf_size_t length) {
 	UART0 -> UART_IER = UART_IER_ENDRX;
 }
 
-/* Helper functions to libflipper. */
-void fmr_push(fmr_module module, fmr_function function, lf_size_t length) {
-	void *swap = malloc(length);
-	if (!swap) {
-		error_raise(E_MALLOC, NULL);
-		return;
-	}
-	/* Pull, not asynchronously. */
-	uart0_pull_wait(swap, length);
-	uint32_t types = fmr_type(lf_size_t) << 2 | fmr_type(void *);
-	struct {
-		void *source;
-		lf_size_t length;
-	} args = { swap, length };
-	fmr_execute(module, function, 2, types, &args);
-	free(swap);
-}
-
-void fmr_pull(fmr_module module, fmr_function function, lf_size_t length) {
-	void *swap = malloc(length);
-	if (!swap) {
-		error_raise(E_MALLOC, NULL);
-		return;
-	}
-	uint32_t types = fmr_type(lf_size_t) << 2 | fmr_type(void *);
-	struct {
-		void *source;
-		lf_size_t length;
-	} args = { swap, length };
-	/* Call the function. */
-	fmr_execute(module, function, 2, types, &args);
-	uart0_push(swap, length);
-	free(swap);
-}
-
 struct _fmr_packet packet;
 
 void system_task(void) {
@@ -79,10 +44,10 @@ void system_task(void) {
 	/* Configure the SPI peripheral. */
 	spi_configure();
 
-	/* Enable the PDC receive complete interrupt. */
-	UART0 -> UART_IER = UART_IER_ENDRX;
-	/* Pull an FMR packet asynchronously. */
-	uart0_pull(&packet, sizeof(struct _fmr_packet));
+	// /* Enable the PDC receive complete interrupt. */
+	// UART0 -> UART_IER = UART_IER_ENDRX;
+	// /* Pull an FMR packet asynchronously. */
+	// uart0_pull(&packet, sizeof(struct _fmr_packet));
 
 	/* -------- USER TASK -------- */
 

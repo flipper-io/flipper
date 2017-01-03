@@ -90,15 +90,19 @@ int lf_libusb_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
 	int _e;
 #ifndef __ALL_BULK__
 	if (length <= INTERRUPT_OUT_SIZE) {
-		_e = libusb_interrupt_transfer(record -> handle, INTERRUPT_OUT_ENDPOINT, source, length, &_length, 0);
+		_e = libusb_interrupt_transfer(record -> handle, INTERRUPT_OUT_ENDPOINT, source, length, &_length, LF_USB_TIMEOUT_MS);
 	} else {
 #endif
-		_e = libusb_bulk_transfer(record -> handle, BULK_OUT_ENDPOINT, source, length, &_length, 0);
+		_e = libusb_bulk_transfer(record -> handle, BULK_OUT_ENDPOINT, source, length, &_length, LF_USB_TIMEOUT_MS);
 #ifndef __ALL_BULK__
 	}
 #endif
 	if (_e < 0) {
-		error_raise(E_COMMUNICATION, error_message("Error during libusb transfer."));
+		if (_e == LIBUSB_ERROR_TIMEOUT) {
+			error_raise(E_TIMEOUT, error_message("The transfer to the device timed out."));
+		} else {
+			error_raise(E_COMMUNICATION, error_message("Error during libusb transfer."));
+		}
 		return lf_error;
 	} else if (_length != length) {
 		error_raise(E_COMMUNICATION, error_message("Failed to transmit complete USB packet."));
@@ -113,15 +117,19 @@ int lf_libusb_pull(struct _lf_endpoint *this, void *destination, lf_size_t lengt
 	int _e;
 #ifndef __ALL_BULK__
 	if (length <= INTERRUPT_IN_SIZE) {
-		_e = libusb_interrupt_transfer(record -> handle, INTERRUPT_IN_ENDPOINT, destination, length, &_length, 0);
+		_e = libusb_interrupt_transfer(record -> handle, INTERRUPT_IN_ENDPOINT, destination, length, &_length, LF_USB_TIMEOUT_MS);
 	} else {
 #endif
-		_e = libusb_bulk_transfer(record -> handle, BULK_IN_ENDPOINT, destination, length, &_length, 0);
+		_e = libusb_bulk_transfer(record -> handle, BULK_IN_ENDPOINT, destination, length, &_length, LF_USB_TIMEOUT_MS);
 #ifndef __ALL_BULK__
 	}
 #endif
 	if (_e < 0) {
-		error_raise(E_COMMUNICATION, error_message("Error during libusb transfer."));
+		if (_e == LIBUSB_ERROR_TIMEOUT) {
+			error_raise(E_TIMEOUT, error_message("The transfer to the device timed out."));
+		} else {
+			error_raise(E_COMMUNICATION, error_message("Error during libusb transfer."));
+		}
 		return lf_error;
 	} else if (_length != length) {
 		error_raise(E_COMMUNICATION, error_message("Failed to receive complete USB packet. (%d bytes / %d bytes)", _length, length));

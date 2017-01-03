@@ -12,11 +12,15 @@
 #define LF_VERSION 0x0001
 
 /* Configuration information for USB. */
-#define LF_USB_TIMEOUT_MS      100
 #define LF_USB_MANUFACTURER    L"flipper.io"
 #define LF_USB_PRODUCT         L"Flipper: Carbon"
 #define LF_USB_VENDOR_ID       0x16C0
 #define LF_USB_PRODUCT_ID      0x0480
+#ifdef __lf_usb_timeout__
+#define LF_USB_TIMEOUT_MS      100
+#else
+#define LF_USB_TIMEOUT_MS      0
+#endif
 
 /* NOTE: Summing the size parameters of each endpoints below should be less than or equal to 160. */
 #define USB_IN_MASK            0x80
@@ -27,7 +31,7 @@
 #define BULK_IN_ENDPOINT       (0x03 | USB_IN_MASK)
 #define BULK_IN_SIZE           64
 #define BULK_OUT_ENDPOINT      0x04
-#define BULK_OUT_SIZE          64
+#define BULK_OUT_SIZE          64\
 
 /* The name of the default device to attach to. */
 #define LF_DEFAULT_NAME "flipper"
@@ -35,7 +39,7 @@
 /* If defined, uses bulk for all USB transfers. */
 #define __ALL_BULK__
 /* If defined, prints debugging information about each packet. */
-#define __lf_debug__
+//#define __lf_debug__
 
 /* Computes the greatest integer from the result of the division of x by y. */
 #define lf_ceiling(x, y) ((x + y - 1) / y)

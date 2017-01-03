@@ -8,6 +8,5 @@ const void *const fmr_modules[] = {
     &fs,
     &led,
     &uart0,
-    &wdt,
-    &fmr
+    &wdt
 };

@@ -17,40 +17,6 @@ struct _lf_device lf_self = {
 
 #define cpu_prescale(clock) (CLKPR = 0x80, CLKPR = clock)
 
-/* Helper functions to libflipper. */
-void fmr_push(fmr_module module, fmr_function function, lf_size_t length) {
-	void *swap = malloc(length);
-	if (!swap) {
-		error_raise(E_MALLOC, NULL);
-		return;
-	}
-	megausb_pull(&megausb, swap, length);
-	uint32_t types = fmr_type(lf_size_t) << 2 | fmr_type(void *);
-	struct {
-		void *source;
-		lf_size_t length;
-	} args = { swap, length };
-	fmr_execute(module, function, 2, types, &args);
-	free(swap);
-}
-
-void fmr_pull(fmr_module module, fmr_function function, lf_size_t length) {
-	void *swap = malloc(length);
-	if (!swap) {
-		error_raise(E_MALLOC, NULL);
-		return;
-	}
-	uint32_t types = fmr_type(lf_size_t) << 2 | fmr_type(void *);
-	struct {
-		void *source;
-		lf_size_t length;
-	} args = { swap, length };
-	/* Call the function. */
-	fmr_execute(module, function, 2, types, &args);
-	megausb_push(&megausb, swap, length);
-	free(swap);
-}
-
 void system_task(void) {
 	while (1) {
 		struct _fmr_packet packet;

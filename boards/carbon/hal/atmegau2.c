@@ -31,8 +31,6 @@ LF_MODULE(_fs, "fs", "Provides access to the device's filesystem.", _fs_id);
 LF_MODULE(_led, "led", "Interacts with the built-in status LED.", _led_id);
 LF_MODULE(_uart0, "uart0", "Provides low level access to the device's UART bus.", _uart0_id);
 LF_MODULE(_wdt, "wdt", "Handles interaction with the internal watchdog timer.", _wdt_id);
-/* NOTE: Remove this module. */
-LF_MODULE(_fmr, "fmr", "Provides a way to access push and pull.", _fmr_id);
 
 struct _lf_endpoint lf_bridge_ep = {
     lf_bridge_configure,
@@ -85,7 +83,6 @@ int lf_bridge_configure(struct _lf_device *device) {
     LF_ASSIGN_MODULE(_led);
     LF_ASSIGN_MODULE(_uart0);
     LF_ASSIGN_MODULE(_wdt);
-    LF_ASSIGN_MODULE(_fmr);
     /* Set the bridge module's index. */
     record -> _uart0_bridge.index = _uart0_id;
     /* Set the bridge module's device pointer pointer. */

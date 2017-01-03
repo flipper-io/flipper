@@ -195,14 +195,21 @@ fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _f
 		error_raise(E_NO_DEVICE, error_message("Failed to invoke on device."));
 		return lf_error;
 	}
-	struct _fmr_invocation_packet packet = { 0 };
+	struct _fmr_packet _packet = { 0 };
+	struct _fmr_invocation_packet *packet = (struct _fmr_invocation_packet *)(&_packet);
+	/* Compute the initial length of the packet. */
+	_packet.header.length = sizeof(struct _fmr_invocation_packet);
+	/* Set the packet class. */
+	_packet.header.class = fmr_standard_invocation_class;
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_generate(module -> index, function, parameters, &packet);
+	int _e = fmr_generate(module -> index, function, parameters, &_packet.header, &packet -> call);
 	if (_e < lf_success) {
 		return lf_error;
 	}
+	/* Compute and store the packet checksum. */
+	_packet.header.checksum = lf_crc(packet, _packet.header.length);
 	/* Send the packet to the target device. */
-	_e = lf_transfer(device, (struct _fmr_packet *)(&packet));
+	_e = lf_transfer(device, (struct _fmr_packet *)(packet));
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -255,14 +262,23 @@ int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_s
 		error_raise(E_NO_DEVICE, error_message("Failed to push to device."));
 		return lf_error;
 	}
-	struct _fmr_invocation_packet packet = { 0 };
+	struct _fmr_packet _packet = { 0 };
+	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
+	/* Compute the initial length of the packet. */
+	_packet.header.length = sizeof(struct _fmr_push_pull_packet);
+	/* Set the packet class. */
+	_packet.header.class = fmr_push_class;
+	/* Set the push length. */
+	packet -> length = length;
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_generate(_fmr.index, _fmr_push, fmr_merge(fmr_args(fmr_int16(module -> index), fmr_int8(function), fmr_int32(length)), parameters), &packet);
+	int _e = fmr_generate(module -> index, function, fmr_merge(fmr_args(fmr_int16(source), fmr_infer(length)), parameters), &_packet.header, &packet -> call);
 	if (_e < lf_success) {
 		return lf_error;
 	}
+	/* Compute and store the packet checksum. */
+	_packet.header.checksum = lf_crc(packet, _packet.header.length);
 	/* Send the packet to the target device. */
-	_e = lf_transfer(device, (struct _fmr_packet *)(&packet));
+	_e = lf_transfer(device, &_packet);
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -295,14 +311,23 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 		error_raise(E_NO_DEVICE, error_message("Failed to pull from device."));
 		return lf_error;
 	}
-	struct _fmr_invocation_packet packet = { 0 };
+	struct _fmr_packet _packet = { 0 };
+	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
+	/* Compute the initial length of the packet. */
+	_packet.header.length = sizeof(struct _fmr_push_pull_packet);
+	/* Set the packet class. */
+	_packet.header.class = fmr_pull_class;
+	/* Set the pull length. */
+	packet -> length = length;
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_generate(_fmr.index, _fmr_pull, fmr_merge(fmr_args(fmr_int16(module -> index), fmr_int8(function), fmr_int32(length)), parameters), &packet);
+	int _e = fmr_generate(module -> index, function, fmr_merge(fmr_args(fmr_int16(destination), fmr_infer(length)), parameters), &_packet.header, &packet -> call);
 	if (_e < lf_success) {
 		return lf_error;
 	}
+	/* Compute and store the packet checksum. */
+	_packet.header.checksum = lf_crc(packet, _packet.header.length);
 	/* Send the packet to the target device. */
-	_e = lf_transfer(device, (struct _fmr_packet *)(&packet));
+	_e = lf_transfer(device, &_packet);
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -320,43 +345,55 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 
 /* Debugging functions for displaying the contents of various FMR related data structures. */
 
+void lf_debug_call(struct _fmr_call *call) {
+	printf("call:\n");
+	printf("\t└─ index:\t0x%x\n", call -> index);
+	printf("\t└─ function:\t0x%x\n", call -> function);
+	printf("\t└─ types:\t0x%x\n", call -> types);
+	printf("\t└─ argc:\t0x%x (%d arguments)\n", call -> argc, call -> argc);
+	printf("arguments:\n");
+	/* Calculate the offset into the packet at which the arguments will be loaded. */
+	uint8_t *offset = call -> parameters;
+	char *typestrs[] = { "fmr_int8", "fmr_int16", "fmr_int32" };
+	fmr_types types = call -> types;
+	for (int i = 0; i < call -> argc; i ++) {
+		fmr_type type = types & 0x3;
+		fmr_arg arg = 0;
+		memcpy(&arg, offset, fmr_sizeof(type));
+		printf("\t└─ %s:\t0x%x\n", typestrs[type], arg);
+		offset += fmr_sizeof(type);
+		types >>= 2;
+	}
+	printf("\n");
+}
+
 void lf_debug_packet(struct _fmr_packet *packet, size_t length) {
 	if (packet -> header.magic == FMR_MAGIC_NUMBER) {
 		printf("header:\n");
 		printf("\t└─ magic:\t0x%x\n", packet -> header.magic);
 		printf("\t└─ checksum:\t0x%x\n", packet -> header.checksum);
 		printf("\t└─ length:\t%d bytes (%.02f%%)\n", packet -> header.length, (float) packet -> header.length/sizeof(struct _fmr_packet)*100);
-        char *classstrs[] = { "configuration", "std_call", "user_call", "event" };
+        char *classstrs[] = { "configuration", "std_call", "user_call", "push", "pull", "event" };
         printf("\t└─ class:\t%s\n", classstrs[packet -> header.class]);
-		/* Print different information depending on the packet class. */
-		if (packet -> header.class == fmr_configuration_class) {
-
-        } else if (packet -> header.class == fmr_standard_invocation_class) {
-			struct _fmr_invocation_packet *invocation = (struct _fmr_invocation_packet *)(packet);
-			printf("target:\n");
-			printf("\t└─ module:\t0x%x\n", invocation -> call.index);
-			printf("\t└─ function:\t0x%x\n", invocation -> call.function);
-			printf("\t└─ argc:\t0x%x (%d arguments)\n", invocation -> call.argc, invocation -> call.argc);
-			printf("arguments:\n");
-			/* Calculate the number of bytes needed to encode the widths of the types. */
-			uint8_t encode_length = lf_ceiling((invocation -> call.argc * 2), 8);
-			/* Calculate the offset into the packet at which the arguments will be loaded. */
-			uint8_t *offset = invocation -> parameters + encode_length;
-			/* Create a buffer for encoding argument types. */
-			uint32_t types = 0;
-			memcpy(&types, invocation -> parameters, encode_length);
-			char *typestrs[] = { "fmr_int8", "fmr_int16", "fmr_int32" };
-			for (int i = 0; i < invocation -> call.argc; i ++) {
-				fmr_type type = types & 0x3;
-				fmr_arg arg = 0;
-				memcpy(&arg, offset, fmr_sizeof(type));
-				printf("\t└─ %s:\t0x%x\n", typestrs[type], arg);
-				offset += fmr_sizeof(type);
-				types >>= 2;
-			}
-			printf("\n");
-		} else {
-			printf("Invalid packet.\n");
+		struct _fmr_invocation_packet *invocation = (struct _fmr_invocation_packet *)(packet);
+		struct _fmr_push_pull_packet *pushpull = (struct _fmr_push_pull_packet *)(packet);
+		switch (packet -> header.class) {
+			case fmr_configuration_class:
+			break;
+			case fmr_standard_invocation_class:
+				lf_debug_call(&invocation -> call);
+			break;
+			case fmr_user_invocation_class:
+			break;
+			case fmr_push_class:
+			case fmr_pull_class:
+				printf("length:\n");
+				printf("\t└─ length:\t0x%x\n", pushpull -> length);
+				lf_debug_call(&pushpull -> call);
+			break;
+			default:
+				printf("Invalid packet class.\n");
+			break;
 		}
 		for (int i = 1; i <= length; i ++) {
 			printf("0x%02x ", ((uint8_t *)packet)[i - 1]);
