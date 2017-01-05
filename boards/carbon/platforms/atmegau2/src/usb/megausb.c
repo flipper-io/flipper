@@ -65,3 +65,28 @@ int megausb_pull(struct _lf_endpoint *this, void *destination, lf_size_t length)
 int megausb_destroy(void) {
 	return lf_success;
 }
+
+int megausb_wait_ready(void) {
+/* If defined, USB transactions will time out after a specified period of time. */
+#ifdef __lf_usb_timeout__
+	megausb_start_timeout();
+#endif
+	/* Wait until the receiver is ready. */
+	while (!(UEINTX & (1 << RWAL))) {
+		/* If USB has been detached while in this loop, return with error. */
+		if (!megausb_configured) {
+			return lf_error;
+		}
+#ifdef __lf_usb_timeout__
+		/* If a timeout has occured, return 0 bytes sent. */
+		else if (megausb_is_timed_out()) {
+			megausb_stop_timeout();
+			return lf_error;
+		}
+#endif
+	}
+#ifdef __lf_usb_timeout__
+	megausb_stop_timeout();
+#endif
+	return lf_success;
+}

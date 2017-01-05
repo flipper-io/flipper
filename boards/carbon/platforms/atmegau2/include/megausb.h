@@ -67,6 +67,17 @@ extern const uint8_t PROGMEM endpoint[];
 
 #define DESC_COUNT 5
 
+/* Timeout using TIMER1. Waits ~100ms. */
+#define megausb_start_timeout() \
+    TCCR1B |= (1 << WGM12); \
+    OCR1A = 6250; \
+    TCCR1B |= (1 << CS12) | (0 << CS11) | (0 << CS10);
+#define megausb_is_timed_out() \
+	(TIFR1 & (1 << OCF1A))
+#define megausb_stop_timeout() \
+	TIFR1 = (1 << OCF1A); \
+	TCCR1B |= (0 << CS12) | (0 << CS11) | (0 << CS10);
+
 extern const struct descriptor {
 	uint16_t value;
 	uint16_t index;
@@ -82,6 +93,8 @@ int8_t megausb_bulk_receive(uint8_t *destination, lf_size_t length);
 int8_t megausb_bulk_transmit(uint8_t *source, lf_size_t length);
 
 int8_t usb_serial_write(const uint8_t *buffer, uint16_t size);
+
+int megausb_wait_ready(void);
 
 #endif
 #endif

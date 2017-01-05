@@ -47,11 +47,15 @@ struct _lf_device *flipper_attach(void) {
 
 /* Attaches a USB device to the bridge endpoint. */
 struct _lf_device *flipper_attach_usb(char *name) {
+	/* Make a backup of the slected device. */
+	struct _lf_device *_device = flipper.device;
 	/* Create a device with the name provided. */
 	struct _lf_device *device = lf_create_device(name);
 	if (!device) {
 		return NULL;
 	}
+	/* Set the current device. */
+	flipper.device = device;
 	/* Set the device's endpoint. */
 	device -> endpoint = &lf_bridge_ep;
 	/* Configure the device's endpoint. */
@@ -59,10 +63,10 @@ struct _lf_device *flipper_attach_usb(char *name) {
 		error_raise(E_ENDPOINT, error_message("Failed to initialize bridge endpoint for usb device."));
 		/* Detach the device in the event of an endpoint configuration failure. */
 		flipper_detach(device);
+		/* Restore the previously selected device. */
+		flipper.device = _device;
 		return NULL;
 	}
-	/* Set the current device. */
-	flipper.device = device;
 	return device;
 }
 
@@ -125,6 +129,10 @@ int flipper_detach(struct _lf_device *device) {
 int __attribute__((__destructor__)) flipper_exit(void) {
 	/* If there is a device attached, free it. */
 	if (flipper.device) {
+		/* If the device has an endpoint, destroy it. */
+		if (flipper.device -> endpoint) {
+			flipper.device -> endpoint -> destroy(flipper.device -> endpoint);
+		}
 		free(flipper.device);
 	}
 	return lf_success;

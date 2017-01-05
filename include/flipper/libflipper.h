@@ -19,12 +19,7 @@
 
 /* If defined, imposes a timeout on USB transactions. */
 //#define __lf_usb_timeout__
-
-#ifdef __lf_usb_timeout__
-#define LF_USB_TIMEOUT_MS      256
-#else
-#define LF_USB_TIMEOUT_MS      0
-#endif
+#define LF_USB_TIMEOUT_MS 10000
 
 /* NOTE: Summing the size parameters of each endpoints below should be less than or equal to 160. */
 #define USB_IN_MASK            0x80

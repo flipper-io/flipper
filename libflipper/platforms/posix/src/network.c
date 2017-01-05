@@ -24,7 +24,7 @@ struct _network_record {
 int network_configure(struct _lf_endpoint *this, char *hostname) {
 	/* Allocate memory for the network record if it has not yet been allocated. */
 	if (!(this -> record)) {
-		this -> record = malloc(sizeof(struct _network_record));
+		this -> record = calloc(1, sizeof(struct _network_record));
 	}
 	/* Obtain a pointer to and cast to the network record associated with the provided endpoint. */
 	struct _network_record *record = this -> record;

@@ -17,19 +17,11 @@ int8_t megausb_interrupt_receive(uint8_t *destination, lf_size_t length) {
 
 	int total = lf_ceiling(length, INTERRUPT_OUT_SIZE);
 	for (int i = 0; i < total; i ++) {
-		/* Wait until data has been received. */
-		while (!(UEINTX & (1 << RWAL))) {
-			/* If USB has been detached while in this loop, return with error. */
-			if (!megausb_configured) {
-				return -1;
-			}
-/* If defined, USB transactions will time out after a specified period of time. */
-#ifdef __lf_usb_timeout__
-			/* If a timeout has occured, return 0 bytes sent. */
-			else if (UDFNUML == timeout) {
-				return 0;
-			}
-#endif
+
+		/* Wait until the USB controller is ready. */
+		int _e = megausb_wait_ready();
+		if (_e < lf_success) {
+			return 0;
 		}
 
 		/* Transfer the buffered data to the destination. */
@@ -67,19 +59,11 @@ int8_t megausb_interrupt_transmit(uint8_t *source, lf_size_t length) {
 
 	int total = lf_ceiling(length, INTERRUPT_IN_SIZE);
 	for (int i = 0; i < total; i ++) {
-		/* Wait until data has been received. */
-		while (!(UEINTX & (1 << RWAL))) {
-			/* If USB has been detached while in this loop, return with error. */
-			if (!megausb_configured) {
-				return -1;
-			}
-/* If defined, USB transactions will time out after a specified period of time. */
-#ifdef __lf_usb_timeout__
-			/* If a timeout has occured, return 0 bytes sent. */
-			else if (UDFNUML == timeout) {
-				return 0;
-			}
-#endif
+
+		/* Wait until the USB controller is ready. */
+		int _e = megausb_wait_ready();
+		if (_e < lf_success) {
+			return 0;
 		}
 
 		/* Transfer the buffered data to the destination. */

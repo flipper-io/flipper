@@ -67,11 +67,11 @@ enum {
 								 "checksums do not match", \
 								 "invalid name", \
 								 "configuration error", \
-								 "acknowledgement error" \
+								 "acknowledgement error", \
 								 "type error", \
 								 "boundary error", \
 								 "timer error", \
-								 "timeout"
+								 "timeout error"
 
 /* Allow the 'error_message' macro to serve as a passthrough for any variadic arguments supplied to it. */
 #define error_message(...) __VA_ARGS__

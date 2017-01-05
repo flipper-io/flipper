@@ -27,7 +27,7 @@ int lf_libusb_configure(struct _lf_endpoint *this, struct _lf_device *device) {
 	}
 	/* Allocate memory for the USB record if it has not yet been allocated. */
 	if (!(this -> record)) {
-		this -> record = malloc(sizeof(struct _lf_libusb_record));
+		this -> record = calloc(1, sizeof(struct _lf_libusb_record));
 		if (!(this -> record)) {
 			error_raise(E_MALLOC, error_message("Failed to allocate the memory needed to create a libusb record."));
 			goto failure;
@@ -63,6 +63,7 @@ int lf_libusb_configure(struct _lf_endpoint *this, struct _lf_device *device) {
 	libusb_set_debug(record -> context, 3);
 	/* Reset the device's USB controller. */
 	libusb_reset_device(record -> handle);
+
 	return lf_success;
 
 failure:

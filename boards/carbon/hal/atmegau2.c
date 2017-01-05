@@ -58,7 +58,7 @@ int lf_bridge_configure(struct _lf_device *device) {
 	}
 	/* Allocate memory for the bridge record if it has not yet been allocated. */
 	if (!(device -> endpoint -> record)) {
-		device -> endpoint -> record = malloc(sizeof(struct _lf_bridge_record));
+		device -> endpoint -> record = calloc(1, sizeof(struct _lf_bridge_record));
         if (!(device -> endpoint -> record)) {
             error_raise(E_MALLOC, error_message("Failed to allocate the memory needed to create a bridge endpoint record."));
             goto failure;
@@ -118,8 +118,14 @@ int lf_bridge_pull(struct _lf_endpoint *this, void *destination, lf_size_t lengt
 }
 
 int lf_bridge_destroy(struct _lf_endpoint *this) {
-    if (this -> record) {
-        free(this -> record);
+    struct _lf_bridge_record *record = this -> record;
+    if (record) {
+        struct _lf_endpoint *endpoint = record -> atmega16u2.endpoint;
+        /* Destroy the bridge endpoint. */
+        if (endpoint) {
+            endpoint -> destroy(endpoint);
+        }
+        free(record);
     }
     return lf_success;
 }
