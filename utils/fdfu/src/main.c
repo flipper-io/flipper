@@ -363,6 +363,9 @@ done:
 	cpu.cycle();
 	printf(KGRN " Successfully reset the CPU.\n" KNRM "----------------------");
 
+	/* Reconfigure the UART0 bus for FMR. */
+	uart0.configure();
+
 	/* If there were no errors, offer to flash again. */
 	if (!(_e < lf_success)) {
 		printf("\n\nWould you like to place the CPU in update mode again? ([y]/n): ");

@@ -117,8 +117,8 @@ void system_init(void) {
 	/* Disable the watchdog timer. */
 	WDT -> WDT_MR = WDT_MR_WDDIS;
 
-	/* Configure the EFC for 3 wait states. */
-	EFC -> EEFC_FMR = EEFC_FMR_FWS(3);
+	/* Configure the EFC for 5 wait states. */
+	EFC -> EEFC_FMR = EEFC_FMR_FWS(5);
 
 	/* Configure the primary clock source. */
 	if (!(PMC -> CKGR_MOR & CKGR_MOR_MOSCSEL)) {
