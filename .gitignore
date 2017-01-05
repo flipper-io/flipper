@@ -19,3 +19,4 @@ xcuserdata
 **/.hi
 .shake
 *.jdebug
+documentation/book/**

@@ -66,7 +66,7 @@ enum {
 };
 /* NOTE: The identifiers in this enumeration must match the order of the module addresses stored in the 'fmr_modules' array. */
 
-/* For internal use to the platform. */
+/* For use internal to the platform. */
 #define __use_uart0__
 
 #endif
