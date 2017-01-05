@@ -27,7 +27,6 @@
 
 /* Declare any standard modules with functionality specific to this device. */
 LF_MODULE(_cpu, "cpu", "Provides control over the CPU of the device.", _cpu_id);
-LF_MODULE(_fs, "fs", "Provides access to the device's filesystem.", _fs_id);
 LF_MODULE(_uart0, "uart0", "Provides low level access to the device's UART bus.", _uart0_id);
 
 struct _lf_endpoint lf_bridge_ep = {
@@ -50,7 +49,7 @@ struct _lf_bridge_record {
     struct _lf_module _uart0_bridge;
 };
 
-#define LF_ASSIGN_MODULE(module) module.device = &(record -> _atmega16u2);
+#define LF_ASSIGN_MODULE(module, id) module.device = &(record -> _atmega16u2); module.index = id;
 
 int lf_bridge_configure(struct _lf_device *device) {
     if (!device) {
@@ -75,12 +74,12 @@ int lf_bridge_configure(struct _lf_device *device) {
     /* Configure the endpoint. */
     record -> atmega16u2.endpoint -> configure(record -> atmega16u2.endpoint, record -> _atmega16u2);
     /* Assign the functionality of the device specific modules to this device. */
-    LF_ASSIGN_MODULE(_button);
-    LF_ASSIGN_MODULE(_cpu);
-    LF_ASSIGN_MODULE(_fs);
-    LF_ASSIGN_MODULE(_led);
-    LF_ASSIGN_MODULE(_uart0);
-    LF_ASSIGN_MODULE(_wdt);
+    LF_ASSIGN_MODULE(_button, _button_id);
+    LF_ASSIGN_MODULE(_cpu, _cpu_id);
+    LF_ASSIGN_MODULE(_fs, _fs_id);
+    LF_ASSIGN_MODULE(_led, _led_id);
+    LF_ASSIGN_MODULE(_uart0, _uart0_id);
+    LF_ASSIGN_MODULE(_wdt, _wdt_id);
     /* Set the bridge module's index. */
     record -> _uart0_bridge.index = _uart0_id;
     /* Set the bridge module's device pointer pointer. */

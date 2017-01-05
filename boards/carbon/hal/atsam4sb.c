@@ -7,6 +7,7 @@ LF_MODULE(_adc, "adc", "Interfaces with the device's internal analog to digital 
 LF_MODULE(_button, "button", "Interacts with the onboard button.", _button_id);
 LF_MODULE(_dac, "dac", "Provides access to the device's digital to analog converter.", _dac_id);
 LF_MODULE(_fld, "fld", "Loads modules on the target device.", _fld_id);
+LF_MODULE(_fs, "fs", "Provides access to the device's filesystem.", _fs_id);
 LF_MODULE(_gpio, "gpio", "Interfaces with the device's general purpose input output pins.", _gpio_id);
 LF_MODULE(_i2c, "i2c", "Interfaces with the device's I2C peripheral.", _i2c_id);
 LF_MODULE(_led, "led", "Interacts with the built-in status LED.", _led_id);
