@@ -1,4 +1,4 @@
-# Getting Started
+## Getting Started
 
 Once you have your Flipper device in hand, plug it in to your computer using the included USB cable. In order to use Flipper, you don't need to install any special drivers onto your computer. All you need to do is install a software package called the Flipper Toolbox.
 
@@ -9,19 +9,19 @@ Once you have your Flipper device in hand, plug it in to your computer using the
 On macOS, you must have homebrew installed to install the Flipper toolbox. Homebrew will take care of installing the dependancies needed by the toolbox as well as keep it up to date as we release updates in the future.
 
 ```bash
-brew install flipper
+$ brew install flipper
 ```
 
 #### Linux (Fedora)
 
 ```bash
-sudo dnf install flipper
+$ sudo dnf install flipper
 ```
 
 #### Linux (Debian/Ubuntu)
 
 ```
-sudo apt-get install flipper
+$ sudo apt-get install flipper
 ```
 
 ### Configuring your device.

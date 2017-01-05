@@ -7,9 +7,11 @@ XCode style (c) Angel Garcia <angelgarcia.mail@gmail.com>
 .hljs {
   display: block;
   overflow-x: auto;
-  padding: 0.5em;
-  background: #fff;
-  color: black;
+  padding: 16px;
+  border-radius: 3px;
+  font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  background: #f7f7f7;
+  color: #333;
 }
 
 .hljs-comment,
