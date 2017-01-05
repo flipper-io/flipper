@@ -2,7 +2,7 @@
 #include <flipper/carbon/modules/usart.h>
 #include <flipper/carbon/platforms/atsam4s16b.h>
 
-#define USART0_BAUDRATE 115200
+#define USART0_BAUDRATE 230400
 
 int usart_configure(void) {
 	/* Create a pinmask for the peripheral pins. */

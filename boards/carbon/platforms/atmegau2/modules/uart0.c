@@ -8,10 +8,10 @@ uint8_t usart_buffer[32];
 uint8_t usart_index = 0;
 
 int uart0_configure(void) {
-	/* 250k baud. */
+	/* 2  megabaud. */
 	UBRR1H = 0x00;
-	UBRR1L = 0x03;
-	UCSR1A &= ~(1 << U2X1);
+	UBRR1L = 0x00;
+	UCSR1A = (1 << U2X1);
 	/* 8n1 */
 	UCSR1C = (1 << UCSZ10) | (1 << UCSZ11);
 	/* Enable the receiver, transmitter, and receiver interrupt. */

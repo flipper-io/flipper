@@ -25,8 +25,6 @@ extern struct _lf_device self;
 #define enable_interrupts() sei()
 #define disable_interrupts() cli()
 
-#define PLATFORM_BAUDRATE 115200
-
 #define delay_ms(ms) _delay_ms(ms)
 
 /* Pin definition macros for F3 hardware. */

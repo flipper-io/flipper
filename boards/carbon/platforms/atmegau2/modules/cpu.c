@@ -62,6 +62,8 @@ lf_error_t cpu_dfu(void) {
 
 	/* 115.2k baud for DFU communication. */
 	UBRR1L = 0x08;
+	/* Don't multiply baud by 2. */
+	UCSR1A &= ~(1 << U2X1);
 
 	/* Assert the reset pin. */
 	clear_bit_in_port(SAM_RESET_PIN, SAM_RESET_PORT);
