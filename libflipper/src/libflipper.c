@@ -155,19 +155,14 @@ int lf_load_configuration(struct _lf_device *device) {
 		return lf_error;
 	}
 	struct _lf_configuration configuration;
-	/* Obtain a response packet from the device. */
+	/* Obtain the configuration from the device. */
 	_e = device -> endpoint -> pull(device -> endpoint, &configuration, sizeof(struct _lf_configuration));
 	if (_e < lf_success) {
 		return lf_error;
 	}
-	/* Obtain the result from the device. */
 	struct _fmr_result result;
 	/* Obtain the result of the operation. */
 	lf_get_result(device, &result);
-	if (result.error != E_OK) {
-		error_raise(result.error, error_message("Error encountered during configuration."));
-		return lf_error;
-	}
 	/* Compare the device identifiers. */
 	if (device -> configuration.identifier != configuration.identifier) {
 		error_raise(E_NO_DEVICE, error_message("Identifier mismatch for device '%s'. (0x%04x instead of 0x%04x)", device -> configuration.name, configuration.identifier, device -> configuration.identifier));
@@ -186,7 +181,7 @@ int lf_get_result(struct _lf_device *device, struct _fmr_result *result) {
 	if (_e < lf_success) {
 		return lf_error;
 	}
-	/* Record the observed error code. */
+	/* If an error occured on the device, raise it. */
 	if (result -> error != E_OK) {
 		error_raise(result -> error, error_message("The following error occured on the device '%s':", device -> configuration.name));
 	}

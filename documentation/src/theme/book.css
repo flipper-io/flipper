@@ -14,7 +14,8 @@ body {
 .hidden {
   display: none;
 }
-h2,
+h2 {
+}
 h3 {
   margin-top: 2.5em;
 }
@@ -199,6 +200,14 @@ table thead td {
   -o-transition: opacity 0.5s ease-in-out;
   -ms-transition: opacity 0.5s ease-in-out;
   transition: opacity 0.5s ease-in-out;
+}
+hr {
+    padding-top: 2%;
+    border-color: #eee;
+    border-style: none;
+    border-bottom-style: solid;
+    color: #888;
+    border-width: 2px;
 }
 .menu-bar:hover .menu-title {
   opacity: 1;

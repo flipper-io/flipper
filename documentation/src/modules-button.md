@@ -1,23 +1,40 @@
 button
-----
+===
 
 > The `button` module handles all user interaction with the tactile push-button that
 > can be found in the upper rightmost corner of your device.
 
-The module declaration can be found below.
+This module contains the following functions:
+- [configure](#configure)
+- [read](#read)
 
-```c
-extern const struct _button {
+-----------
 
-	/* Configures the button hardware. */
-	int (* configure)(void);
+## configure
+`button.configure()`
+> **returns**: `int` representing the success of the operation.
+> - `lf_success` when configuration succeeded.
+> - `lf_error` when configuration failed.
 
-	/* Reads back the button state; returns 0 when released and 1 when pressed. */
-	uint8_t (* read)(void);
+The configure function initializes the button hardware. This function is called
+automatically on startup, and should not need to be called from
+user applications.
 
-} button;
+**console syntax**
+```bash
+$ flipper button configure
 ```
 
-### configure
+## read
+`button.read()`
+> **returns**: `uint8_t` representing the button state.
+> - `0` when the button is released.
+> - `1` when the button is pressed.
 
-The configure function
+The read function returns the button state.
+
+#### console command
+
+```bash
+$ flipper button configure
+```

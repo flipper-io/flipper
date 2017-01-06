@@ -1,5 +1,5 @@
 adc
-----
+===
 
 > The `adc (Analog to Digital Converter)` module presents a simple interface
 > that can be used to read the analog values of the device's analog IO pins.
