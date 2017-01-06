@@ -11,30 +11,37 @@ This module contains the following functions:
 -----------
 
 ## configure
-`button.configure()`
+
+The `configure` function initializes the button hardware. This function is called
+automatically on startup, and should not need to be called from
+user applications.
+
+```c
+button.configure()
+```
 > **returns**: `int` representing the success of the operation.
 > - `lf_success` when configuration succeeded.
 > - `lf_error` when configuration failed.
 
-The configure function initializes the button hardware. This function is called
-automatically on startup, and should not need to be called from
-user applications.
-
 **console syntax**
-```bash
+```
 $ flipper button configure
 ```
 
+-----------
+
 ## read
-`button.read()`
+
+The `read` function returns the button state as described above.
+
+```c
+button.read()
+```
 > **returns**: `uint8_t` representing the button state.
 > - `0` when the button is released.
 > - `1` when the button is pressed.
 
-The read function returns the button state.
-
-#### console command
-
-```bash
-$ flipper button configure
+**console syntax**
+```
+$ flipper button read
 ```

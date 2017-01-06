@@ -14,7 +14,11 @@ body {
 .hidden {
   display: none;
 }
+h1 {
+    font-family: "Open Sans", sans-serif;
+}
 h2 {
+    font-family: "Open Sans", sans-serif;
 }
 h3 {
   margin-top: 2.5em;
