@@ -19,7 +19,11 @@
 
 /* If defined, imposes a timeout on USB transactions. */
 //#define __lf_usb_timeout__
+#ifdef __lf_usb_timeout__
 #define LF_USB_TIMEOUT_MS 10000
+#else
+#define LF_USB_TIMEOUT_MS 0
+#endif
 
 /* NOTE: Summing the size parameters of each endpoints below should be less than or equal to 160. */
 #define USB_IN_MASK            0x80
@@ -30,7 +34,7 @@
 #define BULK_IN_ENDPOINT       (0x03 | USB_IN_MASK)
 #define BULK_IN_SIZE           64
 #define BULK_OUT_ENDPOINT      0x04
-#define BULK_OUT_SIZE          64\
+#define BULK_OUT_SIZE          64
 
 /* The name of the default device to attach to. */
 #define LF_DEFAULT_NAME "flipper"

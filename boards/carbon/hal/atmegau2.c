@@ -5,7 +5,7 @@
  * The atmeaga16u2 device is used to handle USB interactions with the host,
  * while the atsam4s16b is used to perfrom computations and interact with
  * device peripherals. Following the block diagram below, the 4S device is
- * isolated from the host, only able to send and recieve communications
+ * isolated from the host, only able to send and receive communications
  * via its uart0 hardware bus. This HAL provides access to the 4S device using
  * libusb and the atmega16u2 device as a Flipper Message Runtime bridge to the
  * 4S hardware. This is accomplished by creating an FMR endpoint using the U2's

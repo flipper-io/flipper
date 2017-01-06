@@ -94,6 +94,7 @@ void system_task(void) {
 }
 
 void uart0_isr(void) {
+	/* If an entire packet has been received, process it. */
 	if (UART0 -> UART_SR & UART_SR_ENDRX) {
 		/* Disable the PDC receiver. */
 		UART0 -> UART_PTCR = UART_PTCR_RXTDIS;

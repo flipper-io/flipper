@@ -380,8 +380,10 @@ table thead td {
   padding: 0 20px;
   color: #333;
   background-color: #f2f7f9;
-  border-top: 0.1em solid #e1edf1;
-  border-bottom: 0.1em solid #e1edf1;
+  color: #333;
+  padding-top: 2px;
+  border-left: 0.3em solid #e1edf1;
+  padding-bottom: 2px;
 }
 .light table td {
   border-color: #f2f2f2;

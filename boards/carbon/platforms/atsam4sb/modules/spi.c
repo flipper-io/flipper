@@ -58,7 +58,7 @@ void spi_put(uint8_t byte) {
 uint8_t spi_get(void) {
 	/* Write a dummy byte. */
 	spi_put(0xff);
-	/* Wait until data has been recieved. */
+	/* Wait until data has been received. */
 	while (!(SPI -> SPI_SR & SPI_SR_RDRF));
 	/* Return the received byte. */
 	return SPI -> SPI_RDR;

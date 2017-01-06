@@ -18,12 +18,12 @@ struct _lf_timer {
 };
 
 /* Initialize an array of all the timers. */
-struct _lf_timer timers[] = { { &(TC0 -> TC_CHANNEL[0]), false, NULL },
-							  { &(TC0 -> TC_CHANNEL[1]), false, NULL },
-							  { &(TC0 -> TC_CHANNEL[2]), false, NULL },
-						  	  { &(TC0 -> TC_CHANNEL[3]), false, NULL },
-						  	  { &(TC0 -> TC_CHANNEL[4]), false, NULL },
-						  	  { &(TC0 -> TC_CHANNEL[5]), false, NULL } };
+struct _lf_timer timers[] = { { &(TC0 -> TC_CHANNEL[0]), true, NULL },
+							  { &(TC0 -> TC_CHANNEL[1]), true, NULL },
+							  { &(TC0 -> TC_CHANNEL[2]), true, NULL },
+						  	  { &(TC0 -> TC_CHANNEL[3]), true, NULL },
+						  	  { &(TC0 -> TC_CHANNEL[4]), true, NULL },
+						  	  { &(TC0 -> TC_CHANNEL[5]), true, NULL } };
 
 int timer_configure(void) {
 	/* Iterate through the timers and configure their defaults. */
@@ -49,8 +49,12 @@ int timer_register(uint32_t ticks, void *callback) {
 	/* Loop through the timers until a free timer is found. */
 	for (int i = 0; i < sizeof(timers); i ++) {
 		if (timers[i].available) {
+			/* Hold the timer. */
+			timers[i].available = false;
 			/* Set the callback address. */
 			timers[i].callback = callback;
+			/* Set the compare value into C. */
+			timers[i].CH -> TC_RC = ticks;
 			/* Enable the clock and start the timer. */
 			timers[i].CH -> TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;
 			return lf_success;

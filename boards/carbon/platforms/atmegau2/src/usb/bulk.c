@@ -6,11 +6,8 @@ int8_t megausb_bulk_receive(uint8_t *destination, lf_size_t length) {
 
 	/* If USB is not configured, return with error. */
 	if (!megausb_configured) {
-		return -1;
+		return lf_error;
 	}
-
-	/* Calculate the timeout value using the frame counter. */
-	uint8_t timeout = UDFNUML + LF_USB_TIMEOUT_MS;
 
 	/* Select the endpoint that has been configured to receive bulk data. */
 	UENUM = BULK_OUT_ENDPOINT;
@@ -21,7 +18,7 @@ int8_t megausb_bulk_receive(uint8_t *destination, lf_size_t length) {
 		/* Wait until the USB controller is ready. */
 		int _e = megausb_wait_ready();
 		if (_e < lf_success) {
-			return 0;
+			return lf_error;
 		}
 
 		/* Transfer the buffered data to the destination. */
@@ -40,7 +37,7 @@ int8_t megausb_bulk_receive(uint8_t *destination, lf_size_t length) {
 		UEINTX = (1 << NAKINI) | (1 << RWAL) | (1 << RXSTPI) | (1 << STALLEDI) | (1 << TXINI);
 	}
 
-	return BULK_OUT_SIZE;
+	return lf_success;
 }
 
 /* Receive a packet using the appropriate bulk endpoint. */
@@ -48,11 +45,8 @@ int8_t megausb_bulk_transmit(uint8_t *source, lf_size_t length) {
 
 	/* If USB is not configured, return with error. */
 	if (!megausb_configured) {
-		return -1;
+		return lf_error;
 	}
-
-	/* Calculate the timeout value using the frame counter. */
-	uint8_t timeout = UDFNUML + LF_USB_TIMEOUT_MS;
 
 	/* Select the endpoint that has been configured to receive bulk data. */
 	UENUM = BULK_IN_ENDPOINT & ~USB_IN_MASK;
@@ -63,7 +57,7 @@ int8_t megausb_bulk_transmit(uint8_t *source, lf_size_t length) {
 		/* Wait until the USB controller is ready. */
 		int _e = megausb_wait_ready();
 		if (_e < lf_success) {
-			return 0;
+			return lf_error;
 		}
 
 		/* Transfer the buffered data to the destination. */
@@ -82,5 +76,5 @@ int8_t megausb_bulk_transmit(uint8_t *source, lf_size_t length) {
 		UEINTX = (1 << RWAL) | (1 << NAKOUTI) | (1 << RXSTPI) | (1 << STALLEDI);
 	}
 
-	return BULK_IN_SIZE;
+	return lf_success;
 }

@@ -30,7 +30,7 @@ uint8_t nvm_get_status(void) {
 	spi_put(FLASH_OPCODE_GET_STATUS_REGISTER);
 	/* Get the contents of the status register. */
 	uint8_t status = spi_get();
-	/* Disable the device so that no data can be recieved until the next opcode is sent. */
+	/* Disable the device so that no data can be received until the next opcode is sent. */
 	nvm_disable();
 	return status;
 }
@@ -41,7 +41,7 @@ void nvm_wait(void) {
 }
 
 void nvm_begin_continuous_read(uint16_t page, uint16_t offset) {
-	/* Wait until the flash chip is ready to recieve data. */
+	/* Wait until the flash chip is ready to receive data. */
 	nvm_wait();
 	/* Reset the device to prepare it for the incoming opcode. */
 	nvm_reset();
@@ -55,7 +55,7 @@ void nvm_begin_continuous_read(uint16_t page, uint16_t offset) {
 }
 
 void nvm_begin_continuous_buffer_read(uint8_t buffer, uint16_t offset) {
-	/* Wait until the flash chip is ready to recieve data. */
+	/* Wait until the flash chip is ready to receive data. */
 	nvm_wait();
 	/* Reset the device to prepare it for the incoming opcode. */
 	nvm_reset();
@@ -77,7 +77,7 @@ void nvm_begin_continuous_buffer_read(uint8_t buffer, uint16_t offset) {
 }
 
 void nvm_transfer_buffer_to_page_with_erase(uint8_t buffer, uint16_t page, uint8_t erase) {
-	/* Wait until the flash chip is ready to recieve data. */
+	/* Wait until the flash chip is ready to receive data. */
 	nvm_wait();
 	/* Reset the device to prepare it for the incoming opcode. */
 	nvm_reset();
@@ -103,12 +103,12 @@ void nvm_transfer_buffer_to_page_with_erase(uint8_t buffer, uint16_t page, uint8
 	spi_put(nvm_payload_lo(page));
 	/* Complete the transfer by sending 8 don't care bits. The device will remain busy until this operation has completed. */
 	spi_put(0x00);
-	/* Disable the device so that no data can be recieved until the next opcode is sent. */
+	/* Disable the device so that no data can be received until the next opcode is sent. */
 	nvm_disable();
 }
 
 void nvm_transfer_page_to_buffer_with_erase(uint16_t page, uint8_t buffer) {
-	/* Wait until the flash chip is ready to recieve data. */
+	/* Wait until the flash chip is ready to receive data. */
 	nvm_wait();
 	/* Reset the device to prepare it for the incoming opcode. */
 	nvm_reset();
@@ -126,12 +126,12 @@ void nvm_transfer_page_to_buffer_with_erase(uint16_t page, uint8_t buffer) {
 	spi_put(nvm_payload_lo(page));
 	/* Complete the opcode by sending 8 don't care bits. The device will remain busy until this operation has completed. */
 	spi_put(0x00);
-	/* Disable the device so that no data can be recieved until the next opcode is sent. */
+	/* Disable the device so that no data can be received until the next opcode is sent. */
 	nvm_disable();
 }
 
 void nvm_begin_writing_to_buffer_with_offset(uint8_t buffer, uint16_t offset) {
-	/* Wait until the flash chip is ready to recieve data. */
+	/* Wait until the flash chip is ready to receive data. */
 	nvm_wait();
 	/* Reset the device to prepare it for the incoming opcode. */
 	nvm_reset();
@@ -171,7 +171,7 @@ void nvm_begin_reading_from_page_with_offset(uint16_t page, uint16_t offset) {
 }
 
 void nvm_reset_settings(void) {
-	/* Wait until the flash chip is ready to recieve data. */
+	/* Wait until the flash chip is ready to receive data. */
 	nvm_wait();
 	/* Reset the device to prepare it for the incoming opcode. */
 	nvm_reset();
@@ -180,7 +180,7 @@ void nvm_reset_settings(void) {
 	spi_put(FLASH_OPCODE_CONFIGURE_512_BYTE_PAGE_1);
 	spi_put(FLASH_OPCODE_CONFIGURE_512_BYTE_PAGE_2);
 	spi_put(FLASH_OPCODE_CONFIGURE_512_BYTE_PAGE_3);
-	/* Disable the device so that no data can be recieved until the next opcode is sent. */
+	/* Disable the device so that no data can be received until the next opcode is sent. */
 	nvm_disable();
 }
 
