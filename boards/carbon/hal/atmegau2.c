@@ -107,14 +107,45 @@ uint8_t lf_bridge_get(struct _lf_endpoint *this) {
     return lf_invoke(&(record -> _uart0_bridge), _uart0_get, NULL);
 }
 
+#define CHUNK_SIZE 128
 int lf_bridge_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
     struct _lf_bridge_record *record = this -> record;
-    return lf_push(&(record -> _uart0_bridge), _uart0_push, source, length, NULL);
+    /* The number of chunks to send. */
+    int chunks = length / CHUNK_SIZE;
+    int _e;
+    for (int i = 0; i < chunks; i ++) {
+        _e = lf_push(&(record -> _uart0_bridge), _uart0_push, source, CHUNK_SIZE, NULL);
+        if (_e < lf_success) {
+            return _e;
+        }
+        length -= CHUNK_SIZE;
+        source += CHUNK_SIZE;
+    }
+    /* If there is a remainder of data left to send, send it. */
+    if (length) {
+        _e = lf_push(&(record -> _uart0_bridge), _uart0_push, source, length, NULL);
+    }
+    return _e;
 }
 
 int lf_bridge_pull(struct _lf_endpoint *this, void *destination, lf_size_t length) {
     struct _lf_bridge_record *record = this -> record;
-    return lf_pull(&(record -> _uart0_bridge), _uart0_pull, destination, length, NULL);
+    /* The number of chunks to send. */
+    int chunks = length / CHUNK_SIZE;
+    int _e;
+    for (int i = 0; i < chunks; i ++) {
+        _e = lf_pull(&(record -> _uart0_bridge), _uart0_pull, destination, CHUNK_SIZE, NULL);
+        if (_e < lf_success) {
+            return _e;
+        }
+        length -= CHUNK_SIZE;
+        destination += CHUNK_SIZE;
+    }
+    /* If there is a remainder of data left to send, send it. */
+    if (length) {
+        _e = lf_pull(&(record -> _uart0_bridge), _uart0_pull, destination, length, NULL);
+    }
+    return _e;
 }
 
 int lf_bridge_destroy(struct _lf_endpoint *this) {
