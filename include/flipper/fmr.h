@@ -65,6 +65,8 @@ enum {
 	fmr_push_class,
 	/* Causes a pull operation to begin. */
 	fmr_pull_class,
+	/* Experimental: Caused a RAM load and launch. */
+	fmr_ram_load_class,
 	/* Signals the occurance an event. */
 	fmr_event_class
 };

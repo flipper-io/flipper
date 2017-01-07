@@ -205,6 +205,8 @@ fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _f
 	struct _fmr_packet _packet = { 0 };
 	/* A packet cast that exposes the data structures specific to this packet subclass. */
 	struct _fmr_invocation_packet *packet = (struct _fmr_invocation_packet *)(&_packet);
+	/* Set the magic number. */
+	_packet.header.magic = FMR_MAGIC_NUMBER;
 	/* Compute the initial length of the packet. */
 	_packet.header.length = sizeof(struct _fmr_invocation_packet);
 	/* Set the packet class. */
@@ -287,6 +289,8 @@ int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_s
 	}
 	struct _fmr_packet _packet = { 0 };
 	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
+	/* Set the magic number. */
+	_packet.header.magic = FMR_MAGIC_NUMBER;
 	/* Compute the initial length of the packet. */
 	_packet.header.length = sizeof(struct _fmr_push_pull_packet);
 	/* Set the packet class. */
@@ -302,6 +306,48 @@ int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_s
 	_packet.header.checksum = lf_crc(packet, _packet.header.length);
 	/* Send the packet to the target device. */
 	_e = lf_transfer(device, &_packet);
+	if (_e < lf_success) {
+		return lf_error;
+	}
+	/* Transfer the data through to the address space of the device. */
+	_e = device -> endpoint -> push(device -> endpoint, source, length);
+	/* Ensure that the data was successfully transferred to the device. */
+	if (_e < lf_success) {
+		return lf_error;
+	}
+	struct _fmr_result result;
+	/* Obtain the result of the operation. */
+	lf_get_result(device, &result);
+	/* Return a pointer to the data. */
+	return lf_success;
+}
+
+/* Experimental: Load an application into a device's RAM and launch it. */
+int lf_ram_load(struct _lf_device *device, void *source, lf_size_t length) {
+	if (!source) {
+		error_raise(E_NULL, error_message("No source provided for load operation."));
+	} else if (!length) {
+		return lf_success;
+	}
+	/* If no device is provided, throw an error. */
+	if (!device) {
+		error_raise(E_NO_DEVICE, error_message("Failed to load to device."));
+		return lf_error;
+	}
+	struct _fmr_packet _packet = { 0 };
+	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
+	/* Set the magic number. */
+	_packet.header.magic = FMR_MAGIC_NUMBER;
+	/* Compute the initial length of the packet. */
+	_packet.header.length = sizeof(struct _fmr_push_pull_packet);
+	/* Set the packet class. */
+	_packet.header.class = fmr_ram_load_class;
+	/* Set the push length. */
+	packet -> length = length;
+	/* Compute and store the packet checksum. */
+	_packet.header.checksum = lf_crc(packet, _packet.header.length);
+	/* Send the packet to the target device. */
+	int _e = lf_transfer(device, &_packet);
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -337,6 +383,8 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 	}
 	struct _fmr_packet _packet = { 0 };
 	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
+	/* Set the magic number. */
+	_packet.header.magic = FMR_MAGIC_NUMBER;
 	/* Compute the initial length of the packet. */
 	_packet.header.length = sizeof(struct _fmr_push_pull_packet);
 	/* Set the packet class. */

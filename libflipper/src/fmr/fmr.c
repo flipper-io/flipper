@@ -143,8 +143,6 @@ int fmr_create_call(fmr_module module, fmr_function function, struct _fmr_list *
 		/* If no arguments are provided, automatically provide an empty argument list. */
 		parameters = fmr_build(0);
 	}
-	/* Set the magic number. */
-	header -> magic = FMR_MAGIC_NUMBER;
 	/* Store the target module, function, and argument count in the packet. */
 	call -> index = module;
 	call -> function = function;
@@ -233,6 +231,10 @@ int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
 		case fmr_pull_class:
 			/* Each platform has its own way of handling push/pull requests. */
 			fmr_pull((struct _fmr_push_pull_packet *)(packet));
+		break;
+		/* Experimental packet class, loads and launches a program. */
+		case fmr_ram_load_class:
+			fmr_push((struct _fmr_push_pull_packet *)(packet));
 		break;
 		case fmr_event_class:
 			/* Handle an event. */

@@ -16,6 +16,9 @@ struct _lf_device lf_self = {
 	E_OK
 };
 
+/* Experimental: Entry address of the loaded program. */
+volatile void *application_entry = NULL;
+
 void uart0_pull_wait(void *destination, lf_size_t length) {
 	/* Disable the PDC receive complete interrupt. */
 	UART0 -> UART_IDR = UART_IDR_ENDRX;
@@ -33,29 +36,32 @@ void uart0_pull_wait(void *destination, lf_size_t length) {
 }
 
 void fmr_push(struct _fmr_push_pull_packet *packet) {
-	void *swap = malloc(packet -> length);
-	if (!swap) {
+	void *push_buffer = malloc(packet -> length);
+	if (!push_buffer) {
 		error_raise(E_MALLOC, NULL);
 		return;
 	}
-	//lf_self.endpoint -> pull(lf_self.endpoint, swap, packet -> length);
-	uart0_pull_wait(swap, packet -> length);
-	*(uintptr_t *)(packet -> call.parameters) = (uintptr_t)swap;
-	fmr_execute(packet -> call.index, packet -> call.function, packet -> call.argc, packet -> call.types, (void *)(packet -> call.parameters));
-	free(swap);
+	uart0_pull_wait(push_buffer, packet -> length);
+	if (packet -> header.class != fmr_ram_load_class) {
+		*(uintptr_t *)(packet -> call.parameters) = (uintptr_t)push_buffer;
+		fmr_execute(packet -> call.index, packet -> call.function, packet -> call.argc, packet -> call.types, (void *)(packet -> call.parameters));
+		free(push_buffer);
+	} else {
+		/* Add 1 for proper jump to thumb mode. */
+		application_entry = push_buffer + 1;
+	}
 }
 
 void fmr_pull(struct _fmr_push_pull_packet *packet) {
-	void *swap = malloc(packet -> length);
-	if (!swap) {
+	void *pull_buffer = malloc(packet -> length);
+	if (!pull_buffer) {
 		error_raise(E_MALLOC, NULL);
 		return;
 	}
-	*(uintptr_t *)(packet -> call.parameters) = (uintptr_t)swap;
+	*(uintptr_t *)(packet -> call.parameters) = (uintptr_t)pull_buffer;
 	fmr_execute(packet -> call.index, packet -> call.function, packet -> call.argc, packet -> call.types, (void *)(packet -> call.parameters));
-	//lf_self.endpoint -> push(lf_self.endpoint, swap, packet -> length);
-	uart0_push(swap, packet -> length);
-	free(swap);
+	uart0_push(pull_buffer, packet -> length);
+	free(pull_buffer);
 }
 
 struct _fmr_packet packet;
@@ -77,19 +83,27 @@ void system_task(void) {
 
 	/* -------- USER TASK -------- */
 
-	char message[] = "Reset.\n";
-	usart_push(message, sizeof(message));
+	char reset_msg[] = "Reset.\n";
+	usart_push(reset_msg, sizeof(reset_msg));
 
-	gpio_enable(PIO_PA0, 0);
-	PIOA -> PIO_OWER = PIO_PA0;
-	while (1) {
-		PIOA -> PIO_ODSR ^= PIO_PA0;
+repeat:
+	// gpio_enable(PIO_PA0, 0);
+	// PIOA -> PIO_OWER = PIO_PA0;
 
-		char hello[] = "hello";
-		spi_push(hello, sizeof(hello));
+	/* Weird while(1) if behavior fix? */
+	while (!application_entry) __NOP();
 
-		for (int i = 0; i < 5000000; i ++) __NOP();
-	}
+	char load_msg[] = "Loaded app. Launching.\n";
+	usart_push(load_msg, sizeof(load_msg));
+
+	((void (*)(void))(application_entry))();
+
+	char done_msg[] = "Finished executing app.\n";
+	usart_push(done_msg, sizeof(done_msg));
+
+	application_entry = NULL;
+
+	goto repeat;
 
 }
 

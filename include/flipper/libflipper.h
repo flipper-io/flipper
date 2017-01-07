@@ -215,6 +215,9 @@ extern int lf_transfer(struct _lf_device *device, struct _fmr_packet *packet);
 /* Retrieves a packet from the specified device. */
 extern int lf_retrieve(struct _lf_device *device, struct _fmr_result *response);
 
+/* Experimental: Load an application into RAM and execute it. */
+int lf_ram_load(struct _lf_device *device, void *source, lf_size_t length);
+
 /* Prints verbose information about the packet disassembly. */
 extern void lf_debug_packet(struct _fmr_packet *packet, size_t length);
 extern void lf_debug_result(struct _fmr_result *result);
