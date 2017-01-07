@@ -47,8 +47,14 @@ void fmr_push(struct _fmr_push_pull_packet *packet) {
 		fmr_execute(packet -> call.index, packet -> call.function, packet -> call.argc, packet -> call.types, (void *)(packet -> call.parameters));
 		free(push_buffer);
 	} else {
-		/* Add 1 for proper jump to thumb mode. */
-		application_entry = push_buffer + 1;
+		/* If we are not already running an application. */
+		if (!application_entry) {
+			/* Add 1 for proper jump to thumb mode. */
+			application_entry = push_buffer + 1;
+		} else {
+			/* If we are, immediately free the app memory. */
+			free(push_buffer);
+		}
 	}
 }
 
@@ -93,13 +99,10 @@ repeat:
 	/* Weird while(1) if behavior fix? */
 	while (!application_entry) __NOP();
 
-	char load_msg[] = "Loaded app. Launching.\n";
-	usart_push(load_msg, sizeof(load_msg));
-
 	((void (*)(void))(application_entry))();
 
-	char done_msg[] = "Finished executing app.\n";
-	usart_push(done_msg, sizeof(done_msg));
+	/* Free the app memory, subtracting 1 for thumb mode. */
+	free((void *)(application_entry - 1));
 
 	application_entry = NULL;
 
