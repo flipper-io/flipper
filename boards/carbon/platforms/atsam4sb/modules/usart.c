@@ -53,6 +53,8 @@ uint8_t usart_ready(void) {
 }
 
 void usart_put(uint8_t byte) {
+	/* Wait until ready to transmit. */
+	while (!(USART0 -> US_CSR & US_CSR_TXEMPTY));
 	/* Load the byte into the transmitter FIFO. */
 	USART0 -> US_THR = byte;
 }

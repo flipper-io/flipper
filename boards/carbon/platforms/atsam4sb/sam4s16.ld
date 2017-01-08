@@ -39,11 +39,10 @@ SEARCH_DIR(.)
 MEMORY
 {
 	rom (rx)  : ORIGIN = 0x00400000, LENGTH = 0x00100000 /* flash, 1024K */
-	ram (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00020000 /* sram, 128K */
+	SRAM (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00020000 /* sram, 128K */
 }
 
-/* The stack size used by the application. NOTE: you need to adjust according to your application. */
-STACK_SIZE = 0x3000;
+_estack = ORIGIN(SRAM) + LENGTH(SRAM);
 
 /* Section Definitions */
 SECTIONS
@@ -120,7 +119,7 @@ SECTIONS
 		*(.data .data.*);
 		. = ALIGN(4);
 		_erelocate = .;
-	} > ram
+	} > SRAM
 
 	/* .bss section which is used for uninitialized data */
 	.bss (NOLOAD) :
@@ -135,17 +134,7 @@ SECTIONS
 		__bss_end__ = .;
 		_ebss = . ;
 		_ezero = .;
-	} > ram
-
-	/* stack section */
-	.stack (NOLOAD):
-	{
-		. = ALIGN(8);
-		 _sstack = .;
-		. = . + STACK_SIZE;
-		. = ALIGN(8);
-		_estack = .;
-	} > ram
+	} > SRAM
 
 	. = ALIGN(4);
 	_end = . ;

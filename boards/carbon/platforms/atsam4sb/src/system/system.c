@@ -17,7 +17,8 @@ struct _lf_device lf_self = {
 };
 
 /* Experimental: Entry address of the loaded program. */
-volatile void *application_entry = NULL;
+extern int os_load(void *address);
+extern void launch_application(void);
 
 void uart0_pull_wait(void *destination, lf_size_t length) {
 	/* Disable the PDC receive complete interrupt. */
@@ -47,12 +48,9 @@ void fmr_push(struct _fmr_push_pull_packet *packet) {
 		fmr_execute(packet -> call.index, packet -> call.function, packet -> call.argc, packet -> call.types, (void *)(packet -> call.parameters));
 		free(push_buffer);
 	} else {
-		/* If we are not already running an application. */
-		if (!application_entry) {
-			/* Add 1 for proper jump to thumb mode. */
-			application_entry = push_buffer + 1;
-		} else {
-			/* If we are, immediately free the app memory. */
+		/* Attempt to load the image. */
+		if (os_load(push_buffer) < lf_success) {
+			/* If loading failed, release the memory. */
 			free(push_buffer);
 		}
 	}
@@ -92,21 +90,10 @@ void system_task(void) {
 	char reset_msg[] = "Reset.\n";
 	usart_push(reset_msg, sizeof(reset_msg));
 
-repeat:
-	// gpio_enable(PIO_PA0, 0);
-	// PIOA -> PIO_OWER = PIO_PA0;
-
-	/* Weird while(1) if behavior fix? */
-	while (!application_entry) __NOP();
-
-	((void (*)(void))(application_entry))();
-
-	/* Free the app memory, subtracting 1 for thumb mode. */
-	free((void *)(application_entry - 1));
-
-	application_entry = NULL;
-
-	goto repeat;
+	/* Launch apps all day long. */
+	while (1) {
+		launch_application();
+	}
 
 }
 

@@ -1,5 +1,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
+#define __private_include__
+#include <flipper/carbon/modules/usart.h>
 
 extern int errno;
 extern int _end;
@@ -44,6 +46,9 @@ extern int _read(int file, char *ptr, int len) {
 }
 
 extern int _write(int file, char *ptr, int len) {
+	for (int i = 0; i < len; i ++, ptr ++) {
+		usart_put(*ptr);
+	}
 	return 0;
 }
 

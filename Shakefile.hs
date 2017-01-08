@@ -54,8 +54,6 @@ arm_c_prep = [ -- Use C99.
              , "-mcpu=cortex-m4"
                -- Arch is ARMv7E-M:
              , "-march=armv7e-m"
-               -- Use Thumb ISA:
-             , "-mthumb"
                -- Include debugging metadata:
              , "-g"
                -- Platform header:

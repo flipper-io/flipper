@@ -51,6 +51,8 @@ uint8_t uart0_ready(void) {
 }
 
 void uart0_put(uint8_t byte) {
+	/* Wait until ready to transmit. */
+	while (!(UART0 -> UART_SR & UART_SR_TXEMPTY));
 	/* Load the byte into the transmitter FIFO. */
 	UART0 -> UART_THR = byte;
 }
