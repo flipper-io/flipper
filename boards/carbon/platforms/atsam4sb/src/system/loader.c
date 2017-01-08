@@ -82,7 +82,7 @@ int os_load(void *address) {
 void launch_application(void) {
 
     /* Wait until an application is ready to launch. */
-	while(!application_base);
+	while (!application_base);
 
     /* Launch the application. */
 	((void (*)(void))(application_entry))();
