@@ -1,8 +1,5 @@
 #define __private_include__
-#include <flipper/carbon/modules/gpio.h>
-#include <flipper/carbon/modules/uart0.h>
-#include <flipper/carbon/modules.h>
-#include <flipper/carbon/platforms/atsam4s16b.h>
+#include <osmium.h>
 
 /* The fmr_device object containing global state about this device. */
 struct _lf_device lf_self = {
@@ -70,30 +67,12 @@ void fmr_pull(struct _fmr_push_pull_packet *packet) {
 
 struct _fmr_packet packet;
 
+/* System task is executed when user tasks are not active. */
 void system_task(void) {
-	/* Configure the USART peripheral. */
-	usart_configure();
-	/* Configure the UART peripheral. */
-	uart0_configure();
-	/* Configure the GPIO peripheral. */
-	gpio_configure();
-	/* Configure the SPI peripheral. */
-	spi_configure();
 
-	/* Pull an FMR packet asynchronously. */
-	uart0_pull(&packet, sizeof(struct _fmr_packet));
-	/* Enable the PDC receive complete interrupt. */
-	UART0 -> UART_IER = UART_IER_ENDRX;
+	/* -------- SYSTEM TASK -------- */
 
-	/* -------- USER TASK -------- */
-
-	char reset_msg[] = "Reset.\n";
-	usart_push(reset_msg, sizeof(reset_msg));
-
-	/* Launch apps all day long. */
-	while (1) {
-		launch_application();
-	}
+	while (1);
 
 }
 
@@ -117,6 +96,7 @@ void uart0_isr(void) {
 	}
 }
 
+/* Called once on system initialization. */
 void system_init(void) {
 
 	/* Disable the watchdog timer. */
@@ -149,6 +129,25 @@ void system_init(void) {
 
 	/* Allow the reset pin to reset the device. */
 	RSTC -> RSTC_MR = RSTC_MR_KEY(0xA5) | RSTC_MR_URSTEN;
+
+	/* Configure the USART peripheral. */
+	usart_configure();
+	/* Configure the UART peripheral. */
+	uart0_configure();
+	/* Configure the GPIO peripheral. */
+	gpio_configure();
+	/* Configure the SPI peripheral. */
+	spi_configure();
+
+	/* Pull an FMR packet asynchronously to launch FMR. */
+	uart0_pull(&packet, sizeof(struct _fmr_packet));
+	/* Enable the PDC receive complete interrupt. */
+	UART0 -> UART_IER = UART_IER_ENDRX;
+
+	/* Print reset message. */
+	char reset_msg[] = "Reset.\n";
+	usart_push(reset_msg, sizeof(reset_msg));
+
 }
 
 void system_deinit(void) {

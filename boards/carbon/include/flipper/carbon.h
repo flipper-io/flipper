@@ -1,6 +1,28 @@
 /* Flipper: Carbon Edition board header file. */
 #include <flipper/libflipper.h>
 
+/* Include the header files for all of the standard modules exposed by the toolbox. */
+#include <flipper/carbon/modules/adc.h>
+#include <flipper/carbon/modules/button.h>
+#include <flipper/carbon/modules/cpu.h>
+#include <flipper/carbon/modules/dac.h>
+#include <flipper/carbon/modules/fld.h>
+#include <flipper/carbon/modules/fs.h>
+#include <flipper/carbon/modules/gpio.h>
+#include <flipper/carbon/modules/i2c.h>
+#include <flipper/carbon/modules/led.h>
+#include <flipper/carbon/modules/pwm.h>
+#include <flipper/carbon/modules/rtc.h>
+#include <flipper/carbon/modules/spi.h>
+#include <flipper/carbon/modules/swd.h>
+#include <flipper/carbon/modules/task.h>
+#include <flipper/carbon/modules/temp.h>
+#include <flipper/carbon/modules/timer.h>
+#include <flipper/carbon/modules/uart0.h>
+#include <flipper/carbon/modules/usart.h>
+#include <flipper/carbon/modules/usb.h>
+#include <flipper/carbon/modules/wdt.h>
+
 /* NOTE: Probably move this again. */
 extern struct _lf_endpoint lf_bridge_ep;
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */

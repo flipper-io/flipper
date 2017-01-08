@@ -28,6 +28,7 @@
 #define __use_rtc__
 #define __use_spi__
 #define __use_swd__
+#define __use_task__
 #define __use_temp__
 #define __use_timer__
 #define __use_uart0__

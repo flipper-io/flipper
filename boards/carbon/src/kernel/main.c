@@ -17,8 +17,8 @@ int main() {
 	/* Clear the error state. */
 	error_clear();
 
-	/* Perform the system task. */
-	system_task();
+	/* Initialize the scheduler and start executing the system task. */
+	os_task_init();
 
 	/* Loop here if the kernel were ever to reach an unknown execution state. */
 	while (1);

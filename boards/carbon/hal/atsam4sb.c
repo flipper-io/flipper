@@ -15,6 +15,7 @@ LF_MODULE(_pwm, "pwm", "Interfaces with the device's pulse width modulation cont
 LF_MODULE(_rtc, "rtc", "Interfaces with the device's real time clock.", _rtc_id);
 LF_MODULE(_spi, "spi", "Provides control over the device's SPI bus.", _spi_id);
 LF_MODULE(_swd, "swd", "Interfaces with the device's single wire debug unit.", _swd_id);
+LF_MODULE(_task, "task", "Pause, resume, stop the running application.", _task_id);
 LF_MODULE(_temp, "temp", "Interfaces with the device's temperature sensor.", _temp_id);
 LF_MODULE(_timer, "timer", "Interfaces with the device's timer peripheral.", _timer_id);
 LF_MODULE(_usart, "usart", "Provides low level access to the device's UART bus.", _usart_id);

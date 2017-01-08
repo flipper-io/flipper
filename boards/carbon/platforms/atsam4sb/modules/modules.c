@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/carbon/platforms/atsam4s16b/modules.h>
+#include <flipper/carbon.h>
 
 /* Define the standard modules based on platform specific usage declarations. */
 const void *const fmr_modules[] = {
@@ -15,6 +15,7 @@ const void *const fmr_modules[] = {
     &rtc,
     &spi,
     &swd,
+    &task,
     &temp,
     &timer,
     &usart,

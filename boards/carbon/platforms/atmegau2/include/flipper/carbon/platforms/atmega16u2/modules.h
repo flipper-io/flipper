@@ -1,18 +1,6 @@
 #ifndef __lf_modules_h__
 #define __lf_modules_h__
 
-/* Include the header files for all of the standard modules exposed by the toolbox. */
-#include <flipper/carbon/modules/button.h>
-#include <flipper/carbon/modules/cpu.h>
-#include <flipper/carbon/modules/fs.h>
-#include <flipper/carbon/modules/led.h>
-#include <flipper/carbon/modules/spi.h>
-#include <flipper/carbon/modules/uart0.h>
-#include <flipper/carbon/modules/wdt.h>
-
-/* NOTE: This include should only be here until FMR is removed as a module. */
-#include <flipper/fmr.h>
-
 #ifdef __private_include__
 
 /* Create an enumeraion defining all of the precomputed identifiers needed for the standard modules. */

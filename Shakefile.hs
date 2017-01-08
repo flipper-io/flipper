@@ -52,8 +52,6 @@ arm_c_prep = [ -- Use C99.
              , "-Os"
                -- CPU is ARM Cortex M4:
              , "-mcpu=cortex-m4"
-               -- Arch is ARMv7E-M:
-             , "-march=armv7e-m"
                -- Include debugging metadata:
              , "-g"
                -- Platform header:
@@ -685,6 +683,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         ss <- getDirectoryFiles "" [ "boards/carbon/modules//*.c"
                                    , "boards/carbon/src//*.c"
                                    , "boards/carbon/platforms/atmegau2//*.c"
+                                   , "boards/carbon/platforms/atmegau2//*.s"
                                    , "boards/carbon/platforms/atmegau2//*.S"
                                    , "board/carbon/src//*.c"
                                      -- Find a better way to do this:
@@ -711,6 +710,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         ss <- getDirectoryFiles "" [ "boards/carbon/modules//*.c"
                                    , "boards/carbon/src//*.c"
                                    , "boards/carbon/platforms/atsam4sb//*.c"
+                                   , "boards/carbon/platforms/atsam4sb//*.s"
                                    , "boards/carbon/platforms/atsam4sb//*.S"
                                    , "board/carbon/src//*.c"
                                      -- Find a better way to do this:
@@ -735,7 +735,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         elfRule arm_gcc ls os o
 
     -- Generic rule for compiling C or assembling for the ATMEGA16U2:
-    ["build//*.c.avr.o", "build//*.S.avr.o"] |%> \o -> do
+    ["build//*.c.avr.o", "build//*.s.avr.o" ,"build//*.S.avr.o"] |%> \o -> do
 
         -- Find the include files necessary for compiling C or assembling for
         -- the ATMEGA16U2:
@@ -748,7 +748,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         cRule avr_gcc is avr_c_prep o
 
     -- Generic rule for compiling C or assembling for the ATSAM4S16B:
-    ["build//*.c.arm.o", "build//*.S.arm.o"] |%> \o -> do
+    ["build//*.c.arm.o", "build//*.s.arm.o", "build//*.S.arm.o"] |%> \o -> do
 
         -- Find the include files necessary for compiling C or assembling for
         -- the ATSAM4S16B:

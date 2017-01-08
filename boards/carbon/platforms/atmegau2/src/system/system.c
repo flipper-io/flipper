@@ -36,6 +36,10 @@ void system_task(void) {
 	}
 }
 
+void os_task_init() {
+	system_task();
+}
+
 void fmr_push(struct _fmr_push_pull_packet *packet) {
 	void *swap = malloc(packet -> length);
 	if (!swap) {
