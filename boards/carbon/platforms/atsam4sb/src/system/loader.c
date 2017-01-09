@@ -92,7 +92,7 @@ struct _os_task *volatile os_next_task;
 /* Called when an application finishes execution. */
 void task_finished(void) {
     /* Debug message. */
-    printf("Application finished executing. Hanging its PC.\n");
+    //printf("Application finished executing. Hanging its PC.\n");
     /* Idle. */
     while(1) __NOP();
 }
@@ -125,7 +125,7 @@ struct _task_ctx {
 void os_task_init(void) {
     /* Configure the NVIC PendSV execption with the lowest possible priority. */
     NVIC_SetPriority(PendSV_IRQn, PENDSV_PRIORITY);
-    //NVIC_SetPriority(SysTick_IRQn, SYSTICK_PRIORITY);
+    NVIC_SetPriority(SysTick_IRQn, SYSTICK_PRIORITY);
 
     /* Zero the schedule. */
     memset(&schedule, 0, sizeof(struct _os_schedule));
@@ -135,8 +135,8 @@ void os_task_init(void) {
     /* Set the current task. */
     os_current_task = &schedule.tasks[SYSTEM_TASK];
 
-    /* Start the systick. */
-    //SysTick_Config(F_CPU);
+    /* Start the systick to fire once every millisecond. */
+    SysTick_Config(F_CPU / 1000);
 
     /* Set the PSP equal to the system task's stack. */
     uint32_t psp = os_current_task -> sp + sizeof(struct _task_ctx) + sizeof(struct _stack_ctx);
@@ -162,12 +162,12 @@ int task_create(void *handler, os_stack_t *stack, uint32_t stack_size) {
 
     /* Obtain the next task slot. */
     struct _os_task *task = &schedule.tasks[schedule.count];
-    printf("Filling task slot %d.\n", schedule.count);
+    //printf("Filling task slot %d.\n", schedule.count);
     /* Set the entry point of the task. */
     task -> handler = handler;
     /* Set the stack pointer. */
     task -> sp = (uintptr_t)stack + stack_size;
-    printf("Created task with user stack pointer %p.\n", task -> sp);
+    //printf("Created task with user stack pointer %p.\n", task -> sp);
     /* Start with the task idle. */
     task -> status = os_task_status_idle;
 
@@ -221,7 +221,7 @@ void os_task_pause(void) {
 
 /* Resume execution of the active task. */
 void os_task_resume(void) {
-    printf("Switching execution to task slot %d.\n", schedule.active);
+    //printf("Switching execution to task slot %d.\n", schedule.active);
     /* Set the current task as idle. */
     os_current_task -> status = os_task_status_idle;
     /* Make the next task the system task. */
@@ -252,15 +252,15 @@ int os_load(void *address) {
     /* Set the entry point of the image. */
     void *application_entry = address + header->entry + 1;
 
-    printf("Loaded application at address %p.\n", address);
-    printf("Application entry is at address %p.\n", application_entry);
+    //printf("Loaded application at address %p.\n", address);
+    //printf("Application entry is at address %p.\n", application_entry);
 
     /* Register the task for launch. */
     task_create(application_entry, malloc(256), 256);
     /* Start the task. */
     os_task_next();
 
-    printf("Done creating task.\n");
+    //printf("Done creating task.\n");
 
     return lf_success;
 }
