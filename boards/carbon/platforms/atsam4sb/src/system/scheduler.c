@@ -16,8 +16,12 @@ struct _os_schedule schedule = { 0 };
 
 /* Called when an application finishes execution. */
 void os_task_finished(void) {
-    /* Idle. */
-    while(1) __NOP();
+    /* Release the task. */
+    os_task_release(schedule.active);
+    /* Context switch to the next task. */
+    os_task_next();
+    /* Prevent the CPU from wandering off. */
+    while (1);
 }
 
 /* Initializes the scheduler. */
@@ -57,8 +61,22 @@ struct _os_task *os_task_create(void *handler, os_stack_t *stack, uint32_t stack
         return NULL;
     }
 
+    /* Search for an available_pid. */
+    int available_pid = -1;
+    for (int i = 0; i < OS_MAX_TASKS; i ++) {
+        if (!schedule.tasks[i].handler) {
+            available_pid = i;
+            break;
+        }
+    }
+
+    /* If there is no available PID to satisfy the creation of a new task, fail. */
+    if (available_pid == -1) {
+        return NULL;
+    }
+
     /* Allocate the next available task slot. */
-    struct _os_task *task = &schedule.tasks[schedule.count];
+    struct _os_task *task = &schedule.tasks[available_pid];
     /* Set the entry point of the task. */
     task -> handler = handler;
     /* Set the task's stack pointer to the top of the task's stack. */
@@ -96,6 +114,33 @@ struct _os_task *os_task_create(void *handler, os_stack_t *stack, uint32_t stack
     schedule.count ++;
 
     return task;
+}
+
+/* Frees the memory associated with the task and frees its PID slot. */
+int os_task_release(int pid) {
+    /* Don't allow the user to release the system task. */
+    if (pid == SYSTEM_TASK_PID) {
+        return lf_error;
+    }
+    /* Get the task record. */
+    struct _os_task *task = &schedule.tasks[pid];
+    /* Disallow interrupts while freeing memory. */
+    __disable_irq();
+    /* If it was allocated, free the memory associated with the task's base. */
+    if (task -> base) {
+        free(task -> base);
+    }
+    /* If it was allocated, free the memory associated with the task's stack. */
+    if (task -> stack_base) {
+        free(task -> stack_base);
+    }
+    /* Allow interrupts again. */
+    __enable_irq();
+    /* Zero the task record. */
+    memset(task, 0, sizeof(struct _os_task));
+    /* Decrement the number of active tasks. */
+    schedule.count --;
+    return lf_success;
 }
 
 /* Schedules the next task for exeuction. */

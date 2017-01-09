@@ -9,8 +9,8 @@ void main(void) {
     PIOA -> PIO_PER = PIO_PA0;
     PIOA -> PIO_OER = PIO_PA0;
     PIOA -> PIO_OWER = PIO_PA0;
-    while (1) {
+    while (counter --) {
         PIOA -> PIO_ODSR ^= PIO_PA0;
-        for (int i = 0; i < 500000; i ++) __ASM volatile ("nop");
+        for (int i = 0; i < 200000; i ++) __ASM volatile ("nop");
     }
 }

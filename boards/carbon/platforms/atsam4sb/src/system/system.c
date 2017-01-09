@@ -144,8 +144,8 @@ void system_init(void) {
 	UART0 -> UART_IER = UART_IER_ENDRX;
 
 	/* Print reset message. */
-	char reset_msg[] = "Reset.\n";
-	usart_push(reset_msg, sizeof(reset_msg));
+	char reset_msg[] = "Reset\n";
+	usart_push(reset_msg, sizeof(reset_msg) - 1);
 
 }
 

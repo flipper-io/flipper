@@ -67,6 +67,7 @@ struct _task_ctx {
 
 void os_task_init(void);
 struct _os_task *os_task_create(void *handler, os_stack_t *stack, uint32_t stack_size);
+int os_task_release(int pid);
 void os_task_next(void);
 void os_task_pause(void);
 void os_task_resume(void);

@@ -61,6 +61,7 @@ int os_load(void *base) {
     struct _os_task *task = os_task_create(application_entry, malloc(256), 256);
     /* Set the task's base address. */
     task -> base = base;
+    printf("Allocated task at address %p.\n", base);
     /* Start the task. */
     os_task_next();
 
