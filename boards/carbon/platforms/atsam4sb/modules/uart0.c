@@ -28,6 +28,8 @@ int uart0_configure(void) {
 	UART0 -> UART_RNPR = (uintptr_t)(NULL);
 	/* Disable the PDC transmitter and receiver. */
 	UART0 -> UART_PTCR = UART_PTCR_TXTDIS | UART_PTCR_RXTDIS;
+	/* Set the UART0 priority to high. */
+	NVIC_SetPriority(UART0_IRQn, UART0_PRIORITY);
 	/* Enable the UART0 interrupt. */
 	NVIC_EnableIRQ(UART0_IRQn);
 	/* Enable the transmitter and receiver. */

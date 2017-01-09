@@ -23,6 +23,11 @@ extern struct _lf_device self;
 
 #define CLOCK_TIMEOUT 5000
 
+/* Define interrupt priorities, from highest (0) to lowest (15) priority. */
+#define SYSTICK_PRIORITY 0
+#define UART0_PRIORITY 1
+#define PENDSV_PRIORITY 15
+
 /* MCK @ 96 MHz. */
 #define F_CPU 96000000
 

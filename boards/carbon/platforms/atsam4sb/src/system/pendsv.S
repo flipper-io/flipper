@@ -3,29 +3,32 @@
 
 /*
 	Exception frame saved by the NVIC hardware onto stack:
-	+------+
-	|      | <- SP before interrupt (orig. SP)
+
+    (top of stack) @ higher memory address
+	+------+ <- SP before entering interrupt. (SP0 + STACK_SIZE)
 	| xPSR |
 	|  PC  |
 	|  LR  |
 	|  R12 |
-	|  R3  |
+	|  R3  | (HARDWARE SAVED REGISTERS)
 	|  R2  |
 	|  R1  |
-	|  R0  | <- SP after entering interrupt (orig. SP + 32 bytes)
-	+------+
-
-	Registers saved by the software (pendsv_exception):
-	+------+
+	|  R0  |
+	+------+ <- SP after entering interrupt. (SP0 + STACK_SIZE - 32(words))
 	|  R7  |
 	|  R6  |
 	|  R5  |
-	|  R4  |
+	|  R4  | (SOFTWARE SAVED REGISTERS)
 	|  R11 |
 	|  R10 |
 	|  R9  |
-	|  R8  | <- Saved SP (orig. SP + 64 bytes)
+	|  R8  |
+	+------+ <- SP before exiting interrupt. (SP0 + STACK_SIZE - 64(words))
+	+      +
+	+ USER + (USER STACK)
+    +      +
 	+------+
+	(botton of stack) @ lower memory address
 */
 
 .global pendsv_exception
@@ -56,12 +59,12 @@ pendsv_exception:
 	/* Save current task's SP. */
 	ldr r2, =os_current_task
 	ldr r1, [r2]
-	str r0, [r1]
+	str r0, [r1] // <- Loads PSP into os_current_task->sp.
 
 	/* Load next task's SP. */
 	ldr r2, =os_next_task
 	ldr r1, [r2]
-	ldr r0, [r1]
+	ldr r0, [r1] // <- Loads os_next_task->sp into r0.
 
 	/*
 	   Load registers R4-R11 (32 bytes) from the new PSP and make the PSP

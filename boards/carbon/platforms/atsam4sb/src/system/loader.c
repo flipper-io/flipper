@@ -56,17 +56,13 @@ struct _fld_header {
 
 #define OS_MAX_TASKS 3
 
-#define _PSR 1
-#define _PC 2
-#define _LR 3
-
 typedef enum {
     os_task_status_active,
     os_task_status_idle
 } os_task_status;
 
 struct _os_task {
-    /* The task's stack pointer. */
+    /* The task's stack pointer. Points to the last item pushed onto the task's stack. */
     volatile uint32_t sp;
     /* The entry point of the task. */
     void (* handler)(void);
@@ -96,19 +92,40 @@ struct _os_task *volatile os_next_task;
 /* Called when an application finishes execution. */
 void task_finished(void) {
     /* Debug message. */
-    //printf("Application did finish.\n");
-    /* Print reset message. */
-    char fin_msg[] = "Application did finish.\n";
-    usart_push(fin_msg, sizeof(fin_msg));
-
+    printf("Application finished executing. Hanging its PC.\n");
     /* Idle. */
     while(1) __NOP();
 }
 
+/* Data structure to represent registers saved by the hardware. */
+struct _stack_ctx {
+    uint32_t r0;
+    uint32_t r1;
+    uint32_t r2;
+    uint32_t r3;
+    uint32_t r12;
+    uint32_t lr;
+    uint32_t pc;
+    uint32_t psr;
+};
+
+/* Data structure to represent registers saved by the context switcher. */
+struct _task_ctx {
+    uint32_t r4;
+    uint32_t r5;
+    uint32_t r6;
+    uint32_t r7;
+    uint32_t r8;
+    uint32_t r9;
+    uint32_t r10;
+    uint32_t r11;
+};
+
 /* Initializes the scheduler. */
 void os_task_init(void) {
-        /* Configure the NVIC PendSV execption with the lowest possible priority. */
-    NVIC_SetPriority(PendSV_IRQn, 0xff);
+    /* Configure the NVIC PendSV execption with the lowest possible priority. */
+    NVIC_SetPriority(PendSV_IRQn, PENDSV_PRIORITY);
+    //NVIC_SetPriority(SysTick_IRQn, SYSTICK_PRIORITY);
 
     /* Zero the schedule. */
     memset(&schedule, 0, sizeof(struct _os_schedule));
@@ -118,15 +135,22 @@ void os_task_init(void) {
     /* Set the current task. */
     os_current_task = &schedule.tasks[SYSTEM_TASK];
 
-    /* Set the PSP to the top of the system task's stack. */
-    __set_PSP(os_current_task -> sp + 64);
-    /* Switch to unprivilleged mode. */
-    // __set_CONTROL(0x03);
+    /* Start the systick. */
+    //SysTick_Config(F_CPU);
+
+    /* Set the PSP equal to the system task's stack. */
+    uint32_t psp = os_current_task -> sp + sizeof(struct _task_ctx) + sizeof(struct _stack_ctx);
+    __set_PSP(psp);
+    /* Switch to using PSP. */
+    __set_CONTROL(0x02);
     /* Flush the instruction pipeline. */
     __ISB();
 
     /* Exeucte the system task. */
     os_current_task -> handler();
+
+    /* Must hang here, otherwise the routine will pop values meant for MSP onto PSP. */
+    while(1);
 }
 
 /* Stages a task for launch. */
@@ -138,17 +162,38 @@ int task_create(void *handler, os_stack_t *stack, uint32_t stack_size) {
 
     /* Obtain the next task slot. */
     struct _os_task *task = &schedule.tasks[schedule.count];
+    printf("Filling task slot %d.\n", schedule.count);
     /* Set the entry point of the task. */
     task -> handler = handler;
-    /* Set the task's stack pointer, subtracting the 16 words needed to save the task's 16 registers. */
-    task -> sp = (uint32_t)(stack + stack_size - 16);
+    /* Set the stack pointer. */
+    task -> sp = (uintptr_t)stack + stack_size;
+    printf("Created task with user stack pointer %p.\n", task -> sp);
     /* Start with the task idle. */
     task -> status = os_task_status_idle;
 
     /* Load default values into the task's special registers. */
-    stack[stack_size - _PSR] = 0x01000000;
-    stack[stack_size - _PC] = (uintptr_t)handler;
-    stack[stack_size - _LR] = (uintptr_t)(&task_finished);
+    /* Push the stack context onto the process stack. */
+    task -> sp -= sizeof(struct _stack_ctx);
+    struct _stack_ctx *_ctx = (struct _stack_ctx *)(task -> sp);
+    /* This is the default value of the status register. */
+    _ctx -> psr = 0x01000000;
+    /* This is the address at which our task will begin executing. */
+    _ctx -> pc = (uintptr_t)handler;
+    /* This is the address that the task will jump to when it is finished. */
+    _ctx -> lr = (uintptr_t)task_finished;
+
+    /* For debugging initial task state. */
+    /* Push the stack context onto the process stack. */
+    task -> sp -= sizeof(struct _task_ctx);
+    struct _task_ctx *_tsk = (struct _task_ctx *)(task -> sp);
+    _tsk -> r4 = 4;
+    _tsk -> r5 = 5;
+    _tsk -> r6 = 6;
+    _tsk -> r7 = 7;
+    _tsk -> r8 = 8;
+    _tsk -> r9 = 9;
+    _tsk -> r10 = 10;
+    _tsk -> r11 = 11;
 
     /* Increment the number of active tasks. */
     schedule.count ++;
@@ -158,10 +203,11 @@ int task_create(void *handler, os_stack_t *stack, uint32_t stack_size) {
 
 /* Schedules the next task for exeuction. */
 void os_task_next(void) {
+    os_current_task = &schedule.tasks[schedule.active];
     /* Select the next task. */
     schedule.active ++;
     /* If we have reached the end of the task queue, loop back to the beginning. */
-    if (schedule.active > schedule.count) {
+    if (schedule.active >= schedule.count) {
         schedule.active = 0;
     }
     /* Start the task. */
@@ -175,6 +221,7 @@ void os_task_pause(void) {
 
 /* Resume execution of the active task. */
 void os_task_resume(void) {
+    printf("Switching execution to task slot %d.\n", schedule.active);
     /* Set the current task as idle. */
     os_current_task -> status = os_task_status_idle;
     /* Make the next task the system task. */
@@ -205,10 +252,19 @@ int os_load(void *address) {
     /* Set the entry point of the image. */
     void *application_entry = address + header->entry + 1;
 
+    printf("Loaded application at address %p.\n", address);
+    printf("Application entry is at address %p.\n", application_entry);
+
     /* Register the task for launch. */
-    task_create(application_entry, malloc(128 * sizeof(os_stack_t)), 128);
+    task_create(application_entry, malloc(256), 256);
     /* Start the task. */
     os_task_next();
 
+    printf("Done creating task.\n");
+
     return lf_success;
+}
+
+void systick_exception(void) {
+    os_task_next();
 }
