@@ -1,6 +1,7 @@
 #define __private_include__
 #include <osmium.h>
 #include <nvm.h>
+#include <scheduler.h>
 
 int main() {
 

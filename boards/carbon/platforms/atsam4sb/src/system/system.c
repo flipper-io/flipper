@@ -1,5 +1,7 @@
 #define __private_include__
 #include <osmium.h>
+#include <scheduler.h>
+#include <loader.h>
 
 /* The fmr_device object containing global state about this device. */
 struct _lf_device lf_self = {
@@ -13,9 +15,8 @@ struct _lf_device lf_self = {
 	E_OK
 };
 
-/* Experimental: Entry address of the loaded program. */
-extern int os_load(void *address);
-extern void launch_application(void);
+/* Buffer space for incoming message runtime packets. */
+struct _fmr_packet packet;
 
 void uart0_pull_wait(void *destination, lf_size_t length) {
 	/* Disable the PDC receive complete interrupt. */
@@ -65,15 +66,13 @@ void fmr_pull(struct _fmr_push_pull_packet *packet) {
 	free(pull_buffer);
 }
 
-struct _fmr_packet packet;
-
-/* System task is executed when user tasks are not active. */
+/* System task is executed alongside user tasks. */
 void system_task(void) {
 
 	/* -------- SYSTEM TASK -------- */
 
-	while (1);
-
+	/* Nothing to do here, so move on to the next task. */
+	os_task_next();
 }
 
 void uart0_isr(void) {
