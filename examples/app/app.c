@@ -1,6 +1,18 @@
 /* Include the application header file. */
 #include "app.h"
 
+void test() {
+
+}
+
+extern const struct _app { 
+    void (* test)(void);
+} app;
+
+const struct _app app __attribute__((section (".module"))) = {
+    test
+};
+
 /* Initialize the data section. */
 int counter = 50;
 

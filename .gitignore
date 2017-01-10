@@ -20,3 +20,5 @@ xcuserdata
 .shake
 *.jdebug
 documentation/book/**
+*.dSYM
+test

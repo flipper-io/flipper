@@ -40,7 +40,8 @@ enum {
 	E_TYPE,
 	E_BOUNDARY,
 	E_TIMER,
-	E_TIMEOUT
+	E_TIMEOUT,
+	E_UNIMPLEMENTED
 };
 
 /* If this flag is set, error messages are nullified on platforms that do not need to store error strings. */
@@ -71,7 +72,8 @@ enum {
 								 "type error", \
 								 "boundary error", \
 								 "timer error", \
-								 "timeout error"
+								 "timeout error", \
+								 "unimplemented error"
 
 /* Allow the 'error_message' macro to serve as a passthrough for any variadic arguments supplied to it. */
 #define error_message(...) __VA_ARGS__

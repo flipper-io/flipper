@@ -60,7 +60,7 @@ void os_task_init(void) {
 /* Stages a task for launch. */
 struct _os_task *os_task_create(void *handler, os_stack_t *stack, uint32_t stack_size) {
     /* If the OS is already scheduling the maximum number of tasks, fail. */
-    if (schedule.count >= OS_MAX_TASKS) {
+    if (schedule.count >= OS_MAX_TASKS) {        
         return NULL;
     }
 

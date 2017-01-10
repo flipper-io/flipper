@@ -1,9 +1,12 @@
 /* RAM loading linker script for Osmium modules and application. */
 
-/* Obtain the entry point address if it is defined. */
-_ENTRY = DEFINED(main) ? ADDR(.main) : 0;
+/* Obtain the entry point address if the main symbol is defined. */
+_ENTRY = DEFINED(main) ? ADDR(.main) + 1: 0;
 /* Define the entry point. */
 ENTRY(_ENTRY);
+
+/* Ensure the module struct is linked in. */
+/* ASSERT (!DEFINED(module), "Error: No module structure defined."); */
 
 /* The only memory section we need to worry about is RAM. */
 MEMORY {
@@ -24,17 +27,17 @@ SECTIONS {
         /* The offset into the image at which the module structure exists. */
         LONG(ADDR(.module));
         /* The size of the .data section. */
-        LONG(DEFINED(data) ? SIZEOF(.data) : 0);
+        LONG(SIZEOF(.data));
         /* The offset into the image at which the .data section exists. */
-        LONG(DEFINED(data) ? ADDR(.data) : 0);
+        LONG(ADDR(.data));
         /* The size of the .bss section. */
-        LONG(DEFINED(bss) ? SIZEOF(.bss) : 0);
+        LONG(SIZEOF(.bss));
         /* The offset into the image at which the .bss section exists. */
-        LONG(DEFINED(bss) ? ADDR(.bss) : 0);
-        /* The size of the .got.plt section. */
+        LONG(ADDR(.bss));
+        /* The size of the .got section. */
         LONG(DEFINED(_GLOBAL_OFFSET_TABLE_) ? SIZEOF(.got) : 0);
         /* The offset into the image at which the .got section exists. */
-        LONG(DEFINED(_GLOBAL_OFFSET_TABLE_) ? ADDR(.got) : 0);
+        LONG(DEFINED(_GLOBAL_OFFSET_TABLE) ? ADDR(.got) : 0);
     } > RAM
 
 	/* The first section placed into memory is the module structure. */

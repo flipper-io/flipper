@@ -35,7 +35,7 @@ void uart0_pull_wait(void *destination, lf_size_t length) {
 }
 
 fmr_return fmr_push(struct _fmr_push_pull_packet *packet) {
-	fmr_return retval = 0xdeadbeef;
+	fmr_return retval;
 	void *push_buffer = malloc(packet -> length);
 	if (!push_buffer) {
 		error_raise(E_MALLOC, NULL);
@@ -47,13 +47,13 @@ fmr_return fmr_push(struct _fmr_push_pull_packet *packet) {
 		retval = fmr_execute(packet -> call.index, packet -> call.function, packet -> call.argc, packet -> call.types, (void *)(packet -> call.parameters));
 		free(push_buffer);
 	} else {
-		retval = os_load(push_buffer);
+		retval = os_load_image(push_buffer);
 	}
 	return retval;
 }
 
 fmr_return fmr_pull(struct _fmr_push_pull_packet *packet) {
-	fmr_return retval = 0xdeadbeef;
+	fmr_return retval;
 	void *pull_buffer = malloc(packet -> length);
 	if (!pull_buffer) {
 		error_raise(E_MALLOC, NULL);
@@ -87,10 +87,7 @@ void uart0_isr(void) {
 		/* Process the packet. */
 		fmr_perform(&packet, &result);
 		/* Give the result back. */
-		/* NOTE: This is tricky because the UART will already have completed the transfer before the mega is ready to recieve. */
-		for (volatile int i = 0; i < 1000000; i ++);
 		uart0_push(&result, sizeof(struct _fmr_result));
-		usart_push(&result, sizeof(struct _fmr_result));
 		/* Flush any remaining data that has been buffered. */
 		while (UART0 -> UART_SR & UART_SR_RXRDY) UART0 -> UART_RHR;
 		/* Pull the next packet asynchronously. */

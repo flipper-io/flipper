@@ -3,11 +3,11 @@
 #ifndef __loader_h__
 #define __loader_h__
 
-/* A value of 1 must be added to all branch addresses to maintain THUMB mode. */
-#define THUMB_BIT 1
+/* The default stack size for applications. */
+#define APPLICATION_STACK_SIZE_WORDS 256
 
 /* The data structure definition representing the ABI header above. */
-struct _fld_header {
+struct _lf_abi_header {
     uint32_t entry;
     uint32_t module_size;
     uint32_t module_offset;
@@ -19,6 +19,6 @@ struct _fld_header {
     uint32_t got_offset;
 };
 
-int os_load(void *base);
+int os_load_image(void *base);
 
 #endif

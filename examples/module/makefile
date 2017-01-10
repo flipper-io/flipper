@@ -14,8 +14,8 @@ all:
 dump:
 	arm-none-eabi-objdump -S -z -D $(target).elf | less
 
-run: all
+load: all
 	fram $(target).bin
 
 clean:
-	rm -rf *.o *.elf *.bin *.dylib*
+	rm -rf *.o *.elf *.bin *.dylib* test test.dSYM

@@ -52,6 +52,7 @@ struct _lf_bridge_record {
 #define LF_ASSIGN_MODULE(module, id) module.device = &(record -> _atmega16u2); module.index = id;
 
 int lf_bridge_configure(struct _lf_device *device) {
+    /* Ensure that the device pointer is valid. */
     if (!device) {
 		error_raise(E_NULL, error_message("No device or endpoint record provided for libusb configuration. Reattach your device and try again."));
 		return lf_error;
@@ -108,12 +109,11 @@ uint8_t lf_bridge_get(struct _lf_endpoint *this) {
 }
 
 #define CHUNK_SIZE 128
+
 int lf_bridge_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
     struct _lf_bridge_record *record = this -> record;
-    /* The number of chunks to push. */
-    int chunks = length / CHUNK_SIZE;
     int _e;
-    for (int i = 0; i < chunks; i ++) {
+    for (int i = 0; i < length / CHUNK_SIZE; i ++) {
         _e = lf_push(&(record -> _uart0_bridge), _uart0_push, source, CHUNK_SIZE, NULL);
         if (_e < lf_success) {
             return _e;
@@ -121,7 +121,6 @@ int lf_bridge_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
         length -= CHUNK_SIZE;
         source += CHUNK_SIZE;
     }
-    /* If there is a remainder of data left, push it. */
     if (length) {
         _e = lf_push(&(record -> _uart0_bridge), _uart0_push, source, length, NULL);
     }
@@ -130,29 +129,27 @@ int lf_bridge_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
 
 int lf_bridge_pull(struct _lf_endpoint *this, void *destination, lf_size_t length) {
     struct _lf_bridge_record *record = this -> record;
-    /* The number of chunks to pull. */
-    int chunks = length / CHUNK_SIZE;
     int _e;
-    for (int i = 0; i < chunks; i ++) {
-        _e = lf_pull(&(record -> _uart0_bridge), _uart0_pull, destination, CHUNK_SIZE, fmr_args(fmr_int32(UINT16_MAX)));
+    for (int i = 0; i < length / CHUNK_SIZE; i ++) {
+        _e = lf_pull(&(record -> _uart0_bridge), _uart0_pull, destination, CHUNK_SIZE, fmr_args(fmr_int32(0)));
         if (_e < lf_success) {
             return _e;
         }
         length -= CHUNK_SIZE;
         destination += CHUNK_SIZE;
     }
-    /* If there is a remainder of data left, pull it. */
     if (length) {
-        _e = lf_pull(&(record -> _uart0_bridge), _uart0_pull, destination, length, fmr_args(fmr_int32(UINT16_MAX)));
+        _e = lf_pull(&(record -> _uart0_bridge), _uart0_pull, destination, length, fmr_args(fmr_int32(0)));
     }
     return _e;
 }
 
 int lf_bridge_destroy(struct _lf_endpoint *this) {
     struct _lf_bridge_record *record = this -> record;
+    /* If the record was allocated, release it .*/
     if (record) {
         struct _lf_endpoint *endpoint = record -> atmega16u2.endpoint;
-        /* Destroy the bridge endpoint. */
+        /* If the endpoint was allocated, destroy it. */
         if (endpoint) {
             endpoint -> destroy(endpoint);
         }

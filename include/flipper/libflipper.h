@@ -194,7 +194,7 @@ extern int flipper_exit(void);
  *
  * @param module The module in which the function resides.
  * @param function The function to be invoked.
- * @param paramters The list of parameters to be passed to the function.
+ * @param parameters The list of parameters to be passed to the function.
  *
  */
 extern fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _fmr_list *parameters);
