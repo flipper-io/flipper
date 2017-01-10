@@ -27,7 +27,7 @@ ISR(TIMER1_COMPA_vect) {
 	//r_c += direction;
 	//g_c += direction;
 	b_c += direction;
-	led_set_rgb(r_c, g_c, b_c);
+	led_rgb(r_c, g_c, b_c);
 	if (b_c >= 128) {
 		direction = -1;
 	} else if (b_c == 1) {
@@ -35,7 +35,7 @@ ISR(TIMER1_COMPA_vect) {
 	}
 }
 
-void led_set_rgb(uint8_t r, uint8_t g, uint8_t b) {
+void led_rgb(uint8_t r, uint8_t g, uint8_t b) {
 
 	/* Create an array to be sent to the LED in GRB format. */
 	uint8_t *data = (uint8_t *)&((uint8_t []){ g, r, b });

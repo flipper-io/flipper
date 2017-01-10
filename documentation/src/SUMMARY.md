@@ -20,3 +20,4 @@
     - [`usart`](modules-usart.md)
     - [`usb`](modules-usb.md)
     - [`wdt`](modules-wdt.md)
+- [Languages](./languages.md)

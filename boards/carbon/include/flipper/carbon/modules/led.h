@@ -23,11 +23,11 @@ extern const struct _led {
 extern struct _lf_module _led;
 
 /* Declare the FMR overlay for this driver. */
-enum { _led_configure, _led_set_rgb };
+enum { _led_configure, _led_rgb };
 
 /* Declare each prototype for all functions within this driver. */
 int led_configure(void);
-void led_set_rgb(uint8_t r, uint8_t g, uint8_t b);
+void led_rgb(uint8_t r, uint8_t g, uint8_t b);
 
 #endif
 #endif

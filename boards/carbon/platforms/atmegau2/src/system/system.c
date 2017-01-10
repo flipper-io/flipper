@@ -84,7 +84,7 @@ void system_init() {
 
 void system_deinit(void) {
 	/* Clear the state of the status LED. */
-	led_set_rgb(LED_OFF);
+	led_rgb(LED_OFF);
 }
 
 void system_reset(void) {

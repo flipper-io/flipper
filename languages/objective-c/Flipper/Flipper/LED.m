@@ -16,7 +16,7 @@
 }
 
 - (void) setR:(uint8_t)r G:(uint8_t)g B:(uint8_t)b {
-    led_set_rgb(r, g, b);
+    led_rgb(r, g, b);
 }
 
 @end
