@@ -132,7 +132,7 @@ struct _lf_module {
 	/* The module's identifier. */
 	lf_crc_t identifier;
 	/* The module's index. */
-	uint8_t index;
+	uint16_t index;
 	/* The pointer to a pointer to the device upon which the module's counterpart is located. */
 	struct _lf_device **device;
 };

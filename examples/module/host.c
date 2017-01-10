@@ -5,8 +5,8 @@ LF_MODULE(_module, "module", "A simple test module.", -1);
 
 int module_configure(void) {
     printf("Module configure.\n");
-    /* Bind the module to libflipper. */
-    _module.index = 0;
+    /* Hard code the module as a user module with index 0. */
+    _module.index = 0x00 | FMR_USER_INVOCATION_BIT;
     return lf_invoke(&_module, _module_configure, NULL);
 }
 

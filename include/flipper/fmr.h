@@ -53,6 +53,9 @@ typedef enum {
 /* Calculates the length of an FMR type. */
 #define fmr_sizeof(type) (1 << type)
 
+/* If this bit is set in the module's index, then it is a user module. */
+#define FMR_USER_INVOCATION_BIT (1 << 8)
+
 /* Exposes all message runtime packet classes. */
 enum {
 	/* Asks a device for its configuration information. */

@@ -47,7 +47,7 @@
 
 struct _user_module {
     /* Pointer to the module struct. */
-    const void **functions;
+    void **functions;
     /* The number of functions in the module. */
     int func_c;
     /* Base of the module for deallocation purposes. */
@@ -58,7 +58,7 @@ struct _user_modules {
     /* An array of pointers to the user modules. */
     struct _user_module modules[MAX_USER_MODULES];
     /* The number of registered user modules. */
-    int count;
+    volatile int count;
 } user_modules;
 
 /* Loads a module or application located at the given address. */
@@ -91,7 +91,11 @@ int os_load(void *base) {
             return lf_error;
         } else {
             /* Obtain the module structure. */
-            void *_struct = base + header -> module_offset;
+            void **_struct = base + header -> module_offset;
+            /* Patch the function addresses. */
+            for (volatile int i = 0; i < header -> module_size / sizeof(uintptr_t); i ++) {
+                _struct[i] += (uintptr_t)base;
+            }
             /* Allocate the user module. */
             fmr_module index = user_modules.count;
             struct _user_module *module = &user_modules.modules[user_modules.count ++];
@@ -122,10 +126,8 @@ fmr_return fmr_perform_user_invocation(struct _fmr_invocation_packet *packet) {
     if (packet -> call.function >= module -> func_c) {
         return 0;
     }
-    /* Dereference the pointer to the target module. */
-    const void *object = (const void *)(module -> functions[packet -> call.index]);
     /* Dereference and return a pointer to the target function. */
-    const void *address = ((const void **)(object))[packet -> call.function];
+    const void *address = module -> functions[packet -> call.function];
     /* Ensure that the function address is valid. */
     if (!address) {
         error_raise(E_RESOULTION, NULL);

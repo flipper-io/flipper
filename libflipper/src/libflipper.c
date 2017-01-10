@@ -217,10 +217,15 @@ fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _f
 	_packet.header.magic = FMR_MAGIC_NUMBER;
 	/* Compute the initial length of the packet. */
 	_packet.header.length = sizeof(struct _fmr_invocation_packet);
-	/* Set the packet class. */
-	_packet.header.class = fmr_standard_invocation_class;
+	/* If the user module bit is set, make the invocation a user invocation. */
+	if (module -> index & FMR_USER_INVOCATION_BIT) {
+		_packet.header.class = fmr_user_invocation_class;
+	} else {
+		/* Otherwise, make it a standard invocation. */
+		_packet.header.class = fmr_standard_invocation_class;
+	}
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_create_call(module -> index, function, parameters, &_packet.header, &packet -> call);
+	int _e = fmr_create_call((uint8_t)(module -> index), function, parameters, &_packet.header, &packet -> call);
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -461,6 +466,7 @@ void lf_debug_packet(struct _fmr_packet *packet, size_t length) {
 				lf_debug_call(&invocation -> call);
 			break;
 			case fmr_user_invocation_class:
+				lf_debug_call(&invocation -> call);
 			break;
 			case fmr_push_class:
 			case fmr_pull_class:
