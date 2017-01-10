@@ -39,7 +39,7 @@ struct _os_schedule {
 /* The PID of the system task. */
 #define SYSTEM_TASK_PID 0
 /* System task stack size. */
-#define SYSTEM_TASK_STACK_SIZE_WORDS 64
+#define SYSTEM_TASK_STACK_SIZE_WORDS 128
 
 /* Data structure to represent registers saved by the hardware. */
 struct _stack_ctx {

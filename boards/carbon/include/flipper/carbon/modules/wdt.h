@@ -12,13 +12,13 @@ extern const struct _wdt {
 
 #ifdef __private_include__
 
-/* The fmr_module structure for this module. */
+/* Declare the _lf_module structure for this module. */
 extern struct _lf_module _wdt;
 
-/* Declare the FMR overlay for this driver. */
+/* Declare the FMR overlay for this module. */
 enum { _wdt_configure, _wdt_fire };
 
-/* Declare each prototype for all functions within this driver. */
+/* Declare the prototypes for all of the functions within this module. */
 int wdt_configure(void);
 void wdt_fire(void);
 

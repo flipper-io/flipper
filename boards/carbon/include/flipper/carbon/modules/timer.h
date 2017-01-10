@@ -11,13 +11,13 @@ extern const struct _timer {
 
 #ifdef __private_include__
 
-/* The fmr_module structure for this module. */
+/* Declare the _lf_module structure for this module. */
 extern struct _lf_module _timer;
 
-/* Declare the FMR overlay for this driver. */
+/* Declare the FMR overlay for this module. */
 enum { _timer_configure };
 
-/* Declare each prototype for all functions within this driver. */
+/* Declare the prototypes for all of the functions within this module. */
 int timer_configure(void);
 
 #endif

@@ -16,10 +16,10 @@ extern const struct _task {
 
 #ifdef __private_include__
 
-/* The fmr_module structure for this module. */
+/* Declare the _lf_module structure for this module. */
 extern struct _lf_module _task;
 
-/* Declare the FMR overlay for this driver. */
+/* Declare the FMR overlay for this module. */
 enum { _task_pause, _task_resume, _task_stop };
 
 extern void os_task_pause(void);

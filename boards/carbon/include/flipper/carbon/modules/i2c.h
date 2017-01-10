@@ -11,13 +11,13 @@ extern const struct _i2c {
 
 #ifdef __private_include__
 
-/* The fmr_module structure for this module. */
+/* Declare the _lf_module structure for this module. */
 extern struct _lf_module _i2c;
 
-/* Declare the FMR overlay for this driver. */
+/* Declare the FMR overlay for this module. */
 enum { _i2c_configure };
 
-/* Declare each prototype for all functions within this driver. */
+/* Declare the prototypes for all of the functions within this module. */
 int i2c_configure(void);
 
 #endif

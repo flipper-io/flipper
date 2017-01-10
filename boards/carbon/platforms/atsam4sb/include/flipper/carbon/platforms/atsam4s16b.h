@@ -34,5 +34,8 @@ extern struct _lf_device self;
 /* 2 megabaud. */
 #define PLATFORM_BAUDRATE 2000000
 
+/* Experimental: User funtion invocation handler. */
+fmr_return fmr_perform_user_invocation(struct _fmr_invocation_packet *packet);
+
 #endif
 #endif

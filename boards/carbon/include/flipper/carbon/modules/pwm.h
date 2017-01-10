@@ -13,13 +13,13 @@ extern const struct _pwm {
 
 #ifdef __private_include__
 
-/* The fmr_module structure for this module. */
+/* Declare the _lf_module structure for this module. */
 extern struct _lf_module _pwm;
 
-/* Declare the FMR overlay for this driver. */
+/* Declare the FMR overlay for this module. */
 enum { _pwm_configure };
 
-/* Declare each prototype for all functions within this driver. */
+/* Declare the prototypes for all of the functions within this module. */
 int pwm_configure(void);
 
 #endif

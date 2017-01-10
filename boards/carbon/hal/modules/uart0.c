@@ -31,6 +31,6 @@ int uart0_push(void *source, lf_size_t length) {
 	return lf_push(&_uart0, _uart0_push, source, length, NULL);
 }
 
-int uart0_pull(void *destination, lf_size_t length) {
-	return lf_pull(&_uart0, _uart0_pull, destination, length, NULL);
+int uart0_pull(void *destination, lf_size_t length, uint32_t timeout) {
+	return lf_pull(&_uart0, _uart0_pull, destination, length, fmr_args(fmr_infer(timeout)));
 }

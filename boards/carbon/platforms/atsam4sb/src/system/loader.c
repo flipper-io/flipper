@@ -43,6 +43,24 @@
   |             .bss             |
   +------------------------------*/
 
+#define MAX_USER_MODULES 4
+
+struct _user_module {
+    /* Pointer to the module struct. */
+    const void **functions;
+    /* The number of functions in the module. */
+    int func_c;
+    /* Base of the module for deallocation purposes. */
+    void *base;
+};
+
+struct _user_modules {
+    /* An array of pointers to the user modules. */
+    struct _user_module modules[MAX_USER_MODULES];
+    /* The number of registered user modules. */
+    int count;
+} user_modules;
+
 /* Loads a module or application located at the given address. */
 int os_load(void *base) {
     /* Cast to the ABI header. */
@@ -54,16 +72,65 @@ int os_load(void *base) {
       got[i] += (uintptr_t)base;
     }
 
-    /* Obtain the address of the entry point of the image. */
-    void *application_entry = base + header -> entry + THUMB_BIT;
+    /* If the image has an entry point, treat it as an application. */
+    if (header -> entry) {
+        /* Obtain the address of the entry point of the image. */
+        void *application_entry = base + header -> entry + THUMB_BIT;
 
-    /* Register the task for launch. */
-    struct _os_task *task = os_task_create(application_entry, malloc(256), 256);
-    /* Set the task's base address. */
-    task -> base = base;
-    printf("Allocated task at address %p.\n", base);
-    /* Start the task. */
-    os_task_next();
+        /* Register the task for launch. */
+        struct _os_task *task = os_task_create(application_entry, malloc(256), 256);
+        /* Set the task's base address. */
+        task -> base = base;
+        /* Start the task. */
+        os_task_next();
+    } else {
 
-    return lf_success;
+        if (user_modules.count >= MAX_USER_MODULES) {
+            error_raise(E_MODULE, NULL);
+            free(base);
+            return lf_error;
+        } else {
+            /* Obtain the module structure. */
+            void *_struct = base + header -> module_offset;
+            /* Allocate the user module. */
+            fmr_module index = user_modules.count;
+            struct _user_module *module = &user_modules.modules[user_modules.count ++];
+            /* Save the module struct. */
+            module -> functions = _struct;
+            /* Set the number of functions. */
+            module -> func_c = (header -> module_size / sizeof(uintptr_t));
+            /* Save the base. */
+            module -> base = base;
+            /* Send the index back to the host. */
+            return index;
+        }
+
+    }
+
+    return 0xdeadbeef;
+}
+
+/* Experimental: User funtion invocation handler. */
+fmr_return fmr_perform_user_invocation(struct _fmr_invocation_packet *packet) {
+    /* Check index boundary. */
+    if (packet -> call.index >= user_modules.count) {
+        return 0;
+    }
+    /* Get module. */
+    struct _user_module *module = &user_modules.modules[packet -> call.index];
+    /* Check function boundary. */
+    if (packet -> call.function >= module -> func_c) {
+        return 0;
+    }
+    /* Dereference the pointer to the target module. */
+    const void *object = (const void *)(module -> functions[packet -> call.index]);
+    /* Dereference and return a pointer to the target function. */
+    const void *address = ((const void **)(object))[packet -> call.function];
+    /* Ensure that the function address is valid. */
+    if (!address) {
+        error_raise(E_RESOULTION, NULL);
+        return 0;
+    }
+    /* Perform the function call internally. */
+    return fmr_call(address, packet -> call.argc, packet -> call.types, packet -> call.parameters);
 }

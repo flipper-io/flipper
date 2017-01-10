@@ -104,7 +104,7 @@ uint32_t sam_ba_read_word(uint32_t source) {
 	uint8_t retries = 0;
 	while(!uart0.ready() && retries ++ < 8);
 	uint32_t result = 0;
-	uart0.pull(&result, sizeof(uint32_t));
+	uart0.pull(&result, sizeof(uint32_t), UINT16_MAX);
 	return result;
 }
 
@@ -185,7 +185,7 @@ int enter_update_mode(void) {
 	printf("Entering update mode.\n");
 	uint8_t ack[3];
 	uart0.put('#');
-	uart0.pull(ack, sizeof(ack));
+	uart0.pull(ack, sizeof(ack), UINT16_MAX);
 	if (!memcmp(ack, (const uint8_t []){ '\n', '\r', '>' }, sizeof(ack))) {
 		goto done;
 	}
@@ -235,7 +235,7 @@ begin: ;
 	printf("Entering normal mode.\n");
 	uart0.push("N#", 2);
 	char n_ack[2];
-	uart0.pull(n_ack, sizeof(n_ack));
+	uart0.pull(n_ack, sizeof(n_ack), UINT16_MAX);
 	uint8_t retries = 0;
 	while(!uart0.ready() && retries ++ < 8);
 	retries = 0;

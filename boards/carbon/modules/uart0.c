@@ -3,7 +3,7 @@
 
 #ifdef __use_uart0__
 /* Define the virtual interface for this module. */
-const struct _uart uart0 = {
+const struct _uart0 uart0 = {
 	uart0_configure,
 	uart0_enable,
 	uart0_disable,

@@ -40,28 +40,32 @@ void os_task_init() {
 	system_task();
 }
 
-void fmr_push(struct _fmr_push_pull_packet *packet) {
+fmr_return fmr_push(struct _fmr_push_pull_packet *packet) {
+	fmr_return retval = 0xdeadbeef;
 	void *swap = malloc(packet -> length);
 	if (!swap) {
 		error_raise(E_MALLOC, NULL);
-		return;
+		return -1;
 	}
 	lf_self.endpoint -> pull(lf_self.endpoint, swap, packet -> length);
 	*(uintptr_t *)(packet -> call.parameters) = (uintptr_t)swap;
-	fmr_execute(packet -> call.index, packet -> call.function, packet -> call.argc, packet -> call.types, (void *)(packet -> call.parameters));
+	retval = fmr_execute(packet -> call.index, packet -> call.function, packet -> call.argc, packet -> call.types, (void *)(packet -> call.parameters));
 	free(swap);
+	return retval;
 }
 
-void fmr_pull(struct _fmr_push_pull_packet *packet) {
+fmr_return fmr_pull(struct _fmr_push_pull_packet *packet) {
+	fmr_return retval = 0xdeadbeef;
 	void *swap = malloc(packet -> length);
 	if (!swap) {
 		error_raise(E_MALLOC, NULL);
-		return;
+		return -1;
 	}
 	*(uintptr_t *)(packet -> call.parameters) = (uintptr_t)swap;
-	fmr_execute(packet -> call.index, packet -> call.function, packet -> call.argc, packet -> call.types, (void *)(packet -> call.parameters));
+	retval = fmr_execute(packet -> call.index, packet -> call.function, packet -> call.argc, packet -> call.types, (void *)(packet -> call.parameters));
 	lf_self.endpoint -> push(lf_self.endpoint, swap, packet -> length);
 	free(swap);
+	return retval;
 }
 
 void system_init() {

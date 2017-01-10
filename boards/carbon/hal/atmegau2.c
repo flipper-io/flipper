@@ -134,7 +134,7 @@ int lf_bridge_pull(struct _lf_endpoint *this, void *destination, lf_size_t lengt
     int chunks = length / CHUNK_SIZE;
     int _e;
     for (int i = 0; i < chunks; i ++) {
-        _e = lf_pull(&(record -> _uart0_bridge), _uart0_pull, destination, CHUNK_SIZE, NULL);
+        _e = lf_pull(&(record -> _uart0_bridge), _uart0_pull, destination, CHUNK_SIZE, fmr_args(fmr_int32(UINT16_MAX)));
         if (_e < lf_success) {
             return _e;
         }
@@ -143,7 +143,7 @@ int lf_bridge_pull(struct _lf_endpoint *this, void *destination, lf_size_t lengt
     }
     /* If there is a remainder of data left, pull it. */
     if (length) {
-        _e = lf_pull(&(record -> _uart0_bridge), _uart0_pull, destination, length, NULL);
+        _e = lf_pull(&(record -> _uart0_bridge), _uart0_pull, destination, length, fmr_args(fmr_int32(UINT16_MAX)));
     }
     return _e;
 }

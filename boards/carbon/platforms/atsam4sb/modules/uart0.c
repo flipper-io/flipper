@@ -77,7 +77,7 @@ int uart0_push(void *source, lf_size_t length) {
 	return lf_success;
 }
 
-int uart0_pull(void *destination, lf_size_t length) {
+int uart0_pull(void *destination, lf_size_t length, uint32_t timeout) {
 	/* Set the transmission length and destination pointer. */
 	UART0 -> UART_RCR = length;
 	UART0 -> UART_RPR = (uintptr_t)(destination);

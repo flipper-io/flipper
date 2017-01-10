@@ -16,13 +16,13 @@ extern const struct _cpu {
 
 #ifdef __private_include__
 
-/* The fmr_module structure for this module. */
+/* Declare the _lf_module structure for this module. */
 extern struct _lf_module _cpu;
 
-/* Declare the FMR overlay for this driver. */
+/* Declare the FMR overlay for this module. */
 enum { _cpu_configure, _cpu_reset, _cpu_cycle, _cpu_halt, _cpu_power, _cpu_dfu };
 
-/* Declare each prototype for all functions within this driver. */
+/* Declare the prototypes for all of the functions within this module. */
 extern int cpu_configure(void);
 extern void cpu_reset(void);
 extern void cpu_cycle(void);

@@ -188,7 +188,7 @@ fmr_return fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, 
 	return fmr_call(address, argc, types, arguments);
 }
 
-fmr_return fmr_perform_invocation(struct _fmr_invocation_packet *packet) {
+fmr_return fmr_perform_standard_invocation(struct _fmr_invocation_packet *packet) {
 	/* Perform the function invocation. */
 	return fmr_execute(packet -> call.index, packet -> call.function, packet -> call.argc, packet -> call.types, (void *)(packet -> call.parameters));
 }
@@ -219,22 +219,25 @@ int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
 		/* NOTE: Right now standard invocations and user invocations are done the same way. This should change. */
 		case fmr_standard_invocation_class:
 			/* Perform an invocation on a standard module. */
-			result -> value = fmr_perform_invocation((struct _fmr_invocation_packet *)(packet));
+			result -> value = fmr_perform_standard_invocation((struct _fmr_invocation_packet *)(packet));
 		break;
+/* Experimental: User funtion invocation handler. */
+#ifdef __support_user_invocation__
 		case fmr_user_invocation_class:
-
+			result -> value = fmr_perform_user_invocation((struct _fmr_invocation_packet *)(packet));
 		break;
+#endif
 		case fmr_push_class:
 			/* Each platform has its own way of handling push/pull requests. */
-			fmr_push((struct _fmr_push_pull_packet *)(packet));
+			result -> value = fmr_push((struct _fmr_push_pull_packet *)(packet));
 		break;
 		case fmr_pull_class:
 			/* Each platform has its own way of handling push/pull requests. */
-			fmr_pull((struct _fmr_push_pull_packet *)(packet));
+			result -> value = fmr_pull((struct _fmr_push_pull_packet *)(packet));
 		break;
 		/* Experimental packet class, loads and launches a program. */
 		case fmr_ram_load_class:
-			fmr_push((struct _fmr_push_pull_packet *)(packet));
+			result -> value = fmr_push((struct _fmr_push_pull_packet *)(packet));
 		break;
 		case fmr_event_class:
 			/* Handle an event. */

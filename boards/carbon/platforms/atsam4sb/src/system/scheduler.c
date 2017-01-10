@@ -5,14 +5,14 @@
 #include <scheduler.h>
 
 /* Pointers to the current and next tasks. */
-struct _os_task *volatile os_current_task;
-struct _os_task *volatile os_next_task;
+volatile struct _os_task *volatile os_current_task;
+volatile struct _os_task *volatile os_next_task;
 
 /* Reserves the system task stack. */
 os_stack_t os_system_task_stack[SYSTEM_TASK_STACK_SIZE_WORDS];
 
 /* An empty schedule. */
-struct _os_schedule schedule = { 0 };
+struct _os_schedule schedule;
 
 /* Called when an application finishes execution. */
 void os_task_finished(void) {
@@ -31,8 +31,11 @@ void os_task_init(void) {
     /* Configure the NVIC SysTick exception with the highest possible priority. */
     NVIC_SetPriority(SysTick_IRQn, SYSTICK_PRIORITY);
 
+    /* Clear the schedule. */
+    memset(&schedule, 0, sizeof(struct _os_schedule));
+
     /* Create the system task. */
-    os_task_create(system_task, os_system_task_stack, SYSTEM_TASK_STACK_SIZE_WORDS);
+    os_task_create(system_task, os_system_task_stack, SYSTEM_TASK_STACK_SIZE_WORDS * sizeof(uint32_t));
     /* Make the current task the system task. */
     os_current_task = &schedule.tasks[SYSTEM_TASK_PID];
 
@@ -62,7 +65,7 @@ struct _os_task *os_task_create(void *handler, os_stack_t *stack, uint32_t stack
     }
 
     /* Search for an available_pid. */
-    int available_pid = -1;
+    volatile int available_pid = -1;
     for (int i = 0; i < OS_MAX_TASKS; i ++) {
         if (!schedule.tasks[i].handler) {
             available_pid = i;

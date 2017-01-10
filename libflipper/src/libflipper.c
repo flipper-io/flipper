@@ -178,6 +178,9 @@ int lf_load_configuration(struct _lf_device *device) {
 int lf_get_result(struct _lf_device *device, struct _fmr_result *result) {
 	/* Obtain the response packet from the device. */
 	int _e = lf_retrieve(device, result);
+#ifdef __lf_debug__
+	lf_debug_result(result);
+#endif
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -192,6 +195,11 @@ fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _f
 	/* Ensure that we have a valid module and argument pointer. */
 	if (!module) {
 		error_raise(E_NULL, error_message("No module specified for message runtime invocation."));
+		return lf_error;
+	}
+	/* Ensure that we have a valid module and argument pointer. */
+	if ((int8_t)(module -> index) == -1) {
+		error_raise(E_MODULE, error_message("The module '%s' was not configured prior to invocation request.", module -> name));
 		return lf_error;
 	}
 	/* Obtain the target device from the module. */
@@ -252,9 +260,6 @@ int lf_retrieve(struct _lf_device *device, struct _fmr_result *result) {
 		error_raise(E_ENDPOINT, error_message("Failed to retrieve packet from the device '%s'.", device -> configuration.name));
 		return lf_error;
 	}
-#ifdef __lf_debug__
-	lf_debug_result(result);
-#endif
 	return lf_success;
 }
 
@@ -361,7 +366,7 @@ int lf_ram_load(struct _lf_device *device, void *source, lf_size_t length) {
 	/* Obtain the result of the operation. */
 	lf_get_result(device, &result);
 	/* Return a pointer to the data. */
-	return lf_success;
+	return result.value;
 }
 
 int lf_pull(struct _lf_module *module, fmr_function function, void *destination, lf_size_t length, struct _fmr_list *parameters) {

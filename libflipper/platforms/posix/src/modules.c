@@ -10,10 +10,10 @@ uint32_t fmr_call(const void *function, uint8_t argc, uint16_t argt, void *argv)
 
 /* TEMP */
 
-void fmr_push(struct _fmr_push_pull_packet *packet) {
-	
+fmr_return fmr_push(struct _fmr_push_pull_packet *packet) {
+	return -1;
 }
 
-void fmr_pull(struct _fmr_push_pull_packet *packet) {
-
+fmr_return fmr_pull(struct _fmr_push_pull_packet *packet) {
+	return -1;
 }

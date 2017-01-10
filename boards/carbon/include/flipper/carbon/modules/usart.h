@@ -5,7 +5,7 @@
 #include <flipper/libflipper.h>
 
 /* Declare the virtual interface for this modules. */
-extern const struct _uart {
+extern const struct _usart {
 	int (* configure)(void);
 	void (* enable)(void);
 	void (* disable)(void);
@@ -18,13 +18,13 @@ extern const struct _uart {
 
 #ifdef __private_include__
 
-/* The fmr_module structure for this module. */
+/* Declare the _lf_module structure for this module. */
 extern struct _lf_module _usart;
 
-/* Declare the FMR overlay for this driver. */
+/* Declare the FMR overlay for this module. */
 enum { _usart_configure, _usart_enable, _usart_disable, _usart_ready, _usart_put, _usart_get, _usart_push, _usart_pull };
 
-/* Declare each prototype for all functions within this driver. */
+/* Declare the prototypes for all of the functions within this module. */
 extern int usart_configure(void);
 extern void usart_enable(void);
 extern void usart_disable(void);
