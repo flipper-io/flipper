@@ -82,6 +82,9 @@ pendsv_exception:
 	/* EXC_RETURN (thread mode with PSP) */
 	ldr r0, =0xFFFFFFFD
 
+	/* Cycle the task pointers. */
+	bl os_update_task_pointers
+
 	/* Enable interrupts. */
 	cpsie i
 

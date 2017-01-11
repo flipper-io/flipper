@@ -2,14 +2,14 @@
 #include <flipper/libflipper.h>
 #include <flipper/carbon/modules/task.h>
 
-void os_task_pause(void) {
-	lf_invoke(&_task, _task_pause, NULL);
+int os_task_pause(int pid) {
+	return lf_invoke(&_task, _task_pause, fmr_args(fmr_infer(pid)));
 }
 
-void os_task_resume(void) {
-	lf_invoke(&_task, _task_resume, NULL);
+int os_task_resume(int pid) {
+	return lf_invoke(&_task, _task_resume, fmr_args(fmr_infer(pid)));
 }
 
-void os_task_stop(void) {
-	lf_invoke(&_task, _task_stop, NULL);
+int os_task_stop(int pid) {
+	return lf_invoke(&_task, _task_stop, fmr_args(fmr_infer(pid)));
 }

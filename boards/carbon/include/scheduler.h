@@ -8,8 +8,10 @@
 
 /* An enumerated type of possible task states. */
 typedef enum {
+    os_task_status_unallocated,
+    os_task_status_idle,
     os_task_status_active,
-    os_task_status_idle
+    os_task_status_paused
 } os_task_status;
 
 typedef uint32_t os_stack_t;
@@ -17,6 +19,8 @@ typedef uint32_t os_stack_t;
 struct _os_task {
     /* The task's stack pointer. Points to the last item pushed onto the task's stack. */
     volatile uint32_t sp;
+    /* The PID of this task. */
+    int pid;
     /* The entry point of the task. */
     void (* handler)(void);
     /* The task's status (active or idle). */
@@ -25,11 +29,15 @@ struct _os_task {
     void *base;
     /* The base address of the task's stack, stored for task deallocation. */
     void *stack_base;
+    /* The next task to be executed. */
+    struct _os_task *next;
 };
 
 struct _os_schedule {
-    /* A table holding pointers to the active tasks. */
-    struct _os_task tasks[OS_MAX_TASKS];
+    /* PID counter. */
+    int next_pid;
+    /* The system task's pointer. */
+    struct _os_task *head;
     /* The active task PID. */
     volatile uint8_t active;
     /* The number of active tasks. */
@@ -67,10 +75,7 @@ struct _task_ctx {
 
 void os_task_init(void);
 struct _os_task *os_task_create(void *handler, os_stack_t *stack, uint32_t stack_size);
-int os_task_release(int pid);
+int os_task_release(struct _os_task *task);
 void os_task_next(void);
-void os_task_pause(void);
-void os_task_resume(void);
-void os_task_stop(void);
 
 #endif
