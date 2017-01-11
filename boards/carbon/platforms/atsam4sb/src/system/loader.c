@@ -114,6 +114,18 @@ int os_load_module(void *base, struct _lf_abi_header *header) {
     }
 }
 
+/* Releases a previously loaded module. */
+int os_release_module(struct _user_module *module) {
+    /* Ensure the module pointer is valid. */
+    if (!module) {
+        return lf_error;
+    }
+    /* Free the module's base pointer. */
+    if (module -> base) {
+        free(module -> base);
+    }
+}
+
 /* Loads an image into RAM. */
 int os_load_image(void *base) {
     /* Cast the base pointer to obtain the ABI header. */
@@ -137,20 +149,21 @@ int os_load_image(void *base) {
         bss[i] = 0;
     }
 
+    int retval;
+
     if (header -> entry) {
         /* If the image has an entry point, load it as an application. */
-        if (os_load_application(base, header) < lf_success) {
+        if (retval = os_load_application(base, header) < lf_success) {
             goto failure;
         }
     } else {
         /* If not, load the image as a module. */
-        if (os_load_module(base, header) < lf_success) {
+        if (retval = os_load_module(base, header) < lf_success) {
             goto failure;
         }
     }
 
-    return lf_success;
-
+    return retval;
 failure:
     /* Free the memory allocated to load the image. */
     free(base);

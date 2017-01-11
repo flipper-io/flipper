@@ -15,7 +15,7 @@ int uart0_configure(void) {
 	PIOA -> PIO_ABCDSR[0] &= ~UART0_PIN_MASK;
 	PIOA -> PIO_ABCDSR[1] &= ~UART0_PIN_MASK;
 	/* Reset the peripheral and disable the transmitter and receiver. */
-	UART0 -> UART_CR = UART_CR_RSTRX | UART_CR_RSTTX | UART_CR_TXDIS | UART_CR_RXDIS;
+	UART0 -> UART_CR = UART_CR_RSTRX | UART_CR_RSTTX | UART_CR_TXDIS | UART_CR_RXDIS | UART_CR_RSTSTA;
 	/* Set the mode to 8n1. */
 	UART0 -> UART_MR = UART_MR_CHMODE_NORMAL | UART_MR_PAR_NO;
 	/* Set the baudrate. */
