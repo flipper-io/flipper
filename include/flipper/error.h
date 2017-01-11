@@ -83,16 +83,16 @@ enum {
 #endif
 
 /* Prevents the execution of a statement from producing error-related side effects. */
-#define suppress_errors(statement) error_pause(); statement; error_resume();
+#define suppress_errors(statement) lf_error_pause(); statement; lf_error_resume();
 
 /* Configures the error module. */
-extern int error_configure(void);
+extern int lf_error_configure(void);
 /* Raises an error internally to the current context of libflipper. */
-extern void error_raise(lf_error_t error, const char *format, ...) __attribute__ ((format (printf, 2, 3)));
+extern void lf_error_raise(lf_error_t error, const char *format, ...) __attribute__ ((format (printf, 2, 3)));
 /* Causes errors to resume the producion side effects, exiting if fatal. */
-extern void error_resume(void);
+extern void lf_error_resume(void);
 /* Pauses errors from producing side effects of any kind. */
-extern void error_pause(void);
+extern void lf_error_pause(void);
 /* Return the current error state. */
 extern lf_error_t error_get(void);
 /* Clear the current error state. */

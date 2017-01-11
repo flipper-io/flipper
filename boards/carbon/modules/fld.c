@@ -25,26 +25,26 @@ int fld_bind(lf_crc_t identifier) {
 int fld_load(char *path, void **interface) {
 	void *handle = dlopen(path, RTLD_LAZY);
 	if (!handle) {
-		error_raise(E_MODULE, error_message("%s", dlerror()));
+		lf_error_raise(E_MODULE, error_message("%s", dlerror()));
 		return lf_error;
 	}
 	/* Obtain a pointer to the module. */
 	struct _lf_module **module = dlsym(handle, "__fld_module_address");
 	char *error;
 	if ((error = dlerror()) != NULL)  {
-		error_raise(E_MODULE, error_message("%s", error));
+		lf_error_raise(E_MODULE, error_message("%s", error));
 		return lf_error;
 	}
 	/* Extract the loadable code from the module. */
 	void *code = dlsym(handle, "device_bin");
 	if ((error = dlerror()) != NULL)  {
-		error_raise(E_MODULE, error_message("%s", error));
+		lf_error_raise(E_MODULE, error_message("%s", error));
 		return lf_error;
 	}
 	/* Get the size of the loadable code from the module. */
 	uint32_t *size = dlsym(handle, "device_bin_len");
 	if ((error = dlerror()) != NULL)  {
-		error_raise(E_MODULE, error_message("%s", error));
+		lf_error_raise(E_MODULE, error_message("%s", error));
 		return lf_error;
 	}
 	/* Delete the module from the device if it already exists. */
@@ -68,7 +68,7 @@ int fld_load(char *path, void **interface) {
 	/* Load the interface. */
 	*interface = dlsym(handle, (*module) -> name);
 	if ((error = dlerror()) != NULL)  {
-		error_raise(E_MODULE, error_message("%s", error));
+		lf_error_raise(E_MODULE, error_message("%s", error));
 		return lf_error;
 	}
 	return lf_success;

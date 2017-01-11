@@ -54,14 +54,14 @@ struct _lf_bridge_record {
 int lf_bridge_configure(struct _lf_device *device) {
     /* Ensure that the device pointer is valid. */
     if (!device) {
-		error_raise(E_NULL, error_message("No device or endpoint record provided for libusb configuration. Reattach your device and try again."));
+		lf_error_raise(E_NULL, error_message("No device or endpoint record provided for libusb configuration. Reattach your device and try again."));
 		return lf_error;
 	}
 	/* Allocate memory for the bridge record if it has not yet been allocated. */
 	if (!(device -> endpoint -> record)) {
 		device -> endpoint -> record = calloc(1, sizeof(struct _lf_bridge_record));
         if (!(device -> endpoint -> record)) {
-            error_raise(E_MALLOC, error_message("Failed to allocate the memory needed to create a bridge endpoint record."));
+            lf_error_raise(E_MALLOC, error_message("Failed to allocate the memory needed to create a bridge endpoint record."));
             goto failure;
         }
 	}

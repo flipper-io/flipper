@@ -44,7 +44,7 @@ fmr_return fmr_push(struct _fmr_push_pull_packet *packet) {
 	fmr_return retval = 0xdeadbeef;
 	void *swap = malloc(packet -> length);
 	if (!swap) {
-		error_raise(E_MALLOC, NULL);
+		lf_error_raise(E_MALLOC, NULL);
 		return -1;
 	}
 	lf_self.endpoint -> pull(lf_self.endpoint, swap, packet -> length);
@@ -58,7 +58,7 @@ fmr_return fmr_pull(struct _fmr_push_pull_packet *packet) {
 	fmr_return retval = 0xdeadbeef;
 	void *swap = malloc(packet -> length);
 	if (!swap) {
-		error_raise(E_MALLOC, NULL);
+		lf_error_raise(E_MALLOC, NULL);
 		return -1;
 	}
 	*(uintptr_t *)(packet -> call.parameters) = (uintptr_t)swap;

@@ -142,16 +142,16 @@ get = codeError <$> c_error_get
 clear :: IO ()
 clear = c_error_clear
 
-foreign import ccall safe "flipper/error/error.h error_configure"
+foreign import ccall safe "flipper/error/error.h lf_error_configure"
     c_error_configure :: IO Word32
 
-foreign import ccall safe "flipper/error/error.h error_resume"
+foreign import ccall safe "flipper/error/error.h lf_error_resume"
     c_error_resume :: IO ()
 
-foreign import ccall safe "flipper/error/error.h error_pause"
+foreign import ccall safe "flipper/error/error.h lf_error_pause"
     c_error_pause :: IO ()
 
-foreign import ccall safe "flipper/error/error.h error_raise"
+foreign import ccall safe "flipper/error/error.h lf_error_raise"
     c_error_raise :: Word16 -> CString -> IO ()
 
 foreign import ccall safe "flipper/error/error.h error_get"

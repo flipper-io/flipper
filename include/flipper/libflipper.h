@@ -172,7 +172,7 @@ extern struct _flipper {
 	int (* exit)(void);
 	/* Stores the last observed error code. */
 	lf_error_t error_code;
-	/* Global flag that indicates whether or not error_raise() should print to stderr and call exit(). */
+	/* Global flag that indicates whether or not lf_error_raise() should print to stderr and call exit(). */
 	uint8_t errors_cause_side_effects;
 	/* Points to the actively selected device with which interaction will take place. */
 	struct _lf_device *device;

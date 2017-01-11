@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
     /* Close file. */
     fclose(fp);
 
-    error_pause();
+    lf_error_pause();
     /* Load the application into RAM. */
     fmr_return value = lf_ram_load(_device, fbuf, fsize);
     if ((int32_t)value == -1) {
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
     } else {
         printf("Got return value 0x%08x.\n", value);
     }
-    error_resume();
+    lf_error_resume();
 
     /* Free buffer. */
     free(fbuf);

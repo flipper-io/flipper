@@ -68,7 +68,7 @@ struct _os_task *os_task_create(void *handler, os_stack_t *stack, uint32_t stack
     struct _os_task *task = malloc(sizeof(struct _os_task));
     /* Ensure memory was allocated for the new task. */
     if (!task) {
-        error_raise(E_MALLOC, NULL);
+        lf_error_raise(E_MALLOC, NULL);
         return NULL;
     }
 
@@ -127,12 +127,12 @@ struct _os_task *os_task_create(void *handler, os_stack_t *stack, uint32_t stack
 /* Frees the memory associated with the task and frees its PID slot. */
 int os_task_release(struct _os_task *task) {
     if (!task) {
-        error_raise(E_NULL, NULL);
+        lf_error_raise(E_NULL, NULL);
         return lf_error;
     }
     /* Don't allow the user to release the system task. */
     if (task == schedule.head) {
-        error_raise(E_UNIMPLEMENTED, NULL);
+        lf_error_raise(E_UNIMPLEMENTED, NULL);
         return lf_error;
     }
     /* Disallow interrupts while freeing memory. */

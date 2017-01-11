@@ -38,7 +38,7 @@ fmr_return fmr_push(struct _fmr_push_pull_packet *packet) {
 	fmr_return retval;
 	void *push_buffer = malloc(packet -> length);
 	if (!push_buffer) {
-		error_raise(E_MALLOC, NULL);
+		lf_error_raise(E_MALLOC, NULL);
 		return -1;
 	}
 	uart0_pull_wait(push_buffer, packet -> length);
@@ -56,7 +56,7 @@ fmr_return fmr_pull(struct _fmr_push_pull_packet *packet) {
 	fmr_return retval;
 	void *pull_buffer = malloc(packet -> length);
 	if (!pull_buffer) {
-		error_raise(E_MALLOC, NULL);
+		lf_error_raise(E_MALLOC, NULL);
 		return -1;
 	}
 	*(uintptr_t *)(packet -> call.parameters) = (uintptr_t)pull_buffer;

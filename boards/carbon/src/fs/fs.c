@@ -74,7 +74,7 @@ lf_size_t fs_size(void) {
 void fs_seek(lf_size_t offset) {
 	_rw_head = _open_data + offset;
 	if (_rw_head > _open_data + open_size) {
-		error_raise(E_BOUNDARY, error_message("Seeking out of bounds."));
+		lf_error_raise(E_BOUNDARY, error_message("Seeking out of bounds."));
 	}
 }
 
@@ -116,7 +116,7 @@ void fs_format(void) {
 	/* ~ Allocate space externally for the root leaf. ~ */
 	_root_leaf = nvm_alloc(sizeof(leaf));
 	if (!_root_leaf) {
-		error_raise(E_MALLOC, error_message("The request for external memory was denied when trying to format the filesystem."));
+		lf_error_raise(E_MALLOC, error_message("The request for external memory was denied when trying to format the filesystem."));
 	}
 	/* Write the root leaf pointer to NVM. */
 	nvm_push(&_root_leaf, sizeof(nvm_p), _ROOT_LEAF);

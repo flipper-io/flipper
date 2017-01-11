@@ -8,7 +8,7 @@ int fs_transfer(char *path, char *name) {
 	/* Open the file for reading. */
 	FILE *file = fopen(path, "rb");
 	if (!file) {
-		error_raise(E_FS_NO_FILE, error_message("Failed to open the file '%s' for reading.", path));
+		lf_error_raise(E_FS_NO_FILE, error_message("Failed to open the file '%s' for reading.", path));
 		return lf_error;
 	}
 	/* Obtain the size of the file. */
@@ -18,7 +18,7 @@ int fs_transfer(char *path, char *name) {
 	/* Allocate the memory required to load the file into memory. */
 	uint8_t *data = (uint8_t *) malloc(sizeof(uint8_t) * size);
 	if (!data) {
-		error_raise(E_MALLOC, error_message("Failed to obtain the memory required to transfer the file '%s'.", name));
+		lf_error_raise(E_MALLOC, error_message("Failed to obtain the memory required to transfer the file '%s'.", name));
 		return lf_error;
 	}
 	/* Read the file into memory. */
@@ -47,14 +47,14 @@ int fs_receive(char *name, char *path) {
 	/* Open the file on the host. */
 	FILE *file = fopen (path, "wb");
 	if (!file) {
-		error_raise(E_FS_NO_FILE, error_message("Failed to create the file '%s'.", path));
+		lf_error_raise(E_FS_NO_FILE, error_message("Failed to create the file '%s'.", path));
 		return lf_error;
 	}
 	lf_size_t size = fs_size();
 	/* Allocate the memory required to download the file. */
 	uint8_t *data = (uint8_t *) malloc(sizeof(uint8_t) * size);
 	if (!data) {
-		error_raise(E_MALLOC, error_message("Failed to obtain the memory required to receive the file '%s'.", name));
+		lf_error_raise(E_MALLOC, error_message("Failed to obtain the memory required to receive the file '%s'.", name));
 		return lf_error;
 	}
 	/* Pull the data from the file. */

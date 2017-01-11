@@ -74,14 +74,14 @@ int os_load_application(void *base, struct _lf_abi_header *header) {
     /* Allocate the application's stack. */
     os_stack_t *_stack = malloc(APPLICATION_STACK_SIZE_WORDS * sizeof(uint32_t));
     if (!_stack) {
-        error_raise(E_MALLOC, NULL);
+        lf_error_raise(E_MALLOC, NULL);
         return lf_error;
     }
     /* Register the task for launch. */
     struct _os_task *task = os_task_create(_main, _stack, APPLICATION_STACK_SIZE_WORDS * sizeof(uint32_t));
     /* Verify that the task was created successfully. */
     if (!task) {
-        error_raise(E_UNIMPLEMENTED, NULL);
+        lf_error_raise(E_UNIMPLEMENTED, NULL);
         /* Free the memory allocated for the application's stack. */
         free(_stack);
         return lf_error;
@@ -97,7 +97,7 @@ int os_load_application(void *base, struct _lf_abi_header *header) {
 int os_load_module(void *base, struct _lf_abi_header *header) {
     /* If there are no more user module slots to allocate, return with error. */
     if (user_modules.count >= MAX_USER_MODULES) {
-        error_raise(E_UNIMPLEMENTED, NULL);
+        lf_error_raise(E_UNIMPLEMENTED, NULL);
         return lf_error;
     } else {
         fmr_module index = user_modules.count;
@@ -186,7 +186,7 @@ fmr_return fmr_perform_user_invocation(struct _fmr_invocation_packet *packet) {
     const void *address = module -> functions[packet -> call.function];
     /* Ensure that the function address is valid. */
     if (!address) {
-        error_raise(E_RESOULTION, NULL);
+        lf_error_raise(E_RESOULTION, NULL);
         return lf_error;
     }
     /* Perform the function call internally. */

@@ -22,14 +22,14 @@ struct _lf_libusb_record {
 
 int lf_libusb_configure(struct _lf_endpoint *this, struct _lf_device *device) {
 	if (!this) {
-		error_raise(E_NULL, error_message("No endpoint record provided for libusb configuration. Reattach your device and try again."));
+		lf_error_raise(E_NULL, error_message("No endpoint record provided for libusb configuration. Reattach your device and try again."));
 		return lf_error;
 	}
 	/* Allocate memory for the USB record if it has not yet been allocated. */
 	if (!(this -> record)) {
 		this -> record = calloc(1, sizeof(struct _lf_libusb_record));
 		if (!(this -> record)) {
-			error_raise(E_MALLOC, error_message("Failed to allocate the memory needed to create a libusb record."));
+			lf_error_raise(E_MALLOC, error_message("Failed to allocate the memory needed to create a libusb record."));
 			goto failure;
 		}
 	}
@@ -37,26 +37,26 @@ int lf_libusb_configure(struct _lf_endpoint *this, struct _lf_device *device) {
 	/* Initialize the libusb context associated with this endpoint. */
 	int _e = libusb_init(&(record -> context));
 	if (_e < 0) {
-		error_raise(E_LIBUSB, error_message("Failed to initialize libusb. Reboot and try again."));
+		lf_error_raise(E_LIBUSB, error_message("Failed to initialize libusb. Reboot and try again."));
 		goto failure;
 	}
 	/* Attach a physical device to this endpoint. */
 	record -> handle = libusb_open_device_with_vid_pid(record -> context, LF_USB_VENDOR_ID, LF_USB_PRODUCT_ID);
 	if (!(record -> handle)) {
-		error_raise(E_NO_DEVICE, error_message("Could not find any devices connected via USB. Ensure that a device is connected."));
+		lf_error_raise(E_NO_DEVICE, error_message("Could not find any devices connected via USB. Ensure that a device is connected."));
 		goto failure;
 	}
 	/* Claim the interface used to send and receive message runtime packets. */
 	_e = libusb_claim_interface(record -> handle, 0);
 	if (_e < 0) {
-		error_raise(E_LIBUSB, error_message("Failed to claim interface on attached device. Please quit any other programs using your device."));
+		lf_error_raise(E_LIBUSB, error_message("Failed to claim interface on attached device. Please quit any other programs using your device."));
 		goto failure;
 	}
 
 	/* Broadcast a packet to the device over its endpoint to verify the identifier. */
 	_e = lf_load_configuration(device);
 	if (_e < lf_success) {
-		error_raise(E_CONFIGURATION, error_message("Failed to obtain configuration for device '%s'.", device -> configuration.name));
+		lf_error_raise(E_CONFIGURATION, error_message("Failed to obtain configuration for device '%s'.", device -> configuration.name));
 		goto failure;
 	}
 
@@ -100,13 +100,13 @@ int lf_libusb_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
 #endif
 	if (_e < 0) {
 		if (_e == LIBUSB_ERROR_TIMEOUT) {
-			error_raise(E_TIMEOUT, error_message("The transfer to the device timed out."));
+			lf_error_raise(E_TIMEOUT, error_message("The transfer to the device timed out."));
 		} else {
-			error_raise(E_COMMUNICATION, error_message("Error during libusb transfer."));
+			lf_error_raise(E_COMMUNICATION, error_message("Error during libusb transfer."));
 		}
 		return lf_error;
 	} else if (_length != length) {
-		error_raise(E_COMMUNICATION, error_message("Failed to transmit complete USB packet."));
+		lf_error_raise(E_COMMUNICATION, error_message("Failed to transmit complete USB packet."));
 		return lf_error;
 	}
 	return lf_success;
@@ -127,13 +127,13 @@ int lf_libusb_pull(struct _lf_endpoint *this, void *destination, lf_size_t lengt
 #endif
 	if (_e < 0) {
 		if (_e == LIBUSB_ERROR_TIMEOUT) {
-			error_raise(E_TIMEOUT, error_message("The transfer to the device timed out."));
+			lf_error_raise(E_TIMEOUT, error_message("The transfer to the device timed out."));
 		} else {
-			error_raise(E_COMMUNICATION, error_message("Error during libusb transfer."));
+			lf_error_raise(E_COMMUNICATION, error_message("Error during libusb transfer."));
 		}
 		return lf_error;
 	} else if (_length != length) {
-		error_raise(E_COMMUNICATION, error_message("Failed to receive complete USB packet. (%d bytes / %d bytes)", _length, length));
+		lf_error_raise(E_COMMUNICATION, error_message("Failed to receive complete USB packet. (%d bytes / %d bytes)", _length, length));
 		return lf_error;
 	}
 	return lf_success;

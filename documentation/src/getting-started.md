@@ -1,8 +1,6 @@
 ## Getting Started
 
-Once you have your Flipper device in hand, plug it in to your computer using the included USB cable. In order to use Flipper, you don't need to install any special drivers onto your computer. All you need to do is install a software package called the Flipper Toolbox.
-
-### Installing the Flipper Toolbox
+Before you can use your device, you must install a software package to your computer called the Flipper Toolbox. The toolbox bundles the [console](./console.html), [libflipper](./libflipper.html), and the development headers your platform needs to communicate with your device.
 
 #### macOS
 
