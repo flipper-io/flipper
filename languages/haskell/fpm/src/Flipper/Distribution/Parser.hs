@@ -22,23 +22,30 @@ import qualified Text.Megaparsec.Combinator as M
 import qualified Text.Megaparsec.Lexer      as ML
 import qualified Text.Megaparsec.Text       as M
 
+-- | Consume any and all whitespace (except for newlines, which have special behavior in
+--   manifest files) and comments.
 spaceEater :: M.Parser ()
 spaceEater = ML.space (M.skipSome (MC.char ' ' <|> MC.tab))
                       (ML.skipLineComment "--")
                       (ML.skipBlockCommentNested "{-" "-}")
 
+-- | Parse any lexical element.
 lexed :: M.Parser a -> M.Parser a
 lexed = ML.lexeme spaceEater
 
+-- | Parse a lexical symbol.
 symb :: String -> M.Parser String
 symb = ML.symbol spaceEater
 
+-- | Force a parser to consume all of its input.
 greedy :: M.Parser a -> M.Parser a
 greedy = (<* M.eof)
 
+-- | Make a parser lexical and greedy.
 rhs :: M.Parser a -> M.Parser a
 rhs = greedy . lexed
 
+-- | Consumes any visible Unicode character.
 visible :: M.Parser Char
 visible = M.choice [ MC.alphaNumChar
                    , MC.numberChar
@@ -46,5 +53,6 @@ visible = M.choice [ MC.alphaNumChar
                    , MC.symbolChar
                    ]
 
+-- | Consomes a contiguous non-empty sequence of visible Unicode characters.
 word :: M.Parser T.Text
 word = T.pack <$> some visible

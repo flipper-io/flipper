@@ -7,7 +7,10 @@ Maintainer  : travis@flipper.io
 Stability   : Provisional
 Portability : Windows, POSIX
 
-This module provides package specifications.
+This module provides types and parsers for package specifications.
+
+The 'PackageDescription' type documentation provides the detailed syntax and
+semantics for each field.
 -}
 
 {-# LANGUAGE DeriveDataTypeable
@@ -55,7 +58,8 @@ import qualified Text.Megaparsec      as M
 import qualified Text.Megaparsec.Text as M
 
 -- | A legal package name is any string of non-whitespace non-control Unicode
---   characters.
+--   characters. This is quite liberal and we may decide to add more
+--   restrictions later on.
 newtype PackageName = PackageName { unPackageName :: T.Text }
                     deriving ( Eq
                              , Ord
@@ -92,7 +96,14 @@ manifestPackageID = PackageID <$> name <*> version
     where name    = headerKey "name" >>= liftParser parsePackageName
           version = headerKey "version" >>= liftParser parseVersion
 
--- | A name and version range identifies a package dependency.
+-- | A name and version range identifies a package dependency. In a manifest
+--   file, dependencies are listed in a comma-separated list, with each element
+--   consisting of a 'PackageName', followed by whitespace, followed by a
+--   'VersionRange'. For example:
+--
+-- > dependencies: packageX == 1.*
+-- >             , packageY >= 1.0 && < 1.5
+-- >             , packageZ != 0.1
 data Dependency = Dependency {
     -- | Dependency package name.
     depName  :: PackageName
@@ -122,33 +133,33 @@ manifestDependencies = headerKey "dependencies" >>= liftParser parseDependencies
 --   data required for building the package, such as the package dependencies,
 --   exposed modules, and application entry points.
 data PackageDescription = PackageDescription {
-    -- | Package name and version.
+    -- | Package name and version, drawn from the @name@ and @version@ keys.
     package      :: PackageID
-    -- | Package software license type.
+    -- | Package software license type, drawn from the @license@ key.
   , license      :: License
-    -- | Package software license text.
+    -- | Package software license text, drawn from the @license-file@ key.
   , licenseFile  :: FilePath
-    -- | Package copyright holder.
+    -- | Package copyright holder, drawn from the @copyright@ key.
   , copyright    :: T.Text
-    -- | Package maintainer email.
+    -- | Package maintainer email, drawn from the @maintainer@ key.
   , maintainer   :: T.Text
-    -- | Package author name.
+    -- | Package author name, drawn from the @author@ key.
   , author       :: T.Text
-    -- | Package homepage URL.
+    -- | Package homepage URL, drawn from the @homepage@ key.
   , homepage     :: T.Text
-    -- | Package bug report URL.
+    -- | Package bug report URL, drawn from the @bug-reports@ key.
   , bugReports   :: T.Text
-    -- | One-line package summary.
+    -- | One-line package summary, drawn from the @synopsis@ key.
   , synopsis     :: T.Text
     -- | Package dependencies as listed in the @pkg.fpm@ file, not to be
     --   confused with the package dependency closure computed by dependency
-    --   resolution.
+    --   resolution. This is drawn from the @dependencies@ key.
   , dependencies :: [Dependency]
-    -- | Package specification version.
+    -- | Package specification version, drawn from the @fpm-version@ key.
   , specVersion  :: Version
-    -- | Exposed modules.
+    -- | Exposed modules, drawn from the module sections.
   , modules      :: NonEmpty Module
-    -- | Language bindings.
+    -- | Language bindings, drawn from the binding sections.
   , bindings     :: [Binding]
   } deriving ( Eq
              , Ord

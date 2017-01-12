@@ -7,6 +7,7 @@ Maintainer  : travis@flipper.io
 Stability   : Provisional
 Portability : Windows, POSIX
 
+Provides a parser for legal C symbol names.
 -}
 
 {-# LANGUAGE DeriveDataTypeable
@@ -140,5 +141,6 @@ parseSymbolName = (SymbolName . T.pack) <$> (ident >>= notReserved)
                 , "while"
                 ]
 
+-- | Convert a C symbol name to a plain 'String'.
 symbolNamePretty :: SymbolName -> String
 symbolNamePretty = T.unpack . unSymbolName
