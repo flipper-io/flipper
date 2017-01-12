@@ -47,4 +47,6 @@ data Binding = Binding {
              )
 
 manifestBindings :: ManifestP [Binding]
-manifestBindings = undefined
+manifestBindings = procBindingSections mkBinding
+    where mkBinding l = Binding l <$>
+                        (bindingKey l "source" >>= liftParser (parseLangSrc l))

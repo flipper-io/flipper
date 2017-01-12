@@ -12,6 +12,7 @@ This module provides module specifications.
 
 {-# LANGUAGE DeriveDataTypeable
            , DeriveGeneric
+           , FlexibleInstances
            , GeneralizedNewtypeDeriving
            #-}
 
@@ -26,17 +27,22 @@ import Data.Binary
 
 import Data.Data
 
+import Data.List.NonEmpty
+
 import GHC.Generics
 
 import Flipper.Distribution.Manifest
+import Flipper.Distribution.Parser
 import Flipper.Distribution.SymbolName
+
+import qualified Text.Megaparsec as M
 
 -- | A module.
 data Module = Module {
     -- | Module name.
     modName    :: SymbolName
     -- | Exposed module symbols.
-  , modSymbols :: [SymbolName]
+  , modSymbols :: (NonEmpty SymbolName)
     -- | Module entry points.
   , modEntries :: [SymbolName]
   } deriving ( Eq
@@ -47,8 +53,16 @@ data Module = Module {
              , Generic
              )
 
+-- TODO: remove this when Stackage LTS updates the binary package.
+instance Binary (NonEmpty SymbolName)
 instance NFData Module
 instance Binary Module
 
-manifestModules :: ManifestP [Module]
-manifestModules = undefined
+manifestModules :: ManifestP (NonEmpty Module)
+manifestModules = procModuleSections mkModule
+    where mkModule m = Module m
+                   <$> (moduleKey m "symbols" >>= liftParser someSymbs)
+                   <*> (moduleKey m "entry-points" >>= liftParser symbs)
+          ident     = lexed parseSymbolName
+          symbs     = M.sepBy ident (symb ",")
+          someSymbs = fromList <$> M.sepBy1 ident (symb ",")

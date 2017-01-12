@@ -14,25 +14,30 @@ module Flipper.Distribution.Parser where
 
 import Control.Applicative
 
-import qualified Data.Map as M
-
 import qualified Data.Text as T
 
+import qualified Text.Megaparsec            as M
 import qualified Text.Megaparsec.Char       as MC
 import qualified Text.Megaparsec.Combinator as M
-import qualified Text.Megaparsec.Lexer      as M
+import qualified Text.Megaparsec.Lexer      as ML
 import qualified Text.Megaparsec.Text       as M
 
 spaceEater :: M.Parser ()
-spaceEater = M.space (M.skipSome (MC.char ' ' <|> MC.tab))
-                     (M.skipLineComment "--")
-                     (M.skipBlockCommentNested "{-" "-}")
+spaceEater = ML.space (M.skipSome (MC.char ' ' <|> MC.tab))
+                      (ML.skipLineComment "--")
+                      (ML.skipBlockCommentNested "{-" "-}")
 
 lexed :: M.Parser a -> M.Parser a
-lexed = M.lexeme spaceEater
+lexed = ML.lexeme spaceEater
 
 symb :: String -> M.Parser String
-symb = M.symbol spaceEater
+symb = ML.symbol spaceEater
+
+greedy :: M.Parser a -> M.Parser a
+greedy = (<* M.eof)
+
+rhs :: M.Parser a -> M.Parser a
+rhs = greedy . lexed
 
 visible :: M.Parser Char
 visible = M.choice [ MC.alphaNumChar

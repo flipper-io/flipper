@@ -11,15 +11,23 @@ This module provides the first-pass parser for @pkg.fpm@ files and a processing
 monad for accessing the resulting keys and sections.
 -}
 
-{-# LANGUAGE DeriveDataTypeable
+{-# LANGUAGE BangPatterns
+           , DeriveDataTypeable
            , DeriveGeneric
            , GeneralizedNewtypeDeriving
+           , TupleSections
            #-}
 
 module Flipper.Distribution.Manifest (
-    ManifestError(..)
+    Manifest(..)
+  , parseManifest
+
+
+
+  , ManifestError(..)
   , manifestErrorPretty
   , ManifestP()
+  , runManifestP
   , liftParser
   , headerKey
   , optionalHeaderKey
@@ -31,9 +39,11 @@ module Flipper.Distribution.Manifest (
   , optionalBindingKey
   ) where
 
+import Control.Applicative
+
 import Control.DeepSeq
 
-import Control.Monad.Fail
+import Control.Monad
 import Control.Monad.Fix
 
 import Control.Monad.Trans.Class
@@ -45,6 +55,8 @@ import Data.Binary
 
 import Data.Data
 
+import Data.Foldable
+
 import Data.List.NonEmpty
 
 import qualified Data.Map as M
@@ -54,6 +66,7 @@ import Data.Monoid
 import qualified Data.Text as T
 
 import Flipper.Distribution.Language
+import Flipper.Distribution.Parser
 import Flipper.Distribution.SymbolName
 
 import GHC.Generics
@@ -62,14 +75,16 @@ import qualified Text.Megaparsec       as M
 import qualified Text.Megaparsec.Error as M
 import qualified Text.Megaparsec.Text  as M
 
+type TextPairs = M.Map T.Text T.Text
+
 -- | Internal representation of @pkg.fpm@ files after the first parsing pass.
 data Manifest = Manifest {
     -- | Header key-value pairs before any module or binding sections.
-    header       :: M.Map T.Text T.Text
+    header       :: TextPairs
     -- | Module sections indexed by module names.
-  , modSections  :: M.Map SymbolName (M.Map T.Text T.Text)
+  , modSections  :: M.Map SymbolName TextPairs
     -- | Binding sections indexed by language.
-  , bindSections :: M.Map Language (M.Map T.Text T.Text)
+  , bindSections :: M.Map Language TextPairs
   } deriving ( Eq
              , Ord
              , Show
@@ -80,6 +95,79 @@ data Manifest = Manifest {
 
 instance NFData Manifest
 instance Binary Manifest
+
+-- | First-pass parser. This parser provides the 'Manifest' type that parsers in
+--   the 'ManifestP' monad use. Consumes all input.
+parseManifest :: M.Parser Manifest
+parseManifest = do
+    hs       <- parsePairs
+    (ms, bs) <- parseSections
+    M.eof
+    pure $ Manifest hs ms bs
+
+-- | Consumes all pairs until a section declaration or end of input are
+--   encountered.
+parsePairs :: M.Parser TextPairs
+parsePairs = go M.empty
+    where go m = M.option m ((M.try kv) >>= ins m >>= go)
+          kv   = do k <- lexed key
+                    symb ":"
+                    -- val will consume the newline:
+                    v <- T.pack <$> val
+                    pure (k, v)
+          ins m (!k, !v) = case M.lookup k m of
+                                   Nothing -> pure (M.insert k v m)
+                                   _       -> fail $ mconcat [ "Duplicate key "
+                                                             , T.unpack k
+                                                             , "\n"
+                                                             ]
+          key = T.pack <$> M.some (M.choice [ M.alphaNumChar
+                                            , M.char '-'
+                                            ])
+          val :: M.Parser String
+          val = do c <- M.anyChar
+                   case c of '\n' -> M.option [] (M.try indentCont)
+                             x    -> (x :) <$> val
+          indentCont = (M.char ' ' <|> M.char '\t')
+                    *> spaceEater
+                    *> ((' ' :) <$> val)
+
+parseSections :: M.Parser (M.Map SymbolName TextPairs, M.Map Language TextPairs)
+parseSections = M.many someSection >>= foldM appUpdate (M.empty, M.empty)
+    where someSection = M.space *> M.eitherP (M.try parseModSection)
+                                             (M.try parseBindSection)
+          appUpdate (!ms, !bs) (Left mu)  = (,bs) <$> insms mu ms
+          appUpdate (!ms, !bs) (Right bu) = (ms,) <$> insbs bu bs
+          insms (!sn, !ps) ms =
+              case M.lookup sn ms of
+                      Nothing -> pure (M.insert sn ps ms)
+                      _       -> fail $ mconcat [ "Duplicate module section "
+                                                , symbolNamePretty sn
+                                                , "\n"
+                                                ]
+          insbs (!ln, !ps) bs =
+              case M.lookup ln bs of
+                      Nothing -> pure (M.insert ln ps bs)
+                      _       -> fail $ mconcat [ "Duplicate binding section "
+                                                , languagePretty ln
+                                                , "\n"
+                                                ]
+
+parseModSection :: M.Parser (SymbolName, TextPairs)
+parseModSection = do
+    M.string "module "
+    sn <- parseSymbolName
+    M.char '\n'
+    ps <- parsePairs
+    pure (sn, ps)
+
+parseBindSection :: M.Parser (Language, TextPairs)
+parseBindSection = do
+    M.string "binding "
+    ln <- M.try (parseLanguage <* M.char '\n')
+          <|> Unknown <$> (word <* M.char '\n')
+    ps <- parsePairs
+    pure (ln, ps)
 
 type ParseError = M.ParseError Char M.Dec
 
@@ -95,35 +183,49 @@ data ManifestError = ParserError ParseError
                    | ExtraBindingKey Language T.Text
 
 manifestErrorPretty :: ManifestError -> String
-manifestErrorPretty (ParserError e)     = "Parser error.\n"
-                                       <> M.parseErrorPretty e
-manifestErrorPretty (NoHeaderKey k)     = "Missing expected header key \""
-                                       <> T.unpack k
-                                       <> "\"\n"
-manifestErrorPretty (ExtraHeaderKey k) = "Unexpected header key \""
-                                      <> T.unpack k
-                                      <> "\"\n"
-manifestErrorPretty NoModules             = "Manifest file must contain at \
-                                            \ least one module declaration.\n"
-manifestErrorPretty (NoModuleKey m k)     = "Missing expected key \""
-                                         <> T.unpack k
-                                         <> "\" from declaration for module \""
-                                         <> symbolNamePretty m
-                                         <> "\"\n"
-manifestErrorPretty (ExtraModuleKey m k)  = "Unexpected key  \""
-                                         <> T.unpack k
-                                         <> "\" in declaration for module \""
-                                         <> symbolNamePretty m
-                                         <> "\"\n"
-manifestErrorPretty (NoBindingKey b k)    = "Missing expected key \""
-                                         <> T.unpack k
-                                         <> "\" from declaration for binding \""
-                                         <> languagePretty b
-                                         <> "\"\n"
-manifestErrorPretty (ExtraBindingKey b k) = "Unexpected key \""
-                                         <> T.unpack k
-                                         <> "\" in declaration for binding\""
-                                         <> "\"\n"
+manifestErrorPretty (ParserError e) =
+    mconcat [ "Parser error.\n"
+           , M.parseErrorPretty e
+           ]
+manifestErrorPretty (NoHeaderKey k) =
+    mconcat [ "Missing expected header key \""
+            , T.unpack k
+            , "\"\n"
+            ]
+manifestErrorPretty (ExtraHeaderKey k) =
+    mconcat [ "Unexpected header key \""
+            , T.unpack k
+            , "\"\n"
+            ]
+manifestErrorPretty NoModules =
+    "Manifest file must contain at least one module declaration.\n"
+manifestErrorPretty (NoModuleKey m k) =
+    mconcat [ "Missing expected key \""
+            , T.unpack k
+            , "\" from declaration for module \""
+            , symbolNamePretty m
+            , "\"\n"
+            ]
+manifestErrorPretty (ExtraModuleKey m k) =
+    mconcat [ "Unexpected key  \""
+            , T.unpack k
+            , "\" in declaration for module \""
+            , symbolNamePretty m
+            , "\"\n"
+            ]
+manifestErrorPretty (NoBindingKey b k) =
+    mconcat [ "Missing expected key \""
+            , T.unpack k
+            , "\" from declaration for binding \""
+            , languagePretty b
+            , "\"\n"
+            ]
+manifestErrorPretty (ExtraBindingKey b k) =
+    mconcat [ "Unexpected key \""
+            , T.unpack k
+            , "\" in declaration for binding\""
+            , "\"\n"
+            ]
 
 -- | Manifest processing monad. Provides 'ExceptT' for error reporting and
 --   'StateT' for controlled access to the parsed 'Manifest'.
@@ -134,6 +236,14 @@ newtype ManifestP a = ManifestP {
              , Monad
              , MonadFix
              )
+
+runManifestP :: ManifestP a
+             -> String -- ^ File name for error reporting.
+             -> T.Text -- ^ Parser input.
+             -> Either ManifestError a
+runManifestP (ManifestP p) fn input = case M.runParser parseManifest fn input of
+    Left e  -> Left (ParserError e)
+    Right m -> evalState (runExceptT (runReaderT p fn)) m
 
 fileName :: ManifestP String
 fileName = ManifestP ask
@@ -155,8 +265,8 @@ modME = ManifestP . lift . lift . modify'
 liftParser :: M.Parser a -> T.Text -> ManifestP a
 liftParser p t = do
     fn <- fileName
-    case M.runParser p fn t of Right r -> pure r
-                               Left e  -> throwME (ParserError e)
+    case M.runParser (rhs p) fn t of Right r -> pure r
+                                     Left e  -> throwME (ParserError e)
 
 headerKey :: T.Text -> ManifestP T.Text
 headerKey k = do

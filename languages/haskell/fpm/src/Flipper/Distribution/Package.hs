@@ -12,12 +12,21 @@ This module provides package specifications.
 
 {-# LANGUAGE DeriveDataTypeable
            , DeriveGeneric
+           , FlexibleInstances
            , GeneralizedNewtypeDeriving
+           , OverloadedStrings
            #-}
 
 module Flipper.Distribution.Package (
     PackageName()
   , parsePackageName
+  , PackageID(..)
+  , manifestPackageID
+  , Dependency(..)
+  , parseDependencies
+  , manifestDependencies
+  , PackageDescription(..)
+  , manifestPackageDescription
   ) where
 
 import Control.Applicative
@@ -27,6 +36,8 @@ import Control.DeepSeq
 import Data.Binary
 
 import Data.Data
+
+import Data.List.NonEmpty
 
 import qualified Data.Text as T
 
@@ -77,7 +88,9 @@ instance NFData PackageID
 instance Binary PackageID
 
 manifestPackageID :: ManifestP PackageID
-manifestPackageID = undefined
+manifestPackageID = PackageID <$> name <*> version
+    where name    = headerKey "name" >>= liftParser parsePackageName
+          version = headerKey "version" >>= liftParser parseVersion
 
 -- | A name and version range identifies a package dependency.
 data Dependency = Dependency {
@@ -96,8 +109,13 @@ data Dependency = Dependency {
 instance NFData Dependency
 instance Binary Dependency
 
+parseDependencies :: M.Parser [Dependency]
+parseDependencies = M.sepBy1 parseDep (symb ",")
+    where parseDep = Dependency <$> lexed parsePackageName
+                                <*> lexed parseVersionRange
+
 manifestDependencies :: ManifestP [Dependency]
-manifestDependencies = undefined
+manifestDependencies = headerKey "dependencies" >>= liftParser parseDependencies
 
 -- | The internal representation of a @pkg.fpm@ file. This includes metadata
 --   such as the package name, version, description, and license, as well as
@@ -122,9 +140,6 @@ data PackageDescription = PackageDescription {
   , bugReports   :: T.Text
     -- | One-line package summary.
   , synopsis     :: T.Text
-    -- | Package description. This text is parsed as markdown by the Flipper
-    --   package server and displayed on the fpm.flipper.io package page.
-  , description  :: T.Text
     -- | Package dependencies as listed in the @pkg.fpm@ file, not to be
     --   confused with the package dependency closure computed by dependency
     --   resolution.
@@ -132,7 +147,7 @@ data PackageDescription = PackageDescription {
     -- | Package specification version.
   , specVersion  :: Version
     -- | Exposed modules.
-  , modules      :: [Module]
+  , modules      :: NonEmpty Module
     -- | Language bindings.
   , bindings     :: [Binding]
   } deriving ( Eq
@@ -143,8 +158,23 @@ data PackageDescription = PackageDescription {
              , Generic
              )
 
+-- TODO: remove this when Stackage LTS updates the binary package.
+instance Binary (NonEmpty Module)
 instance NFData PackageDescription
 instance Binary PackageDescription
 
 manifestPackageDescription :: ManifestP PackageDescription
-manifestPackageDescription = undefined
+manifestPackageDescription =
+    PackageDescription <$> manifestPackageID
+                       <*> (headerKey "license" >>= liftParser parseLicense)
+                       <*> (T.unpack <$> headerKey "license-file")
+                       <*> headerKey "copyright"
+                       <*> headerKey "maintainer"
+                       <*> headerKey "author"
+                       <*> headerKey "homepage"
+                       <*> headerKey "bug-reports"
+                       <*> headerKey "synopsis"
+                       <*> manifestDependencies
+                       <*> (headerKey "fpm-version" >>= liftParser parseVersion)
+                       <*> manifestModules
+                       <*> manifestBindings
