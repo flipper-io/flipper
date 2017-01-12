@@ -23,6 +23,8 @@
 - [`libflipper`](./libflipper.md)
     - [Endpoints](libflipper-endpoints.md)
     - [Errors](./libflipper-errors.md)
+    - [Modules](./libflipper-modules.md)
+    - [FMR](./libflipper-fmr.md)
 - [Languages](./languages.md)
 - [Console](./console.md)
 - [Package Manager](./package-manager.md)

@@ -3,6 +3,10 @@ Console
 
 The Flipper Console, or **console** for short, is a command line utility that is installed alongside the toolbox. The console makes it easy to interact with the modules that come preinstalled on the device, as well as perform functions such as configuring the device, updating the device, etc.
 
+---
+
+### Obtaining version information.
+
 If the toolbox was installed properly, the console should be accessable using the `flipper` command. To find out which version of the console is installed, use the command below.
 ```bash
 $ flipper version
@@ -20,12 +24,16 @@ If there are one or more devices plugged in, the firmware versions of the attach
 
 If running `flipper` produces an error, ensure the toolbox was installed by visiting [getting started](./getting-started.html).
 
+---
+
 ### Listing commands.
 
 To display a list of the supported commands, the `help` command can be used.
 ```bash
 $ flipper help
 ```
+
+---
 
 ### Running commands.
 
@@ -48,6 +56,8 @@ For help running a specific command, simply run help on the module or command yo
 ```bash
 $ flipper help led
 ```
+
+---
 
 ### Data Accessors
 
@@ -79,6 +89,8 @@ This syntax would first download the raw contents of the page `http://www.mycool
 
 Several other modules support the use of data accessors. Information about the syntax that can be used into invoke a module function using the console can be found in the module's documentation entry. For a list of modules, head to [modules](./modules.html).
 
+---
+
 ### REPL
 
 The read–eval–print loop, or REPL, functionality of the console enables you to execute multiple commands without exiting the console. To enter the REPL, invoke the console with no arguments.
@@ -87,6 +99,8 @@ $ flipper
 ```
 
 You can then resume execting commands normally without needing to type `flipper` in front of them. To exit the REPL, use the `exit` command, or `^C`.
+
+---
 
 ### Package Manager
 
