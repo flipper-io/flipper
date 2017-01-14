@@ -48,7 +48,7 @@ lf_error_t error_get(void) {
 	return flipper.error_code;
 }
 
-void error_clear(void) {
+void lf_error_clear(void) {
 	flipper.error_code = E_OK;
 }
 

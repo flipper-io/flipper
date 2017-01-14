@@ -132,7 +132,7 @@ int os_task_release(struct _os_task *task) {
     }
     /* Don't allow the user to release the system task. */
     if (task == schedule.head) {
-        lf_error_raise(E_UNIMPLEMENTED, NULL);
+        lf_error_raise(E_INVALID_TASK, NULL);
         return lf_error;
     }
     /* Disallow interrupts while freeing memory. */
@@ -211,12 +211,14 @@ struct _os_task *os_task_from_pid(int pid) {
 int os_task_pause(int pid) {
     /* Circumvent users from interacting with the system task. */
     if (!pid) {
+        lf_error_raise(E_INVALID_TASK, NULL);
         return lf_error;
     }
     /* Find the task for the given PID. */
     struct _os_task *task = os_task_from_pid(pid);
     /* Ensure that the PID was valid. */
     if (!task) {
+        lf_error_raise(E_NO_PID, NULL);
         return lf_error;
     }
     /* If the task is the currently executing task, queue the move to the next task. */
@@ -232,12 +234,13 @@ int os_task_pause(int pid) {
 int os_task_resume(int pid) {
     /* Circumvent users from interacting with the system task. */
     if (!pid) {
-        return lf_error;
+        return lf_success;
     }
     /* Find the task for the given PID. */
     struct _os_task *task = os_task_from_pid(pid);
     /* Ensure that the PID was valid. */
     if (!task) {
+        lf_error_raise(E_NO_PID, NULL);
         return lf_error;
     }
     /* Mark the task as idle so it is executed during the next scheduling event. */
@@ -254,6 +257,7 @@ int os_task_resume(int pid) {
 int os_task_stop(int pid) {
     /* Circumvent users from interacting with the system task. */
     if (!pid) {
+        lf_error_raise(E_INVALID_TASK, NULL);
         return lf_error;
     }
     /* Find the task for the given PID. */

@@ -41,6 +41,8 @@ enum {
 	E_BOUNDARY,
 	E_TIMER,
 	E_TIMEOUT,
+	E_NO_PID,
+	E_INVALID_TASK,
 	E_UNIMPLEMENTED
 };
 
@@ -73,6 +75,8 @@ enum {
 								 "boundary error", \
 								 "timer error", \
 								 "timeout error", \
+								 "no task for pid", \
+								 "invalid task specified", \
 								 "unimplemented error"
 
 /* Allow the 'error_message' macro to serve as a passthrough for any variadic arguments supplied to it. */
@@ -96,6 +100,6 @@ extern void lf_error_pause(void);
 /* Return the current error state. */
 extern lf_error_t error_get(void);
 /* Clear the current error state. */
-extern void error_clear(void);
+extern void lf_error_clear(void);
 
 #endif

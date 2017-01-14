@@ -16,7 +16,7 @@ int main() {
 	// nvm_configure();
 
 	/* Clear the error state. */
-	error_clear();
+	lf_error_clear();
 
 	/* Initialize the scheduler and start executing the system task. */
 	os_task_init();

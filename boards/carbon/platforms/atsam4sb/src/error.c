@@ -14,7 +14,7 @@ lf_error_t error_get(void) {
 	return lf_self.error;
 }
 
-void error_clear(void) {
+void lf_error_clear(void) {
 	lf_self.error = E_OK;
 }
 
