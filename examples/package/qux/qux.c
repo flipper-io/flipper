@@ -1,8 +1,8 @@
 #define __private_include__
-#include <module/module.h>
+#include <qux/qux.h>
 #include <flipper/carbon/platforms/atsam4s16b.h>
 
-int module_configure(void) {
+int qux_configure(void) {
     PIOA -> PIO_PER = PIO_PA16;
     PIOA -> PIO_OER = PIO_PA16;
     PIOA -> PIO_OWER = PIO_PA16;
@@ -10,6 +10,6 @@ int module_configure(void) {
     return lf_success;
 }
 
-void module_test(void) {
+void qux_test(void) {
 
 }

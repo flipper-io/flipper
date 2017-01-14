@@ -1,5 +1,5 @@
 #define __private_include__
-#include <module/module.h>
+#include <qux/qux.h>
 
 #ifdef DEVICE_BUILD
 #define MODULE_ATTRIBUTE __attribute__((section (".module")))
@@ -8,7 +8,7 @@
 #endif
 
 /* Define the virtual interface for this module. */
-const struct _module module MODULE_ATTRIBUTE = {
-	module_configure,
-    module_test
+const struct _qux qux MODULE_ATTRIBUTE = {
+	qux_configure,
+    qux_test
 };
