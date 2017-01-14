@@ -332,7 +332,28 @@ int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_s
 	return lf_success;
 }
 
-/* Experimental: Load an application into a device's RAM and launch it. */
+/* Binds the lf_module structure to its counterpart on the attached device. */
+struct _lf_module *lf_bind(char *name) {
+	/* Calculate the identifier of the module. */
+	lf_crc_t identifier = lf_crc(name, strlen(name));
+	/* Allocate the module structure. */
+	struct _lf_module *_module = malloc(sizeof(struct _lf_module));
+	/* Ensure that the module structure was allocated successfully. */
+	if (!_module) {
+		lf_error_raise(E_MALLOC, error_message("Failed to allocate memory for the lf_module."));
+	}
+	// /* Bind the device module to the allocated module structure. */
+	// int _e = fld_bind(_module, identifier);
+	// if (_e < lf_success) {
+	// 	/* Free the memory allocated for the module. */
+	// 	free(_module);
+	// 	return NULL;
+	// }
+	/* Return the loaded module. */
+	return _module;
+}
+
+/* Experimental: Load an image into a device's RAM. */
 int lf_ram_load(struct _lf_device *device, void *source, lf_size_t length) {
 	if (!source) {
 		lf_error_raise(E_NULL, error_message("No source provided for load operation."));

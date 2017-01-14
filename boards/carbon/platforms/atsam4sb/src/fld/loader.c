@@ -47,25 +47,7 @@
   |             .bss             |
   +------------------------------*/
 
-#define MAX_USER_MODULES 4
-
-/* A data structure used to describe the parameters of a loaded module. */
-struct _user_module {
-    /* Array of the module's functions. */
-    void **functions;
-    /* The number of functions within the module. */
-    int func_c;
-    /* Pointer to the base of the module for deallocation purposes. */
-    void *base;
-};
-
-/* A data structure used to keep track of actively registered user modules. */
-struct _user_modules {
-    /* An array of pointers to the user modules. */
-    struct _user_module modules[MAX_USER_MODULES];
-    /* The number of registered user modules. */
-    volatile int count;
-} user_modules;
+struct _user_modules user_modules;
 
 /* Loads an application into RAM. */
 int os_load_application(void *base, struct _lf_abi_header *header) {

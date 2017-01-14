@@ -87,7 +87,7 @@ void uart0_isr(void) {
 		/* Process the packet. */
 		fmr_perform(&packet, &result);
 		/* HACK: Wait until the U2 is ready. */
-		for (volatile int i = 0; i < 100000; i ++);
+		for (volatile int i = 0; i < 10000; i ++);
 		/* Give the result back. */
 		uart0_push(&result, sizeof(struct _fmr_result));
 		usart_push(&result, sizeof(struct _fmr_result));
