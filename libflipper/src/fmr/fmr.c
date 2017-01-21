@@ -119,10 +119,12 @@ int fmr_free(struct _fmr_list *list) {
 	struct _fmr_arg *tail = list -> argv;
 	/* If we have more than one argument, walk the parent list. */
 	if (tail) {
+		/* Declare a pointer to hold the next argument. */
+		struct _fmr_arg *next;
 		/* As we walk the list, free each argument as we go. */
 		while (tail -> next) {
-			/* Obtain a pointer to the next argument. */
-			struct _fmr_arg *next = tail -> next;
+			/* Assign the reference to the next argument. */
+			next = tail -> next;
 			/* Destroy the reference to the current argument. */
 			free(tail);
 			/* Advance to the next argument. */
