@@ -53,11 +53,10 @@ void os_task_init(void) {
     /* Exeucte the system task's handler. */
     task -> handler();
 
-    /* Must hang here, otherwise the routine will pop values meant for MSP onto PSP. */
+    /* Must hang here, otherwise this routine will pop values meant for MSP onto PSP. */
     while (1);
 }
 
-/* Stages a task for launch. */
 struct _os_task *os_task_create(void *handler, os_stack_t *stack, uint32_t stack_size) {
     /* If the OS is already scheduling the maximum number of tasks, fail. */
     if (schedule.count >= OS_MAX_TASKS) {
@@ -124,8 +123,8 @@ struct _os_task *os_task_create(void *handler, os_stack_t *stack, uint32_t stack
     return task;
 }
 
-/* Frees the memory associated with the task and frees its PID slot. */
 int os_task_release(struct _os_task *task) {
+    /* Ensure that the task pointer is valid. */
     if (!task) {
         lf_error_raise(E_NULL, NULL);
         return lf_error;
@@ -216,7 +215,6 @@ int os_task_pause(int pid) {
     }
     /* Find the task for the given PID. */
     struct _os_task *task = os_task_from_pid(pid);
-    /* Ensure that the PID was valid. */
     if (!task) {
         lf_error_raise(E_NO_PID, NULL);
         return lf_error;
@@ -238,7 +236,6 @@ int os_task_resume(int pid) {
     }
     /* Find the task for the given PID. */
     struct _os_task *task = os_task_from_pid(pid);
-    /* Ensure that the PID was valid. */
     if (!task) {
         lf_error_raise(E_NO_PID, NULL);
         return lf_error;

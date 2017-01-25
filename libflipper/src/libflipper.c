@@ -154,15 +154,18 @@ int lf_load_configuration(struct _lf_device *device) {
 	if (_e < lf_success) {
 		return lf_error;
 	}
-	struct _lf_configuration configuration;
 	/* Obtain the configuration from the device. */
+	struct _lf_configuration configuration;
 	_e = device -> endpoint -> pull(device -> endpoint, &configuration, sizeof(struct _lf_configuration));
 	if (_e < lf_success) {
 		return lf_error;
 	}
-	struct _fmr_result result;
 	/* Obtain the result of the operation. */
-	lf_get_result(device, &result);
+	struct _fmr_result result;
+	_e = lf_get_result(device, &result);
+	if (_e < lf_success) {
+		return lf_error;
+	}
 	/* Compare the device identifiers. */
 	if (device -> configuration.identifier != configuration.identifier) {
 		lf_error_raise(E_NO_DEVICE, error_message("Identifier mismatch for device '%s'. (0x%04x instead of 0x%04x)", device -> configuration.name, configuration.identifier, device -> configuration.identifier));
@@ -172,8 +175,6 @@ int lf_load_configuration(struct _lf_device *device) {
 	memcpy(&(device -> configuration), &configuration, sizeof(struct _lf_configuration));
 	return lf_success;
 }
-
-/* -- Packet manipulation functions. -- */
 
 int lf_get_result(struct _lf_device *device, struct _fmr_result *result) {
 	/* Obtain the response packet from the device. */
@@ -186,27 +187,28 @@ int lf_get_result(struct _lf_device *device, struct _fmr_result *result) {
 	}
 	/* If an error occured on the device, raise it. */
 	if (result -> error != E_OK) {
-		lf_error_raise(result -> error, error_message("The following error occured on the device '%s':", device -> configuration.name));
+		lf_error_raise(result -> error, error_message("An error occured on the device '%s':", device -> configuration.name));
+		return lf_error;
 	}
 	return lf_success;
 }
 
 fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _fmr_list *parameters) {
-	/* Ensure that we have a valid module and argument pointer. */
+	/* Ensure that the module pointer is valid. */
 	if (!module) {
-		lf_error_raise(E_NULL, error_message("No module specified for message runtime invocation."));
+		lf_error_raise(E_NULL, error_message("No module was specified for function invocation."));
 		return lf_error;
 	}
-	/* Ensure that we have a valid module and argument pointer. */
-	if ((int8_t)(module -> index) == -1) {
-		lf_error_raise(E_MODULE, error_message("The module '%s' was not configured prior to invocation request.", module -> name));
-		return lf_error;
-	}
-	/* Obtain the target device from the module. */
+	/* Obtain the module's target device. */
 	struct _lf_device *device = *(module -> device);
 	/* If no device is provided, raise an error. */
 	if (!device) {
-		lf_error_raise(E_NO_DEVICE, error_message("Failed to invoke on device."));
+		lf_error_raise(E_NO_DEVICE, error_message("The module '%s' has no target device.", module -> name));
+		return lf_error;
+	}
+	/* Ensure that the module has been bound. */
+	if ((int8_t)(module -> index) == -1) {
+		lf_error_raise(E_MODULE, error_message("The module '%s' has not been bound to a module on its device.", module -> name));
 		return lf_error;
 	}
 	/* The raw packet into which the invocation information will be loaded .*/
@@ -351,6 +353,99 @@ struct _lf_module *lf_bind(char *name) {
 	// }
 	/* Return the loaded module. */
 	return _module;
+}
+
+/* Returns a pointer to data copied into the address space of the device provided. */
+void *lf_send(struct _lf_device *device, void *source, lf_size_t length) {
+	if (!source) {
+		lf_error_raise(E_NULL, error_message("No source provided for copy."));
+	} else if (!length) {
+		return NULL;
+	}
+	/* If no device is provided, throw an error. */
+	if (!device) {
+		lf_error_raise(E_NO_DEVICE, error_message("Failed to copy data."));
+		return NULL;
+	}
+	struct _fmr_packet _packet = { 0 };
+	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
+	/* Set the magic number. */
+	_packet.header.magic = FMR_MAGIC_NUMBER;
+	/* Compute the initial length of the packet. */
+	_packet.header.length = sizeof(struct _fmr_push_pull_packet);
+	/* Set the packet class. */
+	_packet.header.class = fmr_send_class;
+	/* Set the push length. */
+	packet -> length = length;
+	/* Compute and store the packet checksum. */
+	_packet.header.checksum = lf_crc(packet, _packet.header.length);
+	/* Send the packet to the target device. */
+	int _e = lf_transfer(device, &_packet);
+	if (_e < lf_success) {
+		return NULL;
+	}
+	/* Transfer the data through to the address space of the device. */
+	_e = device -> endpoint -> push(device -> endpoint, source, length);
+	/* Ensure that the data was successfully transferred to the device. */
+	if (_e < lf_success) {
+		return NULL;
+	}
+	struct _fmr_result result;
+	/* Obtain the result of the operation. */
+	lf_get_result(device, &result);
+	/* Return a pointer to the data. */
+	return (void *)(uintptr_t)result.value;
+}
+
+/* Copies data from the address space of the device to that of the host. */
+void *lf_recieve(struct _lf_device *device, void *source, lf_size_t length) {
+	if (!source) {
+		lf_error_raise(E_NULL, error_message("No source provided for copy."));
+	} else if (!length) {
+		return NULL;
+	}
+	/* If no device is provided, throw an error. */
+	if (!device) {
+		lf_error_raise(E_NO_DEVICE, error_message("Failed to copy data."));
+		return NULL;
+	}
+	/* Allocate memory for the received data. */
+	void *destination = malloc(length);
+	/* Ensure the memory was allocated successfully. */
+	if (!destination) {
+		lf_error_raise(E_MALLOC, error_message("Failed to allocate memory for receive."));
+		return NULL;
+	}
+	struct _fmr_packet _packet = { 0 };
+	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
+	/* Set the magic number. */
+	_packet.header.magic = FMR_MAGIC_NUMBER;
+	/* Compute the initial length of the packet. */
+	_packet.header.length = sizeof(struct _fmr_push_pull_packet);
+	/* Set the packet class. */
+	_packet.header.class = fmr_receive_class;
+	/* Set the push length. */
+	packet -> length = length;
+	/* Set the address. */
+	*(uintptr_t *)packet -> call.parameters = (uintptr_t)source;
+	/* Compute and store the packet checksum. */
+	_packet.header.checksum = lf_crc(packet, _packet.header.length);
+	/* Send the packet to the target device. */
+	int _e = lf_transfer(device, &_packet);
+	if (_e < lf_success) {
+		return NULL;
+	}
+	/* Transfer the data through to the address space of the device. */
+	_e = device -> endpoint -> pull(device -> endpoint, destination, length);
+	/* Ensure that the data was successfully transferred to the device. */
+	if (_e < lf_success) {
+		return NULL;
+	}
+	struct _fmr_result result;
+	/* Obtain the result of the operation. */
+	lf_get_result(device, &result);
+	/* Return a pointer to the data. */
+	return destination;
 }
 
 /* Experimental: Load an image into a device's RAM. */

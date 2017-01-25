@@ -14,7 +14,7 @@
 	|  R2  |
 	|  R1  |
 	|  R0  |
-	+------+ <- SP after entering interrupt. (SP0 + STACK_SIZE - 32(words))
+	+------+ <- SP after entering interrupt. (SP0 + STACK_SIZE - 8(words))
 	|  R7  |
 	|  R6  |
 	|  R5  |
@@ -23,7 +23,7 @@
 	|  R10 |
 	|  R9  |
 	|  R8  |
-	+------+ <- SP before exiting interrupt. (SP0 + STACK_SIZE - 64(words))
+	+------+ <- SP before exiting interrupt. (SP0 + STACK_SIZE - 16(words))
 	+      +
 	+ USER + (USER STACK)
     +      +
@@ -79,11 +79,11 @@ pendsv_exception:
 	ldmia r0!,{r4-r7}
 	msr psp, r0
 
-	/* EXC_RETURN (thread mode with PSP) */
-	ldr r0, =0xFFFFFFFD
-
 	/* Cycle the task pointers. */
 	bl os_update_task_pointers
+
+	/* EXC_RETURN (thread mode with PSP) */
+	ldr r0, =0xFFFFFFFD
 
 	/* Enable interrupts. */
 	cpsie i

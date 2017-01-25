@@ -68,6 +68,10 @@ enum {
 	fmr_push_class,
 	/* Causes a pull operation to begin. */
 	fmr_pull_class,
+	/* Sends data to device. */
+	fmr_send_class,
+	/* Receives data from the device. */
+	fmr_receive_class,
 	/* Experimental: Caused a RAM load and launch. */
 	fmr_ram_load_class,
 	/* Signals the occurance an event. */

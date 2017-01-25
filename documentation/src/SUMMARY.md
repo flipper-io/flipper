@@ -24,6 +24,7 @@
     - [Endpoints](libflipper-endpoints.md)
     - [Errors](./libflipper-errors.md)
     - [Modules](./libflipper-modules.md)
+    - [ABI](./libflipper-abi.md)
     - [FMR](./libflipper-fmr.md)
 - [Languages](./languages.md)
 - [Console](./console.md)

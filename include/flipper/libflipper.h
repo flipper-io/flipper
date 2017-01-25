@@ -198,6 +198,12 @@ extern int flipper_exit(void);
  *
  */
 extern fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _fmr_list *parameters);
+
+
+/* Copies data into the address space of the device specified and returns a pointer to its remote address. */
+void *lf_send(struct _lf_device *device, void *source, lf_size_t length);
+void *lf_recieve(struct _lf_device *device, void *source, lf_size_t length);
+
 /* Moves data from the address space of the host to that of the device. */
 extern int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _fmr_list *parameters);
 /* Moves data from the address space of the device to that of the host. */

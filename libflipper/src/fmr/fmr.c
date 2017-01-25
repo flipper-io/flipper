@@ -227,17 +227,16 @@ int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
 			result -> value = fmr_perform_user_invocation((struct _fmr_invocation_packet *)(packet));
 		break;
 #endif
+		case fmr_ram_load_class:
+		case fmr_send_class:
 		case fmr_push_class:
 			/* Each platform has its own way of handling push/pull requests. */
 			result -> value = fmr_push((struct _fmr_push_pull_packet *)(packet));
 		break;
+		case fmr_receive_class:
 		case fmr_pull_class:
 			/* Each platform has its own way of handling push/pull requests. */
 			result -> value = fmr_pull((struct _fmr_push_pull_packet *)(packet));
-		break;
-		/* Experimental packet class, loads and launches a program. */
-		case fmr_ram_load_class:
-			result -> value = fmr_push((struct _fmr_push_pull_packet *)(packet));
 		break;
 		case fmr_event_class:
 			/* Handle an event. */

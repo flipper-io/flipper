@@ -78,7 +78,7 @@ void system_init() {
 	/* Configure the SAM4S. */
 	cpu_configure();
 	/* Enable the watchdog timer. */
-	//wdt_enable(WDTO_500MS);
+//	wdt_enable(WDTO_500MS);
 	/* Configure reset button and PCINT8 interrupt. */
 //	PCMSK1 |= (1 << PCINT8);
 //	PCICR |= (1 << PCIE1);
