@@ -21,55 +21,35 @@ struct _lf_libusb_record {
 };
 
 int lf_libusb_configure(struct _lf_endpoint *this, struct _lf_device *device) {
-	if (!this) {
-		lf_error_raise(E_NULL, error_message("No endpoint record provided for libusb configuration. Reattach your device and try again."));
-		return lf_error;
-	}
+	/* Ensure a valid self referential pointer was provided. */
+	lf_assert(!this, E_NULL, "No endpoint record provided for libusb configuration. Reattach your device and try again.");
 	/* Allocate memory for the USB record if it has not yet been allocated. */
 	if (!(this -> record)) {
 		this -> record = calloc(1, sizeof(struct _lf_libusb_record));
-		if (!(this -> record)) {
-			lf_error_raise(E_MALLOC, error_message("Failed to allocate the memory needed to create a libusb record."));
-			goto failure;
-		}
+		lf_assert(!(this -> record), E_MALLOC, "Failed to allocate the memory needed to create a libusb record.");
 	}
-	struct _lf_libusb_record *record = this -> record;
 	/* Initialize the libusb context associated with this endpoint. */
+	struct _lf_libusb_record *record = this -> record;
 	int _e = libusb_init(&(record -> context));
-	if (_e < 0) {
-		lf_error_raise(E_LIBUSB, error_message("Failed to initialize libusb. Reboot and try again."));
-		goto failure;
-	}
+	lf_assert(_e < 0, E_LIBUSB, "Failed to initialize libusb. Reboot and try again.");
 	/* Attach a physical device to this endpoint. */
 	record -> handle = libusb_open_device_with_vid_pid(record -> context, LF_USB_VENDOR_ID, LF_USB_PRODUCT_ID);
-	if (!(record -> handle)) {
-		lf_error_raise(E_NO_DEVICE, error_message("Could not find any devices connected via USB. Ensure that a device is connected."));
-		goto failure;
-	}
+	lf_assert(!(record -> handle), E_NO_DEVICE, "Could not find any devices connected via USB. Ensure that a device is connected.");
 	/* Claim the interface used to send and receive message runtime packets. */
 	_e = libusb_claim_interface(record -> handle, 0);
-	if (_e < 0) {
-		lf_error_raise(E_LIBUSB, error_message("Failed to claim interface on attached device. Please quit any other programs using your device."));
-		goto failure;
-	}
-
+	lf_assert(_e < 0, E_LIBUSB, "Failed to claim interface on attached device. Please quit any other programs using your device.");
 	/* Broadcast a packet to the device over its endpoint to verify the identifier. */
 	_e = lf_load_configuration(device);
-	if (_e < lf_success) {
-		lf_error_raise(E_CONFIGURATION, error_message("Failed to obtain configuration for device '%s'.", device -> configuration.name));
-		goto failure;
-	}
-
+	lf_assert(_e < lf_success, E_CONFIGURATION, "Failed to obtain configuration for device '%s'.", device -> configuration.name);
+	/* Set the debug verbosity. */
 	libusb_set_debug(record -> context, 3);
 	/* Reset the device's USB controller. */
 	libusb_reset_device(record -> handle);
-
 	return lf_success;
-
 failure:
-
-	lf_libusb_destroy(this);
-
+	if (this) {
+		lf_libusb_destroy(this);
+	}
 	return lf_error;
 }
 
@@ -105,11 +85,11 @@ int lf_libusb_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
 			lf_error_raise(E_COMMUNICATION, error_message("Error during libusb transfer."));
 		}
 		return lf_error;
-	} else if (_length != length) {
-		lf_error_raise(E_COMMUNICATION, error_message("Failed to transmit complete USB packet."));
-		return lf_error;
 	}
+	lf_assert(_length != length, E_COMMUNICATION, "Failed to transmit complete USB packet.") return lf_error;
 	return lf_success;
+failure:
+	return lf_error;
 }
 
 int lf_libusb_pull(struct _lf_endpoint *this, void *destination, lf_size_t length) {
