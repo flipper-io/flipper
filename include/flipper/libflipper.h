@@ -207,7 +207,7 @@ void *lf_recieve(struct _lf_device *device, void *source, lf_size_t length);
 /* Short hand for raising errors based on the truth of a condition. */
 #define lf_assert(truth, error, ...) \
 	if (truth) { \
-		lf_error_raise(error, error_message(""__VA_ARGS__)); \
+		lf_error_raise(error, error_message(__VA_ARGS__)); \
 		goto failure; \
 	}
 
