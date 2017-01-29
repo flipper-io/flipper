@@ -58,11 +58,6 @@ void os_task_init(void) {
 }
 
 struct _os_task *os_task_create(void *handler, os_stack_t *stack, uint32_t stack_size) {
-    /* If the OS is already scheduling the maximum number of tasks, fail. */
-    if (schedule.count >= OS_MAX_TASKS) {
-        return NULL;
-    }
-
     /* Allocate the next available task slot. */
     struct _os_task *task = malloc(sizeof(struct _os_task));
     /* Ensure memory was allocated for the new task. */

@@ -116,10 +116,10 @@ struct LF_PACKED _fmr_header {
 
 /* Standardizes the notion of an argument. */
 struct _fmr_arg {
-	/* The value of the argument. */
-	fmr_arg value;
 	/* The type signature of the argument. */
 	fmr_type type;
+	/* The value of the argument. */
+	fmr_arg value;
 	/* The next argument. */
 	struct _fmr_arg *next;
 };
@@ -191,7 +191,7 @@ extern const void *const fmr_modules[];
 /* Builds an fmr_parameters from a set of variadic arguments provided by the fmr_parameters macro. */
 struct _fmr_parameters *fmr_build(fmr_argc argc, ...);
 /* Appends an argument to an fmr_parameters. */
-void fmr_append(struct _fmr_parameters *list, struct _fmr_arg *argument);
+int fmr_append(struct _fmr_parameters *list, fmr_type type, fmr_arg value);
 /* Concatenates two argument lists. */
 struct _fmr_parameters *fmr_merge(struct _fmr_parameters *first, struct _fmr_parameters *second);
 /* Removes and returns the item at the top of the list. */

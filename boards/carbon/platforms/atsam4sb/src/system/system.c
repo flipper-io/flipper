@@ -35,7 +35,7 @@ void uart0_pull_wait(void *destination, lf_size_t length) {
 }
 
 fmr_return fmr_push(struct _fmr_push_pull_packet *packet) {
-	fmr_return retval;
+	fmr_return retval = 0;
 	void *push_buffer = malloc(packet -> length);
 	if (!push_buffer) {
 		lf_error_raise(E_MALLOC, NULL);
@@ -56,7 +56,7 @@ fmr_return fmr_push(struct _fmr_push_pull_packet *packet) {
 }
 
 fmr_return fmr_pull(struct _fmr_push_pull_packet *packet) {
-	fmr_return retval;
+	fmr_return retval = 0;
 	if (packet -> header.class == fmr_receive_class) {
 		/* If we are receiving data, simply push the memory. */
 		uart0_push((void *)*(uint32_t *)(packet -> call.parameters), packet -> length);
@@ -98,7 +98,6 @@ void uart0_isr(void) {
 		for (volatile int i = 0; i < 10000; i ++);
 		/* Give the result back. */
 		uart0_push(&result, sizeof(struct _fmr_result));
-		usart_push(&result, sizeof(struct _fmr_result));
 		/* Flush any remaining data that has been buffered. */
 		while (UART0 -> UART_SR & UART_SR_RXRDY) UART0 -> UART_RHR;
 		/* Clear the error state. */
@@ -115,7 +114,7 @@ void system_init(void) {
 	WDT -> WDT_MR = WDT_MR_WDDIS;
 
 	/* Configure the EFC for 5 wait states. */
-	EFC -> EEFC_FMR = EEFC_FMR_FWS(5);
+	EFC -> EEFC_FMR = EEFC_FMR_FWS(PLATFORM_WAIT_STATES);
 
 	/* Configure the primary clock source. */
 	if (!(PMC -> CKGR_MOR & CKGR_MOR_MOSCSEL)) {

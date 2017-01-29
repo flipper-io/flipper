@@ -24,41 +24,44 @@ struct _fmr_parameters *fmr_build(fmr_argc argc, ...) {
 	while (argc --) {
 		/* Unstage the value of the argument from the variadic argument list. */
 		fmr_va value = va_arg(argv, fmr_va);
-		/* Allocate the memory required to stage the argument into the parent list. */
-		struct _fmr_arg *argument = (struct _fmr_arg *)calloc(1, sizeof(struct _fmr_arg));
-		/* Ensure that the request for memory was satisfied. */
-		if (!argument) {
-			lf_error_raise(E_MALLOC, error_message("Failed to allocate the memory required to append to the argument list located at %p.", list));
-			free(list);
-			/* Nullify the argument list pointer for the failed return. */
-			list = NULL;
-			break;
-		}
 		fmr_type type = (fmr_type)((value >> (sizeof(fmr_arg) * 8)) & 0x7);
 		if (type > fmr_int32_t) {
 			lf_error_raise(E_TYPE, error_message("An invalid type was provided while appending the parameter '0x%08x' to the argument list.", (fmr_arg)value));
 		}
-		/* Write the type and value of the argument into the list. */
-		memcpy(argument, &((struct _fmr_arg){ (fmr_arg)value, type, NULL }), sizeof(struct _fmr_arg));
 		/* Append the argument to the fmr_parameters. */
-		fmr_append(list, argument);
+		int _e = fmr_append(list, type, value);
+		if (_e < lf_success) {
+			lf_error_raise(E_FMR, error_message("Failed to append to argument list."));
+			/* Free the memory allocated to build the list. */
+			free(list);
+			return NULL;
+		}
 	}
 	/* Release the variadic argument list. */
 	va_end(argv);
 	return list;
 }
 
-void fmr_append(struct _fmr_parameters *list, struct _fmr_arg *argument) {
+int fmr_append(struct _fmr_parameters *list, fmr_type type, fmr_arg value) {
 	/* Ensure that a valid list was provided. */
 	if (!list) {
 		lf_error_raise(E_NULL, error_message("An attempt was made to append to an invalid argument list."));
-		return;
+		return lf_error;
 	}
 	/* Ensure that the argument count is within bounds. */
 	if (list -> argc >= FMR_MAX_ARGC) {
 		lf_error_raise(E_OVERFLOW, error_message("The maximum number of arguments (%i) was reached while appending to the argument list located at %p.", FMR_MAX_ARGC, list));
-		return;
+		return lf_error;
 	}
+	/* Allocate the memory required to stage the argument into the parent list. */
+	struct _fmr_arg *argument = (struct _fmr_arg *)calloc(1, sizeof(struct _fmr_arg));
+	/* Ensure that the request for memory was satisfied. */
+	if (!argument) {
+		lf_error_raise(E_MALLOC, error_message("Failed to allocate the memory required to append to the argument list located at %p.", list));
+		return lf_error;
+	}
+	/* Write the type and value into the argument. */
+	memcpy(argument, &((struct _fmr_arg){ type, value, NULL }), sizeof(struct _fmr_arg));
 	/* Obtain the first argument in the parent list. */
 	struct _fmr_arg *tail = list -> argv;
 	/* If we already have a first argument, walk to the end of the parent list. */
@@ -70,23 +73,26 @@ void fmr_append(struct _fmr_parameters *list, struct _fmr_arg *argument) {
 	/* Save the reference to the new argument into the parent list. */
 	if (tail) {
 		tail -> next = argument;
-	}
-	else {
+	} else {
 		list -> argv = argument;
 	}
 	/* Advance the argument count of the list. */
 	list -> argc ++;
+	return lf_success;
 }
 
 struct _fmr_parameters *fmr_merge(struct _fmr_parameters *first, struct _fmr_parameters *second) {
-	if (!second) {
-		goto done;
+	if (second) {
+		/* Pop each argument from the second argument list and append it to the first. */
+		while (second -> argc) {
+			struct _fmr_arg *arg = fmr_pop(second);
+			int _e = fmr_append(first, arg -> type, arg -> value);
+			free(arg);
+			if (_e < lf_success) {
+				return NULL;
+			}
+		}
 	}
-	/* Pop each argument from the second argument list and append it to the first. */
-	while (second -> argc) {
-		fmr_append(first, fmr_pop(second));
-	}
-done:
 	return first;
 }
 

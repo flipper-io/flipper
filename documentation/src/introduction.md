@@ -28,6 +28,10 @@ Functionality of the device's peripherals are encapsulated in small libraries of
 
 It is simple to create applications for the device, too. Applications are just modules with a `main()` function that is called when they are loaded. You can still interact with the public functions of an application, the same way you can with the functions of a module.
 
+### Osmium
+
+Osmium, or Os for short, is Flipper's lightweight operating system. The operating system exposes a basic POSIX compatability layer as well as a filesystem, loader, and scheduler that enable the storage, instantiation of, and execution of Flipper images, respectively.
+
 #### Preinstalled Modules
 
 |<center>Module</center>|<center>Description</center>|

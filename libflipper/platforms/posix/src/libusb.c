@@ -86,7 +86,7 @@ int lf_libusb_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
 		}
 		return lf_error;
 	}
-	lf_assert(_length != length, failure, E_COMMUNICATION, "Failed to transmit complete USB packet.") return lf_error;
+	lf_assert(_length != length, failure, E_COMMUNICATION, "Failed to transmit complete USB packet.");
 	return lf_success;
 failure:
 	return lf_error;

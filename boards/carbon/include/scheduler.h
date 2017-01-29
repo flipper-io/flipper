@@ -3,9 +3,6 @@
 #ifndef __scheduler_h__
 #define __scheduler_h__
 
-/* The maximum number of tasks. */
-#define OS_MAX_TASKS 3
-
 /* An enumerated type of possible task states. */
 typedef enum {
     os_task_status_unallocated,

@@ -16,7 +16,12 @@
 /* A flipper device object which the target can use to keep track of state specific to itself. */
 extern struct _lf_device self;
 
-/* Clock generator settings for 96MHz master clock. */
+/* Clock the CM4 CPU at 96 MHz. */
+#define F_CPU 96000000
+/* NOTE: The number of wait states is proportionate to the clock speed defined above. */
+#define PLATFORM_WAIT_STATES 5
+
+/* Clock generator settings for a 96MHz master clock. */
 #define BOARD_OSCOUNT (CKGR_MOR_MOSCXTST(8))
 #define BOARD_PLLBR (CKGR_PLLBR_MULB(48) | CKGR_PLLBR_PLLBCOUNT(1) | CKGR_PLLBR_DIVB(10))
 #define BOARD_MCKR (PMC_MCKR_PRES_CLK_1 | PMC_MCKR_CSS_PLLB_CLK)
@@ -27,9 +32,6 @@ extern struct _lf_device self;
 #define SYSTICK_PRIORITY 0
 #define UART0_PRIORITY 1
 #define PENDSV_PRIORITY 15
-
-/* MCK @ 96 MHz. */
-#define F_CPU 96000000
 
 /* 2 megabaud. */
 #define PLATFORM_BAUDRATE 2000000
