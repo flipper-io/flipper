@@ -3,7 +3,7 @@ target = app
 region = ram
 
 all:
-	arm-none-eabi-gcc -g -nostartfiles -ffreestanding -fpic -Os -Wl,-T$(region).ld -I/usr/local/include $(target).c -o $(target).elf
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -g -nostartfiles -ffreestanding -fpic -Os -Wl,-T$(region).ld -I/usr/local/include $(target).c -o $(target).elf
 	arm-none-eabi-objcopy --set-section-flags .bss=alloc,load,contents -O binary $(target).elf $(target).bin
 
 dump:

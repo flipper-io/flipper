@@ -15,7 +15,7 @@ device:
 	# Make the build directory if it doesn't exist.
 	mkdir -p build
 	# Compile the module
-	arm-none-eabi-gcc -g -nostartfiles -ffreestanding -fpic -Os -Wl,-T$(region).ld $(includes) -DDEVICE_BUILD src/*.c $(target)/*.c -o build/$(target).elf
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -g -nostartfiles -ffreestanding -fpic -Os -Wl,-T$(region).ld $(includes) -DDEVICE_BUILD src/*.c $(target)/*.c -o build/$(target).elf
 	# Copy the module into a binary image.
 	arm-none-eabi-objcopy --set-section-flags .bss=alloc,load,contents -O binary build/$(target).elf build/$(target).bin
 

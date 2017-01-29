@@ -1,6 +1,8 @@
 /* Include the application header file. */
 #include "app.h"
 
+const char _fmr_app_name[] __attribute__((section (".name"))) = "app"; 
+
 /* Initialize the data section. */
 int counter = 50;
 

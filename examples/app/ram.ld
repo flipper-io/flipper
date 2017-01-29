@@ -20,6 +20,10 @@ SECTIONS {
 
     /* Build the Flipper ABI header. */
 	.header : {
+		/* The length of the module's name. */
+		LONG(SIZEOF(.name));
+		/* The offset into the image at which the plaintext name exists. */
+		LONG(ADDR(.name));
         /* The address of the entry point (if image is an application). */
         LONG(_ENTRY);
         /* The size of the module structure. */
