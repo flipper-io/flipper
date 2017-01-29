@@ -335,27 +335,27 @@ int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_s
 }
 
 /* Binds the lf_module structure to its counterpart on the attached device. */
-int lf_bind(struct _lf_module *module, char *name) {
+int lf_bind(struct _lf_module *module) {
 	/* Ensure that the module structure was allocated successfully. */
 	if (!module) {
 		lf_error_raise(E_NULL, error_message("No module provided to bind."));
 		return lf_error;
 	}
-	/* Calculate the identifier of the module. */
-	lf_crc_t identifier = lf_crc(name, strlen(name));
-	/* Set the module index. */
-	module -> index = 5;
-	/* Set the module device. */
+	/* Calculate the identifier of the module, including the NULL terminator. */
+	lf_crc_t identifier = lf_crc(module -> name, strlen(module -> name) + 1);
+	/* Attempt to get the module index. */
+	fmr_module index = fld_index(identifier) | FMR_USER_INVOCATION_BIT;
+	/* Throw an error if there is no counterpart module found. */
+	lf_assert(index == -1, failure, E_MODULE, "No counterpart module loaded for bind to module '%s'.", module -> name);
+	/* Set the module's indentifier. */
+	module -> identifier = identifier;
+	/* Set the module's index. */
+	module -> index = index;
+	/* Set the module's device. */
 	module -> device = &flipper.device;
-
-	// /* Bind the device module to the allocated module structure. */
-	// int _e = fld_bind(_module, identifier);
-	// if (_e < lf_success) {
-	// 	/* Free the memory allocated for the module. */
-	// 	free(_module);
-	// 	return NULL;
-	// }
 	return lf_success;
+failure:
+	return lf_error;
 }
 
 /* PROTOTYPE FUNCTION: Returns a pointer to data copied into the address space of the device provided. */

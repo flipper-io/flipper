@@ -10,6 +10,8 @@
 
 /* The data structure definition representing the ABI header above. */
 struct _lf_abi_header {
+    uint32_t name_size;
+    uint32_t name_offset;
     uint32_t entry;
     uint32_t module_size;
     uint32_t module_offset;
@@ -42,5 +44,7 @@ extern struct _user_modules {
 } user_modules;
 
 int os_load_image(void *base);
+
+fmr_module os_get_module_index(lf_crc_t identifier);
 
 #endif

@@ -20,30 +20,34 @@
  /* FDL Module/Application ABI Specification */
 
  /*------------------------------+  0x0000     --+
-  |            &(main)           |               |
+  |            &(name)           |               |
   +------------------------------+  0x0004       |
-  |        sizeof(.module)       |               |
+  |          sizeof(name)        |               |
   +------------------------------+  0x0008       |
-  |           &(.module)         |               |
+  |            &(main)           |               |
   +------------------------------+  0x000c       |
-  |          sizeof(.data)       |               |
-  +------------------------------+  0x0010       | - HEADER
-  |            &(.data)          |               |
+  |        sizeof(.module)       |               |
+  +------------------------------+  0x0010       |
+  |           &(.module)         |               |
   +------------------------------+  0x0014       |
-  |          sizeof(.bss)        |               |
-  +------------------------------+  0x0018       |
-  |            &(.bss)           |               |
+  |          sizeof(.data)       |               |
+  +------------------------------+  0x0018       | - HEADER
+  |            &(.data)          |               |
   +------------------------------+  0x001c       |
+  |          sizeof(.bss)        |               |
+  +------------------------------+  0x0020       |
+  |            &(.bss)           |               |
+  +------------------------------+  0x0024       |
   |          sizeof(.got)        |               |
-  +------------------------------+  0x0020     --+
+  +------------------------------+  0x0028     --+
   |            &(.got)           |
-  +------------------------------+  [0x0008]
+  +------------------------------+  [0x000c]
   |           .module            |
   +------------------------------+
   |            .text             |
-  +------------------------------+  [0x0010]
-  |            .data             |
   +------------------------------+  [0x0018]
+  |            .data             |
+  +------------------------------+  [0x0020]
   |             .bss             |
   +------------------------------*/
 
@@ -85,6 +89,9 @@ int os_load_module(void *base, struct _lf_abi_header *header) {
         fmr_module index = user_modules.count;
         /* Allocate the user module. */
         struct _user_module *module = &user_modules.modules[user_modules.count ++];
+        /* Obtain the module's identifier from its name. */
+        char *name = base + header -> name_offset;
+        module -> identifier = lf_crc(name, header -> name_size);
         /* Save the module struct. */
         module -> functions = base + header -> module_offset;
         /* Store the number of functions that exist within the module. */
@@ -94,6 +101,17 @@ int os_load_module(void *base, struct _lf_abi_header *header) {
         /* Send the index back to the host. */
         return index;
     }
+}
+
+fmr_module os_get_module_index(lf_crc_t identifier) {
+    printf("Preparing to compare module.\n");
+    for (int i = 0; i < user_modules.count; i ++) {
+        printf("Comparing module %i, id: 0x%08x v.s. needed 0x%08x.\n", i, user_modules.modules[i].identifier, identifier);
+        if (user_modules.modules[i].identifier == identifier) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 /* Releases a previously loaded module. */

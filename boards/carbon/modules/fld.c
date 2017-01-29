@@ -4,6 +4,7 @@
 #ifdef __use_fld__
 /* Define the virtual interface for this module. */
 const struct _fld fld = {
-	fld_configure
+	fld_configure,
+	fld_index
 };
 #endif

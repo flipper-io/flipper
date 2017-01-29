@@ -7,7 +7,6 @@ int fld_configure(void) {
 	return lf_success;
 }
 
-fmr_module fld_index(lf_crc_t indentifier) {
-
-    return 0;
+fmr_module fld_index(lf_crc_t identifier) {
+    return os_get_module_index(identifier);
 }
