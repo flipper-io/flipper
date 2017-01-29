@@ -5,6 +5,14 @@ The Flipper Message Runtime, or **FMR** for short, is the component of `libflipp
 
 ---
 
+### Theory
+
+The message runtime uses a variety of mechanisms, both software and hardware based, to convey information about remote procedure calls, data transfers, and more from the 'host' to the 'device' registered in the heirarchy.
+
+The message runtime focuses primarily on remote procedure invocation. However, using **subclasses**, the message runtime can also implement platform specific functionality. Specific functionality can be acheived by defining an enumeration of subclass values and registering them within the switch case located inside `fmr_perform`.
+
+---
+
 ### Performing an invocation.
 
 The most basic functionality enabled by the message runtime is the ability to invoke functions remotely. As such, the message runtime serves as the backbone for the remote procedure calling functionality of the toolbox.

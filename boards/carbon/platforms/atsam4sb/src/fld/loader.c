@@ -153,24 +153,24 @@ failure:
 }
 
 /* Handles the invocation of user functions. */
-fmr_return fmr_perform_user_invocation(struct _fmr_invocation_packet *packet) {
+fmr_return fmr_perform_user_invocation(struct _fmr_invocation *invocation) {
     /* Ensure that the index is within bounds. */
-    if (packet -> call.index >= user_modules.count) {
+    if (invocation -> index >= user_modules.count) {
         return lf_error;
     }
     /* Get a pointer to the module. */
-    struct _user_module *module = &user_modules.modules[packet -> call.index];
+    struct _user_module *module = &user_modules.modules[invocation -> index];
     /* Ensure that the function is within bounds. */
-    if (packet -> call.function >= module -> func_c) {
+    if (invocation -> function >= module -> func_c) {
         return lf_error;
     }
     /* Dereference a pointer to the target function. */
-    const void *address = module -> functions[packet -> call.function];
+    const void *address = module -> functions[invocation -> function];
     /* Ensure that the function address is valid. */
     if (!address) {
         lf_error_raise(E_RESOULTION, NULL);
         return lf_error;
     }
     /* Perform the function call internally. */
-    return fmr_call(address, packet -> call.argc, packet -> call.types, packet -> call.parameters);
+    return fmr_call(address, invocation -> argc, invocation -> types, invocation -> parameters);
 }

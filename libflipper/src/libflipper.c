@@ -193,7 +193,7 @@ int lf_get_result(struct _lf_device *device, struct _fmr_result *result) {
 	return lf_success;
 }
 
-fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _fmr_list *parameters) {
+fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _fmr_parameters *parameters) {
 	/* Ensure that the module pointer is valid. */
 	if (!module) {
 		lf_error_raise(E_NULL, error_message("No module was specified for function invocation."));
@@ -282,7 +282,7 @@ fmr_va fmr_ptr(struct _lf_device *device, void *ptr) {
 	return 0;
 }
 
-int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _fmr_list *parameters) {
+int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _fmr_parameters *parameters) {
 	/* Ensure that we have a valid module and argument pointer. */
 	if (!module) {
 		lf_error_raise(E_NULL, error_message("No module specified for message runtime push to module '%s'.", module -> name));
@@ -448,7 +448,7 @@ void *lf_recieve(struct _lf_device *device, void *source, lf_size_t length) {
 	return destination;
 }
 
-/* Experimental: Load an image into a device's RAM. */
+/* PROTOTYPE FUNCTION: Load an image into a device's RAM. */
 int lf_ram_load(struct _lf_device *device, void *source, lf_size_t length) {
 	if (!source) {
 		lf_error_raise(E_NULL, error_message("No source provided for load operation."));
@@ -490,7 +490,7 @@ int lf_ram_load(struct _lf_device *device, void *source, lf_size_t length) {
 	return result.value;
 }
 
-int lf_pull(struct _lf_module *module, fmr_function function, void *destination, lf_size_t length, struct _fmr_list *parameters) {
+int lf_pull(struct _lf_module *module, fmr_function function, void *destination, lf_size_t length, struct _fmr_parameters *parameters) {
 	/* Ensure that we have a valid module and argument pointer. */
 	if (!module) {
 		lf_error_raise(E_NULL, error_message("No module specified for message runtime pull from module '%s'.", module -> name));
@@ -543,7 +543,7 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 
 /* Debugging functions for displaying the contents of various FMR related data structures. */
 
-void lf_debug_call(struct _fmr_call *call) {
+void lf_debug_call(struct _fmr_invocation *call) {
 	printf("call:\n");
 	printf("\t└─ index:\t0x%x\n", call -> index);
 	printf("\t└─ function:\t0x%x\n", call -> function);
