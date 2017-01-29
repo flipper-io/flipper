@@ -54,6 +54,8 @@ arm_c_prep = [ -- Use C99.
              , "-mcpu=cortex-m4"
                -- Include debugging metadata:
              , "-g"
+               -- Thumb mode::
+             , "-mthumb"
                -- Enable FMR constructors.
              , "-D__support_user_invocation__"
                -- Platform header:

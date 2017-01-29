@@ -122,7 +122,7 @@ struct _lf_device {
 extern struct _lf_device lf_self;
 
 /* Standardizes the notion of a module. */
-struct _lf_module {
+struct LF_PACKED _lf_module {
 	/* A string containing the module's name. */
 	char *name;
 	/* A string giving the description of a module. */
