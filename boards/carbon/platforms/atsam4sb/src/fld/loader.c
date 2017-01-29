@@ -153,7 +153,7 @@ failure:
 }
 
 /* Handles the invocation of user functions. */
-fmr_return fmr_perform_user_invocation(struct _fmr_invocation *invocation) {
+int fmr_perform_user_invocation(struct _fmr_invocation *invocation, struct _fmr_result *result) {
     /* Ensure that the index is within bounds. */
     if (invocation -> index >= user_modules.count) {
         return lf_error;
@@ -172,5 +172,6 @@ fmr_return fmr_perform_user_invocation(struct _fmr_invocation *invocation) {
         return lf_error;
     }
     /* Perform the function call internally. */
-    return fmr_call(address, invocation -> argc, invocation -> types, invocation -> parameters);
+    result -> value = fmr_call(address, invocation -> argc, invocation -> types, invocation -> parameters);
+    return result -> error = error_get();
 }

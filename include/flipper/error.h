@@ -43,6 +43,7 @@ enum {
 	E_TIMEOUT,
 	E_NO_PID,
 	E_INVALID_TASK,
+	E_SUBCLASS,
 	E_UNIMPLEMENTED
 };
 
@@ -77,6 +78,7 @@ enum {
 								 "timeout error", \
 								 "no task for pid", \
 								 "invalid task specified", \
+								 "packet subclass error", \
 								 "unimplemented error"
 
 /* Allow the 'error_message' macro to serve as a passthrough for any variadic arguments supplied to it. */
