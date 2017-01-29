@@ -6,12 +6,9 @@ var Struct = require('ref-struct');
 const lf_version_t = ref.types.uint16;
 const lf_crc_t = ref.types.uint16;
 
-const fmr_va = ref.types.uint64;
 const fmr_arg = ref.types.uint32;
-const fmr_module = ref.types.uint32;
 const fmr_function = ref.types.uint8;
 const fmr_argc = ref.types.uint8;
-const fmr_types = ref.types.uint16;
 const fmr_return = ref.types.uint32;
 
 const _fmr_type = [
@@ -21,17 +18,6 @@ const _fmr_type = [
 ];
 
 const fmr_type = ref.types.uint8;
-
-// const _fmr_arg = Struct({
-// 	'value': fmr_arg,
-// 	'type':  fmr_type,
-// 	'next':  'pointer' // Points to another _fmr_arg
-// });
-//
-// const _fmr_parameters = Struct({
-// 	'argc': fmr_argc,
-// 	'argv': ref.refType(_fmr_arg)
-// });
 
 const _lf_module = Struct({
 	'name':        'string',
@@ -57,7 +43,7 @@ const libflipper = ffi.Library('libflipper', {
 
     'fmr_build':      [ 'pointer', [ fmr_argc ] ],
 
-    'fmr_append':     [ ref.types.void, [ fmr_type, fmr_arg ] ],
+    'fmr_append':     [ ref.types.void, [ 'pointer', fmr_type, fmr_arg ] ],
 
 	// led_configure()
 	'led_configure':  [ ref.types.void, [ ] ],
@@ -73,12 +59,6 @@ const _create_fmr_parameters = function (paramTypes, args) {
 	for (i = 0; i < args.length; i++) {
         arg = args[i];
         argType = paramTypes[i];
-
-        if (!_fmr_type.includes(argType)) {
-            console.log("Invalid parameter type for argument " + i);
-            return null;
-        }
-
         libflipper.fmr_append(list, _fmr_type.indexOf(argType), arg);
     }
 
@@ -97,20 +77,10 @@ Flipper.prototype.bindModule = function(iface, name) {
 
     var module = new _lf_module();
 
-    console.log("After module insantiation");
-
-    console.log(self.device);
-    console.log("Module device: ");
-    console.log(module.device);
-
 	// Populates the above module object with metadata.
     var success = libflipper.lf_bind(module.ref(), name);
 
-    console.log("After module bind");
-
 	var bindings = { };
-
-	console.log("Before loop");
 
 	// For each function in the given interface, generate a proxy for it and attach it to the bindings.
 	Object.keys(iface || {}).forEach(function (func, i) {
@@ -122,9 +92,7 @@ Flipper.prototype.bindModule = function(iface, name) {
 
 		// Generate a proxy function and assign it to the bindings.
 		bindings[func] = function() {
-		    console.log("Before libflipper select");
-			// libflipper.select(self.device);
-            console.log("After libflipper select");
+			libflipper.flipper_select(self.device);
 
 			if (arguments.length !== paramTypes.length) {
 				console.log("Expected " + paramTypes.length + " args, got " + arguments.length);
@@ -132,13 +100,7 @@ Flipper.prototype.bindModule = function(iface, name) {
 
 			var params = _create_fmr_parameters(paramTypes, arguments);
 
-			console.log("Before lf_invoke");
-
-			var result = libflipper.lf_invoke(module.ref(), i, ref.NULL);
-			// if (typeof result != resultType) {
-			// 	console.log("Return type does not equal expected.");
-			// }
-			return result;
+			return libflipper.lf_invoke(module.ref(), i, params);
 		}
 	});
 
@@ -146,7 +108,3 @@ Flipper.prototype.bindModule = function(iface, name) {
 };
 
 module.exports = Flipper;
-
-// libflipper.flipper_attach();
-// libflipper.led_configure();
-// libflipper.led_rgb(10, 0, 0);

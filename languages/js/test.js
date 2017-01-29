@@ -4,11 +4,7 @@
 ref = require('ref');
 Flipper = require('./index.js');
 
-console.log("Before new Flipper");
-
 var flipper = new Flipper();
-
-console.log("After new Flipper");
 
 const gpioModuleDef = {
     'gpio_configure': [ 'int', [ ] ],
@@ -18,8 +14,6 @@ const gpioModuleDef = {
 
 var gpioModule = flipper.bindModule(gpioModuleDef, "gpio");
 
-console.log("After bind");
-
 gpioModule.gpio_configure();
-// gpioModule.gpio_enable(1, 0);
-// gpioModule.gpio_write(0, 1);
+gpioModule.gpio_enable(1, 0);
+gpioModule.gpio_write(1, 0);
