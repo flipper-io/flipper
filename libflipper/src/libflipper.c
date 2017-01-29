@@ -19,7 +19,7 @@ struct _flipper flipper = {
 	NULL
 };
 
-struct _lf_device *lf_create_device(char *name) {
+struct _lf_device *lf_create_device(const char *name) {
 	/* Allocate memory to contain the record of the device. */
 	struct _lf_device *device = (struct _lf_device *)calloc(1, sizeof(struct _lf_device));
 	if (!device) {
@@ -33,7 +33,7 @@ struct _lf_device *lf_create_device(char *name) {
 	/* Set the device's name. */
 	strcpy(device -> configuration.name, name);
 	/* Set the device's identifier. */
-	device -> configuration.identifier = lf_crc(name, strlen(name));
+	device -> configuration.identifier = lf_crc((void *)name, (lf_size_t)strlen(name));
 	return device;
 failure:
 	free(device);
@@ -46,7 +46,7 @@ struct _lf_device *flipper_attach(void) {
 }
 
 /* Attaches a USB device to the bridge endpoint. */
-struct _lf_device *flipper_attach_usb(char *name) {
+struct _lf_device *flipper_attach_usb(const char *name) {
 	/* Make a backup of the slected device. */
 	struct _lf_device *_device = flipper.device;
 	/* Create a device with the name provided. */
@@ -70,7 +70,7 @@ struct _lf_device *flipper_attach_usb(char *name) {
 	return device;
 }
 
-struct _lf_device *flipper_attach_network(char *name, char *hostname) {
+struct _lf_device *flipper_attach_network(const char *name, const char *hostname) {
 	struct _lf_device *device = lf_create_device(name);
 	if (!device) {
 		return NULL;
@@ -88,7 +88,7 @@ struct _lf_device *flipper_attach_network(char *name, char *hostname) {
 	return device;
 }
 
-struct _lf_device *flipper_attach_endpoint(char *name, struct _lf_endpoint *endpoint) {
+struct _lf_device *flipper_attach_endpoint(const char *name, struct _lf_endpoint *endpoint) {
 	struct _lf_device *device = lf_create_device(name);
 	if (!device) {
 		return NULL;
@@ -337,7 +337,7 @@ int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_s
 /* Binds the lf_module structure to its counterpart on the attached device. */
 struct _lf_module *lf_bind(char *name) {
 	/* Calculate the identifier of the module. */
-	lf_crc_t identifier = lf_crc(name, strlen(name));
+	lf_crc_t identifier = lf_crc((void *)name, (lf_size_t)strlen(name));
 	/* Allocate the module structure. */
 	struct _lf_module *_module = malloc(sizeof(struct _lf_module));
 	/* Ensure that the module structure was allocated successfully. */

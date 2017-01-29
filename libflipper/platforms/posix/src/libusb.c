@@ -3,7 +3,7 @@
 #define __private_include__
 #include <flipper/libflipper.h>
 #include <flipper/platforms/posix/libusb.h>
-#include <libusb.h>
+#include <libusb-1.0/libusb.h>
 
 struct _lf_endpoint lf_libusb_ep = {
 	lf_libusb_configure,

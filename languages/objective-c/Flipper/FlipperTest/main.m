@@ -7,14 +7,13 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <flipper/libflipper.h>
+#import "flipper.h"
 
 int main(int argc, const char * argv[]) {
 	@autoreleasepool {
         LFDevice *flipper = [[LFDevice alloc] initWithName:@"flipper"];
-        LFLED *led = [flipper led];
-        [led configure];
-        [led setR:0 G:0 B:0];
-	}
+        [LFLED configure];
+        [LFLED setR:0 G:0 B:0];
+    }
     return 0;
 }

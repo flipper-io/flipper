@@ -7,15 +7,15 @@
 //
 
 #import "LED.h"
-#import <flipper/led.h>
+#import <flipper/carbon/modules/led.h>
 
 @implementation LFLED
 
-- (void) configure {
++ (void) configure {
     led_configure();
 }
 
-- (void) setR:(uint8_t)r G:(uint8_t)g B:(uint8_t)b {
++ (void) setR:(uint8_t)r G:(uint8_t)g B:(uint8_t)b {
     led_rgb(r, g, b);
 }
 

@@ -159,11 +159,11 @@ extern struct _flipper {
 	/* Attaches the current instance of libflipper to the first available device over the default endpoint. */
 	struct _lf_device *(* attach)(void);
 	/* Attaches to a Flipper device by name over the USB endpoint. */
-	struct _lf_device *(* attach_usb)(char *name);
+	struct _lf_device *(* attach_usb)(const char *name);
 	/* Attaches to a Flipper device by name and hostname/IP over the network endpoint. */
-	struct _lf_device *(* attach_network)(char *name, char *hostname);
+	struct _lf_device *(* attach_network)(const char *name, const char *hostname);
 	/* Attaches to a Flipper device by name over an arbitrary endpoint. */
-	struct _lf_device *(* attach_endpoint)(char *name, struct _lf_endpoint *endpoint);
+	struct _lf_device *(* attach_endpoint)(const char *name, struct _lf_endpoint *endpoint);
 	/* Selects a previously attached Flipper device and routes all calls to it. */
 	int (* select)(struct _lf_device *device);
 	/* Disconnects a previously attached Flipper device from libflipper. */
@@ -182,9 +182,9 @@ extern struct _flipper {
 
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
 extern struct _lf_device *flipper_attach(void);
-extern struct _lf_device *flipper_attach_usb(char *name);
-extern struct _lf_device *flipper_attach_network(char *name, char *hostname);
-extern struct _lf_device *flipper_attach_endpoint(char *name, struct _lf_endpoint *endpoint);
+extern struct _lf_device *flipper_attach_usb(const char *name);
+extern struct _lf_device *flipper_attach_network(const char *name, const char *hostname);
+extern struct _lf_device *flipper_attach_endpoint(const char *name, struct _lf_endpoint *endpoint);
 extern int flipper_select(struct _lf_device *device);
 extern int flipper_detach(struct _lf_device *device);
 extern int flipper_exit(void);

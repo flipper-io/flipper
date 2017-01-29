@@ -112,7 +112,7 @@ uint8_t lf_bridge_get(struct _lf_endpoint *this) {
 
 int lf_bridge_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
     struct _lf_bridge_record *record = this -> record;
-    int _e;
+    int _e = lf_success;
     for (int i = 0; i < length / CHUNK_SIZE; i ++) {
         _e = lf_push(&(record -> _uart0_bridge), _uart0_push, source, CHUNK_SIZE, NULL);
         if (_e < lf_success) {
@@ -129,7 +129,7 @@ int lf_bridge_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
 
 int lf_bridge_pull(struct _lf_endpoint *this, void *destination, lf_size_t length) {
     struct _lf_bridge_record *record = this -> record;
-    int _e;
+    int _e = lf_success;
     for (int i = 0; i < length / CHUNK_SIZE; i ++) {
         _e = lf_pull(&(record -> _uart0_bridge), _uart0_pull, destination, CHUNK_SIZE, fmr_args(fmr_int32(UINT16_MAX)));
         if (_e < lf_success) {
