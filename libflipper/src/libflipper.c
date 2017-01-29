@@ -335,15 +335,19 @@ int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_s
 }
 
 /* Binds the lf_module structure to its counterpart on the attached device. */
-struct _lf_module *lf_bind(char *name) {
-	/* Calculate the identifier of the module. */
-	lf_crc_t identifier = lf_crc((void *)name, (lf_size_t)strlen(name));
-	/* Allocate the module structure. */
-	struct _lf_module *_module = malloc(sizeof(struct _lf_module));
+int lf_bind(struct _lf_module *module, char *name) {
 	/* Ensure that the module structure was allocated successfully. */
-	if (!_module) {
-		lf_error_raise(E_MALLOC, error_message("Failed to allocate memory for the lf_module."));
+	if (!module) {
+		lf_error_raise(E_NULL, error_message("No module provided to bind."));
+		return lf_error;
 	}
+	/* Calculate the identifier of the module. */
+	lf_crc_t identifier = lf_crc(name, strlen(name));
+	/* Set the module index. */
+	module -> index = 5;
+	/* Set the module device. */
+	module -> device = &flipper.device;
+
 	// /* Bind the device module to the allocated module structure. */
 	// int _e = fld_bind(_module, identifier);
 	// if (_e < lf_success) {
@@ -351,8 +355,7 @@ struct _lf_module *lf_bind(char *name) {
 	// 	free(_module);
 	// 	return NULL;
 	// }
-	/* Return the loaded module. */
-	return _module;
+	return lf_success;
 }
 
 /* PROTOTYPE FUNCTION: Returns a pointer to data copied into the address space of the device provided. */
