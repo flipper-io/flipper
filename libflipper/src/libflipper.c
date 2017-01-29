@@ -355,7 +355,7 @@ struct _lf_module *lf_bind(char *name) {
 	return _module;
 }
 
-/* Returns a pointer to data copied into the address space of the device provided. */
+/* PROTOTYPE FUNCTION: Returns a pointer to data copied into the address space of the device provided. */
 void *lf_send(struct _lf_device *device, void *source, lf_size_t length) {
 	if (!source) {
 		lf_error_raise(E_NULL, error_message("No source provided for copy."));
@@ -397,7 +397,7 @@ void *lf_send(struct _lf_device *device, void *source, lf_size_t length) {
 	return (void *)(uintptr_t)result.value;
 }
 
-/* Copies data from the address space of the device to that of the host. */
+/* PROTOTYPE FUNCTION: Copies data from the address space of the device to that of the host. */
 void *lf_recieve(struct _lf_device *device, void *source, lf_size_t length) {
 	if (!source) {
 		lf_error_raise(E_NULL, error_message("No source provided for copy."));
