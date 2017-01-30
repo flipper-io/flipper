@@ -1,10 +1,10 @@
 package io.flipper;
 
-import io.flipper.fmr._fmr_list;
 import io.flipper.fmr._fmr_module;
 import jnr.ffi.LibraryLoader;
 import jnr.ffi.Pointer;
 import jnr.ffi.Runtime;
+import jnr.ffi.Struct;
 
 import java.lang.reflect.Proxy;
 
@@ -13,17 +13,19 @@ import java.lang.reflect.Proxy;
  */
 public class Flipper {
 
+    private Pointer device;
+
     public interface _libflipper {
 
         // Flipper attach/select bindings.
         Pointer flipper_attach();
 
         // FMR bindings
-        int lf_invoke(_fmr_module module, byte function, _fmr_list parameters);
-        int lf_bind(String name);
+        int lf_invoke(_fmr_module module, byte function, Pointer parameters);
+        int lf_bind(Pointer module);
 
-        long fmr_build(int fmr_argc);
-        void fmr_append(Pointer fmr_list, Pointer fmr_arg);
+        Pointer fmr_build(byte argc);
+        int fmr_append(Pointer list, byte type, int value);
     }
 
     public static final _libflipper libflipper = LibraryLoader.create(_libflipper.class).load("flipper");
@@ -33,34 +35,27 @@ public class Flipper {
     }
 
     public interface FMRInvoker {
-        int invoke(byte function, _fmr_list params);
+        int invoke(byte function, Pointer params);
     }
 
     public Flipper() {
-        libflipper.flipper_attach();
+        device = libflipper.flipper_attach();
     }
 
-    public <T> T bindModule(Class<T> moduleInterface, String name, String description, int version, int identifier) {
+    public <T> T bindModule(Class<T> moduleInterface, String name) {
 
-//        int moduleIndex = libflipper.lf_bind(name);
+        _fmr_module module = new _fmr_module(getRuntime());
 
-        int moduleIndex = 5;
+        module.setName(name);
 
-        final _fmr_module module = new _fmr_module( Runtime.getRuntime(libflipper)
-                                            , name
-                                            , description
-                                            , version
-                                            , identifier
-                                            , moduleIndex);
+        int success = libflipper.lf_bind(Struct.getMemory(module));
 
         /*
          * Whenever a user executes a function from their module interface, this ModuleInvocationHandler gets triggered.
          * Upon receiving an invoke call, the ModuleInvocationHandler constructs a _fmr_list parameter list from the
          * function call and uses this FMRInvoker to deliver it back to us, where we can pass it to lf_invoke.
          */
-        ModuleInvocationHandler invoker = new ModuleInvocationHandler((func, params) -> {
-            return libflipper.lf_invoke(module, func, params);
-        });
+        ModuleInvocationHandler invoker = new ModuleInvocationHandler(moduleInterface, (func, params) -> libflipper.lf_invoke(module, func, params));
 
         return moduleInterface.cast(Proxy.newProxyInstance(moduleInterface.getClassLoader(), new Class[] { moduleInterface }, invoker));
     }
