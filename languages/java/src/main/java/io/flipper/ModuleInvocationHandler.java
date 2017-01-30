@@ -1,45 +1,54 @@
 package io.flipper;
 
-import io.flipper.fmr._fmr_arg;
-import io.flipper.fmr._fmr_list;
+import jnr.ffi.Pointer;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Nick Mosher <nicholastmosher@gmail.com>
  */
-public class ModuleInvocationHandler implements InvocationHandler {
+public class ModuleInvocationHandler <T> implements InvocationHandler {
 
+    private final Class<T> moduleInterface;
     private final Flipper.FMRInvoker invoker;
 
-    ModuleInvocationHandler(Flipper.FMRInvoker invoker) {
+    private final Map<String, Byte> fmr_types = new HashMap<String, Byte>(){{
+        put("byte",  (byte) 0);
+        put("short", (byte) 1);
+        put("int",   (byte) 2);
+    }};
+
+    ModuleInvocationHandler(Class<T> iface, Flipper.FMRInvoker invoker) {
+        moduleInterface = iface;
         this.invoker = invoker;
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-        if (!method.isAnnotationPresent(ModuleFunction.class)) {
-            throw new FlipperModuleException("Methods in flipper bindings interfaces must be annotated with @ModuleFunction with functionId defined.");
-        }
+        Class interfaceClass = Class.forName(moduleInterface.getTypeName());
+        List<Method> iFaceMethods = Arrays.asList(interfaceClass.getDeclaredMethods());
 
         Parameter[] parameters = method.getParameters();
+        Pointer list = Flipper.libflipper.fmr_build((byte) 0);
+        if (args != null) {
+            Parameter param;
+            String pName;
+            for (int i = 0; i < args.length; i++) {
+                param = parameters[i];
+                if (!fmr_types.containsKey(pName = param.getType().getName())) {
+                    throw new IllegalArgumentException("Illegal fmr argument type: " + pName);
+                }
+                Flipper.libflipper.fmr_append(list, fmr_types.get(pName), (Integer) args[i]);
+            }
+        }
 
-        System.out.println("HELLO WE MADE IT TO " + method.getName());
-
-        _fmr_arg arg;
-        _fmr_list list = new _fmr_list(Flipper.getRuntime());
-
-        System.out.println("Survived the Runtime");
-//        for (int i = 0; i < parameters.length; i++) {
-//            Parameter p = parameters[i];
-//            Object a = args[i];
-//            arg = new _fmr_arg(Flipper.getRuntime(), p, a);
-//            list.add(arg);
-//        }
-
-        return invoker.invoke(method.getAnnotation(ModuleFunction.class).functionId(), list);
+        return invoker.invoke((byte) iFaceMethods.indexOf(method), list);
     }
 }
