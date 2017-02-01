@@ -1,6 +1,6 @@
 {-|
 Module      : Flipper.Distribution.Module
-Description : Flipper Packages
+Description : Flipper Package Management
 Copyright   : George Morgan, Travis Whitaker 2016
 License     : All rights reserved.
 Maintainer  : travis@flipper.io
