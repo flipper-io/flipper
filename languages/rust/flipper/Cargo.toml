@@ -1,0 +1,15 @@
+[package]
+name = "flipper"
+version = "0.1.0"
+authors = ["George Morgan <george@george-morgan.com>"]
+
+[lib]
+name = "flipper"
+path = "src/lib.rs"
+
+[[bin]]
+name = "test"
+path = "src/bin.rs"
+
+[dependencies]
+libc = "0.2.0"

@@ -16,7 +16,7 @@ int uart0_configure(void) {
 	UCSR1C = (1 << UCSZ10) | (1 << UCSZ11);
 	/* Enable the receiver, transmitter, and receiver interrupt. */
 	UCSR1B = (1 << RXEN1) | (1 << TXEN1);
-	UCSR1B |= (1 << RXCIE1);
+//	UCSR1B |= (1 << RXCIE1);
 	return lf_success;
 }
 
@@ -39,10 +39,9 @@ void uart0_put(uint8_t byte) {
 	UDR1 = byte;
 }
 
-uint8_t uart0_get(void) {
-	char byte = usart_buffer[0];
-	usart_index = 0;
-	return byte;
+uint8_t uart0_get(volatile uint32_t timeout) {
+	while (!(UCSR1A & (1 << RXC1)) && timeout--);
+	return UDR1;
 }
 
 int uart0_push(void *source, lf_size_t length) {
@@ -50,28 +49,14 @@ int uart0_push(void *source, lf_size_t length) {
 	return lf_success;
 }
 
-int uart0_pull(void *destination, lf_size_t length) {
-	/* Ensure the length requested is not greater than the length of the USART buffer. */
-	if (length > sizeof(usart_buffer)) {
-		error_raise(E_OVERFLOW, NULL);
-		return lf_error;
-	}
-	/* Wait until the incoming data has been buffered. */
-	while ((UCSR1A & (1 << RXC1)));
-	/* Write the UART buffer into the destination. */
-	memcpy(destination, usart_buffer, length);
-	/* Clear the buffer index. */
-	usart_index = 0;
+int uart0_pull(void *destination, lf_size_t length, uint32_t timeout) {
+	while (length --) *(uint8_t *)(destination ++) = uart0_get(timeout);
 	return lf_success;
 }
 
 ISR(USART1_RX_vect) {
-	/* Write the byte into the buffer. */
-	while ((UCSR1A & (1 << RXC1))) {
-		if (usart_index < sizeof(usart_buffer)) {
-			usart_buffer[usart_index ++] = UDR1;
-		} else {
-			(void)UDR1;
-		}
+	/* While there is data to read. */
+	while (UCSR1A & (1 << RXC1)) {
+
 	}
 }

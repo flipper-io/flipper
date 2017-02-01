@@ -10,27 +10,19 @@
 /* Declare the virtual interface for this module. */
 extern const struct _fld {
 	int (* configure)(void);
-	int (* bind)(lf_crc_t identifier);
-#ifdef __fld_upload_symbols__
-	/* Uploads a module from the host's filesystem to the device. */
-	int (* load)(char *path, void **interface);
-#endif
+	fmr_module (* index)(lf_crc_t identifier);
 } fld;
 
-/* Declare the FMR overlay for this driver. */
-enum { _fld_configure, _fld_bind };
+/* Declare the FMR overlay for this module. */
+enum { _fld_configure, _fld_index };
 
-/* The fmr_module structure for this module. */
+/* Declare the _lf_module structure for this module. */
 extern struct _lf_module _fld;
 
-/* Declare each prototype for all functions within this driver. */
+/* Declare the prototypes for all of the functions within this module. */
 int fld_configure(void);
-/* Loads a module instance on the device and returns its module index. */
-int fld_bind(lf_crc_t identifier);
-
-#ifdef __fld_upload_symbols__
-int fld_load(char *path, void **interface);
-#endif
+/* Returns the index of a loaded module. */
+fmr_module fld_index(lf_crc_t identifier);
 
 #endif
 #endif

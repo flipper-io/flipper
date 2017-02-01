@@ -2,11 +2,11 @@
 #include <flipper/error.h>
 #include <flipper/carbon/platforms/atmega16u2.h>
 
-int error_configure(void) {
+int lf_error_configure(void) {
     return lf_success;
 }
 
-void error_raise(lf_error_t error, const char *format, ...) {
+void lf_error_raise(lf_error_t error, const char *format, ...) {
     lf_self.error = error;
 }
 
@@ -14,14 +14,14 @@ lf_error_t error_get(void) {
 	return lf_self.error;
 }
 
-void error_clear(void) {
+void lf_error_clear(void) {
 	lf_self.error = E_OK;
 }
 
-void error_resume(void) {
+void lf_error_resume(void) {
 
 }
 
-void error_pause(void) {
+void lf_error_pause(void) {
 
 }

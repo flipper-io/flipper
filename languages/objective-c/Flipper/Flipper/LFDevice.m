@@ -7,13 +7,12 @@
 //
 
 #import "LFDevice.h"
-#include <flipper/carbon/modules/led.h>
+#include <flipper/libflipper.h>
 
 @implementation LFDevice
 
 - (id) initWithName:(NSString *)name {
     if (self == [super init]) {
-        [self setLed:[[LFLED alloc] init]];
         flipper_attach_usb([name UTF8String]);
         return self;
     }

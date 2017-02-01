@@ -31,12 +31,12 @@ int network_configure(struct _lf_endpoint *this, char *hostname) {
 	/* Create a new socket. */
 	record -> fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (record -> fd < 0) {
-		error_raise(E_SOCKET, error_message("Failed to open a new message runtime socket."));
+		lf_error_raise(E_SOCKET, error_message("Failed to open a new message runtime socket."));
 		return lf_error;
 	}
 	struct hostent *host = gethostbyname(hostname);
 	if (!host) {
-		error_raise(E_NO_DEVICE, error_message("Failed to resolve hostname '%s' to device IP.", hostname));
+		lf_error_raise(E_NO_DEVICE, error_message("Failed to resolve hostname '%s' to device IP.", hostname));
 		return lf_error;
 	}
 	struct in_addr **list = (struct in_addr **) host -> h_addr_list;
@@ -49,7 +49,7 @@ int network_configure(struct _lf_endpoint *this, char *hostname) {
 	if (bind(record -> fd, (struct sockaddr *)&(record -> device), sizeof(struct sockaddr_in)) < 0) {
 		/* Close the opened socket. */
 		close(record -> fd);
-		error_raise(E_SOCKET, error_message("Failed to bind to the message runtime socket."));
+		lf_error_raise(E_SOCKET, error_message("Failed to bind to the message runtime socket."));
 		return lf_error;
 	}
 	return lf_success;
@@ -76,7 +76,7 @@ int network_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
 	socklen_t len = sizeof(struct sockaddr_in);
 	ssize_t _e = sendto(record -> fd, source, length, 0, (struct sockaddr *)&(record -> device), len);
 	if (_e < 0) {
-		error_raise(E_COMMUNICATION, error_message("Failed to transfer data to networked device."));
+		lf_error_raise(E_COMMUNICATION, error_message("Failed to transfer data to networked device."));
 		return lf_error;
 	}
 	return lf_success;
@@ -88,7 +88,7 @@ int network_pull(struct _lf_endpoint *this, void *destination, lf_size_t length)
 	socklen_t _length;
 	ssize_t _e = recvfrom(record -> fd, destination, length, 0, (struct sockaddr *)&(record -> device), &_length);
 	if (_e < 0) {
-		error_raise(E_COMMUNICATION, error_message("Failed to transfer data to networked device."));
+		lf_error_raise(E_COMMUNICATION, error_message("Failed to transfer data to networked device."));
 		return lf_error;
 	}
 	return lf_success;

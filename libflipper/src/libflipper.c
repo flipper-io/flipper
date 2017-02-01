@@ -19,21 +19,21 @@ struct _flipper flipper = {
 	NULL
 };
 
-struct _lf_device *lf_create_device(char *name) {
+struct _lf_device *lf_create_device(const char *name) {
 	/* Allocate memory to contain the record of the device. */
 	struct _lf_device *device = (struct _lf_device *)calloc(1, sizeof(struct _lf_device));
 	if (!device) {
-		error_raise(E_MALLOC, error_message("Failed to allocate the memory required to create a new fmr_device."));
+		lf_error_raise(E_MALLOC, error_message("Failed to allocate the memory required to create a new fmr_device."));
 		return NULL;
 	}
 	if (strlen(name) > sizeof(device -> configuration.name)) {
-		error_raise(E_NAME, error_message("The name '%s' is too long. Please choose a name with %lu characters or less.", name, sizeof(device -> configuration.name)));
+		lf_error_raise(E_NAME, error_message("The name '%s' is too long. Please choose a name with %lu characters or less.", name, sizeof(device -> configuration.name)));
 		goto failure;
 	}
 	/* Set the device's name. */
 	strcpy(device -> configuration.name, name);
 	/* Set the device's identifier. */
-	device -> configuration.identifier = lf_crc(name, strlen(name));
+	device -> configuration.identifier = lf_crc((void *)name, (lf_size_t)strlen(name));
 	return device;
 failure:
 	free(device);
@@ -46,7 +46,7 @@ struct _lf_device *flipper_attach(void) {
 }
 
 /* Attaches a USB device to the bridge endpoint. */
-struct _lf_device *flipper_attach_usb(char *name) {
+struct _lf_device *flipper_attach_usb(const char *name) {
 	/* Make a backup of the slected device. */
 	struct _lf_device *_device = flipper.device;
 	/* Create a device with the name provided. */
@@ -60,7 +60,7 @@ struct _lf_device *flipper_attach_usb(char *name) {
 	device -> endpoint = &lf_bridge_ep;
 	/* Configure the device's endpoint. */
 	if (device -> endpoint -> configure(device) < lf_success) {
-		error_raise(E_ENDPOINT, error_message("Failed to initialize bridge endpoint for usb device."));
+		lf_error_raise(E_ENDPOINT, error_message("Failed to initialize bridge endpoint for usb device."));
 		/* Detach the device in the event of an endpoint configuration failure. */
 		flipper_detach(device);
 		/* Restore the previously selected device. */
@@ -70,7 +70,7 @@ struct _lf_device *flipper_attach_usb(char *name) {
 	return device;
 }
 
-struct _lf_device *flipper_attach_network(char *name, char *hostname) {
+struct _lf_device *flipper_attach_network(const char *name, const char *hostname) {
 	struct _lf_device *device = lf_create_device(name);
 	if (!device) {
 		return NULL;
@@ -78,7 +78,7 @@ struct _lf_device *flipper_attach_network(char *name, char *hostname) {
 	/* Set the device's endpoint. */
 	device -> endpoint = &lf_network_ep;
 	if (device -> endpoint -> configure(device -> endpoint, hostname) < lf_success) {
-		error_raise(E_ENDPOINT, error_message("Failed to initialize endpoint for networked Flipper device."));
+		lf_error_raise(E_ENDPOINT, error_message("Failed to initialize endpoint for networked Flipper device."));
 		/* Detach the device in the event of an endpoint configuration failure. */
 		flipper_detach(device);
 		return NULL;
@@ -88,7 +88,7 @@ struct _lf_device *flipper_attach_network(char *name, char *hostname) {
 	return device;
 }
 
-struct _lf_device *flipper_attach_endpoint(char *name, struct _lf_endpoint *endpoint) {
+struct _lf_device *flipper_attach_endpoint(const char *name, struct _lf_endpoint *endpoint) {
 	struct _lf_device *device = lf_create_device(name);
 	if (!device) {
 		return NULL;
@@ -102,7 +102,7 @@ struct _lf_device *flipper_attach_endpoint(char *name, struct _lf_endpoint *endp
 
 int flipper_select(struct _lf_device *device) {
 	if (!device) {
-		error_raise(E_NULL, error_message("No device provided for selection."));
+		lf_error_raise(E_NULL, error_message("No device provided for selection."));
 		return lf_error;
 	}
 	flipper.device = device;
@@ -111,7 +111,7 @@ int flipper_select(struct _lf_device *device) {
 
 int flipper_detach(struct _lf_device *device) {
 	if (!device) {
-		error_raise(E_NULL, error_message("No device provided for release."));
+		lf_error_raise(E_NULL, error_message("No device provided for release."));
 		return lf_error;
 	}
 	if (device == flipper.device) {
@@ -154,18 +154,21 @@ int lf_load_configuration(struct _lf_device *device) {
 	if (_e < lf_success) {
 		return lf_error;
 	}
-	struct _lf_configuration configuration;
 	/* Obtain the configuration from the device. */
+	struct _lf_configuration configuration;
 	_e = device -> endpoint -> pull(device -> endpoint, &configuration, sizeof(struct _lf_configuration));
 	if (_e < lf_success) {
 		return lf_error;
 	}
-	struct _fmr_result result;
 	/* Obtain the result of the operation. */
-	lf_get_result(device, &result);
+	struct _fmr_result result;
+	_e = lf_get_result(device, &result);
+	if (_e < lf_success) {
+		return lf_error;
+	}
 	/* Compare the device identifiers. */
 	if (device -> configuration.identifier != configuration.identifier) {
-		error_raise(E_NO_DEVICE, error_message("Identifier mismatch for device '%s'. (0x%04x instead of 0x%04x)", device -> configuration.name, configuration.identifier, device -> configuration.identifier));
+		lf_error_raise(E_NO_DEVICE, error_message("Identifier mismatch for device '%s'. (0x%04x instead of 0x%04x)", device -> configuration.name, configuration.identifier, device -> configuration.identifier));
 		return lf_error;
 	}
 	/* Copy the returned configuration into the device. */
@@ -173,32 +176,39 @@ int lf_load_configuration(struct _lf_device *device) {
 	return lf_success;
 }
 
-/* -- Packet manipulation functions. -- */
-
 int lf_get_result(struct _lf_device *device, struct _fmr_result *result) {
 	/* Obtain the response packet from the device. */
 	int _e = lf_retrieve(device, result);
+#ifdef __lf_debug__
+	lf_debug_result(result);
+#endif
 	if (_e < lf_success) {
 		return lf_error;
 	}
 	/* If an error occured on the device, raise it. */
 	if (result -> error != E_OK) {
-		error_raise(result -> error, error_message("The following error occured on the device '%s':", device -> configuration.name));
+		lf_error_raise(result -> error, error_message("An error occured on the device '%s':", device -> configuration.name));
+		return lf_error;
 	}
 	return lf_success;
 }
 
-fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _fmr_list *parameters) {
-	/* Ensure that we have a valid module and argument pointer. */
+fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _fmr_parameters *parameters) {
+	/* Ensure that the module pointer is valid. */
 	if (!module) {
-		error_raise(E_NULL, error_message("No module specified for message runtime invocation."));
+		lf_error_raise(E_NULL, error_message("No module was specified for function invocation."));
 		return lf_error;
 	}
-	/* Obtain the target device from the module. */
+	/* Obtain the module's target device. */
 	struct _lf_device *device = *(module -> device);
 	/* If no device is provided, raise an error. */
 	if (!device) {
-		error_raise(E_NO_DEVICE, error_message("Failed to invoke on device."));
+		lf_error_raise(E_NO_DEVICE, error_message("The module '%s' has no target device.", module -> name));
+		return lf_error;
+	}
+	/* Ensure that the module has been bound. */
+	if ((int8_t)(module -> index) == -1) {
+		lf_error_raise(E_MODULE, error_message("The module '%s' has not been bound to a module on its device.", module -> name));
 		return lf_error;
 	}
 	/* The raw packet into which the invocation information will be loaded .*/
@@ -209,10 +219,15 @@ fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _f
 	_packet.header.magic = FMR_MAGIC_NUMBER;
 	/* Compute the initial length of the packet. */
 	_packet.header.length = sizeof(struct _fmr_invocation_packet);
-	/* Set the packet class. */
-	_packet.header.class = fmr_standard_invocation_class;
+	/* If the user module bit is set, make the invocation a user invocation. */
+	if (module -> index & FMR_USER_INVOCATION_BIT) {
+		_packet.header.class = fmr_user_invocation_class;
+	} else {
+		/* Otherwise, make it a standard invocation. */
+		_packet.header.class = fmr_standard_invocation_class;
+	}
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_create_call(module -> index, function, parameters, &_packet.header, &packet -> call);
+	int _e = fmr_create_call((uint8_t)(module -> index), function, parameters, &_packet.header, &packet -> call);
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -238,7 +253,7 @@ int lf_transfer(struct _lf_device *device, struct _fmr_packet *packet) {
 	int _e = device -> endpoint -> push(device -> endpoint, packet, sizeof(struct _fmr_packet));
 	/* Ensure that the packet was successfully transferred to the device. */
 	if (_e < lf_success) {
-		error_raise(E_ENDPOINT, error_message("Failed to transfer packet to device '%s'.", device -> configuration.name));
+		lf_error_raise(E_ENDPOINT, error_message("Failed to transfer packet to device '%s'.", device -> configuration.name));
 		return lf_error;
 	}
 	return lf_success;
@@ -249,12 +264,9 @@ int lf_retrieve(struct _lf_device *device, struct _fmr_result *result) {
 	int _e = device -> endpoint -> pull(device -> endpoint, result, sizeof(struct _fmr_result));
 	/* Ensure that the packet was successfully obtained from the device. */
 	if (_e < lf_success) {
-		error_raise(E_ENDPOINT, error_message("Failed to retrieve packet from the device '%s'.", device -> configuration.name));
+		lf_error_raise(E_ENDPOINT, error_message("Failed to retrieve packet from the device '%s'.", device -> configuration.name));
 		return lf_error;
 	}
-#ifdef __lf_debug__
-	lf_debug_result(result);
-#endif
 	return lf_success;
 }
 
@@ -265,18 +277,18 @@ fmr_va fmr_ptr(struct _lf_device *device, void *ptr) {
 	} else if (device -> configuration.attributes & lf_device_16bit) {
 		return fmr_int16(ptr);
 	} else {
-		error_raise(E_FMR, error_message("No pointer size specified for the target architecture."));
+		lf_error_raise(E_FMR, error_message("No pointer size specified for the target architecture."));
 	}
 	return 0;
 }
 
-int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _fmr_list *parameters) {
+int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _fmr_parameters *parameters) {
 	/* Ensure that we have a valid module and argument pointer. */
 	if (!module) {
-		error_raise(E_NULL, error_message("No module specified for message runtime push to module '%s'.", module -> name));
+		lf_error_raise(E_NULL, error_message("No module specified for message runtime push to module '%s'.", module -> name));
 		return lf_error;
 	} else if (!source) {
-		error_raise(E_NULL, error_message("No source provided for message runtime push to module '%s'.", module -> name));
+		lf_error_raise(E_NULL, error_message("No source provided for message runtime push to module '%s'.", module -> name));
 	} else if (!length) {
 		return lf_success;
 	}
@@ -284,7 +296,7 @@ int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_s
 	struct _lf_device *device = *(module -> device);
 	/* If no device is provided, throw an error. */
 	if (!device) {
-		error_raise(E_NO_DEVICE, error_message("Failed to push to device."));
+		lf_error_raise(E_NO_DEVICE, error_message("Failed to push to device."));
 		return lf_error;
 	}
 	struct _fmr_packet _packet = { 0 };
@@ -322,16 +334,133 @@ int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_s
 	return lf_success;
 }
 
-/* Experimental: Load an application into a device's RAM and launch it. */
+/* Binds the lf_module structure to its counterpart on the attached device. */
+int lf_bind(struct _lf_module *module) {
+	/* Ensure that the module structure was allocated successfully. */
+	if (!module) {
+		lf_error_raise(E_NULL, error_message("No module provided to bind."));
+		return lf_error;
+	}
+	/* Calculate the identifier of the module, including the NULL terminator. */
+	lf_crc_t identifier = lf_crc(module -> name, strlen(module -> name) + 1);
+	/* Attempt to get the module index. */
+	fmr_module index = fld_index(identifier) | FMR_USER_INVOCATION_BIT;
+	/* Throw an error if there is no counterpart module found. */
+	lf_assert(index == -1, failure, E_MODULE, "No counterpart module loaded for bind to module '%s'.", module -> name);
+	/* Set the module's indentifier. */
+	module -> identifier = identifier;
+	/* Set the module's index. */
+	module -> index = index;
+	/* Set the module's device. */
+	module -> device = &flipper.device;
+	return lf_success;
+failure:
+	return lf_error;
+}
+
+/* PROTOTYPE FUNCTION: Returns a pointer to data copied into the address space of the device provided. */
+void *lf_send(struct _lf_device *device, void *source, lf_size_t length) {
+	if (!source) {
+		lf_error_raise(E_NULL, error_message("No source provided for copy."));
+	} else if (!length) {
+		return NULL;
+	}
+	/* If no device is provided, throw an error. */
+	if (!device) {
+		lf_error_raise(E_NO_DEVICE, error_message("Failed to copy data."));
+		return NULL;
+	}
+	struct _fmr_packet _packet = { 0 };
+	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
+	/* Set the magic number. */
+	_packet.header.magic = FMR_MAGIC_NUMBER;
+	/* Compute the initial length of the packet. */
+	_packet.header.length = sizeof(struct _fmr_push_pull_packet);
+	/* Set the packet class. */
+	_packet.header.class = fmr_send_class;
+	/* Set the push length. */
+	packet -> length = length;
+	/* Compute and store the packet checksum. */
+	_packet.header.checksum = lf_crc(packet, _packet.header.length);
+	/* Send the packet to the target device. */
+	int _e = lf_transfer(device, &_packet);
+	if (_e < lf_success) {
+		return NULL;
+	}
+	/* Transfer the data through to the address space of the device. */
+	_e = device -> endpoint -> push(device -> endpoint, source, length);
+	/* Ensure that the data was successfully transferred to the device. */
+	if (_e < lf_success) {
+		return NULL;
+	}
+	struct _fmr_result result;
+	/* Obtain the result of the operation. */
+	lf_get_result(device, &result);
+	/* Return a pointer to the data. */
+	return (void *)(uintptr_t)result.value;
+}
+
+/* PROTOTYPE FUNCTION: Copies data from the address space of the device to that of the host. */
+void *lf_recieve(struct _lf_device *device, void *source, lf_size_t length) {
+	if (!source) {
+		lf_error_raise(E_NULL, error_message("No source provided for copy."));
+	} else if (!length) {
+		return NULL;
+	}
+	/* If no device is provided, throw an error. */
+	if (!device) {
+		lf_error_raise(E_NO_DEVICE, error_message("Failed to copy data."));
+		return NULL;
+	}
+	/* Allocate memory for the received data. */
+	void *destination = malloc(length);
+	/* Ensure the memory was allocated successfully. */
+	if (!destination) {
+		lf_error_raise(E_MALLOC, error_message("Failed to allocate memory for receive."));
+		return NULL;
+	}
+	struct _fmr_packet _packet = { 0 };
+	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
+	/* Set the magic number. */
+	_packet.header.magic = FMR_MAGIC_NUMBER;
+	/* Compute the initial length of the packet. */
+	_packet.header.length = sizeof(struct _fmr_push_pull_packet);
+	/* Set the packet class. */
+	_packet.header.class = fmr_receive_class;
+	/* Set the push length. */
+	packet -> length = length;
+	/* Set the address. */
+	*(uintptr_t *)packet -> call.parameters = (uintptr_t)source;
+	/* Compute and store the packet checksum. */
+	_packet.header.checksum = lf_crc(packet, _packet.header.length);
+	/* Send the packet to the target device. */
+	int _e = lf_transfer(device, &_packet);
+	if (_e < lf_success) {
+		return NULL;
+	}
+	/* Transfer the data through to the address space of the device. */
+	_e = device -> endpoint -> pull(device -> endpoint, destination, length);
+	/* Ensure that the data was successfully transferred to the device. */
+	if (_e < lf_success) {
+		return NULL;
+	}
+	struct _fmr_result result;
+	/* Obtain the result of the operation. */
+	lf_get_result(device, &result);
+	/* Return a pointer to the data. */
+	return destination;
+}
+
+/* PROTOTYPE FUNCTION: Load an image into a device's RAM. */
 int lf_ram_load(struct _lf_device *device, void *source, lf_size_t length) {
 	if (!source) {
-		error_raise(E_NULL, error_message("No source provided for load operation."));
+		lf_error_raise(E_NULL, error_message("No source provided for load operation."));
 	} else if (!length) {
 		return lf_success;
 	}
 	/* If no device is provided, throw an error. */
 	if (!device) {
-		error_raise(E_NO_DEVICE, error_message("Failed to load to device."));
+		lf_error_raise(E_NO_DEVICE, error_message("Failed to load to device."));
 		return lf_error;
 	}
 	struct _fmr_packet _packet = { 0 };
@@ -361,16 +490,16 @@ int lf_ram_load(struct _lf_device *device, void *source, lf_size_t length) {
 	/* Obtain the result of the operation. */
 	lf_get_result(device, &result);
 	/* Return a pointer to the data. */
-	return lf_success;
+	return result.value;
 }
 
-int lf_pull(struct _lf_module *module, fmr_function function, void *destination, lf_size_t length, struct _fmr_list *parameters) {
+int lf_pull(struct _lf_module *module, fmr_function function, void *destination, lf_size_t length, struct _fmr_parameters *parameters) {
 	/* Ensure that we have a valid module and argument pointer. */
 	if (!module) {
-		error_raise(E_NULL, error_message("No module specified for message runtime pull from module '%s'.", module -> name));
+		lf_error_raise(E_NULL, error_message("No module specified for message runtime pull from module '%s'.", module -> name));
 		return lf_error;
 	} else if (!destination) {
-		error_raise(E_NULL, error_message("No destination provided for message runtime pull from module '%s'.", module -> name));
+		lf_error_raise(E_NULL, error_message("No destination provided for message runtime pull from module '%s'.", module -> name));
 	} else if (!length) {
 		return lf_success;
 	}
@@ -378,7 +507,7 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 	struct _lf_device *device = *(module -> device);
 	/* If no device is provided, throw an error. */
 	if (!device) {
-		error_raise(E_NO_DEVICE, error_message("Failed to pull from device."));
+		lf_error_raise(E_NO_DEVICE, error_message("Failed to pull from device."));
 		return lf_error;
 	}
 	struct _fmr_packet _packet = { 0 };
@@ -417,7 +546,7 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 
 /* Debugging functions for displaying the contents of various FMR related data structures. */
 
-void lf_debug_call(struct _fmr_call *call) {
+void lf_debug_call(struct _fmr_invocation *call) {
 	printf("call:\n");
 	printf("\t└─ index:\t0x%x\n", call -> index);
 	printf("\t└─ function:\t0x%x\n", call -> function);
@@ -456,6 +585,7 @@ void lf_debug_packet(struct _fmr_packet *packet, size_t length) {
 				lf_debug_call(&invocation -> call);
 			break;
 			case fmr_user_invocation_class:
+				lf_debug_call(&invocation -> call);
 			break;
 			case fmr_push_class:
 			case fmr_pull_class:

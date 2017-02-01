@@ -4,7 +4,7 @@
 
 int uart0_configure(void) {
 	/* Create a pinmask for the peripheral pins. */
-	const unsigned int UART0_PIN_MASK = (PIO_PA5A_RXD0 | PIO_PA6A_TXD0);
+	const unsigned int UART0_PIN_MASK = (PIO_PA9A_URXD0 | PIO_PA10A_UTXD0);
 	/* Enable the peripheral clock. */
 	PMC -> PMC_PCER0 = (1 << ID_UART0);
 	/* Disable PIOA interrupts on the peripheral pins. */
@@ -15,7 +15,7 @@ int uart0_configure(void) {
 	PIOA -> PIO_ABCDSR[0] &= ~UART0_PIN_MASK;
 	PIOA -> PIO_ABCDSR[1] &= ~UART0_PIN_MASK;
 	/* Reset the peripheral and disable the transmitter and receiver. */
-	UART0 -> UART_CR = UART_CR_RSTRX | UART_CR_RSTTX | UART_CR_TXDIS | UART_CR_RXDIS;
+	UART0 -> UART_CR = UART_CR_RSTRX | UART_CR_RSTTX | UART_CR_TXDIS | UART_CR_RXDIS | UART_CR_RSTSTA;
 	/* Set the mode to 8n1. */
 	UART0 -> UART_MR = UART_MR_CHMODE_NORMAL | UART_MR_PAR_NO;
 	/* Set the baudrate. */
@@ -28,6 +28,8 @@ int uart0_configure(void) {
 	UART0 -> UART_RNPR = (uintptr_t)(NULL);
 	/* Disable the PDC transmitter and receiver. */
 	UART0 -> UART_PTCR = UART_PTCR_TXTDIS | UART_PTCR_RXTDIS;
+	/* Set the UART0 priority to high. */
+	NVIC_SetPriority(UART0_IRQn, UART0_PRIORITY);
 	/* Enable the UART0 interrupt. */
 	NVIC_EnableIRQ(UART0_IRQn);
 	/* Enable the transmitter and receiver. */
@@ -75,7 +77,7 @@ int uart0_push(void *source, lf_size_t length) {
 	return lf_success;
 }
 
-int uart0_pull(void *destination, lf_size_t length) {
+int uart0_pull(void *destination, lf_size_t length, uint32_t timeout) {
 	/* Set the transmission length and destination pointer. */
 	UART0 -> UART_RCR = length;
 	UART0 -> UART_RPR = (uintptr_t)(destination);

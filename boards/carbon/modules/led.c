@@ -5,6 +5,6 @@
 /* Define the virtual interface for this module. */
 const struct _led led = {
 	led_configure,
-	led_set_rgb
+	led_rgb
 };
 #endif

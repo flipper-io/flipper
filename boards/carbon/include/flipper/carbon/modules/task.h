@@ -7,24 +7,24 @@
 /* Declare the virtual interface for this module. */
 extern const struct _task {
 	/* Pasues the running task. */
-	void (* pause)(void);
+	int (* pause)(int pid);
 	/* Resumes the running task. */
-	void (* resume)(void);
+	int (* resume)(int pid);
 	/* Stops the running task. */
-	void (* stop)(void);
+	int (* stop)(int pid);
 } task;
 
 #ifdef __private_include__
 
-/* The fmr_module structure for this module. */
+/* Declare the _lf_module structure for this module. */
 extern struct _lf_module _task;
 
-/* Declare the FMR overlay for this driver. */
+/* Declare the FMR overlay for this module. */
 enum { _task_pause, _task_resume, _task_stop };
 
-extern void os_task_pause(void);
-extern void os_task_resume(void);
-extern void os_task_stop(void);
+extern int os_task_pause(int pid);
+extern int os_task_resume(int pid);
+extern int os_task_stop(int pid);
 
 #endif
 #endif

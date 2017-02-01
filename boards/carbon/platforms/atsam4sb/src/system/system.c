@@ -1,5 +1,7 @@
 #define __private_include__
 #include <osmium.h>
+#include <scheduler.h>
+#include <loader.h>
 
 /* The fmr_device object containing global state about this device. */
 struct _lf_device lf_self = {
@@ -13,9 +15,8 @@ struct _lf_device lf_self = {
 	E_OK
 };
 
-/* Experimental: Entry address of the loaded program. */
-extern int os_load(void *address);
-extern void launch_application(void);
+/* Buffer space for incoming message runtime packets. */
+struct _fmr_packet packet;
 
 void uart0_pull_wait(void *destination, lf_size_t length) {
 	/* Disable the PDC receive complete interrupt. */
@@ -33,47 +34,53 @@ void uart0_pull_wait(void *destination, lf_size_t length) {
 	UART0 -> UART_IER = UART_IER_ENDRX;
 }
 
-void fmr_push(struct _fmr_push_pull_packet *packet) {
+fmr_return fmr_push(struct _fmr_push_pull_packet *packet) {
+	fmr_return retval = 0;
 	void *push_buffer = malloc(packet -> length);
 	if (!push_buffer) {
-		error_raise(E_MALLOC, NULL);
-		return;
+		lf_error_raise(E_MALLOC, NULL);
+		return -1;
 	}
 	uart0_pull_wait(push_buffer, packet -> length);
-	if (packet -> header.class != fmr_ram_load_class) {
-		*(uintptr_t *)(packet -> call.parameters) = (uintptr_t)push_buffer;
-		fmr_execute(packet -> call.index, packet -> call.function, packet -> call.argc, packet -> call.types, (void *)(packet -> call.parameters));
-		free(push_buffer);
+	if (packet -> header.class == fmr_send_class) {
+		/* If we are copying data, simply return a pointer to the copied data. */
+		retval = (uintptr_t)push_buffer;
+	} else if (packet -> header.class == fmr_ram_load_class) {
+		retval = os_load_image(push_buffer);
 	} else {
-		/* Attempt to load the image. */
-		if (os_load(push_buffer) < lf_success) {
-			/* If loading failed, release the memory. */
-			free(push_buffer);
+		*(uintptr_t *)(packet -> call.parameters) = (uintptr_t)push_buffer;
+		retval = fmr_execute(packet -> call.index, packet -> call.function, packet -> call.argc, packet -> call.types, (void *)(packet -> call.parameters));
+		free(push_buffer);
+	}
+	return retval;
+}
+
+fmr_return fmr_pull(struct _fmr_push_pull_packet *packet) {
+	fmr_return retval = 0;
+	if (packet -> header.class == fmr_receive_class) {
+		/* If we are receiving data, simply push the memory. */
+		uart0_push((void *)*(uint32_t *)(packet -> call.parameters), packet -> length);
+	} else {
+		void *pull_buffer = malloc(packet -> length);
+		if (!pull_buffer) {
+			lf_error_raise(E_MALLOC, NULL);
+			return -1;
 		}
+		*(uintptr_t *)(packet -> call.parameters) = (uintptr_t)pull_buffer;
+		retval = fmr_execute(packet -> call.index, packet -> call.function, packet -> call.argc, packet -> call.types, (void *)(packet -> call.parameters));
+		uart0_push(pull_buffer, packet -> length);
+		free(pull_buffer);
 	}
+	return retval;
 }
 
-void fmr_pull(struct _fmr_push_pull_packet *packet) {
-	void *pull_buffer = malloc(packet -> length);
-	if (!pull_buffer) {
-		error_raise(E_MALLOC, NULL);
-		return;
-	}
-	*(uintptr_t *)(packet -> call.parameters) = (uintptr_t)pull_buffer;
-	fmr_execute(packet -> call.index, packet -> call.function, packet -> call.argc, packet -> call.types, (void *)(packet -> call.parameters));
-	uart0_push(pull_buffer, packet -> length);
-	free(pull_buffer);
-}
-
-struct _fmr_packet packet;
-
-/* System task is executed when user tasks are not active. */
+/* System task is executed alongside user tasks. */
 void system_task(void) {
 
 	/* -------- SYSTEM TASK -------- */
 
-	while (1);
-
+	/* Nothing to do here, so move on to the next task. */
+	os_task_next();
 }
 
 void uart0_isr(void) {
@@ -87,12 +94,16 @@ void uart0_isr(void) {
 		struct _fmr_result result = { 0 };
 		/* Process the packet. */
 		fmr_perform(&packet, &result);
+		/* HACK: Wait until the U2 is ready. */
+		for (volatile int i = 0; i < 10000; i ++);
 		/* Give the result back. */
 		uart0_push(&result, sizeof(struct _fmr_result));
 		/* Flush any remaining data that has been buffered. */
 		while (UART0 -> UART_SR & UART_SR_RXRDY) UART0 -> UART_RHR;
+		/* Clear the error state. */
+		lf_error_clear();
 		/* Pull the next packet asynchronously. */
-		uart0_pull(&packet, sizeof(struct _fmr_packet));
+		uart0_pull(&packet, sizeof(struct _fmr_packet), 0);
 	}
 }
 
@@ -103,7 +114,7 @@ void system_init(void) {
 	WDT -> WDT_MR = WDT_MR_WDDIS;
 
 	/* Configure the EFC for 5 wait states. */
-	EFC -> EEFC_FMR = EEFC_FMR_FWS(5);
+	EFC -> EEFC_FMR = EEFC_FMR_FWS(PLATFORM_WAIT_STATES);
 
 	/* Configure the primary clock source. */
 	if (!(PMC -> CKGR_MOR & CKGR_MOR_MOSCSEL)) {
@@ -140,13 +151,13 @@ void system_init(void) {
 	spi_configure();
 
 	/* Pull an FMR packet asynchronously to launch FMR. */
-	uart0_pull(&packet, sizeof(struct _fmr_packet));
+	uart0_pull(&packet, sizeof(struct _fmr_packet), 0);
 	/* Enable the PDC receive complete interrupt. */
 	UART0 -> UART_IER = UART_IER_ENDRX;
 
 	/* Print reset message. */
-	char reset_msg[] = "Reset.\n";
-	usart_push(reset_msg, sizeof(reset_msg));
+	char reset_msg[] = "Reset\n";
+	usart_push(reset_msg, sizeof(reset_msg) - 1);
 
 }
 

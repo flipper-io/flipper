@@ -4,16 +4,16 @@
 /* If defined, the symbols needed to create FMR packets will be defined. */
 #ifdef __fmr_generators__
 
-struct _fmr_list *fmr_build(fmr_argc argc, ...) {
+struct _fmr_parameters *fmr_build(fmr_argc argc, ...) {
 	/* Ensure that the argument count is within bounds. */
 	if (argc > FMR_MAX_ARGC) {
-		error_raise(E_OVERFLOW, error_message("The maximum number of arguments (%i) was reached while trying to build the argument list.", FMR_MAX_ARGC));
+		lf_error_raise(E_OVERFLOW, error_message("The maximum number of arguments (%i) was reached while trying to build the argument list.", FMR_MAX_ARGC));
 		return NULL;
 	}
-	/* Allocate memory for a new fmr_list. */
-	struct _fmr_list *list = (struct _fmr_list *)calloc(1, sizeof(struct _fmr_list));
+	/* Allocate memory for a new fmr_parameters. */
+	struct _fmr_parameters *list = (struct _fmr_parameters *)calloc(1, sizeof(struct _fmr_parameters));
 	if (!list) {
-		error_raise(E_MALLOC, error_message("Failed to allocate the memory required to create a new argument list."));
+		lf_error_raise(E_MALLOC, error_message("Failed to allocate the memory required to create a new argument list."));
 		return NULL;
 	}
 	/* Construct a va_list to access variadic arguments. */
@@ -24,41 +24,44 @@ struct _fmr_list *fmr_build(fmr_argc argc, ...) {
 	while (argc --) {
 		/* Unstage the value of the argument from the variadic argument list. */
 		fmr_va value = va_arg(argv, fmr_va);
-		/* Allocate the memory required to stage the argument into the parent list. */
-		struct _fmr_arg *argument = (struct _fmr_arg *)calloc(1, sizeof(struct _fmr_arg));
-		/* Ensure that the request for memory was satisfied. */
-		if (!argument) {
-			error_raise(E_MALLOC, error_message("Failed to allocate the memory required to append to the argument list located at %p.", list));
-			free(list);
-			/* Nullify the argument list pointer for the failed return. */
-			list = NULL;
-			break;
-		}
 		fmr_type type = (fmr_type)((value >> (sizeof(fmr_arg) * 8)) & 0x7);
 		if (type > fmr_int32_t) {
-			error_raise(E_TYPE, error_message("An invalid type was provided while appending the parameter '0x%08x' to the argument list.", (fmr_arg)value));
+			lf_error_raise(E_TYPE, error_message("An invalid type was provided while appending the parameter '0x%08x' to the argument list.", (fmr_arg)value));
 		}
-		/* Write the type and value of the argument into the list. */
-		memcpy(argument, &((struct _fmr_arg){ (fmr_arg)value, type, NULL }), sizeof(struct _fmr_arg));
-		/* Append the argument to the fmr_list. */
-		fmr_append(list, argument);
+		/* Append the argument to the fmr_parameters. */
+		int _e = fmr_append(list, type, value);
+		if (_e < lf_success) {
+			lf_error_raise(E_FMR, error_message("Failed to append to argument list."));
+			/* Free the memory allocated to build the list. */
+			free(list);
+			return NULL;
+		}
 	}
 	/* Release the variadic argument list. */
 	va_end(argv);
 	return list;
 }
 
-void fmr_append(struct _fmr_list *list, struct _fmr_arg *argument) {
+int fmr_append(struct _fmr_parameters *list, fmr_type type, fmr_arg value) {
 	/* Ensure that a valid list was provided. */
 	if (!list) {
-		error_raise(E_NULL, error_message("An attempt was made to append to an invalid argument list."));
-		return;
+		lf_error_raise(E_NULL, error_message("An attempt was made to append to an invalid argument list."));
+		return lf_error;
 	}
 	/* Ensure that the argument count is within bounds. */
 	if (list -> argc >= FMR_MAX_ARGC) {
-		error_raise(E_OVERFLOW, error_message("The maximum number of arguments (%i) was reached while appending to the argument list located at %p.", FMR_MAX_ARGC, list));
-		return;
+		lf_error_raise(E_OVERFLOW, error_message("The maximum number of arguments (%i) was reached while appending to the argument list located at %p.", FMR_MAX_ARGC, list));
+		return lf_error;
 	}
+	/* Allocate the memory required to stage the argument into the parent list. */
+	struct _fmr_arg *argument = (struct _fmr_arg *)calloc(1, sizeof(struct _fmr_arg));
+	/* Ensure that the request for memory was satisfied. */
+	if (!argument) {
+		lf_error_raise(E_MALLOC, error_message("Failed to allocate the memory required to append to the argument list located at %p.", list));
+		return lf_error;
+	}
+	/* Write the type and value into the argument. */
+	memcpy(argument, &((struct _fmr_arg){ type, value, NULL }), sizeof(struct _fmr_arg));
 	/* Obtain the first argument in the parent list. */
 	struct _fmr_arg *tail = list -> argv;
 	/* If we already have a first argument, walk to the end of the parent list. */
@@ -70,30 +73,33 @@ void fmr_append(struct _fmr_list *list, struct _fmr_arg *argument) {
 	/* Save the reference to the new argument into the parent list. */
 	if (tail) {
 		tail -> next = argument;
-	}
-	else {
+	} else {
 		list -> argv = argument;
 	}
 	/* Advance the argument count of the list. */
 	list -> argc ++;
+	return lf_success;
 }
 
-struct _fmr_list *fmr_merge(struct _fmr_list *first, struct _fmr_list *second) {
-	if (!second) {
-		goto done;
+struct _fmr_parameters *fmr_merge(struct _fmr_parameters *first, struct _fmr_parameters *second) {
+	if (second) {
+		/* Pop each argument from the second argument list and append it to the first. */
+		while (second -> argc) {
+			struct _fmr_arg *arg = fmr_pop(second);
+			int _e = fmr_append(first, arg -> type, arg -> value);
+			free(arg);
+			if (_e < lf_success) {
+				return NULL;
+			}
+		}
 	}
-	/* Pop each argument from the second argument list and append it to the first. */
-	while (second -> argc) {
-		fmr_append(first, fmr_pop(second));
-	}
-done:
 	return first;
 }
 
-struct _fmr_arg *fmr_pop(struct _fmr_list *list) {
+struct _fmr_arg *fmr_pop(struct _fmr_parameters *list) {
 	/* Ensure that a valid list was provided. */
 	if (!list) {
-		error_raise(E_NULL, error_message("An attempt was made to pop from an invalid argument list."));
+		lf_error_raise(E_NULL, error_message("An attempt was made to pop from an invalid argument list."));
 		return NULL;
 	}
 	/* Save the top level argument. */
@@ -109,10 +115,10 @@ struct _fmr_arg *fmr_pop(struct _fmr_list *list) {
 	return top;
 }
 
-int fmr_free(struct _fmr_list *list) {
+int fmr_free(struct _fmr_parameters *list) {
 	/* Ensure that a valid list was provided. */
 	if (!list) {
-		error_raise(E_NULL, error_message("An attempt was made to free an invalid argument list."));
+		lf_error_raise(E_NULL, error_message("An attempt was made to free an invalid argument list."));
 		return lf_error;
 	}
 	/* Obtain the first argument in the parent list. */
@@ -134,10 +140,10 @@ int fmr_free(struct _fmr_list *list) {
 	return lf_success;
 }
 
-int fmr_create_call(fmr_module module, fmr_function function, struct _fmr_list *parameters, struct _fmr_header *header, struct _fmr_call *call) {
+int fmr_create_call(fmr_module module, fmr_function function, struct _fmr_parameters *parameters, struct _fmr_header *header, struct _fmr_invocation *call) {
 	/* Ensure that the pointer to the outgoing packet is valid. */
 	if (!header || !call) {
-		error_raise(E_NULL, error_message("Invalid header or call reference provided during message runtime packet generation."));
+		lf_error_raise(E_NULL, error_message("Invalid header or call reference provided during message runtime packet generation."));
 		return lf_error;
 	} else if (!parameters) {
 		/* If no arguments are provided, automatically provide an empty argument list. */
@@ -181,22 +187,33 @@ fmr_return fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, 
 	const void *address = ((const void **)(object))[function];
 	/* Ensure that the function address is valid. */
 	if (!address) {
-		error_raise(E_RESOULTION, NULL);
+		lf_error_raise(E_RESOULTION, NULL);
 		return 0;
 	}
 	/* Perform the function call internally. */
 	return fmr_call(address, argc, types, arguments);
 }
 
-fmr_return fmr_perform_invocation(struct _fmr_invocation_packet *packet) {
-	/* Perform the function invocation. */
-	return fmr_execute(packet -> call.index, packet -> call.function, packet -> call.argc, packet -> call.types, (void *)(packet -> call.parameters));
+/* ~ Message runtime subclass handlers. ~ */
+
+LF_WEAK int fmr_perform_standard_invocation(struct _fmr_invocation *call, struct _fmr_result *result) {
+	result -> value = fmr_execute(call -> index, call -> function, call -> argc, call -> types, call -> parameters);
+	return result -> error = error_get();
+}
+
+LF_WEAK int fmr_perform_user_invocation(struct _fmr_invocation *invocation, struct _fmr_result *result) {
+	return lf_error;
+}
+
+LF_WEAK int fmr_configuration_subclass_handler(struct _fmr_result *result) {
+	result -> value = lf_self.endpoint -> push(lf_self.endpoint, &lf_self.configuration, sizeof(struct _lf_configuration));
+	return result -> error = error_get();
 }
 
 int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
 	/* Check that the magic number matches. */
 	if (packet -> header.magic != FMR_MAGIC_NUMBER) {
-		error_raise(E_CHECKSUM, NULL);
+		lf_error_raise(E_CHECKSUM, NULL);
 		goto failure;
 	}
 	/* Create a copy of the packet's checksum. */
@@ -207,48 +224,41 @@ int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
 	uint16_t crc = lf_crc(packet, packet -> header.length);
 	/* Ensure that the checksums of the packets match. */
 	if (_crc != crc) {
-		error_raise(E_CHECKSUM, NULL);
+		lf_error_raise(E_CHECKSUM, NULL);
 		goto failure;
 	}
-	/* Switch through the classes of packets. */
+
+	/* Cast the incoming packet to the different packet structures for subclass handling. */
+	struct _fmr_invocation_packet *_ip = (struct _fmr_invocation_packet *)packet;
+
+	/* Switch through the packet subclasses and invoke the appropriate handler for each. */
 	switch (packet -> header.class) {
 		case fmr_configuration_class:
-			/* Send the configuration information back. */
-			lf_self.endpoint -> push(lf_self.endpoint, &lf_self.configuration, sizeof(struct _lf_configuration));
+			fmr_configuration_subclass_handler(result);
 		break;
-		/* NOTE: Right now standard invocations and user invocations are done the same way. This should change. */
 		case fmr_standard_invocation_class:
-			/* Perform an invocation on a standard module. */
-			result -> value = fmr_perform_invocation((struct _fmr_invocation_packet *)(packet));
+			fmr_perform_standard_invocation(&(_ip -> call), result);
 		break;
 		case fmr_user_invocation_class:
-
+			fmr_perform_user_invocation(&(_ip -> call), result);
 		break;
-		case fmr_push_class:
-			/* Each platform has its own way of handling push/pull requests. */
-			fmr_push((struct _fmr_push_pull_packet *)(packet));
-		break;
-		case fmr_pull_class:
-			/* Each platform has its own way of handling push/pull requests. */
-			fmr_pull((struct _fmr_push_pull_packet *)(packet));
-		break;
-		/* Experimental packet class, loads and launches a program. */
 		case fmr_ram_load_class:
-			fmr_push((struct _fmr_push_pull_packet *)(packet));
+		case fmr_send_class:
+		case fmr_push_class:
+			result -> value = fmr_push((struct _fmr_push_pull_packet *)(packet));
+		break;
+		case fmr_receive_class:
+		case fmr_pull_class:
+			result -> value = fmr_pull((struct _fmr_push_pull_packet *)(packet));
 		break;
 		case fmr_event_class:
-			/* Handle an event. */
-			// Call into event subsystem
 		break;
 		default:
-			/* Bad class value. */
+			lf_assert(true, failure, E_SUBCLASS, "An invalid message runtime subclass was provided.");
 		break;
 	};
-	/* Catalogue any error state generated by the procedure. */
-	result -> error = error_get();
+
 	return lf_success;
 failure:
-	/* Catalogue any error state generated by the procedure. */
-	result -> error = error_get();
 	return lf_error;
 }

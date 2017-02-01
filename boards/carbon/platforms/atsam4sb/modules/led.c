@@ -6,6 +6,6 @@ int led_configure(void) {
 	return lf_success;
 }
 
-void led_set_rgb(uint8_t r, uint8_t g, uint8_t b) {
+void led_rgb(uint8_t r, uint8_t g, uint8_t b) {
 
 }

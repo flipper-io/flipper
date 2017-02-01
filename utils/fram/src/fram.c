@@ -2,7 +2,7 @@
 #include <flipper.h>
 
 int main(int argc, char *argv[]) {
-    
+
     /* Check args. */
     if (argc < 2) {
         fprintf(stderr, "Please provide a path to the file to load.\n");
@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
     FILE *fp = fopen(argv[1], "rb");
     if (!fp) {
         fprintf(stderr, "Failed to open file for reading.\n");
-        exit(EXIT_FAILURE); 
+        exit(EXIT_FAILURE);
     }
 
     /* Attach flipper. */
@@ -39,13 +39,17 @@ int main(int argc, char *argv[]) {
     /* Close file. */
     fclose(fp);
 
+    lf_error_pause();
     /* Load the application into RAM. */
-    int _e = lf_ram_load(_device, fbuf, fsize);
-    if (_e < lf_success) {
+    fmr_return value = lf_ram_load(_device, fbuf, fsize);
+    if ((int32_t)value == -1) {
         fprintf(stderr, "Failed to load application into RAM.\n");
         free(fbuf);
         exit(EXIT_FAILURE);
+    } else {
+        printf("Got return value 0x%08x.\n", value);
     }
+    lf_error_resume();
 
     /* Free buffer. */
     free(fbuf);

@@ -6,7 +6,7 @@
 //  Copyright © 2016 Flipper. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 
 //! Project version number for Flipper.
 FOUNDATION_EXPORT double FlipperVersionNumber;

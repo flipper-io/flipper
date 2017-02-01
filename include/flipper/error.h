@@ -40,7 +40,11 @@ enum {
 	E_TYPE,
 	E_BOUNDARY,
 	E_TIMER,
-	E_TIMEOUT
+	E_TIMEOUT,
+	E_NO_PID,
+	E_INVALID_TASK,
+	E_SUBCLASS,
+	E_UNIMPLEMENTED
 };
 
 /* If this flag is set, error messages are nullified on platforms that do not need to store error strings. */
@@ -71,7 +75,11 @@ enum {
 								 "type error", \
 								 "boundary error", \
 								 "timer error", \
-								 "timeout error"
+								 "timeout error", \
+								 "no task for pid", \
+								 "invalid task specified", \
+								 "packet subclass error", \
+								 "unimplemented error"
 
 /* Allow the 'error_message' macro to serve as a passthrough for any variadic arguments supplied to it. */
 #define error_message(...) __VA_ARGS__
@@ -81,19 +89,19 @@ enum {
 #endif
 
 /* Prevents the execution of a statement from producing error-related side effects. */
-#define suppress_errors(statement) error_pause(); statement; error_resume();
+#define suppress_errors(statement) lf_error_pause(); statement; lf_error_resume();
 
 /* Configures the error module. */
-extern int error_configure(void);
+extern int lf_error_configure(void);
 /* Raises an error internally to the current context of libflipper. */
-extern void error_raise(lf_error_t error, const char *format, ...) __attribute__ ((format (printf, 2, 3)));
+extern void lf_error_raise(lf_error_t error, const char *format, ...) __attribute__ ((format (printf, 2, 3)));
 /* Causes errors to resume the producion side effects, exiting if fatal. */
-extern void error_resume(void);
+extern void lf_error_resume(void);
 /* Pauses errors from producing side effects of any kind. */
-extern void error_pause(void);
+extern void lf_error_pause(void);
 /* Return the current error state. */
 extern lf_error_t error_get(void);
 /* Clear the current error state. */
-extern void error_clear(void);
+extern void lf_error_clear(void);
 
 #endif

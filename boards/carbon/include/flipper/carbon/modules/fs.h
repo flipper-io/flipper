@@ -67,7 +67,7 @@ extern const struct _fs {
 
 #ifdef __private_include__
 
-/* The fmr_module structure for this module. */
+/* Declare the _lf_module structure for this module. */
 extern struct _lf_module _fs;
 
 /* Declare the message runtime overlay for this driver. */

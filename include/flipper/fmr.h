@@ -3,55 +3,79 @@
 #ifndef __lf_fmr_h__
 #define __lf_fmr_h__
 
-/* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
 #include <flipper/types.h>
 #include <flipper/error.h>
 
-/* Defines the size (in bytes) of a single FMR packet. */
+/* The size of a single FMR packet expressed in bytes. */
 #define FMR_PACKET_SIZE 64
-/* Define the upper limit of the number of arguments a function can be invoked using. */
-#define FMR_MAX_ARGC 16
-/* The magic number. */
+/* The magic number that indicates the start of a packet. */
 #define FMR_MAGIC_NUMBER 0xFE
 
-/* Define types exposed by the FMR API. */
+/* ~ Define types exposed by the FMR API. ~ */
+
+/* The variadic argument type. Used to hold argument metadata and value during parsing. */
 typedef uint64_t fmr_va;
+/* The largest argument type. All argument values are held within a variable of this type. */
 typedef uint32_t fmr_arg;
+/* Used to hold the index of a standard or user module in which a function counterpart exists. */
 typedef uint32_t fmr_module;
+/* Used to hold the offset index of a function within a module. */
 typedef uint8_t fmr_function;
+/* Used to hold the number of parameters that are to be passed during a procedure call. */
 typedef uint8_t fmr_argc;
-typedef uint16_t fmr_types;
+/* The largest return type. All return types are held in a variable of this type. */
 typedef uint32_t fmr_return;
 
-/* Enumerates the basic type signatures an argument can be classified using. */
-typedef enum {
-	/* Explicit argument types. */
+/* The maximum number of arguments that can be encoded into a packet. */
+#define FMR_MAX_ARGC 16
+/* Used to hold encoded prameter types within invocation metadata.
+   NOTE: This type must be capable of encoding the exact number of bits
+         given by (FMR_MAX_ARGC * 2).
+*/
+typedef uint32_t fmr_types;
+
+/* Enumerates the basic type signatures an argument can be classified as. */
+enum {
 	fmr_int8_t,
 	fmr_int16_t,
 	fmr_int32_t
-} fmr_type;
+};
 
-/* Counts the number of arguments inside a variadic argument macro. */
+/* A type used to reference the values in the enum above. */
+typedef uint8_t fmr_type;
+
+/* ~ Parameter list building macros. */
+
+/* Counts the number of arguments within a variadic argument macro. */
 #define __fmr_count_implicit(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _a, _b, _c, _d, _e, _f, _10, n, ...) n
 #define __fmr_count(...) __fmr_count_implicit(_, ##__VA_ARGS__, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 
-/* Provides a wrapper around fmr_build and fmr_list. */
+/* Generates and returns a pointer to an 'fmr_parameters' given a list of variadic arguments. */
 #define fmr_args(...) fmr_build(__fmr_count(__VA_ARGS__), ##__VA_ARGS__)
 
-/* Explicitly describes the width of an argument to the argument parser. */
-#define fmr_intx(type, arg) (((fmr_va)type << (sizeof(fmr_arg) * 8)) | (fmr_arg)arg)
-#define fmr_int8(arg) fmr_intx(fmr_int8_t, (uint8_t)arg)
-#define fmr_int16(arg) fmr_intx(fmr_int16_t, (uint16_t)arg)
-#define fmr_int32(arg) fmr_intx(fmr_int32_t, (uint32_t)arg)
-/* Converts a C type into a message runtime type. */
+/* ~ Parser macros for variables. */
+
+/* Converts a C type into an 'fmr_type'. */
 #define fmr_type(type) (sizeof(type) >> 1)
-/* Converts a C type and value into a message runtime type and value. */
-#define fmr_cast(type, arg) fmr_intx(fmr_type(type), arg)
-/* Creates a message runtime argument via type inference. */
-#define fmr_infer(arg) fmr_cast(arg, arg)
+/* Creates an 'fmr_va' from a C variable. */
+#define fmr_infer(variable) fmr_intx(fmr_type(variable), variable)
+
+/* ~ Parser macros for immediate values. ~ */
+
+/* Creates an 'fmr_va' from an 'fmr_type' and an immediate value. */
+#define fmr_intx(type, arg) (((fmr_va)type << (sizeof(fmr_arg) * 8)) | (fmr_arg)arg)
+/* Gives the 'fmr_va' for a given 8-bit integer's value. */
+#define fmr_int8(arg) fmr_intx(fmr_int8_t, (uint8_t)arg)
+/* Gives the 'fmr_va' for a given 16-bit integer's value. */
+#define fmr_int16(arg) fmr_intx(fmr_int16_t, (uint16_t)arg)
+/* Gives the 'fmr_va' for a given 32-bit integer's value. */
+#define fmr_int32(arg) fmr_intx(fmr_int32_t, (uint32_t)arg)
 
 /* Calculates the length of an FMR type. */
 #define fmr_sizeof(type) (1 << type)
+
+/* If this bit is set in the module's index, then it is a user module. */
+#define FMR_USER_INVOCATION_BIT (1 << 8)
 
 /* Exposes all message runtime packet classes. */
 enum {
@@ -65,15 +89,20 @@ enum {
 	fmr_push_class,
 	/* Causes a pull operation to begin. */
 	fmr_pull_class,
+	/* Sends data to device. */
+	fmr_send_class,
+	/* Receives data from the device. */
+	fmr_receive_class,
 	/* Experimental: Caused a RAM load and launch. */
 	fmr_ram_load_class,
 	/* Signals the occurance an event. */
 	fmr_event_class
 };
 
+/* A type used to reference the values in the enum above. */
 typedef uint8_t fmr_class;
 
-/* Contains the information required to obtain, verify, and route the packet. */
+/* Contains the information required to obtain, verify, and parse a packet. */
 struct LF_PACKED _fmr_header {
 	/* A magic number indicating the start of the packet. */
 	uint8_t magic;
@@ -87,16 +116,16 @@ struct LF_PACKED _fmr_header {
 
 /* Standardizes the notion of an argument. */
 struct _fmr_arg {
-	/* The value of the argument. */
-	fmr_arg value;
 	/* The type signature of the argument. */
 	fmr_type type;
+	/* The value of the argument. */
+	fmr_arg value;
 	/* The next argument. */
 	struct _fmr_arg *next;
 };
 
 /* Organizes arguments in a format passible via pointer. */
-struct _fmr_list {
+struct _fmr_parameters {
 	/* The number of arguments contained in the list. */
 	fmr_argc argc;
 	/* A pointer to the first argument in the list. */
@@ -111,15 +140,15 @@ struct LF_PACKED _fmr_packet {
 	uint8_t payload[(FMR_PACKET_SIZE - sizeof(struct _fmr_header))];
 };
 
-/* Procedure call information carried by a packet. */
-struct LF_PACKED _fmr_call {
+/* Procedure call metadata carried by a packet. */
+struct LF_PACKED _fmr_invocation {
 	/* The index of the module in which the target routine resides. */
 	uint8_t index;
 	/* The index of the function within the module. */
 	uint8_t function;
-	/* The types of the parameters encoded into the packet. */
+	/* The types of the encoded parameters. */
 	fmr_types types;
-	/* The number of parameters encoded into the packet. */
+	/* The number of encoded parameters. */
 	fmr_argc argc;
 	/* The encoded values of the parameters to be passed to the callee. */
 	uint8_t parameters[];
@@ -130,7 +159,7 @@ struct LF_PACKED _fmr_invocation_packet {
 	/* The packet header programmed with 'fmr_standard_invocation_class' or 'fmr_user_invocation_class'. */
 	struct _fmr_header header;
 	/* The procedure call information of the invocation. */
-	struct _fmr_call call;
+	struct _fmr_invocation call;
 };
 
 /* Contains metadata needed to perform a push/pull operation. */
@@ -140,7 +169,7 @@ struct LF_PACKED _fmr_push_pull_packet {
 	/* The amount of data to be transferred. */
 	lf_size_t length;
 	/* The procedure call information of the invocation. */
-	struct _fmr_call call;
+	struct _fmr_invocation call;
 };
 
 /* A generic datastructure that is sent back following any message runtime transaction. */
@@ -159,32 +188,30 @@ extern const void *const fmr_modules[];
 
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
 
-/* Builds an fmr_list from a set of variadic arguments provided by the fmr_list macro. */
-struct _fmr_list *fmr_build(fmr_argc argc, ...);
-/* Appends an argument to an fmr_list. */
-void fmr_append(struct _fmr_list *list, struct _fmr_arg *argument);
+/* Builds an fmr_parameters from a set of variadic arguments provided by the fmr_parameters macro. */
+struct _fmr_parameters *fmr_build(fmr_argc argc, ...);
+/* Appends an argument to an fmr_parameters. */
+int fmr_append(struct _fmr_parameters *list, fmr_type type, fmr_arg value);
 /* Concatenates two argument lists. */
-struct _fmr_list *fmr_merge(struct _fmr_list *first, struct _fmr_list *second);
+struct _fmr_parameters *fmr_merge(struct _fmr_parameters *first, struct _fmr_parameters *second);
 /* Removes and returns the item at the top of the list. */
-struct _fmr_arg *fmr_pop(struct _fmr_list *list);
-/* Frees an fmr_list. */
-int fmr_free(struct _fmr_list *list);
+struct _fmr_arg *fmr_pop(struct _fmr_parameters *list);
+/* Frees an fmr_parameters. */
+int fmr_free(struct _fmr_parameters *list);
 /* Generates the appropriate data structure needed for the remote procedure call of 'funtion' in 'module'. */
-int fmr_create_call(fmr_module module, fmr_function function, struct _fmr_list *args, struct _fmr_header *header, struct _fmr_call *call);
+int fmr_create_call(fmr_module module, fmr_function function, struct _fmr_parameters *args, struct _fmr_header *header, struct _fmr_invocation *call);
 /* Executes a standard module. */
 fmr_return fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, fmr_types types, void *arguments);
 /* Executes an fmr_packet and stores the result of the operation in the result buffer provided. */
 int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result);
 
 /* Helper function for lf_push. */
-void fmr_push(struct _fmr_push_pull_packet *packet);
+extern fmr_return fmr_push(struct _fmr_push_pull_packet *packet);
 /* Helper function for lf_pull. */
-void fmr_pull(struct _fmr_push_pull_packet *packet);
+extern fmr_return fmr_pull(struct _fmr_push_pull_packet *packet);
 
 /* ~ Functions with platform specific implementation. ~ */
 
-/* Abstracts platform specific implementation needed to access the standard module array. */
-extern const void *lf_std_function(fmr_module module, fmr_function function);
 /* Unpacks the argument buffer into the CPU following the native architecture's calling convention and jumps to the given function pointer. */
 extern uint32_t fmr_call(const void *function, uint8_t argc, uint16_t argt, void *argv);
 

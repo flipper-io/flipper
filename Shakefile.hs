@@ -54,6 +54,10 @@ arm_c_prep = [ -- Use C99.
              , "-mcpu=cortex-m4"
                -- Include debugging metadata:
              , "-g"
+               -- Thumb mode::
+             , "-mthumb"
+               -- Enable FMR constructors.
+             , "-D__support_user_invocation__"
                -- Platform header:
              , "-DPLATFORM_HEADER=<flipper/carbon/platforms/atsam4s16b.h>"
              ]

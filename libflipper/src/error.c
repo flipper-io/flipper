@@ -5,11 +5,11 @@
 /* Expose the error message strings. */
 char *lf_error_messages[] = { LF_ERROR_MESSAGE_STRINGS };
 
-int error_configure(void) {
+int lf_error_configure(void) {
 	return lf_success;
 }
 
-void error_raise(lf_error_t error, const char *format, ...) {
+void lf_error_raise(lf_error_t error, const char *format, ...) {
 	lf_error_t _error = error;
 	/* Record the observed error. */
 	flipper.error_code = error;
@@ -48,14 +48,14 @@ lf_error_t error_get(void) {
 	return flipper.error_code;
 }
 
-void error_clear(void) {
+void lf_error_clear(void) {
 	flipper.error_code = E_OK;
 }
 
-void error_resume(void) {
+void lf_error_resume(void) {
 	flipper.errors_cause_side_effects = 1;
 }
 
-void error_pause(void) {
+void lf_error_pause(void) {
 	flipper.errors_cause_side_effects = 0;
 }

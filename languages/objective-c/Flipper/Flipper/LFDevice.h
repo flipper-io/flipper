@@ -9,9 +9,11 @@
 #import <Foundation/Foundation.h>
 #import "LED.h"
 
-@interface LFDevice : NSObject
+@interface LFDevice : NSObject {
 
-@property (nonatomic) LFLED *led;
+}
+
+@property (readonly) LFLED *led;
 
 - (id) initWithName:(NSString *)name;
 

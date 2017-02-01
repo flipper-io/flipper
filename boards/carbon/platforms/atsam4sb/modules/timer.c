@@ -60,7 +60,7 @@ int timer_register(uint32_t ticks, void *callback) {
 			return lf_success;
 		}
 	}
-	error_raise(E_TIMER, error_message("No timer is available to register a callback."));
+	lf_error_raise(E_TIMER, error_message("No timer is available to register a callback."));
 	return lf_error;
 }
 

@@ -69,7 +69,6 @@ __attribute__((section(".vectors"))) isr_t vector_table[] = {
 	null_isr     /* 35 not used */
 };
 
-
 extern void system_init(void);
 extern int main(void);
 

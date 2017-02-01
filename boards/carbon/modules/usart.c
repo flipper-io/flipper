@@ -3,7 +3,7 @@
 
 #ifdef __use_usart__
 /* Define the virtual interface for this module. */
-const struct _uart usart = {
+const struct _usart usart = {
 	usart_configure,
 	usart_enable,
 	usart_disable,

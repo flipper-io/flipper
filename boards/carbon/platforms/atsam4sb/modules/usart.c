@@ -17,7 +17,7 @@ int usart_configure(void) {
 	PIOA -> PIO_ABCDSR[0] &= ~USART0_PIN_MASK;
 	PIOA -> PIO_ABCDSR[1] &= ~USART0_PIN_MASK;
 	/* Reset the peripheral and disable the transmitter and receiver. */
-	USART0 -> US_CR = UART_CR_RSTRX | UART_CR_RSTTX | UART_CR_TXDIS | UART_CR_RXDIS;
+	USART0 -> US_CR = US_CR_RSTRX | US_CR_RSTTX | US_CR_TXDIS | US_CR_RXDIS | US_CR_RSTSTA;
 	/* Set the mode to 8n1. */
 	USART0 -> US_MR = US_MR_CHRL_8_BIT | US_MR_PAR_NO | US_MR_NBSTOP_1_BIT;
 	/* Set the baudrate. */
@@ -39,12 +39,12 @@ int usart_configure(void) {
 
 void usart_enable(void) {
 	/* Enable the transmitter and receiver. */
-	USART0 -> US_CR = UART_CR_TXEN | UART_CR_RXEN;
+	USART0 -> US_CR = US_CR_TXEN | US_CR_RXEN;
 }
 
 void usart_disable(void) {
 	/* Disable the transmitter and receiver. */
-	USART0 -> US_CR = UART_CR_TXDIS | UART_CR_RXDIS;
+	USART0 -> US_CR = US_CR_TXDIS | US_CR_RXDIS;
 }
 
 uint8_t usart_ready(void) {

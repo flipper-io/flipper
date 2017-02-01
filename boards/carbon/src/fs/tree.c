@@ -36,13 +36,13 @@ nvm_p fs_add_leaf_with_key(nvm_p current, uint16_t key) {
 		/* Allocate memory for the leaf. */
 		nvm_p region = nvm_alloc(sizeof(leaf));
 		if (!region) {
-			error_raise(E_MALLOC, error_message("Failed to allocate the external memory required to create a new filesystem leaf."));
+			lf_error_raise(E_MALLOC, error_message("Failed to allocate the external memory required to create a new filesystem leaf."));
 			return 0;
 		}
 		/* Create the new leaf. */
 		leaf *_leaf = malloc(sizeof(leaf));
 		if (!_leaf) {
-			error_raise(E_MALLOC, error_message("Failed to allocate the memory required to create a new filesystem leaf."));
+			lf_error_raise(E_MALLOC, error_message("Failed to allocate the memory required to create a new filesystem leaf."));
 			return 0;
 		}
 		/* Clear the new leaf. */
@@ -62,7 +62,7 @@ nvm_p fs_add_leaf_with_key(nvm_p current, uint16_t key) {
 	}
 	/* This case catches an exception wherein the leaf we want to add already exists. */
 	else {
-		error_raise(E_FS_EXISTS, error_message("Could not create a file with the key '0x%04x'.", key));
+		lf_error_raise(E_FS_EXISTS, error_message("Could not create a file with the key '0x%04x'.", key));
 	}
 	return 0;
 }
@@ -71,7 +71,7 @@ nvm_p fs_add_leaf_with_key(nvm_p current, uint16_t key) {
 nvm_p fs_leaf_for_key(nvm_p current, uint16_t key) {
 	/* If we reach the end of the tree and have not yet found a matching key, then the leaf we are interested in finding does not exist. */
 	if (current == 0) {
-		error_raise(E_FS_NO_FILE, error_message("There is no file with the key '0x%04x'.", key));
+		lf_error_raise(E_FS_NO_FILE, error_message("There is no file with the key '0x%04x'.", key));
 		return 0;
 	}
 	/* However, if we have not yet reached the end of the tree, dereference the 'current' leaf pointer to bring a copy of it into local memory. */
@@ -101,7 +101,7 @@ int fs_remove_leaf_with_key(nvm_p parent, uint16_t key) {
 	suppress_errors(nvm_p match = fs_leaf_for_key(parent, key));
 	/* Catch the edge case in which the leaf that we're trying to delete doesn't exist. */
 	if (!match) {
-		error_raise(E_FS_NO_FILE, error_message("Could not remove the leaf with the key '0x%04x'.", key));
+		lf_error_raise(E_FS_NO_FILE, error_message("Could not remove the leaf with the key '0x%04x'.", key));
 		return -1;
 	}
 	/* Otherwise, dereference it to bring a copy of it into local memory. */
@@ -117,7 +117,7 @@ int fs_remove_leaf_with_key(nvm_p parent, uint16_t key) {
 		nvm_p *right = (nvm_p *) nvm_dereference(fs_access(_match -> left, leaf, right), sizeof(nvm_p));
 		nvm_p empty = fs_empty_branch_for_key(fs_access(_match -> left, leaf, right), *right, *key);
 		if (!empty) {
-			error_raise(E_FS_EXISTS, error_message("Could not move a child leaf while trying to delete the file with key '0x%04x'.", *key));
+			lf_error_raise(E_FS_EXISTS, error_message("Could not move a child leaf while trying to delete the file with key '0x%04x'.", *key));
 		}
 		/* Re-index the orphaned right child by writing its address into the empty branch pointer we found. */
 		nvm_push(&(_match -> right), sizeof(nvm_p), empty);

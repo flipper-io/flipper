@@ -17,10 +17,10 @@ extern const struct _gpio {
 
 #ifdef __private_include__
 
-/* The fmr_module structure for this module. */
+/* Declare the _lf_module structure for this module. */
 extern struct _lf_module _gpio;
 
-/* Declare the FMR overlay for this driver. */
+/* Declare the FMR overlay for this module. */
 enum { _gpio_configure, _gpio_enable, _gpio_write, _gpio_read };
 
 /* Declare each prototype for all functgpions within this driver. */

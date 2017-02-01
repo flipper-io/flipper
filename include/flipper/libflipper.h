@@ -122,7 +122,7 @@ struct _lf_device {
 extern struct _lf_device lf_self;
 
 /* Standardizes the notion of a module. */
-struct _lf_module {
+struct LF_PACKED _lf_module {
 	/* A string containing the module's name. */
 	char *name;
 	/* A string giving the description of a module. */
@@ -132,7 +132,7 @@ struct _lf_module {
 	/* The module's identifier. */
 	lf_crc_t identifier;
 	/* The module's index. */
-	uint8_t index;
+	uint16_t index;
 	/* The pointer to a pointer to the device upon which the module's counterpart is located. */
 	struct _lf_device **device;
 };
@@ -159,11 +159,11 @@ extern struct _flipper {
 	/* Attaches the current instance of libflipper to the first available device over the default endpoint. */
 	struct _lf_device *(* attach)(void);
 	/* Attaches to a Flipper device by name over the USB endpoint. */
-	struct _lf_device *(* attach_usb)(char *name);
+	struct _lf_device *(* attach_usb)(const char *name);
 	/* Attaches to a Flipper device by name and hostname/IP over the network endpoint. */
-	struct _lf_device *(* attach_network)(char *name, char *hostname);
+	struct _lf_device *(* attach_network)(const char *name, const char *hostname);
 	/* Attaches to a Flipper device by name over an arbitrary endpoint. */
-	struct _lf_device *(* attach_endpoint)(char *name, struct _lf_endpoint *endpoint);
+	struct _lf_device *(* attach_endpoint)(const char *name, struct _lf_endpoint *endpoint);
 	/* Selects a previously attached Flipper device and routes all calls to it. */
 	int (* select)(struct _lf_device *device);
 	/* Disconnects a previously attached Flipper device from libflipper. */
@@ -172,7 +172,7 @@ extern struct _flipper {
 	int (* exit)(void);
 	/* Stores the last observed error code. */
 	lf_error_t error_code;
-	/* Global flag that indicates whether or not error_raise() should print to stderr and call exit(). */
+	/* Global flag that indicates whether or not lf_error_raise() should print to stderr and call exit(). */
 	uint8_t errors_cause_side_effects;
 	/* Points to the actively selected device with which interaction will take place. */
 	struct _lf_device *device;
@@ -182,9 +182,9 @@ extern struct _flipper {
 
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
 extern struct _lf_device *flipper_attach(void);
-extern struct _lf_device *flipper_attach_usb(char *name);
-extern struct _lf_device *flipper_attach_network(char *name, char *hostname);
-extern struct _lf_device *flipper_attach_endpoint(char *name, struct _lf_endpoint *endpoint);
+extern struct _lf_device *flipper_attach_usb(const char *name);
+extern struct _lf_device *flipper_attach_network(const char *name, const char *hostname);
+extern struct _lf_device *flipper_attach_endpoint(const char *name, struct _lf_endpoint *endpoint);
 extern int flipper_select(struct _lf_device *device);
 extern int flipper_detach(struct _lf_device *device);
 extern int flipper_exit(void);
@@ -194,14 +194,27 @@ extern int flipper_exit(void);
  *
  * @param module The module in which the function resides.
  * @param function The function to be invoked.
- * @param paramters The list of parameters to be passed to the function.
+ * @param parameters The list of parameters to be passed to the function.
  *
  */
-extern fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _fmr_list *parameters);
+extern fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _fmr_parameters *parameters);
+
+
+/* Copies data into the address space of the device specified and returns a pointer to its remote address. */
+void *lf_send(struct _lf_device *device, void *source, lf_size_t length);
+void *lf_recieve(struct _lf_device *device, void *source, lf_size_t length);
+
+/* Short hand for raising errors based on the truth of a condition. */
+#define lf_assert(truth, label, error, ...) \
+	if (truth) { \
+		lf_error_raise(error, error_message(__VA_ARGS__)); \
+		goto label; \
+	}
+
 /* Moves data from the address space of the host to that of the device. */
-extern int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _fmr_list *parameters);
+extern int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _fmr_parameters *parameters);
 /* Moves data from the address space of the device to that of the host. */
-extern int lf_pull(struct _lf_module *module, fmr_function function, void *destination, lf_size_t length, struct _fmr_list *parameters);
+extern int lf_pull(struct _lf_module *module, fmr_function function, void *destination, lf_size_t length, struct _fmr_parameters *parameters);
 
 /* Load the device's configuration information. */
 extern int lf_load_configuration(struct _lf_device *device);
@@ -214,6 +227,8 @@ extern int lf_get_result(struct _lf_device *device, struct _fmr_result *result);
 extern int lf_transfer(struct _lf_device *device, struct _fmr_packet *packet);
 /* Retrieves a packet from the specified device. */
 extern int lf_retrieve(struct _lf_device *device, struct _fmr_result *response);
+/* Binds a module structure to its device counterpart. */
+int lf_bind(struct _lf_module *module);
 
 /* Experimental: Load an application into RAM and execute it. */
 int lf_ram_load(struct _lf_device *device, void *source, lf_size_t length);

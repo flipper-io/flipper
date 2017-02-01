@@ -1,6 +1,7 @@
 #define __private_include__
 #include <osmium.h>
 #include <nvm.h>
+#include <scheduler.h>
 
 int main() {
 
@@ -10,12 +11,12 @@ int main() {
 	/* Initialize peripheral hardware. */
 	//button_configure();
 	//led_configure();
-	//led_set_rgb(LED_COLOR_SUCCESS);
+	//led_rgb(LED_COLOR_SUCCESS);
 	// spi_configure();
 	// nvm_configure();
 
 	/* Clear the error state. */
-	error_clear();
+	lf_error_clear();
 
 	/* Initialize the scheduler and start executing the system task. */
 	os_task_init();
