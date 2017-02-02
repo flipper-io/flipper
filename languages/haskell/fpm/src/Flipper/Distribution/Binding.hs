@@ -1,17 +1,41 @@
 {-|
 Module      : Flipper.Distribution.Binding
-Description : Flipper Packages
+Description : Flipper Package Management
 Copyright   : George Morgan, Travis Whitaker 2016
 License     : All rights reserved.
 Maintainer  : travis@flipper.io
 Stability   : Provisional
 Portability : Windows, POSIX
 
+This module provides types and parsers for handling external language bindings.
+
+When a package is installed on a Flipper device, the symbols exposed in the
+package's modules are available via FMR. However, it is often advantageous to
+provide supplementary host-side code for interacting with the package's modules.
+FPM is not opinionated when it comes to how this host-side code is implemented,
+built, or distributed. However, to make using Flipper packages easier, FPM knows
+how to interact with a few languages' package management tools and systems. If
+the host-side code is implemented in a language whose package management system
+is supported by FPM, package consumers can easily fetch and build the host-side
+bindings. For a list of supported languages see the
+"Flipper.Distribution.Language" module documentation.
+
+FPM manifest files may contain as many unique langauge binding sections as
+required. A binding section in a manifest file looks like this:
+
+> binding <language>
+> source: <source>
+
+Where @\<language\>@ is one of the supported languages in
+"Flipper.Distribution.Language", or any other language name; and @\<source\>@ is
+a package identifier appropriate for the language's package management system,
+or a URI for a repository that @git@ knows how to fetch.
 -}
 
 {-# LANGUAGE DeriveAnyClass
            , DeriveDataTypeable
            , DeriveGeneric
+           , OverloadedStrings
            #-}
 
 module Flipper.Distribution.Binding (
@@ -47,4 +71,6 @@ data Binding = Binding {
              )
 
 manifestBindings :: ManifestP [Binding]
-manifestBindings = undefined
+manifestBindings = procBindingSections mkBinding
+    where mkBinding l = Binding l <$>
+                        (bindingKey l "source" >>= liftParser (parseLangSrc l))

@@ -5,7 +5,7 @@ description:         The FPM library provides the shared core functionality for
                      the Flipper console's package management features and the
                      Flipper package server. The design is largely inspired by
                      Haskell's Common Architecture for Building Applications and
-                     Libraries (cabal) and Rust's cargo package manager.
+                     Libraries (Cabal) and Rust's Cargo package manager.
 license:             AllRightsReserved
 license-file:        LICENSE
 author:              Travis Whitaker

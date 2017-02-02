@@ -1,6 +1,6 @@
 {-|
 Module      : Flipper.Distribution.Version
-Description : Flipper Packages
+Description : Flipper Package Management
 Copyright   : George Morgan, Travis Whitaker 2016
 License     : All rights reserved.
 Maintainer  : travis@flipper.io
@@ -92,9 +92,9 @@ instance IsList Version where
         where e = "fromList: bad Version"
     toList = NE.toList . unVersion
 
--- | A 'Version' range predicate. Beware of this type's 'Eq' instance; ranges
---   are not canonicalized, so 'VersionRange's describing identical intervals
---   won't necessary be equal according to '(==)'. Constructors aren't exported
+-- | A 'Version' range predicate. Beware this type's 'Eq' instance; ranges are
+--   not canonicalized, so 'VersionRange's describing identical intervals won't
+--   necessary be equal according to '(==)'. Constructors aren't exported
 --   because we might change to an interval-based representation later (which
 --   would solve the canonicalization problem and make it possible to warn the
 --   user about unsatisfiable predicates).
@@ -158,7 +158,7 @@ intersection = Intersection
 
 -- | Invert a range.
 --
--- > inRange r v == not (inRange (inverse r) v)
+-- > forall r v. inRange r v == not (inRange (inverse r) v)
 inverse :: VersionRange -> VersionRange
 inverse Any                = noVersion
 inverse (This v)           = notThisVersion v
