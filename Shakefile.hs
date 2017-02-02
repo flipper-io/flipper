@@ -588,7 +588,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
     "build/utils/*/*" %> \o -> do
 
         -- We need libflipper to build the utilities:
-        lf <- ("build/libflipper" </>) <$> dynlib
+        need ["libflipper"]
 
         -- Root folder for this utility:
         let rt = dropFileName (dropDirectory1 o)
@@ -601,7 +601,7 @@ main = shakeArgs (shakeOptions { shakeThreads = 0 }) $ do
         let os = map (buildpref . (<.> ".native.o")) ss
 
         -- Run the linker:
-        ldRule cc [] (lf : os) o
+        ldRule cc ["-Lbuild/libflipper", "-lflipper"] os o
 
     -- Install osmium on the ATSAM4S:
     phony "flash-atsam4s16b" $ do
