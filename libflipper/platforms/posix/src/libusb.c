@@ -132,6 +132,8 @@ int lf_libusb_destroy(struct _lf_endpoint *this) {
 		}
 		/* Free the record. */
 		free(record);
+		/* Zero the record address. */
+		this -> record = 0;
 	}
 	return lf_success;
 }

@@ -23,22 +23,22 @@ void lf_error_raise(lf_error_t error, const char *format, ...) {
 		if (_error > (sizeof(lf_error_messages) / sizeof(char *))) {
 			_error = E_STRING;
 		}
+		/* Get the variadic argument string. */
+		vsprintf(last_error, format, argv);
 		/* Print the exception if a message is provided. */
-		if (format) {
+		if (format && flipper.errors_cause_side_effects) {
 			fprintf(stderr, KYEL "\nThe Flipper runtime encountered the following error:\n  " KNRM "↳ " KRED);
 			if (_error == E_STRING) {
 				fprintf(stderr, "An invalid error code (%i) was provided.\n", error);
 			} else {
-				vfprintf(stderr, format, argv);
-				fprintf(stderr, "\n");
+				fprintf(stderr, "%s\n", last_error);
 			}
 		}
-		/* Print the error code. */
-		sprintf(last_error, KNRM "Error code (%i): '" KBLU "%s" KNRM "'\n\n", _error, lf_error_messages[_error]);
 		/* Release the va_list. */
 		va_end(argv);
 		if (flipper.errors_cause_side_effects) {
-			fprintf(stderr, "%s\n", last_error);
+			/* Print the error code. */
+			fprintf(stderr, KNRM "Error code (%i): '" KBLU "%s" KNRM "'\n\n", _error, lf_error_messages[_error]);
 			/* Exit. */
 			exit(EXIT_FAILURE);
 		}
