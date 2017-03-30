@@ -29,7 +29,7 @@ int network_configure(struct _lf_endpoint *this, char *hostname) {
 	/* Obtain a pointer to and cast to the network record associated with the provided endpoint. */
 	struct _network_record *record = this -> record;
 	/* Create a new socket. */
-	record -> fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	record -> fd = socket(AF_INET, SOCK_DGRAM, 0);
 	if (record -> fd < 0) {
 		lf_error_raise(E_SOCKET, error_message("Failed to open a new message runtime socket."));
 		return lf_error;
@@ -45,13 +45,13 @@ int network_configure(struct _lf_endpoint *this, char *hostname) {
 	record -> device.sin_family = AF_INET;
 	record -> device.sin_addr.s_addr = list[0] -> s_addr;
 	record -> device.sin_port = htons(FMR_PORT);
-	/* Bind to the network socket. */
-	if (bind(record -> fd, (struct sockaddr *)&(record -> device), sizeof(struct sockaddr_in)) < 0) {
-		/* Close the opened socket. */
-		close(record -> fd);
-		lf_error_raise(E_SOCKET, error_message("Failed to bind to the message runtime socket."));
-		return lf_error;
-	}
+	// /* Bind to the network socket. */
+	// if (bind(record -> fd, (struct sockaddr *)&(record -> device), sizeof(struct sockaddr_in)) < 0) {
+	// 	/* Close the opened socket. */
+	// 	close(record -> fd);
+	// 	lf_error_raise(E_SOCKET, error_message("Failed to bind to the message runtime socket."));
+	// 	return lf_error;
+	// }
 	return lf_success;
 }
 

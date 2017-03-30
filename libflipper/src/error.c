@@ -4,6 +4,7 @@
 
 /* Expose the error message strings. */
 char *lf_error_messages[] = { LF_ERROR_MESSAGE_STRINGS };
+char last_error[256];
 
 int lf_error_configure(void) {
 	return lf_success;
@@ -14,8 +15,7 @@ void lf_error_raise(lf_error_t error, const char *format, ...) {
 	/* Record the observed error. */
 	flipper.error_code = error;
 #ifdef __enable_error_side_effects__
-	if(flipper.errors_cause_side_effects && error)
-	{
+	if (error) {
 		/* Construct a va_list to access variadic arguments. */
 		va_list argv;
 		/* Initialize the va_list that we created above. */
@@ -34,14 +34,21 @@ void lf_error_raise(lf_error_t error, const char *format, ...) {
 			}
 		}
 		/* Print the error code. */
-		fprintf(stderr, KNRM "Error code (%i): '" KBLU "%s" KNRM "'\n\n", _error, lf_error_messages[_error]);
+		sprintf(last_error, KNRM "Error code (%i): '" KBLU "%s" KNRM "'\n\n", _error, lf_error_messages[_error]);
 		/* Release the va_list. */
 		va_end(argv);
-		/* Exit. */
-		exit(EXIT_FAILURE);
+		if (flipper.errors_cause_side_effects) {
+			fprintf(stderr, "%s\n", last_error);
+			/* Exit. */
+			exit(EXIT_FAILURE);
+		}
 	}
 #endif
 	return;
+}
+
+char *lf_error_string(void) {
+	return last_error;
 }
 
 lf_error_t error_get(void) {

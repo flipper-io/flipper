@@ -18,9 +18,9 @@
 #define LF_USB_PRODUCT_ID      0x0480
 
 /* If defined, imposes a timeout on USB transactions. */
-//#define __lf_usb_timeout__
+#define __lf_usb_timeout__
 #ifdef __lf_usb_timeout__
-#define LF_USB_TIMEOUT_MS 10000
+#define LF_USB_TIMEOUT_MS 10
 #else
 #define LF_USB_TIMEOUT_MS 0
 #endif

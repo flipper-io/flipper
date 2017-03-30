@@ -95,6 +95,8 @@ enum {
 extern int lf_error_configure(void);
 /* Raises an error internally to the current context of libflipper. */
 extern void lf_error_raise(lf_error_t error, const char *format, ...) __attribute__ ((format (printf, 2, 3)));
+/* Provide the error message string. */
+extern char *lf_error_string(void);
 /* Causes errors to resume the producion side effects, exiting if fatal. */
 extern void lf_error_resume(void);
 /* Pauses errors from producing side effects of any kind. */

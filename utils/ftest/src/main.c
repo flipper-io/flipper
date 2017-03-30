@@ -6,6 +6,7 @@ int main(int argc, char *argv[]) {
 
 	flipper.attach();
 	led.rgb(0, 0, 100);
+	button.read();
 
 	return EXIT_SUCCESS;
 }

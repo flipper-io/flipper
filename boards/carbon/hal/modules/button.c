@@ -7,5 +7,5 @@ int button_configure(void) {
 }
 
 uint8_t button_read(void) {
-	return lf_invoke(&_button, _button_read, NULL);
+	return (lf_invoke(&_button, _button_read, NULL) >> 16) & 0xFF;
 }
