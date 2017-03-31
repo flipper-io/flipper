@@ -39,10 +39,7 @@ int megausb_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
 #ifndef __ALL_BULK__
 	}
 #endif
-	if (_e < lf_success) {
-		return lf_error;
-	}
-	return lf_success;
+	return _e;
 }
 
 int megausb_pull(struct _lf_endpoint *this, void *destination, lf_size_t length) {
@@ -56,21 +53,21 @@ int megausb_pull(struct _lf_endpoint *this, void *destination, lf_size_t length)
 #ifndef __ALL_BULK__
 	}
 #endif
-	if (_e < lf_success) {
-		return lf_error;
-	}
-	return lf_success;
+	return _e;
 }
 
 int megausb_destroy(void) {
 	return lf_success;
 }
 
+#include <flipper/carbon/modules/led.h>
+
 int megausb_wait_ready(void) {
 /* If defined, USB transactions will time out after a specified period of time. */
 #ifdef __lf_usb_timeout__
 	megausb_start_timeout();
 #endif
+	volatile uint16_t timeout = 0x5000;
 	/* Wait until the receiver is ready. */
 	while (!(UEINTX & (1 << RWAL))) {
 		/* If USB has been detached while in this loop, return with error. */

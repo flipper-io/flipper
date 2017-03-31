@@ -9,9 +9,9 @@ int main() {
 	system_init();
 
 	/* Initialize peripheral hardware. */
-	//button_configure();
-	//led_configure();
-	//led_rgb(LED_COLOR_SUCCESS);
+	button_configure();
+	led_configure();
+	led_rgb(LED_COLOR_SUCCESS);
 	// spi_configure();
 	// nvm_configure();
 

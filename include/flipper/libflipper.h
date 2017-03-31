@@ -20,6 +20,7 @@
 /* If defined, imposes a timeout on USB transactions. */
 #define __lf_usb_timeout__
 #ifdef __lf_usb_timeout__
+/* Must be between 1ms and 255ms. */
 #define LF_USB_TIMEOUT_MS 10
 #else
 #define LF_USB_TIMEOUT_MS 0

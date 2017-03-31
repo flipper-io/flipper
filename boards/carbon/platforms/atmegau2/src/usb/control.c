@@ -1,5 +1,6 @@
 #define __private_include__
 #include <megausb.h>
+#include <flipper/carbon/modules/led.h>
 
 volatile uint8_t megausb_configured = 0;
 
@@ -75,6 +76,9 @@ ISR(USB_COM_vect) {
 	uint16_t desc_val;
 	const uint8_t *desc_addr;
 	uint8_t	desc_length;
+
+	/* Clear the configuration. */
+	megausb_configured = 0;
 
 	/* Select the control endpoint. */
 	UENUM = USB_CONTROL_ENDPOINT;

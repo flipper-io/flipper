@@ -75,8 +75,8 @@ extern const uint8_t PROGMEM endpoint[];
 #define megausb_is_timed_out() \
 	(TIFR1 & (1 << OCF1A))
 #define megausb_stop_timeout() \
-	TIFR1 = (1 << OCF1A); \
-	TCCR1B |= (0 << CS12) | (0 << CS11) | (0 << CS10);
+	TIFR1 |= (1 << OCF1A); \
+	TCCR1B = 0;
 
 extern const struct descriptor {
 	uint16_t value;

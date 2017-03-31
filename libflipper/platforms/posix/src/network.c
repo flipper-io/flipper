@@ -83,14 +83,14 @@ int network_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
 }
 
 int network_pull(struct _lf_endpoint *this, void *destination, lf_size_t length) {
-	/* Obtain a pointer to and cast to the network record associated with the active endpoint. */
-	struct _network_record *record = this -> record;
-	socklen_t _length;
-	ssize_t _e = recvfrom(record -> fd, destination, length, 0, (struct sockaddr *)&(record -> device), &_length);
-	if (_e < 0) {
-		lf_error_raise(E_COMMUNICATION, error_message("Failed to transfer data to networked device."));
-		return lf_error;
-	}
+	// /* Obtain a pointer to and cast to the network record associated with the active endpoint. */
+	// struct _network_record *record = this -> record;
+	// socklen_t _length;
+	// ssize_t _e = recvfrom(record -> fd, destination, length, 0, (struct sockaddr *)&(record -> device), &_length);
+	// if (_e < 0) {
+	// 	lf_error_raise(E_COMMUNICATION, error_message("Failed to transfer data to networked device."));
+	// 	return lf_error;
+	// }
 	return lf_success;
 }
 
