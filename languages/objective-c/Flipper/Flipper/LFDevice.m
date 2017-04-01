@@ -11,12 +11,14 @@
 
 @implementation LFDevice
 
-- (id) initWithName:(NSString *)name {
-    if (self == [super init]) {
-        flipper_attach_usb([name UTF8String]);
-        return self;
-    }
-    return NULL;
++ (void) attach {
+    lf_error_pause();
+    flipper_attach();
+}
+
++ (void) attachDevice:(NSString *)name withHostname:(NSString *)hostname {
+    lf_error_pause();
+    flipper_attach_network([name UTF8String], [hostname UTF8String]);
 }
 
 @end

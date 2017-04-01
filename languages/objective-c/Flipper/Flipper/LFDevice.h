@@ -15,6 +15,7 @@
 
 @property (readonly) LFLED *led;
 
-- (id) initWithName:(NSString *)name;
++ (void) attach;
++ (void) attachDevice:(NSString *)name withHostname:(NSString *)hostname;
 
 @end

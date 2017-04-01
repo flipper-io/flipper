@@ -47,6 +47,7 @@ struct _lf_device *flipper_attach(void) {
 
 /* Attaches a USB device to the bridge endpoint. */
 struct _lf_device *flipper_attach_usb(const char *name) {
+#ifndef __lf_disable_usb__
 	/* Make a backup of the slected device. */
 	struct _lf_device *_device = flipper.device;
 	/* Create a device with the name provided. */
@@ -68,6 +69,10 @@ struct _lf_device *flipper_attach_usb(const char *name) {
 		return NULL;
 	}
 	return device;
+#else
+	lf_error_raise(E_LIBUSB, error_message("USB devices are not supported on this platform."));
+	return NULL;
+#endif
 }
 
 struct _lf_device *flipper_attach_network(const char *name, const char *hostname) {
