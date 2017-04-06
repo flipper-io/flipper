@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <flipper.h>
 #include <flipper/platforms/posix.h>
-#include <flipper/carbon/platforms/atsam4s16b.h>
+#include <flipper/carbon/platforms/atsam4sb.h>
 #include <stdio.h>
 
 /* Defines the XMODEM flow control bytes. */
