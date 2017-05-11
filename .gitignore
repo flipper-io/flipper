@@ -10,3 +10,8 @@ projects
 xcuserdata
 __pycache__
 *.pyc
+
+target/
+.idea/
+
+**/*.rs.bk
