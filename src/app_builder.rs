@@ -1,4 +1,4 @@
-use clap::{App, Arg, SubCommand};
+use clap::{App, Arg, ArgMatches, SubCommand, AppSettings};
 
 trait AppExt<'a, 'b> {
     /// Constructs the modules subcommand.
@@ -65,10 +65,11 @@ impl <'a, 'b> AppExt<'a, 'b> for App<'a, 'b> {
     }
 }
 
-pub fn build<'a, 'b>() -> App<'a, 'b> {
+pub fn build<'a>() -> App<'a, 'a> {
     App::new("Flipper Console")
         .version("0.0.1")
         .author("Nick Mosher <nicholastmosher@gmail.com>")
         .about("Command-line utility for managing and controlling Flipper")
+        .setting(AppSettings::AllowExternalSubcommands)
         .subcommand_modules()
 }
