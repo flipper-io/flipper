@@ -1,0 +1,41 @@
+name: flipper
+version: 0.1.0
+author: Nick Mosher <nicholastmosher@gmail.com>
+about: Command line utility for managing and interacting with Flipper
+subcommands:
+
+# Standard module subcommands
+  - adc:
+      about: Controls the analog-to-digital module.
+  - button:
+      about: Controls the button module.
+  - dac:
+      about: Controls the digital-to-analog module.
+  - fs:
+      about: Controls the filesystem module.
+  - gpio:
+      about: Controls the general-purpose input-output module.
+  - i2c:
+      about: Controls the i2c module.
+  - led:
+      about: Controls the RGB LED on Flipper.
+  - pwm:
+      about: Controls the pulse-width modulation module.
+  - rtc:
+      about: Controls the real-time clock.
+  - spi:
+      about: Controls the spi bus.
+  - swd:
+      about: Controls the swd module.
+  - temp:
+      about: Controls the temperature module.
+  - timer:
+      about: Controls the timer module.
+  - uart0:
+      about: Controls the universal asynchronous bus on port 0.
+  - usart:
+      about: Controls the universal synchronous/asynchronous bus.
+  - usb:
+      about: Controls the usb module.
+  - wdt:
+      about: Controls the wdt module.
