@@ -13,5 +13,5 @@ __pycache__
 
 target/
 .idea/
-
+.stack*
 **/*.rs.bk
