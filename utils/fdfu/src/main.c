@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <flipper.h>
 #include <flipper/platforms/posix.h>
+#include <flipper/carbon/platforms/atmegau2.h>
 #include <flipper/carbon/platforms/atsam4sb.h>
 #include <stdio.h>
 
@@ -86,7 +87,7 @@ uint8_t sam_ba_read_byte(uint32_t source) {
 	uart0.push(buffer, sizeof(buffer) - 1);
 	uint32_t retries = 0;
 	while(!uart0.ready() && retries ++ < 8);
-	return uart0.get();
+	return uart0.get(0xff);
 }
 
 /* Instructs the SAM-BA to write a byte from the address provided. */
@@ -104,7 +105,7 @@ uint32_t sam_ba_read_word(uint32_t source) {
 	uint8_t retries = 0;
 	while(!uart0.ready() && retries ++ < 8);
 	uint32_t result = 0;
-	uart0.pull(&result, sizeof(uint32_t), UINT16_MAX);
+	uart0.pull(&result, sizeof(uint32_t), 0xff);
 	return result;
 }
 
@@ -123,7 +124,7 @@ retry:
 	uint8_t retries = 0;
 	while(!uart0.ready() && retries ++ < 8);
 	/* Check for the clear to send byte. */
-	if (uart0.get() != 'C') {
+	if (uart0.get(0xff) != 'C') {
 		return lf_error;
 	}
 	retries = 0;
@@ -145,7 +146,7 @@ retry:
 		/* Obtain acknowledgement. */
 		retries = 0;
 		while(!uart0.ready() && retries ++ < 8);
-		if (uart0.get() != ACK) {
+		if (uart0.get(0xff) != ACK) {
 			return lf_error;
 		}
 		/* Decrement the length appropriately. */
@@ -156,9 +157,29 @@ retry:
 	/* Obtain acknowledgement. */
 	retries = 0;
 	while(!uart0.ready() && retries ++ < 8);
-	if (uart0.get() != ACK) {
+	if (uart0.get(0xff) != ACK) {
 		return lf_error;
 	}
+	return lf_success;
+}
+
+void sam_reset() {
+	gpio.write(0, (1 << SAM_RESET_PIN));
+	usleep(10000);
+	gpio.write((1 << SAM_RESET_PIN), 0);
+}
+
+int sam_enter_dfu(void) {
+	gpio.write((1 << SAM_ERASE_PIN), (1 << SAM_RESET_PIN));
+	usleep(5000000);
+	gpio.write((1 << SAM_RESET_PIN), (1 << SAM_ERASE_PIN));
+
+	// gpio.write(0, (1 << SAM_POWER_PIN) | (1 << SAM_RESET_PIN));
+	// usleep(100000);
+	// gpio.write((1 << SAM_POWER_PIN) | (1 << SAM_RESET_PIN), 0);
+
+	sam_reset();
+
 	return lf_success;
 }
 
@@ -182,22 +203,49 @@ void *load_page_data(FILE *firmware, size_t size) {
 }
 
 int enter_update_mode(void) {
+
+	/* Go to DFU baud. */
+	uart0.dfu();
+
 	printf("Entering update mode.\n");
 	uint8_t ack[3];
 	uart0.put('#');
-	uart0.pull(ack, sizeof(ack), UINT16_MAX);
+	uart0.pull(ack, sizeof(ack), 0xff);
 	if (!memcmp(ack, (const uint8_t []){ '\n', '\r', '>' }, sizeof(ack))) {
 		goto done;
 	}
 	/* Enter DFU mode. */
-	int _e = cpu.dfu();
+	int _e = sam_enter_dfu();
 	if (_e < lf_success) {
 		fprintf(stderr, KRED "Failed to enter update mode. (0x%08x)\n", _e);
 		return lf_error;
 	}
+
 done:
 	fprintf(stderr, KGRN " Successfully entered update mode.\n" KNRM);
 	return lf_success;
+}
+
+int enter_normal_mode(void) {
+
+	/* Go to DFU baud. */
+	uart0.dfu();
+
+	/* Set normal mode. */
+	printf("Entering normal mode.\n");
+	char n_ack[2];
+	uint8_t retries = 0;
+	uart0.push("N#", 2);
+	while(retries++ < 8) {
+		uart0.pull(n_ack, sizeof(n_ack), 0xff);
+		if (!memcmp(n_ack, (const uint8_t []){ 0x0A, 0x0D }, sizeof(n_ack))) {
+			printf(KGRN " Successfully entered normal mode.\n" KNRM);
+			return lf_success;
+		}
+		printf("0x%04x\n", *(uint16_t *)(n_ack));
+	}
+	fprintf(stderr, "Failed to enter normal mode.\n");
+	return lf_error;
 }
 
 int main(int argc, char *argv[]) {
@@ -231,19 +279,10 @@ begin: ;
 		return EXIT_FAILURE;
 	}
 
-	/* Set normal mode. */
-	printf("Entering normal mode.\n");
-	uart0.push("N#", 2);
-	char n_ack[2];
-	uart0.pull(n_ack, sizeof(n_ack), UINT16_MAX);
-	uint8_t retries = 0;
-	while(!uart0.ready() && retries ++ < 8);
-	retries = 0;
-	if (memcmp(n_ack, (char []){ 0x0A, 0x0D }, sizeof(n_ack))) {
-		fprintf(stderr, "Failed to enter normal mode.\n");
+	_e = enter_normal_mode();
+	if (_e < lf_success) {
 		return EXIT_FAILURE;
 	}
-	printf(KGRN " Successfully entered normal mode.\n" KNRM);
 
 	printf("Checking security bit.\n");
 	sam_ba_write_efc_fcr(EFC_GGPB, 0);
@@ -311,7 +350,7 @@ begin: ;
 
 	printf("Checking GPNVM1 bit.\n");
 	sam_ba_write_efc_fcr(EFC_GGPB, 0);
-	retries = 0;
+	uint8_t retries = 0;
 	if (!(sam_ba_read_byte(REGADDR(EFC -> EEFC_FRR)) & (1 << 1)) && retries ++ < RETRIES) {
 		if (retries > RETRIES) {
 			printf(KRED " GPNVM1 bit is not set.\n" KNRM);
@@ -359,8 +398,9 @@ done:
 	free(pagedata);
 
 	printf("Resetting the CPU.\n");
-	/* Power cycle the CPU. */
-	cpu.cycle();
+
+	sam_reset();
+
 	printf(KGRN " Successfully reset the CPU.\n" KNRM "----------------------");
 
 	/* Reconfigure the UART0 bus for FMR. */
