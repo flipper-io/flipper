@@ -1,0 +1,24 @@
+#include <flipper/libflipper.h>
+
+#ifdef __use_led__
+#define __private_include__
+#include <flipper/led.h>
+
+LF_MODULE(_led, "led", "Interacts with the built-in status LED.", _led_id);
+
+/* Define the virtual interface for this module. */
+const struct _led led = {
+	led_configure,
+	led_rgb
+};
+
+LF_WEAK int led_configure(void) {
+	lf_invoke(&_led, _led_configure, NULL);
+	return lf_success;
+}
+
+LF_WEAK void led_rgb(uint8_t r, uint8_t g, uint8_t b) {
+	lf_invoke(&_led, _led_rgb, fmr_args(fmr_infer(r), fmr_infer(g), fmr_infer(b)));
+}
+
+#endif
