@@ -55,12 +55,22 @@ _v := @
 endif #VERBOSE
 
 # Build the target by default
-all: $(TARGET)
+all: $(TARGET) headers
 
 # Linking rule
 $(TARGET): $(OBJS)
 	@echo 'Linking $@'
-	$(_v)$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+	$(_v)$(CC) $(CFLAGS) $(LDFLAGS) -o $(BUILD)/$@ $^
+
+headers:
+	$(_v)cp -r carbon/include/* $(BUILD)/include
+	$(_v)cp -r library/include/* $(BUILD)/include
+	$(_v)cp -r runtime/include/* $(BUILD)/include
+	$(_v)cp flipper.h $(BUILD)/include
+
+install: all
+	$(_v)cp $(BUILD)/$(TARGET) /usr/local/lib
+	$(_v)cp -r $(BUILD)/include/* /usr/local/include
 
 $(TARGET_HEX): $(TARGET)
 	$(_v)$(OBJCOPY) -O ihex $< $@

@@ -72,8 +72,10 @@ void lf_finish(void) {
 }
 
 struct _lf_device *flipper_attach(void) {
-	/* Attach a device over USB with the factory default name. */
-	return flipper_attach_usb(LF_DEFAULT_NAME);
+
+	
+
+	return NULL;
 }
 
 /* Attaches a USB device to the bridge endpoint. */

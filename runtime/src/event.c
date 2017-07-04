@@ -1,5 +1,4 @@
 #include <flipper/libflipper.h>
-#include <unistd.h>
 
 struct _lf_event *lf_event_create(lf_event_id _id, lf_event_handler handler, void *_ctx) {
     struct _lf_event *event = malloc(sizeof(struct _lf_event));
@@ -98,7 +97,7 @@ void lf_handle_events(void) {
         if (lf_get_device_list()) {
             lf_ll_apply_func(lf_get_device_list(), NULL, lf_event_handler_func);
         }
-        usleep(10000);
+        // usleep(10000);
         /* Avoid tail-call optimization. */
         __asm__ __volatile__ ("");
     }

@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/posix/posix.h>
-#include <flipper/carbon/modules.h>
+#include <flipper/carbon.h>
 
 const void *const fmr_modules[] = {};
 

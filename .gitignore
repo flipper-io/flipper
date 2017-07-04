@@ -4,4 +4,4 @@
 *.hex
 *.elf
 *.o
-*/build
+build

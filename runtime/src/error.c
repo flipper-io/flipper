@@ -17,7 +17,7 @@ void lf_error_raise(lf_error_t error, const char *format, ...) {
 	lf_error_t _error = error;
 	/* Record the observed error. */
 	error_code = error;
-#ifdef __enable_error_side_effects__
+#ifndef __disable_error_side_effects__
 	if (error) {
 		/* Construct a va_list to access variadic arguments. */
 		va_list argv;

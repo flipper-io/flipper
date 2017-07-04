@@ -43,6 +43,7 @@ OBJDUMP = $(PREFIX)objdump
 
 # Define compilation and emulation flags.
 CFLAGS = -std=c99 -Os -mcpu=cortex-m4 -mthumb -nostartfiles \
+		-D__disable_error_side_effects__ \
 		-DPLATFORM_HEADER="<flipper/atsam4s/atsam4s.h>" \
 		$(foreach inc,$(INCLUDE_DIRS),-I$(inc))
 
