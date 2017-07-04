@@ -4,7 +4,7 @@
 #define __private_include__
 #include <flipper/usb.h>
 
-LF_MODULE(_usb, "usart", "Provides low level access to the device's USB bus.", _usb_id);
+LF_MODULE(_usb, "usart", "Provides low level access to the device's USB bus.");
 
 /* Define the virtual interface for this module. */
 const struct _usb usb = {

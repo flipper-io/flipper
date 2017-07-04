@@ -4,7 +4,7 @@
 #define __private_include__
 #include <flipper/swd.h>
 
-LF_MODULE(_swd, "swd", "Interfaces with the device's single wire debug unit.", _swd_id);
+LF_MODULE(_swd, "swd", "Interfaces with the device's single wire debug unit.");
 
 /* Define the virtual interface for this module. */
 const struct _swd swd = {

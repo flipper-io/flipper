@@ -23,7 +23,8 @@
 #define __private_include__
 #include <flipper/libflipper.h>
 #include <flipper/carbon.h>
-#include <flipper/carbon/platforms/atmegau2/modules.h>
+#include <flipper/posix/libusb.h>
+#include <flipper/atmegau2/atmegau2.h>
 
 struct _lf_endpoint lf_bridge_ep = {
     lf_bridge_configure,
@@ -33,7 +34,8 @@ struct _lf_endpoint lf_bridge_ep = {
     lf_bridge_push,
     lf_bridge_pull,
     lf_bridge_destroy,
-    NULL
+    NULL,
+	NULL
 };
 
 struct _lf_bridge_record {

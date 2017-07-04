@@ -4,7 +4,7 @@
 #define __private_include__
 #include <flipper/dac.h>
 
-LF_MODULE(_dac, "dac", "Provides access to the device's digital to analog converter.", _dac_id);
+LF_MODULE(_dac, "dac", "Provides access to the device's digital to analog converter.");
 
 /* Define the virtual interface for this module. */
 const struct _dac dac = {

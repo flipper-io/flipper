@@ -4,7 +4,7 @@
 #define __private_include__
 #include <flipper/uart0.h>
 
-LF_MODULE(_uart0, "uart0", "Provides low level access to the device's UART bus.", _uart0_id);
+LF_MODULE(_uart0, "uart0", "Provides low level access to the device's UART bus.");
 
 /* Define the virtual interface for this module. */
 const struct _uart0 uart0 = {

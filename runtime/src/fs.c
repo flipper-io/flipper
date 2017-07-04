@@ -4,7 +4,7 @@
 #define __private_include__
 #include <flipper/fs.h>
 
-LF_MODULE(_fs, "fs", "Provides access to the device's filesystem.", _fs_id);
+LF_MODULE(_fs, "fs", "Provides access to the device's filesystem.");
 
 /* Define the virtual interface for this module. */
 const struct _fs fs = {

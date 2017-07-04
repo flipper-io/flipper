@@ -5,25 +5,70 @@
 /* Include the Carbon board file. */
 #include <flipper/carbon.h>
 
-struct _lf_device *lf_create_device(const char *name) {
-	/* Allocate memory to contain the record of the device. */
+lf_device_list lf_attached_devices;
+struct _lf_device *lf_current_device;
+lf_event_list lf_registered_events;
+
+/* Expose the virtual interface for this driver. */
+struct _flipper flipper = {
+	flipper_attach,
+	flipper_attach_usb,
+	flipper_attach_network,
+	flipper_select,
+	flipper_detach,
+	flipper_exit,
+	E_OK,
+	1,
+	NULL
+};
+
+struct _lf_device *lf_device_create(const char *name, struct _lf_endpoint *endpoint) {
 	struct _lf_device *device = (struct _lf_device *)calloc(1, sizeof(struct _lf_device));
-	if (!device) {
-		lf_error_raise(E_MALLOC, error_message("Failed to allocate the memory required to create a new fmr_device."));
-		return NULL;
-	}
-	if (strlen(name) > sizeof(device -> configuration.name)) {
-		lf_error_raise(E_NAME, error_message("The name '%s' is too long. Please choose a name with %lu characters or less.", name, sizeof(device -> configuration.name)));
-		goto failure;
-	}
-	/* Set the device's name. */
+	lf_assert(device, failure, E_MALLOC, "");
+	lf_assert(strlen(name) < sizeof(device -> configuration.name), failure, E_NAME, "The name '%s' is too long. Please choose a name with %lu characters or less.", name, sizeof(device -> configuration.name));
 	strcpy(device -> configuration.name, name);
-	/* Set the device's identifier. */
 	device -> configuration.identifier = lf_crc((void *)name, (lf_size_t)strlen(name));
+	device -> endpoint = endpoint;
 	return device;
 failure:
-	free(device);
+	if (device) free(device);
 	return NULL;
+}
+
+/* Returns the active device. */
+struct _lf_device *lf_get_current_device(void) {
+    lf_assert(lf_current_device, failure, E_NULL, "NULL");
+    return lf_current_device;
+failure:
+	return NULL;
+}
+
+/* Detaches a device from libflipper. */
+int lf_detach(struct _lf_device *device) {
+    lf_assert(device, failure, E_NULL, "NULL");
+    /* Release the device's endpoint. */
+    lf_endpoint_release(device -> endpoint);
+    return lf_success;
+failure:
+	return lf_error;
+}
+
+/* Attempts to attach to all unattached devices. Returns how many devices were attached. */
+int lf_attach(void) {
+    return 0;
+}
+
+/* Registers an endpoint with the libflipper over which devices may be attached. */
+int lf_register_endpoint(struct _lf_endpoint *endpoint) {
+    return lf_success;
+}
+
+/* Deactivates libflipper state and releases the event loop. */
+void lf_finish(void) {
+    /* Release all of the events. */
+    lf_ll_release(&lf_get_event_list());
+    /* Release all of the attached devices. */
+    lf_ll_release(&lf_get_device_list());
 }
 
 struct _lf_device *flipper_attach(void) {
@@ -37,14 +82,12 @@ struct _lf_device *flipper_attach_usb(const char *name) {
 	/* Make a backup of the slected device. */
 	struct _lf_device *_device = flipper.device;
 	/* Create a device with the name provided. */
-	struct _lf_device *device = lf_create_device(name);
+	struct _lf_device *device = lf_device_create(name, &lf_bridge_ep);
 	if (!device) {
 		return NULL;
 	}
 	/* Set the current device. */
 	flipper.device = device;
-	/* Set the device's endpoint. */
-	device -> endpoint = &lf_bridge_ep;
 	/* Configure the device's endpoint. */
 	if (device -> endpoint -> configure(device) < lf_success) {
 		lf_error_raise(E_ENDPOINT, error_message("Failed to initialize bridge endpoint for usb device."));
@@ -62,30 +105,16 @@ struct _lf_device *flipper_attach_usb(const char *name) {
 }
 
 struct _lf_device *flipper_attach_network(const char *name, const char *hostname) {
-	struct _lf_device *device = lf_create_device(name);
+	struct _lf_device *device = lf_device_create(name, &lf_network_ep);
 	if (!device) {
 		return NULL;
 	}
-	/* Set the device's endpoint. */
-	device -> endpoint = &lf_network_ep;
 	if (device -> endpoint -> configure(device -> endpoint, hostname) < lf_success) {
 		lf_error_raise(E_ENDPOINT, error_message("Failed to initialize endpoint for networked Flipper device."));
 		/* Detach the device in the event of an endpoint configuration failure. */
 		flipper_detach(device);
 		return NULL;
 	}
-	/* Set the current device. */
-	flipper.device = device;
-	return device;
-}
-
-struct _lf_device *flipper_attach_endpoint(const char *name, struct _lf_endpoint *endpoint) {
-	struct _lf_device *device = lf_create_device(name);
-	if (!device) {
-		return NULL;
-	}
-	/* Set the device's endpoint. */
-	device -> endpoint = endpoint;
 	/* Set the current device. */
 	flipper.device = device;
 	return device;
@@ -189,99 +218,6 @@ int lf_bind(struct _lf_module *module) {
 	return lf_success;
 failure:
 	return lf_error;
-}
-
-/* PROTOTYPE FUNCTION: Returns a pointer to data copied into the address space of the device provided. */
-void *lf_send(struct _lf_device *device, void *source, lf_size_t length) {
-	if (!source) {
-		lf_error_raise(E_NULL, error_message("No source provided for copy."));
-	} else if (!length) {
-		return NULL;
-	}
-	/* If no device is provided, throw an error. */
-	if (!device) {
-		lf_error_raise(E_NO_DEVICE, error_message("Failed to copy data."));
-		return NULL;
-	}
-	struct _fmr_packet _packet = { 0 };
-	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
-	/* Set the magic number. */
-	_packet.header.magic = FMR_MAGIC_NUMBER;
-	/* Compute the initial length of the packet. */
-	_packet.header.length = sizeof(struct _fmr_push_pull_packet);
-	/* Set the packet class. */
-	_packet.header.class = fmr_send_class;
-	/* Set the push length. */
-	packet -> length = length;
-	/* Compute and store the packet checksum. */
-	_packet.header.checksum = lf_crc(packet, _packet.header.length);
-	/* Send the packet to the target device. */
-	int _e = lf_transfer(device, &_packet);
-	if (_e < lf_success) {
-		return NULL;
-	}
-	/* Transfer the data through to the address space of the device. */
-	_e = device -> endpoint -> push(device -> endpoint, source, length);
-	/* Ensure that the data was successfully transferred to the device. */
-	if (_e < lf_success) {
-		return NULL;
-	}
-	struct _fmr_result result;
-	/* Obtain the result of the operation. */
-	lf_get_result(device, &result);
-	/* Return a pointer to the data. */
-	return (void *)(uintptr_t)result.value;
-}
-
-/* PROTOTYPE FUNCTION: Copies data from the address space of the device to that of the host. */
-void *lf_recieve(struct _lf_device *device, void *source, lf_size_t length) {
-	if (!source) {
-		lf_error_raise(E_NULL, error_message("No source provided for copy."));
-	} else if (!length) {
-		return NULL;
-	}
-	/* If no device is provided, throw an error. */
-	if (!device) {
-		lf_error_raise(E_NO_DEVICE, error_message("Failed to copy data."));
-		return NULL;
-	}
-	/* Allocate memory for the received data. */
-	void *destination = malloc(length);
-	/* Ensure the memory was allocated successfully. */
-	if (!destination) {
-		lf_error_raise(E_MALLOC, error_message("Failed to allocate memory for receive."));
-		return NULL;
-	}
-	struct _fmr_packet _packet = { 0 };
-	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
-	/* Set the magic number. */
-	_packet.header.magic = FMR_MAGIC_NUMBER;
-	/* Compute the initial length of the packet. */
-	_packet.header.length = sizeof(struct _fmr_push_pull_packet);
-	/* Set the packet class. */
-	_packet.header.class = fmr_receive_class;
-	/* Set the push length. */
-	packet -> length = length;
-	/* Set the address. */
-	*(uintptr_t *)packet -> call.parameters = (uintptr_t)source;
-	/* Compute and store the packet checksum. */
-	_packet.header.checksum = lf_crc(packet, _packet.header.length);
-	/* Send the packet to the target device. */
-	int _e = lf_transfer(device, &_packet);
-	if (_e < lf_success) {
-		return NULL;
-	}
-	/* Transfer the data through to the address space of the device. */
-	_e = device -> endpoint -> pull(device -> endpoint, destination, length);
-	/* Ensure that the data was successfully transferred to the device. */
-	if (_e < lf_success) {
-		return NULL;
-	}
-	struct _fmr_result result;
-	/* Obtain the result of the operation. */
-	lf_get_result(device, &result);
-	/* Return a pointer to the data. */
-	return destination;
 }
 
 /* PROTOTYPE FUNCTION: Load an image into a device's RAM. */

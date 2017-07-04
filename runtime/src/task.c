@@ -4,7 +4,7 @@
 #define __private_include__
 #include <flipper/task.h>
 
-LF_MODULE(_task, "task", "Pause, resume, stop the running application.", _task_id);
+LF_MODULE(_task, "task", "Pause, resume, or stop tasks running in the scheduler.");
 
 /* Define the virtual interface for this module. */
 const struct _task task = {

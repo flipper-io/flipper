@@ -6,7 +6,7 @@ TARGET_HEX := $(basename $(TARGET)).hex
 BUILD := build
 
 # All directories that contain source files
-SRC_DIRS := atsam4s \
+SRC_DIRS := carbon/atsam4s \
 			kernel/src \
 			kernel/arch/armv7 \
 			runtime/arch/armv7 \
@@ -24,7 +24,7 @@ OBJS := $(patsubst %,$(BUILD)/%.o,$(SRCS))
 # Dependency files that are produced during compilation
 DEPS := $(OBJS:.o=.d)
 
-INCLUDE_DIRS := include \
+INCLUDE_DIRS := carbon/include \
 				kernel/include \
 				runtime/include
 
@@ -35,17 +35,18 @@ BUILD_DIRS := $(BUILD) $(addprefix $(BUILD)/,$(SRC_DIRS))
 BUILD_DIR_FILES := $(addsuffix /.dir,$(BUILD_DIRS))
 
 # Aggregate build utilities based on the target platform.
-PREFIX = arm-none-eabi
-CC = $(PREFIX)-gcc
-LD = $(PREFIX)-ld
-OBJCOPY = $(PREFIX)-objcopy
-OBJDUMP = $(PREFIX)-objdump
+PREFIX = arm-none-eabi-
+CC = $(PREFIX)gcc
+LD = $(PREFIX)ld
+OBJCOPY = $(PREFIX)objcopy
+OBJDUMP = $(PREFIX)objdump
 
 # Define compilation and emulation flags.
-CFLAGS = -std=c99 -Os -mcpu=cortex-m4 -mthumb -nostartfiles - \
-	-DPLATFORM_HEADER="<flipper/atsam4s/atsam4s.h>" $(foreach inc,$(INCLUDE_DIRS),-I$(inc))
+CFLAGS = -std=c99 -Os -mcpu=cortex-m4 -mthumb -nostartfiles \
+		-DPLATFORM_HEADER="<flipper/atsam4s/atsam4s.h>" \
+		$(foreach inc,$(INCLUDE_DIRS),-I$(inc))
 
-LDFLAGS = -Wl,-T atsam4s/sam4s16.ld -Wl,--gc-sections
+LDFLAGS = -Wl,-T carbon/atsam4s/sam4s16.ld -Wl,--gc-sections
 
 # Print all commands executed when VERBOSE is defined
 ifdef VERBOSE
@@ -53,7 +54,6 @@ _v :=
 else #VERBOSE
 _v := @
 endif #VERBOSE
-
 
 # Build the target by default
 all: $(TARGET_HEX)
@@ -87,7 +87,7 @@ $(BUILD)/%.S.o: %.S | $(BUILD_DIR_FILES)
 
 clean:
 	@echo 'Removing built products'
-	$(_v)rm -rf $(BUILD) $(TARGET)
+	$(_v)rm -rf $(BUILD) $(TARGET) $(TARGET_HEX)
 
 .PHONY: all clean
 

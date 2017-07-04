@@ -6,7 +6,7 @@ TARGET_HEX := $(basename $(TARGET)).hex
 BUILD := build
 
 # All directories that contain source files
-SRC_DIRS := atmegau2 \
+SRC_DIRS := carbon/atmegau2 \
 			kernel/src \
 			runtime/arch/avr8 \
 			runtime/src
@@ -23,7 +23,7 @@ OBJS := $(patsubst %,$(BUILD)/%.o,$(SRCS))
 # Dependency files that are produced during compilation
 DEPS := $(OBJS:.o=.d)
 
-INCLUDE_DIRS := include \
+INCLUDE_DIRS := carbon/include \
 				kernel/include \
 				runtime/include
 
@@ -34,11 +34,11 @@ BUILD_DIRS := $(BUILD) $(addprefix $(BUILD)/,$(SRC_DIRS))
 BUILD_DIR_FILES := $(addsuffix /.dir,$(BUILD_DIRS))
 
 # Aggregate build utilities based on the target platform.
-PREFIX = avr
-CC = $(PREFIX)-gcc
-LD = $(PREFIX)-ld
-OBJCOPY = $(PREFIX)-objcopy
-OBJDUMP = $(PREFIX)-objdump
+PREFIX = avr-
+CC = $(PREFIX)gcc
+LD = $(PREFIX)ld
+OBJCOPY = $(PREFIX)objcopy
+OBJDUMP = $(PREFIX)objdump
 
 # Define compilation and emulation flags.
 CFLAGS = -std=c99 -Os -mmcu=atmega16u2 -DARCH=ARCH_AVR8 -D__AVR_ATMEGA16U2__ -DF_CPU=16000000UL \
@@ -91,7 +91,7 @@ flash: $(TARGET_HEX)
 
 clean:
 	@echo 'Removing built products'
-	$(_v)rm -rf $(BUILD) $(TARGET)
+	$(_v)rm -rf $(BUILD) $(TARGET) $(TARGET_HEX)
 
 .PHONY: all clean
 

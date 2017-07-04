@@ -1,2 +1,7 @@
+.DS_Store
+*.so
+*.bin
+*.hex
+*.elf
 *.o
-build
+*/build

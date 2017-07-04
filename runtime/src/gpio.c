@@ -4,7 +4,7 @@
 #define __private_include__
 #include <flipper/gpio.h>
 
-LF_MODULE(_gpio, "gpio", "Interfaces with the device's general purpose input output pins.", _gpio_id);
+LF_MODULE(_gpio, "gpio", "Interfaces with the device's general purpose input output pins.");
 
 /* Define the virtual interface for this module. */
 const struct _gpio gpio = {

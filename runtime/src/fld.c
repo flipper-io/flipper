@@ -4,7 +4,7 @@
 #define __private_include__
 #include <flipper/fld.h>
 
-LF_MODULE(_fld, "fld", "Loads modules on the target device.", _fld_id);
+LF_MODULE(_fld, "fld", "Loads modules on the target device.");
 
 /* Define the virtual interface for this module. */
 const struct _fld fld = {

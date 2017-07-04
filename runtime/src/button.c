@@ -4,7 +4,7 @@
 #define __private_include__
 #include <flipper/button.h>
 
-LF_MODULE(_button, "button", "Interacts with the onboard button.", _button_id);
+LF_MODULE(_button, "button", "Interacts with the onboard button.");
 
 /* Define the virtual interface for this module. */
 const struct _button button = {

@@ -4,7 +4,7 @@
 #define __private_include__
 #include <flipper/i2c.h>
 
-LF_MODULE(_i2c, "i2c", "Interfaces with the device's I2C peripheral.", _i2c_id);
+LF_MODULE(_i2c, "i2c", "Interfaces with the device's I2C peripheral.");
 
 /* Define the virtual interface for this module. */
 const struct _i2c i2c = {

@@ -4,7 +4,7 @@
 #define __private_include__
 #include <flipper/usart.h>
 
-LF_MODULE(_usart, "usart", "Provides low level access to the device's UART bus.", _usart_id);
+LF_MODULE(_usart, "usart", "Provides low level access to the device's UART bus.");
 
 /* Define the virtual interface for this module. */
 const struct _usart usart = {

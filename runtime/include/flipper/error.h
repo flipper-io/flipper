@@ -10,6 +10,13 @@
 #define lf_success 0
 #define lf_error -1
 
+/* Short hand for raising errors based on the truth of a condition. */
+#define lf_assert(truth, label, error, ...) \
+	if (!(truth)) { \
+		lf_error_raise(error, error_message(__VA_ARGS__)); \
+		goto label; \
+	}
+
 /* Describes a type used to contain libflipper error codes. */
 typedef uint32_t lf_error_t;
 
@@ -79,9 +86,9 @@ enum {
 								 "packet subclass error", \
 								 "unimplemented error"
 
+
 /* If this flag is set, error messages are nullified on platforms that do not need to store error strings. */
 #ifdef __enable_error_side_effects__
-
 /* Allow the 'error_message' macro to serve as a passthrough for any variadic arguments supplied to it. */
 #define error_message(...) __VA_ARGS__
 #else

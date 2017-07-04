@@ -4,7 +4,7 @@
 #define __private_include__
 #include <flipper/adc.h>
 
-LF_MODULE(_adc, "adc", "Interfaces with the device's internal analog to digital converter.", _adc_id);
+LF_MODULE(_adc, "adc", "Interfaces with the device's internal analog to digital converter.");
 
 /* Define the virtual interface for this module. */
 const struct _adc adc = {

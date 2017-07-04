@@ -4,7 +4,7 @@
 #define __private_include__
 #include <flipper/temp.h>
 
-LF_MODULE(_temp, "temp", "Interfaces with the device's temperature sensor.", _temp_id);
+LF_MODULE(_temp, "temp", "Interfaces with the device's temperature sensor.");
 
 /* Define the virtual interface for this module. */
 const struct _temp temp = {

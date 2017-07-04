@@ -4,7 +4,7 @@
 #define __private_include__
 #include <flipper/wdt.h>
 
-LF_MODULE(_wdt, "wdt", "Handles interaction with the internal watchdog timer.", _wdt_id);
+LF_MODULE(_wdt, "wdt", "Handles interaction with the internal watchdog timer.");
 
 /* Define the virtual interface for this module. */
 const struct _wdt wdt = {

@@ -4,7 +4,7 @@
 #define __private_include__
 #include <flipper/spi.h>
 
-LF_MODULE(_spi, "spi", "Provides control over the device's SPI bus.", _spi_id);
+LF_MODULE(_spi, "spi", "Provides control over the device's SPI bus.");
 
 /* Define the virtual interface for this module. */
 const struct _spi spi = {

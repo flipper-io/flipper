@@ -4,7 +4,7 @@
 #define __private_include__
 #include <flipper/led.h>
 
-LF_MODULE(_led, "led", "Interacts with the built-in status LED.", _led_id);
+LF_MODULE(_led, "led", "Interacts with the built-in status LED.");
 
 /* Define the virtual interface for this module. */
 const struct _led led = {
