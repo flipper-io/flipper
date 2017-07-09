@@ -1,14 +1,16 @@
 [package]
-name = "flipper-console"
+name = "flipper"
 version = "0.1.0"
 authors = ["Nick Mosher <nicholastmosher@gmail.com>"]
 
 [dependencies]
-clap = { version = "2", features = ["yaml"] }
-flipper-bindings = { path = "../languages/rust" }
+clap = "2"
+rustyline = "1.0.0"
+lazy_static = "0.2"
+flipper-rust = { path = "../languages/rust" }
 
 [[bin]]
-name = "flipper-console"
+name = "flipper"
 path = "src/bin/flipper.rs"
 test = false
 doc  = false
