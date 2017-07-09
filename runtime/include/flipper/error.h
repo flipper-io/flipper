@@ -13,7 +13,7 @@
 /* Short hand for raising errors based on the truth of a condition. */
 #define lf_assert(truth, label, error, ...) \
 	if (!(truth)) { \
-		lf_error_raise(error, error_message(__VA_ARGS__)); \
+		lf_error_raise(error, __VA_ARGS__); \
 		goto label; \
 	}
 
@@ -88,7 +88,7 @@ enum {
 
 
 /* If this flag is set, error messages are nullified on platforms that do not need to store error strings. */
-#ifdef __enable_error_side_effects__
+#ifndef __disable_error_side_effects__
 /* Allow the 'error_message' macro to serve as a passthrough for any variadic arguments supplied to it. */
 #define error_message(...) __VA_ARGS__
 #else

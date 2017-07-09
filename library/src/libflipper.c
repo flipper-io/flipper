@@ -10,24 +10,17 @@ struct _lf_device *lf_current_device;
 lf_event_list lf_registered_events;
 
 /* Expose the virtual interface for this driver. */
-struct _flipper flipper = {
+const struct _flipper flipper = {
 	flipper_attach,
-	flipper_attach_usb,
-	flipper_attach_network,
 	flipper_select,
 	flipper_detach,
 	flipper_exit,
-	E_OK,
-	1,
-	NULL
 };
 
-struct _lf_device *lf_device_create(const char *name, struct _lf_endpoint *endpoint) {
+/* Creates a new device. */
+struct _lf_device *lf_device_create(struct _lf_endpoint *endpoint) {
 	struct _lf_device *device = (struct _lf_device *)calloc(1, sizeof(struct _lf_device));
-	lf_assert(device, failure, E_MALLOC, "");
-	lf_assert(strlen(name) < sizeof(device -> configuration.name), failure, E_NAME, "The name '%s' is too long. Please choose a name with %lu characters or less.", name, sizeof(device -> configuration.name));
-	strcpy(device -> configuration.name, name);
-	device -> configuration.identifier = lf_crc((void *)name, (lf_size_t)strlen(name));
+	lf_assert(device, failure, E_MALLOC, "Failed to allocate memory for new device.");
 	device -> endpoint = endpoint;
 	return device;
 failure:
@@ -35,129 +28,59 @@ failure:
 	return NULL;
 }
 
-/* Returns the active device. */
-struct _lf_device *lf_get_current_device(void) {
-    lf_assert(lf_current_device, failure, E_NULL, "NULL");
-    return lf_current_device;
-failure:
-	return NULL;
-}
-
 /* Detaches a device from libflipper. */
 int lf_detach(struct _lf_device *device) {
-    lf_assert(device, failure, E_NULL, "NULL");
-    /* Release the device's endpoint. */
-    lf_endpoint_release(device -> endpoint);
-    return lf_success;
+	lf_assert(device, failure, E_NULL, "NULL device pointer provided for detach.");
+	/* Release the device's endpoint. */
+	lf_endpoint_release(device -> endpoint);
+	return lf_success;
 failure:
 	return lf_error;
 }
 
 /* Attempts to attach to all unattached devices. Returns how many devices were attached. */
-int lf_attach(void) {
-    return 0;
-}
-
-/* Registers an endpoint with the libflipper over which devices may be attached. */
-int lf_register_endpoint(struct _lf_endpoint *endpoint) {
-    return lf_success;
+int lf_attach(struct _lf_device *device) {
+	lf_assert(device, failure, E_NULL, "NULL device pointer provided for attach.");
+	/* Ask the device for its configuration. */
+	int _e = lf_load_configuration(device);
+	lf_assert(_e, failure, E_CONFIGURATION, "Failed to obtain configuration from device.");
+	lf_ll_append(&lf_get_device_list(), device, lf_detach);
+	lf_set_current_device(device);
+	return lf_success;
+failure:
+	return lf_error;
 }
 
 /* Deactivates libflipper state and releases the event loop. */
-void lf_finish(void) {
-    /* Release all of the events. */
-    lf_ll_release(&lf_get_event_list());
-    /* Release all of the attached devices. */
-    lf_ll_release(&lf_get_device_list());
+int __attribute__((__destructor__)) lf_exit(void) {
+	/* Release all of the events. */
+	lf_ll_release(&lf_get_event_list());
+	/* Release all of the attached devices. */
+	lf_ll_release(&lf_get_device_list());
+	return lf_success;
 }
 
-struct _lf_device *flipper_attach(void) {
-
-	
-
-	return NULL;
-}
-
-/* Attaches a USB device to the bridge endpoint. */
-struct _lf_device *flipper_attach_usb(const char *name) {
-#ifndef __lf_disable_usb__
-	/* Make a backup of the slected device. */
-	struct _lf_device *_device = flipper.device;
-	/* Create a device with the name provided. */
-	struct _lf_device *device = lf_device_create(name, &lf_bridge_ep);
-	if (!device) {
-		return NULL;
-	}
-	/* Set the current device. */
-	flipper.device = device;
-	/* Configure the device's endpoint. */
-	if (device -> endpoint -> configure(device) < lf_success) {
-		lf_error_raise(E_ENDPOINT, error_message("Failed to initialize bridge endpoint for usb device."));
-		/* Detach the device in the event of an endpoint configuration failure. */
-		flipper_detach(device);
-		/* Restore the previously selected device. */
-		flipper.device = _device;
-		return NULL;
-	}
-	return device;
-#else
-	lf_error_raise(E_LIBUSB, error_message("USB devices are not supported on this platform."));
-	return NULL;
-#endif
-}
-
-struct _lf_device *flipper_attach_network(const char *name, const char *hostname) {
-	struct _lf_device *device = lf_device_create(name, &lf_network_ep);
-	if (!device) {
-		return NULL;
-	}
-	if (device -> endpoint -> configure(device -> endpoint, hostname) < lf_success) {
-		lf_error_raise(E_ENDPOINT, error_message("Failed to initialize endpoint for networked Flipper device."));
-		/* Detach the device in the event of an endpoint configuration failure. */
-		flipper_detach(device);
-		return NULL;
-	}
-	/* Set the current device. */
-	flipper.device = device;
-	return device;
+/* Shim to attach all possible flipper devices that could be attached to the system. */
+int flipper_attach(void) {
+	return carbon_attach();
 }
 
 int flipper_select(struct _lf_device *device) {
-	if (!device) {
-		lf_error_raise(E_NULL, error_message("No device provided for selection."));
-		return lf_error;
-	}
-	flipper.device = device;
+	lf_assert(device, failure, E_NULL, "NULL device pointer provided for selection.");
+	lf_set_current_device(device);
 	return lf_success;
+failure:
+	return lf_error;
 }
 
+/* Shim around lf_detach. */
 int flipper_detach(struct _lf_device *device) {
-	if (!device) {
-		lf_error_raise(E_NULL, error_message("No device provided for release."));
-		return lf_error;
-	}
-	if (device == flipper.device) {
-		flipper.device = NULL;
-	}
-	if (device -> endpoint) {
-		/* If the device has an endpoint, destroy it. */
-		device -> endpoint -> destroy(device -> endpoint);
-	}
-	/* Free the device record structure. */
-	free(device);
-	return lf_success;
+	return lf_detach(device);
 }
 
-int __attribute__((__destructor__)) flipper_exit(void) {
-	/* If there is a device attached, free it. */
-	if (flipper.device) {
-		/* If the device has an endpoint, destroy it. */
-		if (flipper.device -> endpoint) {
-			flipper.device -> endpoint -> destroy(flipper.device -> endpoint);
-		}
-		free(flipper.device);
-	}
-	return lf_success;
+/* Shim around lf_exit. */
+int flipper_exit(void) {
+	return lf_exit();
 }
 
 int lf_load_configuration(struct _lf_device *device) {
@@ -216,7 +139,7 @@ int lf_bind(struct _lf_module *module) {
 	/* Set the module's index. */
 	module -> index = index;
 	/* Set the module's device. */
-	module -> device = &flipper.device;
+	module -> device = &lf_get_current_device();
 	return lf_success;
 failure:
 	return lf_error;
@@ -294,8 +217,8 @@ void lf_debug_packet(struct _fmr_packet *packet, size_t length) {
 		printf("\t└─ magic:\t0x%x\n", packet -> header.magic);
 		printf("\t└─ checksum:\t0x%x\n", packet -> header.checksum);
 		printf("\t└─ length:\t%d bytes (%.02f%%)\n", packet -> header.length, (float) packet -> header.length/sizeof(struct _fmr_packet)*100);
-        char *classstrs[] = { "configuration", "std_call", "user_call", "push", "pull", "event" };
-        printf("\t└─ class:\t%s\n", classstrs[packet -> header.class]);
+		char *classstrs[] = { "configuration", "std_call", "user_call", "push", "pull", "event" };
+		printf("\t└─ class:\t%s\n", classstrs[packet -> header.class]);
 		struct _fmr_invocation_packet *invocation = (struct _fmr_invocation_packet *)(packet);
 		struct _fmr_push_pull_packet *pushpull = (struct _fmr_push_pull_packet *)(packet);
 		switch (packet -> header.class) {

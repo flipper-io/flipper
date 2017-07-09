@@ -41,7 +41,7 @@ OBJCOPY = $(PREFIX)objcopy
 OBJDUMP = $(PREFIX)objdump
 
 # Define compilation and emulation flags.
-CFLAGS = -std=c99 -Os \
+CFLAGS = -std=c99 -Os -g \
 		 -DPLATFORM_HEADER="<flipper/posix/posix.h>" \
 		 $(foreach inc,$(INCLUDE_DIRS),-I$(inc))
 
@@ -71,6 +71,10 @@ headers:
 install: all
 	$(_v)cp $(BUILD)/$(TARGET) /usr/local/lib
 	$(_v)cp -r $(BUILD)/include/* /usr/local/include
+
+uninstall:
+	$(_v)rm -r /usr/local/include/flipper*
+	$(_v)rm -r /usr/local/lib/$(TARGET)
 
 $(TARGET_HEX): $(TARGET)
 	$(_v)$(OBJCOPY) -O ihex $< $@

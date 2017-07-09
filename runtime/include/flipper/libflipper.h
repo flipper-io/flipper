@@ -12,18 +12,18 @@
 #define LF_VERSION 0x0001
 
 /* Configuration information for USB. */
-#define LF_USB_MANUFACTURER    L"flipper.io"
-#define LF_USB_PRODUCT         L"Flipper: Carbon"
-#define LF_USB_VENDOR_ID       0x16C0
-#define LF_USB_PRODUCT_ID      0x0480
+#define CARBON_USB_MANUFACTURER    L"flipper.io"
+#define CARBON_USB_PRODUCT         L"Flipper: Carbon"
+#define CARBON_USB_VENDOR_ID       0x16C0
+#define CARBON_USB_PRODUCT_ID      0x0480
 
 /* If defined, imposes a timeout on USB transactions. */
 #define __lf_usb_timeout__
 #ifdef __lf_usb_timeout__
 /* Must be between 1ms and 255ms. */
-#define LF_USB_TIMEOUT_MS 255
+#define CARBON_USB_TIMEOUT_MS 255
 #else
-#define LF_USB_TIMEOUT_MS 0
+#define CARBON_USB_TIMEOUT_MS 0
 #endif
 
 /* NOTE: Summing the size parameters of each endpoints below should be less than or equal to 160. */
@@ -43,7 +43,7 @@
 /* If defined, uses bulk for all USB transfers. */
 #define __ALL_BULK__
 /* If defined, prints debugging information about each packet. */
-//#define __lf_debug__
+#define __lf_debug__
 
 /* Computes the greatest integer from the result of the division of x by y. */
 #define lf_ceiling(x, y) ((x + y - 1) / y)
@@ -98,7 +98,34 @@ struct _lf_device {
 	lf_error_t error;
 };
 
+/* ~ Declare the virtual interface for this driver. ~ */
+extern const struct _flipper {
+	/* Attaches the current instance of libflipper to the first available device over the default endpoint. */
+	int (* const attach)(void);
+	/* Selects a previously attached Flipper device and routes all calls to it. */
+	int (* const select)(struct _lf_device *device);
+	/* Disconnects a previously attached Flipper device from libflipper. */
+	int (* const detach)(struct _lf_device *device);
+	/* Safely destroys all libflipper state before termination. */
+	int (* const exit)(void);
+} flipper;
+
+typedef struct _lf_ll *lf_event_list;
+extern lf_event_list lf_registered_events;
+#define lf_get_event_list() lf_registered_events
+
+typedef struct _lf_ll *lf_device_list;
+extern lf_device_list lf_attached_devices;
+#define lf_get_device_list() lf_attached_devices
+
+extern struct _lf_device *lf_current_device;
+inline void lf_set_current_device(struct _lf_device *device) {
+	lf_current_device = device;
+}
+#define lf_get_current_device() lf_current_device
+
 /* All devices must implement a self referential interface. */
+#pragma warning Remove this.
 struct _lf_device lf_self;
 
 /* Standardizes the notion of a module. */
@@ -125,7 +152,7 @@ struct _lf_module {
 		LF_VERSION, \
 		0, \
 		0, \
-		&flipper.device \
+		&lf_get_current_device() \
 	};
 
 #ifdef PLATFORM_HEADER
@@ -134,64 +161,22 @@ struct _lf_module {
 /* NOTE: The PLATFORM_HEADER macro is passed as a preprocessor flag during compilation. */
 #endif
 
-typedef struct _lf_ll *lf_device_list;
-typedef struct _lf_ll *lf_event_list;
+struct _lf_device *lf_device_create(struct _lf_endpoint *endpoint);
 
-/* LIBFLIPPER GLOBAL STATE */
-extern lf_device_list lf_attached_devices;
-extern struct _lf_device *lf_current_device;
-extern lf_event_list lf_registered_events;
-
-/* Returns the event list. */
-#define lf_get_event_list() lf_registered_events
-/* Gets the head of the device linked list, the first device attached. */
-#define lf_get_device_list() lf_attached_devices
-
-/* ~ Declare the virtual interface for this driver. ~ */
-extern struct _flipper {
-	/* Attaches the current instance of libflipper to the first available device over the default endpoint. */
-	struct _lf_device *(* attach)(void);
-	/* Attaches to a Flipper device by name over the USB endpoint. */
-	struct _lf_device *(* attach_usb)(const char *name);
-	/* Attaches to a Flipper device by name and hostname/IP over the network endpoint. */
-	struct _lf_device *(* attach_network)(const char *name, const char *hostname);
-	/* Selects a previously attached Flipper device and routes all calls to it. */
-	int (* select)(struct _lf_device *device);
-	/* Disconnects a previously attached Flipper device from libflipper. */
-	int (* detach)(struct _lf_device *device);
-	/* Safely destroys all libflipper state before termination. */
-	int (* exit)(void);
-	/* Stores the last observed error code. */
-	lf_error_t error_code;
-	/* Global flag that indicates whether or not lf_error_raise() should print to stderr and call exit(). */
-	uint8_t errors_cause_side_effects;
-	/* Points to the actively selected device with which interaction will take place. */
-	struct _lf_device *device;
-} flipper;
-
-struct _lf_device *lf_device_create(const char *name, struct _lf_endpoint *_endpoint);
-struct _lf_device *lf_get_current_device(void);
+/* Attaches to a device. */
+int lf_attach(struct _lf_device *device);
 int lf_detach(struct _lf_device *device);
-int lf_attach(void);
 int lf_register_endpoint(struct _lf_endpoint *endpoint);
 void lf_finish(void);
 
+/* -------------- OLD API -------------- */
+
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
-struct _lf_device *flipper_attach(void);
-struct _lf_device *flipper_attach_usb(const char *name);
-struct _lf_device *flipper_attach_network(const char *name, const char *hostname);
+int flipper_attach(void);
 int flipper_select(struct _lf_device *device);
 int flipper_detach(struct _lf_device *device);
 int flipper_exit(void);
 
-/**
- * @brief Invokes a function in a module with a list of parameters.
- *
- * @param module The module in which the function resides.
- * @param function The function to be invoked.
- * @param parameters The list of parameters to be passed to the function.
- *
- */
 fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _fmr_parameters *parameters);
 
 /* Moves data from the address space of the host to that of the device. */
