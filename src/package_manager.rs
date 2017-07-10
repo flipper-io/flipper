@@ -1,9 +1,15 @@
+//! The package manager is a subset of console commands dedicating to managing Flipper projects.
+//! These commands assist in creating new projects, adding and managing module dependencies,
+//! and generating language bindings for modules.
+
 use clap::{App, AppSettings, Arg, ArgMatches};
-use app::lang_flags;
+use /*flipper*/::lang_flags;
 
 pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
     vec![
-        App::new("init").args(&lang_flags()),
+        App::new("init")
+            .about("Create a new Flipper project in the current directory")
+            .args(&lang_flags()),
         App::new("new")
             .about("Create a new Flipper project with the given name")
             .args(&lang_flags())
@@ -40,49 +46,82 @@ pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
                 .help("The module to remove as a dependency")
             ),
         App::new("update")
-            .about("Update module dependencies to the latest versions")
+            .about("Update module dependencies to the latest versions"),
+        App::new("generate")
+            .alias("gen")
+            .about("Generate Flipper language bindings")
+            .before_help("Generate bindings for the current-project module, or [module] if given")
+            .args(&lang_flags())
+            .arg(Arg::with_name("module")
+                .takes_value(true)
+                .value_name("module")
+                .help("The name of the module to generate language bindings for")
+            ),
     ]
 }
 
 pub fn execute(args: &ArgMatches) {
     match args.subcommand() {
-        ("init", Some(m)) => init::execute(m),
         ("new", Some(m)) => new::execute(m),
+        ("init", Some(m)) => new::execute(m),
         ("add", Some(m)) => add::execute(m),
         ("remove", Some(m)) => remove::execute(m),
         ("update", Some(m)) => update::execute(m),
-        (unknown, Some(_)) => println!("Unrecognized command: {}", unknown),
-        _ => println!("No command")
+        ("generate", Some(m)) => generate::execute(m),
+        (unknown, Some(_)) => println!("Unrecognized PM command: {}", unknown),
+        _ => println!("Illegal subcommand")
     }
 }
 
-pub mod init {
-    use super::*;
-    pub fn execute(args: &ArgMatches) {
-
-    }
-}
+/// Usage: `flipper new <project>`
+/// Creates a new Flipper project in `./project`, creating the directory if it doesn't
+/// exist, or populating it if it exists and is empty.
 pub mod new {
     use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }
+
+/// Usage: `flipper add <module>`
+/// Adds `module` as a dependency of the current project.
 pub mod add {
     use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }
+
+/// Usage: `flipper remove <module>` or `flipper rm <module>`
+/// Removes `module` as a dependency of the current project.
 pub mod remove {
     use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }
+
+/// Usage: `flipper update <module>`
+/// Updates all project dependencies to their latest (compatible) versions.
 pub mod update {
     use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
+    }
+}
+
+/// Usage: `flipper generate [LANG]`, where `[LANG]` is one of:
+///        --java, --javascript, --python, --objc, --swift, --rust
+/// Flipper modules can be executed remotely from a host machine
+/// such as a laptop or mobile phone.
+pub mod generate {
+    use super::*;
+
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }

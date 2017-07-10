@@ -1,6 +1,4 @@
-use clap::{App, AppSettings, Arg, ArgMatches};
-
-use app::{lang_flags};
+use clap::{App, Arg, ArgMatches};
 
 pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
     vec![
@@ -21,15 +19,6 @@ pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
                 .takes_value(true)
                 .value_name("package")
                 .help("Specify a package to install, such as from the repository")),
-        App::new("generate")
-            .alias("gen")
-            .about("Generate Flipper language bindings")
-            .before_help("Generate bindings for the current-project module, or [module] if given")
-            .args(&lang_flags())
-            .arg(Arg::with_name("module")
-                .takes_value(true)
-                .value_name("module")
-                .help("The name of the module to generate language bindings for"))
     ]
 }
 
@@ -44,21 +33,24 @@ pub fn execute(args: &ArgMatches) {
 
 pub mod install {
     use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }
 
 pub mod deploy {
     use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }
 
 pub mod generate {
     use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }

@@ -19,8 +19,8 @@
 pub use clap::{App, AppSettings, Arg, ArgMatches, SubCommand as Sub};
 
 pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
-
     App::new("module")
+        .alias("modules")
         .settings(&[
             AppSettings::AllowExternalSubcommands,
             AppSettings::ArgRequiredElseHelp,
@@ -65,24 +65,24 @@ pub fn execute(args: &ArgMatches) {
     }
 
     match args.subcommand() {
-        ("adc",    Some(m)) => adc::execute(m),
+        ("adc", Some(m)) => adc::execute(m),
         ("button", Some(m)) => button::execute(m),
-        ("dac",    Some(m)) => dac::execute(m),
-        ("fs",     Some(m)) => fs::execute(m),
-        ("gpio",   Some(m)) => gpio::execute(m),
-        ("i2c",    Some(m)) => i2c::execute(m),
-        ("led",    Some(m)) => led::execute(m),
-        ("pwm",    Some(m)) => pwm::execute(m),
-        ("rtc",    Some(m)) => rtc::execute(m),
-        ("spi",    Some(m)) => spi::execute(m),
-        ("swd",    Some(m)) => swd::execute(m),
-        ("temp",   Some(m)) => temp::execute(m),
-        ("timer",  Some(m)) => timer::execute(m),
-        ("uart0",  Some(m)) => uart0::execute(m),
-        ("usart",  Some(m)) => usart::execute(m),
-        ("usb",    Some(m)) => usb::execute(m),
-        ("wdt",    Some(m)) => wdt::execute(m),
-        (unknown,  Some(_)) => println!("Unrecognized module: {}", unknown),
+        ("dac", Some(m)) => dac::execute(m),
+        ("fs", Some(m)) => fs::execute(m),
+        ("gpio", Some(m)) => gpio::execute(m),
+        ("i2c", Some(m)) => i2c::execute(m),
+        ("led", Some(m)) => led::execute(m),
+        ("pwm", Some(m)) => pwm::execute(m),
+        ("rtc", Some(m)) => rtc::execute(m),
+        ("spi", Some(m)) => spi::execute(m),
+        ("swd", Some(m)) => swd::execute(m),
+        ("temp", Some(m)) => temp::execute(m),
+        ("timer", Some(m)) => timer::execute(m),
+        ("uart0", Some(m)) => uart0::execute(m),
+        ("usart", Some(m)) => usart::execute(m),
+        ("usb", Some(m)) => usb::execute(m),
+        ("wdt", Some(m)) => wdt::execute(m),
+        (unknown, Some(_)) => println!("Unrecognized module: {}", unknown),
         _ => println!("Invalid command")
     }
 }
@@ -117,111 +117,145 @@ pub fn repl() {
 
 pub mod adc {
     pub use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }
+
 pub mod button {
     pub use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }
+
 pub mod dac {
     pub use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }
+
 pub mod fs {
     pub use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }
+
 pub mod gpio {
     pub use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }
+
 pub mod i2c {
     pub use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }
+
 pub mod led {
     pub use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }
+
 pub mod pwm {
     pub use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }
+
 pub mod rtc {
     pub use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }
+
 pub mod spi {
     pub use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }
+
 pub mod swd {
     pub use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }
+
 pub mod temp {
     pub use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }
+
 pub mod timer {
     pub use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }
+
 pub mod uart0 {
     pub use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }
+
 pub mod usart {
     pub use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }
+
 pub mod usb {
     pub use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }
+
 pub mod wdt {
     pub use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }
 
 /// Includes logic for locating custom module implementations
 pub mod custom {
     use super::*;
-    pub fn execute(args: &ArgMatches) {
 
+    pub fn execute(args: &ArgMatches) {
+        unimplemented!();
     }
 }
