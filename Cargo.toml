@@ -11,6 +11,6 @@ flipper-rust = { path = "../languages/rust" }
 
 [[bin]]
 name = "flipper"
-path = "src/bin/flipper.rs"
+path = "src/flipper.rs"
 test = false
 doc  = false
