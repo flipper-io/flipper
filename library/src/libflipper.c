@@ -28,6 +28,19 @@ failure:
 	return NULL;
 }
 
+/* Attempts to attach to all unattached devices. Returns how many devices were attached. */
+int lf_attach(struct _lf_device *device) {
+	lf_assert(device, failure, E_NULL, "NULL device pointer provided for attach.");
+	/* Ask the device for its configuration. */
+	int _e = lf_load_configuration(device);
+	lf_assert(_e == lf_success, failure, E_CONFIGURATION, "Failed to obtain configuration from device.");
+	lf_ll_append(&lf_get_device_list(), device, lf_detach);
+	lf_select(device);
+	return lf_success;
+failure:
+	return lf_error;
+}
+
 /* Detaches a device from libflipper. */
 int lf_detach(struct _lf_device *device) {
 	lf_assert(device, failure, E_NULL, "NULL device pointer provided for detach.");
@@ -38,15 +51,11 @@ failure:
 	return lf_error;
 }
 
-/* Attempts to attach to all unattached devices. Returns how many devices were attached. */
-int lf_attach(struct _lf_device *device) {
-	lf_assert(device, failure, E_NULL, "NULL device pointer provided for attach.");
-	/* Ask the device for its configuration. */
-	int _e = lf_load_configuration(device);
-	lf_assert(_e, failure, E_CONFIGURATION, "Failed to obtain configuration from device.");
-	lf_ll_append(&lf_get_device_list(), device, lf_detach);
+/* Call's the device's selector function and selects the device. */
+int lf_select(struct _lf_device *device) {
+	lf_assert(device, failure, E_NULL, "NULL device pointer provided for selection.");
+	device -> selector(device);
 	lf_set_current_device(device);
-	return lf_success;
 failure:
 	return lf_error;
 }
@@ -111,11 +120,13 @@ int lf_load_configuration(struct _lf_device *device) {
 	if (_e < lf_success) {
 		return lf_error;
 	}
-	/* Compare the device identifiers. */
-	if (device -> configuration.identifier != configuration.identifier) {
-		lf_error_raise(E_NO_DEVICE, error_message("Identifier mismatch for device '%s'. (0x%04x instead of 0x%04x)", device -> configuration.name, configuration.identifier, device -> configuration.identifier));
-		return lf_error;
-	}
+
+	// /* Compare the device identifiers. */
+	// if (device -> configuration.identifier != configuration.identifier) {
+	// 	lf_error_raise(E_NO_DEVICE, error_message("Identifier mismatch for device '%s'. (0x%04x instead of 0x%04x)", device -> configuration.name, configuration.identifier, device -> configuration.identifier));
+	// 	return lf_error;
+	// }
+
 	/* Copy the returned configuration into the device. */
 	memcpy(&(device -> configuration), &configuration, sizeof(struct _lf_configuration));
 	return lf_success;

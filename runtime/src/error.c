@@ -6,8 +6,12 @@
 /* Expose the error message strings. */
 char *lf_error_messages[] = { LF_ERROR_MESSAGE_STRINGS };
 char last_error[256];
-lf_error_t error_code;
-uint8_t errors_cause_side_effects;
+lf_error_t error_code = E_OK;
+#ifdef __disable_error_side_effects__
+uint8_t errors_cause_side_effects = 0;
+#else
+uint8_t errors_cause_side_effects = 1;
+#endif
 
 int lf_error_configure(void) {
 	return lf_success;
@@ -19,7 +23,7 @@ void lf_error_raise(lf_error_t error, const char *format, ...) {
 	error_code = error;
 #ifndef __disable_error_side_effects__
 	if (error) {
-		/* Construct a va_list to access variadic arguments. */
+		/* Construct a va_list to acmmcess variadic arguments. */
 		va_list argv;
 		/* Initialize the va_list that we created above. */
 		va_start(argv, format);

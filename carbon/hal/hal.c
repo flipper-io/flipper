@@ -26,8 +26,49 @@
 #include <flipper/posix/libusb.h>
 #include <flipper/atmegau2/atmegau2.h>
 
+struct _carbon_record {
+	/* Microcontroller that handles USB interaction. (U2) */
+	struct _lf_device *mcu;
+	/* Microprocessor that handles code execution. (4S) */
+	struct _lf_device *mpu;
+};
+
+int carbon_select(struct _lf_device *device);
+
+void *carbon_create(void *_endpoint, void *_other) {
+	/* The MCU's endpoint. */
+	struct _lf_endpoint *mcu_ep = _endpoint;
+	struct _lf_device *mcu = lf_device_create(mcu_ep);
+	lf_load_configuration(mcu);
+	struct _lf_endpoint *mpu_ep = lf_endpoint_create(&uart0, NULL);
+	struct _lf_device *mpu = lf_device_create(mpu_ep);
+	lf_load_configuration(mpu);
+	return NULL;
+}
+
+/* The Carbon architecture is interesting because we actually have to attach
+ * two flipper devices, the U2 and the 4S. We need libflipper to understand
+ * how to interact with each of these devices as well as to forward calls to
+ * the standard modules to the appropriate hardware that implements them.
+ *
+ * The way that this is accomplished is a list of U2 devices is first obtained
+ * from libusb, and then each device is mutated.
+ *
+ */
+
 int carbon_attach(void) {
-	return lf_libusb_attach_devices_with_vid_pid(CARBON_USB_VENDOR_ID, CARBON_USB_PRODUCT_ID);
+	struct _lf_ll *endpoints = lf_libusb_endpoints_for_vid_pid(CARBON_USB_VENDOR_ID, CARBON_USB_PRODUCT_ID);
+	lf_assert(endpoints, failure, E_NULL, "Failed to claim any Carbon endpoints.");
+	/* Make each endpoint into a Carbon device. */
+	lf_ll_apply_func(endpoints, NULL, carbon_create);
+	return lf_success;
+failure:
+	return lf_error;
+}
+
+/* Selects a carbon device. */
+int carbon_select(struct _lf_device *device) {
+	return lf_success;
 }
 
 /* ----------- OLD API ------------ */
@@ -42,16 +83,14 @@ int lf_bridge_pull(struct _lf_endpoint *this, void *destination, lf_size_t lengt
 int lf_bridge_destroy(struct _lf_endpoint *this);
 
 
-struct _lf_endpoint lf_bridge_ep = {
+struct _lf_endpoint lf_atmegau2_uart0_prototype = {
 	lf_bridge_configure,
 	lf_bridge_ready,
 	lf_bridge_put,
 	lf_bridge_get,
 	lf_bridge_push,
 	lf_bridge_pull,
-	lf_bridge_destroy,
-	NULL,
-	NULL
+	lf_bridge_destroy
 };
 
 struct _lf_bridge_record {
@@ -63,7 +102,7 @@ struct _lf_bridge_record {
 	struct _lf_module _uart0_bridge;
 };
 
-#define LF_ASSIGN_MODULE(module, id) module.device = &(record -> _atmega16u2); module.index = id;
+#define LF_ASSIGN_MODULE(module, id) module.device = record -> _atmega16u2; module.index = id;
 
 int lf_bridge_configure(struct _lf_device *device) {
 	/* Ensure that the device pointer is valid. */
@@ -92,7 +131,7 @@ int lf_bridge_configure(struct _lf_device *device) {
 	record -> atmega16u2.endpoint -> configure(record -> atmega16u2.endpoint, record -> _atmega16u2);
 	/* Assign the functionality of the device specific modules to this device. */
 	LF_ASSIGN_MODULE(_button, _button_id);
-	//LF_ASSIGN_MODULE(_gpio, _gpio_id);
+	LF_ASSIGN_MODULE(_gpio, _gpio_id);
 	LF_ASSIGN_MODULE(_fs, _fs_id);
 	LF_ASSIGN_MODULE(_led, _led_id);
 	LF_ASSIGN_MODULE(_uart0, _uart0_id);
@@ -100,7 +139,7 @@ int lf_bridge_configure(struct _lf_device *device) {
 	/* Set the bridge module's index. */
 	record -> _uart0_bridge.index = _uart0_id;
 	/* Set the bridge module's device pointer pointer. */
-	record -> _uart0_bridge.device = &(record -> _atmega16u2);
+	record -> _uart0_bridge.device = record -> _atmega16u2;
 	/* Set the bridged device's attributes. */
 	device -> configuration.attributes = (lf_device_32bit | lf_device_little_endian);
 	return lf_success;

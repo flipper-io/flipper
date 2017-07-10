@@ -56,7 +56,7 @@ fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _f
 		return lf_error;
 	}
 	/* Obtain the module's target device. */
-	struct _lf_device *device = *(module -> device);
+	struct _lf_device *device = module -> device;
 	/* If no device is provided, raise an error. */
 	if (!device) {
 		lf_error_raise(E_NO_DEVICE, error_message("The module '%s' has no target device.", module -> name));
@@ -124,7 +124,7 @@ int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_s
 		return lf_success;
 	}
 	/* Obtain the target device from the module. */
-	struct _lf_device *device = *(module -> device);
+	struct _lf_device *device = module -> device;
 	/* If no device is provided, throw an error. */
 	if (!device) {
 		lf_error_raise(E_NO_DEVICE, error_message("Failed to push to device."));
@@ -176,7 +176,7 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 		return lf_success;
 	}
 	/* Obtain the target device from the module. */
-	struct _lf_device *device = *(module -> device);
+	struct _lf_device *device = module -> device;
 	/* If no device is provided, throw an error. */
 	if (!device) {
 		lf_error_raise(E_NO_DEVICE, error_message("Failed to pull from device."));

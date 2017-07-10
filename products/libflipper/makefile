@@ -41,7 +41,7 @@ OBJCOPY = $(PREFIX)objcopy
 OBJDUMP = $(PREFIX)objdump
 
 # Define compilation and emulation flags.
-CFLAGS = -std=c99 -Os -g \
+CFLAGS = -std=c99 -g \
 		 -DPLATFORM_HEADER="<flipper/posix/posix.h>" \
 		 $(foreach inc,$(INCLUDE_DIRS),-I$(inc))
 

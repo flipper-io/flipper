@@ -2,9 +2,10 @@
 #define __lf_libusb_h__
 
 #include <flipper/types.h>
+#include <flipper/ll.h>
 
 /* Attaches to all devices with a given VID and PID. */
-int lf_libusb_attach_devices_with_vid_pid(uint16_t vid, uint16_t pid);
+struct _lf_ll *lf_libusb_endpoints_for_vid_pid(uint16_t vid, uint16_t pid);
 
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
 int lf_libusb_configure();

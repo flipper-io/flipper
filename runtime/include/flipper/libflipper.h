@@ -94,6 +94,8 @@ struct _lf_device {
 	struct _lf_configuration configuration;
 	/* A pointer to the endpoint through which packets will be transferred. */
 	struct _lf_endpoint *endpoint;
+	/* The device's selector function. Mutates modules state as appropriate for the device. */
+	int (* selector)(struct _lf_device *device);
 	/* The current error state of the device. */
 	lf_error_t error;
 };
@@ -119,7 +121,7 @@ extern lf_device_list lf_attached_devices;
 #define lf_get_device_list() lf_attached_devices
 
 extern struct _lf_device *lf_current_device;
-inline void lf_set_current_device(struct _lf_device *device) {
+static inline void lf_set_current_device(struct _lf_device *device) {
 	lf_current_device = device;
 }
 #define lf_get_current_device() lf_current_device
@@ -141,7 +143,7 @@ struct _lf_module {
 	/* The module's index. */
 	uint16_t index;
 	/* The pointer to a pointer to the device upon which the module's counterpart is located. */
-	struct _lf_device **device;
+	struct _lf_device *device;
 };
 
 /* Macro for easily generating module structures. */
@@ -152,7 +154,7 @@ struct _lf_module {
 		LF_VERSION, \
 		0, \
 		0, \
-		&lf_get_current_device() \
+		NULL \
 	};
 
 #ifdef PLATFORM_HEADER
@@ -166,6 +168,7 @@ struct _lf_device *lf_device_create(struct _lf_endpoint *endpoint);
 /* Attaches to a device. */
 int lf_attach(struct _lf_device *device);
 int lf_detach(struct _lf_device *device);
+int lf_select(struct _lf_device *device);
 int lf_register_endpoint(struct _lf_endpoint *endpoint);
 void lf_finish(void);
 
