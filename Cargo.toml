@@ -13,4 +13,3 @@ flipper-rust = { path = "../languages/rust" }
 name = "flipper"
 path = "src/flipper.rs"
 test = false
-doc  = false
