@@ -24,6 +24,7 @@ pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
         .settings(&[
             AppSettings::AllowExternalSubcommands,
             AppSettings::ArgRequiredElseHelp,
+            AppSettings::DeriveDisplayOrder,
         ])
         .template(
             "{bin} \n\
@@ -32,29 +33,30 @@ pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
              {all-args}"
         )
         .before_help("Control modules from the command line or use the interactive REPL")
+        .about("Control modules from the command line or use the interactive REPL")
         .arg(Arg::with_name("repl")
             .short("r")
             .long("--repl")
             .help("Enter a Read-Eval-Print-Loop for interactive module control")
         )
         .subcommands(vec![
-            App::new("adc").about("Analog to Digital Converter"),
-            App::new("button").about("Flipper's onboard button"),
-            App::new("dac").about("Digital to Analog Converter"),
-            App::new("fs").about("Filesystem"),
-            App::new("gpio").about("General-Purpose Input/Output"),
-            App::new("i2c").about("Inter-IC (integrated circuit) bus"),
-            App::new("led").about("Onboard RGB LED"),
-            App::new("pwm").about("Pulse-Width Modulation"),
-            App::new("rtc").about("Real-Time Clock"),
-            App::new("spi").about("Serial Peripheral Interface"),
-            App::new("swd").about("Serial Wire Debug"),
-            App::new("temp").about("Temperature"),
-            App::new("timer").about("General purpose Timer"),
-            App::new("uart0").about("Universal Asynchronous Receive/Transmit, bus 0"),
-            App::new("usart").about("Universal Synchronous/Asynchronous Receive/Transmit"),
-            App::new("usb").about("Universal Serial Bus"),
-            App::new("wdt").about("WatchDog Timer"),
+            adc::make_subcommand(),
+            button::make_subcommand(),
+            dac::make_subcommand(),
+            fs::make_subcommand(),
+            gpio::make_subcommand(),
+            i2c::make_subcommand(),
+            led::make_subcommand(),
+            pwm::make_subcommand(),
+            rtc::make_subcommand(),
+            spi::make_subcommand(),
+            swd::make_subcommand(),
+            temp::make_subcommand(),
+            timer::make_subcommand(),
+            uart0::make_subcommand(),
+            usart::make_subcommand(),
+            usb::make_subcommand(),
+            wdt::make_subcommand(),
         ])
 }
 
@@ -82,8 +84,7 @@ pub fn execute(args: &ArgMatches) {
         ("usart", Some(m)) => usart::execute(m),
         ("usb", Some(m)) => usb::execute(m),
         ("wdt", Some(m)) => wdt::execute(m),
-        (unknown, Some(_)) => println!("Unrecognized module: {}", unknown),
-        _ => println!("Invalid command")
+        (unknown, _) => println!("Unrecognized module: {}", unknown),
     }
 }
 
@@ -118,6 +119,11 @@ pub fn repl() {
 pub mod adc {
     pub use super::*;
 
+    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+        App::new("adc")
+            .about("Analog to Digital Converter")
+    }
+
     pub fn execute(args: &ArgMatches) {
         unimplemented!();
     }
@@ -125,6 +131,11 @@ pub mod adc {
 
 pub mod button {
     pub use super::*;
+
+    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+        App::new("button")
+            .about("Flipper's built-in Button")
+    }
 
     pub fn execute(args: &ArgMatches) {
         unimplemented!();
@@ -134,6 +145,11 @@ pub mod button {
 pub mod dac {
     pub use super::*;
 
+    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+        App::new("dac")
+            .about("Digital to Analog Converter")
+    }
+
     pub fn execute(args: &ArgMatches) {
         unimplemented!();
     }
@@ -141,6 +157,11 @@ pub mod dac {
 
 pub mod fs {
     pub use super::*;
+
+    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+        App::new("fs")
+            .about("Filesystem")
+    }
 
     pub fn execute(args: &ArgMatches) {
         unimplemented!();
@@ -150,6 +171,11 @@ pub mod fs {
 pub mod gpio {
     pub use super::*;
 
+    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+        App::new("gpio")
+            .about("General-Purpose Input/Output")
+    }
+
     pub fn execute(args: &ArgMatches) {
         unimplemented!();
     }
@@ -157,6 +183,11 @@ pub mod gpio {
 
 pub mod i2c {
     pub use super::*;
+
+    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+        App::new("i2c")
+            .about("Inter-IC (integrated circuit) bus")
+    }
 
     pub fn execute(args: &ArgMatches) {
         unimplemented!();
@@ -166,6 +197,11 @@ pub mod i2c {
 pub mod led {
     pub use super::*;
 
+    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+        App::new("led")
+            .about("Onboard RGB LED")
+    }
+
     pub fn execute(args: &ArgMatches) {
         unimplemented!();
     }
@@ -173,6 +209,11 @@ pub mod led {
 
 pub mod pwm {
     pub use super::*;
+
+    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+        App::new("pwm")
+            .about("Pulse-Width Modulation")
+    }
 
     pub fn execute(args: &ArgMatches) {
         unimplemented!();
@@ -182,6 +223,11 @@ pub mod pwm {
 pub mod rtc {
     pub use super::*;
 
+    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+        App::new("rtc")
+            .about("Real-Time Clock")
+    }
+
     pub fn execute(args: &ArgMatches) {
         unimplemented!();
     }
@@ -189,6 +235,11 @@ pub mod rtc {
 
 pub mod spi {
     pub use super::*;
+
+    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+        App::new("spi")
+            .about("Serial Peripheral Interface")
+    }
 
     pub fn execute(args: &ArgMatches) {
         unimplemented!();
@@ -198,6 +249,11 @@ pub mod spi {
 pub mod swd {
     pub use super::*;
 
+    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+        App::new("swd")
+            .about("Serial Wire Debug")
+    }
+
     pub fn execute(args: &ArgMatches) {
         unimplemented!();
     }
@@ -205,6 +261,11 @@ pub mod swd {
 
 pub mod temp {
     pub use super::*;
+
+    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+        App::new("temp")
+            .about("Temperature")
+    }
 
     pub fn execute(args: &ArgMatches) {
         unimplemented!();
@@ -214,6 +275,11 @@ pub mod temp {
 pub mod timer {
     pub use super::*;
 
+    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+        App::new("timer")
+            .about("General purpose Timer")
+    }
+
     pub fn execute(args: &ArgMatches) {
         unimplemented!();
     }
@@ -221,6 +287,11 @@ pub mod timer {
 
 pub mod uart0 {
     pub use super::*;
+
+    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+        App::new("uart0")
+            .about("Universal Asynchronous Receive/Transmit bus")
+    }
 
     pub fn execute(args: &ArgMatches) {
         unimplemented!();
@@ -230,6 +301,11 @@ pub mod uart0 {
 pub mod usart {
     pub use super::*;
 
+    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+        App::new("usart")
+            .about("Universal Synchronous/Asynchronous Receive/Transmit bus")
+    }
+
     pub fn execute(args: &ArgMatches) {
         unimplemented!();
     }
@@ -237,6 +313,11 @@ pub mod usart {
 
 pub mod usb {
     pub use super::*;
+
+    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+        App::new("usb")
+            .about("Universal Serial Bus")
+    }
 
     pub fn execute(args: &ArgMatches) {
         unimplemented!();
@@ -246,14 +327,10 @@ pub mod usb {
 pub mod wdt {
     pub use super::*;
 
-    pub fn execute(args: &ArgMatches) {
-        unimplemented!();
+    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+        App::new("wdt")
+            .about("WatchDog Timer")
     }
-}
-
-/// Includes logic for locating custom module implementations
-pub mod custom {
-    use super::*;
 
     pub fn execute(args: &ArgMatches) {
         unimplemented!();
