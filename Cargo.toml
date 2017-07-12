@@ -6,10 +6,12 @@ authors = ["Nick Mosher <nicholastmosher@gmail.com>"]
 [dependencies]
 clap = "2"
 rustyline = "1.0.0"
-lazy_static = "0.2"
+serde = "1.0.9"
+serde_derive = "1.0.9"
+toml = "0.4"
 flipper-rust = { path = "../languages/rust" }
 
 [[bin]]
 name = "flipper"
-path = "src/flipper.rs"
+path = "src/bin/flipper.rs"
 test = false

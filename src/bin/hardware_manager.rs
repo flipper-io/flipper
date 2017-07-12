@@ -1,3 +1,7 @@
+//! The hardware manager is in charge of interactions involving the Flipper
+//! hardware which isn't remote module execution. This includes booting the
+//! board and installing and deploying modules.
+
 use clap::{App, Arg, ArgMatches};
 
 pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
@@ -22,12 +26,30 @@ pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
     ]
 }
 
-pub fn execute(args: &ArgMatches) {
-    match args.subcommand() {
-        ("install", Some(m)) => install::execute(m),
-        ("deploy", Some(m)) => deploy::execute(m),
-        ("generate", Some(m)) => generate::execute(m),
-        _ => println!("Unrecognized command"),
+/// Commands managed by the *hardware manager* are top-level commands, meaning
+/// that even though they were parsed by the top-level `flipper` command handler,
+/// the argument match was not consumed. Hence, we match on solely the command
+/// string, then forward the ArgMatches to the implementing rust mod.
+pub fn execute(command: &str, args: &ArgMatches) {
+    match command {
+        "boot" => boot::execute(args),
+        "install" => install::execute(args),
+        "deploy" => deploy::execute(args),
+        unknown => println!("Unrecognized command: {}", unknown)
+    }
+}
+
+pub mod boot {
+    use super::*;
+    use std::process::Command;
+
+    // TODO check that `dfu-programmer` exists before attempting to execute it.
+    pub fn execute(args: &ArgMatches) {
+        Command::new("dfu-programmer")
+            .arg("at90usb162")
+            .arg("start")
+            .spawn()
+            .expect("Error booting Flipper");
     }
 }
 
@@ -40,14 +62,6 @@ pub mod install {
 }
 
 pub mod deploy {
-    use super::*;
-
-    pub fn execute(args: &ArgMatches) {
-        unimplemented!();
-    }
-}
-
-pub mod generate {
     use super::*;
 
     pub fn execute(args: &ArgMatches) {
