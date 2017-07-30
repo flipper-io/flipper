@@ -19,7 +19,7 @@ int8_t megausb_bulk_receive(uint8_t *destination, lf_size_t length) {
 	for (int i = 0; i < total; i ++) {
 
 		/* Wait until the USB controller is ready. */
-		volatile uint8_t timeout = UDFNUML + CARBON_USB_TIMEOUT_MS;
+		volatile uint8_t timeout = UDFNUML + LF_USB_TIMEOUT_MS;
 		while (!(UEINTX & (1 << RWAL))) {
 			if (!megausb_configured || UDFNUML == timeout) {
 				/* Reset the endpoint hardware. */
@@ -74,7 +74,7 @@ int8_t megausb_bulk_transmit(uint8_t *source, lf_size_t length) {
 	for (int i = 0; i < total; i ++) {
 
 		/* Wait until the USB controller is ready. */
-		volatile uint8_t timeout = UDFNUML + CARBON_USB_TIMEOUT_MS;
+		volatile uint8_t timeout = UDFNUML + LF_USB_TIMEOUT_MS;
 		while (!(UEINTX & (1 << RWAL))) {
 			if (!megausb_configured || UDFNUML == timeout) {
 				/* Reset the endpoint hardware. */

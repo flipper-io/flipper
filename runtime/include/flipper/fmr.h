@@ -5,6 +5,7 @@
 
 #include <flipper/types.h>
 #include <flipper/error.h>
+#include <flipper/ll.h>
 
 /* The size of a single FMR packet expressed in bytes. */
 #define FMR_PACKET_SIZE 64
@@ -30,7 +31,7 @@ typedef uint32_t fmr_return;
 #define FMR_MAX_ARGC 16
 /* Used to hold encoded prameter types within invocation metadata.
    NOTE: This type must be capable of encoding the exact number of bits
-         given by (FMR_MAX_ARGC * 2).
+		 given by (FMR_MAX_ARGC * 2).
 */
 typedef uint32_t fmr_types;
 
@@ -59,8 +60,6 @@ typedef uint8_t fmr_type;
 #define fmr_type(type) (sizeof(type) >> 1)
 /* Creates an 'fmr_va' from a C variable. */
 #define fmr_infer(variable) fmr_intx(fmr_type(variable), variable)
-
-/* ~ Parser macros for immediate values. ~ */
 
 /* Creates an 'fmr_va' from an 'fmr_type' and an immediate value. */
 #define fmr_intx(type, arg) (((fmr_va)type << (sizeof(fmr_arg) * 8)) | (fmr_arg)arg)
@@ -115,21 +114,11 @@ struct LF_PACKED _fmr_header {
 };
 
 /* Standardizes the notion of an argument. */
-struct _fmr_arg {
+struct _lf_arg {
 	/* The type signature of the argument. */
 	fmr_type type;
 	/* The value of the argument. */
 	fmr_arg value;
-	/* The next argument. */
-	struct _fmr_arg *next;
-};
-
-/* Organizes arguments in a format passible via pointer. */
-struct _fmr_parameters {
-	/* The number of arguments contained in the list. */
-	fmr_argc argc;
-	/* A pointer to the first argument in the list. */
-	struct _fmr_arg *argv;
 };
 
 /* Generic packet data type that can be passed around by packet parsing equipment. */
@@ -187,17 +176,11 @@ extern const void *const fmr_modules[];
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
 
 /* Builds an fmr_parameters from a set of variadic arguments provided by the fmr_parameters macro. */
-struct _fmr_parameters *fmr_build(fmr_argc argc, ...);
+struct _lf_ll *fmr_build(fmr_argc argc, ...);
 /* Appends an argument to an fmr_parameters. */
-int fmr_append(struct _fmr_parameters *list, fmr_type type, fmr_arg value);
-/* Concatenates two argument lists. */
-struct _fmr_parameters *fmr_merge(struct _fmr_parameters *first, struct _fmr_parameters *second);
-/* Removes and returns the item at the top of the list. */
-struct _fmr_arg *fmr_pop(struct _fmr_parameters *list);
-/* Frees an fmr_parameters. */
-int fmr_free(struct _fmr_parameters *list);
+int fmr_append(struct _lf_ll *list, fmr_type type, fmr_arg value);
 /* Generates the appropriate data structure needed for the remote procedure call of 'funtion' in 'module'. */
-int fmr_create_call(fmr_module module, fmr_function function, struct _fmr_parameters *args, struct _fmr_header *header, struct _fmr_invocation *call);
+int fmr_create_call(fmr_module module, fmr_function function, struct _lf_ll *args, struct _fmr_header *header, struct _fmr_invocation *call);
 /* Executes a standard module. */
 fmr_return fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, fmr_types types, void *arguments);
 /* Executes an fmr_packet and stores the result of the operation in the result buffer provided. */

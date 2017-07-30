@@ -26,6 +26,45 @@
 #include <flipper/posix/libusb.h>
 #include <flipper/atmegau2/atmegau2.h>
 
+int carbon_select(struct _lf_device *device);
+
+struct _lf_device *carbon_attach_endpoint(struct _lf_endpoint *endpoint) {
+	struct _lf_device *device = lf_device_create(endpoint);
+	lf_assert(device, failure, E_NULL, "Failed to create Carbon device.");
+	device->selector = carbon_select;
+
+	_led.device = device;
+	_led.index = _led_id;
+
+	lf_attach(device);
+	return device;
+failure:
+	return NULL;
+}
+
+void *carbon_attach_endpoint_applier(void *_endpoint, void *_other) {
+	return carbon_attach_endpoint(_endpoint);
+}
+
+/* Attaches to all of the Carbon devices available on the system. */
+int carbon_attach(void) {
+	/* Obtains a list of endpoints for all Carbon devices attached to the system. */
+	struct _lf_ll *endpoints = lf_libusb_endpoints_for_vid_pid(CARBON_USB_VENDOR_ID, CARBON_USB_PRODUCT_ID);
+	lf_assert(endpoints, failure, E_NULL, "Failed to claim any Carbon endpoints.");
+
+	/* Attach to each of the endpoints. */
+	lf_ll_apply_func(endpoints, NULL, carbon_attach_endpoint_applier);
+
+	return lf_success;
+failure:
+	return lf_error;
+}
+
+/* Selects a carbon device. */
+int carbon_select(struct _lf_device *device) {
+	return lf_success;
+}
+
 struct _carbon_record {
 	/* Microcontroller that handles USB interaction. (U2) */
 	struct _lf_device *mcu;
@@ -33,18 +72,7 @@ struct _carbon_record {
 	struct _lf_device *mpu;
 };
 
-int carbon_select(struct _lf_device *device);
-
-void *carbon_create(void *_endpoint, void *_other) {
-	/* The MCU's endpoint. */
-	struct _lf_endpoint *mcu_ep = _endpoint;
-	struct _lf_device *mcu = lf_device_create(mcu_ep);
-	lf_load_configuration(mcu);
-	struct _lf_endpoint *mpu_ep = lf_endpoint_create(&uart0, NULL);
-	struct _lf_device *mpu = lf_device_create(mpu_ep);
-	lf_load_configuration(mpu);
-	return NULL;
-}
+/* ----------- OLD API ------------ */
 
 /* The Carbon architecture is interesting because we actually have to attach
  * two flipper devices, the U2 and the 4S. We need libflipper to understand
@@ -56,22 +84,6 @@ void *carbon_create(void *_endpoint, void *_other) {
  *
  */
 
-int carbon_attach(void) {
-	struct _lf_ll *endpoints = lf_libusb_endpoints_for_vid_pid(CARBON_USB_VENDOR_ID, CARBON_USB_PRODUCT_ID);
-	lf_assert(endpoints, failure, E_NULL, "Failed to claim any Carbon endpoints.");
-	/* Make each endpoint into a Carbon device. */
-	lf_ll_apply_func(endpoints, NULL, carbon_create);
-	return lf_success;
-failure:
-	return lf_error;
-}
-
-/* Selects a carbon device. */
-int carbon_select(struct _lf_device *device) {
-	return lf_success;
-}
-
-/* ----------- OLD API ------------ */
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
 
 int lf_bridge_configure();
@@ -129,6 +141,7 @@ int lf_bridge_configure(struct _lf_device *device) {
 
 	/* Configure the endpoint. */
 	record -> atmega16u2.endpoint -> configure(record -> atmega16u2.endpoint, record -> _atmega16u2);
+
 	/* Assign the functionality of the device specific modules to this device. */
 	LF_ASSIGN_MODULE(_button, _button_id);
 	LF_ASSIGN_MODULE(_gpio, _gpio_id);
@@ -136,6 +149,7 @@ int lf_bridge_configure(struct _lf_device *device) {
 	LF_ASSIGN_MODULE(_led, _led_id);
 	LF_ASSIGN_MODULE(_uart0, _uart0_id);
 	LF_ASSIGN_MODULE(_wdt, _wdt_id);
+
 	/* Set the bridge module's index. */
 	record -> _uart0_bridge.index = _uart0_id;
 	/* Set the bridge module's device pointer pointer. */

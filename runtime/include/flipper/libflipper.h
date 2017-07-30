@@ -21,9 +21,9 @@
 #define __lf_usb_timeout__
 #ifdef __lf_usb_timeout__
 /* Must be between 1ms and 255ms. */
-#define CARBON_USB_TIMEOUT_MS 255
+#define LF_USB_TIMEOUT_MS 255
 #else
-#define CARBON_USB_TIMEOUT_MS 0
+#define LF_USB_TIMEOUT_MS 0
 #endif
 
 /* NOTE: Summing the size parameters of each endpoints below should be less than or equal to 160. */
@@ -157,6 +157,8 @@ struct _lf_module {
 		NULL \
 	};
 
+extern struct _lf_device lf_self;
+
 #ifdef PLATFORM_HEADER
 /* Include platform specific declarations. */
 #include PLATFORM_HEADER
@@ -180,12 +182,12 @@ int flipper_select(struct _lf_device *device);
 int flipper_detach(struct _lf_device *device);
 int flipper_exit(void);
 
-fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _fmr_parameters *parameters);
+fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _lf_ll *args);
 
 /* Moves data from the address space of the host to that of the device. */
-int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _fmr_parameters *parameters);
+int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _lf_ll *args);
 /* Moves data from the address space of the device to that of the host. */
-int lf_pull(struct _lf_module *module, fmr_function function, void *destination, lf_size_t length, struct _fmr_parameters *parameters);
+int lf_pull(struct _lf_module *module, fmr_function function, void *destination, lf_size_t length, struct _lf_ll *args);
 
 /* Load the device's configuration information. */
 int lf_load_configuration(struct _lf_device *device);

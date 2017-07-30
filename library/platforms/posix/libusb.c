@@ -25,50 +25,50 @@ struct _lf_ll *lf_libusb_endpoints_for_vid_pid(uint16_t vid, uint16_t pid) {
 	struct libusb_context *context = NULL;
 	struct libusb_device **libusb_devices = NULL;
 	struct _lf_ll *endpoints = NULL;
+
 	int _e = libusb_init(&context);
 	lf_assert(_e == 0, failure, E_LIBUSB, "Failed to initialize libusb. Reboot and try again.");
-	size_t device_count = libusb_get_device_list(context, &libusb_devices);
+
 	/* Walk the device list until all desired devices are attached. */
+	size_t device_count = libusb_get_device_list(context, &libusb_devices);
 	for (size_t i = 0; i < device_count; i ++) {
-		/* Obtain a reference to the device. */
 		struct libusb_device *libusb_device = libusb_devices[i];
-		/* Stack allocate space to hold the device's descriptor. */
+
+		/* Obtain the device's descriptor. */
 		struct libusb_device_descriptor descriptor;
 		_e = libusb_get_device_descriptor(libusb_device, &descriptor);
 		lf_assert(_e == 0, failure, E_LIBUSB, "Failed to obtain descriptor for device.");
+
 		/* Check if we have a match with the desired VID and PID. */
 		if (descriptor.idVendor == vid && descriptor.idProduct == pid) {
-			struct _lf_libusb_record *record = NULL;
-			struct _lf_endpoint *endpoint = NULL;
-			/* Create a libusb record to hold the references to this device. */
-			record = calloc(1, sizeof(struct _lf_libusb_record));
-			lf_assert(record, release, E_MALLOC, "Failed to allocate the memory needed to create a libusb record.");
 			/* Create an new endpoint for this device. */
-			endpoint = lf_endpoint_create(&lf_libusb_constructor, record);
+			struct _lf_endpoint *endpoint = lf_endpoint_create(&lf_libusb_constructor, sizeof(struct _lf_libusb_record));
 			lf_assert(endpoint, release, E_NULL, "Failed to create new libusb endpoint.");
+
 			/* Retain a reference to the libusb context and give it to the record. */
-			_e = libusb_init(&(record -> context));
+			struct _lf_libusb_record *record = endpoint->record;
+			_e = libusb_init(&(record->context));
 			lf_assert(_e == 0, release, E_LIBUSB, "Failed to initialize libusb. Reboot and try again.");
+
 			/* Open the device and give it to the record. */
-			_e = libusb_open(libusb_device, &(record -> handle));
+			_e = libusb_open(libusb_device, &(record->handle));
 			lf_assert(_e == 0, release, E_NO_DEVICE, "Could not find any devices connected via USB. Ensure that a device is connected.");
+
 			/* Claim the device's control interface. */
-			_e = libusb_claim_interface(record -> handle, 0);
+			_e = libusb_claim_interface(record->handle, 0);
 			lf_assert(_e == 0, release, E_LIBUSB, "Failed to claim interface on attached device. Please quit any other programs using your device.");
+
 			/* Reset the device's USB controller. */
-			_e = libusb_reset_device(record -> handle);
+			_e = libusb_reset_device(record->handle);
 			lf_assert(_e == 0, release, E_LIBUSB, "Failed to reset the libusb device.");
+
 			/* Add the device to the device list. */
-			_e = lf_ll_append(&endpoints, endpoint, lf_detach);
+			_e = lf_ll_append(&endpoints, endpoint, lf_endpoint_release);
 			lf_assert(_e == 0, release, E_NULL, "Failed to attach device.");
+
 			continue;
 release:
-			if (endpoint) {
-				/* This will also release the endpoint's record. */
-				lf_endpoint_release(endpoint);
-			} else if (record) {
-				free(record);
-			}
+			lf_endpoint_release(endpoint);
 			break;
 		}
 	}
@@ -95,15 +95,15 @@ uint8_t lf_libusb_get(struct _lf_endpoint *this) {
 }
 
 int lf_libusb_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
-	struct _lf_libusb_record *record = this -> record;
+	struct _lf_libusb_record *record = this->record;
 	int _length;
 	int _e;
 #ifndef __ALL_BULK__
 	if (length <= INTERRUPT_OUT_SIZE) {
-		_e = libusb_interrupt_transfer(record -> handle, INTERRUPT_OUT_ENDPOINT, source, length, &_length, CARBON_USB_TIMEOUT_MS);
+		_e = libusb_interrupt_transfer(record->handle, INTERRUPT_OUT_ENDPOINT, source, length, &_length, LF_USB_TIMEOUT_MS);
 	} else {
 #endif
-		_e = libusb_bulk_transfer(record -> handle, BULK_OUT_ENDPOINT, source, length, &_length, CARBON_USB_TIMEOUT_MS);
+		_e = libusb_bulk_transfer(record->handle, BULK_OUT_ENDPOINT, source, length, &_length, LF_USB_TIMEOUT_MS);
 #ifndef __ALL_BULK__
 	}
 #endif
@@ -122,15 +122,15 @@ failure:
 }
 
 int lf_libusb_pull(struct _lf_endpoint *this, void *destination, lf_size_t length) {
-	struct _lf_libusb_record *record = this -> record;
+	struct _lf_libusb_record *record = this->record;
 	int _length;
 	int _e;
 #ifndef __ALL_BULK__
 	if (length <= INTERRUPT_IN_SIZE) {
-		_e = libusb_interrupt_transfer(record -> handle, INTERRUPT_IN_ENDPOINT, destination, length, &_length, CARBON_USB_TIMEOUT_MS);
+		_e = libusb_interrupt_transfer(record->handle, INTERRUPT_IN_ENDPOINT, destination, length, &_length, LF_USB_TIMEOUT_MS);
 	} else {
 #endif
-		_e = libusb_bulk_transfer(record -> handle, BULK_IN_ENDPOINT, destination, length, &_length, CARBON_USB_TIMEOUT_MS);
+		_e = libusb_bulk_transfer(record->handle, BULK_IN_ENDPOINT, destination, length, &_length, LF_USB_TIMEOUT_MS);
 #ifndef __ALL_BULK__
 	}
 #endif
@@ -149,19 +149,11 @@ failure:
 }
 
 int lf_libusb_destroy(struct _lf_endpoint *this) {
-	struct _lf_libusb_record *record = this -> record;
-	if (record) {
-		if (record -> handle) {
-			/* Close the device handle. */
-			libusb_close(record -> handle);
-		}
-		if (record -> context) {
-			/* Destroy the libusb context. */
-			libusb_exit(record -> context);
-		}
-		free(record);
-		/* Zero the record address. */
-		this -> record = 0;
-	}
+	struct _lf_libusb_record *record = this->record;
+	lf_assert(record, failure, E_NULL, "NULL pointer provided to libusb deconstructor.");
+	libusb_close(record->handle);
+	libusb_exit(record->context);
 	return lf_success;
+failure:
+	return lf_error;
 }

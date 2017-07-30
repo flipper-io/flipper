@@ -2,11 +2,12 @@
 #include <flipper/message.h>
 
 /* Creates a new libflipper endpoint. */
-struct _lf_endpoint *lf_endpoint_create(const struct _lf_endpoint *constructor, void *record) {
+struct _lf_endpoint *lf_endpoint_create(const struct _lf_endpoint *constructor, size_t record_size) {
 	struct _lf_endpoint *endpoint = calloc(1, sizeof(struct _lf_endpoint));
 	lf_assert(endpoint, failure, E_MALLOC, "Failed to allocate memory for new endpoint.");
 	memcpy(endpoint, constructor, sizeof(struct _lf_endpoint));
-	endpoint -> record = record;
+	endpoint -> record = calloc(1, record_size);
+	lf_assert(endpoint -> record, failure, E_MALLOC, "Failed to allocate the memory needed to create a libusb record.");
 	return endpoint;
 failure:
 	return NULL;
@@ -35,6 +36,7 @@ void lf_endpoint_poll(struct _lf_endpoint *endpoint) {
 int lf_endpoint_release(struct _lf_endpoint *endpoint) {
 	lf_assert(endpoint, failure, E_NULL, "NULL pointer provided for endpoint deallocation.");
 	endpoint -> destroy(endpoint);
+	free(endpoint -> record);
 	free(endpoint);
 	return lf_success;
 failure:

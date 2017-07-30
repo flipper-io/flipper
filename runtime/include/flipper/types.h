@@ -19,13 +19,10 @@
 
 /* Used to contain the result of checksumming operations. */
 typedef uint16_t lf_crc_t;
-
 /* Describes a pointer to an address within non-volatile memory. */
 typedef uint32_t nvm_p;
-
 /* Used to quantify block sizes sent accross different platforms. */
 typedef uint32_t lf_size_t;
-
 /* Used to quantify the version of modules in a standardized format. */
 typedef uint16_t lf_version_t;
 

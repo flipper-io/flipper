@@ -29,7 +29,7 @@ struct _lf_endpoint {
 	lf_msg_queue *incoming;
 };
 
-struct _lf_endpoint *lf_endpoint_create(const struct _lf_endpoint *constructor, void *record);
+struct _lf_endpoint *lf_endpoint_create(const struct _lf_endpoint *constructor, size_t record_size);
 int lf_endpoint_enqueue(struct _lf_endpoint *endpoint, struct _lf_msg *message);
 bool lf_endpoint_has_data(struct _lf_endpoint *endpoint);
 struct _lf_msg *lf_endpoint_dequeue(struct _lf_endpoint *endpoint);

@@ -49,7 +49,7 @@ int lf_retrieve(struct _lf_device *device, struct _fmr_result *result) {
 	return lf_success;
 }
 
-fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _fmr_parameters *parameters) {
+fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _lf_ll *parameters) {
 	/* Ensure that the module pointer is valid. */
 	if (!module) {
 		lf_error_raise(E_NULL, error_message("No module was specified for function invocation."));
@@ -75,6 +75,8 @@ fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _f
 	_packet.header.magic = FMR_MAGIC_NUMBER;
 	/* Compute the initial length of the packet. */
 	_packet.header.length = sizeof(struct _fmr_invocation_packet);
+
+	#pragma warning Remove this.
 	/* If the user module bit is set, make the invocation a user invocation. */
 	if (module -> index & FMR_USER_INVOCATION_BIT) {
 		_packet.header.class = fmr_user_invocation_class;
@@ -82,6 +84,7 @@ fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _f
 		/* Otherwise, make it a standard invocation. */
 		_packet.header.class = fmr_standard_invocation_class;
 	}
+
 	/* Generate the function call in the outgoing packet. */
 	int _e = fmr_create_call((uint8_t)(module -> index), function, parameters, &_packet.header, &packet -> call);
 	if (_e < lf_success) {
@@ -113,7 +116,7 @@ fmr_va fmr_ptr(struct _lf_device *device, void *ptr) {
 	return 0;
 }
 
-int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _fmr_parameters *parameters) {
+int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _lf_ll *parameters) {
 	/* Ensure that we have a valid module and argument pointer. */
 	if (!module) {
 		lf_error_raise(E_NULL, error_message("No module specified for message runtime push to module '%s'.", module -> name));
@@ -141,7 +144,8 @@ int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_s
 	/* Set the push length. */
 	packet -> length = length;
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_create_call(module -> index, function, fmr_merge(fmr_args(fmr_ptr(device, source), fmr_infer(length)), parameters), &_packet.header, &packet -> call);
+	//int _e = fmr_create_call(module -> index, function, fmr_merge(fmr_args(fmr_ptr(device, source), fmr_infer(length)), parameters), &_packet.header, &packet -> call);
+	int _e = lf_error;
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -165,7 +169,7 @@ int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_s
 	return lf_success;
 }
 
-int lf_pull(struct _lf_module *module, fmr_function function, void *destination, lf_size_t length, struct _fmr_parameters *parameters) {
+int lf_pull(struct _lf_module *module, fmr_function function, void *destination, lf_size_t length, struct _lf_ll *parameters) {
 	/* Ensure that we have a valid module and argument pointer. */
 	if (!module) {
 		lf_error_raise(E_NULL, error_message("No module specified for message runtime pull from module '%s'.", module -> name));
@@ -193,7 +197,8 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 	/* Set the pull length. */
 	packet -> length = length;
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_create_call(module -> index, function, fmr_merge(fmr_args(fmr_ptr(device, destination), fmr_infer(length)), parameters), &_packet.header, &packet -> call);
+	//int _e = fmr_create_call(module -> index, function, fmr_merge(fmr_args(fmr_ptr(device, destination), fmr_infer(length)), parameters), &_packet.header, &packet -> call);
+	int _e = lf_error;
 	if (_e < lf_success) {
 		return lf_error;
 	}

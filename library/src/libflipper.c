@@ -32,8 +32,8 @@ failure:
 int lf_attach(struct _lf_device *device) {
 	lf_assert(device, failure, E_NULL, "NULL device pointer provided for attach.");
 	/* Ask the device for its configuration. */
-	int _e = lf_load_configuration(device);
-	lf_assert(_e == lf_success, failure, E_CONFIGURATION, "Failed to obtain configuration from device.");
+	//int _e = lf_load_configuration(device);
+	//lf_assert(_e == lf_success, failure, E_CONFIGURATION, "Failed to obtain configuration from device.");
 	lf_ll_append(&lf_get_device_list(), device, lf_detach);
 	lf_select(device);
 	return lf_success;
@@ -114,6 +114,7 @@ int lf_load_configuration(struct _lf_device *device) {
 	if (_e < lf_success) {
 		return lf_error;
 	}
+
 	/* Obtain the result of the operation. */
 	struct _fmr_result result;
 	_e = lf_get_result(device, &result);
@@ -150,7 +151,7 @@ int lf_bind(struct _lf_module *module) {
 	/* Set the module's index. */
 	module -> index = index;
 	/* Set the module's device. */
-	module -> device = &lf_get_current_device();
+	module -> device = lf_get_current_device();
 	return lf_success;
 failure:
 	return lf_error;

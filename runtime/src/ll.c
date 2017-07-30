@@ -22,8 +22,7 @@ failure:
 	return lf_error;
 }
 
-void *lf_ll_apply_func(struct _lf_ll *_ll, void *_other, void *(* func)(void *_item, void *_other)) {
-	struct _lf_ll *ll = _ll;
+void *lf_ll_apply_func(struct _lf_ll *ll, void *_other, void *(* func)(void *_item, void *_other)) {
 	lf_assert(ll, failure, E_NULL, "NULL");
 	do {
 		void *result = NULL;
@@ -42,7 +41,7 @@ failure:
 int lf_ll_release(struct _lf_ll **_ll) {
 	lf_assert(_ll, failure, E_NULL, "NULL");
 	struct _lf_ll *ll = *_ll;
-	lf_assert(ll, failure, E_NULL, "NULL");
+	if (!ll) return lf_success;
 	do {
 		/* Call the item's deconstructor. */
 		if (ll -> deconstructor) {
@@ -65,8 +64,17 @@ void *lf_ll_pop(struct _lf_ll **_ll) {
 	*_ll = ll -> next;
 	void *item = ll -> item;
 	free(ll);
-	*_ll = NULL;
 	return item;
 failure:
 	return NULL;
+}
+
+size_t lf_ll_count(struct _lf_ll *ll) {
+	if (!ll) return 0;
+	size_t count = 0;
+    while (ll) {
+        ll = ll->next;
+        count ++;
+    }
+	return count;
 }

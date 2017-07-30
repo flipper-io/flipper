@@ -85,7 +85,7 @@ $(BUILD)/%.S.o: %.S | $(BUILD_DIR_FILES)
 %/.dir:
 	$(_v)mkdir -p $* && touch $@
 
-flash: $(TARGET_HEX)
+install: $(TARGET_HEX)
 	dfu-programmer at90usb162 erase
 	dfu-programmer at90usb162 flash $(TARGET_HEX)
 	dfu-programmer at90usb162 launch --no-reset
