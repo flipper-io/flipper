@@ -41,7 +41,7 @@ OBJCOPY = $(PREFIX)objcopy
 OBJDUMP = $(PREFIX)objdump
 
 # Define compilation and emulation flags.
-CFLAGS = -std=c99 -g \
+CFLAGS = -std=c99 -g -fpic \
 		 -DPLATFORM_HEADER="<flipper/posix/posix.h>" \
 		 $(foreach inc,$(INCLUDE_DIRS),-I$(inc))
 
@@ -63,14 +63,15 @@ $(TARGET): $(OBJS)
 	$(_v)$(CC) $(CFLAGS) $(LDFLAGS) -o $(BUILD)/$@ $^
 
 headers:
-	$(_v)cp -r carbon/include/* $(BUILD)/include
-	$(_v)cp -r library/include/* $(BUILD)/include
-	$(_v)cp -r runtime/include/* $(BUILD)/include
+	$(_v)mkdir -p $(BUILD)/include/flipper
+	$(_v)cp -r carbon/include/* $(BUILD)/include/flipper
+	$(_v)cp -r library/include/* $(BUILD)/include/flipper
+	$(_v)cp -r runtime/include/* $(BUILD)/include/flipper
 	$(_v)cp flipper.h $(BUILD)/include
 
-install: all
-	$(_v)cp $(BUILD)/$(TARGET) /usr/local/lib
-	$(_v)cp -r $(BUILD)/include/* /usr/local/include
+install:
+	$(_v)cp $(BUILD)/$(TARGET) /usr/local/lib/
+	$(_v)cp -r $(BUILD)/include/* /usr/local/include/
 
 uninstall:
 	$(_v)rm -r /usr/local/include/flipper*
