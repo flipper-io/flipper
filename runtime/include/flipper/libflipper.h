@@ -18,7 +18,7 @@
 #define CARBON_USB_PRODUCT_ID      0x0480
 
 /* If defined, imposes a timeout on USB transactions. */
-#define __lf_usb_timeout__
+//#define __lf_usb_timeout__
 #ifdef __lf_usb_timeout__
 /* Must be between 1ms and 255ms. */
 #define LF_USB_TIMEOUT_MS 255
@@ -125,10 +125,6 @@ static inline void lf_set_current_device(struct _lf_device *device) {
 }
 #define lf_get_current_device() lf_current_device
 
-/* All devices must implement a self referential interface. */
-#pragma warning Remove this.
-extern struct _lf_device lf_self;
-
 /* Standardizes the notion of a module. */
 struct _lf_module {
 	/* A string containing the module's name. */
@@ -155,6 +151,8 @@ struct _lf_module {
 		0, \
 		NULL \
 	};
+
+#define LF_MODULE_SET_DEVICE_AND_ID(module, _device, _id) module.device = _device; module.index = _id;
 
 extern struct _lf_device lf_self;
 

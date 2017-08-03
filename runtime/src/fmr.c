@@ -90,7 +90,7 @@ LF_WEAK int fmr_perform_user_invocation(struct _fmr_invocation *invocation, stru
 }
 
 LF_WEAK int fmr_configuration_subclass_handler(struct _fmr_result *result) {
-	result->value = lf_self.endpoint->push(lf_self.endpoint, &lf_self.configuration, sizeof(struct _lf_configuration));
+	
 	return result->error = lf_error_get();
 }
 

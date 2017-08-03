@@ -4,7 +4,6 @@
 #include <flipper/libflipper.h>
 
 #include <flipper/atsam4s/SAM4S16.h>
-#include <cmsis/core_cm3.h>
 
 /* Create an enumeraion defining all of the precomputed identifiers needed for the standard modules. */
 enum {

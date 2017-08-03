@@ -2,18 +2,7 @@
 #include <osmium.h>
 #include <scheduler.h>
 #include <loader.h>
-
-/* The fmr_device object containing global state about this device. */
-struct _lf_device lf_self = {
-	{
-		"flipper",
-		0xc713,
-		LF_VERSION,
-		(lf_device_32bit | lf_device_little_endian)
-	},
-	NULL,
-	E_OK
-};
+#include <flipper/atsam4s/atsam4s.h>
 
 /* Buffer space for incoming message runtime packets. */
 struct _fmr_packet packet;

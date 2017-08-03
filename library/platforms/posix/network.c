@@ -42,7 +42,6 @@ int lf_network_destroy(struct _lf_endpoint *this) {
 	if (this && this->_ctx) {
 		struct _lf_network_context *context = this->_ctx;
 		close(context->fd);
-		free(context);
 	}
 	return lf_success;
 }
@@ -65,8 +64,8 @@ struct _lf_endpoint *lf_network_endpoint_for_hostname(char *hostname) {
 	context->device.sin_family = AF_INET;
 	context->device.sin_addr.s_addr = list[0]->s_addr;
 	context->device.sin_port = htons(FMR_PORT);
-	int _e = bind(context->fd, (struct sockaddr *)&(context->device), sizeof(struct sockaddr_in));
-	lf_assert(_e > 0, failure, E_SOCKET, "Failed to bind to socket on device.");
+	// int _e = bind(context->fd, (struct sockaddr *)&(context->device), sizeof(struct sockaddr_in));
+	// lf_assert(_e > 0, failure, E_SOCKET, "Failed to bind to socket on device.");
 	return endpoint;
 failure:
 	if (context) close(context->fd);

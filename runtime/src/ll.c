@@ -29,14 +29,12 @@ failure:
 
 void *lf_ll_pop(struct _lf_ll **_ll) {
 	lf_assert(_ll, failure, E_NULL, "Invalid list reference provided to '%s.'", __PRETTY_FUNCTION__);
-	struct _lf_ll *ll = *_ll;
 	void *item = NULL;
-	if (ll) {
-		struct _lf_ll **old = _ll;
-		*_ll = ll->next;
-		item = ll->item;
-		free(ll);
-		*old = NULL;
+	if (*_ll) {
+		item = (*_ll)->item;
+		struct _lf_ll *old = *_ll;
+		*_ll = (*_ll)->next;
+		free(old);
 	}
 	return item;
 failure:

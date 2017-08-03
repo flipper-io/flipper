@@ -2,32 +2,6 @@
 #include <flipper/atmegau2/megausb.h>
 #include <flipper/atmegau2/atmegau2.h>
 
-struct _lf_endpoint megausb = {
-	megausb_configure,
-	megausb_ready,
-	megausb_put,
-	megausb_get,
-	megausb_push,
-	megausb_pull,
-	megausb_destroy
-};
-
-int megausb_configure(void) {
-	return lf_success;
-}
-
-uint8_t megausb_ready(struct _lf_endpoint *this) {
-	return 0;
-}
-
-void megausb_put(struct _lf_endpoint *this, uint8_t byte) {
-
-}
-
-uint8_t megausb_get(struct _lf_endpoint *this) {
-	return 0;
-}
-
 int megausb_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
 	int8_t _e;
 #ifndef __ALL_BULK__

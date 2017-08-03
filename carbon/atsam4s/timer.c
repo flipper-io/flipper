@@ -1,11 +1,13 @@
 #define __private_include__
 #include <flipper/timer.h>
 #include <flipper/error.h>
+#include <flipper/atsam4s/atsam4s.h>
+#include <cmsis/core_cm3.h>
 
 /* NOTE: TC0 is reserved by the system scheduler. */
 
 /* Expose channel A within TC0. */
-TcChannel *TCA = &(TC0 -> TC_CHANNEL[0]);
+TcChannel *TCA = &(TC0->TC_CHANNEL[0]);
 
 /* A data structure to hold information pertainent to each timer. */
 struct _lf_timer {
@@ -18,26 +20,26 @@ struct _lf_timer {
 };
 
 /* Initialize an array of all the timers. */
-struct _lf_timer timers[] = { { &(TC0 -> TC_CHANNEL[0]), true, NULL },
-							  { &(TC0 -> TC_CHANNEL[1]), true, NULL },
-							  { &(TC0 -> TC_CHANNEL[2]), true, NULL },
-						  	  { &(TC0 -> TC_CHANNEL[3]), true, NULL },
-						  	  { &(TC0 -> TC_CHANNEL[4]), true, NULL },
-						  	  { &(TC0 -> TC_CHANNEL[5]), true, NULL } };
+struct _lf_timer timers[] = { { &(TC0->TC_CHANNEL[0]), true, NULL },
+							  { &(TC0->TC_CHANNEL[1]), true, NULL },
+							  { &(TC0->TC_CHANNEL[2]), true, NULL },
+								{ &(TC0->TC_CHANNEL[3]), true, NULL },
+								{ &(TC0->TC_CHANNEL[4]), true, NULL },
+								{ &(TC0->TC_CHANNEL[5]), true, NULL } };
 
 int timer_configure(void) {
 	/* Iterate through the timers and configure their defaults. */
 	for (int i = 0; i < sizeof(timers); i ++) {
 		/* Enable the timer's peripheral clock. */
-		PMC -> PMC_PCER0 |= (1 << ID_TC0 + i);
+		PMC->PMC_PCER0 |= (1 << (ID_TC0 + i));
 		/* Disable the source clock to TCA. */
-		timers[i].CH -> TC_CCR = TC_CCR_CLKDIS;
+		timers[i].CH->TC_CCR = TC_CCR_CLKDIS;
 		/* Select the incoming clock signal as MCK / 128. */
-		timers[i].CH -> TC_CMR = TC_CMR_TCCLKS_TIMER_CLOCK4;
+		timers[i].CH->TC_CMR = TC_CMR_TCCLKS_TIMER_CLOCK4;
 		/* Enable the TCA C compare interrupt. */
-		timers[i].CH -> TC_IER = TC_IER_CPCS;
+		timers[i].CH->TC_IER = TC_IER_CPCS;
 		/* Set the compare value into C. */
-		timers[i].CH -> TC_RC = 0xFFFF;
+		timers[i].CH->TC_RC = 0xFFFF;
 		/* Enable the timer's interrupt. */
 		NVIC_EnableIRQ(TC0_IRQn + i);
 	}
@@ -54,9 +56,9 @@ int timer_register(uint32_t ticks, void *callback) {
 			/* Set the callback address. */
 			timers[i].callback = callback;
 			/* Set the compare value into C. */
-			timers[i].CH -> TC_RC = ticks;
+			timers[i].CH->TC_RC = ticks;
 			/* Enable the clock and start the timer. */
-			timers[i].CH -> TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;
+			timers[i].CH->TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;
 			return lf_success;
 		}
 	}
@@ -66,11 +68,11 @@ int timer_register(uint32_t ticks, void *callback) {
 
 void tcx_isr(uint8_t timer) {
 	/* Read the interrupt flag to clear it. */
-	timers[timer].CH -> TC_SR;
+	timers[timer].CH->TC_SR;
 	/* Perform the timer callback. */
 	timers[timer].callback();
 	/* Stop the timer. */
-	timers[timer].CH -> TC_CCR = TC_CCR_CLKDIS;
+	timers[timer].CH->TC_CCR = TC_CCR_CLKDIS;
 	/* Release the timer. */
 	timers[timer].available = true;
 }
