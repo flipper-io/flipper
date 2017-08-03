@@ -17,7 +17,7 @@ struct _lf_ll *fmr_build(fmr_argc argc, ...) {
 		fmr_type type = (fmr_type)((value >> (sizeof(fmr_arg) * 8)) & 0x7);
 		lf_assert(type < fmr_int32_t, failure, E_TYPE, "An invalid type was provided while appending the parameter '0x%08x' to the argument list.", (fmr_arg)value);
 		struct _lf_arg *arg = malloc(sizeof(struct _lf_arg));
-		arg->value = value;
+		arg->value = (fmr_arg)value;
 		arg->type = type;
 		lf_assert(arg, failure, E_MALLOC, "Failed to allocate new lf_arg.");
 		lf_ll_append(&list, arg, free);

@@ -2,6 +2,8 @@
 #include <flipper/posix/posix.h>
 #include <flipper/carbon.h>
 
+struct _lf_device lf_self;
+
 const void *const fmr_modules[] = {};
 
 uint32_t fmr_call(const void *function, uint8_t argc, uint16_t argt, void *argv) {

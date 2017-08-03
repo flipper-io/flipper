@@ -50,10 +50,9 @@ void *carbon_attach_endpoint_applier(void *_endpoint, void *_other) {
 int carbon_attach(void) {
 	/* Obtains a list of endpoints for all Carbon devices attached to the system. */
 	struct _lf_ll *endpoints = lf_libusb_endpoints_for_vid_pid(CARBON_USB_VENDOR_ID, CARBON_USB_PRODUCT_ID);
-	lf_assert(endpoints, failure, E_NULL, "Failed to claim any Carbon endpoints.");
-
+	if (!endpoints) return 0;
 	/* Attach to each of the endpoints. */
-	lf_ll_apply_func(endpoints, NULL, carbon_attach_endpoint_applier);
+	lf_ll_apply_func(endpoints, carbon_attach_endpoint_applier, NULL);
 
 	return lf_success;
 failure:

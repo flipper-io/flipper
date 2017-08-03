@@ -128,7 +128,7 @@ static inline void lf_set_current_device(struct _lf_device *device) {
 
 /* All devices must implement a self referential interface. */
 #pragma warning Remove this.
-struct _lf_device lf_self;
+extern struct _lf_device lf_self;
 
 /* Standardizes the notion of a module. */
 struct _lf_module {
@@ -192,7 +192,7 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 /* Load the device's configuration information. */
 int lf_load_configuration(struct _lf_device *device);
 /* Provides a checksum for a given block of data. */
-lf_crc_t lf_crc(void *source, lf_size_t length);
+lf_crc_t lf_crc(void *source, size_t length);
 
 /* Obtains a result from a device. */
 int lf_get_result(struct _lf_device *device, struct _fmr_result *result);

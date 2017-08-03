@@ -17,35 +17,25 @@ const struct _flipper flipper = {
 	flipper_exit,
 };
 
-/* Creates a new device. */
+/* Creates a new libflipper device. */
 struct _lf_device *lf_device_create(struct _lf_endpoint *endpoint) {
 	struct _lf_device *device = (struct _lf_device *)calloc(1, sizeof(struct _lf_device));
 	lf_assert(device, failure, E_MALLOC, "Failed to allocate memory for new device.");
 	device -> endpoint = endpoint;
 	return device;
 failure:
-	if (device) free(device);
+	free(device);
 	return NULL;
 }
 
 /* Attempts to attach to all unattached devices. Returns how many devices were attached. */
 int lf_attach(struct _lf_device *device) {
-	lf_assert(device, failure, E_NULL, "NULL device pointer provided for attach.");
+	lf_assert(device, failure, E_NULL, "Attempt to attach an invalid device.");
 	/* Ask the device for its configuration. */
 	//int _e = lf_load_configuration(device);
 	//lf_assert(_e == lf_success, failure, E_CONFIGURATION, "Failed to obtain configuration from device.");
 	lf_ll_append(&lf_get_device_list(), device, lf_detach);
 	lf_select(device);
-	return lf_success;
-failure:
-	return lf_error;
-}
-
-/* Detaches a device from libflipper. */
-int lf_detach(struct _lf_device *device) {
-	lf_assert(device, failure, E_NULL, "NULL device pointer provided for detach.");
-	/* Release the device's endpoint. */
-	lf_endpoint_release(device -> endpoint);
 	return lf_success;
 failure:
 	return lf_error;
@@ -60,9 +50,18 @@ failure:
 	return lf_error;
 }
 
+/* Detaches a device from libflipper. */
+int lf_detach(struct _lf_device *device) {
+	lf_assert(device, failure, E_NULL, "Attempt to detach an invalid device.");
+	lf_endpoint_release(device -> endpoint);
+	return lf_success;
+failure:
+	return lf_error;
+}
+
 /* Deactivates libflipper state and releases the event loop. */
 int __attribute__((__destructor__)) lf_exit(void) {
-	/* Release all of the events. */
+	/* Release all of the libflipper events. */
 	lf_ll_release(&lf_get_event_list());
 	/* Release all of the attached devices. */
 	lf_ll_release(&lf_get_device_list());

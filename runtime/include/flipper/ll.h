@@ -14,7 +14,7 @@ struct _lf_ll {
 };
 
 int lf_ll_append(struct _lf_ll **_ll, void *item, void *deconstructor);
-void *lf_ll_apply_func(struct _lf_ll *ll, void *_other, void *(* func)(void *_item, void *_other));
+void *lf_ll_apply_func(struct _lf_ll *ll, void *(* func)(void *_item, void *_other) ,void *_other);
 int lf_ll_release(struct _lf_ll **_ll);
 void *lf_ll_pop(struct _lf_ll **_ll);
 size_t lf_ll_count(struct _lf_ll *ll);

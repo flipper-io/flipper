@@ -22,7 +22,7 @@ failure:
 	return lf_error;
 }
 
-void *lf_ll_apply_func(struct _lf_ll *ll, void *_other, void *(* func)(void *_item, void *_other)) {
+void *lf_ll_apply_func(struct _lf_ll *ll, void *(* func)(void *_item, void *_other),  void *_other) {
 	lf_assert(ll, failure, E_NULL, "NULL");
 	do {
 		void *result = NULL;
@@ -72,9 +72,9 @@ failure:
 size_t lf_ll_count(struct _lf_ll *ll) {
 	if (!ll) return 0;
 	size_t count = 0;
-    while (ll) {
-        ll = ll->next;
-        count ++;
-    }
+	while (ll) {
+		ll = ll->next;
+		count ++;
+	}
 	return count;
 }

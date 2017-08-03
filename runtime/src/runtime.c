@@ -49,6 +49,19 @@ int lf_retrieve(struct _lf_device *device, struct _fmr_result *result) {
 	return lf_success;
 }
 
+fmr_return _lf_invoke(struct _lf_module *module, fmr_function function, struct _lf_ll *args) {
+	lf_assert(module, failure, E_MODULE, "Attempt to invoke a function within an invalid module.");
+
+	struct _lf_device *device = module->device;
+	struct _fmr_invocation_packet packet;
+	fmr_create_call(module->index, function, args, &packet.header, &packet.call);
+	lf_transfer(device, (struct _fmr_packet *)&packet);
+
+
+failure:
+	return 0;
+}
+
 fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _lf_ll *parameters) {
 	/* Ensure that the module pointer is valid. */
 	if (!module) {
@@ -59,7 +72,7 @@ fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _l
 	struct _lf_device *device = module -> device;
 	/* If no device is provided, raise an error. */
 	if (!device) {
-		lf_error_raise(E_NO_DEVICE, error_message("The module '%s' has no target device.", module -> name));
+		lf_error_raise(E_NO_DEVICE, error_message("The module '%s' has no target device. Did you attach?", module -> name));
 		return lf_error;
 	}
 	/* Ensure that the module has been bound. */
