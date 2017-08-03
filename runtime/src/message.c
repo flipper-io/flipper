@@ -20,7 +20,7 @@ int lf_msg_send(struct _lf_msg *msg, struct _lf_endpoint *endpoint) {
 }
 
 /* Creates a message receipt event for the outgoing packet. */
-int lf_msg_subscribe_receipt(struct _lf_msg *msg, lf_event_handler callback) {
+int lf_msg_subscribe_receipt(struct _lf_msg *msg, lf_event_handler_func callback) {
     /* Generate a unique id to receive the message receipt event over. */
     lf_event_id id = lf_event_generate_unique_id();
     lf_event_register(id, callback, NULL);
@@ -30,7 +30,7 @@ int lf_msg_subscribe_receipt(struct _lf_msg *msg, lf_event_handler callback) {
 }
 
 /* Asynchronously sends a message to the given device. Invokes the callback function with the response message when the message returns. */
-int lf_msg_send_async(struct _lf_msg *msg, struct _lf_endpoint *endpoint, lf_event_handler callback) {
+int lf_msg_send_async(struct _lf_msg *msg, struct _lf_endpoint *endpoint, lf_event_handler_func callback) {
     if (callback) {
         /* Subscribe the handler provided to the message's response. */
         lf_msg_subscribe_receipt(msg, callback);

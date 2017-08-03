@@ -118,7 +118,6 @@ extern lf_event_list lf_registered_events;
 
 typedef struct _lf_ll *lf_device_list;
 extern lf_device_list lf_attached_devices;
-#define lf_get_device_list() lf_attached_devices
 
 extern struct _lf_device *lf_current_device;
 static inline void lf_set_current_device(struct _lf_device *device) {
@@ -165,7 +164,7 @@ extern struct _lf_device lf_self;
 /* NOTE: The PLATFORM_HEADER macro is passed as a preprocessor flag during compilation. */
 #endif
 
-struct _lf_device *lf_device_create(struct _lf_endpoint *endpoint);
+struct _lf_device *lf_device_create(struct _lf_endpoint *endpoint, int (* selector)(struct _lf_device *selector));
 
 /* Attaches to a device. */
 int lf_attach(struct _lf_device *device);

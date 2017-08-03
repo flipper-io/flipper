@@ -6,101 +6,69 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-struct _lf_endpoint lf_network_ep = {
-	network_configure,
-	network_ready,
-	network_put,
-	network_get,
-	network_push,
-	network_pull,
-	network_destroy
-};
-
-struct _network_record {
+struct _lf_network_context {
 	int fd;
+	char *host;
 	struct sockaddr_in device;
 };
 
-int network_configure(struct _lf_endpoint *this, char *hostname) {
-	/* Allocate memory for the network record if it has not yet been allocated. */
-	if (!(this -> record)) {
-		this -> record = calloc(1, sizeof(struct _network_record));
-	}
-	/* Obtain a pointer to and cast to the network record associated with the provided endpoint. */
-	struct _network_record *record = this -> record;
-	/* Create a new socket. */
-	record -> fd = socket(AF_INET, SOCK_DGRAM, 0);
-	if (record -> fd < 0) {
-		lf_error_raise(E_SOCKET, error_message("Failed to open a new message runtime socket."));
-		return lf_error;
-	}
-	struct hostent *host = gethostbyname(hostname);
-	if (!host) {
-		lf_error_raise(E_NO_DEVICE, error_message("Failed to resolve hostname '%s' to device IP.", hostname));
-		return lf_error;
-	}
-	struct in_addr **list = (struct in_addr **) host -> h_addr_list;
-	/* Create the addressing record. */
-	memset(&(record -> device), 0, sizeof(struct sockaddr_in));
-	record -> device.sin_family = AF_INET;
-	record -> device.sin_addr.s_addr = list[0] -> s_addr;
-	record -> device.sin_port = htons(FMR_PORT);
-	// /* Bind to the network socket. */
-	// if (bind(record -> fd, (struct sockaddr *)&(record -> device), sizeof(struct sockaddr_in)) < 0) {
-	// 	/* Close the opened socket. */
-	// 	close(record -> fd);
-	// 	lf_error_raise(E_SOCKET, error_message("Failed to bind to the message runtime socket."));
-	// 	return lf_error;
-	// }
-	return lf_success;
+bool lf_network_ready(struct _lf_endpoint *this) {
+	return false;
 }
 
-uint8_t network_ready(struct _lf_endpoint *this) {
-	return true;
-}
-
-void network_put(struct _lf_endpoint *this, uint8_t byte) {
-	return;
-}
-
-uint8_t network_get(struct _lf_endpoint *this) {
-	return 0;
-}
-
-int network_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
-	/* Obtain a pointer to and cast to the network record associated with the active endpoint. */
-	struct _network_record *record = this -> record;
-	char derp[length];
-	memcpy(derp, source, length);
-	printf("'%s' to %s\n", derp, inet_ntoa(record -> device.sin_addr));
+int lf_network_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
+	/* Obtain a pointer to and cast to the network context associated with the active endpoint. */
+	struct _lf_network_context *context = (struct _lf_network_context *)this->_ctx;
 	socklen_t len = sizeof(struct sockaddr_in);
-	ssize_t _e = sendto(record -> fd, source, length, 0, (struct sockaddr *)&(record -> device), len);
-	if (_e < 0) {
-		lf_error_raise(E_COMMUNICATION, error_message("Failed to transfer data to networked device."));
-		return lf_error;
+	ssize_t _e = sendto(context->fd, source, length, 0, (struct sockaddr *)&(context->device), len);
+	lf_assert(_e > 0, failure, E_COMMUNICATION, "Failed to send data to networked device '%s' at '%s'.", context->host, inet_ntoa(context->device.sin_addr));
+	return lf_success;
+failure:
+	return lf_error;
+}
+
+int lf_network_pull(struct _lf_endpoint *this, void *destination, lf_size_t length) {
+	/* Obtain a pointer to and cast to the network context associated with the active endpoint. */
+	struct _lf_network_context *context = (struct _lf_network_context *)this->_ctx;
+	socklen_t _length;
+	ssize_t _e = recvfrom(context->fd, destination, length, 0, (struct sockaddr *)&(context->device), &_length);
+	lf_assert(_e > 0, failure, E_COMMUNICATION, "Failed to receive data from networked device.");
+	return lf_success;
+failure:
+	return lf_error;
+}
+
+int lf_network_destroy(struct _lf_endpoint *this) {
+	if (this && this->_ctx) {
+		struct _lf_network_context *context = this->_ctx;
+		close(context->fd);
+		free(context);
 	}
 	return lf_success;
 }
 
-int network_pull(struct _lf_endpoint *this, void *destination, lf_size_t length) {
-	// /* Obtain a pointer to and cast to the network record associated with the active endpoint. */
-	// struct _network_record *record = this -> record;
-	// socklen_t _length;
-	// ssize_t _e = recvfrom(record -> fd, destination, length, 0, (struct sockaddr *)&(record -> device), &_length);
-	// if (_e < 0) {
-	// 	lf_error_raise(E_COMMUNICATION, error_message("Failed to transfer data to networked device."));
-	// 	return lf_error;
-	// }
-	return lf_success;
-}
-
-int network_destroy(struct _lf_endpoint *this) {
-	/* Obtain a pointer to and cast to the network record associated with the provided endpoint. */
-	struct _network_record *record = this -> record;
-	/* If a file descriptor has been opened for the associated socket, close it. */
-	if (record) {
-		close(record -> fd);
-		free(record);
-	}
-	return lf_success;
+struct _lf_endpoint *lf_network_endpoint_for_hostname(char *hostname) {
+	struct _lf_network_context *context = NULL;
+	struct _lf_endpoint *endpoint = lf_endpoint_create(lf_network_ready,
+													   lf_network_push,
+													   lf_network_pull,
+													   lf_network_destroy,
+													   sizeof(struct _lf_network_context));
+	lf_assert(endpoint, failure, E_ENDPOINT, "Failed to create endpoint for networked device.");
+	context = (struct _lf_network_context *)endpoint->_ctx;
+	context->fd = socket(AF_INET, SOCK_DGRAM, 0);
+	lf_assert(context->fd > 0, failure, E_SOCKET, "Failed to create socket for network device.");
+	struct hostent *host = gethostbyname(hostname);
+	lf_assert(host, failure, E_COMMUNICATION, "Failed to find device with hostname '%s' on the network.", hostname);
+	struct in_addr **list = (struct in_addr **) host->h_addr_list;
+	memset(&(context->device), 0, sizeof(struct sockaddr_in));
+	context->device.sin_family = AF_INET;
+	context->device.sin_addr.s_addr = list[0]->s_addr;
+	context->device.sin_port = htons(FMR_PORT);
+	int _e = bind(context->fd, (struct sockaddr *)&(context->device), sizeof(struct sockaddr_in));
+	lf_assert(_e > 0, failure, E_SOCKET, "Failed to bind to socket on device.");
+	return endpoint;
+failure:
+	if (context) close(context->fd);
+	return NULL;
 }

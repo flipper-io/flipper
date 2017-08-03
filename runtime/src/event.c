@@ -1,6 +1,6 @@
 #include <flipper/libflipper.h>
 
-struct _lf_event *lf_event_create(lf_event_id _id, lf_event_handler handler, void *_ctx) {
+struct _lf_event *lf_event_create(lf_event_id _id, lf_event_handler_func handler, void *_ctx) {
 	struct _lf_event *event = malloc(sizeof(struct _lf_event));
 	lf_assert(event, failure, E_NULL, "NULL");
 	memset(event, 0, sizeof(struct _lf_event));
@@ -29,7 +29,7 @@ failure:
 }
 
 /* Registers an event with the event system and assigns its handler. This is done on ALL platforms that interact with a given event identifier. */
-lf_event *lf_event_register(lf_event_id id, lf_event_handler handler, void *ctx) {
+lf_event *lf_event_register(lf_event_id id, lf_event_handler_func handler, void *ctx) {
 	struct _lf_event *event = lf_event_create(id, handler, ctx);
 	lf_assert(event, failure, E_NULL, "NULL");
 	lf_ll_append(&lf_get_event_list(), event, lf_event_release);
@@ -38,18 +38,8 @@ failure:
 	return NULL;
 }
 
-void *lf_event_finder(void *_event, void *_id) {
-	struct _lf_event *event = _event;
-	lf_event_id id = (lf_event_id)_id;
-	if (event -> id == id) {
-		return event;
-	}
-	return NULL;
-}
-
 struct _lf_event *lf_event_for_id(lf_event_id id) {
-	void *id_as_void_ptr = (void *)(uintptr_t)id;
-	return lf_ll_apply_func(lf_get_event_list(), lf_event_finder, id_as_void_ptr);
+	return NULL;
 }
 
 /* Causes a local event to be triggered when events of the same identifier are triggered on the device. */
@@ -76,8 +66,8 @@ int lf_event_trigger(lf_event *event) {
 }
 
 /* This function is called for each of the attached devices. */
-void *lf_event_handler_func(void *_device, void *_other) {
-	struct _lf_device *device = _device;
+void lf_event_handler(const void *_device, void *_other) {
+	struct _lf_device *device = (struct _lf_device *)_device;
 	lf_assert(device, failure, E_NULL, "NULL");
 	/* Handle all of the messages available over the device's endpoint. */
 	while (lf_endpoint_has_data(device -> endpoint)) {
@@ -88,14 +78,14 @@ void *lf_event_handler_func(void *_device, void *_other) {
 		lf_msg_apply(msg);
 	}
 failure:
-	return NULL;
+	return;
 }
 
 void lf_handle_events(void) {
 	for (;;) {
 		/* Handle events across all attached devices. */
-		if (lf_get_device_list()) {
-			lf_ll_apply_func(lf_get_device_list(), lf_event_handler_func, NULL);
+		if (lf_attached_devices) {
+			lf_ll_apply_func(lf_attached_devices, lf_event_handler, NULL);
 		}
 		// usleep(10000);
 		/* Avoid tail-call optimization. */

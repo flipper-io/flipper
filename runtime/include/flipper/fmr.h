@@ -176,7 +176,7 @@ extern const void *const fmr_modules[];
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
 
 /* Builds an fmr_parameters from a set of variadic arguments provided by the fmr_parameters macro. */
-struct _lf_ll *fmr_build(fmr_argc argc, ...);
+struct _lf_ll *fmr_build(int argc, ...);
 /* Appends an argument to an fmr_parameters. */
 int fmr_append(struct _lf_ll *list, fmr_type type, fmr_arg value);
 /* Generates the appropriate data structure needed for the remote procedure call of 'funtion' in 'module'. */

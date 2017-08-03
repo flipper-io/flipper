@@ -3,7 +3,7 @@
 
 /* TODO: Move this implementation to use lf_ll. */
 
-struct _lf_ll *fmr_build(fmr_argc argc, ...) {
+struct _lf_ll *fmr_build(int argc, ...) {
 	lf_assert(argc < FMR_MAX_ARGC, failure, E_OVERFLOW, "Too many arguments were provided when building (%i) call.", argc);
 	struct _lf_ll *list = NULL;
 	/* Construct a va_list to access variadic arguments. */

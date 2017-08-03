@@ -18,10 +18,11 @@ const struct _flipper flipper = {
 };
 
 /* Creates a new libflipper device. */
-struct _lf_device *lf_device_create(struct _lf_endpoint *endpoint) {
+struct _lf_device *lf_device_create(struct _lf_endpoint *endpoint, int (* selector)(struct _lf_device *selector)) {
 	struct _lf_device *device = (struct _lf_device *)calloc(1, sizeof(struct _lf_device));
 	lf_assert(device, failure, E_MALLOC, "Failed to allocate memory for new device.");
-	device -> endpoint = endpoint;
+	device->endpoint = endpoint;
+	device->selector = selector;
 	return device;
 failure:
 	free(device);
@@ -34,7 +35,7 @@ int lf_attach(struct _lf_device *device) {
 	/* Ask the device for its configuration. */
 	//int _e = lf_load_configuration(device);
 	//lf_assert(_e == lf_success, failure, E_CONFIGURATION, "Failed to obtain configuration from device.");
-	lf_ll_append(&lf_get_device_list(), device, lf_detach);
+	lf_ll_append(&lf_attached_devices, device, lf_detach);
 	lf_select(device);
 	return lf_success;
 failure:
@@ -44,7 +45,7 @@ failure:
 /* Call's the device's selector function and selects the device. */
 int lf_select(struct _lf_device *device) {
 	lf_assert(device, failure, E_NULL, "NULL device pointer provided for selection.");
-	device -> selector(device);
+	if (device->selector) device->selector(device);
 	lf_set_current_device(device);
 failure:
 	return lf_error;
@@ -52,8 +53,8 @@ failure:
 
 /* Detaches a device from libflipper. */
 int lf_detach(struct _lf_device *device) {
-	lf_assert(device, failure, E_NULL, "Attempt to detach an invalid device.");
-	lf_endpoint_release(device -> endpoint);
+	if (device) lf_endpoint_release(device->endpoint);
+	lf_ll_remove(&lf_attached_devices, device);
 	return lf_success;
 failure:
 	return lf_error;
@@ -64,7 +65,7 @@ int __attribute__((__destructor__)) lf_exit(void) {
 	/* Release all of the libflipper events. */
 	lf_ll_release(&lf_get_event_list());
 	/* Release all of the attached devices. */
-	lf_ll_release(&lf_get_device_list());
+	lf_ll_release(&lf_attached_devices);
 	return lf_success;
 }
 
@@ -109,7 +110,7 @@ int lf_load_configuration(struct _lf_device *device) {
 	}
 	/* Obtain the configuration from the device. */
 	struct _lf_configuration configuration;
-	_e = device -> endpoint -> pull(device -> endpoint, &configuration, sizeof(struct _lf_configuration));
+	_e = device->endpoint->pull(device->endpoint, &configuration, sizeof(struct _lf_configuration));
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -122,13 +123,13 @@ int lf_load_configuration(struct _lf_device *device) {
 	}
 
 	// /* Compare the device identifiers. */
-	// if (device -> configuration.identifier != configuration.identifier) {
-	// 	lf_error_raise(E_NO_DEVICE, error_message("Identifier mismatch for device '%s'. (0x%04x instead of 0x%04x)", device -> configuration.name, configuration.identifier, device -> configuration.identifier));
+	// if (device->configuration.identifier != configuration.identifier) {
+	// 	lf_error_raise(E_NO_DEVICE, error_message("Identifier mismatch for device '%s'. (0x%04x instead of 0x%04x)", device->configuration.name, configuration.identifier, device->configuration.identifier));
 	// 	return lf_error;
 	// }
 
 	/* Copy the returned configuration into the device. */
-	memcpy(&(device -> configuration), &configuration, sizeof(struct _lf_configuration));
+	memcpy(&(device->configuration), &configuration, sizeof(struct _lf_configuration));
 	return lf_success;
 }
 
@@ -140,17 +141,17 @@ int lf_bind(struct _lf_module *module) {
 		return lf_error;
 	}
 	/* Calculate the identifier of the module, including the NULL terminator. */
-	lf_crc_t identifier = lf_crc(module -> name, strlen(module -> name) + 1);
+	lf_crc_t identifier = lf_crc(module->name, strlen(module->name) + 1);
 	/* Attempt to get the module index. */
 	fmr_module index = fld_index(identifier) | FMR_USER_INVOCATION_BIT;
 	/* Throw an error if there is no counterpart module found. */
-	lf_assert(index == -1, failure, E_MODULE, "No counterpart module loaded for bind to module '%s'.", module -> name);
+	lf_assert(index == -1, failure, E_MODULE, "No counterpart module loaded for bind to module '%s'.", module->name);
 	/* Set the module's indentifier. */
-	module -> identifier = identifier;
+	module->identifier = identifier;
 	/* Set the module's index. */
-	module -> index = index;
+	module->index = index;
 	/* Set the module's device. */
-	module -> device = lf_get_current_device();
+	module->device = lf_get_current_device();
 	return lf_success;
 failure:
 	return lf_error;
@@ -177,7 +178,7 @@ int lf_ram_load(struct _lf_device *device, void *source, lf_size_t length) {
 	/* Set the packet class. */
 	_packet.header.class = fmr_ram_load_class;
 	/* Set the push length. */
-	packet -> length = length;
+	packet->length = length;
 	/* Compute and store the packet checksum. */
 	_packet.header.checksum = lf_crc(packet, _packet.header.length);
 	/* Send the packet to the target device. */
@@ -186,7 +187,7 @@ int lf_ram_load(struct _lf_device *device, void *source, lf_size_t length) {
 		return lf_error;
 	}
 	/* Transfer the data through to the address space of the device. */
-	_e = device -> endpoint -> push(device -> endpoint, source, length);
+	_e = device->endpoint->push(device->endpoint, source, length);
 	/* Ensure that the data was successfully transferred to the device. */
 	if (_e < lf_success) {
 		return lf_error;
@@ -202,16 +203,16 @@ int lf_ram_load(struct _lf_device *device, void *source, lf_size_t length) {
 
 void lf_debug_call(struct _fmr_invocation *call) {
 	printf("call:\n");
-	printf("\t└─ index:\t0x%x\n", call -> index);
-	printf("\t└─ function:\t0x%x\n", call -> function);
-	printf("\t└─ types:\t0x%x\n", call -> types);
-	printf("\t└─ argc:\t0x%x (%d arguments)\n", call -> argc, call -> argc);
+	printf("\t└─ index:\t0x%x\n", call->index);
+	printf("\t└─ function:\t0x%x\n", call->function);
+	printf("\t└─ types:\t0x%x\n", call->types);
+	printf("\t└─ argc:\t0x%x (%d arguments)\n", call->argc, call->argc);
 	printf("arguments:\n");
 	/* Calculate the offset into the packet at which the arguments will be loaded. */
-	uint8_t *offset = call -> parameters;
+	uint8_t *offset = call->parameters;
 	char *typestrs[] = { "fmr_int8", "fmr_int16", "fmr_int32" };
-	fmr_types types = call -> types;
-	for (int i = 0; i < call -> argc; i ++) {
+	fmr_types types = call->types;
+	for (int i = 0; i < call->argc; i ++) {
 		fmr_type type = types & 0x3;
 		fmr_arg arg = 0;
 		memcpy(&arg, offset, fmr_sizeof(type));
@@ -223,29 +224,29 @@ void lf_debug_call(struct _fmr_invocation *call) {
 }
 
 void lf_debug_packet(struct _fmr_packet *packet, size_t length) {
-	if (packet -> header.magic == FMR_MAGIC_NUMBER) {
+	if (packet->header.magic == FMR_MAGIC_NUMBER) {
 		printf("header:\n");
-		printf("\t└─ magic:\t0x%x\n", packet -> header.magic);
-		printf("\t└─ checksum:\t0x%x\n", packet -> header.checksum);
-		printf("\t└─ length:\t%d bytes (%.02f%%)\n", packet -> header.length, (float) packet -> header.length/sizeof(struct _fmr_packet)*100);
+		printf("\t└─ magic:\t0x%x\n", packet->header.magic);
+		printf("\t└─ checksum:\t0x%x\n", packet->header.checksum);
+		printf("\t└─ length:\t%d bytes (%.02f%%)\n", packet->header.length, (float) packet->header.length/sizeof(struct _fmr_packet)*100);
 		char *classstrs[] = { "configuration", "std_call", "user_call", "push", "pull", "event" };
-		printf("\t└─ class:\t%s\n", classstrs[packet -> header.class]);
+		printf("\t└─ class:\t%s\n", classstrs[packet->header.class]);
 		struct _fmr_invocation_packet *invocation = (struct _fmr_invocation_packet *)(packet);
 		struct _fmr_push_pull_packet *pushpull = (struct _fmr_push_pull_packet *)(packet);
-		switch (packet -> header.class) {
+		switch (packet->header.class) {
 			case fmr_configuration_class:
 			break;
 			case fmr_standard_invocation_class:
-				lf_debug_call(&invocation -> call);
+				lf_debug_call(&invocation->call);
 			break;
 			case fmr_user_invocation_class:
-				lf_debug_call(&invocation -> call);
+				lf_debug_call(&invocation->call);
 			break;
 			case fmr_push_class:
 			case fmr_pull_class:
 				printf("length:\n");
-				printf("\t└─ length:\t0x%x\n", pushpull -> length);
-				lf_debug_call(&pushpull -> call);
+				printf("\t└─ length:\t0x%x\n", pushpull->length);
+				lf_debug_call(&pushpull->call);
 			break;
 			default:
 				printf("Invalid packet class.\n");
@@ -256,14 +257,14 @@ void lf_debug_packet(struct _fmr_packet *packet, size_t length) {
 			if (i % 8 == 0 && i < length - 1) printf("\n");
 		}
 	} else {
-		printf("Invalid magic number (0x%02x).\n", packet -> header.magic);
+		printf("Invalid magic number (0x%02x).\n", packet->header.magic);
 	}
 	printf("\n\n-----------\n\n");
 }
 
 void lf_debug_result(struct _fmr_result *result) {
 	printf("response:\n");
-	printf("\t└─ value:\t0x%x\n", result -> value);
-	printf("\t└─ error:\t0x%x\n", result -> error);
+	printf("\t└─ value:\t0x%x\n", result->value);
+	printf("\t└─ error:\t0x%x\n", result->error);
 	printf("\n-----------\n\n");
 }

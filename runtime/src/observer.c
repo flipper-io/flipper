@@ -24,13 +24,13 @@ failure:
 	return lf_error;
 }
 
-void *lf_observer_notify(void *_observer, void *_unused) {
-    struct _lf_observer *observer = _observer;
+void lf_observer_notify(const void *_observer, void *_unused) {
+    struct _lf_observer *observer = (struct _lf_observer *)_observer;
     lf_assert(observer, failure, E_NULL, "NULL");
     /* Send a message to the observer to notify it that an event was triggered. */
     struct _lf_msg *msg = lf_msg_create(lf_msg_event_kind);
     msg -> event_id = observer -> event_id;
     lf_msg_send(msg, observer -> endpoint);
 failure:
-    return NULL;
+    return;
 }
