@@ -1,6 +1,0 @@
--Iruntime/include
--Ikernel/include
--Ilibrary/include
--Icarbon/include
--I/usr/local/include
--DPLATFORM_HEADER=<flipper/posix/posix.h>
