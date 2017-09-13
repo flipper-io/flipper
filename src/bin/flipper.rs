@@ -6,7 +6,7 @@
 //! responsibility for the subcommands into child rust modules. Each
 //! subcommand module has two responsibilities: report the argument
 //! structure from its subtree using `make_subcommand` or
-//! `make subcommands`, and define the implementations for those
+//! `make_subcommands`, and define the implementations for those
 //! commands using `execute`. Higher-level commands such as `flipper`
 //! itself typically only need to interpret each command enough to
 //! decide which child module to pass the execution onto.
@@ -14,14 +14,18 @@
 #[macro_use]
 extern crate clap;
 extern crate rustyline;
+extern crate byteorder;
+extern crate libc;
+extern crate flipper;
+extern crate flipper_rust;
 
-mod modules;
-mod package_manager;
-mod hardware_manager;
+pub mod modules;
+pub mod package_manager;
+pub mod hardware_manager;
 
+use clap::{App, AppSettings, Arg, ArgMatches};
 use package_manager as pm;
 use hardware_manager as hw;
-use clap::{App, AppSettings, Arg, ArgMatches};
 
 const ABOUT: &'static str = "flipper: Manage and control Flipper from the command line";
 
@@ -59,6 +63,7 @@ pub fn execute(args: &ArgMatches) {
     match args.subcommand() {
         ("module", Some(m)) => modules::execute(m),
         (c @ "boot", Some(m)) => hw::execute(c, m),
+        (c @ "flash", Some(m)) => hw::execute(c, m),
         (c @ "install", Some(m)) => hw::execute(c, m),
         (c @ "deploy", Some(m)) => hw::execute(c, m),
         (c @ "init", Some(m)) => pm::execute(c, m),
