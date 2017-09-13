@@ -7,6 +7,11 @@ use clap::{App, Arg, ArgMatches};
 pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
     vec![
         App::new("boot"),
+        App::new("flash")
+            .about("Flash a new firmware image onto Flipper")
+            .arg(Arg::with_name("image")
+                .required(true)
+                .takes_value(true)),
         App::new("install")
             .about("Install a Flipper package onto the device (persists on reset)")
             .before_help("Install the current-project package, or [package] if given")
@@ -33,6 +38,7 @@ pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
 pub fn execute(command: &str, args: &ArgMatches) {
     match command {
         "boot" => boot::execute(args),
+        "flash" => flash::execute(args),
         "install" => install::execute(args),
         "deploy" => deploy::execute(args),
         unknown => println!("Unrecognized command: {}", unknown)
@@ -50,6 +56,17 @@ pub mod boot {
             .arg("start")
             .spawn()
             .expect("Error booting Flipper");
+    }
+}
+
+pub mod flash {
+    use super::*;
+    use flipper::hardware::fdfu;
+    use flipper_rust;
+
+    pub fn execute(args: &ArgMatches) {
+        let flipper = flipper_rust::attach();
+        fdfu::enter_update_mode();
     }
 }
 
