@@ -6,28 +6,10 @@ use clap::{App, Arg, ArgMatches};
 
 pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
     vec![
-        App::new("boot"),
-        App::new("flash")
-            .about("Flash a new firmware image onto Flipper")
-            .arg(Arg::with_name("image")
-                .required(true)
-                .takes_value(true)),
-        App::new("install")
-            .about("Install a Flipper package onto the device (persists on reset)")
-            .before_help("Install the current-project package, or [package] if given")
-            .arg(Arg::with_name("package")
-                .required(false)
-                .takes_value(true)
-                .value_name("package")
-                .help("Specifies a package to install, such as from the repository")),
-        App::new("deploy")
-            .about("Deploy a Flipper package onto the device (lost on reset)")
-            .before_help("Deploy the current-project package, or [package] if given")
-            .arg(Arg::with_name("package")
-                .required(false)
-                .takes_value(true)
-                .value_name("package")
-                .help("Specify a package to install, such as from the repository")),
+        boot::make_subcommand(),
+        flash::make_subcommand(),
+        install::make_subcommand(),
+        deploy::make_subcommand(),
     ]
 }
 
@@ -49,6 +31,10 @@ pub mod boot {
     use super::*;
     use std::process::Command;
 
+    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+        App::new("boot")
+    }
+
     // TODO check that `dfu-programmer` exists before attempting to execute it.
     pub fn execute(args: &ArgMatches) {
         Command::new("dfu-programmer")
@@ -62,16 +48,36 @@ pub mod boot {
 pub mod flash {
     use super::*;
     use flipper::hardware::fdfu;
-    use flipper_rust;
+
+    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+        App::new("flash")
+            .about("Flash a new firmware image onto Flipper")
+            .arg(Arg::with_name("image")
+                .required(true)
+                .takes_value(true))
+    }
 
     pub fn execute(args: &ArgMatches) {
-        let flipper = flipper_rust::attach();
-        fdfu::enter_update_mode();
+        use flipper::hardware::fdfu;
+        if let Some(image) = args.value_of("image") {
+            fdfu::flash(image);
+        }
     }
 }
 
 pub mod install {
     use super::*;
+
+    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+        App::new("install")
+            .about("Install a Flipper package onto the device (persists on reset)")
+            .before_help("Install the current-project package, or [package] if given")
+            .arg(Arg::with_name("package")
+                .required(false)
+                .takes_value(true)
+                .value_name("package")
+                .help("Specifies a package to install, such as from the repository"))
+    }
 
     pub fn execute(args: &ArgMatches) {
         unimplemented!();
@@ -80,6 +86,17 @@ pub mod install {
 
 pub mod deploy {
     use super::*;
+
+    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+        App::new("deploy")
+            .about("Deploy a Flipper package onto the device (lost on reset)")
+            .before_help("Deploy the current-project package, or [package] if given")
+            .arg(Arg::with_name("package")
+                .required(false)
+                .takes_value(true)
+                .value_name("package")
+                .help("Specify a package to install, such as from the repository"))
+    }
 
     pub fn execute(args: &ArgMatches) {
         unimplemented!();
