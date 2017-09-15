@@ -64,9 +64,9 @@ $(TARGET): $(OBJS)
 
 headers:
 	$(_v)mkdir -p $(BUILD)/include/flipper
-	$(_v)cp -r carbon/include/* $(BUILD)/include/flipper
-	$(_v)cp -r library/include/* $(BUILD)/include/flipper
-	$(_v)cp -r runtime/include/* $(BUILD)/include/flipper
+	$(_v)cp -r carbon/include/flipper/* $(BUILD)/include/flipper
+	$(_v)cp -r library/include/flipper/* $(BUILD)/include/flipper
+	$(_v)cp -r runtime/include/flipper/* $(BUILD)/include/flipper
 	$(_v)cp flipper.h $(BUILD)/include
 
 install:
