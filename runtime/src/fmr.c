@@ -15,7 +15,7 @@ struct _lf_ll *fmr_build(int argc, ...) {
 		/* Unstage the value of the argument from the variadic argument list. */
 		fmr_va value = va_arg(argv, fmr_va);
 		fmr_type type = (fmr_type)((value >> (sizeof(fmr_arg) * 8)) & 0x7);
-		lf_assert(type < fmr_int32_t, failure, E_TYPE, "An invalid type was provided while appending the parameter '0x%08x' to the argument list.", (fmr_arg)value);
+		lf_assert(type <= fmr_int32_t, failure, E_TYPE, "An invalid type was provided while appending the parameter '0x%08x' with type '0x%02x' to the argument list.", (fmr_arg)value, (fmr_type)type);
 		struct _lf_arg *arg = malloc(sizeof(struct _lf_arg));
 		arg->value = (fmr_arg)value;
 		arg->type = type;
@@ -90,7 +90,7 @@ LF_WEAK int fmr_perform_user_invocation(struct _fmr_invocation *invocation, stru
 }
 
 LF_WEAK int fmr_configuration_subclass_handler(struct _fmr_result *result) {
-	
+
 	return result->error = lf_error_get();
 }
 

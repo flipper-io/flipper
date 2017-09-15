@@ -71,7 +71,11 @@ int __attribute__((__destructor__)) lf_exit(void) {
 
 /* Shim to attach all possible flipper devices that could be attached to the system. */
 int flipper_attach(void) {
-	return carbon_attach();
+	int _e = carbon_attach();
+	lf_assert(_e == lf_success, failure, E_NO_DEVICE, "Failed to find any Flipper devices attached to this computer. Please check your connection and try again.");
+	return lf_success;
+failure:
+	return lf_error;
 }
 
 int flipper_select(struct _lf_device *device) {
@@ -201,9 +205,13 @@ int lf_ram_load(struct _lf_device *device, void *source, lf_size_t length) {
 
 /* Debugging functions for displaying the contents of various FMR related data structures. */
 
+
+#pragma warning TEMP
+extern const struct _lf_module *const atmegau2_modules[];
+
 void lf_debug_call(struct _fmr_invocation *call) {
 	printf("call:\n");
-	printf("\t└─ index:\t0x%x\n", call->index);
+	printf("\t└─ module:\t0x%x (%s)\n", call->index, atmegau2_modules[call->index]->name);
 	printf("\t└─ function:\t0x%x\n", call->function);
 	printf("\t└─ types:\t0x%x\n", call->types);
 	printf("\t└─ argc:\t0x%x (%d arguments)\n", call->argc, call->argc);

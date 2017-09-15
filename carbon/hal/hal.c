@@ -28,6 +28,18 @@
 #include <flipper/atmegau2/atmegau2.h>
 //#include <flipper/atsam4s/atsam4s.h>
 
+/* Define the standard module array for this platform. */
+#pragma warning TEMP
+const struct _lf_module *const atmegau2_modules[] = {
+	&_button,
+	&_fs,
+	&_gpio,
+	&_led,
+	&_uart0,
+	&_wdt
+};
+
+
 /* Selects a carbon device. */
 int carbon_select(struct _lf_device *device) {
 	LF_MODULE_SET_DEVICE_AND_ID(_adc, device, _led_id);

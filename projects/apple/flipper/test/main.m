@@ -3,9 +3,9 @@
 
 int main(int argc, const char * argv[]) {
     
-    flipper.attach();
+    carbon_attach_hostname("localhost");
     
-    led.rgb(0, 0, 0);
+    gpio.write(1, 1);
     
     return 0;
 }

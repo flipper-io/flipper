@@ -1,15 +1,11 @@
 # Target to build
-TARGET := libflipper.so
+TARGET := fvm
 
 # Directory where build products are stored.
 BUILD := build
 
 # All directories that contain source files
-SRC_DIRS := carbon/hal \
-			library/src \
-			library/arch/x86_64 \
-			library/platforms/posix \
-			runtime/src
+SRC_DIRS := src
 
 # Macro to find all files with the given extension in SRC_DIRS.
 find_srcs = $(wildcard *.$1) $(foreach d,$(SRC_DIRS),$(wildcard $d/*.$1))
@@ -23,9 +19,7 @@ OBJS := $(patsubst %,$(BUILD)/%.o,$(SRCS))
 # Dependency files that are produced during compilation
 DEPS := $(OBJS:.o=.d)
 
-INCLUDE_DIRS := carbon/include \
-				library/include \
-				runtime/include
+INCLUDE_DIRS :=
 
 # All build directories that will be produced
 BUILD_DIRS := $(BUILD) $(addprefix $(BUILD)/,$(SRC_DIRS))
@@ -41,11 +35,10 @@ OBJCOPY = $(PREFIX)objcopy
 OBJDUMP = $(PREFIX)objdump
 
 # Define compilation and emulation flags.
-CFLAGS = -std=c99 -g -fpic \
-		 -DPLATFORM_HEADER="<flipper/posix/posix.h>" \
-		 $(foreach inc,$(INCLUDE_DIRS),-I$(inc))
+CFLAGS = -std=c99 -g \
+		 -DPLATFORM_HEADER="<flipper/posix/posix.h>"
 
-LDFLAGS = -shared -L/usr/local/lib -lusb-1.0
+LDFLAGS = -lflipper
 
 # Print all commands executed when VERBOSE is defined
 ifdef VERBOSE
@@ -55,30 +48,21 @@ _v := @
 endif #VERBOSE
 
 # Build the target by default
-all: $(TARGET) headers
+all: $(TARGET)
 
 # Linking rule
 $(TARGET): $(OBJS)
 	@echo 'Linking $@'
 	$(_v)$(CC) $(CFLAGS) $(LDFLAGS) -o $(BUILD)/$@ $^
 
-headers:
-	$(_v)mkdir -p $(BUILD)/include/flipper
-	$(_v)cp -r carbon/include/flipper/* $(BUILD)/include/flipper
-	$(_v)cp -r library/include/flipper/* $(BUILD)/include/flipper
-	$(_v)cp -r runtime/include/flipper/* $(BUILD)/include/flipper
-	$(_v)cp flipper.h $(BUILD)/include
-
 install: all
-	$(_v)cp $(BUILD)/$(TARGET) /usr/local/lib/
-	$(_v)cp -r $(BUILD)/include/* /usr/local/include/
+	$(_v)cp $(BUILD)/$(TARGET) /usr/local/bin
 
 uninstall:
-	$(_v)rm -r /usr/local/include/flipper*
-	$(_v)rm -r /usr/local/lib/$(TARGET)
+	$(_v)rm -r /usr/local/bin/$(TARGET)
 
-$(TARGET_HEX): $(TARGET)
-	$(_v)$(OBJCOPY) -O ihex $< $@
+run: all
+	$(_v)./build/$(TARGET)
 
 # Compiling rule for C sources
 $(BUILD)/%.c.o: %.c | $(BUILD_DIR_FILES)

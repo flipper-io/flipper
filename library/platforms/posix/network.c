@@ -2,15 +2,6 @@
 #include <flipper/posix/network.h>
 #include <flipper/error.h>
 #include <flipper/libflipper.h>
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-
-struct _lf_network_context {
-	int fd;
-	char *host;
-	struct sockaddr_in device;
-};
 
 bool lf_network_ready(struct _lf_endpoint *this) {
 	return false;
@@ -19,8 +10,7 @@ bool lf_network_ready(struct _lf_endpoint *this) {
 int lf_network_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
 	/* Obtain a pointer to and cast to the network context associated with the active endpoint. */
 	struct _lf_network_context *context = (struct _lf_network_context *)this->_ctx;
-	socklen_t len = sizeof(struct sockaddr_in);
-	ssize_t _e = sendto(context->fd, source, length, 0, (struct sockaddr *)&(context->device), len);
+	ssize_t _e = sendto(context->fd, source, length, 0, (struct sockaddr *)&context->device, sizeof(struct sockaddr_in));
 	lf_assert(_e > 0, failure, E_COMMUNICATION, "Failed to send data to networked device '%s' at '%s'.", context->host, inet_ntoa(context->device.sin_addr));
 	return lf_success;
 failure:
@@ -30,8 +20,8 @@ failure:
 int lf_network_pull(struct _lf_endpoint *this, void *destination, lf_size_t length) {
 	/* Obtain a pointer to and cast to the network context associated with the active endpoint. */
 	struct _lf_network_context *context = (struct _lf_network_context *)this->_ctx;
-	socklen_t _length;
-	ssize_t _e = recvfrom(context->fd, destination, length, 0, (struct sockaddr *)&(context->device), &_length);
+	socklen_t _length = sizeof(context->device);
+	ssize_t _e = recvfrom(context->fd, destination, length, 0, (struct sockaddr *)&context->device, &_length);
 	lf_assert(_e > 0, failure, E_COMMUNICATION, "Failed to receive data from networked device.");
 	return lf_success;
 failure:
@@ -59,13 +49,12 @@ struct _lf_endpoint *lf_network_endpoint_for_hostname(char *hostname) {
 	lf_assert(context->fd > 0, failure, E_SOCKET, "Failed to create socket for network device.");
 	struct hostent *host = gethostbyname(hostname);
 	lf_assert(host, failure, E_COMMUNICATION, "Failed to find device with hostname '%s' on the network.", hostname);
+	strncpy(context->host, host->h_name, sizeof(context->host));
 	struct in_addr **list = (struct in_addr **) host->h_addr_list;
 	memset(&(context->device), 0, sizeof(struct sockaddr_in));
 	context->device.sin_family = AF_INET;
 	context->device.sin_addr.s_addr = list[0]->s_addr;
-	context->device.sin_port = htons(FMR_PORT);
-	// int _e = bind(context->fd, (struct sockaddr *)&(context->device), sizeof(struct sockaddr_in));
-	// lf_assert(_e > 0, failure, E_SOCKET, "Failed to bind to socket on device.");
+	context->device.sin_port = htons(LF_UDP_PORT);
 	return endpoint;
 failure:
 	if (context) close(context->fd);

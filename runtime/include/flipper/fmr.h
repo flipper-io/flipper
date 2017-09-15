@@ -194,6 +194,6 @@ extern fmr_return fmr_pull(struct _fmr_push_pull_packet *packet);
 /* ~ Functions with platform specific implementation. ~ */
 
 /* Unpacks the argument buffer into the CPU following the native architecture's calling convention and jumps to the given function pointer. */
-extern uint32_t fmr_call(const void *function, uint8_t argc, uint16_t argt, void *argv);
+extern uint32_t fmr_call(const uint32_t (* function)(void), uint8_t argc, uint16_t argt, void *argv);
 
 #endif
