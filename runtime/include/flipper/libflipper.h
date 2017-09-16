@@ -92,7 +92,9 @@ struct _lf_device {
 	/* A pointer to the endpoint through which packets will be transferred. */
 	struct _lf_endpoint *endpoint;
 	/* The device's selector function. Mutates modules state as appropriate for the device. */
-	int (* selector)(struct _lf_device *device);
+	int (* select)(struct _lf_device *device);
+	/* The device's destructor. */
+	int (* destroy)(struct _lf_device *device);
 	/* The device's context. */
 	void *_ctx;
 	/* The current error state of the device. */
@@ -161,7 +163,8 @@ extern struct _lf_device lf_self;
 /* NOTE: The PLATFORM_HEADER macro is passed as a preprocessor flag during compilation. */
 #endif
 
-struct _lf_device *lf_device_create(struct _lf_endpoint *endpoint, int (* selector)(struct _lf_device *selector));
+struct _lf_device *lf_device_create(struct _lf_endpoint *endpoint, int (* select)(struct _lf_device *device), int (* destroy)(struct _lf_device *device), size_t context_size);
+int lf_device_release(struct _lf_device *device);
 
 /* Attaches to a device. */
 int lf_attach(struct _lf_device *device);

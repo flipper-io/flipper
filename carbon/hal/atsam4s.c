@@ -5,7 +5,7 @@
 #include <flipper/carbon.h>
 #include <flipper/atsam4s/atsam4s.h>
 
-void carbon_select_atsam4s(struct _lf_device *device) {
+int carbon_select_atsam4s(struct _lf_device *device) {
 	LF_MODULE_SET_DEVICE_AND_ID(_adc, device, _adc_id);
 	LF_MODULE_SET_DEVICE_AND_ID(_button, device, _button_id);
 	LF_MODULE_SET_DEVICE_AND_ID(_dac, device, _dac_id);
@@ -24,4 +24,5 @@ void carbon_select_atsam4s(struct _lf_device *device) {
 	LF_MODULE_SET_DEVICE_AND_ID(_usart, device, _usart_id);
 	LF_MODULE_SET_DEVICE_AND_ID(_usb, device, _usb_id);
 	LF_MODULE_SET_DEVICE_AND_ID(_wdt, device, _wdt_id);
+	return lf_success;
 }

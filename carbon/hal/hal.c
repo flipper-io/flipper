@@ -27,14 +27,14 @@
 #include <flipper/posix/network.h>
 
 struct _carbon_context {
-	/* Microcontroller that handles USB interaction. (ATMEGA16U2) */
+	/* Device that handles interacting with the 4s. (ATMEGA16U2) */
 	struct _lf_device *_u2;
 	/* Microprocessor that handles code execution. (ATSAM4S16B) */
 	struct _lf_device *_4s;
 };
 
-extern void carbon_select_atmegau2(struct _lf_device *device);
-extern void carbon_select_atsam4s(struct _lf_device *device);
+extern int carbon_select_atmegau2(struct _lf_device *device);
+extern int carbon_select_atsam4s(struct _lf_device *device);
 
 /* Selects a carbon device. */
 int carbon_select(struct _lf_device *device) {
@@ -43,32 +43,25 @@ int carbon_select(struct _lf_device *device) {
 	/* Obtain the carbon device's context. */
 	struct _carbon_context *context = device->_ctx;
 	lf_assert(context, failure, E_NULL, "No context for selected carbon device.");
-	/* Extract the carbon device's sub-devices. */
-	struct _lf_device *_u2 = context->_u2;
-	struct _lf_device *_4s = context->_4s;
 	/* Select the modules on the 4s first. */
-	carbon_select_atsam4s(_4s);
-	/* Select the modules on the u2. (if the connection is USB i.e. we have a u2) */
-	if (_u2) {
-		carbon_select_atmegau2(_u2);
-	}
+	carbon_select_atsam4s(device);
+	/* Select the modules on the bridge next. */
+	if (context->_4s) context->_u2->select(context->_u2);
 	return lf_success;
 failure:
 	return lf_error;
 }
 
+int carbon_destroy(struct _lf_device *device);
+
 struct _lf_device *carbon_attach_endpoint(struct _lf_endpoint *endpoint, struct _lf_device *_u2, struct _lf_device *_4s) {
 	/* Create the parent carbon device. */
-	struct _lf_device *carbon = lf_device_create(endpoint, carbon_select);
+	struct _lf_device *carbon = lf_device_create(endpoint, carbon_select, carbon_destroy, sizeof(struct _carbon_context));
 	/* Set the 4s's context. */
-	struct _carbon_context *context = carbon->_ctx = malloc(sizeof(struct _carbon_context));
+	struct _carbon_context *context = carbon->_ctx;
 	/* Set the carbon's u2 and 4s sub-devices. */
 	context->_u2 = _u2;
-	if (_4s) {
-		context->_4s = _4s;
-	} else {
-		context->_4s = carbon;
-	}
+	context->_4s = _4s;
 	/* Attach to the new carbon device. */
 	lf_attach(carbon);
 	return carbon;
@@ -78,11 +71,11 @@ void carbon_attach_to_usb_endpoint_applier(const void *__u2_ep, void *_other) {
 	/* Obtain the u2's endpoint. */
 	struct _lf_endpoint *_u2_ep = (struct _lf_endpoint *)__u2_ep;
 	/* Create the u2 sub-device. */
-	struct _lf_device *_u2 = lf_device_create(_u2_ep, NULL);
+	struct _lf_device *_u2 = lf_device_create(_u2_ep, carbon_select_atmegau2, NULL, 0);
 	/* Create the 4s' endpoint using the u2's uart0 endpoint as a bridge. */
 	struct _lf_endpoint *_4s_ep = lf_endpoint_create(uart0_configure, uart0_ready, uart0_push, uart0_pull, NULL, 0);
 	/* Create the 4s sub-device. */
-	struct _lf_device *_4s = lf_device_create(_4s_ep, NULL);
+	struct _lf_device *_4s = lf_device_create(_4s_ep, carbon_select_atsam4s, NULL, 0);
 	/* Attach to a carbon device over the 4s' endpoint. */
 	carbon_attach_endpoint(_4s_ep, _u2, _4s);
 }
@@ -93,6 +86,15 @@ int carbon_attach(void) {
 	struct _lf_ll *endpoints = lf_libusb_endpoints_for_vid_pid(CARBON_USB_VENDOR_ID, CARBON_USB_PRODUCT_ID);
 	if (!endpoints) return lf_error;
 	lf_ll_apply_func(endpoints, carbon_attach_to_usb_endpoint_applier, NULL);
+	return lf_success;
+}
+
+int carbon_destroy(struct _lf_device *device) {
+	if (device) {
+		struct _carbon_context *context = (struct _carbon_context *)device->_ctx;
+		lf_device_release(context->_u2);
+		lf_device_release(context->_4s);
+	}
 	return lf_success;
 }
 

@@ -7,7 +7,7 @@ struct _lf_endpoint *lf_endpoint_create(int (* configure)(struct _lf_endpoint *e
 										int (* push)(struct _lf_endpoint *endpoint, void *source, lf_size_t length),
 										int (* pull)(struct _lf_endpoint *endpoint, void *destination, lf_size_t length),
 										int (* destroy)(struct _lf_endpoint *endpoint),
-										size_t record_size) {
+										size_t context_size) {
 	struct _lf_endpoint *endpoint = calloc(1, sizeof(struct _lf_endpoint));
 	lf_assert(endpoint, failure, E_MALLOC, "Failed to allocate memory for new endpoint.");
 	endpoint->configure = configure;
@@ -15,7 +15,7 @@ struct _lf_endpoint *lf_endpoint_create(int (* configure)(struct _lf_endpoint *e
 	endpoint->push = push;
 	endpoint->pull = pull;
 	endpoint->destroy = destroy;
-	endpoint->_ctx = calloc(1, record_size);
+	endpoint->_ctx = calloc(1, context_size);
 	lf_assert(endpoint->_ctx, failure, E_MALLOC, "Failed to allocate the memory needed to create an endpoint context.");
 	return endpoint;
 failure:

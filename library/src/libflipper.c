@@ -18,15 +18,27 @@ const struct _flipper flipper = {
 };
 
 /* Creates a new libflipper device. */
-struct _lf_device *lf_device_create(struct _lf_endpoint *endpoint, int (* selector)(struct _lf_device *selector)) {
+struct _lf_device *lf_device_create(struct _lf_endpoint *endpoint, int (* select)(struct _lf_device *device), int (* destroy)(struct _lf_device *device), size_t context_size) {
 	struct _lf_device *device = (struct _lf_device *)calloc(1, sizeof(struct _lf_device));
 	lf_assert(device, failure, E_MALLOC, "Failed to allocate memory for new device.");
 	device->endpoint = endpoint;
-	device->selector = selector;
+	device->select = select;
+	device->destroy = destroy;
+	device->_ctx = calloc(1, context_size);
 	return device;
 failure:
 	free(device);
 	return NULL;
+}
+
+int lf_device_release(struct _lf_device *device) {
+	if (device) {
+		lf_endpoint_release(device->endpoint);
+		if (device->destroy) device->destroy(device);
+		free(device->_ctx);
+		free(device);
+	}
+	return lf_success;
 }
 
 /* Attempts to attach to all unattached devices. Returns how many devices were attached. */
@@ -45,7 +57,7 @@ failure:
 /* Call's the device's selector function and selects the device. */
 int lf_select(struct _lf_device *device) {
 	lf_assert(device, failure, E_NULL, "NULL device pointer provided for selection.");
-	if (device->selector) device->selector(device);
+	device->select(device);
 	lf_set_current_device(device);
 failure:
 	return lf_error;
@@ -53,7 +65,8 @@ failure:
 
 /* Detaches a device from libflipper. */
 int lf_detach(struct _lf_device *device) {
-	if (device) lf_endpoint_release(device->endpoint);
+	lf_assert(device, failure, E_NULL, "Invalid device provided to detach.");
+	lf_device_release(device);
 	lf_ll_remove(&lf_attached_devices, device);
 	return lf_success;
 failure:
