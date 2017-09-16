@@ -48,7 +48,9 @@ enum {
 };
 /* NOTE: The identifiers in this enumeration must match the order of the module addresses stored in the 'fmr_modules' array. */
 
+#ifdef __ATSAM4SB__
 #include <exceptions.h>
+#endif
 
 /* Clock the CM4 CPU at 96 MHz. */
 #define F_CPU 96000000

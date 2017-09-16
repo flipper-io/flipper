@@ -10,7 +10,7 @@ int gpio_configure(void) {
 }
 
 void gpio_enable(uint32_t enable, uint32_t disable) {
-	printf("Enabling gpio pins 0x08x, disabling gpio pins 0x%08x.\n", enable, disable);
+	printf("Enabling gpio pins 0x%08x, disabling gpio pins 0x%08x.\n", enable, disable);
 }
 
 void gpio_write(uint32_t set, uint32_t clear) {

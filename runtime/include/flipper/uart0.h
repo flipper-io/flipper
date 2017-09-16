@@ -7,35 +7,23 @@
 
 #ifdef __private_include__
 
+struct _uart0_configuration {
+	uint8_t b;
+};
+
 /* Declare the virtual interface for this modules. */
-extern const struct _uart0 {
-	int (* configure)(void);
-	void (* dfu)(void);
-	void (* enable)(void);
-	void (* disable)(void);
-	uint8_t (* ready)(void);
-	void (* put)(uint8_t byte);
-	uint8_t (* get)(uint32_t timeout);
-	int (* push)(void *source, lf_size_t length);
-	int (* pull)(void *destination, lf_size_t length, uint32_t timeout);
-} uart0;
+extern const struct _lf_endpoint uart0;
 
 /* Declare the _lf_module structure for this module. */
 extern struct _lf_module _uart0;
 
-/* Declare the FMR overlay for this module. */
-enum { _uart0_configure, _uart0_dfu, _uart0_enable, _uart0_disable, _uart0_ready, _uart0_put, _uart0_get, _uart0_push, _uart0_pull };
-
 /* Declare the prototypes for all of the functions within this module. */
-extern int uart0_configure(void);
-extern void uart0_dfu(void);
-extern void uart0_enable(void);
-extern void uart0_disable(void);
-extern uint8_t uart0_ready(void);
-extern void uart0_put(uint8_t byte);
-extern uint8_t uart0_get(uint32_t timeout);
-extern int uart0_push(void *source, lf_size_t length);
-extern int uart0_pull(void *destination, lf_size_t length, uint32_t timeout);
+extern int uart0_configure(struct _lf_endpoint *endpoint, void *_configuration);
+extern bool uart0_ready(struct _lf_endpoint *endpoint);
+extern int uart0_push(struct _lf_endpoint *endpoint, void *source, lf_size_t length);
+extern int uart0_pull(struct _lf_endpoint *endpoint, void *destination, lf_size_t length);
+
+extern void uart0_dfu(struct _lf_endpoint *endpoint);
 
 #endif
 #endif

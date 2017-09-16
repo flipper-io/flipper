@@ -9,6 +9,8 @@ typedef struct _lf_ll lf_msg_queue;
 
 /* Standardizes interaction with a physical hardware bus for the transmission of arbitrary data. */
 struct _lf_endpoint {
+	/* Reconfigures the endpoint with a new context. */
+	int (* configure)(struct _lf_endpoint *endpoint, void *_ctx);
 	/* Indicates whether or not the endpoint is ready to send or receive data. */
 	bool (* ready)(struct _lf_endpoint *endpoint);
 	/* Transmits a block of data through the endpoint. */
@@ -21,9 +23,12 @@ struct _lf_endpoint {
 	void *_ctx;
 };
 
-struct _lf_endpoint *lf_endpoint_create(bool (* ready)(struct _lf_endpoint *endpoint),
-										int (* push)(struct _lf_endpoint *_endpoint, void *source, lf_size_t length),
-										int (* pull)(struct _lf_endpoint *_endpoint, void *destination, lf_size_t length),
+enum { _endpoint_configure, _endpoint_ready, _endpoint_push, _endpoint_pull, _endpoint_destroy };
+
+struct _lf_endpoint *lf_endpoint_create(int (* configure)(struct _lf_endpoint *endpoint, void *_ctx),
+										bool (* ready)(struct _lf_endpoint *endpoint),
+										int (* push)(struct _lf_endpoint *endpoint, void *source, lf_size_t length),
+										int (* pull)(struct _lf_endpoint *endpoint, void *destination, lf_size_t length),
 										int (* destroy)(struct _lf_endpoint *endpoint),
 										size_t record_size);
 int lf_endpoint_enqueue(struct _lf_endpoint *endpoint, struct _lf_msg *message);

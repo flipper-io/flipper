@@ -12,7 +12,7 @@ const struct _adc adc = {
 };
 
 LF_WEAK int adc_configure(void) {
-	return lf_success;
+	return lf_invoke(&_adc, _adc_configure, NULL);
 }
 
 #endif

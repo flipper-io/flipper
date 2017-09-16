@@ -10,12 +10,16 @@ struct _lf_libusb_context {
 	struct libusb_context *context;
 };
 
-bool lf_libusb_ready(struct _lf_endpoint *this) {
+int lf_libusb_configure(struct _lf_endpoint *endpoint, void *_ctx) {
+	return lf_success;
+}
+
+bool lf_libusb_ready(struct _lf_endpoint *endpoint) {
 	return false;
 }
 
-int lf_libusb_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
-	struct _lf_libusb_context *context = (struct _lf_libusb_context *)this->_ctx;
+int lf_libusb_push(struct _lf_endpoint *endpoint, void *source, lf_size_t length) {
+	struct _lf_libusb_context *context = (struct _lf_libusb_context *)endpoint->_ctx;
 	int _length;
 	int _e;
 #ifndef __ALL_BULK__
@@ -41,8 +45,8 @@ failure:
 	return lf_error;
 }
 
-int lf_libusb_pull(struct _lf_endpoint *this, void *destination, lf_size_t length) {
-	struct _lf_libusb_context *context = (struct _lf_libusb_context *)this->_ctx;
+int lf_libusb_pull(struct _lf_endpoint *endpoint, void *destination, lf_size_t length) {
+	struct _lf_libusb_context *context = (struct _lf_libusb_context *)endpoint->_ctx;
 	int _length;
 	int _e;
 #ifndef __ALL_BULK__
@@ -68,9 +72,9 @@ failure:
 	return lf_error;
 }
 
-int lf_libusb_destroy(struct _lf_endpoint *this) {
-	if (this) {
-		struct _lf_libusb_context *context = (struct _lf_libusb_context *)this->_ctx;
+int lf_libusb_destroy(struct _lf_endpoint *endpoint) {
+	if (endpoint) {
+		struct _lf_libusb_context *context = (struct _lf_libusb_context *)endpoint->_ctx;
 		libusb_close(context->handle);
 		libusb_exit(context->context);
 	}
@@ -93,8 +97,9 @@ struct _lf_ll *lf_libusb_endpoints_for_vid_pid(uint16_t vid, uint16_t pid) {
 		lf_assert(_e == 0, failure, E_LIBUSB, "Failed to obtain descriptor for device.");
 		/* Check if we have a match with the desired VID and PID. */
 		if (descriptor.idVendor == vid && descriptor.idProduct == pid) {
-			/* Create an new endpoint for this device. */
-			struct _lf_endpoint *endpoint = lf_endpoint_create(lf_libusb_ready,
+			/* Create an new endpoint for endpoint device. */
+			struct _lf_endpoint *endpoint = lf_endpoint_create(lf_libusb_configure,
+															   lf_libusb_ready,
 															   lf_libusb_push,
 															   lf_libusb_pull,
 															   lf_libusb_destroy,

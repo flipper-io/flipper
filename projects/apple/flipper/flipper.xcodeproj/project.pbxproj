@@ -11,6 +11,8 @@
 		5E1E56811F329D7D0038FE23 /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E1E56801F329D7D0038FE23 /* libusb-1.0.0.dylib */; };
 		5E1E56891F329FA90038FE23 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E1E56881F329FA90038FE23 /* main.m */; };
 		5E1E568F1F329FF20038FE23 /* flipper.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E1E55B21F329C4F0038FE23 /* flipper.framework */; };
+		5E2E427F1F6C9E630079419C /* atsam4s.c in Sources */ = {isa = PBXBuildFile; fileRef = 5E2E427D1F6C9E630079419C /* atsam4s.c */; };
+		5E2E42801F6C9E630079419C /* atmegau2.c in Sources */ = {isa = PBXBuildFile; fileRef = 5E2E427E1F6C9E630079419C /* atmegau2.c */; };
 		5EB8687A1F32A39D000D7529 /* hal.c in Sources */ = {isa = PBXBuildFile; fileRef = 5EB867A61F32A33B000D7529 /* hal.c */; };
 		5EB8687B1F32A39D000D7529 /* fmr.c in Sources */ = {isa = PBXBuildFile; fileRef = 5EB867731F32A33B000D7529 /* fmr.c */; };
 		5EB8687C1F32A39D000D7529 /* libusb.c in Sources */ = {isa = PBXBuildFile; fileRef = 5EB867741F32A33B000D7529 /* libusb.c */; };
@@ -114,6 +116,8 @@
 		5E1E56801F329D7D0038FE23 /* libusb-1.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libusb-1.0.0.dylib"; path = "../../../../../../../usr/local/Cellar/libusb/1.0.21/lib/libusb-1.0.0.dylib"; sourceTree = "<group>"; };
 		5E1E56861F329FA80038FE23 /* test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test; sourceTree = BUILT_PRODUCTS_DIR; };
 		5E1E56881F329FA90038FE23 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		5E2E427D1F6C9E630079419C /* atsam4s.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = atsam4s.c; path = ../../../../carbon/hal/atsam4s.c; sourceTree = "<group>"; };
+		5E2E427E1F6C9E630079419C /* atmegau2.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = atmegau2.c; path = ../../../../carbon/hal/atmegau2.c; sourceTree = "<group>"; };
 		5EB867671F32A33B000D7529 /* .keep */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .keep; sourceTree = "<group>"; };
 		5EB867691F32A33B000D7529 /* .keep */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .keep; sourceTree = "<group>"; };
 		5EB8676C1F32A33B000D7529 /* libusb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libusb.h; sourceTree = "<group>"; };
@@ -126,7 +130,6 @@
 		5EB867751F32A33B000D7529 /* network.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = network.c; sourceTree = "<group>"; };
 		5EB867771F32A33B000D7529 /* .keep */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .keep; sourceTree = "<group>"; };
 		5EB867781F32A33B000D7529 /* libflipper.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = libflipper.c; sourceTree = "<group>"; };
-		5EB8677A1F32A33B000D7529 /* .keep */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .keep; sourceTree = "<group>"; };
 		5EB8677C1F32A33B000D7529 /* .keep */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .keep; sourceTree = "<group>"; };
 		5EB8677D1F32A33B000D7529 /* bulk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bulk.c; sourceTree = "<group>"; };
 		5EB8677E1F32A33B000D7529 /* button.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = button.c; sourceTree = "<group>"; };
@@ -166,7 +169,6 @@
 		5EB867A11F32A33B000D7529 /* usart.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = usart.c; sourceTree = "<group>"; };
 		5EB867A21F32A33B000D7529 /* usb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = usb.c; sourceTree = "<group>"; };
 		5EB867A31F32A33B000D7529 /* wdt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = wdt.c; sourceTree = "<group>"; };
-		5EB867A51F32A33B000D7529 /* .keep */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .keep; sourceTree = "<group>"; };
 		5EB867A61F32A33B000D7529 /* hal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hal.c; sourceTree = "<group>"; };
 		5EB867A81F32A33B000D7529 /* .keep */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .keep; sourceTree = "<group>"; };
 		5EB867AB1F32A33B000D7529 /* .keep */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .keep; sourceTree = "<group>"; };
@@ -381,7 +383,6 @@
 		5EB867791F32A33B000D7529 /* carbon */ = {
 			isa = PBXGroup;
 			children = (
-				5EB8677A1F32A33B000D7529 /* .keep */,
 				5EB8677B1F32A33B000D7529 /* atmegau2 */,
 				5EB8678C1F32A33B000D7529 /* atsam4s */,
 				5EB867A41F32A33B000D7529 /* hal */,
@@ -448,7 +449,8 @@
 		5EB867A41F32A33B000D7529 /* hal */ = {
 			isa = PBXGroup;
 			children = (
-				5EB867A51F32A33B000D7529 /* .keep */,
+				5E2E427E1F6C9E630079419C /* atmegau2.c */,
+				5E2E427D1F6C9E630079419C /* atsam4s.c */,
 				5EB867A61F32A33B000D7529 /* hal.c */,
 			);
 			path = hal;
@@ -769,8 +771,10 @@
 				5EB868901F32A39D000D7529 /* rtc.c in Sources */,
 				5EB868911F32A39D000D7529 /* runtime.c in Sources */,
 				5EB868921F32A39D000D7529 /* spi.c in Sources */,
+				5E2E427F1F6C9E630079419C /* atsam4s.c in Sources */,
 				5EB868931F32A39D000D7529 /* swd.c in Sources */,
 				5EB868941F32A39D000D7529 /* task.c in Sources */,
+				5E2E42801F6C9E630079419C /* atmegau2.c in Sources */,
 				5EB868951F32A39D000D7529 /* temp.c in Sources */,
 				5EB868961F32A39D000D7529 /* timer.c in Sources */,
 				5EB868971F32A39D000D7529 /* uart0.c in Sources */,

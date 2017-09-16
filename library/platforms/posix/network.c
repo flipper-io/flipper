@@ -3,13 +3,17 @@
 #include <flipper/error.h>
 #include <flipper/libflipper.h>
 
-bool lf_network_ready(struct _lf_endpoint *this) {
+int lf_network_configure(struct _lf_endpoint *endpoint, void *_ctx) {
+return lf_success;
+}
+
+bool lf_network_ready(struct _lf_endpoint *endpoint) {
 	return false;
 }
 
-int lf_network_push(struct _lf_endpoint *this, void *source, lf_size_t length) {
+int lf_network_push(struct _lf_endpoint *endpoint, void *source, lf_size_t length) {
 	/* Obtain a pointer to and cast to the network context associated with the active endpoint. */
-	struct _lf_network_context *context = (struct _lf_network_context *)this->_ctx;
+	struct _lf_network_context *context = (struct _lf_network_context *)endpoint->_ctx;
 	ssize_t _e = sendto(context->fd, source, length, 0, (struct sockaddr *)&context->device, sizeof(struct sockaddr_in));
 	lf_assert(_e > 0, failure, E_COMMUNICATION, "Failed to send data to networked device '%s' at '%s'.", context->host, inet_ntoa(context->device.sin_addr));
 	return lf_success;
@@ -17,20 +21,20 @@ failure:
 	return lf_error;
 }
 
-int lf_network_pull(struct _lf_endpoint *this, void *destination, lf_size_t length) {
+int lf_network_pull(struct _lf_endpoint *endpoint, void *destination, lf_size_t length) {
 	/* Obtain a pointer to and cast to the network context associated with the active endpoint. */
-	struct _lf_network_context *context = (struct _lf_network_context *)this->_ctx;
+	struct _lf_network_context *context = (struct _lf_network_context *)endpoint->_ctx;
 	socklen_t _length = sizeof(context->device);
 	ssize_t _e = recvfrom(context->fd, destination, length, 0, (struct sockaddr *)&context->device, &_length);
-	lf_assert(_e > 0, failure, E_COMMUNICATION, "Failed to receive data from networked device.");
+	lf_assert(_e > 0, failure, E_COMMUNICATION, "Failed to receive data from networked device '%s' at '%s'.", context->host, inet_ntoa(context->device.sin_addr));
 	return lf_success;
 failure:
 	return lf_error;
 }
 
-int lf_network_destroy(struct _lf_endpoint *this) {
-	if (this && this->_ctx) {
-		struct _lf_network_context *context = this->_ctx;
+int lf_network_destroy(struct _lf_endpoint *endpoint) {
+	if (endpoint && endpoint->_ctx) {
+		struct _lf_network_context *context = endpoint->_ctx;
 		close(context->fd);
 	}
 	return lf_success;
@@ -38,7 +42,8 @@ int lf_network_destroy(struct _lf_endpoint *this) {
 
 struct _lf_endpoint *lf_network_endpoint_for_hostname(char *hostname) {
 	struct _lf_network_context *context = NULL;
-	struct _lf_endpoint *endpoint = lf_endpoint_create(lf_network_ready,
+	struct _lf_endpoint *endpoint = lf_endpoint_create(lf_network_configure,
+													   lf_network_ready,
 													   lf_network_push,
 													   lf_network_pull,
 													   lf_network_destroy,

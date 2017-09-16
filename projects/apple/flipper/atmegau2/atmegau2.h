@@ -2,7 +2,7 @@
 #define __atmega16u2_h__
 
 /* Include the avr-libc standard library headers. */
-#ifdef __AVR_ATMEGA16U2__
+#ifdef __ATMEGAU2__
 #include <avr/common.h>
 #include <util/delay.h>
 #include <avr/eeprom.h>

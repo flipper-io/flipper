@@ -129,6 +129,11 @@ fmr_va fmr_ptr(struct _lf_device *device, void *ptr) {
 	return 0;
 }
 
+/* Sends data to the address space of the device for a function call. Deallocated at the function return. */
+fmr_va fmr_data(void *data, lf_size_t size) {
+	return fmr_ptr(lf_get_current_device(), NULL);
+}
+
 int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _lf_ll *parameters) {
 	/* Ensure that we have a valid module and argument pointer. */
 	if (!module) {

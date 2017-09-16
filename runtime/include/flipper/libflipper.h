@@ -66,9 +66,6 @@
 
 #include <flipper/types.h>
 #include <flipper/error.h>
-#include <flipper/fmr.h>
-#include <flipper/endpoint.h>
-#include <flipper/ll.h>
 
 /* Macros that quantify device attributes. */
 #define lf_device_8bit (1 << 1)
@@ -96,6 +93,8 @@ struct _lf_device {
 	struct _lf_endpoint *endpoint;
 	/* The device's selector function. Mutates modules state as appropriate for the device. */
 	int (* selector)(struct _lf_device *device);
+	/* The device's context. */
+	void *_ctx;
 	/* The current error state of the device. */
 	lf_error_t error;
 };
@@ -170,6 +169,10 @@ int lf_detach(struct _lf_device *device);
 int lf_select(struct _lf_device *device);
 int lf_register_endpoint(struct _lf_endpoint *endpoint);
 void lf_finish(void);
+
+#include <flipper/fmr.h>
+#include <flipper/endpoint.h>
+#include <flipper/ll.h>
 
 /* -------------- OLD API -------------- */
 

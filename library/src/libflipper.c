@@ -205,13 +205,9 @@ int lf_ram_load(struct _lf_device *device, void *source, lf_size_t length) {
 
 /* Debugging functions for displaying the contents of various FMR related data structures. */
 
-
-#pragma warning TEMP
-extern const struct _lf_module *const atmegau2_modules[];
-
 void lf_debug_call(struct _fmr_invocation *call) {
 	printf("call:\n");
-	printf("\t└─ module:\t0x%x (%s)\n", call->index, atmegau2_modules[call->index]->name);
+	printf("\t└─ module:\t0x%x\n", call->index);
 	printf("\t└─ function:\t0x%x\n", call->function);
 	printf("\t└─ types:\t0x%x\n", call->types);
 	printf("\t└─ argc:\t0x%x (%d arguments)\n", call->argc, call->argc);

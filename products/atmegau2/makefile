@@ -43,6 +43,7 @@ OBJDUMP = $(PREFIX)objdump
 # Define compilation and emulation flags.
 CFLAGS = -std=c99 -Os -mmcu=atmega16u2 -DARCH=ARCH_AVR8 -D__AVR_ATMEGA16U2__ -DF_CPU=16000000UL \
 	-D__disable_error_side_effects__ \
+	-D__ATMEGAU2__ \
 	-DPLATFORM_HEADER="<flipper/atmegau2/atmegau2.h>" $(foreach inc,$(INCLUDE_DIRS),-I$(inc))
 
 LDFLAGS = -Wl,--gc-sections
