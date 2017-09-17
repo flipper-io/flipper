@@ -4,40 +4,23 @@
 #define __private_include__
 #include <flipper/uart0.h>
 
-int usart0_configure(void) {
-	printf("Configuring the usart0.\n");
+int uart0_configure(struct _lf_endpoint *self, void *_configuration) {
+	printf("Configuring the uart0.\n");
 	return lf_success;
 }
 
-void usart0_enable(void) {
-	printf("Enabling the usart0.\n");
-}
-
-void usart0_disable(void) {
-	printf("Disabling the usart0.\n");
-}
-
-uint8_t usart0_ready(void) {
-	printf("Checking if the usart0 is ready.\n");
+bool uart0_ready(struct _lf_endpoint *self) {
+	printf("Checking if the uart0 is ready.\n");
 	return lf_success;
 }
 
-void usart0_put(uint8_t byte) {
-	printf("Putting to the usart0 bus.\n");
-}
-
-uint8_t usart0_get(void) {
-	printf("Getting from the usart0 bus.\n");
+int uart0_push(struct _lf_endpoint *self, void *source, lf_size_t length) {
+	printf("Pushing to the uart0 bus.\n");
 	return lf_success;
 }
 
-int usart0_push(void *source, lf_size_t length) {
-	printf("Pushing to the usart0 bus.\n");
-	return lf_success;
-}
-
-int usart0_pull(void *destination, lf_size_t length) {
-	printf("Pulling from the usart0 bus.\n");
+int uart0_pull(struct _lf_endpoint *self, void *destination, lf_size_t length) {
+	printf("Pulling from the uart0 bus.\n");
 	return lf_success;
 }
 

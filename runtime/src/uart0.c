@@ -16,7 +16,7 @@ const struct _lf_endpoint uart0 = {
 
 LF_WEAK int uart0_configure(struct _lf_endpoint *self, void *_configuration) {
 	struct _uart0_configuration *configuration = _configuration;
-	lf_invoke(&_uart0, _endpoint_configure, fmr_args(fmr_ptr(_uart0.device, NULL), fmr_data(configuration, sizeof(struct _lf_configuration))));
+	lf_invoke(&_uart0, _endpoint_configure, NULL);
 	return lf_success;
 }
 
