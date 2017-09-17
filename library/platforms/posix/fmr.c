@@ -28,9 +28,9 @@ const void *const fmr_modules[] = {
 
 uint32_t fmr_call(const uint32_t (* function)(void), uint8_t argc, uint16_t argt, void *argv) {
 	/* Grab the symbol name of the function for debugging purposes. */
-	Dl_info info;
-	dladdr(function, &info);
-	printf("Calling local function '%s', with %i arguments, arg types %i, and va_list %p.\n", info.dli_sname, argc, argt, argv);
+	//Dl_info info;
+	//dladdr(function, &info);
+	//printf("Calling local function '%s', with %i arguments, arg types %i, and va_list %p.\n", info.dli_sname, argc, argt, argv);
 	return function();
 }
 
