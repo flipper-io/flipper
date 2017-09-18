@@ -7,6 +7,7 @@ use clap::{App, Arg, ArgMatches};
 pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
     vec![
         boot::make_subcommand(),
+        reset::make_subcommand(),
         flash::make_subcommand(),
         install::make_subcommand(),
         deploy::make_subcommand(),
@@ -35,13 +36,31 @@ pub mod boot {
         App::new("boot")
     }
 
-    // TODO check that `dfu-programmer` exists before attempting to execute it.
     pub fn execute(args: &ArgMatches) {
-        Command::new("dfu-programmer")
+        let result = Command::new("dfu-programmer")
             .arg("at90usb162")
             .arg("start")
-            .spawn()
-            .expect("Error booting Flipper");
+            .spawn();
+
+        match result {
+            Ok(_) => return,
+            Err(e) => match e.kind() {
+                NotFound => println!("Couldn't find dfu-programmer. Please make sure it's in your path"),
+                _ => println!("Encountered unexpected error booting Flipper")
+            }
+        }
+    }
+}
+
+pub mod reset {
+    use super::*;
+
+    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+        App::new("reset")
+    }
+
+    pub fn execute(args: &ArgMatches) {
+
     }
 }
 
@@ -60,6 +79,7 @@ pub mod flash {
     pub fn execute(args: &ArgMatches) {
         use flipper::hardware::fdfu;
         if let Some(image) = args.value_of("image") {
+            println!("Flipper flash got image: {}", image);
             fdfu::flash(image);
         }
     }
