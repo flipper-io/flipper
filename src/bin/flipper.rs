@@ -63,6 +63,7 @@ pub fn execute(args: &ArgMatches) {
     match args.subcommand() {
         ("module", Some(m)) => modules::execute(m),
         (c @ "boot", Some(m)) => hw::execute(c, m),
+        (c @ "reset", Some(m)) => hw::execute(c, m),
         (c @ "flash", Some(m)) => hw::execute(c, m),
         (c @ "install", Some(m)) => hw::execute(c, m),
         (c @ "deploy", Some(m)) => hw::execute(c, m),
