@@ -130,12 +130,11 @@ pub fn enter_normal_mode() {
 pub fn flash<P: AsRef<Path>>(path: P) -> Result<()> {
     let file = File::open(path).map_err(|_| ::Error::FileNotFound);
 
-    let flipper = flipper_rust::Flipper::attach();
+    let flipper = flipper_rust::Flipper::attach_hostname("localhost");
     let mut bus = flipper_rust::fsm::uart0::Uart0::new(&flipper);
+    flipper_rust::fsm::uart0::configure();
 
     let samba = SamBa { bus: &mut bus };
-
-//    enter_update_mode(&mut bus);
 
     Ok(())
 }
