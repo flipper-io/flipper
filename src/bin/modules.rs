@@ -200,10 +200,27 @@ pub mod led {
     pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
         App::new("led")
             .about("Onboard RGB LED")
+            .arg(Arg::with_name("red")
+                .index(1)
+                .required(true)
+            )
+            .arg(Arg::with_name("green")
+                .index(2)
+                .required(true)
+            )
+            .arg(Arg::with_name("blue")
+                .index(3)
+                .required(true)
+            )
     }
 
     pub fn execute(args: &ArgMatches) {
-        unimplemented!();
+        let red = args.value_of("red").unwrap().parse::<u8>().unwrap();
+        let green = args.value_of("green").unwrap().parse::<u8>().unwrap();
+        let blue = args.value_of("blue").unwrap().parse::<u8>().unwrap();
+
+        let flipper = ::flipper_rust::Flipper::attach();
+        ::flipper_rust::fsm::led::rgb(red, green, blue);
     }
 }
 
