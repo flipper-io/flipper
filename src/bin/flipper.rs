@@ -16,16 +16,19 @@ extern crate clap;
 extern crate rustyline;
 extern crate byteorder;
 extern crate libc;
+extern crate goblin;
 extern crate flipper;
 extern crate flipper_rust;
 
 pub mod modules;
 pub mod package_manager;
 pub mod hardware_manager;
+pub mod binding_manager;
 
 use clap::{App, AppSettings, Arg, ArgMatches};
 use package_manager as pm;
 use hardware_manager as hw;
+use binding_manager as bm;
 
 const ABOUT: &'static str = "flipper: Manage and control Flipper from the command line";
 
@@ -52,6 +55,7 @@ pub fn app() -> App<'static, 'static> {
         .subcommand(modules::make_subcommand())
         .subcommands(hw::make_subcommands())
         .subcommands(pm::make_subcommands())
+        .subcommands(bm::make_subcommands())
 }
 
 /// Determine which child rust module is responsible for the command and pass
@@ -72,6 +76,7 @@ pub fn execute(args: &ArgMatches) {
         (c @ "remove", Some(m)) => pm::execute(c, m),
         (c @ "update", Some(m)) => pm::execute(c, m),
         (c @ "generate", Some(m)) => pm::execute(c, m),
+        (c @ "bind", Some(m)) => bm::execute(c, m),
         (unknown, _) => println!("Unknown command at app.rs: {}", unknown),
     }
 }
