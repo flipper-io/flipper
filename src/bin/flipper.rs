@@ -20,10 +20,10 @@ extern crate goblin;
 extern crate flipper;
 extern crate flipper_rust;
 
-pub mod modules;
-pub mod package_manager;
-pub mod hardware_manager;
-pub mod binding_manager;
+mod modules;
+mod package_manager;
+mod hardware_manager;
+mod binding_manager;
 
 use clap::{App, AppSettings, Arg, ArgMatches};
 use package_manager as pm;
@@ -63,7 +63,7 @@ pub fn app() -> App<'static, 'static> {
 /// are implemented by a child module rather than by the `flipper` module
 /// itself. Because of this, we have to explicitly pass the name of the matched
 /// command to the child module (e.g. the "c" in `(c @ "boot")`).
-pub fn execute(args: &ArgMatches) {
+pub fn execute(args: &ArgMatches) -> flipper::Result<()> {
     match args.subcommand() {
         ("module", Some(m)) => modules::execute(m),
         (c @ "boot", Some(m)) => hw::execute(c, m),
@@ -77,7 +77,7 @@ pub fn execute(args: &ArgMatches) {
         (c @ "update", Some(m)) => pm::execute(c, m),
         (c @ "generate", Some(m)) => pm::execute(c, m),
         (c @ "bind", Some(m)) => bm::execute(c, m),
-        (unknown, _) => println!("Unknown command at app.rs: {}", unknown),
+        (unknown, _) => { println!("Unknown command at app.rs: {}", unknown); Ok(()) },
     }
 }
 

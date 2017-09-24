@@ -7,8 +7,6 @@ use xmodem::Xmodem;
 use flipper_rust;
 use flipper_rust::fsm::{uart0, gpio};
 
-use ::Result;
-
 struct SamBa<'a, B: 'a> where B: Write + Read {
     bus: &'a mut B,
 }
@@ -127,8 +125,8 @@ pub fn enter_normal_mode() {
 
 }
 
-pub fn flash<P: AsRef<Path>>(path: P) -> Result<()> {
-    let file = File::open(path).map_err(|_| ::Error::FileNotFound);
+pub fn flash<P: AsRef<Path>>(path: P) -> ::Result<()> {
+    let file = File::open(path).map_err(|e| ::CliError::IoError(e));
 
     let flipper = flipper_rust::Flipper::attach_hostname("localhost");
     let mut bus = flipper_rust::fsm::uart0::Uart0::new(&flipper);
