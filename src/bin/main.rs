@@ -18,17 +18,15 @@ extern crate byteorder;
 extern crate libc;
 extern crate goblin;
 extern crate flipper;
-extern crate flipper_rust;
+extern crate flipper_console;
 
-mod modules;
-mod package_manager;
-mod hardware_manager;
-mod binding_manager;
+mod modules_cli;
+mod package_cli;
+mod hardware_cli;
+mod binding_cli;
 
+use flipper_console as console;
 use clap::{App, AppSettings, Arg, ArgMatches};
-use package_manager as pm;
-use hardware_manager as hw;
-use binding_manager as bm;
 
 const ABOUT: &'static str = "flipper: Manage and control Flipper from the command line";
 
@@ -52,10 +50,10 @@ pub fn app() -> App<'static, 'static> {
             AppSettings::DeriveDisplayOrder,
             AppSettings::UnifiedHelpMessage,
         ])
-        .subcommand(modules::make_subcommand())
-        .subcommands(hw::make_subcommands())
-        .subcommands(pm::make_subcommands())
-        .subcommands(bm::make_subcommands())
+        .subcommand(modules_cli::make_subcommand())
+        .subcommands(hardware_cli::make_subcommands())
+        .subcommands(package_cli::make_subcommands())
+        .subcommands(binding_cli::make_subcommands())
 }
 
 /// Determine which child rust module is responsible for the command and pass
@@ -63,20 +61,20 @@ pub fn app() -> App<'static, 'static> {
 /// are implemented by a child module rather than by the `flipper` module
 /// itself. Because of this, we have to explicitly pass the name of the matched
 /// command to the child module (e.g. the "c" in `(c @ "boot")`).
-pub fn execute(args: &ArgMatches) -> flipper::Result<()> {
+pub fn execute(args: &ArgMatches) -> console::Result<()> {
     match args.subcommand() {
-        ("module", Some(m)) => modules::execute(m),
-        (c @ "boot", Some(m)) => hw::execute(c, m),
-        (c @ "reset", Some(m)) => hw::execute(c, m),
-        (c @ "flash", Some(m)) => hw::execute(c, m),
-        (c @ "install", Some(m)) => hw::execute(c, m),
-        (c @ "deploy", Some(m)) => hw::execute(c, m),
-        (c @ "init", Some(m)) => pm::execute(c, m),
-        (c @ "new", Some(m)) => pm::execute(c, m),
-        (c @ "remove", Some(m)) => pm::execute(c, m),
-        (c @ "update", Some(m)) => pm::execute(c, m),
-        (c @ "generate", Some(m)) => pm::execute(c, m),
-        (c @ "bind", Some(m)) => bm::execute(c, m),
+        ("module", Some(m)) => modules_cli::execute(m),
+        (c @ "boot", Some(m)) => hardware_cli::execute(c, m),
+        (c @ "reset", Some(m)) => hardware_cli::execute(c, m),
+        (c @ "flash", Some(m)) => hardware_cli::execute(c, m),
+        (c @ "install", Some(m)) => hardware_cli::execute(c, m),
+        (c @ "deploy", Some(m)) => hardware_cli::execute(c, m),
+        (c @ "init", Some(m)) => package_cli::execute(c, m),
+        (c @ "new", Some(m)) => package_cli::execute(c, m),
+        (c @ "remove", Some(m)) => package_cli::execute(c, m),
+        (c @ "update", Some(m)) => package_cli::execute(c, m),
+        (c @ "generate", Some(m)) => package_cli::execute(c, m),
+        (c @ "bind", Some(m)) => binding_cli::execute(c, m),
         (unknown, _) => { println!("Unknown command at app.rs: {}", unknown); Ok(()) },
     }
 }

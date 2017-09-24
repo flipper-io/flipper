@@ -4,8 +4,10 @@ use std::path::Path;
 use std::{thread, time};
 use byteorder::{BigEndian, ReadBytesExt};
 use xmodem::Xmodem;
-use flipper_rust;
-use flipper_rust::fsm::{uart0, gpio};
+
+use flipper;
+use flipper::fsm::{uart0, gpio};
+use ::ConsoleError;
 
 struct SamBa<'a, B: 'a> where B: Write + Read {
     bus: &'a mut B,
@@ -126,11 +128,11 @@ pub fn enter_normal_mode() {
 }
 
 pub fn flash<P: AsRef<Path>>(path: P) -> ::Result<()> {
-    let file = File::open(path).map_err(|e| ::CliError::IoError(e));
+    let file = File::open(path).map_err(|e| ConsoleError::IoError(e));
 
-    let flipper = flipper_rust::Flipper::attach_hostname("localhost");
-    let mut bus = flipper_rust::fsm::uart0::Uart0::new(&flipper);
-    flipper_rust::fsm::uart0::configure();
+    let flipper = flipper::Flipper::attach_hostname("localhost");
+    let mut bus = flipper::fsm::uart0::Uart0::new(&flipper);
+    flipper::fsm::uart0::configure();
 
     let samba = SamBa { bus: &mut bus };
 

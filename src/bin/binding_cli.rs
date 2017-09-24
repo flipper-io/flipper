@@ -3,8 +3,8 @@ use std::path::PathBuf;
 use std::fs::File;
 use std::io::Read;
 use clap::{App, Arg, ArgMatches};
-use flipper;
-use flipper::bindings::binary_parser;
+use flipper_console as console;
+use console::bindings::binary_parser;
 
 pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
     vec![
@@ -12,7 +12,7 @@ pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
     ]
 }
 
-pub fn execute(command: &str, args: &ArgMatches) -> flipper::Result<()> {
+pub fn execute(command: &str, args: &ArgMatches) -> console::Result<()> {
     match command {
         "bind" => bind::execute(args),
         _ => { println!("Unrecognized command!"); Ok(()) },
@@ -30,7 +30,7 @@ pub mod bind {
             )
     }
 
-    pub fn execute(args: &ArgMatches) -> flipper::Result<()> {
+    pub fn execute(args: &ArgMatches) -> console::Result<()> {
         if let Some(filename) = args.value_of("file") {
 
             println!("flipper bind got {}", filename);

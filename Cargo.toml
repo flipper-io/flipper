@@ -1,5 +1,5 @@
 [package]
-name = "flipper"
+name = "flipper_console"
 version = "0.1.0"
 authors = ["Nick Mosher <nicholastmosher@gmail.com>"]
 
@@ -15,13 +15,13 @@ xmodem = "0.1.3"
 goblin = "0.0.11"
 gimli = "0.14.0"
 object = "0.4.0"
-flipper-rust = { path = "../flipper/languages/rust" }
+flipper = { path = "../flipper/languages/rust" }
 
 [lib]
-name = "flipper"
+name = "flipper_console"
 path = "src/lib.rs"
 
 [[bin]]
-name = "flipper"
-path = "src/bin/flipper.rs"
+name = "flipper_console"
+path = "src/bin/main.rs"
 test = false
