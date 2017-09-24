@@ -8,7 +8,7 @@ extern crate goblin;
 extern crate gimli;
 extern crate object;
 
-extern crate flipper_rust;
+extern crate flipper;
 
 pub mod packages;
 pub mod hardware;
@@ -17,8 +17,8 @@ pub mod bindings;
 use std::io;
 use std::result;
 
-pub enum CliError {
+pub enum ConsoleError {
     IoError(io::Error),
 }
 
-pub type Result<T> = result::Result<T, CliError>;
+pub type Result<T> = result::Result<T, ConsoleError>;

@@ -2,7 +2,7 @@
 //! hardware which isn't remote module execution. This includes booting the
 //! board and installing and deploying modules.
 
-use flipper;
+use flipper_console as console;
 use clap::{App, Arg, ArgMatches};
 
 pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
@@ -19,7 +19,7 @@ pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
 /// that even though they were parsed by the top-level `flipper` command handler,
 /// the argument match was not consumed. Hence, we match on solely the command
 /// string, then forward the ArgMatches to the implementing rust mod.
-pub fn execute(command: &str, args: &ArgMatches) -> flipper::Result<()> {
+pub fn execute(command: &str, args: &ArgMatches) -> console::Result<()> {
     match command {
         "boot" => boot::execute(args),
         "flash" => flash::execute(args),
@@ -37,7 +37,7 @@ pub mod boot {
         App::new("boot")
     }
 
-    pub fn execute(args: &ArgMatches) -> flipper::Result<()> {
+    pub fn execute(args: &ArgMatches) -> console::Result<()> {
         let result = Command::new("dfu-programmer")
             .arg("at90usb162")
             .arg("start")
@@ -61,14 +61,14 @@ pub mod reset {
         App::new("reset")
     }
 
-    pub fn execute(args: &ArgMatches) -> flipper::Result<()> {
+    pub fn execute(args: &ArgMatches) -> console::Result<()> {
         unimplemented!();
     }
 }
 
 pub mod flash {
     use super::*;
-    use flipper::hardware::fdfu;
+    use console::hardware::fdfu;
 
     pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
         App::new("flash")
@@ -78,8 +78,8 @@ pub mod flash {
                 .takes_value(true))
     }
 
-    pub fn execute(args: &ArgMatches) -> flipper::Result<()> {
-        use flipper::hardware::fdfu;
+    pub fn execute(args: &ArgMatches) -> console::Result<()> {
+        use console::hardware::fdfu;
         if let Some(image) = args.value_of("image") {
             println!("Flipper flash got image: {}", image);
             fdfu::flash(image);
@@ -102,7 +102,7 @@ pub mod install {
                 .help("Specifies a package to install, such as from the repository"))
     }
 
-    pub fn execute(args: &ArgMatches) -> flipper::Result<()> {
+    pub fn execute(args: &ArgMatches) -> console::Result<()> {
         unimplemented!();
     }
 }
@@ -121,7 +121,7 @@ pub mod deploy {
                 .help("Specify a package to install, such as from the repository"))
     }
 
-    pub fn execute(args: &ArgMatches) -> flipper::Result<()> {
+    pub fn execute(args: &ArgMatches) -> console::Result<()> {
         unimplemented!();
     }
 }
