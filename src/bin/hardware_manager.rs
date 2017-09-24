@@ -2,6 +2,7 @@
 //! hardware which isn't remote module execution. This includes booting the
 //! board and installing and deploying modules.
 
+use flipper;
 use clap::{App, Arg, ArgMatches};
 
 pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
@@ -18,13 +19,13 @@ pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
 /// that even though they were parsed by the top-level `flipper` command handler,
 /// the argument match was not consumed. Hence, we match on solely the command
 /// string, then forward the ArgMatches to the implementing rust mod.
-pub fn execute(command: &str, args: &ArgMatches) {
+pub fn execute(command: &str, args: &ArgMatches) -> flipper::Result<()> {
     match command {
         "boot" => boot::execute(args),
         "flash" => flash::execute(args),
         "install" => install::execute(args),
         "deploy" => deploy::execute(args),
-        unknown => println!("Unrecognized command: {}", unknown)
+        unknown => { println!("Unrecognized command: {}", unknown); Ok(()) },
     }
 }
 
@@ -36,19 +37,20 @@ pub mod boot {
         App::new("boot")
     }
 
-    pub fn execute(args: &ArgMatches) {
+    pub fn execute(args: &ArgMatches) -> flipper::Result<()> {
         let result = Command::new("dfu-programmer")
             .arg("at90usb162")
             .arg("start")
             .spawn();
 
         match result {
-            Ok(_) => return,
+            Ok(_) => (),
             Err(e) => match e.kind() {
                 NotFound => println!("Couldn't find dfu-programmer. Please make sure it's in your path"),
                 _ => println!("Encountered unexpected error booting Flipper")
             }
-        }
+        };
+        Ok(())
     }
 }
 
@@ -59,8 +61,8 @@ pub mod reset {
         App::new("reset")
     }
 
-    pub fn execute(args: &ArgMatches) {
-
+    pub fn execute(args: &ArgMatches) -> flipper::Result<()> {
+        unimplemented!();
     }
 }
 
@@ -76,12 +78,13 @@ pub mod flash {
                 .takes_value(true))
     }
 
-    pub fn execute(args: &ArgMatches) {
+    pub fn execute(args: &ArgMatches) -> flipper::Result<()> {
         use flipper::hardware::fdfu;
         if let Some(image) = args.value_of("image") {
             println!("Flipper flash got image: {}", image);
             fdfu::flash(image);
         }
+        Ok(())
     }
 }
 
@@ -99,7 +102,7 @@ pub mod install {
                 .help("Specifies a package to install, such as from the repository"))
     }
 
-    pub fn execute(args: &ArgMatches) {
+    pub fn execute(args: &ArgMatches) -> flipper::Result<()> {
         unimplemented!();
     }
 }
@@ -118,7 +121,7 @@ pub mod deploy {
                 .help("Specify a package to install, such as from the repository"))
     }
 
-    pub fn execute(args: &ArgMatches) {
+    pub fn execute(args: &ArgMatches) -> flipper::Result<()> {
         unimplemented!();
     }
 }

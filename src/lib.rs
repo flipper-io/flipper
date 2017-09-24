@@ -4,16 +4,21 @@ extern crate byteorder;
 extern crate xmodem;
 extern crate serde;
 extern crate toml;
+extern crate goblin;
+extern crate gimli;
+extern crate object;
 
 extern crate flipper_rust;
 
-use std::result;
-
 pub mod packages;
 pub mod hardware;
+pub mod bindings;
 
-pub enum Error {
-    FileNotFound,
+use std::io;
+use std::result;
+
+pub enum CliError {
+    IoError(io::Error),
 }
 
-pub type Result<T> = result::Result<T, Error>;
+pub type Result<T> = result::Result<T, CliError>;
