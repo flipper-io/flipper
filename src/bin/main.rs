@@ -88,8 +88,7 @@ pub fn execute(args: &ArgMatches) -> Result<()> {
         (c @ "new", Some(m)) => packages_cli::execute(c, m),
         (c @ "remove", Some(m)) => packages_cli::execute(c, m),
         (c @ "update", Some(m)) => packages_cli::execute(c, m),
-        (c @ "generate", Some(m)) => packages_cli::execute(c, m),
-        (c @ "bind", Some(m)) => bindings_cli::execute(c, m),
+        (c @ "generate", Some(m)) => bindings_cli::execute(c, m),
         (unknown, _) => bail!("Unknown command: {}", unknown),
     }
 }
