@@ -3,6 +3,7 @@
 //! board and installing and deploying modules.
 
 use flipper_console as console;
+use console::errors::*;
 use clap::{App, Arg, ArgMatches};
 
 pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
@@ -19,7 +20,7 @@ pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
 /// that even though they were parsed by the top-level `flipper` command handler,
 /// the argument match was not consumed. Hence, we match on solely the command
 /// string, then forward the ArgMatches to the implementing rust mod.
-pub fn execute(command: &str, args: &ArgMatches) -> console::Result<()> {
+pub fn execute(command: &str, args: &ArgMatches) -> Result<()> {
     match command {
         "boot" => boot::execute(args),
         "flash" => flash::execute(args),
@@ -37,7 +38,7 @@ pub mod boot {
         App::new("boot")
     }
 
-    pub fn execute(args: &ArgMatches) -> console::Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<()> {
         let result = Command::new("dfu-programmer")
             .arg("at90usb162")
             .arg("start")
@@ -61,7 +62,7 @@ pub mod reset {
         App::new("reset")
     }
 
-    pub fn execute(args: &ArgMatches) -> console::Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<()> {
         unimplemented!();
     }
 }
@@ -78,7 +79,7 @@ pub mod flash {
                 .takes_value(true))
     }
 
-    pub fn execute(args: &ArgMatches) -> console::Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<()> {
         use console::hardware::fdfu;
         if let Some(image) = args.value_of("image") {
             println!("Flipper flash got image: {}", image);
@@ -102,7 +103,7 @@ pub mod install {
                 .help("Specifies a package to install, such as from the repository"))
     }
 
-    pub fn execute(args: &ArgMatches) -> console::Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<()> {
         unimplemented!();
     }
 }
@@ -121,7 +122,7 @@ pub mod deploy {
                 .help("Specify a package to install, such as from the repository"))
     }
 
-    pub fn execute(args: &ArgMatches) -> console::Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<()> {
         unimplemented!();
     }
 }

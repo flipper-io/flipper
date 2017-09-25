@@ -4,6 +4,7 @@ use std::fs::File;
 use std::io::Read;
 use clap::{App, Arg, ArgMatches};
 use flipper_console as console;
+use console::errors::*;
 use console::bindings::binary_parser;
 
 pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
@@ -12,7 +13,7 @@ pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
     ]
 }
 
-pub fn execute(command: &str, args: &ArgMatches) -> console::Result<()> {
+pub fn execute(command: &str, args: &ArgMatches) -> Result<()> {
     match command {
         "bind" => bind::execute(args),
         _ => { println!("Unrecognized command!"); Ok(()) },
@@ -30,15 +31,17 @@ pub mod bind {
             )
     }
 
-    pub fn execute(args: &ArgMatches) -> console::Result<()> {
-        if let Some(filename) = args.value_of("file") {
+    pub fn execute(args: &ArgMatches) -> Result<()> {
 
-            println!("flipper bind got {}", filename);
-            let path = PathBuf::from(filename);
-            let mut file = File::open(path).unwrap();
+        let filename = args.value_of("file")
+            .chain_err(|| "error reading filename")?;
 
-            binary_parser::parse_elf(&mut file);
-        };
+        println!("flipper bind got {}", filename);
+        let path = PathBuf::from(filename);
+        let mut file = File::open(path).unwrap();
+
+        binary_parser::parse_elf(&mut file);
+
         Ok(())
     }
 }

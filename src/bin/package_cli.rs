@@ -3,6 +3,7 @@
 //! and generating language bindings for modules.
 
 use flipper_console as console;
+use console::errors::*;
 use clap::{App, AppSettings, Arg, ArgMatches};
 use /*flipper*/::lang_flags;
 
@@ -21,7 +22,7 @@ pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
 /// that even though they were parsed by the top-level `flipper` command handler,
 /// the argument match was not consumed. Hence, we match on solely the command
 /// string, then forward the ArgMatches to the implementing rust mod.
-pub fn execute(command: &str, args: &ArgMatches) -> console::Result<()> {
+pub fn execute(command: &str, args: &ArgMatches) -> Result<()> {
     match command {
         "new" => new::execute(args),
         "init" => new::execute(args),
@@ -55,7 +56,7 @@ pub mod new {
         ]
     }
 
-    pub fn execute(args: &ArgMatches) -> console::Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<()> {
         unimplemented!();
     }
 }
@@ -87,7 +88,7 @@ pub mod add {
             ])
     }
 
-    pub fn execute(args: &ArgMatches) -> console::Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<()> {
         unimplemented!();
     }
 }
@@ -110,7 +111,7 @@ pub mod remove {
             )
     }
 
-    pub fn execute(args: &ArgMatches) -> console::Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<()> {
         unimplemented!();
     }
 }
@@ -125,7 +126,7 @@ pub mod update {
             .about("Update module dependencies to the latest versions")
     }
 
-    pub fn execute(args: &ArgMatches) -> console::Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<()> {
         unimplemented!();
     }
 }
@@ -150,7 +151,7 @@ pub mod generate {
             )
     }
 
-    pub fn execute(args: &ArgMatches) -> console::Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<()> {
         unimplemented!();
     }
 }

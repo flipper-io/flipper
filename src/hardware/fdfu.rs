@@ -7,7 +7,7 @@ use xmodem::Xmodem;
 
 use flipper;
 use flipper::fsm::{uart0, gpio};
-use ::ConsoleError;
+use ::errors::*;
 
 struct SamBa<'a, B: 'a> where B: Write + Read {
     bus: &'a mut B,
@@ -127,8 +127,9 @@ pub fn enter_normal_mode() {
 
 }
 
-pub fn flash<P: AsRef<Path>>(path: P) -> ::Result<()> {
-    let file = File::open(path).map_err(|e| ConsoleError::IoError(e));
+pub fn flash<P: AsRef<Path>>(path: P) -> Result<()> {
+    let file = File::open(path)
+        .chain_err(|| "unable to open image file")?;
 
     let flipper = flipper::Flipper::attach_hostname("localhost");
     let mut bus = flipper::fsm::uart0::Uart0::new(&flipper);

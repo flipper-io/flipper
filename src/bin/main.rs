@@ -12,6 +12,8 @@
 //! decide which child module to pass the execution onto.
 
 #[macro_use]
+extern crate error_chain;
+#[macro_use]
 extern crate clap;
 extern crate rustyline;
 extern crate byteorder;
@@ -25,13 +27,28 @@ mod package_cli;
 mod hardware_cli;
 mod binding_cli;
 
+use std::process;
+use flipper_console::errors::*;
 use flipper_console as console;
 use clap::{App, AppSettings, Arg, ArgMatches};
 
 const ABOUT: &'static str = "flipper: Manage and control Flipper from the command line";
 
-fn main() {
-    execute(&app().get_matches());
+//fn main() {
+//    let result = execute(&app().get_matches());
+//    match result {
+//        Ok(()) => (),
+//        Err(err) => {
+//            eprintln!("{}", err);
+//            process::exit(1);
+//        }
+//    }
+//}
+
+quick_main!(run);
+
+fn run() -> Result<()> {
+    execute(&app().get_matches())
 }
 
 /// Create Flipper's top-level argument structure and define App settings.
@@ -61,7 +78,7 @@ pub fn app() -> App<'static, 'static> {
 /// are implemented by a child module rather than by the `flipper` module
 /// itself. Because of this, we have to explicitly pass the name of the matched
 /// command to the child module (e.g. the "c" in `(c @ "boot")`).
-pub fn execute(args: &ArgMatches) -> console::Result<()> {
+pub fn execute(args: &ArgMatches) -> Result<()> {
     match args.subcommand() {
         ("module", Some(m)) => modules_cli::execute(m),
         (c @ "boot", Some(m)) => hardware_cli::execute(c, m),
