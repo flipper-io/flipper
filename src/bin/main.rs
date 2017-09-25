@@ -90,7 +90,7 @@ pub fn execute(args: &ArgMatches) -> Result<()> {
         (c @ "update", Some(m)) => packages_cli::execute(c, m),
         (c @ "generate", Some(m)) => packages_cli::execute(c, m),
         (c @ "bind", Some(m)) => bindings_cli::execute(c, m),
-        (unknown, _) => { println!("Unknown command at app.rs: {}", unknown); Ok(()) },
+        (unknown, _) => bail!("Unknown command: {}", unknown),
     }
 }
 

@@ -26,7 +26,7 @@ pub fn execute(command: &str, args: &ArgMatches) -> Result<()> {
         "flash" => flash::execute(args),
         "install" => install::execute(args),
         "deploy" => deploy::execute(args),
-        unknown => { println!("Unrecognized command: {}", unknown); Ok(()) },
+        unknown => bail!("Unrecognized command: {}", unknown),
     }
 }
 
@@ -45,13 +45,12 @@ pub mod boot {
             .spawn();
 
         match result {
-            Ok(_) => (),
+            Ok(_) => Ok(()),
             Err(e) => match e.kind() {
-                NotFound => println!("Couldn't find dfu-programmer. Please make sure it's in your path"),
-                _ => println!("Encountered unexpected error booting Flipper")
+                NotFound => bail!("Couldn't find dfu-programmer. Please make sure it's in your path"),
+                _ => bail!("Encountered unexpected error booting Flipper")
             }
-        };
-        Ok(())
+        }
     }
 }
 
