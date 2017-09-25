@@ -1,3 +1,7 @@
+#![recursion_limit = "1024"]
+
+#[macro_use]
+extern crate error_chain;
 #[macro_use]
 extern crate serde_derive;
 extern crate byteorder;
@@ -14,11 +18,6 @@ pub mod packages;
 pub mod hardware;
 pub mod bindings;
 
-use std::io;
-use std::result;
-
-pub enum ConsoleError {
-    IoError(io::Error),
+pub mod errors {
+    error_chain!{}
 }
-
-pub type Result<T> = result::Result<T, ConsoleError>;
