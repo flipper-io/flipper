@@ -16,7 +16,7 @@ pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
 pub fn execute(command: &str, args: &ArgMatches) -> Result<()> {
     match command {
         "bind" => bind::execute(args),
-        _ => { println!("Unrecognized command!"); Ok(()) },
+        _ => bail!("Unrecognized command!"),
     }
 }
 

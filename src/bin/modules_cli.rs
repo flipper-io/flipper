@@ -87,7 +87,7 @@ pub fn execute(args: &ArgMatches) -> Result<()> {
         ("usart", Some(m)) => usart::execute(m),
         ("usb", Some(m)) => usb::execute(m),
         ("wdt", Some(m)) => wdt::execute(m),
-        (unknown, _) => { println!("Unrecognized module: {}", unknown); Ok(()) },
+        (unknown, _) => bail!("Unrecognized module: {}", unknown),
     }
 }
 

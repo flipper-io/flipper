@@ -30,7 +30,7 @@ pub fn execute(command: &str, args: &ArgMatches) -> Result<()> {
         "remove" => remove::execute(args),
         "update" => update::execute(args),
         "generate" => generate::execute(args),
-        unknown => { println!("Unrecognized command: {}", unknown); Ok(()) },
+        unknown => bail!("Unrecognized command: {}", unknown),
     }
 }
 
