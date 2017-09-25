@@ -1,8 +1,10 @@
+//! Parses package metadata from a Flipper.toml file.
+
 use std::path::{Path, PathBuf};
 use std::fs;
 
 #[derive(Clone)]
-pub struct Layout {
+struct Layout {
     root: PathBuf,
     module: Option<PathBuf>,
     apps: Vec<PathBuf>,
@@ -27,13 +29,10 @@ impl Layout {
     }
 }
 
+#[derive(Debug)]
 #[derive(Serialize, Deserialize)]
-pub struct Manifest {
+struct Manifest {
     name: String,
     version: String,
     author: String,
-}
-
-pub fn print_manifest() {
-
 }
