@@ -11,6 +11,16 @@
 //! itself typically only need to interpret each command enough to
 //! decide which child module to pass the execution onto.
 
+#![deny(missing_docs)]
+#![deny(missing_debug_implementations)]
+#![deny(missing_copy_implementations)]
+#![deny(trivial_casts)]
+#![deny(trivial_numeric_casts)]
+#![deny(unsafe_code)]
+#![deny(unstable_features)]
+#![deny(unused_import_braces)]
+#![deny(unused_qualifications)]
+
 #[macro_use]
 extern crate error_chain;
 #[macro_use]
@@ -34,19 +44,7 @@ use clap::{App, AppSettings, Arg, ArgMatches};
 
 const ABOUT: &'static str = "flipper: Manage and control Flipper from the command line";
 
-//fn main() {
-//    let result = execute(&app().get_matches());
-//    match result {
-//        Ok(()) => (),
-//        Err(err) => {
-//            eprintln!("{}", err);
-//            process::exit(1);
-//        }
-//    }
-//}
-
 quick_main!(run);
-
 fn run() -> Result<()> {
     execute(&app().get_matches())
 }
@@ -96,6 +94,8 @@ pub fn execute(args: &ArgMatches) -> Result<()> {
     }
 }
 
+/// Describes a common set of flags representing the supported language
+/// bindings that the console can interact with.
 pub fn lang_flags<'a, 'b>() -> Vec<Arg<'a, 'b>> {
     vec![
         Arg::with_name("java").short("J").long("--java"),

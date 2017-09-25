@@ -1,9 +1,16 @@
+//! Flipper module "public APIs" are exported in a binary section called
+//! `.flipper_exports`. This module uses ELF and DWARF file metadata to read
+//! the signatures of each exported function in a flipper module. This metadata
+//! is the foundation for auto-generating high level language bindings to
+//! remotely execute the modules.
+
 use std::fs::File;
 use std::io::Read;
 use goblin::elf::{Elf, Sym};
 use gimli;
 use object;
 
+/// Parses a binary file and prints information about the sections.
 pub fn parse_elf(file: &mut File) {
 
     let buffer = { let mut v = Vec::new(); file.read_to_end(&mut v).unwrap(); v};
@@ -33,6 +40,7 @@ pub fn parse_elf(file: &mut File) {
     }
 }
 
+/// Parses a file to extract the debugging information.
 pub fn parse_dwarf(file: &mut File) {
 
     fn load_section<'input, 'file, S, Endian>(

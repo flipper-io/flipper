@@ -1,3 +1,10 @@
+//! Flipper Device Firmware Upgrade
+//!
+//! The `fdfu` crate defines how to flash new firmware onto Flipper's hardware.
+//! It utilizes Flipper's own Rust language bindings to perform the necessary
+//! GPIO and UART hardware interactions to enter update mode, copy the firmware,
+//! and reboot the board.
+
 use std::io::{Read, Write, Cursor};
 use std::fs::File;
 use std::path::Path;
@@ -62,7 +69,7 @@ impl <'a, B> SamBa<'a, B> where B: Write + Read {
 
 /// Moves data from the host to the device's RAM using the SAM-BA
 /// and XMODEM protocol.
-pub fn sam_ba_copy<B: Write + Read>(bus: &mut B, address: u32, data: &mut [u8]) {
+fn sam_ba_copy<B: Write + Read>(bus: &mut B, address: u32, data: &mut [u8]) {
 
     write!(bus, "S{:08X},{:08X}#", address, data.len());
 
@@ -80,13 +87,13 @@ pub fn sam_ba_copy<B: Write + Read>(bus: &mut B, address: u32, data: &mut [u8]) 
 const SAM_ERASE_PIN: u32 = 0x06;
 const SAM_RESET_PIN: u32 = 0x05;
 
-pub fn sam_reset() {
+fn sam_reset() {
     gpio::write(0, (1 << SAM_RESET_PIN));
     thread::sleep(time::Duration::from_millis(10));
     gpio::write((1 << SAM_RESET_PIN), 0);
 }
 
-pub fn sam_enter_dfu() -> bool {
+fn sam_enter_dfu() -> bool {
     gpio::write((1 << SAM_ERASE_PIN), (1 << SAM_RESET_PIN));
     thread::sleep(time::Duration::from_millis(5000));
     gpio::write((1 << SAM_RESET_PIN), (1 << SAM_ERASE_PIN));
@@ -94,11 +101,11 @@ pub fn sam_enter_dfu() -> bool {
     return true;
 }
 
-pub fn load_page_data() {
+fn load_page_data() {
 
 }
 
-pub fn enter_update_mode<B: Write + Read>(bus: &mut B) -> bool {
+fn enter_update_mode<B: Write + Read>(bus: &mut B) -> bool {
 
     println!("Setting uart0 to DFU baud");
     // FIXME
@@ -123,10 +130,12 @@ pub fn enter_update_mode<B: Write + Read>(bus: &mut B) -> bool {
     }
 }
 
-pub fn enter_normal_mode() {
+fn enter_normal_mode() {
 
 }
 
+/// Given a path to a file, flash the binary contents of that file as an image
+/// onto Flipper's hardware.
 pub fn flash<P: AsRef<Path>>(path: P) -> Result<()> {
     let file = File::open(path)
         .chain_err(|| "unable to open image file")?;
