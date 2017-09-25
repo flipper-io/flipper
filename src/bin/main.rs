@@ -66,9 +66,9 @@ pub fn app() -> App<'static, 'static> {
             AppSettings::UnifiedHelpMessage,
         ])
         .subcommand(modules_cli::make_subcommand())
+        .subcommand(bindings_cli::make_subcommand())
         .subcommands(hardware_cli::make_subcommands())
         .subcommands(packages_cli::make_subcommands())
-        .subcommands(bindings_cli::make_subcommands())
 }
 
 /// Determine which child rust module is responsible for the command and pass
@@ -79,6 +79,7 @@ pub fn app() -> App<'static, 'static> {
 pub fn execute(args: &ArgMatches) -> Result<()> {
     match args.subcommand() {
         ("module", Some(m)) => modules_cli::execute(m),
+        ("binding", Some(m)) => bindings_cli::execute(m),
         (c @ "boot", Some(m)) => hardware_cli::execute(c, m),
         (c @ "reset", Some(m)) => hardware_cli::execute(c, m),
         (c @ "flash", Some(m)) => hardware_cli::execute(c, m),
@@ -88,7 +89,6 @@ pub fn execute(args: &ArgMatches) -> Result<()> {
         (c @ "new", Some(m)) => packages_cli::execute(c, m),
         (c @ "remove", Some(m)) => packages_cli::execute(c, m),
         (c @ "update", Some(m)) => packages_cli::execute(c, m),
-        (c @ "generate", Some(m)) => bindings_cli::execute(c, m),
         (unknown, _) => bail!("Unknown command: {}", unknown),
     }
 }

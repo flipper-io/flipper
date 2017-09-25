@@ -6,16 +6,18 @@
 
 use std::fs::File;
 use std::io::Read;
+use ::errors::*;
+
 use goblin::elf::{Elf, Sym};
 use gimli;
 use object;
 
 /// Parses a binary file and prints information about the sections.
-pub fn parse_elf(file: &mut File) {
+pub fn parse_elf(file: &mut File) -> Result<()> {
 
     let buffer = { let mut v = Vec::new(); file.read_to_end(&mut v).unwrap(); v};
 
-    let elf = Elf::parse(&buffer).unwrap();
+    let elf = Elf::parse(&buffer).chain_err(|| "Failed to parse elf file")?;
     let syms = elf.syms;
     let strtab = elf.strtab;
     let section_headers = elf.section_headers;
@@ -38,6 +40,8 @@ pub fn parse_elf(file: &mut File) {
                  sym.st_value
         );
     }
+
+    Ok(())
 }
 
 /// Parses a file to extract the debugging information.
