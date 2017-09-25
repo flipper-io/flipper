@@ -33,9 +33,9 @@ extern crate flipper;
 extern crate flipper_console;
 
 mod modules_cli;
-mod package_cli;
+mod packages_cli;
 mod hardware_cli;
-mod binding_cli;
+mod bindings_cli;
 
 use std::process;
 use flipper_console::errors::*;
@@ -67,8 +67,8 @@ pub fn app() -> App<'static, 'static> {
         ])
         .subcommand(modules_cli::make_subcommand())
         .subcommands(hardware_cli::make_subcommands())
-        .subcommands(package_cli::make_subcommands())
-        .subcommands(binding_cli::make_subcommands())
+        .subcommands(packages_cli::make_subcommands())
+        .subcommands(bindings_cli::make_subcommands())
 }
 
 /// Determine which child rust module is responsible for the command and pass
@@ -84,12 +84,12 @@ pub fn execute(args: &ArgMatches) -> Result<()> {
         (c @ "flash", Some(m)) => hardware_cli::execute(c, m),
         (c @ "install", Some(m)) => hardware_cli::execute(c, m),
         (c @ "deploy", Some(m)) => hardware_cli::execute(c, m),
-        (c @ "init", Some(m)) => package_cli::execute(c, m),
-        (c @ "new", Some(m)) => package_cli::execute(c, m),
-        (c @ "remove", Some(m)) => package_cli::execute(c, m),
-        (c @ "update", Some(m)) => package_cli::execute(c, m),
-        (c @ "generate", Some(m)) => package_cli::execute(c, m),
-        (c @ "bind", Some(m)) => binding_cli::execute(c, m),
+        (c @ "init", Some(m)) => packages_cli::execute(c, m),
+        (c @ "new", Some(m)) => packages_cli::execute(c, m),
+        (c @ "remove", Some(m)) => packages_cli::execute(c, m),
+        (c @ "update", Some(m)) => packages_cli::execute(c, m),
+        (c @ "generate", Some(m)) => packages_cli::execute(c, m),
+        (c @ "bind", Some(m)) => bindings_cli::execute(c, m),
         (unknown, _) => { println!("Unknown command at app.rs: {}", unknown); Ok(()) },
     }
 }
