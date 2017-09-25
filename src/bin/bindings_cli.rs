@@ -2,21 +2,31 @@ use std::ops::Deref;
 use std::path::PathBuf;
 use std::fs::File;
 use std::io::Read;
-use clap::{App, Arg, ArgMatches};
+use clap::{App, AppSettings, Arg, ArgMatches};
 use flipper_console as console;
 use console::errors::*;
 use console::bindings::binary_parser;
 
-pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
-    vec![
-        generate::make_subcommand(),
-    ]
+pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+    App::new("binding")
+        .settings(&[
+            AppSettings::AllowExternalSubcommands,
+            AppSettings::ArgRequiredElseHelp,
+            AppSettings::DeriveDisplayOrder,
+            AppSettings::ColoredHelp,
+        ])
+        .template(
+            "{bin} \n\
+             USAGE: \n    {usage} \n\n\
+             {all-args}"
+        )
+        .subcommand(generate::make_subcommand())
 }
 
-pub fn execute(command: &str, args: &ArgMatches) -> Result<()> {
-    match command {
-        "generate" => generate::execute(args),
-        _ => bail!("Unrecognized command!"),
+pub fn execute(args: &ArgMatches) -> Result<()> {
+    match args.subcommand() {
+        ("generate", Some(m)) => generate::execute(m),
+        (unknown, _) => bail!("Unrecognized command: {}", unknown),
     }
 }
 
@@ -32,9 +42,10 @@ pub mod generate {
             .alias("gen")
             .about("Generate Flipper language bindings")
             .before_help("Generate bindings for the current-project module, or [module] if given")
-            .arg(Arg::with_name("module")
+            .arg(Arg::with_name("file")
+                .index(1)
                 .takes_value(true)
-                .value_name("module")
+                .required(true)
                 .help("The name of the module to generate language bindings for")
             )
     }
@@ -42,11 +53,10 @@ pub mod generate {
     pub fn execute(args: &ArgMatches) -> Result<()> {
 
         let filename = args.value_of("file")
-            .chain_err(|| "error reading filename")?;
+            .chain_err(|| "error reading filename from args")?;
 
-        println!("flipper bind got {}", filename);
-        let path = PathBuf::from(filename);
-        let mut file = File::open(path).unwrap();
+        let mut file = File::open(filename)
+            .chain_err(|| format!("failed to open file: {}", filename))?;
 
         binary_parser::parse_elf(&mut file);
 
