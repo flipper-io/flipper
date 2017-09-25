@@ -9,25 +9,33 @@ use console::bindings::binary_parser;
 
 pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
     vec![
-        bind::make_subcommand(),
+        generate::make_subcommand(),
     ]
 }
 
 pub fn execute(command: &str, args: &ArgMatches) -> Result<()> {
     match command {
-        "bind" => bind::execute(args),
+        "generate" => generate::execute(args),
         _ => bail!("Unrecognized command!"),
     }
 }
 
-pub mod bind {
+/// Usage: `flipper generate [LANG]`, where `[LANG]` is one of:
+///        --java, --javascript, --python, --objc, --swift, --rust
+/// Flipper modules can be executed remotely from a host machine
+/// such as a laptop or mobile phone.
+pub mod generate {
     use super::*;
 
     pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
-        App::new("bind")
-            .arg(Arg::with_name("file")
-                .index(1)
-                .required(true)
+        App::new("generate")
+            .alias("gen")
+            .about("Generate Flipper language bindings")
+            .before_help("Generate bindings for the current-project module, or [module] if given")
+            .arg(Arg::with_name("module")
+                .takes_value(true)
+                .value_name("module")
+                .help("The name of the module to generate language bindings for")
             )
     }
 

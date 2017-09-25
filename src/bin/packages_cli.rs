@@ -5,14 +5,13 @@
 use flipper_console as console;
 use console::errors::*;
 use clap::{App, AppSettings, Arg, ArgMatches};
-use /*flipper*/::lang_flags;
+use ::lang_flags;
 
 pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
     let mut subcommands = vec![
         add::make_subcommand(),
         remove::make_subcommand(),
         update::make_subcommand(),
-        generate::make_subcommand(),
     ];
     subcommands.extend(new::make_subcommands());
     subcommands
@@ -29,7 +28,6 @@ pub fn execute(command: &str, args: &ArgMatches) -> Result<()> {
         "add" => add::execute(args),
         "remove" => remove::execute(args),
         "update" => update::execute(args),
-        "generate" => generate::execute(args),
         unknown => bail!("Unrecognized command: {}", unknown),
     }
 }
@@ -124,31 +122,6 @@ pub mod update {
     pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
         App::new("update")
             .about("Update module dependencies to the latest versions")
-    }
-
-    pub fn execute(args: &ArgMatches) -> Result<()> {
-        unimplemented!();
-    }
-}
-
-/// Usage: `flipper generate [LANG]`, where `[LANG]` is one of:
-///        --java, --javascript, --python, --objc, --swift, --rust
-/// Flipper modules can be executed remotely from a host machine
-/// such as a laptop or mobile phone.
-pub mod generate {
-    use super::*;
-
-    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
-        App::new("generate")
-            .alias("gen")
-            .about("Generate Flipper language bindings")
-            .before_help("Generate bindings for the current-project module, or [module] if given")
-            .args(&lang_flags())
-            .arg(Arg::with_name("module")
-                .takes_value(true)
-                .value_name("module")
-                .help("The name of the module to generate language bindings for")
-            )
     }
 
     pub fn execute(args: &ArgMatches) -> Result<()> {
