@@ -38,7 +38,6 @@ extern int carbon_select_atsam4s(struct _lf_device *device);
 
 /* Selects a carbon device. */
 int carbon_select(struct _lf_device *device) {
-	printf("Selecting carbon\n");
 	lf_assert(device, failure, E_NULL, "NULL pointer provided when selecting device.");
 	/* Obtain the carbon device's context. */
 	struct _carbon_context *context = device->_ctx;

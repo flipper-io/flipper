@@ -227,7 +227,7 @@ void lf_debug_call(struct _fmr_invocation *call) {
 	printf("arguments:\n");
 	/* Calculate the offset into the packet at which the arguments will be loaded. */
 	uint8_t *offset = call->parameters;
-	char *typestrs[] = { "fmr_int8", "fmr_int16", "fmr_int32" };
+	char *typestrs[] = { "fmr_int8", "fmr_int16", "fmr_int32", "fmr_ptr" };
 	fmr_types types = call->types;
 	for (int i = 0; i < call->argc; i ++) {
 		fmr_type type = types & 0x3;

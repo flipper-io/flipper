@@ -59,7 +59,6 @@ all: $(TARGET) headers
 
 # Linking rule
 $(TARGET): $(OBJS)
-	@echo 'Linking $@'
 	$(_v)$(CC) $(CFLAGS) $(LDFLAGS) -o $(BUILD)/$@ $^
 
 headers:
@@ -82,12 +81,10 @@ $(TARGET_HEX): $(TARGET)
 
 # Compiling rule for C sources
 $(BUILD)/%.c.o: %.c | $(BUILD_DIR_FILES)
-	@echo 'Compiling $<'
 	$(_v)$(CC) $(CFLAGS) -I$(<D) -MD -MP -MF $(BUILD)/$*.c.d -c -o $@ $<
 
 # Compiling rule for S sources
 $(BUILD)/%.S.o: %.S | $(BUILD_DIR_FILES)
-	@echo 'Compiling $<'
 	$(_v)$(CC) $(CFLAGS) -I$(<D) -MD -MP -MF $(BUILD)/$*.S.d -c -o $@ $<
 
 # Build dependency rules
@@ -100,7 +97,6 @@ $(BUILD)/%.S.o: %.S | $(BUILD_DIR_FILES)
 	$(_v)mkdir -p $* && touch $@
 
 clean:
-	@echo 'Removing built products'
 	$(_v)rm -rf $(BUILD) $(TARGET)
 
 .PHONY: all clean

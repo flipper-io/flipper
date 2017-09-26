@@ -23,7 +23,7 @@ extern bool uart0_ready(struct _lf_endpoint *endpoint);
 extern int uart0_push(struct _lf_endpoint *endpoint, void *source, lf_size_t length);
 extern int uart0_pull(struct _lf_endpoint *endpoint, void *destination, lf_size_t length);
 
-extern void uart0_dfu(struct _lf_endpoint *endpoint);
+extern void uart0_dfu(void);
 
 #endif
 #endif

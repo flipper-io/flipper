@@ -46,6 +46,8 @@ _load:
 	breq _load_16
 	cpi r16, 2
 	breq _load_32
+	cpi r16, 3
+	breq _load_ptr
 _load_8:
 	ld r0, Z+
 	st -X, r0
@@ -70,6 +72,9 @@ _load_32:
 	ld r0, Z+
 	st X, r0
 	subi XL, 0x04
+_load_ptr:
+	subi XL, 0x02
+	rjmp _load_16
 _load_done:
 	; Shift the encoded types two bits to the right.
 	asr argt_h

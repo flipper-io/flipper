@@ -116,7 +116,7 @@ struct _lf_ll *lf_libusb_endpoints_for_vid_pid(uint16_t vid, uint16_t pid) {
 			_e = libusb_claim_interface(context->handle, 0);
 			lf_assert(_e == 0, release, E_LIBUSB, "Failed to claim interface on attached device. Please quit any other programs using your device.");
 			/* Reset the device's USB controller. */
-			_e = libusb_reset_device(context->handle);
+			//_e = libusb_reset_device(context->handle);
 			lf_assert(_e == 0, release, E_LIBUSB, "Failed to reset the libusb device.");
 			/* Add the device to the device list. */
 			_e = lf_ll_append(&endpoints, endpoint, lf_endpoint_release);

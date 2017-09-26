@@ -117,21 +117,9 @@ fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _l
 	return result.value;
 }
 
-/* Hacky way to compute the appropriate pointer argument for a device. */
-fmr_va fmr_ptr(struct _lf_device *device, void *ptr) {
-	if (device -> configuration.attributes & lf_device_32bit) {
-		return fmr_int32((uintptr_t)ptr);
-	} else if (device -> configuration.attributes & lf_device_16bit) {
-		return fmr_int16((uintptr_t)ptr);
-	} else {
-		lf_error_raise(E_FMR, error_message("No pointer size specified for the target architecture."));
-	}
-	return 0;
-}
-
 /* Sends data to the address space of the device for a function call. Deallocated at the function return. */
 fmr_va fmr_data(void *data, lf_size_t size) {
-	return fmr_ptr(lf_get_current_device(), NULL);
+	return fmr_ptr(NULL);
 }
 
 int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _lf_ll *parameters) {

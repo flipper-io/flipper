@@ -16,12 +16,12 @@ const struct _lf_endpoint uart0 = {
 
 LF_WEAK int uart0_configure(struct _lf_endpoint *self, void *_configuration) {
 	struct _uart0_configuration *configuration = _configuration;
-	lf_invoke(&_uart0, _endpoint_configure, NULL);
+	lf_invoke(&_uart0, _endpoint_configure, fmr_args(fmr_ptr(NULL), fmr_ptr(NULL)));
 	return lf_success;
 }
 
 LF_WEAK bool uart0_ready(struct _lf_endpoint *self) {
-	return lf_invoke(&_uart0, _endpoint_ready, NULL) >> 16;
+	return lf_invoke(&_uart0, _endpoint_ready, NULL);
 }
 
 LF_WEAK int uart0_push(struct _lf_endpoint *self, void *source, lf_size_t length) {
@@ -29,12 +29,12 @@ LF_WEAK int uart0_push(struct _lf_endpoint *self, void *source, lf_size_t length
 }
 
 LF_WEAK int uart0_pull(struct _lf_endpoint *self, void *destination, lf_size_t length) {
-	return lf_pull(&_uart0, _endpoint_pull, destination, length, fmr_args(fmr_int32(0)));
+	return lf_pull(&_uart0, _endpoint_pull, destination, length, NULL);
 }
 
 #pragma warning Move this.
 
-LF_WEAK void uart0_dfu(struct _lf_endpoint *self) {
+LF_WEAK void uart0_dfu(void) {
 	lf_invoke(&_uart0, 0, NULL);
 }
 

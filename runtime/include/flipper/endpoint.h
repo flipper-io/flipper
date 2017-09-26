@@ -25,12 +25,12 @@ struct _lf_endpoint {
 
 enum { _endpoint_configure, _endpoint_ready, _endpoint_push, _endpoint_pull, _endpoint_destroy };
 
-struct _lf_endpoint *lf_endpoint_create(int (* configure)(struct _lf_endpoint *endpoint, void *_ctx),
+struct _lf_endpoint *lf_endpoint_create(int (* configure)(struct _lf_endpoint *endpoint, void *ctx),
 										bool (* ready)(struct _lf_endpoint *endpoint),
 										int (* push)(struct _lf_endpoint *endpoint, void *source, lf_size_t length),
 										int (* pull)(struct _lf_endpoint *endpoint, void *destination, lf_size_t length),
 										int (* destroy)(struct _lf_endpoint *endpoint),
-										size_t context_size);
+										size_t ctx_size);
 int lf_endpoint_enqueue(struct _lf_endpoint *endpoint, struct _lf_msg *message);
 bool lf_endpoint_has_data(struct _lf_endpoint *endpoint);
 struct _lf_msg *lf_endpoint_dequeue(struct _lf_endpoint *endpoint);

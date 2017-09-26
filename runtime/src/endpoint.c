@@ -2,12 +2,12 @@
 #include <flipper/message.h>
 
 /* Creates a new libflipper endpoint. */
-struct _lf_endpoint *lf_endpoint_create(int (* configure)(struct _lf_endpoint *endpoint, void *_configuration),
+struct _lf_endpoint *lf_endpoint_create(int (* configure)(struct _lf_endpoint *endpoint, void *_ctx),
 										bool (* ready)(struct _lf_endpoint *endpoint),
 										int (* push)(struct _lf_endpoint *endpoint, void *source, lf_size_t length),
 										int (* pull)(struct _lf_endpoint *endpoint, void *destination, lf_size_t length),
 										int (* destroy)(struct _lf_endpoint *endpoint),
-										size_t context_size) {
+										size_t ctx_size) {
 	struct _lf_endpoint *endpoint = calloc(1, sizeof(struct _lf_endpoint));
 	lf_assert(endpoint, failure, E_MALLOC, "Failed to allocate memory for new endpoint.");
 	endpoint->configure = configure;
@@ -15,7 +15,7 @@ struct _lf_endpoint *lf_endpoint_create(int (* configure)(struct _lf_endpoint *e
 	endpoint->push = push;
 	endpoint->pull = pull;
 	endpoint->destroy = destroy;
-	endpoint->_ctx = calloc(1, context_size);
+	endpoint->_ctx = calloc(1, ctx_size);
 	lf_assert(endpoint->_ctx, failure, E_MALLOC, "Failed to allocate the memory needed to create an endpoint context.");
 	return endpoint;
 failure:

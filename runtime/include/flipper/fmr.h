@@ -39,7 +39,8 @@ typedef uint32_t fmr_types;
 enum {
 	fmr_int8_t,
 	fmr_int16_t,
-	fmr_int32_t
+	fmr_int32_t,
+	fmr_ptr_t
 };
 
 /* A type used to reference the values in the enum above. */
@@ -69,9 +70,9 @@ typedef uint8_t fmr_type;
 #define fmr_int16(arg) fmr_intx(fmr_int16_t, (uint16_t)arg)
 /* Gives the 'fmr_va' for a given 32-bit integer's value. */
 #define fmr_int32(arg) fmr_intx(fmr_int32_t, (uint32_t)arg)
+/* Gives the 'fmr_va' for a pointer. */
+#define fmr_ptr(arg) fmr_int32((uintptr_t)arg)
 
-/* Gives the appropriate fmr_va for a device pointer. */
-fmr_va fmr_ptr(struct _lf_device *device, void *ptr);
 /* Sends pointer data to the device, deallocated after function call. */
 fmr_va fmr_data(void *data, lf_size_t size);
 

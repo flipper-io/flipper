@@ -41,10 +41,11 @@ OBJCOPY = $(PREFIX)objcopy
 OBJDUMP = $(PREFIX)objdump
 
 # Define compilation and emulation flags.
-CFLAGS = -std=c99 -Os -mmcu=atmega16u2 -DARCH=ARCH_AVR8 -D__AVR_ATMEGA16U2__ -DF_CPU=16000000UL \
+CFLAGS = -std=c99 -Os -mmcu=atmega16u2 -DARCH=ARCH_AVR8 -D__AVR_AT90USB162__ -DF_CPU=16000000UL \
 	-D__disable_error_side_effects__ \
 	-D__ATMEGAU2__ \
-	-DPLATFORM_HEADER="<flipper/atmegau2/atmegau2.h>" $(foreach inc,$(INCLUDE_DIRS),-I$(inc))
+	-DPLATFORM_HEADER="<flipper/atmegau2/atmegau2.h>" \
+	$(foreach inc,$(INCLUDE_DIRS),-I$(inc))
 
 LDFLAGS = -Wl,--gc-sections
 
@@ -61,7 +62,6 @@ all: $(TARGET_HEX)
 
 # Linking rule
 $(TARGET): $(OBJS)
-	@echo 'Linking $@'
 	$(_v)$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 $(TARGET_HEX): $(TARGET)
@@ -69,12 +69,10 @@ $(TARGET_HEX): $(TARGET)
 
 # Compiling rule for C sources
 $(BUILD)/%.c.o: %.c | $(BUILD_DIR_FILES)
-	@echo 'Compiling $<'
 	$(_v)$(CC) $(CFLAGS) -I$(<D) -MD -MP -MF $(BUILD)/$*.c.d -c -o $@ $<
 
 # Compiling rule for S sources
 $(BUILD)/%.S.o: %.S | $(BUILD_DIR_FILES)
-	@echo 'Compiling $<'
 	$(_v)$(CC) $(CFLAGS) -I$(<D) -MD -MP -MF $(BUILD)/$*.S.d -c -o $@ $<
 
 # Build dependency rules
@@ -92,7 +90,6 @@ install: $(TARGET_HEX)
 	dfu-programmer at90usb162 launch --no-reset
 
 clean:
-	@echo 'Removing built products'
 	$(_v)rm -rf $(BUILD) $(TARGET) $(TARGET_HEX)
 
 .PHONY: all clean

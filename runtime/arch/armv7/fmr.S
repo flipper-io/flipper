@@ -39,6 +39,8 @@ _load:
 	beq _load_16
 	cmp temp, #2
 	beq _load_32
+	cmp temp, #3
+	beq _load_ptr
 	/* If the type was encoded improperly, return with error. */
 	b _error
 _load_8:
@@ -58,6 +60,8 @@ _load_32:
 	ldr temp, [_argv, #0]
 	/* Increment the argv pointer by four. */
 	add _argv, #4
+_load_ptr:
+	b _load_32
 _load_done:
 	/* If the argument index is less than 4, load the argument into the appropriate register. */
 	cmp argi, #0

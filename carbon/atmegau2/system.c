@@ -61,7 +61,7 @@ void system_init() {
 	/* Configure the USB subsystem. */
 	configure_usb();
 	/* Configure the UART0 subsystem. */
-	uart0_configure();
+	uart0_configure(NULL, NULL);
 	/* Enable the watchdog timer. */
 	wdt_enable(WDTO_500MS);
 	/* Configure reset button and PCINT8 interrupt. */
