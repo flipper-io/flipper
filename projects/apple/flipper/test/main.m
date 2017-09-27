@@ -7,7 +7,8 @@ int main(int argc, const char * argv[]) {
     //carbon_attach();
     
     flipper.attach();
-    led.rgb(10, 0, 0);
+    //led.configure();
+    led.rgb(0, 0, 10);
     
     return 0;
 }

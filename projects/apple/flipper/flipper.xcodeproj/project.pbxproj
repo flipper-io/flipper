@@ -922,6 +922,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"PLATFORM_HEADER=\"<flipper/posix/posix.h>\"",
 					__DISABLE_TERMINAL_COLORS__,
+					__enable_usb__,
 				);
 				HEADER_SEARCH_PATHS = (
 					runtime/include,
@@ -956,6 +957,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"PLATFORM_HEADER=\"<flipper/posix/posix.h>\"",
 					__DISABLE_TERMINAL_COLORS__,
+					__enable_usb__,
 				);
 				HEADER_SEARCH_PATHS = (
 					runtime/include,
