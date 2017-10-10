@@ -4,6 +4,9 @@ BUILD := build
 # List of all target types
 TARGETS := ARM AVR X86
 
+# Pre-declare double colon rules
+all::
+
 # ARM target variables
 ARM_TARGET	 := atsam4s
 
@@ -33,7 +36,7 @@ ARM_CFLAGS	 := -std=c99											\
 ARM_LDFLAGS  := -Wl,-T carbon/atsam4s/sam4s16.ld					\
 				-Wl,--gc-sections
 
-atsam4s: atsam4s.bin
+$(ARM_TARGET): $(ARM_TARGET).bin
 
 # AVR target variables
 AVR_TARGET	 := atmegau2
@@ -64,7 +67,7 @@ AVR_CFLAGS 	 := -std=c99											\
 AVR_LDFLAGS  := -mmcu=atmega16u2									\
 				-Wl,--gc-sections
 
-atmega16u2: atmega16u2.hex
+$(AVR_TARGET): $(AVR_TARGET).hex
 
 install-atmega16u2: atmega16u2
 	dfu-programmer at90usb162 erase
@@ -95,7 +98,7 @@ X86_CFLAGS	 := -std=c99											\
 
 X86_LDFLAGS  := -lusb-1.0
 
-libflipper: $(X86_TARGET).so
+$(X86_TARGET): $(X86_TARGET).so
 
 install-libflipper: libflipper
 	$(_v)mkdir -p $(BUILD)/include/flipper
@@ -118,14 +121,6 @@ else #VERBOSE
 _v := @
 endif #VERBOSE
 
-# Pre-declare double colon rules
-all::
-
-clean::
-
-.PHONY: all clean
-
-
 # Make sure that the .dir files aren't automatically deleted after building
 .SECONDARY:
 
@@ -145,7 +140,6 @@ find_srcs = $(foreach sd,$1,$(foreach ext,$2,$(wildcard $(sd)/*.$(ext))))
 
 # All supported source file extensions.
 SRC_EXTS := c S
-
 
 #####
 # generate_target($1: target prefix)
@@ -202,13 +196,14 @@ $$($1_BUILD)/%.S.o: %.S | $$($1_BUILD_DIR_FILES)
 # Build dependency rules
 -include $$($1_DEPS)
 
-# Add to the clean rule
-clean::
-	$$(_v)rm -rf $$($1_BUILD)
-
 endef
 generate_target = $(eval $(call _generate_target,$1))
 #####
 
 # Generate all of the rules for every target
 $(foreach target,$(TARGETS),$(call generate_target,$(target)))
+
+.PHONY: all clean
+
+clean:
+	$(_v)rm -rf $(BUILD)
