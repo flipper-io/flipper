@@ -69,9 +69,9 @@ AVR_LDFLAGS  := -mmcu=atmega16u2									\
 
 $(AVR_TARGET): $(AVR_TARGET).hex
 
-install-atmega16u2: atmega16u2
+install-atmegau2: atmegau2
 	dfu-programmer at90usb162 erase
-	dfu-programmer at90usb162 flash $(TARGET_HEX)
+	dfu-programmer at90usb162 flash $(BUILD)/$(AVR_TARGET)/$(AVR_TARGET).hex
 	dfu-programmer at90usb162 launch --no-reset
 
 # x86 target variables
