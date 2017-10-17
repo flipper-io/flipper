@@ -77,7 +77,7 @@ typedef uint8_t fmr_type;
 fmr_va fmr_data(void *data, lf_size_t size);
 
 /* Calculates the length of an FMR type. */
-#define fmr_sizeof(type) (1 << type)
+#define fmr_sizeof(type) ((type != fmr_ptr_t) ? (1 << type) : 4)
 
 /* If this bit is set in the module's index, then it is a user module. */
 #define FMR_USER_INVOCATION_BIT (1 << 8)
@@ -177,7 +177,7 @@ struct LF_PACKED _fmr_result {
 };
 
 /* A reference to the fmr_modules array. */
-extern const void *const fmr_modules[];
+extern const void *fmr_modules[];
 
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
 

@@ -6,3 +6,7 @@
 *.elf
 *.o
 build
+projects
+xcuserdata
+__pycache__
+*.pyc

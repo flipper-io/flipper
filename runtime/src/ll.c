@@ -27,16 +27,10 @@ failure:
 	return lf_error;
 }
 
-void *lf_ll_pop(struct _lf_ll **_ll) {
-	lf_assert(_ll, failure, E_NULL, "Invalid list reference provided to '%s.'", __PRETTY_FUNCTION__);
-	void *item = NULL;
-	if (*_ll) {
-		item = (*_ll)->item;
-		struct _lf_ll *old = *_ll;
-		*_ll = (*_ll)->next;
-		free(old);
-	}
-	return item;
+void *lf_ll_item(struct _lf_ll *ll, uint32_t index) {
+	while (index-- && ll) ll = ll->next;
+	lf_assert(ll, failure, E_NULL, "End of list reached before item.");
+	return ll->item;
 failure:
 	return NULL;
 }
@@ -44,6 +38,7 @@ failure:
 void lf_ll_remove(struct _lf_ll **_ll, void *item) {
 	lf_assert(_ll, failure, E_NULL, "Invalid list reference provided to '%s.'", __PRETTY_FUNCTION__);
 	while (*_ll) {
+#warning Need to call deconstructor here.
 		if ((*_ll)->item == item) *_ll = (*_ll)->next;
 	}
 failure:

@@ -42,7 +42,7 @@ int fmr_create_call(fmr_module module, fmr_function function, struct _lf_ll *arg
 	/* Load arguments into the packet, encoding the type of each. */
 	for (int i = 0; i < argc; i ++) {
 		/* Pop the argument from the argument list. */
-		struct _lf_arg *arg = lf_ll_pop(&args);
+		struct _lf_arg *arg = lf_ll_item(args, i);
 		/* Encode the argument's type. */
 		call->types |= (arg->type & 0x3) << (i * 2);
 		/* Calculate the size of the argument. */
@@ -53,8 +53,6 @@ int fmr_create_call(fmr_module module, fmr_function function, struct _lf_ll *arg
 		offset += size;
 		/* Increment the size of the packet. */
 		header->length += size;
-		/* Release the argument. */
-		free(arg);
 	}
 	 /* Destroy the argument list. */
 	lf_ll_release(&args);
@@ -66,16 +64,16 @@ failure:
 
 fmr_return fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, fmr_types types, void *arguments) {
 	/* Dereference the pointer to the target module. */
-	const void *object = (const void *)(fmr_modules[module]);
+	void *const *object = fmr_modules[module];
 	/* Dereference and return a pointer to the target function. */
-	const void *address = ((const void **)(object))[function];
+	void *address = object[function];
 	/* Ensure that the function address is valid. */
 	if (!address) {
 		lf_error_raise(E_RESOULTION, NULL);
 		return 0;
 	}
 	/* Perform the function call internally. */
-	return fmr_call(address, argc, types, arguments);
+	return (uint32_t)fmr_modules[0]; //fmr_call(address, argc, types, arguments);
 }
 
 /* ~ Message runtime subclass handlers. ~ */

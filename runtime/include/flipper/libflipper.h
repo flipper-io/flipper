@@ -18,10 +18,10 @@
 #define CARBON_USB_PRODUCT_ID      0x0480
 
 /* If defined, imposes a timeout on USB transactions. */
-//#define __lf_usb_timeout__
+#define __lf_usb_timeout__
 #ifdef __lf_usb_timeout__
 /* Must be between 1ms and 255ms. */
-#define LF_USB_TIMEOUT_MS 255
+#define LF_USB_TIMEOUT_MS 50
 #else
 #define LF_USB_TIMEOUT_MS 0
 #endif
@@ -43,7 +43,7 @@
 /* If defined, uses bulk for all USB transfers. */
 #define __ALL_BULK__
 /* If defined, prints debugging information about each packet. */
-//#define __lf_debug__
+#define __lf_debug__
 
 /* Computes the greatest integer from the result of the division of x by y. */
 #define lf_ceiling(x, y) ((x + y - 1) / y)
@@ -204,7 +204,7 @@ int lf_transfer(struct _lf_device *device, struct _fmr_packet *packet);
 /* Retrieves a packet from the specified device. */
 int lf_retrieve(struct _lf_device *device, struct _fmr_result *response);
 /* Binds a module structure to its device counterpart. */
-int lf_bind(struct _lf_module *module);
+int lf_bind(struct _lf_module *module, struct _lf_device *device);
 
 /* Experimental: Load an application into RAM and execute it. */
 int lf_ram_load(struct _lf_device *device, void *source, lf_size_t length);
