@@ -204,7 +204,7 @@ int lf_transfer(struct _lf_device *device, struct _fmr_packet *packet);
 /* Retrieves a packet from the specified device. */
 int lf_retrieve(struct _lf_device *device, struct _fmr_result *response);
 /* Binds a module structure to its device counterpart. */
-int lf_bind(struct _lf_module *module, struct _lf_device *device);
+int lf_bind(struct _lf_module *module);
 
 /* Experimental: Load an application into RAM and execute it. */
 int lf_ram_load(struct _lf_device *device, void *source, lf_size_t length);
