@@ -177,7 +177,7 @@ struct LF_PACKED _fmr_result {
 };
 
 /* A reference to the fmr_modules array. */
-extern const void *fmr_modules[];
+extern const void *const fmr_modules[];
 
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
 
