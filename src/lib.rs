@@ -2,8 +2,6 @@
 //!
 //!
 
-#![recursion_limit = "1024"]
-
 #![deny(missing_docs)]
 #![deny(missing_debug_implementations)]
 #![deny(missing_copy_implementations)]
@@ -14,10 +12,9 @@
 #![deny(unused_import_braces)]
 #![deny(unused_qualifications)]
 
-#[macro_use]
-extern crate error_chain;
-#[macro_use]
-extern crate serde_derive;
+#[macro_use] extern crate serde_derive;
+#[macro_use] extern crate failure;
+#[macro_use] extern crate derive_fail;
 extern crate byteorder;
 extern crate xmodem;
 extern crate serde;
@@ -32,7 +29,12 @@ pub mod packages;
 pub mod hardware;
 pub mod bindings;
 
-/// A boilerplate error handling module created using error_chain.
-pub mod errors {
-    error_chain!{}
+/// Defines the errors that may be encountered while parsing and executing
+/// commands.
+#[derive(Debug, Fail)]
+#[fail(display = "Command line error")]
+pub enum CliError {
+    /// An error that indicates that a command or its arguments was invalid.
+    #[fail(display = "flipper: '{}' is not a flipper command. See 'flipper --help'.", _0)]
+    UnrecognizedCommand(String),
 }

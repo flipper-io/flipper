@@ -2,9 +2,18 @@
 //! hardware which isn't remote module execution. This includes booting the
 //! board and installing and deploying modules.
 
-use flipper_console as console;
-use console::errors::*;
+use flipper_console::CliError;
 use clap::{App, Arg, ArgMatches};
+use failure::{Fail, Error};
+
+#[derive(Debug, Fail)]
+#[fail(display = "A hardware error occurred")]
+enum HardwareError {
+    #[fail(display = "DFU programmer not found")]
+    DfuProgrammerNotFound,
+    #[fail(display = "An unknown error occurred while booting Flipper")]
+    UnknownBootError,
+}
 
 pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
     vec![
@@ -20,13 +29,13 @@ pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
 /// that even though they were parsed by the top-level `flipper` command handler,
 /// the argument match was not consumed. Hence, we match on solely the command
 /// string, then forward the ArgMatches to the implementing rust mod.
-pub fn execute(command: &str, args: &ArgMatches) -> Result<()> {
+pub fn execute(command: &str, args: &ArgMatches) -> Result<(), Error> {
     match command {
         "boot" => boot::execute(args),
         "flash" => flash::execute(args),
         "install" => install::execute(args),
         "deploy" => deploy::execute(args),
-        unknown => bail!("Unrecognized command: {}", unknown),
+        unknown => Err(CliError::UnrecognizedCommand(unknown.to_owned()).into()),
     }
 }
 
@@ -38,19 +47,16 @@ pub mod boot {
         App::new("boot")
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
-        let result = Command::new("dfu-programmer")
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
+        Command::new("dfu-programmer")
             .arg("at90usb162")
             .arg("start")
-            .spawn();
-
-        match result {
-            Ok(_) => Ok(()),
-            Err(e) => match e.kind() {
-                NotFound => bail!("Couldn't find dfu-programmer. Please make sure it's in your path"),
-                _ => bail!("Encountered unexpected error booting Flipper")
-            }
-        }
+            .spawn()
+            .map(|_| ())
+            .map_err(|e| match e.kind() {
+                NotFound => HardwareError::DfuProgrammerNotFound,
+                _ => HardwareError::UnknownBootError,
+            }.into())
     }
 }
 
@@ -61,7 +67,7 @@ pub mod reset {
         App::new("reset")
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         unimplemented!();
     }
 }
@@ -78,13 +84,13 @@ pub mod flash {
                 .takes_value(true))
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         use console::hardware::fdfu;
-        if let Some(image) = args.value_of("image") {
-            println!("Flipper flash got image: {}", image);
-            fdfu::flash(image);
-        }
-        Ok(())
+
+        // This is safe because "image" is a required argument.
+        let image = args.value_of("image").unwrap();
+        println!("Flipper flash got image: {}", image);
+        fdfu::flash(image)
     }
 }
 
@@ -102,7 +108,7 @@ pub mod install {
                 .help("Specifies a package to install, such as from the repository"))
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         unimplemented!();
     }
 }
@@ -121,7 +127,7 @@ pub mod deploy {
                 .help("Specify a package to install, such as from the repository"))
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         unimplemented!();
     }
 }

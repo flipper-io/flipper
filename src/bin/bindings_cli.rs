@@ -2,10 +2,21 @@ use std::ops::Deref;
 use std::path::PathBuf;
 use std::fs::File;
 use std::io::Read;
+use std::io::Error as IoError;
 use clap::{App, AppSettings, Arg, ArgMatches};
-use flipper_console as console;
-use console::errors::*;
+use failure::Error;
+use flipper_console::CliError;
 use console::bindings::binary_parser;
+
+#[derive(Debug, Fail)]
+#[fail(display = "Errors that occur while generating bindings")]
+enum BindingError {
+    /// Indicates that an io::Error occurred involving a given file.
+    /// _0: The name of the file involved.
+    /// _1: The io::Error with details.
+    #[fail(display = "File error for '{}': {}", _0, _1)]
+    FileError(String, IoError),
+}
 
 pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
     App::new("binding")
@@ -23,10 +34,10 @@ pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
         .subcommand(generate::make_subcommand())
 }
 
-pub fn execute(args: &ArgMatches) -> Result<()> {
+pub fn execute(args: &ArgMatches) -> Result<(), Error> {
     match args.subcommand() {
         ("generate", Some(m)) => generate::execute(m),
-        (unknown, _) => bail!("Unrecognized command: {}", unknown),
+        (unknown, _) => Err(CliError::UnrecognizedCommand(unknown.to_owned()).into()),
     }
 }
 
@@ -50,16 +61,14 @@ pub mod generate {
             )
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
 
-        let filename = args.value_of("file")
-            .chain_err(|| "error reading filename from args")?;
+        // Guaranteed to be safe because "file" is a required argument.
+        let filename = args.value_of("file").unwrap();
 
         let mut file = File::open(filename)
-            .chain_err(|| format!("failed to open file: {}", filename))?;
+            .map_err(|e| BindingError::FileError(filename.to_owned(), e))?;
 
-        binary_parser::parse_elf(&mut file);
-
-        Ok(())
+        binary_parser::parse_elf(&mut file)
     }
 }

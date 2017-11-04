@@ -7,14 +7,25 @@
 
 use std::io::{Read, Write, Cursor};
 use std::fs::File;
-use std::path::Path;
+use std::ffi::OsStr;
+use std::path::{Path, PathBuf};
 use std::{thread, time};
+use std::io::Error as IoError;
 use byteorder::{BigEndian, ReadBytesExt};
 use xmodem::Xmodem;
+use failure::{Fail, Error};
 
 use flipper;
 use flipper::fsm::{uart0, gpio};
-use ::errors::*;
+
+#[derive(Debug, Fail)]
+enum FdfuError {
+    /// Indicates that an io::Error occurred involving a given file.
+    /// _0: The name of the file involved.
+    /// _1: The io::Error with details.
+    #[fail(display = "File error: {}", _0)]
+    FileError(IoError),
+}
 
 struct SamBa<'a, B: 'a> where B: Write + Read {
     bus: &'a mut B,
@@ -136,9 +147,9 @@ fn enter_normal_mode() {
 
 /// Given a path to a file, flash the binary contents of that file as an image
 /// onto Flipper's hardware.
-pub fn flash<P: AsRef<Path>>(path: P) -> Result<()> {
-    let file = File::open(path)
-        .chain_err(|| "unable to open image file")?;
+pub fn flash<P: AsRef<Path>>(path: P) -> Result<(), Error> {
+    let file = File::open(&path)
+        .map_err(|e| FdfuError::FileError(e))?;
 
     let flipper = flipper::Flipper::attach_hostname("localhost");
     let mut bus = flipper::fsm::uart0::Uart0::new(&flipper);

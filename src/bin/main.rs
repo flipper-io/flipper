@@ -21,10 +21,9 @@
 #![deny(unused_import_braces)]
 #![deny(unused_qualifications)]
 
-#[macro_use]
-extern crate error_chain;
-#[macro_use]
-extern crate clap;
+#[macro_use] extern crate clap;
+#[macro_use] extern crate failure;
+#[macro_use] extern crate derive_fail;
 extern crate rustyline;
 extern crate byteorder;
 extern crate libc;
@@ -38,15 +37,18 @@ mod hardware_cli;
 mod bindings_cli;
 
 use std::process;
-use flipper_console::errors::*;
+use flipper_console::CliError;
 use flipper_console as console;
 use clap::{App, AppSettings, Arg, ArgMatches};
+use failure::Error;
 
 const ABOUT: &'static str = "flipper: Manage and control Flipper from the command line";
 
-quick_main!(run);
-fn run() -> Result<()> {
-    execute(&app().get_matches())
+fn main() {
+    match execute(&app().get_matches()) {
+        Ok(()) => return,
+        Err(e) => println!("{}", e),
+    }
 }
 
 /// Create Flipper's top-level argument structure and define App settings.
@@ -76,7 +78,7 @@ pub fn app() -> App<'static, 'static> {
 /// are implemented by a child module rather than by the `flipper` module
 /// itself. Because of this, we have to explicitly pass the name of the matched
 /// command to the child module (e.g. the "c" in `(c @ "boot")`).
-pub fn execute(args: &ArgMatches) -> Result<()> {
+pub fn execute(args: &ArgMatches) -> Result<(), Error> {
     match args.subcommand() {
         ("module", Some(m)) => modules_cli::execute(m),
         ("binding", Some(m)) => bindings_cli::execute(m),
@@ -89,7 +91,7 @@ pub fn execute(args: &ArgMatches) -> Result<()> {
         (c @ "new", Some(m)) => packages_cli::execute(c, m),
         (c @ "remove", Some(m)) => packages_cli::execute(c, m),
         (c @ "update", Some(m)) => packages_cli::execute(c, m),
-        (unknown, _) => bail!("Unknown command: {}", unknown),
+        (unknown, _) => Err(CliError::UnrecognizedCommand(unknown.to_owned()).into()),
     }
 }
 
