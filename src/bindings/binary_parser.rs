@@ -6,18 +6,30 @@
 
 use std::fs::File;
 use std::io::Read;
-use ::errors::*;
+use std::path::PathBuf;
+use failure::{Fail, Error};
 
 use goblin::elf::{Elf, Sym};
 use gimli;
 use object;
 
+#[derive(Debug, Fail)]
+enum BinaryError {
+    #[fail(display = "file '{}' is not valid DWARF", path)]
+    InvalidDwarfFile {
+        path: String,
+    },
+    #[fail(display = "failed to parse elf file")]
+    ElfParseError
+}
+
 /// Parses a binary file and prints information about the sections.
-pub fn parse_elf(file: &mut File) -> Result<()> {
+pub fn parse_elf(file: &mut File) -> Result<(), Error> {
 
     let buffer = { let mut v = Vec::new(); file.read_to_end(&mut v).unwrap(); v};
 
-    let elf = Elf::parse(&buffer).chain_err(|| "Failed to parse elf file")?;
+    let elf = Elf::parse(&buffer)
+        .map_err(|_| BinaryError::ElfParseError)?;
     let syms = elf.syms;
     let strtab = elf.strtab;
     let section_headers = elf.section_headers;

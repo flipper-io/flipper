@@ -2,9 +2,9 @@
 //! These commands assist in creating new projects, adding and managing module dependencies,
 //! and generating language bindings for modules.
 
-use flipper_console as console;
-use console::errors::*;
+use flipper_console::CliError;
 use clap::{App, AppSettings, Arg, ArgMatches};
+use failure::Error;
 use ::lang_flags;
 
 pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
@@ -21,14 +21,14 @@ pub fn make_subcommands<'a, 'b>() -> Vec<App<'a, 'b>> {
 /// that even though they were parsed by the top-level `flipper` command handler,
 /// the argument match was not consumed. Hence, we match on solely the command
 /// string, then forward the ArgMatches to the implementing rust mod.
-pub fn execute(command: &str, args: &ArgMatches) -> Result<()> {
+pub fn execute(command: &str, args: &ArgMatches) -> Result<(), Error> {
     match command {
         "new" => new::execute(args),
         "init" => new::execute(args),
         "add" => add::execute(args),
         "remove" => remove::execute(args),
         "update" => update::execute(args),
-        unknown => bail!("Unrecognized command: {}", unknown),
+        unknown => Err(CliError::UnrecognizedCommand(unknown.to_owned()).into()),
     }
 }
 
@@ -54,7 +54,7 @@ pub mod new {
         ]
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         unimplemented!();
     }
 }
@@ -86,7 +86,7 @@ pub mod add {
             ])
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         unimplemented!();
     }
 }
@@ -109,7 +109,7 @@ pub mod remove {
             )
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         unimplemented!();
     }
 }
@@ -124,7 +124,7 @@ pub mod update {
             .about("Update module dependencies to the latest versions")
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         unimplemented!();
     }
 }

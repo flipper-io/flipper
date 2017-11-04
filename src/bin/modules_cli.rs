@@ -17,9 +17,9 @@
 //! ```
 
 use flipper;
-use flipper_console as console;
-use console::errors::*;
+use flipper_console::CliError;
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand as Sub};
+use failure::Error;
 
 pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
     App::new("module")
@@ -63,7 +63,7 @@ pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
         ])
 }
 
-pub fn execute(args: &ArgMatches) -> Result<()> {
+pub fn execute(args: &ArgMatches) -> Result<(), Error> {
     if args.is_present("repl") {
         repl();
         ::std::process::exit(0);
@@ -87,7 +87,7 @@ pub fn execute(args: &ArgMatches) -> Result<()> {
         ("usart", Some(m)) => usart::execute(m),
         ("usb", Some(m)) => usb::execute(m),
         ("wdt", Some(m)) => wdt::execute(m),
-        (unknown, _) => bail!("Unrecognized module: {}", unknown),
+        (unknown, _) => Err(CliError::UnrecognizedCommand(unknown.to_owned()).into()),
     }
 }
 
@@ -127,7 +127,7 @@ pub mod adc {
             .about("Analog to Digital Converter")
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         unimplemented!();
     }
 }
@@ -140,7 +140,7 @@ pub mod button {
             .about("Flipper's built-in Button")
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         unimplemented!();
     }
 }
@@ -153,7 +153,7 @@ pub mod dac {
             .about("Digital to Analog Converter")
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         unimplemented!();
     }
 }
@@ -166,7 +166,7 @@ pub mod fs {
             .about("Filesystem")
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         unimplemented!();
     }
 }
@@ -179,7 +179,7 @@ pub mod gpio {
             .about("General-Purpose Input/Output")
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         unimplemented!();
     }
 }
@@ -192,7 +192,7 @@ pub mod i2c {
             .about("Inter-IC (integrated circuit) bus")
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         unimplemented!();
     }
 }
@@ -217,7 +217,7 @@ pub mod led {
             )
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         let red = args.value_of("red").unwrap().parse::<u8>().unwrap();
         let green = args.value_of("green").unwrap().parse::<u8>().unwrap();
         let blue = args.value_of("blue").unwrap().parse::<u8>().unwrap();
@@ -236,7 +236,7 @@ pub mod pwm {
             .about("Pulse-Width Modulation")
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         unimplemented!();
     }
 }
@@ -249,7 +249,7 @@ pub mod rtc {
             .about("Real-Time Clock")
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         unimplemented!();
     }
 }
@@ -262,7 +262,7 @@ pub mod spi {
             .about("Serial Peripheral Interface")
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         unimplemented!();
     }
 }
@@ -275,7 +275,7 @@ pub mod swd {
             .about("Serial Wire Debug")
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         unimplemented!();
     }
 }
@@ -288,7 +288,7 @@ pub mod temp {
             .about("Temperature")
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         unimplemented!();
     }
 }
@@ -301,7 +301,7 @@ pub mod timer {
             .about("General purpose Timer")
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         unimplemented!();
     }
 }
@@ -314,7 +314,7 @@ pub mod uart0 {
             .about("Universal Asynchronous Receive/Transmit bus")
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         unimplemented!();
     }
 }
@@ -327,7 +327,7 @@ pub mod usart {
             .about("Universal Synchronous/Asynchronous Receive/Transmit bus")
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         unimplemented!();
     }
 }
@@ -340,7 +340,7 @@ pub mod usb {
             .about("Universal Serial Bus")
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         unimplemented!();
     }
 }
@@ -353,7 +353,7 @@ pub mod wdt {
             .about("WatchDog Timer")
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<()> {
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         unimplemented!();
     }
 }
