@@ -2,10 +2,10 @@
 #include <flipper/atmegau2/megausb.h>
 
 /* Receive a packet using the appropriate interrupt endpoint. */
-int8_t megausb_interrupt_receive(uint8_t *destination, lf_size_t length) {
+int8_t megausb_interrupt_receive(void *destination, lf_size_t length) {
 
 	/* If USB is not configured, return with error. */
-	if (!megausb_configured) {
+	if (!megausb_configuration) {
 		return lf_error;
 	}
 
@@ -16,9 +16,16 @@ int8_t megausb_interrupt_receive(uint8_t *destination, lf_size_t length) {
 	for (int i = 0; i < total; i ++) {
 
 		/* Wait until the USB controller is ready. */
-		int _e = megausb_wait_ready();
-		if (_e < lf_success) {
-			return lf_error;
+		volatile uint8_t timeout = UDFNUML + LF_USB_TIMEOUT_MS;
+		while (!(UEINTX & (1 << RWAL)) && megausb_configuration) {
+#ifdef __lf_usb_timeout__
+			if (UDFNUML == timeout) {
+				/* Reset the endpoint hardware. */
+				UERST = 0x1E;
+				UERST = 0;
+				goto failure;
+			}
+#endif
 		}
 
 		/* Transfer the buffered data to the destination. */
@@ -26,7 +33,7 @@ int8_t megausb_interrupt_receive(uint8_t *destination, lf_size_t length) {
 		while (len --) {
 			if (length --) {
 				/* If there is still valid data to send, load it from the receive buffer. */
-				*destination ++ = UEDATX;
+				*(uint8_t *)destination++ = UEDATX;
 			} else {
 				/* Otherwise, flush the buffer. */
 				break;
@@ -38,13 +45,17 @@ int8_t megausb_interrupt_receive(uint8_t *destination, lf_size_t length) {
 	}
 
 	return lf_success;
+
+failure:
+
+	return lf_error;
 }
 
 /* Send a packet using the appropriate interrupt endpoint. */
-int8_t megausb_interrupt_transmit(uint8_t *source, lf_size_t length) {
+int8_t megausb_interrupt_transmit(void *source, lf_size_t length) {
 
 	/* If USB is not configured, return with error. */
-	if (!megausb_configured) {
+	if (!megausb_configuration) {
 		return lf_error;
 	}
 
@@ -55,16 +66,23 @@ int8_t megausb_interrupt_transmit(uint8_t *source, lf_size_t length) {
 	for (int i = 0; i < total; i ++) {
 
 		/* Wait until the USB controller is ready. */
-		int _e = megausb_wait_ready();
-		if (_e < lf_success) {
-			return lf_error;
+		volatile uint8_t timeout = UDFNUML + LF_USB_TIMEOUT_MS;
+		while (!(UEINTX & (1 << RWAL)) && megausb_configuration) {
+#ifdef __lf_usb_timeout__
+			if (UDFNUML == timeout) {
+				/* Reset the endpoint hardware. */
+				UERST = 0x1E;
+				UERST = 0;
+				goto failure;
+			}
+#endif
 		}
 
 		/* Transfer the buffered data to the destination. */
 		uint8_t len = INTERRUPT_IN_SIZE;
 		while (len --) {
 			if (length --) {
-				UEDATX = *source ++;
+				UEDATX = *(uint8_t *)source++;
 			} else {
 				/* Otherwise, flush the buffer. */
 				break;
@@ -76,4 +94,8 @@ int8_t megausb_interrupt_transmit(uint8_t *source, lf_size_t length) {
 	}
 
 	return lf_success;
+
+failure:
+
+	return lf_error;
 }

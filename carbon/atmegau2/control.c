@@ -1,10 +1,9 @@
 #define __private_include__
 #include <flipper/atmegau2/megausb.h>
-#include <flipper/led.h>
 
-volatile uint8_t megausb_configured = 0;
+volatile uint8_t megausb_configuration = 0;
 
-void configure_usb(void) {
+int usb_configure(void) {
 	/* Enable the USB hardware for configuration, but freeze the clock. */
 	USBCON = (1 << USBE) | (1 << FRZCLK);
 	/* Configure the USB PLL to use the 16MHz system clock. */
@@ -16,11 +15,10 @@ void configure_usb(void) {
 	/* Attach the USB device. */
 	UDCON = 0;
 	/* Clear the current USB configuration. */
-	megausb_configured = 0;
+	megausb_configuration = 0;
 	/* Enable the end of reset and start of frame events to generate interrupts. */
 	UDIEN = (1 << EORSTE) | (1 << SOFE);
-	/* Enable interrupts. */
-	sei();
+	return lf_success;
 }
 
 /* This is the 'general' USB interrupt service routine. It handles all non CONTROL related interrupts. */
@@ -44,11 +42,11 @@ ISR(USB_GEN_vect) {
 		/* Let setup packets generate interrupts. */
 		UEIENX = (1 << RXSTPE);
 		/* Zero the USB configuration. */
-		megausb_configured = 0;
+		megausb_configuration = 0;
 	}
 
 	/* Evaluates when a start of frame interrupt is received. Occurs once every millisecond. */
-	if ((_udint & (1 << SOFI)) && megausb_configured) {
+	if ((_udint & (1 << SOFI)) && megausb_configuration) {
 
 	}
 
@@ -76,9 +74,6 @@ ISR(USB_COM_vect) {
 	uint16_t desc_val;
 	const uint8_t *desc_addr;
 	uint8_t	desc_length;
-
-	/* Clear the configuration. */
-	megausb_configured = 0;
 
 	/* Select the control endpoint. */
 	UENUM = USB_CONTROL_ENDPOINT;
@@ -144,7 +139,7 @@ ISR(USB_COM_vect) {
 			return;
 		}
 		if (bRequest == SET_CONFIGURATION && bmRequestType == 0) {
-			megausb_configured = wValue;
+			megausb_configuration = wValue;
 			usb_send_in();
 			cfg = endpoint;
 			for (i = 1; i < 5; i++) {
@@ -162,7 +157,7 @@ ISR(USB_COM_vect) {
 		}
 		if (bRequest == GET_CONFIGURATION && bmRequestType == 0x80) {
 			usb_wait_in_ready();
-			UEDATX = megausb_configured;
+			UEDATX = megausb_configuration;
 			usb_send_in();
 			return;
 		}

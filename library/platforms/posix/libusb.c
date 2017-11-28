@@ -86,6 +86,7 @@ struct _lf_ll *lf_libusb_endpoints_for_vid_pid(uint16_t vid, uint16_t pid) {
 	struct libusb_device **libusb_devices = NULL;
 	struct _lf_ll *endpoints = NULL;
 	int _e = libusb_init(&context);
+    libusb_set_debug(context, LIBUSB_LOG_LEVEL_INFO);
 	lf_assert(_e == 0, failure, E_LIBUSB, "Failed to initialize libusb. Reboot and try again.");
 	/* Walk the device list until all desired devices are attached. */
 	size_t device_count = libusb_get_device_list(context, &libusb_devices);
@@ -107,8 +108,6 @@ struct _lf_ll *lf_libusb_endpoints_for_vid_pid(uint16_t vid, uint16_t pid) {
 			lf_assert(endpoint, release, E_NULL, "Failed to create new libusb endpoint.");
 			/* Retain a reference to the libusb context and give it to the context. */
 			struct _lf_libusb_context *context = (struct _lf_libusb_context *)endpoint->_ctx;
-			_e = libusb_init(&(context->context));
-			lf_assert(_e == 0, release, E_LIBUSB, "Failed to initialize libusb. Reboot and try again.");
 			/* Open the device and give it to the context. */
 			_e = libusb_open(libusb_device, &(context->handle));
 			lf_assert(_e == 0, release, E_NO_DEVICE, "Could not find any devices connected via USB. Ensure that a device is connected.");
@@ -116,19 +115,19 @@ struct _lf_ll *lf_libusb_endpoints_for_vid_pid(uint16_t vid, uint16_t pid) {
 			_e = libusb_claim_interface(context->handle, 0);
 			lf_assert(_e == 0, release, E_LIBUSB, "Failed to claim interface on attached device. Please quit any other programs using your device.");
 			/* Reset the device's USB controller. */
-			//_e = libusb_reset_device(context->handle);
+			_e = libusb_reset_device(context->handle);
 			lf_assert(_e == 0, release, E_LIBUSB, "Failed to reset the libusb device.");
 			/* Add the device to the device list. */
 			_e = lf_ll_append(&endpoints, endpoint, lf_endpoint_release);
 			lf_assert(_e == 0, release, E_NULL, "Failed to attach device.");
 			continue;
 release:
-			lf_endpoint_release(endpoint);
+			//lf_endpoint_release(endpoint);
 			break;
 		}
 	}
 failure:
-	libusb_free_device_list(libusb_devices, 1);
-	libusb_exit(context);
+	//libusb_free_device_list(libusb_devices, 1);
+	//libusb_exit(context);
 	return endpoints;
 }

@@ -15,7 +15,8 @@ ARM_PREFIX	 := arm-none-eabi-
 # Directories that need to be included for this target.
 ARM_INC_DIRS := carbon/include 										\
 				kernel/include 										\
-				runtime/include
+				library/include										\
+				runtime/include										\
 
 ARM_SRC_DIRS := carbon/atsam4s										\
 				kernel/src											\
@@ -46,7 +47,8 @@ AVR_PREFIX	 := avr-
 # Directories that need to be included for this target.
 AVR_INC_DIRS := carbon/include 										\
 				kernel/include 										\
-				runtime/include
+				library/include										\
+				runtime/include										\
 
 AVR_SRC_DIRS := carbon/atmegau2 									\
 				kernel/src 											\

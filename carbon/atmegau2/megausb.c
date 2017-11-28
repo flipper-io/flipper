@@ -45,7 +45,7 @@ int megausb_wait_ready(void) {
 	/* Wait until the receiver is ready. */
 	while (!(UEINTX & (1 << RWAL))) {
 		/* If USB has been detached while in this loop, return with error. */
-		if (!megausb_configured) {
+		if (!megausb_configuration) {
 			return lf_error;
 		}
 #ifdef __lf_usb_timeout__

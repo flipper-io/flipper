@@ -28,13 +28,16 @@
 
 /* NOTE: Summing the size parameters of each endpoints below should be less than or equal to 160. */
 #define USB_IN_MASK            0x80
+
+#warning Intererupt IN/OUT endpoint numbers do NOT match device.
 #define INTERRUPT_IN_ENDPOINT  (0x01 | USB_IN_MASK)
 #define INTERRUPT_IN_SIZE      16
 #define INTERRUPT_OUT_ENDPOINT 0x02
 #define INTERRUPT_OUT_SIZE     16
-#define BULK_IN_ENDPOINT       (0x03 | USB_IN_MASK)
+
+#define BULK_IN_ENDPOINT       (0x01 | USB_IN_MASK)
 #define BULK_IN_SIZE           64
-#define BULK_OUT_ENDPOINT      0x04
+#define BULK_OUT_ENDPOINT      0x02
 #define BULK_OUT_SIZE          64
 
 /* The name of the default device to attach to. */
@@ -204,7 +207,7 @@ int lf_transfer(struct _lf_device *device, struct _fmr_packet *packet);
 /* Retrieves a packet from the specified device. */
 int lf_retrieve(struct _lf_device *device, struct _fmr_result *response);
 /* Binds a module structure to its device counterpart. */
-int lf_bind(struct _lf_module *module, struct _lf_device *device);
+int lf_bind(struct _lf_module *module);
 
 /* Experimental: Load an application into RAM and execute it. */
 int lf_ram_load(struct _lf_device *device, void *source, lf_size_t length);

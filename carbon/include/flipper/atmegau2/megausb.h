@@ -5,21 +5,9 @@
 #include <flipper/libflipper.h>
 #include <flipper/atmegau2/atmegau2.h>
 
-/* ~ Declare the virtual interface for this driver. ~ */
-extern struct _lf_endpoint megausb;
-
-extern volatile uint8_t megausb_configured;
-
 #ifdef __private_include__
 
-/* ~ Declare the prototypes for all functions exposed by this driver. ~ */
-extern int megausb_configure();
-extern uint8_t megausb_ready(struct _lf_endpoint *this);
-extern void megausb_put(struct _lf_endpoint *this, uint8_t byte);
-extern uint8_t megausb_get(struct _lf_endpoint *this);
-extern int megausb_push(struct _lf_endpoint *this, void *source, lf_size_t length);
-extern int megausb_pull(struct _lf_endpoint *this, void *destination, lf_size_t length);
-extern int megausb_destroy();
+extern volatile uint8_t megausb_configuration;
 
 /* USB endpoint configuration macros. */
 
@@ -61,17 +49,15 @@ extern int megausb_destroy();
 
 #define VENDOR_SPECIFIC					0xFF
 
-#define NUM_DESC_LIST (sizeof(descriptors) / sizeof(struct descriptor))
+#define NUM_DESC_LIST 5
 
 extern const uint8_t PROGMEM endpoint[];
 
-#define DESC_COUNT 5
-
 /* Timeout using TIMER1. Waits ~100ms. */
 #define megausb_start_timeout() \
-    TCCR1B |= (1 << WGM12); \
-    OCR1A = 6250; \
-    TCCR1B |= (1 << CS12) | (0 << CS11) | (0 << CS10);
+	TCCR1B |= (1 << WGM12); \
+	OCR1A = 6250; \
+	TCCR1B |= (1 << CS12) | (0 << CS11) | (0 << CS10);
 #define megausb_is_timed_out() \
 	(TIFR1 & (1 << OCF1A))
 #define megausb_stop_timeout() \
@@ -83,18 +69,14 @@ extern const struct descriptor {
 	uint16_t index;
 	const uint8_t *address;
 	uint8_t length;
-} PROGMEM descriptors[DESC_COUNT];
+} PROGMEM descriptors[NUM_DESC_LIST];
 
-void configure_usb(void);
-int8_t megausb_interrupt_receive(uint8_t *destination, lf_size_t length);
-int8_t megausb_interrupt_transmit(uint8_t *source, lf_size_t length);
 
-int8_t megausb_bulk_receive(uint8_t *destination, lf_size_t length);
-int8_t megausb_bulk_transmit(uint8_t *source, lf_size_t length);
+int8_t megausb_interrupt_receive(void *destination, lf_size_t length);
+int8_t megausb_interrupt_transmit(void *source, lf_size_t length);
 
-int8_t usb_serial_write(const uint8_t *buffer, uint16_t size);
-
-int megausb_wait_ready(void);
+int8_t megausb_bulk_receive(void *destination, lf_size_t length);
+int8_t megausb_bulk_transmit(void *source, lf_size_t length);
 
 #endif
 #endif

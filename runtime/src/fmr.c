@@ -73,7 +73,7 @@ fmr_return fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, 
 		return 0;
 	}
 	/* Perform the function call internally. */
-	return (uint32_t)fmr_modules[0]; //fmr_call(address, argc, types, arguments);
+	return fmr_call(address, argc, types, arguments);
 }
 
 /* ~ Message runtime subclass handlers. ~ */

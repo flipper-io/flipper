@@ -92,7 +92,7 @@ int carbon_destroy(struct _lf_device *device) {
 	if (device) {
 		struct _carbon_context *context = (struct _carbon_context *)device->_ctx;
 		lf_device_release(context->_u2);
-		lf_device_release(context->_4s);
+		//lf_device_release(context->_4s);
 	}
 	return lf_success;
 }

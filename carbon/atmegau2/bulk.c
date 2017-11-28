@@ -5,10 +5,10 @@
 
 
 /* Receive a packet using the appropriate bulk endpoint. */
-int8_t megausb_bulk_receive(uint8_t *destination, lf_size_t length) {
+int8_t megausb_bulk_receive(void *destination, lf_size_t length) {
 
 	/* If USB is not configured, return with error. */
-	if (!megausb_configured) {
+	if (!megausb_configuration) {
 		return lf_error;
 	}
 
@@ -20,13 +20,15 @@ int8_t megausb_bulk_receive(uint8_t *destination, lf_size_t length) {
 
 		/* Wait until the USB controller is ready. */
 		volatile uint8_t timeout = UDFNUML + LF_USB_TIMEOUT_MS;
-		while (!(UEINTX & (1 << RWAL))) {
-			if (!megausb_configured || UDFNUML == timeout) {
+		while (!(UEINTX & (1 << RWAL)) && megausb_configuration) {
+#ifdef __lf_usb_timeout__
+			if (UDFNUML == timeout) {
 				/* Reset the endpoint hardware. */
 				UERST = 0x1E;
-        		UERST = 0;
+				UERST = 0;
 				goto failure;
 			}
+#endif
 		}
 
 		/* Transfer the buffered data to the destination. */
@@ -34,7 +36,7 @@ int8_t megausb_bulk_receive(uint8_t *destination, lf_size_t length) {
 		while (len --) {
 			if (length) {
 				/* If there is still valid data to send, load it from the receive buffer. */
-				*destination ++ = UEDATX;
+				*(uint8_t *)destination++ = UEDATX;
 				/* Decrement the length. */
 				length --;
 			} else {
@@ -60,10 +62,10 @@ failure:
 }
 
 /* Receive a packet using the appropriate bulk endpoint. */
-int8_t megausb_bulk_transmit(uint8_t *source, lf_size_t length) {
+int8_t megausb_bulk_transmit(void *source, lf_size_t length) {
 
 	/* If USB is not configured, return with error. */
-	if (!megausb_configured) {
+	if (!megausb_configuration) {
 		return lf_error;
 	}
 
@@ -75,13 +77,15 @@ int8_t megausb_bulk_transmit(uint8_t *source, lf_size_t length) {
 
 		/* Wait until the USB controller is ready. */
 		volatile uint8_t timeout = UDFNUML + LF_USB_TIMEOUT_MS;
-		while (!(UEINTX & (1 << RWAL))) {
-			if (!megausb_configured || UDFNUML == timeout) {
+		while (!(UEINTX & (1 << RWAL)) && megausb_configuration) {
+#ifdef __lf_usb_timeout__
+			if (UDFNUML == timeout) {
 				/* Reset the endpoint hardware. */
 				UERST = 0x1E;
-        		UERST = 0;
+				UERST = 0;
 				goto failure;
 			}
+#endif
 		}
 
 		/* Transfer the buffered data to the destination. */
@@ -89,7 +93,7 @@ int8_t megausb_bulk_transmit(uint8_t *source, lf_size_t length) {
 		while (len --) {
 			if (length) {
 				/* If there is still valid data to send, load it into the transmit buffer. */
-				UEDATX = *source ++;
+				UEDATX = *(uint8_t *)source++;
 				/* Decrement the length. */
 				length --;
 			} else {

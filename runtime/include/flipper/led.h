@@ -10,6 +10,8 @@
 #define LED_COLOR_SUCCESS 0, 25, 0
 #define LED_COLOR_ERROR 25, 0, 0
 
+#define LED_GREEN 0, 10, 0
+
 /* Declare the virtual interface for this module. */
 extern const struct _led {
 	int (* configure)(void);
