@@ -55,24 +55,24 @@ AVR_SRC_DIRS := carbon/atmegau2 									\
 
 AVR_CFLAGS 	 := -std=c99											\
 				-Os													\
-				-mmcu=atmega16u2									\
+				-mmcu=atmega32u2									\
 				-DARCH=ARCH_AVR8									\
-				-D__AVR_AT90USB162__								\
+				-D__AVR_ATmega32U2__								\
 				-DF_CPU=16000000UL									\
 				-D__disable_error_side_effects__					\
 				-D__ATMEGAU2__										\
 				-DPLATFORM_HEADER="<flipper/atmegau2/atmegau2.h>"	\
 				$(foreach inc,$(AVR_INC_DIRS),-I$(inc))
 
-AVR_LDFLAGS  := -mmcu=atmega16u2									\
+AVR_LDFLAGS  := -mmcu=atmega32u2									\
 				-Wl,--gc-sections
 
 $(AVR_TARGET): $(AVR_TARGET).hex
 
 install-atmegau2: atmegau2
-	dfu-programmer at90usb162 erase
-	dfu-programmer at90usb162 flash $(BUILD)/$(AVR_TARGET)/$(AVR_TARGET).hex
-	dfu-programmer at90usb162 launch --no-reset
+	dfu-programmer atmega32u2 erase
+	dfu-programmer atmega32u2 flash $(BUILD)/$(AVR_TARGET)/$(AVR_TARGET).hex
+	dfu-programmer atmega32u2 launch --no-reset
 
 # x86 target variables
 X86_TARGET	 := libflipper
