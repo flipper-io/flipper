@@ -13,7 +13,7 @@
 /* Short hand for raising errors based on the truth of a condition. */
 #define lf_assert(truth, label, error, ...) \
 	if (!(truth)) { \
-		lf_error_raise(error, __VA_ARGS__); \
+		lf_error_raise(error, error_message(__VA_ARGS__)); \
 		goto label; \
 	}
 

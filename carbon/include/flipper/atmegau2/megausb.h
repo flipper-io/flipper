@@ -56,17 +56,6 @@ extern volatile uint8_t megausb_configuration;
 
 extern const uint8_t PROGMEM endpoint[];
 
-/* Timeout using TIMER1. Waits ~100ms. */
-#define megausb_start_timeout() \
-	TCCR1B |= (1 << WGM12); \
-	OCR1A = 6250; \
-	TCCR1B |= (1 << CS12) | (0 << CS11) | (0 << CS10);
-#define megausb_is_timed_out() \
-	(TIFR1 & (1 << OCF1A))
-#define megausb_stop_timeout() \
-	TIFR1 |= (1 << OCF1A); \
-	TCCR1B = 0;
-
 extern const struct descriptor {
 	uint16_t value;
 	uint16_t index;

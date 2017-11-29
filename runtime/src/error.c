@@ -22,7 +22,7 @@ void lf_error_raise(lf_error_t error, const char *format, ...) {
 	/* Record the observed error. */
 	error_code = error;
 #ifndef __disable_error_side_effects__
-	if (error) {
+	if (error && errors_cause_side_effects) {
 		/* Construct a va_list to acmmcess variadic arguments. */
 		va_list argv;
 		/* Initialize the va_list that we created above. */
@@ -33,7 +33,7 @@ void lf_error_raise(lf_error_t error, const char *format, ...) {
 		/* Get the variadic argument string. */
 		vsprintf(last_error, format, argv);
 		/* Print the exception if a message is provided. */
-		if (format && errors_cause_side_effects) {
+		if (format) {
 			fprintf(stderr, KYEL "\nThe Flipper runtime encountered the following error:\n  " KNRM "↳ " KRED);
 			if (_error == E_STRING) {
 				fprintf(stderr, "An invalid error code (%i) was provided.\n", error);

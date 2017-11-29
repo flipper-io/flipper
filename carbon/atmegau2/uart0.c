@@ -6,8 +6,8 @@
 int uart0_configure(void *_ctx) {
 
 	/* 115.2k baud for DFU communication. */
-	UBRR1L = 0x08;
-	UCSR1A &= ~(1 << U2X1);
+	UBRR1L = 0x10;
+	UCSR1A |= (1 << U2X1);
 
 	// if (_ctx == 0) {
 	// 	/* 2  megabaud. */
@@ -20,7 +20,6 @@ int uart0_configure(void *_ctx) {
 	// 	UCSR1A &= ~(1 << U2X1);
 	// }
 
-	UCSR1A = (1 << U2X1);
 	/* 8n1 */
 	UCSR1C = (1 << UCSZ10) | (1 << UCSZ11);
 	/* Enable the receiver, transmitter, and receiver interrupt. */
@@ -34,7 +33,6 @@ int uart0_ready(void) {
 }
 
 int uart0_push(void *source, lf_size_t length) {
-	printf("Pushing %i bytes\n", length);
 	while (length --) {
 		while (!(UCSR1A & (1 << UDRE1)));
 		UDR1 = *(uint8_t *)(source ++);
@@ -43,17 +41,12 @@ int uart0_push(void *source, lf_size_t length) {
 }
 
 int uart0_pull(void *destination, lf_size_t length) {
-	printf("Pulling %i bytes\n", length);
 	while (length --) {
 		uint8_t timeout = UDFNUML + LF_UART_TIMEOUT_MS;
 		while (!(UCSR1A & (1 << RXC1))) {
-			if (UDFNUML == timeout) {
-				goto failure;
-			}
+			if (UDFNUML == timeout) return -1;
 		}
 		*(uint8_t *)(destination ++) = UDR1;
 	}
 	return lf_success;
-failure:
-	return lf_error;
 }

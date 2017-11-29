@@ -169,7 +169,7 @@ int sam_ba_copy(uint32_t destination, void *source, uint32_t length) {
 retry:
 	sam_push(buffer, sizeof(buffer) - 1);
 	uint8_t retries = 0;
-//	while(!sam_ready() && retries ++ < 8) printf("CHECKING READY\n");
+	while(!sam_ready() && retries ++ < 8);
 	/* Check for the clear to send byte. */
 	if (sam_get() != 'C') {
 		return lf_error;

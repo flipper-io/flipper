@@ -48,6 +48,7 @@ int8_t megausb_bulk_receive(void *destination, lf_size_t length) {
 				length --;
 			} else {
 				/* Otherwise, flush the buffer. */
+				while ((UEINTX & (1 << RWAL))) (void)UEDATX;
 				break;
 			}
 		}
@@ -109,6 +110,7 @@ int8_t megausb_bulk_transmit(void *source, lf_size_t length) {
 				length --;
 			} else {
 				/* Otherwise, flush the buffer. */
+				while ((UEINTX & (1 << RWAL))) UEDATX = 0;
 				break;
 			}
 		}

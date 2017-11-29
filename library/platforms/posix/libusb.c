@@ -20,62 +20,56 @@ bool lf_libusb_ready(struct _lf_endpoint *endpoint) {
 
 int lf_libusb_push(struct _lf_endpoint *endpoint, void *source, lf_size_t length) {
 	struct _lf_libusb_context *context = (struct _lf_libusb_context *)endpoint->_ctx;
-	int _length;
+	int transferred;
 	int _e;
-#ifndef __ALL_BULK__
-	if (length <= INTERRUPT_OUT_SIZE) {
-		_e = libusb_interrupt_transfer(context->handle, INTERRUPT_OUT_ENDPOINT, source, length, &_length, LF_USB_TIMEOUT_MS);
-	} else {
-#endif
-		_e = libusb_bulk_transfer(context->handle, BULK_OUT_ENDPOINT, source, length, &_length, LF_USB_TIMEOUT_MS);
-#ifndef __ALL_BULK__
-	}
-#endif
-	if (_e != 0) {
-		if (_e == LIBUSB_ERROR_TIMEOUT) {
-			lf_error_raise(E_TIMEOUT, error_message("The transfer to the device timed out."));
+	int total = lf_ceiling(length, BULK_IN_SIZE);
+	for (int i = 0; i < total; i ++) {
+		uint8_t data[BULK_OUT_SIZE];
+		if (length >= BULK_OUT_SIZE) {
+			memcpy(data, source, BULK_OUT_SIZE);
 		} else {
-			lf_error_raise(E_COMMUNICATION, error_message("Error during libusb transfer."));
+			memcpy(data, source, length);
 		}
-		return lf_error;
+		_e = libusb_bulk_transfer(context->handle, BULK_OUT_ENDPOINT, data, BULK_OUT_SIZE, &transferred, LF_USB_TIMEOUT_MS);
+		if (_e != 0) {
+			if (_e == LIBUSB_ERROR_TIMEOUT) {
+				lf_error_raise(E_TIMEOUT, error_message("The transfer to the device timed out."));
+			} else {
+				lf_error_raise(E_COMMUNICATION, error_message("Error during libusb transfer."));
+			}
+			return lf_error;
+		}
+		source += transferred;
+		length -= transferred;
 	}
-	if (_length != length) {
-		printf("Sent %i out of %i\n", _length, length);
-	}
-	lf_assert(_length == length, failure, E_COMMUNICATION, "Failed to transmit complete USB packet.");
 	return lf_success;
-failure:
-	return lf_error;
 }
 
 int lf_libusb_pull(struct _lf_endpoint *endpoint, void *destination, lf_size_t length) {
 	struct _lf_libusb_context *context = (struct _lf_libusb_context *)endpoint->_ctx;
-	int _length;
+	int transferred;
 	int _e;
-#ifndef __ALL_BULK__
-	if (length <= INTERRUPT_IN_SIZE) {
-		_e = libusb_interrupt_transfer(context->handle, INTERRUPT_IN_ENDPOINT, destination, length, &_length, LF_USB_TIMEOUT_MS);
-	} else {
-#endif
-		_e = libusb_bulk_transfer(context->handle, BULK_IN_ENDPOINT, destination, length, &_length, LF_USB_TIMEOUT_MS);
-#ifndef __ALL_BULK__
-	}
-#endif
-	if (_e != 0) {
-		if (_e == LIBUSB_ERROR_TIMEOUT) {
-			lf_error_raise(E_TIMEOUT, error_message("The transfer to the device timed out."));
-		} else {
-			lf_error_raise(E_COMMUNICATION, error_message("Error during libusb transfer."));
+	int total = lf_ceiling(length, BULK_IN_SIZE);
+	for (int i = 0; i < total; i ++) {
+		uint8_t data[BULK_IN_SIZE];
+		_e = libusb_bulk_transfer(context->handle, BULK_IN_ENDPOINT, data, BULK_IN_SIZE, &transferred, LF_USB_TIMEOUT_MS);
+		if (_e != 0) {
+			if (_e == LIBUSB_ERROR_TIMEOUT) {
+				lf_error_raise(E_TIMEOUT, error_message("The transfer to the device timed out."));
+			} else {
+				lf_error_raise(E_COMMUNICATION, error_message("Error during libusb transfer."));
+			}
+			return lf_error;
 		}
-		return lf_error;
+		if (length >= BULK_IN_SIZE) {
+			memcpy(destination, data, BULK_IN_SIZE);
+		} else {
+			memcpy(destination, data, length);
+		}
+		destination += transferred;
+		length -= transferred;
 	}
-	if (_length != length) {
-		printf("Received %i out of %i\n", _length, length);
-	}
-	lf_assert(_length == length, failure, E_COMMUNICATION, "Failed to receive complete USB packet.");
 	return lf_success;
-failure:
-	return lf_error;
 }
 
 int lf_libusb_destroy(struct _lf_endpoint *endpoint) {

@@ -43,12 +43,6 @@ int main(int argc, char *argv[]) {
 		goto exit;
 	}
 
-	_e = libusb_set_configuration(handle, 1);
-	if (_e) {
-		fprintf(stderr, "Failed to configure the device.\n");
-		goto exit;
-	}
-
 	int len;
 
 	unsigned char incoming[DEBUG_BUFFER_SIZE + 1]; // don't forget the null
