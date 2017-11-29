@@ -71,32 +71,32 @@ uint8_t applet[] = {
 
 void sam_set_baud(uint32_t baud) {
 	if (baud == FMR_BAUD) {
-		uart0_configure(&uart0, 0);
+		uart0_configure((void *)0);
 	} else {
-		uart0_configure(&uart0, 1);
+		uart0_configure((void *)1);
 	}
 }
 
 bool sam_ready(void) {
-	return uart0_ready(&uart0);
+	return uart0_ready();
 }
 
 void sam_put(uint8_t c) {
-	uart0_push(&uart0, &c, 1);
+	uart0_push(&c, 1);
 }
 
 uint8_t sam_get(void) {
 	uint8_t c;
-	uart0_pull(&uart0, &c, 1);
+	uart0_pull(&c, 1);
 	return c;
 }
 
 void sam_push(void *source, size_t len) {
-	uart0_push(&uart0, source, len);
+	uart0_push(source, len);
 }
 
 void sam_pull(void *destination, size_t len) {
-	uart0_pull(&uart0, destination, len);
+	uart0_pull(destination, len);
 }
 
 void sam_reset() {
@@ -107,7 +107,7 @@ void sam_reset() {
 
 int sam_enter_dfu(void) {
 	gpio.write((1 << SAM_ERASE_PIN), (1 << SAM_RESET_PIN));
-	usleep(5000000);
+	usleep(1000000);
 	gpio.write((1 << SAM_RESET_PIN), (1 << SAM_ERASE_PIN));
 	sam_reset();
 	return lf_success;
@@ -169,7 +169,7 @@ int sam_ba_copy(uint32_t destination, void *source, uint32_t length) {
 retry:
 	sam_push(buffer, sizeof(buffer) - 1);
 	uint8_t retries = 0;
-	while(!sam_ready() && retries ++ < 8);
+//	while(!sam_ready() && retries ++ < 8) printf("CHECKING READY\n");
 	/* Check for the clear to send byte. */
 	if (sam_get() != 'C') {
 		return lf_error;
@@ -243,7 +243,6 @@ repeat:
 
 	sam_put('#');
 	sam_pull(ack, sizeof(ack));
-	printf("ACK: 0x%02x 0x%02x 0x%02x\n", ack[0], ack[1], ack[2]);
 	if (!memcmp(ack, (const uint8_t []){ '\n', '\r', '>' }, sizeof(ack))) {
 		goto done;
 	}
@@ -252,7 +251,7 @@ repeat:
 	sam_enter_dfu();
 
 	if (tries > 2) {
-		fprintf(stderr, KRED "Failed to enter update mode.\n");
+		fprintf(stderr, KRED "Failed to enter update mode.\n" KNRM);
 		return lf_error;
 	}
 
@@ -274,8 +273,8 @@ int enter_normal_mode(void) {
 	printf("Entering normal mode.\n");
 	char n_ack[2];
 	uint8_t retries = 0;
-	sam_push("N#", 2);
 	while(retries++ < 8) {
+		sam_push("N#", 2);
 		sam_pull(n_ack, sizeof(n_ack));
 		if (!memcmp(n_ack, (const uint8_t []){ 0x0A, 0x0D }, sizeof(n_ack))) {
 			printf(KGRN " Successfully entered normal mode.\n" KNRM);
@@ -303,7 +302,6 @@ int main(int argc, char *argv[]) {
 	struct _lf_device *device = lf_get_current_device();
 	struct _lf_device *u2 = carbon_get_u2(device);
 	carbon_select_atmegau2(u2);
-	printf("UART0 is %i\n", _uart0.index);
 
 begin: ;
 

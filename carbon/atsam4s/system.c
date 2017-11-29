@@ -48,7 +48,7 @@ fmr_return fmr_pull(struct _fmr_push_pull_packet *packet) {
 	fmr_return retval = 0;
 	if (packet -> header.class == fmr_receive_class) {
 		/* If we are receiving data, simply push the memory. */
-		uart0_push(NULL, (uintptr_t *)*(uint32_t *)(packet -> call.parameters), packet -> length);
+		uart0_push((uintptr_t *)*(uint32_t *)(packet -> call.parameters), packet -> length);
 	} else {
 		void *pull_buffer = malloc(packet -> length);
 		if (!pull_buffer) {
@@ -57,7 +57,7 @@ fmr_return fmr_pull(struct _fmr_push_pull_packet *packet) {
 		}
 		*(uintptr_t *)(packet -> call.parameters) = (uintptr_t)pull_buffer;
 		retval = fmr_execute(packet -> call.index, packet -> call.function, packet -> call.argc, packet -> call.types, (void *)(packet -> call.parameters));
-		uart0_push(NULL, pull_buffer, packet -> length);
+		uart0_push(pull_buffer, packet -> length);
 		free(pull_buffer);
 	}
 	return retval;
@@ -86,13 +86,13 @@ void uart0_isr(void) {
 		/* HACK: Wait until the U2 is ready. */
 		for (volatile int i = 0; i < 10000; i ++);
 		/* Give the result back. */
-		uart0_push(NULL, &result, sizeof(struct _fmr_result));
+		uart0_push(&result, sizeof(struct _fmr_result));
 		/* Flush any remaining data that has been buffered. */
 		while (UART0 -> UART_SR & UART_SR_RXRDY) UART0 -> UART_RHR;
 		/* Clear the error state. */
 		lf_error_clear();
 		/* Pull the next packet asynchronously. */
-		uart0_pull(NULL, &packet, sizeof(struct _fmr_packet));
+		uart0_pull(&packet, sizeof(struct _fmr_packet));
 	}
 }
 
@@ -133,14 +133,14 @@ void system_init(void) {
 	/* Configure the USART peripheral. */
 	usart_configure();
 	/* Configure the UART peripheral. */
-	uart0_configure(NULL, NULL);
+	uart0_configure(NULL);
 	/* Configure the GPIO peripheral. */
 	gpio_configure();
 	/* Configure the SPI peripheral. */
 	spi_configure();
 
 	/* Pull an FMR packet asynchronously to launch FMR. */
-	uart0_pull(NULL, &packet, sizeof(struct _fmr_packet));
+	uart0_pull(&packet, sizeof(struct _fmr_packet));
 	/* Enable the PDC receive complete interrupt. */
 	UART0 -> UART_IER = UART_IER_ENDRX;
 

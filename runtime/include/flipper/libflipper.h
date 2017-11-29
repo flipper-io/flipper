@@ -21,7 +21,7 @@
 #define __lf_usb_timeout__
 #ifdef __lf_usb_timeout__
 /* Must be between 1ms and 255ms. */
-#define LF_USB_TIMEOUT_MS 200
+#define LF_USB_TIMEOUT_MS 50
 #else
 #define LF_USB_TIMEOUT_MS 0
 #endif

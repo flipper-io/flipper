@@ -56,10 +56,6 @@ int8_t usb_debug_putchar(uint8_t c)
 	return 0;
 }
 
-void usb_debug_write(char *msg) {
-	while (*msg) usb_debug_putchar(*msg++);
-}
-
 // immediately transmit any buffered output.
 void usb_debug_flush_output(void)
 {

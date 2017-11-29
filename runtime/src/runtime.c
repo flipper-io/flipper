@@ -150,8 +150,7 @@ int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_s
 	/* Set the push length. */
 	packet -> length = length;
 	/* Generate the function call in the outgoing packet. */
-	//int _e = fmr_create_call(module -> index, function, fmr_merge(fmr_args(fmr_ptr(device, source), fmr_infer(length)), parameters), &_packet.header, &packet -> call);
-	int _e = lf_error;
+	int _e = fmr_create_call(module -> index, function, fmr_args(fmr_int16(source), fmr_infer(length)), &_packet.header, &packet -> call);
 	if (_e < lf_success) {
 		return lf_error;
 	}
@@ -203,8 +202,7 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 	/* Set the pull length. */
 	packet -> length = length;
 	/* Generate the function call in the outgoing packet. */
-	//int _e = fmr_create_call(module -> index, function, fmr_merge(fmr_args(fmr_ptr(device, destination), fmr_infer(length)), parameters), &_packet.header, &packet -> call);
-	int _e = lf_error;
+	int _e = fmr_create_call(module -> index, function, fmr_args(fmr_int16(destination), fmr_infer(length)), &_packet.header, &packet -> call);
 	if (_e < lf_success) {
 		return lf_error;
 	}

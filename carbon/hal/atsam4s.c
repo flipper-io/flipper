@@ -3,7 +3,7 @@
 #define __private_include__
 #include <flipper/libflipper.h>
 #include <flipper/carbon.h>
-#include <flipper/atsam4s/atsam4s.h>
+#include <flipper/atsam4s/modules.h>
 
 int carbon_select_atsam4s(struct _lf_device *device) {
 	LF_MODULE_SET_DEVICE_AND_ID(_adc, device, _adc_id);

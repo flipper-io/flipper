@@ -5,7 +5,7 @@
 #include <flipper/atsam4s/atsam4s.h>
 #include <cmsis/core_cm3.h>
 
-int uart0_configure(struct _lf_endpoint *endpoint, void *_ctx) {
+int uart0_configure(void *_ctx) {
 	/* Create a pinmask for the peripheral pins. */
 	const unsigned int UART0_PIN_MASK = (PIO_PA9A_URXD0 | PIO_PA10A_UTXD0);
 	/* Enable the peripheral clock. */
@@ -50,7 +50,7 @@ void uart0_disable(void) {
 	UART0 -> UART_CR = UART_CR_TXDIS | UART_CR_RXDIS;
 }
 
-bool uart0_ready(struct _lf_endpoint *endpoint) {
+int uart0_ready(void) {
 	/* Return the empty condition of the transmitter FIFO. */
 	return (UART0 -> UART_SR & UART_SR_TXEMPTY);
 }
@@ -67,7 +67,7 @@ uint8_t uart0_get(uint32_t timeout) {
 	return UART0 -> UART_RHR;
 }
 
-int uart0_push(struct _lf_endpoint *endpoint, void *source, lf_size_t length) {
+int uart0_push(void *source, lf_size_t length) {
 	/* Set the transmission length and source pointer. */
 	UART0 -> UART_TCR = length;
 	UART0 -> UART_TPR = (uintptr_t)(source);
@@ -80,7 +80,7 @@ int uart0_push(struct _lf_endpoint *endpoint, void *source, lf_size_t length) {
 	return lf_success;
 }
 
-int uart0_pull(struct _lf_endpoint *endpoint, void *destination, lf_size_t length) {
+int uart0_pull(void *destination, lf_size_t length) {
 	/* Set the transmission length and destination pointer. */
 	UART0 -> UART_RCR = length;
 	UART0 -> UART_RPR = (uintptr_t)(destination);

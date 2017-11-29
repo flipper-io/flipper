@@ -38,7 +38,7 @@ _load:
 	breq _call
 	; Obtain the argument type from the lowest two bits by masking 0b11.
 	mov r16, argt_l
-	andi r16, 3
+	andi r16, 0x03
 	; Jump to the appropraite code for the argument's type.
 	cpi r16, 0
 	breq _load_8
@@ -72,9 +72,10 @@ _load_32:
 	ld r0, Z+
 	st X, r0
 	subi XL, 0x04
+	rjmp _load_done
 _load_ptr:
-	subi XL, 0x02
-	rjmp _load_16
+//	addi ZL, 0x02
+//	rjmp _load_16
 _load_done:
 	; Shift the encoded types two bits to the right.
 	asr argt_h

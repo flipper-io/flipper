@@ -1,5 +1,6 @@
 #include <signal.h>
 #include <stdio.h>
+#include <string.h>
 #include <libusb-1.0/libusb.h>
 
 #define VENDOR 0x16C0
@@ -7,6 +8,8 @@
 #define DEBUG_INTERFACE 1
 #define DEBUG_BUFFER_SIZE 32
 #define DEBUG_IN_ENDPOINT 0x03 | 0x80
+/* Timeout here must be larger than the flush rate of the device. */
+#define DEBUG_TIMEOUT 50
 
 static volatile int alive = 1;
 
@@ -48,14 +51,22 @@ int main(int argc, char *argv[]) {
 
 	int len;
 
-	unsigned char incoming[DEBUG_BUFFER_SIZE];
+	unsigned char incoming[DEBUG_BUFFER_SIZE + 1]; // don't forget the null
 
 	while (alive) {
-		_e = libusb_interrupt_transfer(handle, DEBUG_IN_ENDPOINT, incoming, sizeof(incoming), &len, 0);
-		if (_e) {
+		memset(incoming, '\0', sizeof(incoming));
+		_e = libusb_interrupt_transfer(handle, DEBUG_IN_ENDPOINT, incoming, DEBUG_BUFFER_SIZE, &len, DEBUG_TIMEOUT);
+		if (_e == 0) {
+			if (len > 0) {
+				printf("%s", incoming);
+				fflush(stdout);
+			}
+		} else if (_e == LIBUSB_ERROR_TIMEOUT) {
+			continue;
+		} else {
 			fprintf(stderr, "Something went wronge with the transfer.\n");
+			goto exit;
 		}
-		printf("%s\n", incoming);
 	}
 
 exit:

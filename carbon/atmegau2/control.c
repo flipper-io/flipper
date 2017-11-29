@@ -57,9 +57,7 @@ ISR(USB_GEN_vect) {
 			debug_flush_timer = --t;
 			if (!t) {
 				UENUM = DEBUG_IN_ENDPOINT;
-				while ((UEINTX & (1<<RWAL))) {
-					UEDATX = 0;
-				}
+				while ((UEINTX & (1 << RWAL))) UEDATX = '\0';
 				UEINTX = 0x3A;
 			}
 		}

@@ -36,6 +36,14 @@ struct _carbon_context {
 extern int carbon_select_atmegau2(struct _lf_device *device);
 extern int carbon_select_atsam4s(struct _lf_device *device);
 
+struct _lf_device *carbon_get_u2(struct _lf_device *device) {
+	struct _carbon_context *context = device->_ctx;
+	lf_assert(context, failure, E_NULL, "No context for selected carbon device.");
+	return context->_u2;
+failure:
+	return NULL;
+}
+
 /* Selects a carbon device. */
 int carbon_select(struct _lf_device *device) {
 	lf_assert(device, failure, E_NULL, "NULL pointer provided when selecting device.");
@@ -66,13 +74,29 @@ struct _lf_device *carbon_attach_endpoint(struct _lf_endpoint *endpoint, struct 
 	return carbon;
 }
 
+int uart0_bridge_configure(struct _lf_endpoint *endpoint, void *_configuration) {
+	return lf_success;
+}
+
+bool uart0_bridge_ready(struct _lf_endpoint *endpoint) {
+	return 1;
+}
+
+int uart0_bridge_push(struct _lf_endpoint *endpoint, void *source, lf_size_t length) {
+	return 0;
+}
+
+int uart0_bridge_pull(struct _lf_endpoint *endpoint, void *destination, lf_size_t length) {
+	return 0;
+}
+
 void carbon_attach_to_usb_endpoint_applier(const void *__u2_ep, void *_other) {
 	/* Obtain the u2's endpoint. */
 	struct _lf_endpoint *_u2_ep = (struct _lf_endpoint *)__u2_ep;
 	/* Create the u2 sub-device. */
 	struct _lf_device *_u2 = lf_device_create(_u2_ep, carbon_select_atmegau2, NULL, 0);
 	/* Create the 4s' endpoint using the u2's uart0 endpoint as a bridge. */
-	struct _lf_endpoint *_4s_ep = lf_endpoint_create(uart0_configure, uart0_ready, uart0_push, uart0_pull, NULL, 0);
+	struct _lf_endpoint *_4s_ep = lf_endpoint_create(uart0_bridge_configure, uart0_bridge_ready, uart0_bridge_push, uart0_bridge_pull, NULL, 0);
 	/* Create the 4s sub-device. */
 	struct _lf_device *_4s = lf_device_create(_4s_ep, carbon_select_atsam4s, NULL, 0);
 	/* Attach to a carbon device over the 4s' endpoint. */

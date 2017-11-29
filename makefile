@@ -4,8 +4,10 @@ BUILD := build
 # List of all target types
 TARGETS := ARM AVR X86
 
-# Pre-declare double colon rules
+.PHONY: all install
+
 all::
+install::
 
 # ARM target variables
 ARM_TARGET	 := atsam4s
@@ -39,6 +41,11 @@ ARM_LDFLAGS  := -Wl,-T carbon/atsam4s/sam4s16.ld					\
 
 $(ARM_TARGET): $(ARM_TARGET).bin
 
+.PHONY: install-atsam4s
+
+install-atsam4s: utils $(ARM_TARGET).bin
+	$(_v)$(BUILD)/utils/fdfu $(BUILD)/$(ARM_TARGET)/$(ARM_TARGET).bin
+
 # AVR target variables
 AVR_TARGET	 := atmegau2
 
@@ -71,10 +78,14 @@ AVR_LDFLAGS  := -mmcu=atmega32u2									\
 
 $(AVR_TARGET): $(AVR_TARGET).hex
 
+.PHONY: install-atmegau2
+
 install-atmegau2: atmegau2
-	dfu-programmer atmega32u2 erase
-	dfu-programmer atmega32u2 flash $(BUILD)/$(AVR_TARGET)/$(AVR_TARGET).hex
-	dfu-programmer atmega32u2 launch --no-reset
+	$(_v)dfu-programmer atmega32u2 erase
+	$(_v)dfu-programmer atmega32u2 flash $(BUILD)/$(AVR_TARGET)/$(AVR_TARGET).hex
+	$(_v)dfu-programmer atmega32u2 launch --no-reset
+
+# install:: install-atmegau2
 
 # x86 target variables
 X86_TARGET	 := libflipper
@@ -101,6 +112,9 @@ X86_CFLAGS	 := -std=c99											\
 X86_LDFLAGS  := -lusb-1.0
 
 $(X86_TARGET): $(X86_TARGET).so
+.PHONY: install-libflipper uninstall-libflipper
+
+# --- LIBFLIPPER --- #
 
 install-libflipper: libflipper
 	$(_v)mkdir -p $(BUILD)/include/flipper
@@ -111,10 +125,29 @@ install-libflipper: libflipper
 	$(_v)cp $(BUILD)/$(X86_TARGET)/$(X86_TARGET).so /usr/local/lib/
 	$(_v)cp -r $(BUILD)/include/* /usr/local/include/
 
+install:: install-libflipper
+
 uninstall-libflipper:
 	$(_v)rm -r /usr/local/include/flipper.h
 	$(_v)rm -rf /usr/local/include/flipper
 	$(_v)rm -r /usr/local/lib/$(X86_TARGET).so
+
+# --- UTILITIES --- #
+
+.PHONY: utils install-utils uninstall-utils
+
+utils:
+	$(_v)mkdir -p $(BUILD)/utils
+	$(_v)gcc -lflipper utils/fdfu/src/main.c -o $(BUILD)/utils/fdfu
+	$(_v)gcc -lusb-1.0 utils/fdebug/src/main.c -o $(BUILD)/utils/fdebug
+
+install-utils: utils
+	$(_v)cp -r $(BUILD)/utils/* /usr/local/bin
+
+install:: install-utils
+
+uninstall-utils:
+	$(_v)rm -rf /usr/local/bin/fdfu
 
 # Print all commands executed when VERBOSE is defined
 ifdef VERBOSE
@@ -205,7 +238,7 @@ generate_target = $(eval $(call _generate_target,$1))
 # Generate all of the rules for every target
 $(foreach target,$(TARGETS),$(call generate_target,$(target)))
 
-.PHONY: all clean
+.PHONY: clean
 
 clean:
 	$(_v)rm -rf $(BUILD)

@@ -12,6 +12,9 @@ int8_t megausb_bulk_receive(void *destination, lf_size_t length) {
 		return lf_error;
 	}
 
+	uint8_t _sreg = SREG;
+	cli();
+
 	/* Select the endpoint that has been configured to receive bulk data. */
 	UENUM = BULK_OUT_ENDPOINT;
 
@@ -19,16 +22,20 @@ int8_t megausb_bulk_receive(void *destination, lf_size_t length) {
 	for (int i = 0; i < total; i ++) {
 
 		/* Wait until the USB controller is ready. */
-		volatile uint8_t timeout = UDFNUML + LF_USB_TIMEOUT_MS;
-		while (!(UEINTX & (1 << RWAL)) && megausb_configuration) {
-#ifdef __lf_usb_timeout__
-			if (UDFNUML == timeout) {
-				/* Reset the endpoint hardware. */
-				UERST = 0x1E;
-				UERST = 0;
-				goto failure;
-			}
-#endif
+		uint8_t timeout = UDFNUML + LF_USB_TIMEOUT_MS;
+		while (1) {
+
+			if ((UEINTX & (1 << RWAL))) break;
+			SREG = _sreg;
+
+			if (UDFNUML == timeout) return lf_error;
+
+			if (!megausb_configuration) return lf_error;
+
+			_sreg = SREG;
+			cli();
+
+			UENUM = BULK_OUT_ENDPOINT;
 		}
 
 		/* Transfer the buffered data to the destination. */
@@ -49,16 +56,13 @@ int8_t megausb_bulk_receive(void *destination, lf_size_t length) {
 		UEINTX = (1 << NAKINI) | (1 << RWAL) | (1 << RXSTPI) | (1 << STALLEDI) | (1 << TXINI);
 	}
 
+	SREG = _sreg;
 	return lf_success;
 
-failure:
-
-	while (UEINTX & (1 << RWAL)) {
-		/* Flush the receive buffer and reset the interrupt state machine. */
-		UEINTX = (1 << NAKINI) | (1 << RWAL) | (1 << RXSTPI) | (1 << STALLEDI) | (1 << TXINI);
-	}
-
-	return lf_error;
+	// while (UEINTX & (1 << RWAL)) {
+	// 	/* Flush the receive buffer and reset the interrupt state machine. */
+	// 	UEINTX = (1 << NAKINI) | (1 << RWAL) | (1 << RXSTPI) | (1 << STALLEDI) | (1 << TXINI);
+	// }
 }
 
 /* Receive a packet using the appropriate bulk endpoint. */
@@ -69,6 +73,9 @@ int8_t megausb_bulk_transmit(void *source, lf_size_t length) {
 		return lf_error;
 	}
 
+	uint8_t _sreg = SREG;
+	cli();
+
 	/* Select the endpoint that has been configured to receive bulk data. */
 	UENUM = BULK_IN_ENDPOINT & ~USB_IN_MASK;
 
@@ -76,16 +83,20 @@ int8_t megausb_bulk_transmit(void *source, lf_size_t length) {
 	for (int i = 0; i < total; i ++) {
 
 		/* Wait until the USB controller is ready. */
-		volatile uint8_t timeout = UDFNUML + LF_USB_TIMEOUT_MS;
-		while (!(UEINTX & (1 << RWAL)) && megausb_configuration) {
-#ifdef __lf_usb_timeout__
-			if (UDFNUML == timeout) {
-				/* Reset the endpoint hardware. */
-				UERST = 0x1E;
-				UERST = 0;
-				goto failure;
-			}
-#endif
+		uint8_t timeout = UDFNUML + LF_USB_TIMEOUT_MS;
+		while (1) {
+
+			if ((UEINTX & (1 << RWAL))) break;
+			SREG = _sreg;
+
+			if (UDFNUML == timeout) return lf_error;
+
+			if (!megausb_configuration) return lf_error;
+
+			_sreg = SREG;
+			cli();
+
+			UENUM = BULK_IN_ENDPOINT & ~USB_IN_MASK;
 		}
 
 		/* Transfer the buffered data to the destination. */
@@ -106,14 +117,12 @@ int8_t megausb_bulk_transmit(void *source, lf_size_t length) {
 		UEINTX = (1 << RWAL) | (1 << NAKOUTI) | (1 << RXSTPI) | (1 << STALLEDI);
 	}
 
+	SREG = _sreg;
 	return lf_success;
 
-failure:
+	// while (UEINTX & (1 << RWAL)) {
+	// 	/* Flush the transmit buffer and reset the interrupt state machine. */
+	// 	UEINTX = (1 << RWAL) | (1 << NAKOUTI) | (1 << RXSTPI) | (1 << STALLEDI);
+	// }
 
-	while (UEINTX & (1 << RWAL)) {
-		/* Flush the transmit buffer and reset the interrupt state machine. */
-		UEINTX = (1 << RWAL) | (1 << NAKOUTI) | (1 << RXSTPI) | (1 << STALLEDI);
-	}
-
-	return lf_error;
 }

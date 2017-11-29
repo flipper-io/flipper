@@ -14,22 +14,12 @@
 #include <avr/wdt.h>
 #endif
 
-/* Create an enumeraion defining all of the precomputed identifiers needed for the standard modules. */
-enum {
-	#define __use_button__
-	_button_id,
-	#define __use_fs__
-	_fs_id,
-	#define __use_gpio__
-	_gpio_id,
-	#define __use_led__
-	_led_id,
-	#define __use_uart0__
-	_uart0_id,
-	#define __use_wdt__
-	_wdt_id,
-};
-/* NOTE: The identifiers in this enumeration must match the order of the module addresses stored in the 'fmr_modules' array. */
+#define __use_button__
+#define __use_fs__
+#define __use_gpio__
+#define __use_led__
+#define __use_uart0__
+#define __use_wdt__
 
 /* These macros are defined in platform specific header files. */
 #define enable_interrupts() sei()
@@ -70,11 +60,11 @@ enum {
 
 #define SAM_RESET_DDR           DDRD
 #define SAM_RESET_PORT          PORTD
-#define SAM_RESET_PIN           0x05
+#define SAM_RESET_PIN           0x04
 
 #define SAM_TEST_DDR            DDRD
 #define SAM_TEST_PORT           PORTD
-#define SAM_TEST_PIN            0x04
+#define SAM_TEST_PIN            0x05
 
 #define SAM_ERASE_DDR           DDRD
 #define SAM_ERASE_PORT          PORTD

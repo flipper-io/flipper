@@ -7,23 +7,25 @@
 
 #ifdef __private_include__
 
-struct _uart0_configuration {
-	uint8_t b;
-};
-
 /* Declare the virtual interface for this modules. */
-extern const struct _lf_endpoint uart0;
+extern const struct _uart0 {
+	int (* configure)(void *_ctx);
+	int (* ready)(void);
+	int (* push)(void *source, lf_size_t length);
+	int (* pull)(void *destination, lf_size_t length);
+} uart0;
 
 /* Declare the _lf_module structure for this module. */
 extern struct _lf_module _uart0;
 
-/* Declare the prototypes for all of the functions within this module. */
-extern int uart0_configure(struct _lf_endpoint *endpoint, void *_configuration);
-extern bool uart0_ready(struct _lf_endpoint *endpoint);
-extern int uart0_push(struct _lf_endpoint *endpoint, void *source, lf_size_t length);
-extern int uart0_pull(struct _lf_endpoint *endpoint, void *destination, lf_size_t length);
+/* Declare the FMR overlay for this module. */
+enum { _uart0_configure, _uart0_ready, _uart0_push, _uart0_pull };
 
-extern void uart0_dfu(void);
+/* Declare the prototypes for all of the functions within this module. */
+int uart0_configure(void *_ctx);
+int uart0_ready(void);
+int uart0_push(void *source, lf_size_t length);
+int uart0_pull(void *destination, lf_size_t length);
 
 #endif
 #endif

@@ -3,7 +3,7 @@
 #define __private_include__
 #include <flipper/libflipper.h>
 #include <flipper/carbon.h>
-#include <flipper/atmegau2/atmegau2.h>
+#include <flipper/atmegau2/modules.h>
 
 int carbon_select_atmegau2(struct _lf_device *device) {
 	LF_MODULE_SET_DEVICE_AND_ID(_button, device, _button_id);

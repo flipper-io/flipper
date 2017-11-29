@@ -2,25 +2,6 @@
 #include <flipper/carbon.h>
 #include <flipper/atmegau2/megausb.h>
 
-void system_task(void) {
-	while (1) {
-		/* Pet the watchdog. */
-		//wdt_reset();
-		struct _fmr_packet packet;
-		struct _fmr_result result;
-		int8_t _e = megausb_bulk_receive((uint8_t *)(&packet), sizeof(struct _fmr_packet));
-		if (_e == lf_success) {
-			lf_error_clear();
-			fmr_perform(&packet, &result);
-			megausb_bulk_transmit((uint8_t *)(&result), sizeof(struct _fmr_result));
-		}
-	}
-}
-
-void os_task_init() {
-	system_task();
-}
-
 fmr_return fmr_push(struct _fmr_push_pull_packet *packet) {
 	fmr_return retval = 0xdeadbeef;
 	void *swap = malloc(packet->length);
