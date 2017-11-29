@@ -2,12 +2,9 @@
 #include <flipper/atmegau2/megausb.h>
 
 const uint8_t PROGMEM endpoint[] = {
-	// /* Bidirectional interrupt endpoints for quick FMR transactions. */
-	// 1, ENDPOINT_TYPE_INTERRUPT_IN, ENDPOINT_SIZE(INTERRUPT_IN_SIZE) | INTERRUPT_TRANSMIT_BUFFER,
-	// 1, ENDPOINT_TYPE_INTERRUPT_OUT, ENDPOINT_SIZE(INTERRUPT_OUT_SIZE) | INTERRUPT_RECEIVE_BUFFER,
-	/* Bidirectional bulk endpoints for large push/pull exchanges. */
 	1, ENDPOINT_TYPE_BULK_IN, ENDPOINT_SIZE(BULK_IN_SIZE) | BULK_TRANSMIT_BUFFER,
-	1, ENDPOINT_TYPE_BULK_OUT, ENDPOINT_SIZE(BULK_OUT_SIZE) | BULK_RECEIVE_BUFFER
+	1, ENDPOINT_TYPE_BULK_OUT, ENDPOINT_SIZE(BULK_OUT_SIZE) | BULK_RECEIVE_BUFFER,
+	1, ENDPOINT_TYPE_INTERRUPT_IN, ENDPOINT_SIZE(DEBUG_IN_SIZE) | DEBUG_TRANSMIT_BUFFER,
 };
 
 static const uint8_t PROGMEM device_descriptor[] = {
@@ -29,7 +26,7 @@ static const uint8_t PROGMEM device_descriptor[] = {
 	1							// bNumConfigurations
 };
 
-#define CONFIGURATION_SIZE	(9+9/*+7+7*/+7+7)
+#define CONFIGURATION_SIZE	(9+9/*+7+7*/+7+7+9+7)
 
 static const uint8_t PROGMEM configuration[CONFIGURATION_SIZE] = {
 	/* Configuration descriptor. (USB spec 9.6.3, page 264-266, Table 9-10) */
@@ -43,10 +40,10 @@ static const uint8_t PROGMEM configuration[CONFIGURATION_SIZE] = {
 	0xC0,						// bmAttributes
 	250,						// bMaxPower
 
-	/* Interface 0 (interrupt) descriptor. (USB spec 9.6.5, page 267-269, Table 9-12) */
+	/* Interface 0 descriptor. (USB spec 9.6.5, page 267-269, Table 9-12) */
 	0x09,						// bLength
 	0x04,						// bDescriptorType
-	0,							// bInterfaceNumber
+	FMR_INTERFACE,				// bInterfaceNumber
 	0x00,						// bAlternateSetting
 	0x02,						// bNumEndpoints
 	VENDOR_SPECIFIC,			// bInterfaceClass
@@ -84,7 +81,27 @@ static const uint8_t PROGMEM configuration[CONFIGURATION_SIZE] = {
 	BULK_OUT_ENDPOINT,			// bEndpointAddress
 	0x02,						// bmAttributes (0x02 = bulk)
 	BULK_OUT_SIZE, 0x00,		// wMaxPacketSize
-	BULK_RECEIVE_INTERVAL		// bInterval
+	BULK_RECEIVE_INTERVAL,		// bInterval
+
+	/* Interface 1 (debug) descriptor. (USB spec 9.6.5, page 267-269, Table 9-12) */
+	0x09,						// bLength
+	0x04,						// bDescriptorType
+	DEBUG_INTERFACE,			// bInterfaceNumber
+	0x00,						// bAlternateSetting
+	0x01,						// bNumEndpoints
+	VENDOR_SPECIFIC,			// bInterfaceClass
+	0x01,						// bInterfaceSubClass
+	0x01,						// bInterfaceProtocol
+	0x00,						// iInterface
+
+	/* Bulk IN endpoint descriptor. (USB spec 9.6.6, page 269-271, Table 9-13) */
+	0x07,						// bLength
+	0x05,						// bDescriptorType
+	DEBUG_IN_ENDPOINT, 			// bEndpointAddress
+	0x03,						// bmAttributes (0x03 = interrupt)
+	DEBUG_IN_SIZE, 0x00,		// wMaxPacketSize
+	DEBUG_TRANSMIT_INTERVAL,	// bInterval
+
 };
 
 struct usb_string {

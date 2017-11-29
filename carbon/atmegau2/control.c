@@ -21,6 +21,8 @@ int usb_configure(void) {
 	return lf_success;
 }
 
+extern volatile uint8_t debug_flush_timer;
+
 /* This is the 'general' USB interrupt service routine. It handles all non CONTROL related interrupts. */
 ISR(USB_GEN_vect) {
 
@@ -45,8 +47,22 @@ ISR(USB_GEN_vect) {
 		megausb_configuration = 0;
 	}
 
+	uint8_t t;
+
 	/* Evaluates when a start of frame interrupt is received. Occurs once every millisecond. */
 	if ((_udint & (1 << SOFI)) && megausb_configuration) {
+
+		t = debug_flush_timer;
+		if (t) {
+			debug_flush_timer = --t;
+			if (!t) {
+				UENUM = DEBUG_IN_ENDPOINT;
+				while ((UEINTX & (1<<RWAL))) {
+					UEDATX = 0;
+				}
+				UEINTX = 0x3A;
+			}
+		}
 
 	}
 

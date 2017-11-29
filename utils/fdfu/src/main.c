@@ -1,9 +1,9 @@
 #define __private_include__
 #include <unistd.h>
 #include <flipper.h>
-#include <flipper/platforms/posix.h>
-#include <flipper/carbon/platforms/atmegau2.h>
-#include <flipper/carbon/platforms/atsam4sb.h>
+#include <flipper/posix/posix.h>
+#include <flipper/atmegau2/atmegau2.h>
+#include <flipper/atsam4s/atsam4s.h>
 #include <stdio.h>
 
 /* Defines the XMODEM flow control bytes. */
@@ -66,46 +66,93 @@ uint8_t applet[] = {
 /* Defines the number of times communication will be retried. */
 #define RETRIES 4
 
+#define FMR_BAUD 1000000
+#define DFU_BAUD 119200
+
+void sam_set_baud(uint32_t baud) {
+	if (baud == FMR_BAUD) {
+		uart0_configure(&uart0, 0);
+	} else {
+		uart0_configure(&uart0, 1);
+	}
+}
+
+bool sam_ready(void) {
+	return uart0_ready(&uart0);
+}
+
+void sam_put(uint8_t c) {
+	uart0_push(&uart0, &c, 1);
+}
+
+uint8_t sam_get(void) {
+	uint8_t c;
+	uart0_pull(&uart0, &c, 1);
+	return c;
+}
+
+void sam_push(void *source, size_t len) {
+	uart0_push(&uart0, source, len);
+}
+
+void sam_pull(void *destination, size_t len) {
+	uart0_pull(&uart0, destination, len);
+}
+
+void sam_reset() {
+	gpio.write(0, (1 << SAM_RESET_PIN));
+	usleep(10000);
+	gpio.write((1 << SAM_RESET_PIN), 0);
+}
+
+int sam_enter_dfu(void) {
+	gpio.write((1 << SAM_ERASE_PIN), (1 << SAM_RESET_PIN));
+	usleep(5000000);
+	gpio.write((1 << SAM_RESET_PIN), (1 << SAM_ERASE_PIN));
+	sam_reset();
+	return lf_success;
+}
+
 /* Instructs the SAM-BA to jump to the given address. */
 void sam_ba_jump(uint32_t address) {
 	char buffer[11];
 	sprintf(buffer, "G%08X#", address);
-	uart0.push(buffer, sizeof(buffer) - 1);
+	sam_push(buffer, sizeof(buffer) - 1);
 }
 
 /* Instructs the SAM-BA to write a word to the address provided. */
 void sam_ba_write_word(uint32_t destination, uint32_t word) {
 	char buffer[20];
 	sprintf(buffer, "W%08X,%08X#", destination, word);
-	uart0.push(buffer, sizeof(buffer) - 1);
+	sam_push(buffer, sizeof(buffer) - 1);
 }
 
 /* Instructs the SAM-BA to read a byte from the address provided. */
 uint8_t sam_ba_read_byte(uint32_t source) {
 	char buffer[12];
 	sprintf(buffer, "o%08X,#", source);
-	uart0.push(buffer, sizeof(buffer) - 1);
+	sam_push(buffer, sizeof(buffer) - 1);
 	uint32_t retries = 0;
-	while(!uart0.ready() && retries ++ < 8);
-	return uart0.get(0xff);
+	while(!sam_ready() && retries ++ < 8);
+	return sam_get();
 }
 
 /* Instructs the SAM-BA to write a byte from the address provided. */
 void sam_ba_write_byte(uint32_t destination, uint8_t byte) {
 	char buffer[20];
 	sprintf(buffer, "O%08X,%02X#", destination, byte);
-	uart0.push(buffer, sizeof(buffer) - 1);
+	sam_push(buffer, sizeof(buffer) - 1);
 }
 
 /* Instructs the SAM-BA to read a word from the address provided. */
 uint32_t sam_ba_read_word(uint32_t source) {
 	char buffer[12];
 	sprintf(buffer, "w%08X,#", source);
-	uart0.push(buffer, sizeof(buffer) - 1);
+	sam_push(buffer, sizeof(buffer) - 1);
 	uint8_t retries = 0;
-	while(!uart0.ready() && retries ++ < 8);
+	while(!sam_ready() && retries ++ < 8);
 	uint32_t result = 0;
-	uart0.pull(&result, sizeof(uint32_t), 0xff);
+	sam_pull(&result, sizeof(uint32_t));
 	return result;
 }
 
@@ -120,11 +167,11 @@ int sam_ba_copy(uint32_t destination, void *source, uint32_t length) {
 	char buffer[20];
 	sprintf(buffer, "S%08X,%08X#", destination, length);
 retry:
-	uart0.push(buffer, sizeof(buffer) - 1);
+	sam_push(buffer, sizeof(buffer) - 1);
 	uint8_t retries = 0;
-	while(!uart0.ready() && retries ++ < 8);
+	while(!sam_ready() && retries ++ < 8);
 	/* Check for the clear to send byte. */
-	if (uart0.get(0xff) != 'C') {
+	if (sam_get() != 'C') {
 		return lf_error;
 	}
 	retries = 0;
@@ -142,44 +189,24 @@ retry:
 		/* Calculate the checksum of the data and write it to the packet in little endian format. */
 		_packet.checksum = little(lf_crc(_packet.data, sizeof(_packet.data)));
 		/* Transfer the packet to the SAM-BA. */
-		uart0.push(&_packet, sizeof(struct _xpacket));
+		sam_push(&_packet, sizeof(struct _xpacket));
 		/* Obtain acknowledgement. */
 		retries = 0;
-		while(!uart0.ready() && retries ++ < 8);
-		if (uart0.get(0xff) != ACK) {
+		while(!sam_ready() && retries ++ < 8);
+		if (sam_get() != ACK) {
 			return lf_error;
 		}
 		/* Decrement the length appropriately. */
 		length -= _len;
 	}
 	/* Send end of transmission. */
-	uart0.put(EOT);
+	sam_put(EOT);
 	/* Obtain acknowledgement. */
 	retries = 0;
-	while(!uart0.ready() && retries ++ < 8);
-	if (uart0.get(0xff) != ACK) {
+	while(!sam_ready() && retries ++ < 8);
+	if (sam_get() != ACK) {
 		return lf_error;
 	}
-	return lf_success;
-}
-
-void sam_reset() {
-	gpio.write(0, (1 << SAM_RESET_PIN));
-	usleep(10000);
-	gpio.write((1 << SAM_RESET_PIN), 0);
-}
-
-int sam_enter_dfu(void) {
-	gpio.write((1 << SAM_ERASE_PIN), (1 << SAM_RESET_PIN));
-	usleep(5000000);
-	gpio.write((1 << SAM_RESET_PIN), (1 << SAM_ERASE_PIN));
-
-	// gpio.write(0, (1 << SAM_POWER_PIN) | (1 << SAM_RESET_PIN));
-	// usleep(100000);
-	// gpio.write((1 << SAM_POWER_PIN) | (1 << SAM_RESET_PIN), 0);
-
-	sam_reset();
-
 	return lf_success;
 }
 
@@ -205,21 +232,33 @@ void *load_page_data(FILE *firmware, size_t size) {
 int enter_update_mode(void) {
 
 	/* Go to DFU baud. */
-	uart0.dfu();
+	sam_set_baud(DFU_BAUD);
 
 	printf("Entering update mode.\n");
+
+	uint8_t tries = 0;
 	uint8_t ack[3];
-	uart0.put('#');
-	uart0.pull(ack, sizeof(ack), 0xff);
+
+repeat:
+
+	sam_put('#');
+	sam_pull(ack, sizeof(ack));
+	printf("ACK: 0x%02x 0x%02x 0x%02x\n", ack[0], ack[1], ack[2]);
 	if (!memcmp(ack, (const uint8_t []){ '\n', '\r', '>' }, sizeof(ack))) {
 		goto done;
 	}
+
 	/* Enter DFU mode. */
-	int _e = sam_enter_dfu();
-	if (_e < lf_success) {
-		fprintf(stderr, KRED "Failed to enter update mode. (0x%08x)\n", _e);
+	sam_enter_dfu();
+
+	if (tries > 2) {
+		fprintf(stderr, KRED "Failed to enter update mode.\n");
 		return lf_error;
 	}
+
+	tries ++;
+
+	goto repeat;
 
 done:
 	fprintf(stderr, KGRN " Successfully entered update mode.\n" KNRM);
@@ -229,15 +268,15 @@ done:
 int enter_normal_mode(void) {
 
 	/* Go to DFU baud. */
-	uart0.dfu();
+	sam_set_baud(DFU_BAUD);
 
 	/* Set normal mode. */
 	printf("Entering normal mode.\n");
 	char n_ack[2];
 	uint8_t retries = 0;
-	uart0.push("N#", 2);
+	sam_push("N#", 2);
 	while(retries++ < 8) {
-		uart0.pull(n_ack, sizeof(n_ack), 0xff);
+		sam_pull(n_ack, sizeof(n_ack));
 		if (!memcmp(n_ack, (const uint8_t []){ 0x0A, 0x0D }, sizeof(n_ack))) {
 			printf(KGRN " Successfully entered normal mode.\n" KNRM);
 			return lf_success;
@@ -247,6 +286,9 @@ int enter_normal_mode(void) {
 	fprintf(stderr, "Failed to enter normal mode.\n");
 	return lf_error;
 }
+
+extern int carbon_select_atmegau2(struct _lf_device *device);
+extern struct _lf_device *carbon_get_u2(struct _lf_device *device);
 
 int main(int argc, char *argv[]) {
 
@@ -258,6 +300,10 @@ int main(int argc, char *argv[]) {
 
 	/* Attach to a Flipper device. */
 	flipper.attach();
+	struct _lf_device *device = lf_get_current_device();
+	struct _lf_device *u2 = carbon_get_u2(device);
+	carbon_select_atmegau2(u2);
+	printf("UART0 is %i\n", _uart0.index);
 
 begin: ;
 
@@ -403,8 +449,7 @@ done:
 
 	printf(KGRN " Successfully reset the CPU.\n" KNRM "----------------------");
 
-	/* Reconfigure the UART0 bus for FMR. */
-	uart0.configure();
+	sam_set_baud(FMR_BAUD);
 
 	/* If there were no errors, offer to flash again. */
 	if (!(_e < lf_success)) {

@@ -21,24 +21,30 @@
 #define __lf_usb_timeout__
 #ifdef __lf_usb_timeout__
 /* Must be between 1ms and 255ms. */
-#define LF_USB_TIMEOUT_MS 50
+#define LF_USB_TIMEOUT_MS 200
 #else
 #define LF_USB_TIMEOUT_MS 0
 #endif
 
+#define LF_UART_TIMEOUT_MS 1
+
 /* NOTE: Summing the size parameters of each endpoints below should be less than or equal to 160. */
 #define USB_IN_MASK            0x80
 
-#warning Intererupt IN/OUT endpoint numbers do NOT match device.
-#define INTERRUPT_IN_ENDPOINT  (0x01 | USB_IN_MASK)
-#define INTERRUPT_IN_SIZE      16
-#define INTERRUPT_OUT_ENDPOINT 0x02
-#define INTERRUPT_OUT_SIZE     16
+#define INTERRUPT_IN_ENDPOINT	(0x01 | USB_IN_MASK)
+#define INTERRUPT_IN_SIZE		16
+#define INTERRUPT_OUT_ENDPOINT	0x02
+#define INTERRUPT_OUT_SIZE		16
 
-#define BULK_IN_ENDPOINT       (0x01 | USB_IN_MASK)
-#define BULK_IN_SIZE           64
-#define BULK_OUT_ENDPOINT      0x02
-#define BULK_OUT_SIZE          64
+#define FMR_INTERFACE			0
+#define BULK_IN_ENDPOINT		(0x01 | USB_IN_MASK)
+#define BULK_IN_SIZE			64
+#define BULK_OUT_ENDPOINT		0x02
+#define BULK_OUT_SIZE			64
+
+#define DEBUG_INTERFACE			1
+#define DEBUG_IN_ENDPOINT		(0x03 | USB_IN_MASK)
+#define DEBUG_IN_SIZE			32
 
 /* The name of the default device to attach to. */
 #define LF_DEFAULT_NAME "flipper"
