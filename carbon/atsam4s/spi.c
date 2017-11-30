@@ -66,6 +66,7 @@ uint8_t spi_get(void) {
 }
 
 int spi_push(void *source, uint32_t length) {
+	printf("Pushing %i to SPI\n", length);
 	/* Set the transmission length and destination pointer. */
 	SPI -> SPI_TCR = length;
 	SPI -> SPI_TPR = (uintptr_t)(source);
@@ -80,6 +81,7 @@ int spi_push(void *source, uint32_t length) {
 
 #define __spi_pull_sync__
 int spi_pull(void *destination, uint32_t length) {
+	printf("Pulling %i from SPI\n", length);
 	/* Set the transmission length and destination pointer. */
 	SPI -> SPI_RCR = length;
 	SPI -> SPI_RPR = (uintptr_t)(destination);

@@ -239,7 +239,7 @@ repeat:
 	/* Enter DFU mode. */
 	sam_enter_dfu();
 
-	if (tries < 1) {
+	if (tries < 2) {
 		fprintf(stderr, KRED "Failed to enter update mode.\n" KNRM);
 		return lf_error;
 	}

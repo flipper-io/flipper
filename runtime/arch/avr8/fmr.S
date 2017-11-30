@@ -74,8 +74,13 @@ _load_32:
 	subi XL, 0x04
 	rjmp _load_done
 _load_ptr:
-//	addi ZL, 0x02
-//	rjmp _load_16
+	dec XL
+	ld r0, Z+
+	st X+, r0
+	ld r0, Z+
+	st X, r0
+	subi XL, 0x02
+	adiw ZL, 0x02
 _load_done:
 	; Shift the encoded types two bits to the right.
 	asr argt_h
