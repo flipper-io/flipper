@@ -1,11 +1,11 @@
 [package]
-name = "flipper-rust"
+name = "flipper"
 version = "0.1.0"
 authors = [ "George Morgan <george@george-morgan.com>",
             "Nick Mosher <nicholastmosher@gmail.com>" ]
 
 [lib]
-name = "flipper_rust"
+name = "flipper"
 path = "src/lib.rs"
 
 [dependencies]
