@@ -5,17 +5,13 @@
 /* Include the Carbon board file. */
 #include <flipper/carbon.h>
 
-struct _lf_device *lf_selected_device;
-
 int lf_get_result(struct _lf_device *device, struct _fmr_result *result) {
 	/* Obtain the response packet from the device. */
 	int _e = lf_retrieve(device, result);
-#ifdef __lf_debug__
-	lf_debug_result(result);
-#endif
 	if (_e < lf_success) {
 		return lf_error;
 	}
+	lf_debug_result(result);
 	/* If an error occured on the device, raise it. */
 	if (result -> error != E_OK) {
 		lf_error_raise(result -> error, error_message("An error occured on the device '%s':", device -> configuration.name));
@@ -25,9 +21,7 @@ int lf_get_result(struct _lf_device *device, struct _fmr_result *result) {
 }
 
 int lf_transfer(struct _lf_device *device, struct _fmr_packet *packet) {
-#ifdef __lf_debug__
 	lf_debug_packet(packet, sizeof(struct _fmr_packet));
-#endif
 	/* Transfer the packet buffer through its registered endpoint. */
 	int _e = device -> endpoint -> push(device -> endpoint, packet, sizeof(struct _fmr_packet));
 	/* Ensure that the packet was successfully transferred to the device. */

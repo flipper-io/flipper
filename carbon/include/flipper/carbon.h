@@ -22,6 +22,13 @@
 #include <flipper/usb.h>
 #include <flipper/wdt.h>
 
+struct _carbon_context {
+	/* Device that handles interacting with the 4s. (ATMEGA16U2) */
+	struct _lf_device *_u2;
+	/* Microprocessor that handles code execution. (ATSAM4S16B) */
+	struct _lf_device *_4s;
+};
+
 /* Attaches to all carbon devices. */
 int carbon_attach(void);
 /* Attaches to a carbon device over the network. */

@@ -90,14 +90,14 @@ void sam_pull(void *destination, size_t len) {
 
 void sam_reset() {
 	gpio.write(0, (1 << SAM_RESET_PIN));
-	usleep(1000);
+	usleep(10000);
 	gpio.write((1 << SAM_RESET_PIN), 0);
 }
 
 int sam_enter_dfu(void) {
-	gpio.write((1 << SAM_ERASE_PIN), (1 << SAM_RESET_PIN));
-	usleep(1000000);
-	gpio.write((1 << SAM_RESET_PIN), (1 << SAM_ERASE_PIN));
+	gpio.write((1 << SAM_ERASE_PIN), 0);
+	usleep(8000000);
+	gpio.write(0, (1 << SAM_ERASE_PIN));
 	sam_reset();
 	return lf_success;
 }
@@ -275,8 +275,7 @@ int enter_normal_mode(void) {
 	return lf_error;
 }
 
-extern int carbon_select_atmegau2(struct _lf_device *device);
-extern struct _lf_device *carbon_get_u2(struct _lf_device *device);
+int carbon_select_u2_gpio(struct _lf_device *device);
 
 int main(int argc, char *argv[]) {
 
@@ -287,10 +286,9 @@ int main(int argc, char *argv[]) {
 	}
 
 	/* Attach to a Flipper device. */
-	flipper.attach();
-	struct _lf_device *device = lf_get_current_device();
-	struct _lf_device *u2 = carbon_get_u2(device);
-	carbon_select_atmegau2(u2);
+	struct _lf_device *device = flipper.attach();
+	carbon_select_u2_gpio(device);
+
 
 begin: ;
 

@@ -49,4 +49,6 @@
 /* 2 megabaud. */
 #define PLATFORM_BAUDRATE 2000000
 
+#define FMR_PIN 0
+
 #endif

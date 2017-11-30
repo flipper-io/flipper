@@ -2,6 +2,21 @@
 #include <flipper.h>
 #include <flipper/atsam4s/atsam4s.h>
 
+struct _fmr_packet packet;
+
+extern void uart0_put(uint8_t byte);
+
+int debug_putchar(char c, FILE *stream) {
+	uart0_put(c);
+}
+
+void system_task(void) {
+	while (1) {
+		printf("Hello!\n");
+		for (int i = 0x7FFFFF; i > 0; i --) __asm__ __volatile__ ("nop");
+	}
+}
+
 int main(void) {
 
 	/* Disable the watchdog timer. */
@@ -44,13 +59,43 @@ int main(void) {
 	/* Configure the SPI peripheral. */
 	spi_configure();
 
-	while (1) {
-		/* Print reset message. */
-		char reset_msg[] = "Hello!\n";
-		uart0_push(reset_msg, sizeof(reset_msg) - 1);
-		for (int i = 0x7FFFFF; i > 0; i --) __asm__ __volatile__ ("nop");
-	}
+	/* Enable the FSI pin. */
+	gpio_enable((1 << FMR_PIN), 0);
+
+	/* Pull an FMR packet asynchronously to launch FMR. */
+	uart0_pull(&packet, sizeof(struct _fmr_packet));
+	/* Enable the PDC receive complete interrupt. */
+	UART0 -> UART_IER = UART_IER_ENDRX;
+
+	/* Start scheduling. */
+	os_task_init();
 
 	/* Loop here if the kernel were ever to reach an unknown execution state. */
 	while (1) __asm__ __volatile__("nop");
+}
+
+void uart0_isr(void) {
+	/* If an entire packet has been received, process it. */
+	if (UART0 -> UART_SR & UART_SR_ENDRX) {
+		/* Disable the PDC receiver. */
+		UART0 -> UART_PTCR = UART_PTCR_RXTDIS;
+		/* Clear the PDC RX interrupt flag. */
+		UART0 -> UART_RCR = 1;
+		/* Disable the PDC receive complete interrupt. */
+		UART0->UART_IDR = UART_IDR_ENDRX;
+
+		struct _fmr_result result;
+		lf_error_clear();
+		fmr_perform(&packet, &result);
+
+		gpio_write((1 << FMR_PIN), 0);
+		uart0_push(&result, sizeof(struct _fmr_result));
+		gpio_write(0, (1 << FMR_PIN));
+
+		/* Flush any remaining data that has been buffered. */
+		while (UART0 -> UART_SR & UART_SR_RXRDY) UART0 -> UART_RHR;
+
+		UART0 -> UART_IER |= UART_IER_ENDRX;
+		uart0_pull(&packet, sizeof(struct _fmr_packet));
+	}
 }

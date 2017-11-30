@@ -60,6 +60,7 @@ _load_32:
 	ldr temp, [_argv, #0]
 	/* Increment the argv pointer by four. */
 	add _argv, #4
+	b _load_done;
 _load_ptr:
 	b _load_32
 _load_done:

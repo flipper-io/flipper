@@ -25,24 +25,11 @@
 #include <flipper/carbon.h>
 #include <flipper/posix/libusb.h>
 #include <flipper/posix/network.h>
-
-struct _carbon_context {
-	/* Device that handles interacting with the 4s. (ATMEGA16U2) */
-	struct _lf_device *_u2;
-	/* Microprocessor that handles code execution. (ATSAM4S16B) */
-	struct _lf_device *_4s;
-};
+#include <flipper/atmegau2/atmegau2.h>
+#include <flipper/atsam4s/atsam4s.h>
 
 extern int carbon_select_atmegau2(struct _lf_device *device);
 extern int carbon_select_atsam4s(struct _lf_device *device);
-
-struct _lf_device *carbon_get_u2(struct _lf_device *device) {
-	struct _carbon_context *context = device->_ctx;
-	lf_assert(context, failure, E_NULL, "No context for selected carbon device.");
-	return context->_u2;
-failure:
-	return NULL;
-}
 
 /* Selects a carbon device. */
 int carbon_select(struct _lf_device *device) {
@@ -75,19 +62,19 @@ struct _lf_device *carbon_attach_endpoint(struct _lf_endpoint *endpoint, struct 
 }
 
 int uart0_bridge_configure(struct _lf_endpoint *endpoint, void *_configuration) {
-	return lf_success;
+	return uart0_configure(FMR_BAUD, true);
 }
 
 bool uart0_bridge_ready(struct _lf_endpoint *endpoint) {
-	return 1;
+	return uart0_ready();
 }
 
 int uart0_bridge_push(struct _lf_endpoint *endpoint, void *source, lf_size_t length) {
-	return 0;
+	return uart0_push(source, length);
 }
 
 int uart0_bridge_pull(struct _lf_endpoint *endpoint, void *destination, lf_size_t length) {
-	return 0;
+	return uart0_pull(destination, length);
 }
 
 void carbon_attach_to_usb_endpoint_applier(const void *__u2_ep, void *_other) {

@@ -70,6 +70,8 @@ int main(void) {
 /* PCINT8 interrupt service routine; captures reset button press and resets the device using the WDT. */
 ISR (PCINT1_vect) {
 	led_rgb(LED_OFF);
+	SAM_RESET_PORT &= ~(1 << SAM_RESET_PIN);
+	SAM_POWER_PORT &= ~(1 << SAM_POWER_PIN);
 	wdt_enable(WDTO_15MS);
 	while (1) __asm__ __volatile__("nop");
 }

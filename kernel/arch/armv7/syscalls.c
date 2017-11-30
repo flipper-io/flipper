@@ -45,9 +45,11 @@ extern int _read(int file, char *ptr, int len) {
 	return 0 ;
 }
 
+extern void uart0_put(char c);
+
 extern int _write(int file, char *ptr, int len) {
 	for (int i = 0; i < len; i ++, ptr ++) {
-		usart_put(*ptr);
+		uart0_put(*ptr);
 	}
 	return 0;
 }

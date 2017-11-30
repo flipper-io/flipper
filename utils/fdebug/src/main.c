@@ -17,6 +17,14 @@ void sigint(int signal) {
 	alive = 0;
 }
 
+void print_time(void) {
+	time_t rawtime;
+	struct tm * timeinfo;
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+	printf("%02d:%02d:%02d ", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
+}
+
 int main(int argc, char *argv[]) {
 
 	signal(SIGINT, sigint);
@@ -47,6 +55,10 @@ int main(int argc, char *argv[]) {
 
 	unsigned char incoming[DEBUG_BUFFER_SIZE + 1]; // don't forget the null
 
+	int printtime = 1;
+
+	print_time();
+
 	while (alive) {
 		memset(incoming, '\0', sizeof(incoming));
 		_e = libusb_interrupt_transfer(handle, DEBUG_IN_ENDPOINT, incoming, DEBUG_BUFFER_SIZE, &len, DEBUG_TIMEOUT);
@@ -54,11 +66,15 @@ int main(int argc, char *argv[]) {
 			if (len > 0) {
 				printf("%s", incoming);
 				fflush(stdout);
+				printtime = 1;
 			}
 		} else if (_e == LIBUSB_ERROR_TIMEOUT) {
-			continue;
+			if (printtime) {
+				print_time();
+				printtime = 0;
+			}
 		} else {
-			fprintf(stderr, "Something went wronge with the transfer.\n");
+			fprintf(stderr, "Something went wrong with the transfer.\n");
 			goto exit;
 		}
 	}

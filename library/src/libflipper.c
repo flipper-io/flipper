@@ -83,12 +83,12 @@ int __attribute__((__destructor__)) lf_exit(void) {
 }
 
 /* Shim to attach all possible flipper devices that could be attached to the system. */
-int flipper_attach(void) {
+struct _lf_device *flipper_attach(void) {
 	int _e = carbon_attach();
 	lf_assert(_e == lf_success, failure, E_NO_DEVICE, "Failed to find any Flipper devices attached to this computer. Please check your connection and try again.");
-	return lf_success;
+	return lf_get_current_device();
 failure:
-	return lf_error;
+	return NULL;
 }
 
 int flipper_select(struct _lf_device *device) {
@@ -240,13 +240,21 @@ void lf_debug_call(struct _fmr_invocation *call) {
 	printf("\n");
 }
 
+static int lf_debug_level = LF_DEBUG_LEVEL_OFF;
+
+void lf_set_debug_level(int level) {
+	lf_debug_level = level;
+}
+
 void lf_debug_packet(struct _fmr_packet *packet, size_t length) {
+	if (lf_debug_level != LF_DEBUG_LEVEL_ALL) return;
+
 	if (packet->header.magic == FMR_MAGIC_NUMBER) {
 		printf("header:\n");
 		printf("\t└─ magic:\t0x%x\n", packet->header.magic);
 		printf("\t└─ checksum:\t0x%x\n", packet->header.checksum);
 		printf("\t└─ length:\t%d bytes (%.02f%%)\n", packet->header.length, (float) packet->header.length/sizeof(struct _fmr_packet)*100);
-		char *classstrs[] = { "configuration", "std_call", "user_call", "push", "pull", "event" };
+		char *classstrs[] = { "configu", "standard", "user", "push", "pull", "send", "receive", "load", "event" };
 		printf("\t└─ class:\t%s\n", classstrs[packet->header.class]);
 		struct _fmr_invocation_packet *invocation = (struct _fmr_invocation_packet *)(packet);
 		struct _fmr_push_pull_packet *pushpull = (struct _fmr_push_pull_packet *)(packet);
@@ -280,6 +288,8 @@ void lf_debug_packet(struct _fmr_packet *packet, size_t length) {
 }
 
 void lf_debug_result(struct _fmr_result *result) {
+	if (lf_debug_level != LF_DEBUG_LEVEL_ALL) return;
+
 	printf("response:\n");
 	printf("\t└─ value:\t0x%x\n", result->value);
 	printf("\t└─ error:\t0x%x\n", result->error);

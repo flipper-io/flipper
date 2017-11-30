@@ -140,6 +140,7 @@ utils:
 	$(_v)mkdir -p $(BUILD)/utils
 	$(_v)gcc -lflipper utils/fdfu/src/main.c -o $(BUILD)/utils/fdfu
 	$(_v)gcc -lusb-1.0 utils/fdebug/src/main.c -o $(BUILD)/utils/fdebug
+	$(_v)gcc -lflipper utils/fload/src/main.c -o $(BUILD)/utils/fload
 
 install-utils: utils
 	$(_v)cp -r $(BUILD)/utils/* /usr/local/bin

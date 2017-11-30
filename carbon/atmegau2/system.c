@@ -3,8 +3,7 @@
 #include <flipper/atmegau2/megausb.h>
 
 fmr_return fmr_push(struct _fmr_push_pull_packet *packet) {
-	printf("Preparing to send %i bytes\n", packet->length);
-	fmr_return retval = 0xdeadbeef;
+	int retval;
 	void *swap = malloc(packet->length);
 	if (!swap) {
 		printf("Malloc failure\n");
@@ -19,7 +18,7 @@ fmr_return fmr_push(struct _fmr_push_pull_packet *packet) {
 }
 
 fmr_return fmr_pull(struct _fmr_push_pull_packet *packet) {
-	fmr_return retval = 0xdeadbeef;
+	int retval;
 	void *swap = malloc(packet->length);
 	if (!swap) {
 		lf_error_raise(E_MALLOC, NULL);

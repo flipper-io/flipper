@@ -21,12 +21,12 @@
 #define __lf_usb_timeout__
 #ifdef __lf_usb_timeout__
 /* Must be between 1ms and 255ms. */
-#define LF_USB_TIMEOUT_MS 50
+#define LF_USB_TIMEOUT_MS 200
 #else
-#define LF_USB_TIMEOUT_MS 0
+#define LF_USB_TIMEOUT_MS 100
 #endif
 
-#define LF_UART_TIMEOUT_MS 1
+#define LF_UART_TIMEOUT_MS 50
 
 /* NOTE: Summing the size parameters of each endpoints below should be less than or equal to 160. */
 #define USB_IN_MASK            0x80
@@ -51,8 +51,16 @@
 
 /* If defined, uses bulk for all USB transfers. */
 #define __ALL_BULK__
-/* If defined, prints debugging information about each packet. */
-//#define __lf_debug__
+
+enum {
+	LF_DEBUG_LEVEL_OFF,
+	LF_DEBUG_LEVEL_WARNINGS,
+	LF_DEBUG_LEVEL_ERRORS,
+	LF_DEBUG_LEVEL_ALL
+};
+
+/* Sets library debug verbosity. */
+void lf_set_debug_level(int level);
 
 /* Computes the greatest integer from the result of the division of x by y. */
 #define lf_ceiling(x, y) ((x + y - 1) / y)
@@ -113,7 +121,7 @@ struct _lf_device {
 /* ~ Declare the virtual interface for this driver. ~ */
 extern const struct _flipper {
 	/* Attaches the current instance of libflipper to the first available device over the default endpoint. */
-	int (* const attach)(void);
+	struct _lf_device *(* const attach)(void);
 	/* Selects a previously attached Flipper device and routes all calls to it. */
 	int (* const select)(struct _lf_device *device);
 	/* Disconnects a previously attached Flipper device from libflipper. */
@@ -189,7 +197,7 @@ void lf_finish(void);
 /* -------------- OLD API -------------- */
 
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
-int flipper_attach(void);
+struct _lf_device *flipper_attach(void);
 int flipper_select(struct _lf_device *device);
 int flipper_detach(struct _lf_device *device);
 int flipper_exit(void);
