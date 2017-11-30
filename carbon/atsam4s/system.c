@@ -24,20 +24,18 @@ void uart0_pull_wait(void *destination, lf_size_t length) {
 }
 
 fmr_return fmr_push(struct _fmr_push_pull_packet *packet) {
-	fmr_return retval = 0;
+	fmr_return retval = 0xdeadbeef;
 	void *push_buffer = malloc(packet->length);
 	if (!push_buffer) {
 		lf_error_raise(E_MALLOC, NULL);
 		return -1;
 	}
-	printf("Preparing pull of %i bytes\n", packet->length);
 	uart0_pull_wait(push_buffer, packet->length);
 	if (packet->header.class == fmr_send_class) {
 		/* If we are copying data, simply return a pointer to the copied data. */
 		retval = (uintptr_t)push_buffer;
 	} else if (packet->header.class == fmr_ram_load_class) {
-		printf("RAM load begin\n");
-		retval = os_load_image(push_buffer);
+		os_load_image(push_buffer);
 	} else {
 		*(uintptr_t *)(packet->call.parameters) = (uintptr_t)push_buffer;
 		retval = fmr_execute(packet->call.index, packet->call.function, packet->call.argc, packet->call.types, (void *)(packet->call.parameters));

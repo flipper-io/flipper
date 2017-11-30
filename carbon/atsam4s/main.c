@@ -89,6 +89,7 @@ void uart0_isr(void) {
 		fmr_perform(&packet, &result);
 
 		gpio_write((1 << FMR_PIN), 0);
+		usart_push(&result, sizeof(struct _fmr_result));
 		uart0_push(&result, sizeof(struct _fmr_result));
 		gpio_write(0, (1 << FMR_PIN));
 

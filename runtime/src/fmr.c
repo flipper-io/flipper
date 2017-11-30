@@ -80,7 +80,7 @@ fmr_return fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, 
 
 LF_WEAK int fmr_perform_standard_invocation(struct _fmr_invocation *call, struct _fmr_result *result) {
 	result->value = fmr_execute(call->index, call->function, call->argc, call->types, call->parameters);
-	return result->error = lf_error_get();
+	return lf_success;
 }
 
 LF_WEAK int fmr_perform_user_invocation(struct _fmr_invocation *invocation, struct _fmr_result *result) {
@@ -88,8 +88,7 @@ LF_WEAK int fmr_perform_user_invocation(struct _fmr_invocation *invocation, stru
 }
 
 LF_WEAK int fmr_configuration_subclass_handler(struct _fmr_result *result) {
-
-	return result->error = lf_error_get();
+	return lf_success;
 }
 
 int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
@@ -140,7 +139,9 @@ int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
 		break;
 	};
 
+	result->error = lf_error_get();
 	return lf_success;
 failure:
+	result->error = lf_error_get();
 	return lf_error;
 }

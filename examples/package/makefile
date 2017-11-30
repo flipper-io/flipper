@@ -37,7 +37,7 @@ dump:
 
 # Writes the module image to the attached device.
 load: all
-	fram build/$(target).bin
+	fload build/$(target).bin
 
 # Removes all build artifacts.
 clean:

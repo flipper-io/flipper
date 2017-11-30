@@ -1,6 +1,6 @@
 #define __private_include__
 #include <qux/qux.h>
-#include <flipper/carbon/platforms/atsam4s16b.h>
+#include <flipper/atsam4s/atsam4s.h>
 
 const char _fmr_module_name[] __attribute__((section (".name"))) = "qux"; 
 

@@ -6,7 +6,6 @@ fmr_return fmr_push(struct _fmr_push_pull_packet *packet) {
 	int retval;
 	void *swap = malloc(packet->length);
 	if (!swap) {
-		printf("Malloc failure\n");
 		lf_error_raise(E_MALLOC, NULL);
 		return -1;
 	}

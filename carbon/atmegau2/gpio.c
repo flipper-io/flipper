@@ -12,7 +12,6 @@ void gpio_enable(uint32_t enable, uint32_t disable) {
 }
 
 void gpio_write(uint32_t set, uint32_t clear) {
-	printf("Writing GPIO s:0x%02x c:0x%02x\n", (uint8_t)(set & 0xFF), (uint8_t)(clear & 0xFF));
 	PORTD |= set & 0xff;
 	PORTD &= ~(clear & 0xff);
 }

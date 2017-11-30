@@ -1,7 +1,7 @@
 #define __private_include__
 #include <qux/qux.h>
 
-LF_MODULE(_qux, "qux", "A simple test module.", -1);
+LF_MODULE(_qux, "qux", "A simple test module.");
 
 int qux_configure(void) {
     /* Bind this module to its counterpart on the device. */

@@ -39,16 +39,18 @@ int uart0_push(void *source, lf_size_t length) {
 }
 
 int uart0_pull(void *destination, lf_size_t length) {
+	printf("Pulling\n");
 	/* Drain the buffered data. */
 	if (idx) {
 		if (length > idx) {
 			memcpy(destination, uart0_buffer, idx);
+			destination += idx;
 			length -= idx;
 			idx = 0;
 		} else {
 			memcpy(destination, uart0_buffer, length);
 			memmove(uart0_buffer, uart0_buffer + length, idx - length);
-			idx = 0;
+			idx -= length;
 			return lf_success;
 		}
 	}
@@ -63,9 +65,9 @@ int uart0_pull(void *destination, lf_size_t length) {
 }
 
 ISR(USART1_RX_vect) {
-	/* Is this an FMR transfer? */
 	if (FSI_IN & (1 << FSI_PIN)) {
-		uart0_buffer[idx++] = UDR1;
+		/* It's an FMR transfer. */
+		while (UCSR1A & (1 << RXC1)) uart0_buffer[idx++] = UDR1;
 	} else {
 		/* It's a debug message. */
 		while (UCSR1A & (1 << RXC1)) usb_debug_putchar(UDR1);

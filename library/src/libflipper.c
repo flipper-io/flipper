@@ -291,7 +291,7 @@ void lf_debug_result(struct _fmr_result *result) {
 	if (lf_debug_level != LF_DEBUG_LEVEL_ALL) return;
 
 	printf("response:\n");
-	printf("\t└─ value:\t0x%x\n", result->value);
-	printf("\t└─ error:\t0x%x\n", result->error);
+	printf("\t└─ value:\t0x%08x\n", result->value);
+	printf("\t└─ error:\t0x%02x\n", result->error);
 	printf("\n-----------\n\n");
 }
