@@ -4,7 +4,7 @@
 #define __private_include__
 #include <flipper/uart0.h>
 
-int uart0_configure(void *_configuration) {
+int uart0_configure(uint8_t baud, uint8_t interrupts) {
 	printf("Configuring the uart0.\n");
 	return lf_success;
 }

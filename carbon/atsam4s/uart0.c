@@ -5,7 +5,7 @@
 #include <flipper/atsam4s/atsam4s.h>
 #include <cmsis/core_cm3.h>
 
-int uart0_configure(void *_ctx) {
+int uart0_configure(uint8_t baud, uint8_t interrupts) {
 	/* Create a pinmask for the peripheral pins. */
 	const unsigned int UART0_PIN_MASK = (PIO_PA9A_URXD0 | PIO_PA10A_UTXD0);
 	/* Enable the peripheral clock. */

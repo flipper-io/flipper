@@ -66,17 +66,6 @@ uint8_t applet[] = {
 /* Defines the number of times communication will be retried. */
 #define RETRIES 4
 
-#define FMR_BAUD 1000000
-#define DFU_BAUD 119200
-
-void sam_set_baud(uint32_t baud) {
-	if (baud == FMR_BAUD) {
-		uart0_configure((void *)0);
-	} else {
-		uart0_configure((void *)1);
-	}
-}
-
 bool sam_ready(void) {
 	return uart0_ready();
 }
@@ -101,7 +90,7 @@ void sam_pull(void *destination, size_t len) {
 
 void sam_reset() {
 	gpio.write(0, (1 << SAM_RESET_PIN));
-	usleep(10000);
+	usleep(1000);
 	gpio.write((1 << SAM_RESET_PIN), 0);
 }
 
@@ -232,7 +221,7 @@ void *load_page_data(FILE *firmware, size_t size) {
 int enter_update_mode(void) {
 
 	/* Go to DFU baud. */
-	sam_set_baud(DFU_BAUD);
+	uart0_configure(DFU_BAUD, false);
 
 	printf("Entering update mode.\n");
 
@@ -250,7 +239,7 @@ repeat:
 	/* Enter DFU mode. */
 	sam_enter_dfu();
 
-	if (tries > 2) {
+	if (tries < 1) {
 		fprintf(stderr, KRED "Failed to enter update mode.\n" KNRM);
 		return lf_error;
 	}
@@ -267,7 +256,7 @@ done:
 int enter_normal_mode(void) {
 
 	/* Go to DFU baud. */
-	sam_set_baud(DFU_BAUD);
+	uart0_configure(DFU_BAUD, false);
 
 	/* Set normal mode. */
 	printf("Entering normal mode.\n");
@@ -447,7 +436,7 @@ done:
 
 	printf(KGRN " Successfully reset the CPU.\n" KNRM "----------------------");
 
-	sam_set_baud(FMR_BAUD);
+	uart0_configure(FMR_BAUD, true);
 
 	/* If there were no errors, offer to flash again. */
 	if (!(_e < lf_success)) {

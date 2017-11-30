@@ -3,8 +3,6 @@
 #include <flipper/atmegau2/atmegau2.h>
 #include <flipper/atmegau2/megausb.h>
 
-extern void usb_debug_putchar(char c);
-
 int debug_putchar(char c, FILE *stream) {
 	usb_debug_putchar(c);
 }
@@ -49,7 +47,7 @@ int main(void) {
 	button_configure();
 	led_configure();
 	usb_configure();
-	uart0_configure(NULL);
+	uart0_configure(FMR_BAUD, true);
 
 	/* Use USB debug as STDOUT. */
 	FILE debug_f = FDEV_SETUP_STREAM(debug_putchar, NULL, _FDEV_SETUP_RW);

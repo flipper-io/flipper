@@ -12,6 +12,7 @@
 #include <avr/power.h>
 #include <avr/sleep.h>
 #include <avr/wdt.h>
+
 #endif
 
 #define __use_button__
@@ -26,6 +27,9 @@
 #define disable_interrupts() cli()
 
 #define delay_ms(ms) _delay_ms(ms)
+
+#define DFU_BAUD				0x10
+#define FMR_BAUD				0x00
 
 /* Pin definition macros for F3 hardware. */
 #define FLASH_CS_DDR            DDRB
@@ -69,5 +73,9 @@
 #define SAM_ERASE_DDR           DDRD
 #define SAM_ERASE_PORT          PORTD
 #define SAM_ERASE_PIN           0x06
+
+#define FSI_DDR					DDRC
+#define FSI_IN					PINC
+#define FSI_PIN					0x07
 
 #endif

@@ -35,11 +35,21 @@ int main(void) {
 	/* Allow the reset pin to reset the device. */
 	RSTC -> RSTC_MR = RSTC_MR_KEY(0xA5) | RSTC_MR_URSTEN;
 
+	/* Configure the USART peripheral. */
+	usart_configure();
+	/* Configure the UART peripheral. */
+	uart0_configure(0, true);
 	/* Configure the GPIO peripheral. */
 	gpio_configure();
+	/* Configure the SPI peripheral. */
+	spi_configure();
 
-	gpio_enable(PIO_PA7, 0);
-	gpio_write(PIO_PA7, 0);
+	while (1) {
+		/* Print reset message. */
+		char reset_msg[] = "Hello!\n";
+		uart0_push(reset_msg, sizeof(reset_msg) - 1);
+		for (int i = 0x7FFFFF; i > 0; i --) __asm__ __volatile__ ("nop");
+	}
 
 	/* Loop here if the kernel were ever to reach an unknown execution state. */
 	while (1) __asm__ __volatile__("nop");

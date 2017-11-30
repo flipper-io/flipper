@@ -14,9 +14,8 @@ const struct _uart0 uart0 = {
 	uart0_pull
 };
 
-LF_WEAK int uart0_configure(void *_configuration) {
-	struct _uart0_configuration *configuration = _configuration;
-	lf_invoke(&_uart0, _uart0_configure, fmr_args(fmr_ptr(_configuration)));
+LF_WEAK int uart0_configure(uint8_t baud, uint8_t interrupts) {
+	lf_invoke(&_uart0, _uart0_configure, fmr_args(fmr_infer(baud), fmr_infer(interrupts)));
 	return lf_success;
 }
 

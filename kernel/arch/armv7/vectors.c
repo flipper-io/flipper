@@ -76,26 +76,23 @@ void reset_exception(void) {
 
 	uint32_t *pSrc, *pDest ;
 
-	/* Initialize the platform hardware. */
-	system_init();
-
 	/* Initialize the relocate segment */
-    pSrc = &_etext ;
-    pDest = &_srelocate ;
+	pSrc = &_etext ;
+	pDest = &_srelocate ;
 
-    if ( pSrc != pDest )
-    {
-        for ( ; pDest < &_erelocate ; )
-        {
-            *pDest++ = *pSrc++ ;
-        }
-    }
+	if ( pSrc != pDest )
+	{
+		for ( ; pDest < &_erelocate ; )
+		{
+			*pDest++ = *pSrc++ ;
+		}
+	}
 
-    /* Clear the zero segment */
-    for ( pDest = &_szero ; pDest < &_ezero ; )
-    {
-        *pDest++ = 0;
-    }
+	/* Clear the zero segment */
+	for ( pDest = &_szero ; pDest < &_ezero ; )
+	{
+		*pDest++ = 0;
+	}
 
 	/* Set the vector table base address */
 	// pSrc = (uint32_t *)&_sfixed;

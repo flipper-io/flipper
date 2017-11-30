@@ -1,30 +1,25 @@
 #define __private_include__
 #include <flipper/uart0.h>
 #include <flipper/atmegau2/atmegau2.h>
-#include <flipper/error.h>
+#include <flipper/atmegau2/megausb.h>
 
-int uart0_configure(void *_ctx) {
+int uart0_configure(uint8_t baud, uint8_t interrupts) {
 
-	/* 115.2k baud for DFU communication. */
-	UBRR1L = 0x10;
+	UBRR1L = baud;
 	UCSR1A |= (1 << U2X1);
-
-	// if (_ctx == 0) {
-	// 	/* 2  megabaud. */
-	// 	UBRR1H = 0x00;
-	// 	UBRR1L = 0x00;
-	// } else {
-	// 	/* 115.2k baud for DFU communication. */
-	// 	UBRR1L = 0x08;
-	// 	/* Don't multiply baud by 2. */
-	// 	UCSR1A &= ~(1 << U2X1);
-	// }
-
 	/* 8n1 */
 	UCSR1C = (1 << UCSZ10) | (1 << UCSZ11);
 	/* Enable the receiver, transmitter, and receiver interrupt. */
 	UCSR1B = (1 << RXEN1) | (1 << TXEN1);
-//	UCSR1B |= (1 << RXCIE1);
+	
+	if (interrupts) {
+		UCSR1B |= (1 << RXCIE1);
+	} else {
+		UCSR1B &= ~(1 << RXCIE1);
+	}
+
+	/* Enable the FSI line as an input. */
+	FSI_DDR &= ~(1 << FSI_PIN);
 	return lf_success;
 }
 
@@ -49,4 +44,14 @@ int uart0_pull(void *destination, lf_size_t length) {
 		*(uint8_t *)(destination ++) = UDR1;
 	}
 	return lf_success;
+}
+
+ISR(USART1_RX_vect) {
+	/* Is this an FMR transfer? */
+	if (FSI_IN & (1 << FSI_PIN)) {
+
+	} else {
+		/* It's a debug message. */
+		while (UCSR1A & (1 << RXC1)) usb_debug_putchar(UDR1);
+	}
 }
