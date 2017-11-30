@@ -1,8 +1,7 @@
-#include <flipper/libflipper.h>
-
-#ifdef __use_swd__
 #define __private_include__
 #include <flipper/swd.h>
+
+#ifdef __use_swd__
 
 LF_MODULE(_swd, "swd", "Interfaces with the device's single wire debug unit.");
 

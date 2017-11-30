@@ -1,8 +1,7 @@
-#include <flipper/libflipper.h>
-
-#ifdef __use_pwm__
 #define __private_include__
 #include <flipper/pwm.h>
+
+#ifdef __use_pwm__
 
 LF_MODULE(_pwm, "pwm", "Interfaces with the device's pulse width modulation controller.");
 

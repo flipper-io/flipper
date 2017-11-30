@@ -1,6 +1,7 @@
 #define __private_include__
 #include <flipper.h>
 #include <flipper/atsam4s/atsam4s.h>
+#include <os/scheduler.h>
 
 struct _fmr_packet packet;
 
@@ -10,7 +11,7 @@ int debug_putchar(char c, FILE *stream) {
 	uart0_put(c);
 }
 
-void system_task(void) {
+void os_kernel_task(void) {
 	while (1) {
 		printf("Hello!\n");
 		for (int i = 0x7FFFFF; i > 0; i --) __asm__ __volatile__ ("nop");
@@ -67,11 +68,9 @@ int main(void) {
 	/* Enable the PDC receive complete interrupt. */
 	UART0 -> UART_IER = UART_IER_ENDRX;
 
-	/* Start scheduling. */
-	os_task_init();
+	/* Launch the kernel task. */
+	os_scheduler_init();
 
-	/* Loop here if the kernel were ever to reach an unknown execution state. */
-	while (1) __asm__ __volatile__("nop");
 }
 
 void uart0_isr(void) {

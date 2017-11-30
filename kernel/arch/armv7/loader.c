@@ -1,9 +1,8 @@
 /* The Osmium loader implementation. */
 
 #define __private_include__
-#include <osmium.h>
-#include <loader.h>
-#include <scheduler.h>
+#include <os/loader.h>
+#include <os/scheduler.h>
 
 /*
  * The loader handles the loading of moudles and applications into program memory

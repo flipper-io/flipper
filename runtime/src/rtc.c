@@ -1,8 +1,7 @@
-#include <flipper/libflipper.h>
-
-#ifdef __use_rtc__
 #define __private_include__
 #include <flipper/rtc.h>
+
+#ifdef __use_rtc__
 
 LF_MODULE(_rtc, "rtc", "Interfaces with the device's real time clock.");
 

@@ -39,7 +39,6 @@ int uart0_push(void *source, lf_size_t length) {
 }
 
 int uart0_pull(void *destination, lf_size_t length) {
-	printf("Pulling\n");
 	/* Drain the buffered data. */
 	if (idx) {
 		if (length > idx) {

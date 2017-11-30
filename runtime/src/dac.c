@@ -1,8 +1,7 @@
-#include <flipper/libflipper.h>
-
-#ifdef __use_dac__
 #define __private_include__
 #include <flipper/dac.h>
+
+#ifdef __use_dac__
 
 LF_MODULE(_dac, "dac", "Provides access to the device's digital to analog converter.");
 

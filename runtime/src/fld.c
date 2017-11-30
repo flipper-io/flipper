@@ -1,8 +1,7 @@
-#include <flipper/libflipper.h>
-
-#ifdef __use_fld__
 #define __private_include__
 #include <flipper/fld.h>
+
+#ifdef __use_fld__
 
 LF_MODULE(_fld, "fld", "Loads modules on the target device.");
 

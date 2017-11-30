@@ -1,8 +1,6 @@
 #define __private_include__
-#include <osmium.h>
-#include <scheduler.h>
-#include <loader.h>
 #include <flipper/atsam4s/atsam4s.h>
+#include <os/loader.h>
 
 /* Buffer space for incoming message runtime packets. */
 struct _fmr_packet packet;

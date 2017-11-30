@@ -1,8 +1,7 @@
-#include <flipper/libflipper.h>
-
-#ifdef __use_wdt__
 #define __private_include__
 #include <flipper/wdt.h>
+
+#ifdef __use_wdt__
 
 LF_MODULE(_wdt, "wdt", "Handles interaction with the internal watchdog timer.");
 

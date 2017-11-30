@@ -1,8 +1,7 @@
-#include <flipper/libflipper.h>
-
-#ifdef __use_task__
 #define __private_include__
 #include <flipper/task.h>
+
+#ifdef __use_task__
 
 LF_MODULE(_task, "task", "Pause, resume, or stop tasks running in the scheduler.");
 

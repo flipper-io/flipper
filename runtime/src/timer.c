@@ -1,8 +1,7 @@
-#include <flipper/libflipper.h>
-
-#ifdef __use_timer__
 #define __private_include__
 #include <flipper/timer.h>
+
+#ifdef __use_timer__
 
 LF_MODULE(_timer, "timer", "Interfaces with the device's timer peripheral.");
 

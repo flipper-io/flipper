@@ -1,8 +1,7 @@
-#include <flipper/libflipper.h>
-
-#ifdef __use_temp__
 #define __private_include__
 #include <flipper/temp.h>
+
+#ifdef __use_temp__
 
 LF_MODULE(_temp, "temp", "Interfaces with the device's temperature sensor.");
 

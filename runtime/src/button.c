@@ -1,8 +1,7 @@
-#include <flipper/libflipper.h>
-
-#ifdef __use_button__
 #define __private_include__
 #include <flipper/button.h>
+
+#ifdef __use_button__
 
 LF_MODULE(_button, "button", "Interacts with the onboard button.");
 

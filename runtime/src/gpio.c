@@ -1,8 +1,7 @@
-#include <flipper/libflipper.h>
-
-#ifdef __use_gpio__
 #define __private_include__
 #include <flipper/gpio.h>
+
+#ifdef __use_gpio__
 
 LF_MODULE(_gpio, "gpio", "Interfaces with the device's general purpose input output pins.");
 

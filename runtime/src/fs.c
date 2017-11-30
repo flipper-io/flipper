@@ -1,8 +1,7 @@
-#include <flipper/libflipper.h>
-
-#ifdef __use_fs__
 #define __private_include__
 #include <flipper/fs.h>
+
+#ifdef __use_fs__
 
 LF_MODULE(_fs, "fs", "Provides access to the device's filesystem.");
 

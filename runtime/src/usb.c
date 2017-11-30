@@ -1,8 +1,7 @@
-#include <flipper/libflipper.h>
-
-#ifdef __use_usb__
 #define __private_include__
 #include <flipper/usb.h>
+
+#ifdef __use_usb__
 
 LF_MODULE(_usb, "usart", "Provides low level access to the device's USB bus.");
 

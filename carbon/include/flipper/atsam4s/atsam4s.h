@@ -6,7 +6,7 @@
 #include <flipper/atsam4s/SAM4S16.h>
 
 #ifdef __ATSAM4SB__
-#include <exceptions.h>
+#include <os/exceptions.h>
 #endif
 
 #define __use_adc__

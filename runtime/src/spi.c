@@ -1,8 +1,7 @@
-#include <flipper/libflipper.h>
-
-#ifdef __use_spi__
 #define __private_include__
 #include <flipper/spi.h>
+
+#ifdef __use_spi__
 
 LF_MODULE(_spi, "spi", "Provides control over the device's SPI bus.");
 

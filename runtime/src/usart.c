@@ -1,8 +1,7 @@
-#include <flipper/libflipper.h>
-
-#ifdef __use_usart__
 #define __private_include__
 #include <flipper/usart.h>
+
+#ifdef __use_usart__
 
 LF_MODULE(_usart, "usart", "Provides low level access to the device's UART bus.");
 

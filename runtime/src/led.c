@@ -1,8 +1,7 @@
-#include <flipper/libflipper.h>
-
-#ifdef __use_led__
 #define __private_include__
 #include <flipper/led.h>
+
+#ifdef __use_led__
 
 LF_MODULE(_led, "led", "Interacts with the built-in status LED.");
 
