@@ -83,7 +83,7 @@ lf_return_t lf_invoke(struct _lf_module *module, fmr_function function, struct _
 	/* Compute the initial length of the packet. */
 	_packet.header.length = sizeof(struct _fmr_invocation_packet);
 
-	#pragma warning Remove this.
+	#warning Remove this.
 	/* If the user module bit is set, make the invocation a user invocation. */
 	if (module -> index & FMR_USER_INVOCATION_BIT) {
 		_packet.header.class = fmr_user_invocation_class;

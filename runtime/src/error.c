@@ -18,10 +18,10 @@ int lf_error_configure(void) {
 }
 
 void lf_error_raise(lf_error_t error, const char *format, ...) {
-	lf_error_t _error = error;
 	/* Record the observed error. */
 	error_code = error;
 #ifndef __disable_error_side_effects__
+	lf_error_t _error = error;
 	if (error && errors_cause_side_effects) {
 		/* Construct a va_list to acmmcess variadic arguments. */
 		va_list argv;

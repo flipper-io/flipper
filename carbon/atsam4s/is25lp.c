@@ -20,7 +20,7 @@ int is25lp_configure(void) {
 	return lf_success;
 }
 
-int is25lp_wait_ready(void) {
+void is25lp_wait_ready(void) {
 	uint8_t wait[] = { IS25LP_RDSR };
 	while (1) {
 		spi_push(wait, sizeof(wait));
@@ -30,7 +30,6 @@ int is25lp_wait_ready(void) {
 		}
 		spi_end();
 	}
-
 }
 
 #define is25lp_sector_to_page(sector) (sector*IS25LP_SECTOR_SIZE)

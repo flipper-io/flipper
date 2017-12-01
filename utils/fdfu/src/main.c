@@ -155,7 +155,6 @@ int sam_ba_copy(uint32_t destination, void *source, uint32_t length) {
 	/* Initialize the transfer. */
 	char buffer[20];
 	sprintf(buffer, "S%08X,%08X#", destination, length);
-retry:
 	sam_push(buffer, sizeof(buffer) - 1);
 	uint8_t retries = 0;
 	while(!sam_ready() && retries ++ < 8);

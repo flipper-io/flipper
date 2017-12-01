@@ -180,8 +180,6 @@ int lf_device_release(struct _lf_device *device);
 int lf_attach(struct _lf_device *device);
 int lf_detach(struct _lf_device *device);
 int lf_select(struct _lf_device *device);
-int lf_register_endpoint(struct _lf_endpoint *endpoint);
-void lf_finish(void);
 
 #include <flipper/fmr.h>
 #include <flipper/endpoint.h>

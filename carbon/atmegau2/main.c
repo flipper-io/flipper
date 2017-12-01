@@ -5,6 +5,7 @@
 
 int debug_putchar(char c, FILE *stream) {
 	usb_debug_putchar(c);
+	return 0;
 }
 
 void loop(void) {

@@ -9,6 +9,7 @@ extern void uart0_put(uint8_t byte);
 
 int debug_putchar(char c, FILE *stream) {
 	uart0_put(c);
+	return 0;
 }
 
 void os_kernel_task(void) {

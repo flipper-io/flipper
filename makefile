@@ -29,6 +29,7 @@ ARM_SRC_DIRS := carbon/atsam4s										\
 				runtime/src
 
 ARM_CFLAGS	 := -std=gnu99											\
+				-Wall												\
 				-Os													\
 				-mcpu=cortex-m4										\
 				-mthumb												\
@@ -65,6 +66,7 @@ AVR_SRC_DIRS := carbon/atmegau2 									\
 				runtime/src
 
 AVR_CFLAGS 	 := -std=gnu99											\
+				-Wall												\
 				-Os													\
 				-mmcu=atmega32u2									\
 				-DARCH=ARCH_AVR8									\
@@ -106,6 +108,7 @@ X86_SRC_DIRS := carbon/hal											\
 				runtime/src
 
 X86_CFLAGS	 := -std=gnu99											\
+				-Wall												\
 				-g													\
 				-fpic												\
 				-DPLATFORM_HEADER="<flipper/posix/posix.h>"			\

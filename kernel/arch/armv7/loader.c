@@ -123,6 +123,7 @@ int os_release_module(struct _user_module *module) {
 	if (module -> base) {
 		free(module -> base);
 	}
+	return lf_success;
 }
 
 /* Loads an image into RAM. */
