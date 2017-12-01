@@ -132,9 +132,9 @@ install-libflipper: libflipper
 install:: install-libflipper
 
 uninstall-libflipper:
-	$(_v)rm -r $(PREFIX)/include/flipper.h
+	$(_v)rm $(PREFIX)/include/flipper.h
 	$(_v)rm -r $(PREFIX)/include/flipper
-	$(_v)rm -r $(PREFIX)/lib/$(X86_TARGET).so
+	$(_v)rm $(PREFIX)/lib/$(X86_TARGET).so
 
 # --- UTILITIES --- #
 
@@ -153,7 +153,9 @@ install-utils: utils
 install:: install-utils
 
 uninstall-utils:
-	$(_v)rm -r $(PREFIX)/bin/fdfu
+	$(_v)rm $(PREFIX)/bin/fdfu
+	$(_v)rm $(PREFIX)/bin/fdebug
+	$(_v)rm $(PREFIX)/bin/fload
 
 # Print all commands executed when VERBOSE is defined
 ifdef VERBOSE
