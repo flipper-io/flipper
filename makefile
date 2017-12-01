@@ -119,16 +119,15 @@ X86_LDFLAGS  := $(shell pkg-config --libs libusb-1.0) -install_name $(PREFIX)/li
 
 # --- LIBFLIPPER --- #
 
-libflipper: $(X86_TARGET).so
-
-.PHONY: install-libflipper uninstall-libflipper
-
-install-libflipper: libflipper
-	$(_v)mkdir -p $(BUILD)/include/flipper
+libflipper: $(X86_TARGET).so | $(BUILD)/include/flipper/.dir
 	$(_v)cp -r carbon/include/flipper/* $(BUILD)/include/flipper
 	$(_v)cp -r library/include/flipper/* $(BUILD)/include/flipper
 	$(_v)cp -r runtime/include/flipper/* $(BUILD)/include/flipper
 	$(_v)cp library/include/flipper.h $(BUILD)/include
+
+.PHONY: install-libflipper uninstall-libflipper
+
+install-libflipper: libflipper
 	$(_v)cp $(BUILD)/$(X86_TARGET)/$(X86_TARGET).so $(PREFIX)/lib/
 	$(_v)cp -r $(BUILD)/include/* $(PREFIX)/include/
 
