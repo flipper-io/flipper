@@ -4,6 +4,9 @@
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
 #include <flipper/libflipper.h>
 
+#define IS25LP_PAGE_SIZE 256
+#define IS25LP_SECTOR_SIZE 16
+
 /* IS25LP Opcodes */
 #define IS25LP_NORD			0x03
 #define IS25LP_FRD			0x0B

@@ -48,6 +48,10 @@ uint8_t spi_ready(void) {
 	return (SPI->SPI_SR & SPI_SR_TXEMPTY);
 }
 
+void spi_end(void) {
+	SPI->SPI_CR |= SPI_CR_LASTXFER;
+}
+
 void spi_put(uint8_t byte) {
 	/* Transmit the byte. */
 	SPI->SPI_TDR = byte;

@@ -24,18 +24,39 @@ int is25lp_wait_ready(void) {
 	uint8_t wait[] = { IS25LP_RDSR };
 	while (1) {
 		spi_push(wait, sizeof(wait));
-		if (spi_get() & (1 << IS25LP_SR_WIP)) continue;
-		break;
+		if (spi_get() & (1 << IS25LP_SR_WIP)) {
+			spi_end();
+			break;
+		}
+		spi_end();
 	}
 
 }
 
-int is25lp_write_sector(uint32_t sector, void *source) {
-	SPI->SPI_MR = SPI_MR_PCS(FLASH_PCS);
+#define is25lp_sector_to_page(sector) (sector*IS25LP_SECTOR_SIZE)
+
+int is25lp_write_sector(uint32_t sector, void *source, uint32_t length) {
+	uint32_t _mr = SPI->SPI_MR;
+	SPI->SPI_MR = SPI_MR_PCS(FLASH_PCS) | SPI_MR_MSTR | SPI_MR_MODFDIS;
 	/* Erase the sector. */
 	uint8_t erase[] = { IS25LP_SER, (sector >> 16) & 0xFF, (sector >> 8) & 0xFF, sector & 0xFF };
 	spi_push(erase, sizeof(erase));
 	/* Wait until ready. */
-	SPI->SPI_MR = SPI_MR_PCS(USER_PCS);
+	is25lp_wait_ready();
+	uint32_t page = is25lp_sector_to_page(sector);
+	for (int i = 0; (i < IS25LP_SECTOR_SIZE) && length; i++, page++) {
+		uint8_t write[] = { IS25LP_PP, (page >> 16) & 0xFF, (page >> 8) & 0xFF, page & 0xFF };
+		spi_push(write, sizeof(write));
+		if (length >= IS25LP_PAGE_SIZE) {
+			spi_push(source, IS25LP_PAGE_SIZE);
+			length -= IS25LP_PAGE_SIZE;
+			source += IS25LP_PAGE_SIZE;
+		} else {
+			spi_push(source, length);
+			length -= length;
+		}
+		spi_end();
+	}
+	SPI->SPI_MR = _mr;
 	return lf_success;
 }
