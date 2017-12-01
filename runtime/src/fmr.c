@@ -40,7 +40,7 @@ int fmr_create_call(fmr_module module, fmr_function function, struct _lf_ll *arg
 	/* Calculate the offset into the packet at which the arguments will be loaded. */
 	uint8_t *offset = (uint8_t *)&(call->parameters);
 	/* Load arguments into the packet, encoding the type of each. */
-	for (int i = 0; i < argc; i ++) {
+	for (size_t i = 0; i < argc; i ++) {
 		/* Pop the argument from the argument list. */
 		struct _lf_arg *arg = lf_ll_item(args, i);
 		/* Encode the argument's type. */

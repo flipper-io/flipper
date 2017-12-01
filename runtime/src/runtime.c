@@ -43,20 +43,6 @@ int lf_retrieve(struct _lf_device *device, struct _fmr_result *result) {
 	return lf_success;
 }
 
-lf_return_t _lf_invoke(struct _lf_module *module, fmr_function function, struct _lf_ll *args) {
-	lf_assert(module, failure, E_MODULE, "Attempt to invoke a function within an invalid module.");
-
-	struct _lf_device *device = module->device;
-	struct _fmr_invocation_packet packet;
-	memset(&packet, 0, sizeof(struct _fmr_invocation_packet));
-	fmr_create_call(module->index, function, args, &packet.header, &packet.call);
-	lf_transfer(device, (struct _fmr_packet *)&packet);
-
-
-failure:
-	return 0;
-}
-
 lf_return_t lf_invoke(struct _lf_module *module, fmr_function function, struct _lf_ll *parameters) {
 	/* Ensure that the module pointer is valid. */
 	if (!module) {
