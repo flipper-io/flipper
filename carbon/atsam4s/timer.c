@@ -2,7 +2,6 @@
 #include <flipper/timer.h>
 #include <flipper/error.h>
 #include <flipper/atsam4s/atsam4s.h>
-#include <cmsis/core_cm3.h>
 
 /* NOTE: TC0 is reserved by the system scheduler. */
 

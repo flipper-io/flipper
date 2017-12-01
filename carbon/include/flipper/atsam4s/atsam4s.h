@@ -3,11 +3,7 @@
 
 #include <flipper/libflipper.h>
 
-#include <flipper/atsam4s/SAM4S16.h>
-
-#ifdef __ATSAM4SB__
-#include <os/exceptions.h>
-#endif
+#include <flipper/atsam4s/sam4s16b.h>
 
 #define __use_adc__
 #define __use_button__
@@ -50,5 +46,11 @@
 #define PLATFORM_BAUDRATE 2000000
 
 #define FMR_PIN 0
+
+#define FLASH_PCS 0
+#define FLASH_PCS_PIN PIO_PA11A_NPCS0
+
+#define USER_PCS 1
+#define USER_PCS_PIN PIO_PA31A_NPCS1
 
 #endif

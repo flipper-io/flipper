@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/nvm.h>
+#include <flipper/is25lp.h>
 #include <flipper/atmegau2/atmegau2.h>
 #include <flipper/spi.h>
 

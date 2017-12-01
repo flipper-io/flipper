@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/fs.h>
-#include <flipper/nvm.h>
+#include <flipper/is25lp.h>
 #include <flipper/error.h>
 
 /* This function traverses the filesystem tree starting at a leaf pointed to by the 'current' argument until an empty branch pointer corresponding to the given key is found. */

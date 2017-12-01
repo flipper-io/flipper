@@ -9,6 +9,7 @@
 #include <flipper/fs.h>
 #include <flipper/gpio.h>
 #include <flipper/i2c.h>
+#include <flipper/is25lp.h>
 #include <flipper/led.h>
 #include <flipper/pwm.h>
 #include <flipper/rtc.h>

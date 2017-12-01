@@ -145,9 +145,9 @@ uint32_t sam_ba_read_word(uint32_t source) {
 	return result;
 }
 
-/* Writes the given command and argument into the EFC -> EEFC_FCR register. */
+/* Writes the given command and argument into the EFC0->EEFC_FCR register. */
 void sam_ba_write_efc_fcr(uint8_t command, uint32_t arg) {
-	sam_ba_write_word(REGADDR(EFC -> EEFC_FCR), (EEFC_FCR_FKEY(0x5A) | EEFC_FCR_FARG(arg) | EEFC_FCR_FCMD(command)));
+	sam_ba_write_word(REGADDR(EFC0->EEFC_FCR), (EEFC_FCR_FKEY(0x5A) | EEFC_FCR_FARG(arg) | EEFC_FCR_FCMD(command)));
 }
 
 /* Moves data from the host to the device's RAM using the SAM-BA and XMODEM protocol. */
@@ -200,15 +200,15 @@ retry:
 }
 
 void *load_page_data(FILE *firmware, size_t size) {
-	size_t pages = lf_ceiling(size, IFLASH_PAGE_SIZE);
-	uint8_t *raw = (uint8_t *)malloc(pages * IFLASH_PAGE_SIZE);
+	size_t pages = lf_ceiling(size, IFLASH0_PAGE_SIZE);
+	uint8_t *raw = (uint8_t *)malloc(pages * IFLASH0_PAGE_SIZE);
 	for (int i = 0; i < pages; i ++) {
-		for (int j = 0; j < IFLASH_PAGE_SIZE; j ++) {
+		for (int j = 0; j < IFLASH0_PAGE_SIZE; j ++) {
 			uint8_t c = fgetc(firmware);
 			if (!feof(firmware)) {
-				raw[((i * IFLASH_PAGE_SIZE) + j)] = c;
+				raw[((i * IFLASH0_PAGE_SIZE) + j)] = c;
 			} else {
-				raw[((i * IFLASH_PAGE_SIZE) + j)] = 0;
+				raw[((i * IFLASH0_PAGE_SIZE) + j)] = 0;
 			}
 		}
 
@@ -317,7 +317,7 @@ begin: ;
 
 	printf("Checking security bit.\n");
 	sam_ba_write_efc_fcr(EFC_GGPB, 0);
-	if (sam_ba_read_word(REGADDR(EFC -> EEFC_FRR)) & 0x01) {
+	if (sam_ba_read_word(REGADDR(EFC0->EEFC_FRR)) & 0x01) {
 		fprintf(stderr, KRED "The device's security bit is set. Please erase again.\n");
 		return EXIT_FAILURE;
 	}
@@ -337,7 +337,7 @@ begin: ;
 	/* Write the entry address into the applet. */
 	sam_ba_write_word(_APPLET_ENTRY, _APPLET + 0x09);
 	/* Write the destination of the page data into the applet. */
-	sam_ba_write_word(_APPLET_DESTINATION, IFLASH_ADDR);
+	sam_ba_write_word(_APPLET_DESTINATION, IFLASH0_ADDR);
 	/* Write the source of the page data into the applet. */
 	sam_ba_write_word(_APPLET_SOURCE, _PAGEBUFFER);
 
@@ -345,14 +345,14 @@ begin: ;
 	void *pagedata = load_page_data(firmware, firmware_size);
 
 	/* Calculate the number of pages to send. */
-	lf_size_t pages = lf_ceiling(firmware_size, IFLASH_PAGE_SIZE);
+	lf_size_t pages = lf_ceiling(firmware_size, IFLASH0_PAGE_SIZE);
 	/* Send the firmware, page by page. */
 	for (lf_size_t page = 0; page < pages; page ++) {
 		/* Print the page count. */
 		printf("Uploading page %i / %u. (%.2f%%)", page + 1, pages, ((float)(page + 1))/pages*100);
 		fflush(stdout);
 		/* Copy the page. */
-		int _e = sam_ba_copy(_PAGEBUFFER, (void *)(pagedata + (page * IFLASH_PAGE_SIZE)), IFLASH_PAGE_SIZE);
+		int _e = sam_ba_copy(_PAGEBUFFER, (void *)(pagedata + (page * IFLASH0_PAGE_SIZE)), IFLASH0_PAGE_SIZE);
 		if (_e < lf_success) {
 			fprintf(stderr, KRED "\nFailed to upload page %i of %i.\n" KNRM, page + 1, pages);
 			goto done;
@@ -363,7 +363,7 @@ begin: ;
 		sam_ba_jump(_APPLET);
 		/* Wait until the EFC has finished writing the page. */
 		uint8_t retries = 0, fsr = 0;
-		while(!((fsr = sam_ba_read_byte(REGADDR(EFC -> EEFC_FSR))) & 1) && retries ++ < 4) {
+		while(!((fsr = sam_ba_read_byte(REGADDR(EFC0->EEFC_FSR))) & 1) && retries ++ < 4) {
 			if (fsr & 0xE) {
 				fprintf(stderr, KRED "Flash write error on page %u.\n" KNRM, page);
 			}
@@ -374,7 +374,7 @@ begin: ;
 	}
 
 	/* Print statistics about the memory usage. */
-	printf(KGRN "\n Successfully uploaded all pages. %zu bytes used. (%.2f%% of flash)\n" KNRM, firmware_size, (float)firmware_size/IFLASH_SIZE*100);
+	printf(KGRN "\n Successfully uploaded all pages. %zu bytes used. (%.2f%% of flash)\n" KNRM, firmware_size, (float)firmware_size/IFLASH0_SIZE*100);
 
 	/* Set GPNVM1 to boot from flash memory. */
 	sam_ba_write_efc_fcr(EFC_SGPB, 0x01);
@@ -382,7 +382,7 @@ begin: ;
 	printf("Checking GPNVM1 bit.\n");
 	sam_ba_write_efc_fcr(EFC_GGPB, 0);
 	uint8_t retries = 0;
-	if (!(sam_ba_read_byte(REGADDR(EFC -> EEFC_FRR)) & (1 << 1)) && retries ++ < RETRIES) {
+	if (!(sam_ba_read_byte(REGADDR(EFC0->EEFC_FRR)) & (1 << 1)) && retries ++ < RETRIES) {
 		if (retries > RETRIES) {
 			printf(KRED " GPNVM1 bit is not set.\n" KNRM);
 			return EXIT_FAILURE;
@@ -400,14 +400,14 @@ begin: ;
 			uint32_t errors = 0, perrors = 0, total = lf_ceiling(firmware_size, sizeof(uint32_t));
 			uint8_t retries = 0;
 			for (uint32_t i = 0; i < total; i ++) {
-				uint32_t addr = IFLASH_ADDR + (i * sizeof(uint32_t));
-				if ((i % (IFLASH_PAGE_SIZE/sizeof(uint32_t)) == 0)) {
-					printf(" Checking address 0x%08x (page %lu) -> %s\n", addr, i / (IFLASH_PAGE_SIZE/sizeof(uint32_t)), (!perrors) ? KGRN "GOOD" KNRM : KRED "BAD" KNRM);
+				uint32_t addr = IFLASH0_ADDR + (i * sizeof(uint32_t));
+				if ((i % (IFLASH0_PAGE_SIZE/sizeof(uint32_t)) == 0)) {
+					printf(" Checking address 0x%08x (page %lu)->%s\n", addr, i / (IFLASH0_PAGE_SIZE/sizeof(uint32_t)), (!perrors) ? KGRN "GOOD" KNRM : KRED "BAD" KNRM);
 				}
 				uint32_t word = sam_ba_read_word(addr);
 				uint32_t _word = *(uint32_t *)(pagedata + (i * sizeof(uint32_t)));
 				uint8_t match = ((uint16_t)word == (uint16_t)_word);
-				//printf("0x%08x: 0x%08x (0x%08x) -> %s\n", addr, word, _word, (match) ? KGRN "GOOD" KNRM : KRED "BAD" KNRM);
+				//printf("0x%08x: 0x%08x (0x%08x)->%s\n", addr, word, _word, (match) ? KGRN "GOOD" KNRM : KRED "BAD" KNRM);
 				if (!match && retries < RETRIES) {
 					if (retries == 0) {
 						perrors ++;

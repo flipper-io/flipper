@@ -2,7 +2,6 @@
 
 #define __private_include__
 #include <os/scheduler.h>
-#include <cmsis/core_cm3.h>
 
 /* Pointers to the current and next tasks. */
 struct _os_task *os_current_task;

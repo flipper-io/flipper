@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/fs.h>
-#include <flipper/nvm.h>
+#include <flipper/is25lp.h>
 #include <flipper/error.h>
 
 /* Declare all of the global variables for this module. */

@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/nvm.h>
+#include <flipper/is25lp.h>
 #include <flipper/fs.h>
 
 typedef struct _block {
