@@ -8,7 +8,6 @@ const void *const fmr_modules[] = {
 	&button,
 	&dac,
 	&fld,
-	&fs,
 	&gpio,
 	&i2c,
 	&led,

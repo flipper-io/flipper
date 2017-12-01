@@ -16,7 +16,6 @@
 #endif
 
 #define __use_button__
-#define __use_fs__
 #define __use_gpio__
 #define __use_led__
 #define __use_uart0__

@@ -5,7 +5,6 @@
 /* Define the standard module array for this platform. */
 const void *const fmr_modules[] = {
 	&button,
-	&fs,
 	&gpio,
 	&led,
 	&uart0,

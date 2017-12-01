@@ -17,7 +17,6 @@ failure:
 
 int carbon_select_atmegau2(struct _lf_device *device) {
 	LF_MODULE_SET_DEVICE_AND_ID(_button, device, _button_id);
-	LF_MODULE_SET_DEVICE_AND_ID(_fs, device, _fs_id);
 //	LF_MODULE_SET_DEVICE_AND_ID(_gpio, device, _gpio_id);
 	LF_MODULE_SET_DEVICE_AND_ID(_led, device, _led_id);
 	LF_MODULE_SET_DEVICE_AND_ID(_uart0, device, _uart0_id);

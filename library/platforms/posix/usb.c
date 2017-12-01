@@ -2,8 +2,7 @@
 
 #define __private_include__
 #include <flipper/libflipper.h>
-#include <flipper/posix/libusb.h>
-#include <libusb-1.0/libusb.h>
+#include <libusb.h>
 
 struct _lf_libusb_context {
 	struct libusb_device_handle *handle;

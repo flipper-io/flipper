@@ -4,7 +4,7 @@
 /* Top-level POSIX platform support header. */
 
 #include <flipper/posix/network.h>
-#include <flipper/posix/libusb.h>
+#include <flipper/posix/usb.h>
 
 /* Terminal colors. */
 #ifndef __DISABLE_TERMINAL_COLORS__
@@ -28,7 +28,6 @@
 #define __use_error__
 #define __use_fld__
 #define __use_fmr__
-#define __use_fs__
 #define __use_gpio__
 #define __use_i2c__
 #define __use_led__

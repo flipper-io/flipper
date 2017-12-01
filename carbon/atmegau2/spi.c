@@ -9,30 +9,22 @@
 
 int spi_configure() {
 	/* Configure MOSI and SCK as inputs. */
-	clear_bits_in_port_with_mask(SPI_DDR, (bit(MOSI) | bit(SCK)));
+	SPI_DDR |= (1 << MOSI) | (1 << SCK);
 	/* Put the SPI bus into MODE3. */
-	set_bits_in_port_with_mask(SPCR, SPI_DATA_MODE_3);
+	SPCR |= SPI_DATA_MODE_3;
 	/* Configure the SPI clock to be 1/2 of the system clock. This is the fastest SCK we can specify.  */
-	set_bits_in_port_with_mask(SPSR, bit(SPI2X));
+	SPCR |= (1 << SPI2X);
 	return lf_success;
 }
 
 void spi_enable(void) {
-	/* Configure MOSI and SCK as outputs. */
-	set_bits_in_port_with_mask(SPI_DDR, (bit(MOSI) | bit(SCK)));
-	/* Put the SPI into master mode by setting the master bit. */
-	set_bit_in_port(MSTR, SPCR);
-	/* Enable the SPI bus by setting the SPI enable bit in the SPCR. */
-	set_bit_in_port(SPE, SPCR);
+	SPI_DDR |= (1 << MOSI) | (1 << SCK);
+	SPCR |= (1 << MSTR) | (1 << SPE);
 }
 
 void spi_disable(void) {
-	/* Disable the SPI bus by clearing the SPI enable bit in the SPCR. */
-	clear_bit_in_port(SPE, SPCR);
-	/* Enter slave mode. */
-	clear_bit_in_port(MSTR, SPCR);
-	/* Configure MOSI and SCK as inputs. */
-	clear_bits_in_port_with_mask(SPI_DDR, (bit(MOSI) | bit(SCK)));
+	SPCR &= ~((1 << MSTR) | (1 << SPE));
+	SPI_DDR &= ~((1 << MOSI) | (1 << SCK));
 }
 
 uint8_t spi_ready(void) {

@@ -1,7 +1,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
-#include <libusb-1.0/libusb.h>
+#include <libusb.h>
 
 #define VENDOR 0x16C0
 #define PRODUCT 0x0480

@@ -1,5 +1,7 @@
 # Directory where build products are stored.
 BUILD := build
+# Prefix where build projects are installed
+PREFIX := /usr/local
 
 # List of all target types
 TARGETS := ARM AVR X86
@@ -26,7 +28,7 @@ ARM_SRC_DIRS := carbon/atsam4s										\
 				runtime/arch/armv7									\
 				runtime/src
 
-ARM_CFLAGS	 := -std=c99											\
+ARM_CFLAGS	 := -std=gnu99											\
 				-Os													\
 				-mcpu=cortex-m4										\
 				-mthumb												\
@@ -62,7 +64,7 @@ AVR_SRC_DIRS := carbon/atmegau2 									\
 				runtime/arch/avr8									\
 				runtime/src
 
-AVR_CFLAGS 	 := -std=c99											\
+AVR_CFLAGS 	 := -std=gnu99											\
 				-Os													\
 				-mmcu=atmega32u2									\
 				-DARCH=ARCH_AVR8									\
@@ -90,7 +92,7 @@ install-atmegau2: atmegau2
 # x86 target variables
 X86_TARGET	 := libflipper
 
-X86_PREFIX	 :=
+X86_PREFIX	 := /usr/local/bin/
 
 # Directories that need to be included for this target.
 X86_INC_DIRS := carbon/include 										\
@@ -103,18 +105,20 @@ X86_SRC_DIRS := carbon/hal											\
 				library/platforms/posix								\
 				runtime/src
 
-X86_CFLAGS	 := -std=c99											\
+X86_CFLAGS	 := -std=gnu99											\
 				-g													\
 				-fpic												\
 				-DPLATFORM_HEADER="<flipper/posix/posix.h>"			\
-				$(foreach inc,$(X86_INC_DIRS),-I$(inc))
+				$(shell pkg-config --cflags libusb-1.0)				\
+				$(foreach inc,$(X86_INC_DIRS),-I$(inc))				\
 
-X86_LDFLAGS  := -lusb-1.0
-
-$(X86_TARGET): $(X86_TARGET).so
-.PHONY: install-libflipper uninstall-libflipper
+X86_LDFLAGS  := $(shell pkg-config --libs libusb-1.0) -install_name $(PREFIX)/lib/libflipper.so
 
 # --- LIBFLIPPER --- #
+
+libflipper: $(X86_TARGET).so
+
+.PHONY: install-libflipper uninstall-libflipper
 
 install-libflipper: libflipper
 	$(_v)mkdir -p $(BUILD)/include/flipper
@@ -122,33 +126,34 @@ install-libflipper: libflipper
 	$(_v)cp -r library/include/flipper/* $(BUILD)/include/flipper
 	$(_v)cp -r runtime/include/flipper/* $(BUILD)/include/flipper
 	$(_v)cp library/include/flipper.h $(BUILD)/include
-	$(_v)cp $(BUILD)/$(X86_TARGET)/$(X86_TARGET).so /usr/local/lib/
-	$(_v)cp -r $(BUILD)/include/* /usr/local/include/
+	$(_v)cp $(BUILD)/$(X86_TARGET)/$(X86_TARGET).so $(PREFIX)/lib/
+	$(_v)cp -r $(BUILD)/include/* $(PREFIX)/include/
 
 install:: install-libflipper
 
 uninstall-libflipper:
-	$(_v)rm -r /usr/local/include/flipper.h
-	$(_v)rm -rf /usr/local/include/flipper
-	$(_v)rm -r /usr/local/lib/$(X86_TARGET).so
+	$(_v)rm -r $(PREFIX)/include/flipper.h
+	$(_v)rm -r $(PREFIX)/include/flipper
+	$(_v)rm -r $(PREFIX)/lib/$(X86_TARGET).so
 
 # --- UTILITIES --- #
 
 .PHONY: utils install-utils uninstall-utils
 
-utils:
-	$(_v)mkdir -p $(BUILD)/utils
-	$(_v)gcc -lflipper utils/fdfu/src/main.c -o $(BUILD)/utils/fdfu
-	$(_v)gcc -lusb-1.0 utils/fdebug/src/main.c -o $(BUILD)/utils/fdebug
-	$(_v)gcc -lflipper utils/fload/src/main.c -o $(BUILD)/utils/fload
+utils: libflipper | $(BUILD)/utils/.dir
+	$(_v)$(X86_CC) $(X86_CFLAGS) $(BUILD)/$(X86_TARGET)/$(X86_TARGET).so utils/fdfu/src/main.c -o $(BUILD)/utils/fdfu
+	$(_v)$(X86_CC) $(X86_CFLAGS) $(shell pkg-config --libs libusb-1.0) utils/fdebug/src/main.c -o $(BUILD)/utils/fdebug
+	$(_v)$(X86_CC) $(X86_CFLAGS) $(BUILD)/$(X86_TARGET)/$(X86_TARGET).so utils/fload/src/main.c -o $(BUILD)/utils/fload
+
+all:: utils
 
 install-utils: utils
-	$(_v)cp -r $(BUILD)/utils/* /usr/local/bin
+	$(_v)cp -r $(BUILD)/utils/* $(PREFIX)/bin
 
 install:: install-utils
 
 uninstall-utils:
-	$(_v)rm -rf /usr/local/bin/fdfu
+	$(_v)rm -r $(PREFIX)/bin/fdfu
 
 # Print all commands executed when VERBOSE is defined
 ifdef VERBOSE
@@ -157,7 +162,7 @@ else #VERBOSE
 _v := @
 endif #VERBOSE
 
-# Make sure that the .dir files aren't automatically deleted after building
+# Make sure that the .dir files aren't automatically deleted after building.
 .SECONDARY:
 
 %/.dir:
@@ -242,4 +247,4 @@ $(foreach target,$(TARGETS),$(call generate_target,$(target)))
 .PHONY: clean
 
 clean:
-	$(_v)rm -rf $(BUILD)
+	$(_v)rm -r $(BUILD)

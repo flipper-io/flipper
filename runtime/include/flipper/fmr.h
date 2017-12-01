@@ -71,7 +71,7 @@ typedef uint8_t fmr_type;
 /* Gives the 'fmr_va' for a given 32-bit integer's value. */
 #define fmr_int32(arg) fmr_intx(fmr_int32_t, (uint32_t)arg)
 /* Gives the 'fmr_va' for a pointer. */
-#define fmr_ptr(arg) fmr_intx(fmr_ptr_t, (uint32_t)arg)
+#define fmr_ptr(arg) fmr_intx(fmr_ptr_t, (uintptr_t)arg)
 
 /* Sends pointer data to the device, deallocated after function call. */
 fmr_va fmr_data(void *data, lf_size_t size);

@@ -4,7 +4,6 @@ enum {
 	_button_id,
 	_dac_id,
 	_fld_id,
-	_fs_id,
 	_gpio_id,
 	_i2c_id,
 	_led_id,

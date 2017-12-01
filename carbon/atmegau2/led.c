@@ -4,7 +4,7 @@
 
 int led_configure(void) {
 	/* Configure the DI (data in) pin of the LED as an output. */
-	set_bit_in_port(LED_DI, LED_DDR);
+	LED_DDR |= (1 << LED_DI);
 	return lf_success;
 }
 

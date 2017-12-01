@@ -25,7 +25,7 @@ extern struct _lf_module _spi;
 enum { _spi_configure, _spi_enable, _spi_disable, _spi_ready, _spi_put, _spi_get, _spi_push, _spi_pull };
 
 /* Declare the prototypes for all of the functions within this module. */
-int spi_configure();
+int spi_configure(void);
 void spi_enable(void);
 void spi_disable(void);
 uint8_t spi_ready(void);

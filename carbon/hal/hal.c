@@ -23,7 +23,7 @@
 #define __private_include__
 #include <flipper/libflipper.h>
 #include <flipper/carbon.h>
-#include <flipper/posix/libusb.h>
+#include <flipper/posix/usb.h>
 #include <flipper/posix/network.h>
 #include <flipper/atmegau2/atmegau2.h>
 #include <flipper/atsam4s/atsam4s.h>

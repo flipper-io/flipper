@@ -22,9 +22,9 @@ extern struct _lf_module _task;
 /* Declare the FMR overlay for this module. */
 enum { _task_pause, _task_resume, _task_stop };
 
-extern int os_task_pause(int pid);
-extern int os_task_resume(int pid);
-extern int os_task_stop(int pid);
+int os_task_pause(int pid);
+int os_task_resume(int pid);
+int os_task_stop(int pid);
 
 #endif
 #endif

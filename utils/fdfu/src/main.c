@@ -61,7 +61,7 @@ uint8_t applet[] = {
 #define EFC_SGPB 0x0B
 #define EFC_GGPB 0x0D
 
-#define REGADDR(reg) (uint32_t)&(reg)
+#define REGADDR(reg) ((uint32_t)(uintptr_t)&reg)
 
 /* Defines the number of times communication will be retried. */
 #define RETRIES 4

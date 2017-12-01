@@ -3,8 +3,7 @@
 #include <flipper/atmegau2/atmegau2.h>
 
 int button_configure(void) {
-	/* Enable the button as an input. */
-	clear_bit_in_port(BUTTON_PIN, BUTTON_DDR);
+	BUTTON_DDR &= ~(1 << BUTTON_PIN);
 	return lf_success;
 }
 

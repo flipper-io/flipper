@@ -22,13 +22,13 @@ struct _lf_timer {
 struct _lf_timer timers[] = { { &(TC0->TC_CHANNEL[0]), true, NULL },
 							  { &(TC0->TC_CHANNEL[1]), true, NULL },
 							  { &(TC0->TC_CHANNEL[2]), true, NULL },
-								{ &(TC0->TC_CHANNEL[3]), true, NULL },
-								{ &(TC0->TC_CHANNEL[4]), true, NULL },
-								{ &(TC0->TC_CHANNEL[5]), true, NULL } };
+							  { &(TC0->TC_CHANNEL[3]), true, NULL },
+							  { &(TC0->TC_CHANNEL[4]), true, NULL },
+							  { &(TC0->TC_CHANNEL[5]), true, NULL } };
 
 int timer_configure(void) {
 	/* Iterate through the timers and configure their defaults. */
-	for (int i = 0; i < sizeof(timers); i ++) {
+	for (int i = 0; i < sizeof(timers)/sizeof(struct _lf_timer); i ++) {
 		/* Enable the timer's peripheral clock. */
 		PMC->PMC_PCER0 |= (1 << (ID_TC0 + i));
 		/* Disable the source clock to TCA. */

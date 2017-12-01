@@ -8,6 +8,8 @@
 #ifndef __libflipper_h__
 #define __libflipper_h__
 
+#include <flipper/types.h>
+
 /* The current version of libflipper. */
 #define LF_VERSION 0x0001
 
@@ -66,14 +68,6 @@ void lf_set_debug_level(int level);
 #define lf_ceiling(x, y) ((x + y - 1) / y)
 
 /* Define bit manipulation macros. */
-#define bit(b)								(0x01 << (b))
-#define get_bit_from_port(b, p)				((p) & bit(b))
-#define set_bit_in_port(b, p)				((p) |= bit(b))
-#define set_bits_in_port_with_mask(p, m)	((p) |= (m))
-#define clear_bit_in_port(b, p)				((p) &= ~(bit(b)))
-#define clear_bits_in_port_with_mask(p, m)	((p) &= ~(m))
-#define flip_bit_in_port(b, p)				((p) ^= bit(b))
-#define flip_bits_in_port_with_mask(p, m)	((p) ^= (m))
 #define lo(x) ((uint8_t)(x))
 #define hi(x) ((uint8_t)(x >> 8))
 #define lo16(x) ((uint16_t)(((uint32_t)(x))))
@@ -81,7 +75,6 @@ void lf_set_debug_level(int level);
 #define little(x) ((((uint16_t)(x)) << 8 ) | (((uint16_t)(x)) >> 8))
 #define little32(x) ((((uint32_t)(x)) << 16 ) | (((uint32_t)(x)) >> 16))
 
-#include <flipper/types.h>
 #include <flipper/error.h>
 
 /* Macros that quantify device attributes. */

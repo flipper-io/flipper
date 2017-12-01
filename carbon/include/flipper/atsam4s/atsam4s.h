@@ -9,7 +9,6 @@
 #define __use_button__
 #define __use_dac__
 #define __use_fld__
-#define __use_fs__
 #define __use_gpio__
 #define __use_i2c__
 #define __use_led__
