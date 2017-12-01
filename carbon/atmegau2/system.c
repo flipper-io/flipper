@@ -2,7 +2,7 @@
 #include <flipper/carbon.h>
 #include <flipper/atmegau2/megausb.h>
 
-fmr_return fmr_push(struct _fmr_push_pull_packet *packet) {
+lf_return_t fmr_push(struct _fmr_push_pull_packet *packet) {
 	int retval;
 	void *swap = malloc(packet->length);
 	if (!swap) {
@@ -16,7 +16,7 @@ fmr_return fmr_push(struct _fmr_push_pull_packet *packet) {
 	return retval;
 }
 
-fmr_return fmr_pull(struct _fmr_push_pull_packet *packet) {
+lf_return_t fmr_pull(struct _fmr_push_pull_packet *packet) {
 	int retval;
 	void *swap = malloc(packet->length);
 	if (!swap) {

@@ -24,8 +24,6 @@ typedef uint32_t fmr_module;
 typedef uint8_t fmr_function;
 /* Used to hold the number of parameters that are to be passed during a procedure call. */
 typedef uint8_t fmr_argc;
-/* The largest return type. All return types are held in a variable of this type. */
-typedef uint32_t fmr_return;
 
 /* The maximum number of arguments that can be encoded into a packet. */
 #define FMR_MAX_ARGC 16
@@ -188,14 +186,14 @@ int fmr_append(struct _lf_ll *list, fmr_type type, fmr_arg value);
 /* Generates the appropriate data structure needed for the remote procedure call of 'funtion' in 'module'. */
 int fmr_create_call(fmr_module module, fmr_function function, struct _lf_ll *args, struct _fmr_header *header, struct _fmr_invocation *call);
 /* Executes a standard module. */
-fmr_return fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, fmr_types types, void *arguments);
+lf_return_t fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, fmr_types types, void *arguments);
 /* Executes an fmr_packet and stores the result of the operation in the result buffer provided. */
 int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result);
 
 /* Helper function for lf_push. */
-extern fmr_return fmr_push(struct _fmr_push_pull_packet *packet);
+extern lf_return_t fmr_push(struct _fmr_push_pull_packet *packet);
 /* Helper function for lf_pull. */
-extern fmr_return fmr_pull(struct _fmr_push_pull_packet *packet);
+extern lf_return_t fmr_pull(struct _fmr_push_pull_packet *packet);
 
 /* ~ Functions with platform specific implementation. ~ */
 

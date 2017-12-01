@@ -33,10 +33,10 @@ uint32_t fmr_call(const uint32_t (* function)(void), uint8_t argc, uint16_t argt
 	return function();
 }
 
-fmr_return fmr_push(struct _fmr_push_pull_packet *packet) {
+lf_return_t fmr_push(struct _fmr_push_pull_packet *packet) {
 	return -1;
 }
 
-fmr_return fmr_pull(struct _fmr_push_pull_packet *packet) {
+lf_return_t fmr_pull(struct _fmr_push_pull_packet *packet) {
 	return -1;
 }

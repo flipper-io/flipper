@@ -9,7 +9,7 @@ const lf_crc_t = ref.types.uint16;
 const fmr_arg = ref.types.uint32;
 const fmr_function = ref.types.uint8;
 const fmr_argc = ref.types.uint8;
-const fmr_return = ref.types.uint32;
+const lf_return_t = ref.types.uint32;
 
 const _fmr_type = [
   ref.types.uint8,
@@ -35,8 +35,8 @@ const libflipper = ffi.Library('libflipper', {
 
   'flipper_select': [ 'int', [ 'pointer' ] ],
 
-  // fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _fmr_parameters *parameters)
-  'lf_invoke': [ fmr_return, [ ref.refType(_lf_module), fmr_function, 'pointer' ] ],
+  // lf_return_t lf_invoke(struct _lf_module *module, fmr_function function, struct _fmr_parameters *parameters)
+  'lf_invoke': [ lf_return_t, [ ref.refType(_lf_module), fmr_function, 'pointer' ] ],
 
   // int lf_bind(struct _lf_module *module, String name)
   'lf_bind': [ 'int', [ ref.refType(_lf_module), 'string' ] ],

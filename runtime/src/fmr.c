@@ -62,7 +62,7 @@ failure:
 	return lf_error;
 }
 
-fmr_return fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, fmr_types types, void *arguments) {
+lf_return_t fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, fmr_types types, void *arguments) {
 	/* Dereference the pointer to the target module. */
 	void *const *object = fmr_modules[module];
 	/* Dereference and return a pointer to the target function. */

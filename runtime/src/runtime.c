@@ -43,7 +43,7 @@ int lf_retrieve(struct _lf_device *device, struct _fmr_result *result) {
 	return lf_success;
 }
 
-fmr_return _lf_invoke(struct _lf_module *module, fmr_function function, struct _lf_ll *args) {
+lf_return_t _lf_invoke(struct _lf_module *module, fmr_function function, struct _lf_ll *args) {
 	lf_assert(module, failure, E_MODULE, "Attempt to invoke a function within an invalid module.");
 
 	struct _lf_device *device = module->device;
@@ -56,7 +56,7 @@ failure:
 	return 0;
 }
 
-fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _lf_ll *parameters) {
+lf_return_t lf_invoke(struct _lf_module *module, fmr_function function, struct _lf_ll *parameters) {
 	/* Ensure that the module pointer is valid. */
 	if (!module) {
 		lf_error_raise(E_NULL, error_message("No module was specified for function invocation."));
@@ -75,7 +75,7 @@ fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _l
 		return lf_error;
 	}
 	/* The raw packet into which the invocation information will be loaded .*/
-	struct _fmr_packet _packet = { 0 };
+	struct _fmr_packet _packet;
 	/* A packet cast that exposes the data structures specific to this packet subclass. */
 	struct _fmr_invocation_packet *packet = (struct _fmr_invocation_packet *)(&_packet);
 	/* Set the magic number. */
@@ -133,7 +133,7 @@ int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_s
 		lf_error_raise(E_NO_DEVICE, error_message("Failed to push to device."));
 		return lf_error;
 	}
-	struct _fmr_packet _packet = { 0 };
+	struct _fmr_packet _packet;
 	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
 	/* Set the magic number. */
 	_packet.header.magic = FMR_MAGIC_NUMBER;
@@ -185,7 +185,7 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 		lf_error_raise(E_NO_DEVICE, error_message("Failed to pull from device."));
 		return lf_error;
 	}
-	struct _fmr_packet _packet = { 0 };
+	struct _fmr_packet _packet;
 	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
 	/* Set the magic number. */
 	_packet.header.magic = FMR_MAGIC_NUMBER;

@@ -195,7 +195,7 @@ int flipper_select(struct _lf_device *device);
 int flipper_detach(struct _lf_device *device);
 int flipper_exit(void);
 
-fmr_return lf_invoke(struct _lf_module *module, fmr_function function, struct _lf_ll *args);
+lf_return_t lf_invoke(struct _lf_module *module, fmr_function function, struct _lf_ll *args);
 
 /* Moves data from the address space of the host to that of the device. */
 int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _lf_ll *args);

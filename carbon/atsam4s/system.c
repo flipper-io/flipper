@@ -22,8 +22,8 @@ void uart0_pull_wait(void *destination, lf_size_t length) {
 	UART0->UART_IER = UART_IER_ENDRX;
 }
 
-fmr_return fmr_push(struct _fmr_push_pull_packet *packet) {
-	fmr_return retval = 0xdeadbeef;
+lf_return_t fmr_push(struct _fmr_push_pull_packet *packet) {
+	lf_return_t retval = 0xdeadbeef;
 	void *push_buffer = malloc(packet->length);
 	if (!push_buffer) {
 		lf_error_raise(E_MALLOC, NULL);
@@ -43,8 +43,8 @@ fmr_return fmr_push(struct _fmr_push_pull_packet *packet) {
 	return retval;
 }
 
-fmr_return fmr_pull(struct _fmr_push_pull_packet *packet) {
-	fmr_return retval = 0;
+lf_return_t fmr_pull(struct _fmr_push_pull_packet *packet) {
+	lf_return_t retval = 0;
 	if (packet->header.class == fmr_receive_class) {
 		/* If we are receiving data, simply push the memory. */
 		uart0_push((uintptr_t *)*(uint32_t *)(packet->call.parameters), packet->length);
