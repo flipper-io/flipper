@@ -87,10 +87,6 @@ LF_WEAK int fmr_perform_user_invocation(struct _fmr_invocation *invocation, stru
 	return lf_error;
 }
 
-LF_WEAK int fmr_configuration_subclass_handler(struct _fmr_result *result) {
-	return lf_success;
-}
-
 int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
 	/* Check that the magic number matches. */
 	if (packet->header.magic != FMR_MAGIC_NUMBER) {
@@ -114,9 +110,6 @@ int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
 
 	/* Switch through the packet subclasses and invoke the appropriate handler for each. */
 	switch (packet->header.class) {
-		case fmr_configuration_class:
-			fmr_configuration_subclass_handler(result);
-		break;
 		case fmr_standard_invocation_class:
 			fmr_perform_standard_invocation(&(_ip->call), result);
 		break;

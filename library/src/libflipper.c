@@ -36,9 +36,6 @@ int lf_device_release(struct _lf_device *device) {
 /* Attempts to attach to all unattached devices. Returns how many devices were attached. */
 int lf_attach(struct _lf_device *device) {
 	lf_assert(device, failure, E_NULL, "Attempt to attach an invalid device.");
-	/* Ask the device for its configuration. */
-	//int _e = lf_load_configuration(device);
-	//lf_assert(_e == lf_success, failure, E_CONFIGURATION, "Failed to obtain configuration from device.");
 	lf_ll_append(&lf_attached_devices, device, lf_detach);
 	lf_select(device);
 	return lf_success;
@@ -71,47 +68,6 @@ int __attribute__((__destructor__)) lf_exit(void) {
 	lf_ll_release(&lf_get_event_list());
 	/* Release all of the attached devices. */
 	lf_ll_release(&lf_attached_devices);
-	return lf_success;
-}
-
-int lf_load_configuration(struct _lf_device *device) {
-	/* Create a configuration packet. */
-	struct _fmr_packet packet;
-	/* Set the magic number. */
-	packet.header.magic = FMR_MAGIC_NUMBER;
-	/* Compute the length of the packet. */
-	packet.header.length = sizeof(struct _fmr_header);
-	/* Make the outgoing packet a configuration packet. */
-	packet.header.class = fmr_configuration_class;
-	/* Calculate the packet checksum. */
-	packet.header.checksum = lf_crc(&packet, packet.header.length);
-	/* Send the packet to the target device. */
-	int _e = lf_transfer(device, &packet);
-	if (_e < lf_success) {
-		return lf_error;
-	}
-	/* Obtain the configuration from the device. */
-	struct _lf_configuration configuration;
-	_e = device->endpoint->pull(device->endpoint, &configuration, sizeof(struct _lf_configuration));
-	if (_e < lf_success) {
-		return lf_error;
-	}
-
-	/* Obtain the result of the operation. */
-	struct _fmr_result result;
-	_e = lf_get_result(device, &result);
-	if (_e < lf_success) {
-		return lf_error;
-	}
-
-	// /* Compare the device identifiers. */
-	// if (device->configuration.identifier != configuration.identifier) {
-	// 	lf_error_raise(E_NO_DEVICE, error_message("Identifier mismatch for device '%s'. (0x%04x instead of 0x%04x)", device->configuration.name, configuration.identifier, device->configuration.identifier));
-	// 	return lf_error;
-	// }
-
-	/* Copy the returned configuration into the device. */
-	memcpy(&(device->configuration), &configuration, sizeof(struct _lf_configuration));
 	return lf_success;
 }
 
@@ -152,6 +108,7 @@ int lf_ram_load(struct _lf_device *device, void *source, lf_size_t length) {
 		return lf_error;
 	}
 	struct _fmr_packet _packet;
+	memset(&_packet, 0, sizeof(struct _fmr_packet));
 	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
 	/* Set the magic number. */
 	_packet.header.magic = FMR_MAGIC_NUMBER;
@@ -219,13 +176,11 @@ void lf_debug_packet(struct _fmr_packet *packet, size_t length) {
 		printf("\t└─ magic:\t0x%x\n", packet->header.magic);
 		printf("\t└─ checksum:\t0x%x\n", packet->header.checksum);
 		printf("\t└─ length:\t%d bytes (%.02f%%)\n", packet->header.length, (float) packet->header.length/sizeof(struct _fmr_packet)*100);
-		char *classstrs[] = { "configu", "standard", "user", "push", "pull", "send", "receive", "load", "event" };
+		char *classstrs[] = { "standard", "user", "push", "pull", "send", "receive", "load", "event" };
 		printf("\t└─ class:\t%s\n", classstrs[packet->header.class]);
 		struct _fmr_invocation_packet *invocation = (struct _fmr_invocation_packet *)(packet);
 		struct _fmr_push_pull_packet *pushpull = (struct _fmr_push_pull_packet *)(packet);
 		switch (packet->header.class) {
-			case fmr_configuration_class:
-			break;
 			case fmr_standard_invocation_class:
 				lf_debug_call(&invocation->call);
 			break;

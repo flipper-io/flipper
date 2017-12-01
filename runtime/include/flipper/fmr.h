@@ -82,8 +82,6 @@ fmr_va fmr_data(void *data, lf_size_t size);
 
 /* Exposes all message runtime packet classes. */
 enum {
-	/* Asks a device for its configuration information. */
-	fmr_configuration_class,
 	/* Invokes a function in a standard module. */
 	fmr_standard_invocation_class,
 	/* Invokes a function in user module. */

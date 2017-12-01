@@ -48,6 +48,7 @@ lf_return_t _lf_invoke(struct _lf_module *module, fmr_function function, struct 
 
 	struct _lf_device *device = module->device;
 	struct _fmr_invocation_packet packet;
+	memset(&packet, 0, sizeof(struct _fmr_invocation_packet));
 	fmr_create_call(module->index, function, args, &packet.header, &packet.call);
 	lf_transfer(device, (struct _fmr_packet *)&packet);
 
@@ -76,6 +77,7 @@ lf_return_t lf_invoke(struct _lf_module *module, fmr_function function, struct _
 	}
 	/* The raw packet into which the invocation information will be loaded .*/
 	struct _fmr_packet _packet;
+	memset(&_packet, 0, sizeof(struct _fmr_packet));
 	/* A packet cast that exposes the data structures specific to this packet subclass. */
 	struct _fmr_invocation_packet *packet = (struct _fmr_invocation_packet *)(&_packet);
 	/* Set the magic number. */
@@ -134,6 +136,7 @@ lf_return_t lf_push(struct _lf_module *module, fmr_function function, void *sour
 		return lf_error;
 	}
 	struct _fmr_packet _packet;
+	memset(&_packet, 0, sizeof(struct _fmr_packet));
 	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
 	/* Set the magic number. */
 	_packet.header.magic = FMR_MAGIC_NUMBER;
@@ -186,6 +189,7 @@ lf_return_t lf_pull(struct _lf_module *module, fmr_function function, void *dest
 		return lf_error;
 	}
 	struct _fmr_packet _packet;
+	memset(&_packet, 0, sizeof(struct _fmr_packet));
 	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
 	/* Set the magic number. */
 	_packet.header.magic = FMR_MAGIC_NUMBER;
