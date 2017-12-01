@@ -92,7 +92,7 @@ install-atmegau2: atmegau2
 # x86 target variables
 X86_TARGET	 := libflipper
 
-X86_PREFIX	 := /usr/local/bin/
+X86_PREFIX	 :=
 
 # Directories that need to be included for this target.
 X86_INC_DIRS := carbon/include 										\
