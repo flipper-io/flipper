@@ -9,14 +9,6 @@ lf_device_list lf_attached_devices;
 struct _lf_device *lf_current_device;
 lf_event_list lf_registered_events;
 
-/* Expose the virtual interface for this driver. */
-const struct _flipper flipper = {
-	flipper_attach,
-	flipper_select,
-	flipper_detach,
-	flipper_exit,
-};
-
 /* Creates a new libflipper device. */
 struct _lf_device *lf_device_create(struct _lf_endpoint *endpoint, int (* select)(struct _lf_device *device), int (* destroy)(struct _lf_device *device), size_t context_size) {
 	struct _lf_device *device = (struct _lf_device *)calloc(1, sizeof(struct _lf_device));
@@ -82,36 +74,9 @@ int __attribute__((__destructor__)) lf_exit(void) {
 	return lf_success;
 }
 
-/* Shim to attach all possible flipper devices that could be attached to the system. */
-struct _lf_device *flipper_attach(void) {
-	int _e = carbon_attach();
-	lf_assert(_e == lf_success, failure, E_NO_DEVICE, "Failed to find any Flipper devices attached to this computer. Please check your connection and try again.");
-	return lf_get_current_device();
-failure:
-	return NULL;
-}
-
-int flipper_select(struct _lf_device *device) {
-	lf_assert(device, failure, E_NULL, "NULL device pointer provided for selection.");
-	lf_set_current_device(device);
-	return lf_success;
-failure:
-	return lf_error;
-}
-
-/* Shim around lf_detach. */
-int flipper_detach(struct _lf_device *device) {
-	return lf_detach(device);
-}
-
-/* Shim around lf_exit. */
-int flipper_exit(void) {
-	return lf_exit();
-}
-
 int lf_load_configuration(struct _lf_device *device) {
 	/* Create a configuration packet. */
-	struct _fmr_packet packet = { 0 };
+	struct _fmr_packet packet;
 	/* Set the magic number. */
 	packet.header.magic = FMR_MAGIC_NUMBER;
 	/* Compute the length of the packet. */
@@ -186,7 +151,7 @@ int lf_ram_load(struct _lf_device *device, void *source, lf_size_t length) {
 		lf_error_raise(E_NO_DEVICE, error_message("Failed to load to device."));
 		return lf_error;
 	}
-	struct _fmr_packet _packet = { 0 };
+	struct _fmr_packet _packet;
 	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
 	/* Set the magic number. */
 	_packet.header.magic = FMR_MAGIC_NUMBER;

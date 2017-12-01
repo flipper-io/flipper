@@ -111,18 +111,6 @@ struct _lf_device {
 	lf_error_t error;
 };
 
-/* ~ Declare the virtual interface for this driver. ~ */
-extern const struct _flipper {
-	/* Attaches the current instance of libflipper to the first available device over the default endpoint. */
-	struct _lf_device *(* const attach)(void);
-	/* Selects a previously attached Flipper device and routes all calls to it. */
-	int (* const select)(struct _lf_device *device);
-	/* Disconnects a previously attached Flipper device from libflipper. */
-	int (* const detach)(struct _lf_device *device);
-	/* Safely destroys all libflipper state before termination. */
-	int (* const exit)(void);
-} flipper;
-
 typedef struct _lf_ll *lf_event_list;
 extern lf_event_list lf_registered_events;
 #define lf_get_event_list() lf_registered_events
@@ -185,20 +173,15 @@ int lf_select(struct _lf_device *device);
 #include <flipper/endpoint.h>
 #include <flipper/ll.h>
 
-/* -------------- OLD API -------------- */
-
-/* ~ Declare the prototypes for all functions exposed by this driver. ~ */
-struct _lf_device *flipper_attach(void);
-int flipper_select(struct _lf_device *device);
-int flipper_detach(struct _lf_device *device);
-int flipper_exit(void);
-
+/* Performs a remote procedure call to a module's function. */
 lf_return_t lf_invoke(struct _lf_module *module, fmr_function function, struct _lf_ll *args);
-
 /* Moves data from the address space of the host to that of the device. */
-int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _lf_ll *args);
+lf_return_t lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _lf_ll *args);
 /* Moves data from the address space of the device to that of the host. */
-int lf_pull(struct _lf_module *module, fmr_function function, void *destination, lf_size_t length, struct _lf_ll *args);
+lf_return_t lf_pull(struct _lf_module *module, fmr_function function, void *destination, lf_size_t length, struct _lf_ll *args);
+
+/* Closes the library. */
+int lf_exit(void);
 
 /* Load the device's configuration information. */
 int lf_load_configuration(struct _lf_device *device);

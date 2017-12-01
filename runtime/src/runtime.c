@@ -116,7 +116,7 @@ fmr_va fmr_data(void *data, lf_size_t size) {
 	return fmr_ptr(NULL);
 }
 
-int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _lf_ll *parameters) {
+lf_return_t lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _lf_ll *parameters) {
 	/* Ensure that we have a valid module and argument pointer. */
 	if (!module) {
 		lf_error_raise(E_NULL, error_message("No module specified for message runtime push to module '%s'.", module -> name));
@@ -165,10 +165,10 @@ int lf_push(struct _lf_module *module, fmr_function function, void *source, lf_s
 	/* Obtain the result of the operation. */
 	lf_get_result(device, &result);
 	/* Return a pointer to the data. */
-	return lf_success;
+	return result.value;
 }
 
-int lf_pull(struct _lf_module *module, fmr_function function, void *destination, lf_size_t length, struct _lf_ll *parameters) {
+lf_return_t lf_pull(struct _lf_module *module, fmr_function function, void *destination, lf_size_t length, struct _lf_ll *parameters) {
 	/* Ensure that we have a valid module and argument pointer. */
 	if (!module) {
 		lf_error_raise(E_NULL, error_message("No module specified for message runtime pull from module '%s'.", module -> name));
@@ -216,5 +216,5 @@ int lf_pull(struct _lf_module *module, fmr_function function, void *destination,
 	struct _fmr_result result;
 	/* Obtain the result of the operation. */
 	lf_get_result(device, &result);
-	return lf_success;
+	return result.value;
 }
