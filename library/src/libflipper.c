@@ -73,69 +73,17 @@ int __attribute__((__destructor__)) lf_exit(void) {
 
 /* Binds the lf_module structure to its counterpart on the attached device. */
 int lf_bind(struct _lf_module *module) {
-	/* Ensure that the module structure was allocated successfully. */
-	if (!module) {
-		lf_error_raise(E_NULL, error_message("No module provided to bind."));
-		return lf_error;
-	}
-	/* Calculate the identifier of the module, including the NULL terminator. */
-	lf_crc_t identifier = lf_crc(module->name, strlen(module->name) + 1);
-	/* Attempt to get the module index. */
-	fmr_module index = fld_index(identifier) | FMR_USER_INVOCATION_BIT;
-	/* Throw an error if there is no counterpart module found. */
-	lf_assert(index == -1, failure, E_MODULE, "No counterpart module loaded for bind to module '%s'.", module->name);
-	/* Set the module's indentifier. */
-	module->identifier = identifier;
-	/* Set the module's index. */
+	lf_assert(module, failure, E_MODULE, "NULL module passed to bind.");
+	module->identifier = lf_crc(module->name, strlen(module->name) + 1);
+	if (!module->device) module->device = lf_get_current_device();
+
+	fmr_module index = fld_index(module->identifier) | FMR_USER_INVOCATION_BIT;
+	lf_assert(index != -1, failure, E_MODULE, "No counterpart for the module '%s' was found on the device '%s'. Load the module first.", module->name, module->device->configuration.name);
 	module->index = index;
-	/* Set the module's device. */
-	module->device = lf_get_current_device();
+
 	return lf_success;
 failure:
 	return lf_error;
-}
-
-/* PROTOTYPE FUNCTION: Load an image into a device's RAM. */
-int lf_ram_load(struct _lf_device *device, void *source, lf_size_t length) {
-	if (!source) {
-		lf_error_raise(E_NULL, error_message("No source provided for load operation."));
-	} else if (!length) {
-		return lf_success;
-	}
-	/* If no device is provided, throw an error. */
-	if (!device) {
-		lf_error_raise(E_NO_DEVICE, error_message("Failed to load to device."));
-		return lf_error;
-	}
-	struct _fmr_packet _packet;
-	memset(&_packet, 0, sizeof(struct _fmr_packet));
-	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
-	/* Set the magic number. */
-	_packet.header.magic = FMR_MAGIC_NUMBER;
-	/* Compute the initial length of the packet. */
-	_packet.header.length = sizeof(struct _fmr_push_pull_packet);
-	/* Set the packet class. */
-	_packet.header.class = fmr_ram_load_class;
-	/* Set the push length. */
-	packet->length = length;
-	/* Compute and store the packet checksum. */
-	_packet.header.checksum = lf_crc(packet, _packet.header.length);
-	/* Send the packet to the target device. */
-	int _e = lf_transfer(device, &_packet);
-	if (_e < lf_success) {
-		return lf_error;
-	}
-	/* Transfer the data through to the address space of the device. */
-	_e = device->endpoint->push(device->endpoint, source, length);
-	/* Ensure that the data was successfully transferred to the device. */
-	if (_e < lf_success) {
-		return lf_error;
-	}
-	struct _fmr_result result;
-	/* Obtain the result of the operation. */
-	lf_get_result(device, &result);
-	/* Return a pointer to the data. */
-	return result.value;
 }
 
 /* Debugging functions for displaying the contents of various FMR related data structures. */

@@ -9,7 +9,7 @@ int uart0_configure(uint8_t baud, uint8_t interrupts) {
 	return lf_success;
 }
 
-bool uart0_ready(struct _lf_endpoint *self) {
+int uart0_ready(void) {
 	printf("Checking if the uart0 is ready.\n");
 	return lf_success;
 }

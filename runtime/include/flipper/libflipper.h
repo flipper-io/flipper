@@ -140,6 +140,9 @@ struct _lf_module {
 	struct _lf_device *device;
 };
 
+#define LF_VAR __attribute__((section(".lf.vars")))
+#define LF_FUNC __attribute__((section(".lf.funcs")))
+
 /* Macro for easily generating module structures. */
 #define LF_MODULE(symbol, name, description) \
 	struct _lf_module symbol = { \
@@ -198,7 +201,7 @@ int lf_retrieve(struct _lf_device *device, struct _fmr_result *response);
 int lf_bind(struct _lf_module *module);
 
 /* Experimental: Load an application into RAM and execute it. */
-int lf_ram_load(struct _lf_device *device, void *source, lf_size_t length);
+int lf_load(struct _lf_device *device, void *source, lf_size_t length);
 
 /* Prints verbose information about the packet disassembly. */
 void lf_debug_packet(struct _fmr_packet *packet, size_t length);

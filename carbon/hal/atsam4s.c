@@ -9,6 +9,7 @@ int carbon_select_atsam4s(struct _lf_device *device) {
 	LF_MODULE_SET_DEVICE_AND_ID(_adc, device, _adc_id);
 	LF_MODULE_SET_DEVICE_AND_ID(_button, device, _button_id);
 	LF_MODULE_SET_DEVICE_AND_ID(_dac, device, _dac_id);
+	LF_MODULE_SET_DEVICE_AND_ID(_fld, device, _fld_id);
 	LF_MODULE_SET_DEVICE_AND_ID(_gpio, device, _gpio_id);
 	LF_MODULE_SET_DEVICE_AND_ID(_i2c, device, _i2c_id);
 	LF_MODULE_SET_DEVICE_AND_ID(_led, device, _led_id);

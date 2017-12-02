@@ -84,6 +84,7 @@ LF_WEAK int fmr_perform_standard_invocation(struct _fmr_invocation *call, struct
 }
 
 LF_WEAK int fmr_perform_user_invocation(struct _fmr_invocation *invocation, struct _fmr_result *result) {
+	printf("User invocation requested.\n");
 	return lf_error;
 }
 
