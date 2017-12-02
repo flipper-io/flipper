@@ -105,7 +105,7 @@ X86_INC_DIRS := carbon/include 										\
 
 X86_SRC_DIRS := carbon/hal											\
 				library/src											\
-				library/arch/x86_64									\
+				runtime/arch/x64									\
 				library/platforms/posix								\
 				runtime/src
 

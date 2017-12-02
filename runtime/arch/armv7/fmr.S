@@ -5,7 +5,7 @@
 #define argi r8
 #define temp r9
 
-/* uint32_t fmr_call(const uint32_t (* function)(void), uint8_t argc, uint16_t argt, void *argv); */
+/* lf_return_t fmr_call(lf_return_t (* function)(void), uint8_t argc, uint16_t argt, void *argv); */
 
 .syntax unified
 .global fmr_call
