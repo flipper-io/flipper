@@ -35,11 +35,21 @@ failure:
 	return NULL;
 }
 
+void lf_ll_free(struct _lf_ll **_ll) {
+	struct _lf_ll *ll = *_ll;
+	if (ll->deconstructor) ll->deconstructor(ll->item);
+    *_ll = (*_ll)->next;
+	free(ll);
+}
+
 void lf_ll_remove(struct _lf_ll **_ll, void *item) {
 	lf_assert(_ll, failure, E_NULL, "Invalid list reference provided to '%s.'", __PRETTY_FUNCTION__);
-	while (*_ll) {
-#warning Need to call deconstructor here.
-		if ((*_ll)->item == item) *_ll = (*_ll)->next;
+    while (*_ll) {
+        if ((*_ll)->item == item) {
+            lf_ll_free(_ll);
+        } else {
+            _ll = &(*_ll)->next;
+        }
 	}
 failure:
 	return;
@@ -57,15 +67,7 @@ failure:
 /* Releases the entire linked list. */
 int lf_ll_release(struct _lf_ll **_ll) {
 	lf_assert(_ll, failure, E_NULL, "Invalid list reference provided to '%s'.", __PRETTY_FUNCTION__);
-	struct _lf_ll *ll = *_ll;
-	while (ll) {
-		/* Call the item's deconstructor. */
-		if (ll->deconstructor) ll->deconstructor(ll->item);
-		struct _lf_ll *old = ll;
-		ll = ll->next;
-		free(old);
-	};
-	*_ll = NULL;
+	while (*_ll) lf_ll_free(_ll);
 	return lf_success;
 failure:
 	return lf_error;

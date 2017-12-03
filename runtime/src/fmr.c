@@ -1,8 +1,6 @@
 #define __private_include__
 #include <flipper/libflipper.h>
 
-/* TODO: Move this implementation to use lf_ll. */
-
 struct _lf_ll *fmr_build(int argc, ...) {
 	lf_assert(argc < FMR_MAX_ARGC, failure, E_OVERFLOW, "Too many arguments were provided when building (%i) call.", argc);
 	struct _lf_ll *list = NULL;
@@ -27,11 +25,14 @@ struct _lf_ll *fmr_build(int argc, ...) {
 	return list;
 failure:
 	lf_ll_release(&list);
+	/* Release the variadic argument list. */
+	va_end(argv);
 	return NULL;
 }
 
 int fmr_create_call(fmr_module module, fmr_function function, struct _lf_ll *args, struct _fmr_header *header, struct _fmr_invocation *call) {
-	lf_assert(header || call, failure, E_NULL, "No header or call.");
+	lf_assert(header, failure, E_NULL, "NULL header passed to '%s'.", __PRETTY_FUNCTION__);
+	lf_assert(header, failure, E_NULL, "NULL call passed to '%s'.", __PRETTY_FUNCTION__);
 	/* Store the target module, function, and argument count in the packet. */
 	size_t argc = lf_ll_count(args);
 	call->index = module;
@@ -68,20 +69,14 @@ lf_return_t fmr_execute(fmr_module module, fmr_function function, fmr_argc argc,
 	/* Dereference and return a pointer to the target function. */
 	void *address = object[function];
 	/* Ensure that the function address is valid. */
-	if (!address) {
-		lf_error_raise(E_RESOULTION, NULL);
-		return 0;
-	}
+	lf_assert(address, failure, E_NULL, "NULL address supplied to '%s'.", __PRETTY_FUNCTION__);
 	/* Perform the function call internally. */
 	return fmr_call(address, argc, types, arguments);
+failure:
+	return -1;
 }
 
 /* ~ Message runtime subclass handlers. ~ */
-
-LF_WEAK int fmr_perform_standard_invocation(struct _fmr_invocation *call, struct _fmr_result *result) {
-	result->value = fmr_execute(call->index, call->function, call->argc, call->types, call->parameters);
-	return lf_success;
-}
 
 LF_WEAK int fmr_perform_user_invocation(struct _fmr_invocation *invocation, struct _fmr_result *result) {
 	printf("User invocation requested.\n");
@@ -90,32 +85,24 @@ LF_WEAK int fmr_perform_user_invocation(struct _fmr_invocation *invocation, stru
 
 int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
 	/* Check that the magic number matches. */
-	if (packet->header.magic != FMR_MAGIC_NUMBER) {
-		lf_error_raise(E_CHECKSUM, NULL);
-		goto failure;
-	}
-	/* Create a copy of the packet's checksum. */
+	lf_assert(packet->header.magic == FMR_MAGIC_NUMBER, failure, E_CHECKSUM, "Invalid magic number.");
+
+	/* Ensure the packet's checksums match. */
 	lf_crc_t _crc = packet->header.checksum;
-	/* Clear the checksum of the packet. */
 	packet->header.checksum = 0x00;
-	/* Calculate our checksum of the packet. */
 	uint16_t crc = lf_crc(packet, packet->header.length);
-	/* Ensure that the checksums of the packets match. */
-	if (_crc != crc) {
-		lf_error_raise(E_CHECKSUM, NULL);
-		goto failure;
-	}
+	lf_assert(_crc == crc, failure, E_CHECKSUM, "Checksums do not match.");
 
 	/* Cast the incoming packet to the different packet structures for subclass handling. */
-	struct _fmr_invocation_packet *_ip = (struct _fmr_invocation_packet *)packet;
+	struct _fmr_invocation *call = &( (struct _fmr_invocation_packet *)packet)->call;
 
 	/* Switch through the packet subclasses and invoke the appropriate handler for each. */
 	switch (packet->header.class) {
 		case fmr_standard_invocation_class:
-			fmr_perform_standard_invocation(&(_ip->call), result);
+			result->value = fmr_execute(call->index, call->function, call->argc, call->types, call->parameters);
 		break;
 		case fmr_user_invocation_class:
-			fmr_perform_user_invocation(&(_ip->call), result);
+			fmr_perform_user_invocation(call, result);
 		break;
 		case fmr_ram_load_class:
 		case fmr_send_class:
