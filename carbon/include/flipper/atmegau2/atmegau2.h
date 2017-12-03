@@ -27,8 +27,8 @@
 
 #define delay_ms(ms) _delay_ms(ms)
 
-#define DFU_BAUD				0x10
-#define FMR_BAUD				0x01
+#define DFU_BAUD				0x08
+#define FMR_BAUD				0x00
 
 /* Pin definition macros for F3 hardware. */
 #define FLASH_CS_DDR            DDRB

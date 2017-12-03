@@ -152,7 +152,7 @@ _ret_int:
 	mov r23, r25
 	clr r25
 	sbrc r23, 7
-	com r23
+	com r25
 	mov r22, r24
 	clr r24
 	sbrc r23, 7

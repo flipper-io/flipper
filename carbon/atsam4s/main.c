@@ -64,7 +64,8 @@ int main(void) {
 	is25lp_configure();
 
 	/* Enable the FSI pin. */
-	gpio_enable((1 << FMR_PIN), 0);
+	gpio_enable(FMR_PIN, 0);
+	gpio_write(0, FMR_PIN);
 
 	/* Pull an FMR packet asynchronously to launch FMR. */
 	uart0_pull(&packet, sizeof(struct _fmr_packet));
@@ -77,28 +78,32 @@ int main(void) {
 }
 
 void uart0_isr(void) {
+
+	__disable_irq();
+
+	uint32_t _sr = UART0->UART_SR;
+
 	/* If an entire packet has been received, process it. */
-	if (UART0->UART_SR & UART_SR_ENDRX) {
-		/* Disable the PDC receiver. */
-		UART0->UART_PTCR = UART_PTCR_RXTDIS;
-		/* Clear the PDC RX interrupt flag. */
-		UART0->UART_RCR = 1;
-		/* Disable the PDC receive complete interrupt. */
-		UART0->UART_IDR = UART_IDR_ENDRX;
+	if (_sr & UART_SR_ENDRX) {
+		gpio_write(FMR_PIN, 0);
+
+		UART0->UART_PTCR = UART_PTCR_RXTDIS | UART_PTCR_TXTDIS;
 
 		struct _fmr_result result;
 		lf_error_clear();
 		fmr_perform(&packet, &result);
-
-		gpio_write((1 << FMR_PIN), 0);
-		usart_push(&result, sizeof(struct _fmr_result));
 		uart0_push(&result, sizeof(struct _fmr_result));
-		gpio_write(0, (1 << FMR_PIN));
-
-		/* Flush any remaining data that has been buffered. */
-		while (UART0->UART_SR & UART_SR_RXRDY) UART0->UART_RHR;
-
-		UART0->UART_IER |= UART_IER_ENDRX;
 		uart0_pull(&packet, sizeof(struct _fmr_packet));
+
+		/* Wait a bit before raising the FMR pin. */
+		for (size_t i = 0; i < 0x3FF; i ++) __asm__ __volatile__("nop");
+
+		gpio_write(0, FMR_PIN);
+	} else {
+		printf("uart error o:%li f:%li p:%li\n", (_sr & UART_SR_OVRE), (_sr & UART_SR_FRAME), (_sr & UART_SR_PARE));
+		UART0->UART_CR = UART_CR_RSTSTA;
 	}
+
+	__enable_irq();
+
 }

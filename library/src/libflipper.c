@@ -73,6 +73,7 @@ int __attribute__((__destructor__)) lf_exit(void) {
 /* Binds the lf_module structure to its counterpart on the attached device. */
 int lf_bind(struct _lf_module *module) {
 	lf_assert(module, failure, E_MODULE, "NULL module passed to bind.");
+    lf_assert(module->name, failure, E_MODULE, "Module has no name.");
 	module->identifier = lf_crc(module->name, strlen(module->name) + 1);
 	if (!module->device) module->device = lf_get_current_device();
 

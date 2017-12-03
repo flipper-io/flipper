@@ -44,7 +44,7 @@
 /* 2 megabaud. */
 #define PLATFORM_BAUDRATE 1000000
 
-#define FMR_PIN 0
+#define FMR_PIN PIO_PA0
 
 #define FLASH_PCS 0
 #define FLASH_PCS_PIN PIO_PA11A_NPCS0

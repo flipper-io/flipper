@@ -9,9 +9,9 @@ uint8_t idx = 0;
 int uart0_configure(uint8_t baud, uint8_t interrupts) {
 
 	UBRR1L = baud;
-	UCSR1A |= (1 << U2X1);
+	UCSR1A &= ~(1 << U2X1);
 	/* 8n1 */
-	UCSR1C = (1 << UCSZ10) | (1 << UCSZ11);
+	UCSR1C = (1 << UCSZ11) | (1 << UCSZ10);
 	/* Enable the receiver, transmitter, and receiver interrupt. */
 	UCSR1B = (1 << RXEN1) | (1 << TXEN1);
 
@@ -72,9 +72,8 @@ failure:
 
 ISR(USART1_RX_vect) {
 	if (FSI_IN & (1 << FSI_PIN)) {
-		while (UCSR1A & (1 << RXC1)) uart0_buffer[idx++] = UDR1;
+		uart0_buffer[idx++] = UDR1;
 	} else {
-		/* It's a debug message. */
-		while (UCSR1A & (1 << RXC1)) usb_debug_putchar(UDR1);
+		usb_debug_putchar(UDR1);
 	}
 }

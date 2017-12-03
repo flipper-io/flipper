@@ -103,9 +103,7 @@ int os_load_module(void *base, struct _lf_abi_header *header) {
 }
 
 fmr_module os_get_module_index(lf_crc_t identifier) {
-	printf("Preparing to compare module.\n");
 	for (int i = 0; i < user_modules.count; i ++) {
-		printf("Comparing module %i, id: 0x%08x v.s. needed 0x%08x.\n", i, user_modules.modules[i].identifier, identifier);
 		if (user_modules.modules[i].identifier == identifier) {
 			return i;
 		}
