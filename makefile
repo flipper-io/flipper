@@ -121,7 +121,7 @@ X86_CFLAGS	 := -std=gnu99											\
 				$(shell pkg-config --cflags libusb-1.0)				\
 				$(foreach inc,$(X86_INC_DIRS),-I$(inc))				\
 
-X86_LDFLAGS  := $(shell pkg-config --libs libusb-1.0) -install_name $(PREFIX)/lib/libflipper.so
+X86_LDFLAGS  := $(shell pkg-config --libs libusb-1.0)
 
 # --- LIBFLIPPER --- #
 
