@@ -61,7 +61,7 @@ int uart0_pull(void *destination, lf_size_t length) {
 	while (length--) {
 		uint8_t timeout = UDFNUML + LF_UART_TIMEOUT_MS;
 		while (!(UCSR1A & (1 << RXC1))) {
-			lf_assert(UDFNUML != timeout, failure, E_UART0_PUSH_TIMEOUT, "Timeout occurred while pushing to uart0.");
+			lf_assert(UDFNUML != timeout, failure, E_UART0_PULL_TIMEOUT, "Timeout occurred while pulling from uart0.");
 		}
 		*(uint8_t *)(destination ++) = UDR1;
 	}

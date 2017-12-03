@@ -44,6 +44,9 @@ void lf_error_raise(lf_error_t error, const char *format, ...) {
 		/* Release the va_list. */
 		va_end(argv);
 		if (errors_cause_side_effects) {
+            if (_error >= E_MAX) {
+                _error = E_UNIMPLEMENTED;
+            }
 			/* Print the error code. */
 			fprintf(stderr, KNRM "Error code (%i): '" KBLU "%s" KNRM "'\n\n", _error, lf_error_messages[_error]);
 		}

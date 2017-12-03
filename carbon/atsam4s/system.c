@@ -37,7 +37,7 @@ lf_return_t fmr_push(struct _fmr_push_pull_packet *packet) {
 		os_load_image(push_buffer);
 	} else {
 		*(uintptr_t *)(packet->call.parameters) = (uintptr_t)push_buffer;
-		retval = fmr_execute(packet->call.index, packet->call.function, packet->call.argc, packet->call.types, (void *)(packet->call.parameters));
+		retval = fmr_execute(packet->call.index, packet->call.function, packet->call.ret, packet->call.argc, packet->call.types, (void *)(packet->call.parameters));
 		free(push_buffer);
 	}
 	return retval;
@@ -55,7 +55,7 @@ lf_return_t fmr_pull(struct _fmr_push_pull_packet *packet) {
 			return -1;
 		}
 		*(uintptr_t *)(packet->call.parameters) = (uintptr_t)pull_buffer;
-		retval = fmr_execute(packet->call.index, packet->call.function, packet->call.argc, packet->call.types, (void *)(packet->call.parameters));
+		retval = fmr_execute(packet->call.index, packet->call.function, packet->call.ret, packet->call.argc, packet->call.types, (void *)(packet->call.parameters));
 		uart0_push(pull_buffer, packet->length);
 		free(pull_buffer);
 	}

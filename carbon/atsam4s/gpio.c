@@ -9,12 +9,14 @@ int gpio_configure(void) {
 }
 
 void gpio_enable(uint32_t enable, uint32_t disable) {
+	printf("gpio e:0x%08x d:0x%08x\n", enable, disable);
 	PIOA -> PIO_PER |= enable;
 	PIOA -> PIO_OER |= enable;
 	PIOA -> PIO_ODR |= disable;
 }
 
 void gpio_write(uint32_t set, uint32_t clear) {
+	printf("gpio s:0x%08x c:0x%08x\n", set, clear);
 	PIOA -> PIO_SODR |= set;
 	PIOA -> PIO_CODR |= clear;
 }

@@ -24,7 +24,7 @@ const void *const fmr_modules[] = {
 	&wdt
 };
 
-LF_WEAK lf_return_t fmr_call(lf_return_t (* function)(void), uint8_t argc, uint16_t argt, void *argv) {
+LF_WEAK lf_return_t fmr_call(lf_return_t (* function)(void), fmr_type ret, uint8_t argc, uint16_t argt, void *argv) {
 	/* Grab the symbol name of the function for debugging purposes. */
 #ifdef __dl_info__
 	#include <dlfcn.h>

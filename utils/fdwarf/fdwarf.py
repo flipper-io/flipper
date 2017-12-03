@@ -108,7 +108,7 @@ def process_file(filename, package):
 	functs = []
 	for f in functions:
 		struct.append('&%s' % f.name)
-		statement = 'lf_invoke(MODULE, FUNCTION, fmr_args(ARGS));'
+		statement = 'lf_invoke(MODULE, FUNCTION, fmr_int_t, fmr_args(ARGS));'
 		args = []
 		for p in f.parameters:
 			args.append('fmr_infer(ARG)'.replace('ARG', p.name))

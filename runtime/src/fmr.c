@@ -30,13 +30,14 @@ failure:
 	return NULL;
 }
 
-int fmr_create_call(fmr_module module, fmr_function function, struct _lf_ll *args, struct _fmr_header *header, struct _fmr_invocation *call) {
+int fmr_create_call(fmr_module module, fmr_function function, fmr_type ret, struct _lf_ll *args, struct _fmr_header *header, struct _fmr_invocation *call) {
 	lf_assert(header, failure, E_NULL, "NULL header passed to '%s'.", __PRETTY_FUNCTION__);
-	lf_assert(header, failure, E_NULL, "NULL call passed to '%s'.", __PRETTY_FUNCTION__);
+	lf_assert(call, failure, E_NULL, "NULL call passed to '%s'.", __PRETTY_FUNCTION__);
 	/* Store the target module, function, and argument count in the packet. */
 	size_t argc = lf_ll_count(args);
 	call->index = module;
 	call->function = function;
+	call->ret = ret;
 	call->argc = argc;
 	/* Calculate the offset into the packet at which the arguments will be loaded. */
 	uint8_t *offset = (uint8_t *)&(call->parameters);
@@ -44,8 +45,9 @@ int fmr_create_call(fmr_module module, fmr_function function, struct _lf_ll *arg
 	for (size_t i = 0; i < argc; i ++) {
 		/* Pop the argument from the argument list. */
 		struct _lf_arg *arg = lf_ll_item(args, i);
+		lf_assert(arg, failure, E_NULL, "Invalid argument supplied to '%s'.", __PRETTY_FUNCTION__);
 		/* Encode the argument's type. */
-		call->types |= (arg->type & 0x3) << (i * 2);
+		call->types |= (arg->type & 0xF) << (i * 4);
 		/* Calculate the size of the argument. */
 		uint8_t size = fmr_sizeof(arg->type);
 		/* Copy the argument into the parameter segment. */
@@ -63,7 +65,7 @@ failure:
 	return lf_error;
 }
 
-lf_return_t fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, fmr_types types, void *arguments) {
+lf_return_t fmr_execute(fmr_module module, fmr_function function, fmr_type ret, fmr_argc argc, fmr_types argt, void *arguments) {
 	/* Dereference the pointer to the target module. */
 	void *const *object = fmr_modules[module];
 	/* Dereference and return a pointer to the target function. */
@@ -71,7 +73,7 @@ lf_return_t fmr_execute(fmr_module module, fmr_function function, fmr_argc argc,
 	/* Ensure that the function address is valid. */
 	lf_assert(address, failure, E_NULL, "NULL address supplied to '%s'.", __PRETTY_FUNCTION__);
 	/* Perform the function call internally. */
-	return fmr_call(address, argc, types, arguments);
+	return fmr_call(address, ret, argc, argt, arguments);
 failure:
 	return lf_error;
 }
@@ -99,7 +101,7 @@ int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
 	/* Switch through the packet subclasses and invoke the appropriate handler for each. */
 	switch (packet->header.class) {
 		case fmr_standard_invocation_class:
-			result->value = fmr_execute(call->index, call->function, call->argc, call->types, call->parameters);
+			result->value = fmr_execute(call->index, call->function, call->ret, call->argc, call->types, call->parameters);
 		break;
 		case fmr_user_invocation_class:
 			fmr_perform_user_invocation(call, result);

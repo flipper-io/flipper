@@ -33,7 +33,7 @@ failure:
 	return lf_error;
 }
 
-lf_return_t lf_invoke(struct _lf_module *module, fmr_function function, struct _lf_ll *parameters) {
+lf_return_t lf_invoke(struct _lf_module *module, fmr_function function, fmr_type ret, struct _lf_ll *parameters) {
 	lf_assert(module, failure, E_NULL, "No module was specified for function invocation.");
 	lf_assert(module->index != -1, failure, E_MODULE, "The module '%s' has not been configured. Call '%s_configure()' first.", module->name, module->name);
 	lf_assert(module->device, failure, E_NO_DEVICE, "The module '%s' has no target device. Did you attach before configuring?", module->name);
@@ -55,7 +55,7 @@ lf_return_t lf_invoke(struct _lf_module *module, fmr_function function, struct _
 
 	/* Generate the function call in the outgoing packet. */
 	struct _fmr_invocation_packet *packet = (struct _fmr_invocation_packet *)(&_packet);
-	int _e = fmr_create_call((uint8_t)(module->index), function, parameters, &_packet.header, &packet->call);
+	int _e = fmr_create_call((uint8_t)(module->index), function, ret, parameters, &_packet.header, &packet->call);
 	lf_assert(_e == lf_success, failure, E_NULL, "Failed to generate a valid call to module '%s'.", module->name);
 	_packet.header.checksum = lf_crc(&_packet, _packet.header.length);
 
@@ -89,7 +89,7 @@ lf_return_t lf_push(struct _lf_module *module, fmr_function function, void *sour
 	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
 	packet->length = length;
 
-	int _e = fmr_create_call(module->index, function, fmr_args(fmr_ptr(source), fmr_infer(length)), &_packet.header, &packet->call);
+	int _e = fmr_create_call(module->index, function, fmr_int_t, fmr_args(fmr_ptr(source), fmr_infer(length)), &_packet.header, &packet->call);
 	lf_assert(_e == lf_success, failure, E_NULL, "Failed to generate a valid push to module '%s'.", module->name);
 	_packet.header.checksum = lf_crc(packet, _packet.header.length);
 
@@ -124,7 +124,7 @@ lf_return_t lf_pull(struct _lf_module *module, fmr_function function, void *dest
 	packet->length = length;
 
 	/* Generate the function call in the outgoing packet. */
-	int _e = fmr_create_call(module->index, function, fmr_args(fmr_ptr(destination), fmr_infer(length)), &_packet.header, &packet->call);
+	int _e = fmr_create_call(module->index, function, fmr_int_t, fmr_args(fmr_ptr(destination), fmr_infer(length)), &_packet.header, &packet->call);
 	lf_assert(_e == lf_success, failure, E_NULL, "Failed to generate a valid pull from module '%s'.", module->name);
 	_packet.header.checksum = lf_crc(packet, _packet.header.length);
 

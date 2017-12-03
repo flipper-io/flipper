@@ -12,11 +12,11 @@ const struct _button button = {
 };
 
 LF_WEAK int button_configure(void) {
-	return lf_invoke(&_button, _button_configure, NULL);
+	return lf_invoke(&_button, _button_configure, fmr_int_t, NULL);
 }
 
 LF_WEAK uint8_t button_read(void) {
-	return (lf_invoke(&_button, _button_read, NULL) >> 16) & 0xFF;
+	return lf_invoke(&_button, _button_read, fmr_int8_t, NULL);
 }
 
 #endif

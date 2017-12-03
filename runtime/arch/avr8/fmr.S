@@ -1,16 +1,19 @@
 #define param_function_h	r25
 #define param_function_l	r24
-#define param_argc_h		r23
-#define param_argc_l		r22
-#define argc				r2
-#define param_argt_h		r21
-#define param_argt_l		r20
+#define param_retv_h			r23
+#define param_retv_l			r22
+#define retv				r2
+#define param_argc_h		r21
+#define param_argc_l		r20
+#define argc				r3
+#define param_argt_h		r19
+#define param_argt_l		r18
 #define	argt_h				r5
 #define argt_l				r4
-#define param_argv_h		r19
-#define param_argv_l		r18
+#define param_argv_h		r17
+#define param_argv_l		r16
 
-; lf_return_t fmr_call(lf_return_t (* function)(void), uint8_t argc, uint16_t argt, void *argv);
+; lf_return_t fmr_call(lf_return_t (* function)(void), fmr_type ret, uint8_t argc, uint16_t argt, void *argv);
 
 .global fmr_call
 
@@ -22,6 +25,8 @@ fmr_call:
 	; Preserve the function address on the stack.
 	push param_function_h
 	push param_function_l
+	; Save the retv parameter into a lower register.
+	mov retv, param_retv_l
 	; Save the argc parameter into a lower register.
 	mov argc, param_argc_l
 	; Save the encoded argument types into a lower register duet.
@@ -38,16 +43,23 @@ _load:
 	breq _call
 	; Obtain the argument type from the lowest two bits by masking 0b11.
 	mov r16, argt_l
-	andi r16, 0x03
+	andi r16, 0xF
 	; Jump to the appropraite code for the argument's type.
+	; fmr_int8_t
 	cpi r16, 0
 	breq _load_8
+	; fmr_int16_t
 	cpi r16, 1
 	breq _load_16
+	; fmr_int32_t
 	cpi r16, 2
 	breq _load_32
+	; fmr_ptr_t
 	cpi r16, 3
 	breq _load_ptr
+	; fmr_int_t
+	cpi r16, 4
+	breq _load_16
 _load_8:
 	ld r0, Z+
 	st -X, r0
@@ -82,7 +94,11 @@ _load_ptr:
 	subi XL, 0x02
 	adiw ZL, 0x02
 _load_done:
-	; Shift the encoded types two bits to the right.
+	; Shift the encoded types four bits to the right.
+	asr argt_h
+	ror argt_l
+	asr argt_h
+	ror argt_l
 	asr argt_h
 	ror argt_l
 	asr argt_h
@@ -97,6 +113,56 @@ _call:
 	pop ZH
 	; Call the target function.
 	icall
+_ret:
+	mov r16, retv
+	andi r16, 0xF
+	; fmr_int8_t
+	cpi r16, 0
+	breq _ret_8
+	; fmr_int16_t
+	cpi r16, 1
+	breq _ret_16
+	; fmr_int32_t
+	cpi r16, 2
+	breq _ret_32
+	; fmr_ptr_t
+	cpi r16, 3
+	breq _ret_16
+	; fmr_int_t
+	cpi r16, 4
+	breq _ret_int
+	; fmr_void_t
+	cpi r16, 5
+	breq _ret_void
+_ret_8:
+	clr r25
+	mov r22, r24
+	clr r24
+	clr r23
+	rjmp _call_done
+_ret_16:
+	mov r23, r25
+	clr r25
+	mov r22, r24
+	clr r24
+	rjmp _call_done
+_ret_32:
+	rjmp _call_done
+_ret_int:
+	mov r23, r25
+	clr r25
+	sbrc r23, 7
+	com r23
+	mov r22, r24
+	clr r24
+	sbrc r23, 7
+	com r24
+	rjmp _call_done
+_ret_void:
+	clr r25
+	clr r24
+	clr r23
+	clr r22
 _call_done:
 	; Restore the callee saved registers.
 	pop argt_h

@@ -38,7 +38,9 @@ enum {
 	fmr_int8_t,
 	fmr_int16_t,
 	fmr_int32_t,
-	fmr_ptr_t
+	fmr_ptr_t,
+	fmr_int_t,
+	fmr_void_t
 };
 
 /* A type used to reference the values in the enum above. */
@@ -137,6 +139,8 @@ struct LF_PACKED _fmr_invocation {
 	uint8_t index;
 	/* The index of the function within the module. */
 	uint8_t function;
+	/* The return type. */
+	fmr_type ret;
 	/* The types of the encoded parameters. */
 	fmr_types types;
 	/* The number of encoded parameters. */
@@ -182,9 +186,9 @@ struct _lf_ll *fmr_build(int argc, ...);
 /* Appends an argument to an fmr_parameters. */
 int fmr_append(struct _lf_ll *list, fmr_type type, fmr_arg value);
 /* Generates the appropriate data structure needed for the remote procedure call of 'funtion' in 'module'. */
-int fmr_create_call(fmr_module module, fmr_function function, struct _lf_ll *args, struct _fmr_header *header, struct _fmr_invocation *call);
+int fmr_create_call(fmr_module module, fmr_function function, fmr_type ret, struct _lf_ll *args, struct _fmr_header *header, struct _fmr_invocation *call);
 /* Executes a standard module. */
-lf_return_t fmr_execute(fmr_module module, fmr_function function, fmr_argc argc, fmr_types types, void *arguments);
+lf_return_t fmr_execute(fmr_module module, fmr_function function, fmr_type ret, fmr_argc argc, fmr_types argt, void *arguments);
 /* Executes an fmr_packet and stores the result of the operation in the result buffer provided. */
 int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result);
 
@@ -196,6 +200,6 @@ extern lf_return_t fmr_pull(struct _fmr_push_pull_packet *packet);
 /* ~ Functions with platform specific implementation. ~ */
 
 /* Unpacks the argument buffer into the CPU following the native architecture's calling convention and jumps to the given function pointer. */
-extern lf_return_t fmr_call(lf_return_t (* function)(void), uint8_t argc, uint16_t argt, void *argv);
+extern lf_return_t fmr_call(lf_return_t (* function)(void), fmr_type ret, uint8_t argc, uint16_t argt, void *argv);
 
 #endif

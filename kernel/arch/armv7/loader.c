@@ -190,6 +190,6 @@ int fmr_perform_user_invocation(struct _fmr_invocation *invocation, struct _fmr_
 		return lf_error;
 	}
 	/* Perform the function call internally. */
-	result->value = fmr_call(address, invocation->argc, invocation->types, invocation->parameters);
+	result->value = fmr_call(address, invocation->ret, invocation->argc, invocation->types, invocation->parameters);
 	return result->error = lf_error_get();
 }

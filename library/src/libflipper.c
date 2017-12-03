@@ -91,20 +91,21 @@ void lf_debug_call(struct _fmr_invocation *call) {
 	printf("call:\n");
 	printf("\t└─ module:\t0x%x\n", call->index);
 	printf("\t└─ function:\t0x%x\n", call->function);
+    char *typestrs[] = { "fmr_int8", "fmr_int16", "fmr_int32", "fmr_ptr", "fmr_int", "fmr_void" };
+	printf("\t└─ return:\t%s\n", typestrs[call->ret]);
 	printf("\t└─ types:\t0x%x\n", call->types);
 	printf("\t└─ argc:\t0x%x (%d arguments)\n", call->argc, call->argc);
 	printf("arguments:\n");
 	/* Calculate the offset into the packet at which the arguments will be loaded. */
 	uint8_t *offset = call->parameters;
-	char *typestrs[] = { "fmr_int8", "fmr_int16", "fmr_int32", "fmr_ptr" };
 	fmr_types types = call->types;
 	for (fmr_argc i = 0; i < call->argc; i ++) {
-		fmr_type type = types & 0x3;
+		fmr_type type = types & 0xF;
 		fmr_arg arg = 0;
 		memcpy(&arg, offset, fmr_sizeof(type));
 		printf("\t└─ %s:\t0x%x\n", typestrs[type], arg);
 		offset += fmr_sizeof(type);
-		types >>= 2;
+		types >>= 4;
 	}
 	printf("\n");
 }

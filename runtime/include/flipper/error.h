@@ -55,7 +55,9 @@ enum {
 
 	/* uart0 */
 	E_UART0_PUSH_TIMEOUT,
-	E_UART0_PULL_TIMEOUT
+	E_UART0_PULL_TIMEOUT,
+    
+    E_MAX
 };
 
 /* These are the error strings that correspond to the values in the error code enumeration. */

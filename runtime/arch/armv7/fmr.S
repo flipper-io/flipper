@@ -1,11 +1,12 @@
-#define _function r4
-#define argc r5
-#define argt r6
-#define _argv r7
-#define argi r8
-#define temp r9
+#define _function r5
+#define retv r6
+#define argc r7
+#define argt r8
+#define _argv r9
+#define argi r10
+#define temp r11
 
-/* lf_return_t fmr_call(lf_return_t (* function)(void), uint8_t argc, uint16_t argt, void *argv); */
+/* lf_return_t fmr_call(lf_return_t (* function)(void), fmr_type ret, uint8_t argc, uint16_t argt, void *argv); */
 
 .syntax unified
 .global fmr_call
@@ -13,15 +14,17 @@
 .thumb_func
 fmr_call:
 	/* Save registers. */
-	push { _function-temp, lr }
+	push { r5-r11, lr }
 	/* Save the function address into r4. */
 	mov _function, r0
+	/* Load the return type. */
+	mov retv, r1
 	/* Load the argument count into r5. */
-	mov argc, r1
+	mov argc, r2
 	/* Load the argument types into r6. */
-	mov argt, r2
+	mov argt, r3
 	/* Load the address of the argument list into r7. */
-	mov _argv, r3
+	ldr _argv, [sp, #32]
 	/* Clear the argument index register. */
 	mov argi, #0
 _load:
@@ -29,20 +32,22 @@ _load:
 	cmp argc, #0
 	/* If there are no arguments left to load, call the function. */
 	beq _call
-	/* Obtain the argument type from the lowest two bits by masking 0b11. */
+	/* Obtain the argument type from the lowest two bits by masking 0b1111. */
 	mov temp, argt
-	and temp, 3
+	and temp, 0xF
 	/* Jump to the appropraite code for the argument's type. */
 	cmp temp, #0
-	beq _load_8
+		beq _load_8
 	cmp temp, #1
-	beq _load_16
+		beq _load_16
 	cmp temp, #2
-	beq _load_32
+		beq _load_32
 	cmp temp, #3
-	beq _load_ptr
+		beq _load_ptr
+	cmp temp, #4
+		beq _load_int
 	/* If the type was encoded improperly, return with error. */
-	b _error
+	b _failure
 _load_8:
 	/* Load a byte from the argument list. */
 	ldrb temp, [_argv, #0]
@@ -60,8 +65,10 @@ _load_32:
 	ldr temp, [_argv, #0]
 	/* Increment the argv pointer by four. */
 	add _argv, #4
-	b _load_done;
+	b _load_done
 _load_ptr:
+	b _load_32
+_load_int:
 	b _load_32
 _load_done:
 	/* If the argument index is less than 4, load the argument into the appropriate register. */
@@ -85,12 +92,13 @@ _write_r2:
 	b _write_done
 _write_r3:
 	mov r3, temp
+	b _write_done
 _write_stack:
 	/* Todo. */
-
+	b _failure
 _write_done:
 	/* Shift the encoded types two bits to the right. */
-	lsrs argt, #2
+	lsrs argt, #4
 	/* Decrease the argument count. */
 	sub argc, #1
 	/* Increase the argument index. */
@@ -100,11 +108,41 @@ _write_done:
 _call:
 	/* Jump to the function. */
 	blx _function
-	b _done
-_error:
+_ret:
+	/* Obtain the argument type from the lowest two bits by masking 0b11. */
+	mov temp, retv
+	and temp, 0xF
+	/* Jump to the appropraite code for the argument's type. */
+	cmp temp, #0
+		beq _ret_8
+	cmp temp, #1
+		beq _ret_16
+	cmp temp, #2
+		beq _ret_32
+	cmp temp, #3
+		beq _ret_ptr
+	cmp temp, #4
+		beq _ret_int
+	cmp temp, #5
+		beq _ret_void
+	b _failure
+_ret_8:
+	b _call_done
+_ret_16:
+	b _call_done
+_ret_32:
+	b _call_done
+_ret_ptr:
+	b _call_done
+_ret_int:
+	b _call_done
+_ret_void:
+	mov r0, #0
+	b _call_done
+_failure:
 	/* Return -1 if an error has occured. */
 	mov r0, #-1
-_done:
+_call_done:
 	/* Restore registers and return to the top-level caller. */
 	pop { _function-temp, pc }
 

@@ -47,7 +47,7 @@ void usart_disable(void) {
 	USART0 -> US_CR = US_CR_TXDIS | US_CR_RXDIS;
 }
 
-uint8_t usart_ready(void) {
+int usart_ready(void) {
 	/* Return the empty condition of the transmitter FIFO. */
 	return (USART0 -> US_CSR & US_CSR_TXEMPTY);
 }

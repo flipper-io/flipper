@@ -9,25 +9,8 @@ int usart_configure(void) {
 	return lf_success;
 }
 
-void usart_enable(void) {
-	printf("Enabling the usart.\n");
-}
-
-void usart_disable(void) {
-	printf("Disabling the usart.\n");
-}
-
-uint8_t usart_ready(void) {
+int usart_ready(void) {
 	printf("Checking if the usart is ready.\n");
-	return lf_success;
-}
-
-void usart_put(uint8_t byte) {
-	printf("Putting to the usart bus.\n");
-}
-
-uint8_t usart_get(void) {
-	printf("Getting from the usart bus.\n");
 	return lf_success;
 }
 
