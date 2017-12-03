@@ -36,7 +36,7 @@ int lf_device_release(struct _lf_device *device) {
 /* Attempts to attach to all unattached devices. Returns how many devices were attached. */
 int lf_attach(struct _lf_device *device) {
 	lf_assert(device, failure, E_NULL, "Attempt to attach an invalid device.");
-	lf_ll_append(&lf_attached_devices, device, lf_detach);
+	lf_ll_append(&lf_attached_devices, device, lf_device_release);
 	lf_select(device);
 	return lf_success;
 failure:
@@ -55,7 +55,6 @@ failure:
 /* Detaches a device from libflipper. */
 int lf_detach(struct _lf_device *device) {
 	lf_assert(device, failure, E_NULL, "Invalid device provided to detach.");
-	lf_device_release(device);
 	lf_ll_remove(&lf_attached_devices, device);
 	return lf_success;
 failure:
