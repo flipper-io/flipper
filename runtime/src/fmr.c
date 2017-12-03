@@ -73,7 +73,7 @@ lf_return_t fmr_execute(fmr_module module, fmr_function function, fmr_argc argc,
 	/* Perform the function call internally. */
 	return fmr_call(address, argc, types, arguments);
 failure:
-	return -1;
+	return lf_error;
 }
 
 /* ~ Message runtime subclass handlers. ~ */

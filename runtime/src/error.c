@@ -46,8 +46,6 @@ void lf_error_raise(lf_error_t error, const char *format, ...) {
 		if (errors_cause_side_effects) {
 			/* Print the error code. */
 			fprintf(stderr, KNRM "Error code (%i): '" KBLU "%s" KNRM "'\n\n", _error, lf_error_messages[_error]);
-			/* Exit. */
-			exit(EXIT_FAILURE);
 		}
 	}
 #endif

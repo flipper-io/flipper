@@ -9,7 +9,7 @@
 #define DEBUG_BUFFER_SIZE 32
 #define DEBUG_IN_ENDPOINT 0x03 | 0x80
 /* Timeout here must be larger than the flush rate of the device. */
-#define DEBUG_TIMEOUT 50
+#define DEBUG_TIMEOUT 0
 
 static volatile int alive = 1;
 

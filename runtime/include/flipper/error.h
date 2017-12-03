@@ -51,7 +51,11 @@ enum {
 	E_NO_PID,
 	E_INVALID_TASK,
 	E_SUBCLASS,
-	E_UNIMPLEMENTED
+	E_UNIMPLEMENTED,
+
+	/* uart0 */
+	E_UART0_PUSH_TIMEOUT,
+	E_UART0_PULL_TIMEOUT
 };
 
 /* These are the error strings that correspond to the values in the error code enumeration. */
@@ -84,7 +88,9 @@ enum {
 								 "no task for pid", \
 								 "invalid task specified", \
 								 "packet subclass error", \
-								 "unimplemented error"
+								 "unimplemented error",	\
+								 "uart0 push timeout", \
+								 "uart0 pull timeout"
 
 
 /* If this flag is set, error messages are nullified on platforms that do not need to store error strings. */

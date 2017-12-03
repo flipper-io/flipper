@@ -25,10 +25,10 @@
 /* Must be between 1ms and 255ms. */
 #define LF_USB_TIMEOUT_MS 200
 #else
-#define LF_USB_TIMEOUT_MS 100
+#define LF_USB_TIMEOUT_MS 0
 #endif
 
-#define LF_UART_TIMEOUT_MS 50
+#define LF_UART_TIMEOUT_MS 100
 
 /* NOTE: Summing the size parameters of each endpoints below should be less than or equal to 160. */
 #define USB_IN_MASK            0x80
@@ -135,7 +135,7 @@ struct _lf_module {
 	/* The module's identifier. */
 	lf_crc_t identifier;
 	/* The module's index. */
-	uint16_t index;
+	int index;
 	/* The pointer to a pointer to the device upon which the module's counterpart is located. */
 	struct _lf_device *device;
 };
@@ -149,7 +149,7 @@ struct _lf_module {
 		name, \
 		description, \
 		LF_VERSION, \
-		0, \
+		-1, \
 		0, \
 		NULL \
 	};

@@ -7,7 +7,7 @@ lf_return_t fmr_push(struct _fmr_push_pull_packet *packet) {
 	void *swap = malloc(packet->length);
 	if (!swap) {
 		lf_error_raise(E_MALLOC, NULL);
-		return -1;
+		return lf_error;
 	}
 	megausb_bulk_receive(swap, packet->length);
 	*(uint32_t *)(packet->call.parameters) = (uintptr_t)swap;
@@ -17,11 +17,11 @@ lf_return_t fmr_push(struct _fmr_push_pull_packet *packet) {
 }
 
 lf_return_t fmr_pull(struct _fmr_push_pull_packet *packet) {
-	int retval;
+	lf_return_t retval;
 	void *swap = malloc(packet->length);
 	if (!swap) {
 		lf_error_raise(E_MALLOC, NULL);
-		return -1;
+		return lf_error;
 	}
 	*(uint32_t *)(packet->call.parameters) = (uintptr_t)swap;
 	retval = fmr_execute(packet->call.index, packet->call.function, packet->call.argc, packet->call.types, (void *)(packet->call.parameters));

@@ -32,10 +32,15 @@ int uart0_ready(void) {
 
 int uart0_push(void *source, lf_size_t length) {
 	while (length --) {
-		while (!(UCSR1A & (1 << UDRE1)));
+		uint8_t timeout = UDFNUML + LF_UART_TIMEOUT_MS;
+		while (!(UCSR1A & (1 << UDRE1))) {
+			lf_assert(UDFNUML != timeout, failure, E_UART0_PUSH_TIMEOUT, "Timeout occurred while pushing to uart0.");
+		}
 		UDR1 = *(uint8_t *)(source ++);
 	}
 	return lf_success;
+failure:
+	return lf_error;
 }
 
 int uart0_pull(void *destination, lf_size_t length) {
@@ -56,16 +61,17 @@ int uart0_pull(void *destination, lf_size_t length) {
 	while (length--) {
 		uint8_t timeout = UDFNUML + LF_UART_TIMEOUT_MS;
 		while (!(UCSR1A & (1 << RXC1))) {
-			if (UDFNUML == timeout) return lf_error;
+			lf_assert(UDFNUML != timeout, failure, E_UART0_PUSH_TIMEOUT, "Timeout occurred while pushing to uart0.");
 		}
 		*(uint8_t *)(destination ++) = UDR1;
 	}
 	return lf_success;
+failure:
+	return lf_error;
 }
 
 ISR(USART1_RX_vect) {
 	if (FSI_IN & (1 << FSI_PIN)) {
-		/* It's an FMR transfer. */
 		while (UCSR1A & (1 << RXC1)) uart0_buffer[idx++] = UDR1;
 	} else {
 		/* It's a debug message. */

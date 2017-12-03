@@ -8,9 +8,9 @@
 int lf_get_result(struct _lf_device *device, struct _fmr_result *result) {
 	/* Obtain the response packet from the device. */
 	int _e = lf_retrieve(device, result);
-	lf_assert(_e == lf_success, failure, E_ENDPOINT, "Failed to obtain response from device '%s':", device->configuration.name);
 	lf_debug_result(result);
-	lf_assert(result->error == E_OK, failure, E_ENDPOINT, "An error occured on the device '%s':", device->configuration.name);
+	lf_assert(_e == lf_success, failure, E_ENDPOINT, "Failed to obtain response from device '%s':", device->configuration.name);
+	lf_assert(result->error == E_OK, failure, result->error, "An error occured on the device '%s':", device->configuration.name);
 	return lf_success;
 failure:
 	return lf_error;
@@ -35,7 +35,7 @@ failure:
 
 lf_return_t lf_invoke(struct _lf_module *module, fmr_function function, struct _lf_ll *parameters) {
 	lf_assert(module, failure, E_NULL, "No module was specified for function invocation.");
-	lf_assert(module->index, failure, E_MODULE, "The module '%s' has not been configured. Call '%s_configure()' first.", module->name, module->name);
+	lf_assert(module->index != -1, failure, E_MODULE, "The module '%s' has not been configured. Call '%s_configure()' first.", module->name, module->name);
 	lf_assert(module->device, failure, E_NO_DEVICE, "The module '%s' has no target device. Did you attach before configuring?", module->name);
 
 	/* The raw packet into which the invocation information will be loaded .*/
@@ -60,7 +60,7 @@ lf_return_t lf_invoke(struct _lf_module *module, fmr_function function, struct _
 	_packet.header.checksum = lf_crc(&_packet, _packet.header.length);
 
 	_e = lf_transfer(module->device, &_packet);
-	lf_assert(_e == lf_success, failure, E_FMR, "Failed to transfer packet to module '%s'.", module->name);
+	lf_assert(_e == lf_success, failure, E_FMR, "Failed to transfer command to module '%s'.", module->name);
 
 	struct _fmr_result result;
 	lf_get_result(module->device, &result);
@@ -77,7 +77,7 @@ fmr_va fmr_data(void *data, lf_size_t size) {
 
 lf_return_t lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _lf_ll *parameters) {
 	lf_assert(module, failure, E_NULL, "NULL module was specified for data push.");
-	lf_assert(module->index, failure, E_MODULE, "The module '%s' has not been configured. Call '%s_configure()' first.", module->name, module->name);
+	lf_assert(module->index != -1, failure, E_MODULE, "The module '%s' has not been configured. Call '%s_configure()' first.", module->name, module->name);
 	lf_assert(module->device, failure, E_NO_DEVICE, "The module '%s' has no target device. Did you attach before configuring?", module->name);
 	if (!length) return lf_success;
 
@@ -111,7 +111,7 @@ failure:
 
 lf_return_t lf_pull(struct _lf_module *module, fmr_function function, void *destination, lf_size_t length, struct _lf_ll *parameters) {
 	lf_assert(module, failure, E_NULL, "NULL module was specified for data pull.");
-	lf_assert(module->index, failure, E_MODULE, "The module '%s' has not been configured. Call '%s_configure()' first.", module->name, module->name);
+	lf_assert(module->index != -1, failure, E_MODULE, "The module '%s' has not been configured. Call '%s_configure()' first.", module->name, module->name);
 	lf_assert(module->device, failure, E_NO_DEVICE, "The module '%s' has no target device. Did you attach before configuring?", module->name);
 	if (!length) return lf_success;
 

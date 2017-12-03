@@ -42,7 +42,7 @@
 #define PENDSV_PRIORITY 15
 
 /* 2 megabaud. */
-#define PLATFORM_BAUDRATE 2000000
+#define PLATFORM_BAUDRATE 9600
 
 #define FMR_PIN 0
 
