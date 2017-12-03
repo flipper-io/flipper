@@ -76,7 +76,7 @@ int lf_bind(struct _lf_module *module) {
 	module->identifier = lf_crc(module->name, strlen(module->name) + 1);
 	if (!module->device) module->device = lf_get_current_device();
 
-	fmr_module index = fld_index(module->identifier) | FMR_USER_INVOCATION_BIT;
+	int index = fld_index(module->identifier) | FMR_USER_INVOCATION_BIT;
 	lf_assert(index != -1, failure, E_MODULE, "No counterpart for the module '%s' was found on the device '%s'. Load the module first.", module->name, module->device->configuration.name);
 	module->index = index;
 
@@ -98,7 +98,7 @@ void lf_debug_call(struct _fmr_invocation *call) {
 	uint8_t *offset = call->parameters;
 	char *typestrs[] = { "fmr_int8", "fmr_int16", "fmr_int32", "fmr_ptr" };
 	fmr_types types = call->types;
-	for (int i = 0; i < call->argc; i ++) {
+	for (fmr_argc i = 0; i < call->argc; i ++) {
 		fmr_type type = types & 0x3;
 		fmr_arg arg = 0;
 		memcpy(&arg, offset, fmr_sizeof(type));
@@ -144,7 +144,7 @@ void lf_debug_packet(struct _fmr_packet *packet, size_t length) {
 				printf("Invalid packet class.\n");
 			break;
 		}
-		for (int i = 1; i <= length; i ++) {
+		for (size_t i = 1; i <= length; i ++) {
 			printf("0x%02x ", ((uint8_t *)packet)[i - 1]);
 			if (i % 8 == 0 && i < length - 1) printf("\n");
 		}

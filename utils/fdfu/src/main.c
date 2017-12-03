@@ -201,8 +201,8 @@ int sam_ba_copy(uint32_t destination, void *source, uint32_t length) {
 void *load_page_data(FILE *firmware, size_t size) {
 	size_t pages = lf_ceiling(size, IFLASH0_PAGE_SIZE);
 	uint8_t *raw = (uint8_t *)malloc(pages * IFLASH0_PAGE_SIZE);
-	for (int i = 0; i < pages; i ++) {
-		for (int j = 0; j < IFLASH0_PAGE_SIZE; j ++) {
+	for (size_t i = 0; i < pages; i ++) {
+		for (size_t j = 0; j < IFLASH0_PAGE_SIZE; j ++) {
 			uint8_t c = fgetc(firmware);
 			if (!feof(firmware)) {
 				raw[((i * IFLASH0_PAGE_SIZE) + j)] = c;

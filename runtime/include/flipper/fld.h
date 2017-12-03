@@ -9,7 +9,7 @@
 /* Declare the virtual interface for this module. */
 extern const struct _fld {
 	int (* configure)(void);
-	fmr_module (* index)(lf_crc_t identifier);
+	int (* index)(lf_crc_t identifier);
 } fld;
 
 /* Declare the FMR overlay for this module. */
@@ -21,7 +21,7 @@ extern struct _lf_module _fld;
 /* Declare the prototypes for all of the functions within this module. */
 int fld_configure(void);
 /* Returns the index of a loaded module. */
-fmr_module fld_index(lf_crc_t identifier);
+int fld_index(lf_crc_t identifier);
 
 #endif
 #endif

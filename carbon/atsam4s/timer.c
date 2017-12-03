@@ -26,7 +26,7 @@ struct _lf_timer timers[] = { { &(TC0->TC_CHANNEL[0]), true, NULL },
 
 int timer_configure(void) {
 	/* Iterate through the timers and configure their defaults. */
-	for (int i = 0; i < sizeof(timers)/sizeof(struct _lf_timer); i ++) {
+	for (size_t i = 0; i < sizeof(timers)/sizeof(struct _lf_timer); i ++) {
 		/* Enable the timer's peripheral clock. */
 		PMC->PMC_PCER0 |= (1 << (ID_TC0 + i));
 		/* Disable the source clock to TCA. */
@@ -46,7 +46,7 @@ int timer_configure(void) {
 /* Registers a callback with the next available timer. */
 int timer_register(uint32_t ticks, void *callback) {
 	/* Loop through the timers until a free timer is found. */
-	for (int i = 0; i < sizeof(timers); i ++) {
+	for (size_t i = 0; i < sizeof(timers); i ++) {
 		if (timers[i].available) {
 			/* Hold the timer. */
 			timers[i].available = false;

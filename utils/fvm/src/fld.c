@@ -5,6 +5,6 @@ int fld_configure(void) {
 	return lf_success;
 }
 
-fmr_module fld_index(lf_crc_t identifier) {
+int fld_index(lf_crc_t identifier) {
 	return -1;
 }

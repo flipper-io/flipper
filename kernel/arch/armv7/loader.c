@@ -55,7 +55,7 @@ struct _user_modules user_modules;
 /* Loads an application into RAM. */
 int os_load_application(void *base, struct _lf_abi_header *header) {
 	/* Obtain the address of the application's main function. */
-	void *_main = base + header -> entry;
+	void *_main = base + header->entry;
 	/* Allocate the application's stack. */
 	os_stack_t *_stack = malloc(APPLICATION_STACK_SIZE_WORDS * sizeof(uint32_t));
 	if (!_stack) {
@@ -72,7 +72,7 @@ int os_load_application(void *base, struct _lf_abi_header *header) {
 		return lf_error;
 	}
 	/* Set the task's base address. */
-	task -> base = base;
+	task->base = base;
 	/* Launch the task. */
 	os_task_next();
 	return lf_success;
@@ -89,14 +89,14 @@ int os_load_module(void *base, struct _lf_abi_header *header) {
 		/* Allocate the user module. */
 		struct _user_module *module = &user_modules.modules[user_modules.count ++];
 		/* Obtain the module's identifier from its name. */
-		char *name = base + header -> name_offset;
-		module -> identifier = lf_crc(name, header -> name_size);
+		char *name = base + header->name_offset;
+		module->identifier = lf_crc(name, header->name_size);
 		/* Save the module struct. */
-		module -> functions = base + header -> module_offset;
+		module->functions = base + header->module_offset;
 		/* Store the number of functions that exist within the module. */
-		module -> func_c = (header -> module_size / sizeof(uintptr_t));
+		module->func_c = (header->module_size / sizeof(uintptr_t));
 		/* Save the base address of the module. */
-		module -> base = base;
+		module->base = base;
 		/* Send the index back to the host. */
 		return index;
 	}
@@ -120,8 +120,8 @@ int os_release_module(struct _user_module *module) {
 		return lf_error;
 	}
 	/* Free the module's base pointer. */
-	if (module -> base) {
-		free(module -> base);
+	if (module->base) {
+		free(module->base);
 	}
 	return lf_success;
 }
@@ -132,26 +132,26 @@ int os_load_image(void *base) {
 	struct _lf_abi_header *header = base;
 
 	/* Patch the function pointers in the module structure. */
-	void **_functions = base + header -> module_offset;
-	for (int i = 0; i < header -> module_size / sizeof(uintptr_t); i ++) {
+	void **_functions = base + header->module_offset;
+	for (uint32_t i = 0; i < header->module_size / sizeof(uintptr_t); i ++) {
 		_functions[i] += (uintptr_t)base;
 	}
 
 	/* Patch the Global Offset Table of the image. */
-	uintptr_t *got = base + header -> got_offset;
-	for (int i = 0; i < header -> got_size / sizeof(uintptr_t); i ++) {
+	uintptr_t *got = base + header->got_offset;
+	for (uint32_t i = 0; i < header->got_size / sizeof(uintptr_t); i ++) {
 		got[i] += (uintptr_t)base;
 	}
 
 	/* Zero the BSS. */
-	uint32_t *bss = base + header -> got_offset;
-	for (int i = 0; i < header -> bss_size; i ++) {
+	uint32_t *bss = base + header->got_offset;
+	for (uint32_t i = 0; i < header->bss_size; i ++) {
 		bss[i] = 0;
 	}
 
 	int retval;
 
-	if (header -> entry) {
+	if (header->entry) {
 		/* If the image has an entry point, load it as an application. */
 		if ((retval = os_load_application(base, header)) != lf_success) {
 			goto failure;
@@ -173,23 +173,23 @@ failure:
 /* Handles the invocation of user functions. */
 int fmr_perform_user_invocation(struct _fmr_invocation *invocation, struct _fmr_result *result) {
 	/* Ensure that the index is within bounds. */
-	if (invocation -> index >= user_modules.count) {
+	if (invocation->index >= user_modules.count) {
 		return lf_error;
 	}
 	/* Get a pointer to the module. */
-	struct _user_module *module = &user_modules.modules[invocation -> index];
+	struct _user_module *module = &user_modules.modules[invocation->index];
 	/* Ensure that the function is within bounds. */
-	if (invocation -> function >= module -> func_c) {
+	if (invocation->function >= module->func_c) {
 		return lf_error;
 	}
 	/* Dereference a pointer to the target function. */
-	const void *address = module -> functions[invocation -> function];
+	const void *address = module->functions[invocation->function];
 	/* Ensure that the function address is valid. */
 	if (!address) {
 		lf_error_raise(E_RESOULTION, NULL);
 		return lf_error;
 	}
 	/* Perform the function call internally. */
-	result -> value = fmr_call(address, invocation -> argc, invocation -> types, invocation -> parameters);
-	return result -> error = lf_error_get();
+	result->value = fmr_call(address, invocation->argc, invocation->types, invocation->parameters);
+	return result->error = lf_error_get();
 }

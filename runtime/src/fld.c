@@ -15,7 +15,7 @@ LF_WEAK int fld_configure(void) {
 	return lf_invoke(&_fld, _fld_configure, NULL);
 }
 
-LF_WEAK fmr_module fld_index(lf_crc_t identifier) {
+LF_WEAK int fld_index(lf_crc_t identifier) {
 	return lf_invoke(&_fld, _fld_index, fmr_args(fmr_infer(identifier)));
 }
 
