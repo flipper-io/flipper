@@ -47,6 +47,6 @@ extern struct _user_modules {
 
 int os_load_image(void *base);
 
-fmr_module os_get_module_index(lf_crc_t identifier);
+int os_get_module_index(lf_crc_t identifier);
 
 #endif

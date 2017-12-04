@@ -78,6 +78,21 @@ int os_load_application(void *base, struct _lf_abi_header *header) {
 	return lf_success;
 }
 
+/* Releases a previously loaded module. */
+int os_release_module(struct _user_module *module) {
+	printf("Releasing module\n");
+	/* Ensure the module pointer is valid. */
+	if (!module) {
+		return lf_error;
+	}
+	/* Free the module's base pointer. */
+	if (module->base) {
+		free(module->base);
+	}
+	memset(module, 0, sizeof(struct _user_module));
+	return lf_success;
+}
+
 /* Loads a module into RAM. */
 int os_load_module(void *base, struct _lf_abi_header *header) {
 	/* If there are no more user module slots to allocate, return with error. */
@@ -85,12 +100,17 @@ int os_load_module(void *base, struct _lf_abi_header *header) {
 		lf_error_raise(E_UNIMPLEMENTED, NULL);
 		return lf_error;
 	} else {
-		fmr_module index = user_modules.count;
-		/* Allocate the user module. */
-		struct _user_module *module = &user_modules.modules[user_modules.count ++];
 		/* Obtain the module's identifier from its name. */
 		char *name = base + header->name_offset;
-		module->identifier = lf_crc(name, header->name_size);
+		lf_crc_t id = lf_crc(name, header->name_size);
+		int index = os_get_module_index(id);
+		if (index == lf_error) {
+			index = user_modules.count++;
+		} else {
+			os_release_module(&user_modules.modules[index]);
+		}
+		struct _user_module *module = &user_modules.modules[index];
+		module->identifier = id;
 		/* Save the module struct. */
 		module->functions = base + header->module_offset;
 		/* Store the number of functions that exist within the module. */
@@ -102,26 +122,13 @@ int os_load_module(void *base, struct _lf_abi_header *header) {
 	}
 }
 
-fmr_module os_get_module_index(lf_crc_t identifier) {
+int os_get_module_index(lf_crc_t identifier) {
 	for (int i = 0; i < user_modules.count; i ++) {
 		if (user_modules.modules[i].identifier == identifier) {
 			return i;
 		}
 	}
-	return -1;
-}
-
-/* Releases a previously loaded module. */
-int os_release_module(struct _user_module *module) {
-	/* Ensure the module pointer is valid. */
-	if (!module) {
-		return lf_error;
-	}
-	/* Free the module's base pointer. */
-	if (module->base) {
-		free(module->base);
-	}
-	return lf_success;
+	return lf_error;
 }
 
 /* Loads an image into RAM. */

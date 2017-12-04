@@ -119,7 +119,7 @@ def process_file(filename, package):
 		else:
 			body = ''
 			ret = ' ' + statement
-		functs.append(str(f) + ' {\nBODY\treturnVALUE\n}\n'.replace('BODY', body).replace('VALUE', ret))
+		functs.append('__attribute__((weak)) ' + str(f) + ' {\nBODY\treturnVALUE\n}\n'.replace('BODY', body).replace('VALUE', ret))
 	ctemplate = ctemplate.replace('VARIABLES\n\n', '')
 	ctemplate = ctemplate.replace('STRUCT', '\t' + ',\n\t'.join(struct))
 	ctemplate = ctemplate.replace('FUNCTIONS', '\n'.join(functs))

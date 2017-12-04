@@ -73,7 +73,7 @@ int __attribute__((__destructor__)) lf_exit(void) {
 /* Binds the lf_module structure to its counterpart on the attached device. */
 int lf_bind(struct _lf_module *module) {
 	lf_assert(module, failure, E_MODULE, "NULL module passed to bind.");
-    lf_assert(module->name, failure, E_MODULE, "Module has no name.");
+	lf_assert(module->name, failure, E_MODULE, "Module has no name.");
 	module->identifier = lf_crc(module->name, strlen(module->name) + 1);
 	if (!module->device) module->device = lf_get_current_device();
 
@@ -92,7 +92,7 @@ void lf_debug_call(struct _fmr_invocation *call) {
 	printf("call:\n");
 	printf("\t└─ module:\t0x%x\n", call->index);
 	printf("\t└─ function:\t0x%x\n", call->function);
-    char *typestrs[] = { "fmr_int8", "fmr_int16", "fmr_int32", "fmr_ptr", "fmr_int", "fmr_void" };
+	char *typestrs[] = { "fmr_int8", "fmr_int16", "fmr_int32", "fmr_ptr", "fmr_int", "fmr_void" };
 	printf("\t└─ return:\t%s\n", typestrs[call->ret]);
 	printf("\t└─ types:\t0x%x\n", call->types);
 	printf("\t└─ argc:\t0x%x (%d arguments)\n", call->argc, call->argc);

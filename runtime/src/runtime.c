@@ -106,7 +106,7 @@ lf_return_t lf_push(struct _lf_module *module, fmr_function function, void *sour
 	return result.value;
 
 failure:
-	return -1;
+	return lf_error;
 }
 
 lf_return_t lf_pull(struct _lf_module *module, fmr_function function, void *destination, lf_size_t length, struct _lf_ll *parameters) {
@@ -141,7 +141,7 @@ lf_return_t lf_pull(struct _lf_module *module, fmr_function function, void *dest
 	return result.value;
 
 failure:
-	return -1;
+	return lf_error;
 }
 
 int lf_load(struct _lf_device *device, void *source, lf_size_t length) {
@@ -171,5 +171,5 @@ int lf_load(struct _lf_device *device, void *source, lf_size_t length) {
 	return result.value;
 
 failure:
-	return -1;
+	return lf_error;
 }

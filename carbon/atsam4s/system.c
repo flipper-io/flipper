@@ -23,41 +23,42 @@ void uart0_pull_wait(void *destination, lf_size_t length) {
 }
 
 lf_return_t fmr_push(struct _fmr_push_pull_packet *packet) {
-	lf_return_t retval = 0xdeadbeef;
+	lf_return_t _e = lf_success;
 	void *push_buffer = malloc(packet->length);
 	if (!push_buffer) {
 		lf_error_raise(E_MALLOC, NULL);
-		return -1;
+		return lf_error;
 	}
 	uart0_pull_wait(push_buffer, packet->length);
 	if (packet->header.class == fmr_send_class) {
 		/* If we are copying data, simply return a pointer to the copied data. */
-		retval = (uintptr_t)push_buffer;
+		_e = (uintptr_t)push_buffer;
 	} else if (packet->header.class == fmr_ram_load_class) {
-		os_load_image(push_buffer);
+		_e = os_load_image(push_buffer);
+		return lf_success;
 	} else {
 		*(uintptr_t *)(packet->call.parameters) = (uintptr_t)push_buffer;
-		retval = fmr_execute(packet->call.index, packet->call.function, packet->call.ret, packet->call.argc, packet->call.types, (void *)(packet->call.parameters));
+		_e = fmr_execute(packet->call.index, packet->call.function, packet->call.ret, packet->call.argc, packet->call.types, (void *)(packet->call.parameters));
 		free(push_buffer);
 	}
-	return retval;
+	return _e;
 }
 
 lf_return_t fmr_pull(struct _fmr_push_pull_packet *packet) {
-	lf_return_t retval = 0;
+	lf_return_t _e = lf_success;
 	if (packet->header.class == fmr_receive_class) {
 		/* If we are receiving data, simply push the memory. */
-		uart0_push((uintptr_t *)*(uint32_t *)(packet->call.parameters), packet->length);
+		_e = uart0_push((uintptr_t *)*(uint32_t *)(packet->call.parameters), packet->length);
 	} else {
 		void *pull_buffer = malloc(packet->length);
 		if (!pull_buffer) {
 			lf_error_raise(E_MALLOC, NULL);
-			return -1;
+			return lf_error;
 		}
 		*(uintptr_t *)(packet->call.parameters) = (uintptr_t)pull_buffer;
-		retval = fmr_execute(packet->call.index, packet->call.function, packet->call.ret, packet->call.argc, packet->call.types, (void *)(packet->call.parameters));
+		_e = fmr_execute(packet->call.index, packet->call.function, packet->call.ret, packet->call.argc, packet->call.types, (void *)(packet->call.parameters));
 		uart0_push(pull_buffer, packet->length);
 		free(pull_buffer);
 	}
-	return retval;
+	return _e;
 }
