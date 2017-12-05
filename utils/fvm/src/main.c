@@ -47,9 +47,8 @@ failure:
 
 int fmr_perform_user_invocation(struct _fmr_invocation *invocation, struct _fmr_result *result) {
 	lf_assert(invocation->index < modulec, failure, E_BOUNDARY, "Module index was out of bounds.");
-	void (* function)(void) = fvm_modules[invocation->index].functions[invocation->index];
-	function();
-	return lf_success;
+	lf_return_t (* function)(void) = fvm_modules[invocation->index].functions[invocation->function];
+	return fmr_call(function, invocation->ret, invocation->argc, invocation->types, invocation->parameters);
 failure:
 	return lf_error;
 }
@@ -93,8 +92,6 @@ int main(int argc, char *argv[]) {
 	context = (struct _lf_network_context *)nep->_ctx;
 	context->fd = sd;
 
-	lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
-
 	while (1) {
 		struct _fmr_packet packet;
 		nep->pull(nep, &packet, sizeof(struct _fmr_packet));
@@ -102,6 +99,7 @@ int main(int argc, char *argv[]) {
 		struct _fmr_result result;
 		lf_error_clear();
 		fmr_perform(&packet, &result);
+		lf_debug_result(&result);
 		nep->push(nep, &result, sizeof(struct _fmr_result));
 	}
 
