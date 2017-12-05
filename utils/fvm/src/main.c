@@ -6,6 +6,8 @@
 
 /* fserve - Creates a local server that acts as a virtual flipper device. */
 
+struct _lf_endpoint *nep = NULL;
+
 int main(int argc, char *argv[]) {
 
 	/* Create a UDP server. */
@@ -27,7 +29,7 @@ int main(int argc, char *argv[]) {
 
 	/* The network endpoint for the virtual flipper device. */
 	struct _lf_network_context *context = NULL;
-	struct _lf_endpoint *nep = lf_endpoint_create(lf_network_configure,
+	nep = lf_endpoint_create(lf_network_configure,
 												  lf_network_ready,
 												  lf_network_push,
 												  lf_network_pull,
@@ -44,6 +46,7 @@ int main(int argc, char *argv[]) {
 		nep->pull(nep, &packet, sizeof(struct _fmr_packet));
 		lf_debug_packet(&packet, sizeof(struct _fmr_packet));
 		struct _fmr_result result;
+		lf_error_clear();
 		fmr_perform(&packet, &result);
 		nep->push(nep, &result, sizeof(struct _fmr_result));
 	}
@@ -52,4 +55,30 @@ int main(int argc, char *argv[]) {
 
 failure:
 	return EXIT_FAILURE;
+}
+
+lf_return_t fmr_push(struct _fmr_push_pull_packet *packet) {
+	int retval;
+	void *swap = malloc(packet->length);
+	lf_assert(swap, failure, E_MALLOC, "Failed to allocate push buffer");
+	nep->pull(nep, swap, packet->length);
+	*(uint32_t *)(packet->call.parameters) = (uintptr_t)swap;
+	retval = fmr_execute(packet->call.index, packet->call.function, packet->call.ret, packet->call.argc, packet->call.types, (void *)(packet->call.parameters));
+	free(swap);
+	return retval;
+failure:
+	return lf_error;
+}
+
+lf_return_t fmr_pull(struct _fmr_push_pull_packet *packet) {
+	lf_return_t retval;
+	void *swap = malloc(packet->length);
+	lf_assert(swap, failure, E_MALLOC, "Failed to allocate pull buffer");
+	*(uint32_t *)(packet->call.parameters) = (uintptr_t)swap;
+	retval = fmr_execute(packet->call.index, packet->call.function, packet->call.ret, packet->call.argc, packet->call.types, (void *)(packet->call.parameters));
+	nep->push(nep, swap, packet->length);
+	free(swap);
+	return retval;
+failure:
+	return lf_error;
 }

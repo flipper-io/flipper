@@ -12,20 +12,18 @@ struct _lf_ll *fmr_build(int argc, ...) {
 	while (argc --) {
 		/* Unstage the value of the argument from the variadic argument list. */
 		fmr_va value = va_arg(argv, fmr_va);
-		fmr_type type = (fmr_type)((value >> (sizeof(fmr_arg) * 8)) & 0x7);
+		fmr_type type = (fmr_type)((value >> (sizeof(fmr_arg) * 8)) & 0xF);
 		lf_assert(type <= fmr_ptr_t, failure, E_TYPE, "An invalid type was provided while appending the parameter '0x%08x' with type '0x%02x' to the argument list.", (fmr_arg)value, (fmr_type)type);
 		struct _lf_arg *arg = malloc(sizeof(struct _lf_arg));
+		lf_assert(arg, failure, E_MALLOC, "Failed to allocate new lf_arg.");
 		arg->value = (fmr_arg)value;
 		arg->type = type;
-		lf_assert(arg, failure, E_MALLOC, "Failed to allocate new lf_arg.");
 		lf_ll_append(&list, arg, free);
 	}
-	/* Release the variadic argument list. */
 	va_end(argv);
 	return list;
 failure:
 	lf_ll_release(&list);
-	/* Release the variadic argument list. */
 	va_end(argv);
 	return NULL;
 }
@@ -57,7 +55,6 @@ int fmr_create_call(fmr_module module, fmr_function function, fmr_type ret, stru
 		/* Increment the size of the packet. */
 		header->length += size;
 	}
-	 /* Destroy the argument list. */
 	lf_ll_release(&args);
 	return lf_success;
 failure:
@@ -120,7 +117,7 @@ int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
 		default:
 			lf_assert(true, failure, E_SUBCLASS, "An invalid message runtime subclass was provided.");
 		break;
-	};
+	}
 
 	result->error = lf_error_get();
 	return lf_success;

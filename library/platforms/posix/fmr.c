@@ -35,10 +35,10 @@ LF_WEAK lf_return_t fmr_call(lf_return_t (* function)(void), fmr_type ret, uint8
 	return function();
 }
 
-lf_return_t fmr_push(struct _fmr_push_pull_packet *packet) {
+LF_WEAK lf_return_t fmr_push(struct _fmr_push_pull_packet *packet) {
 	return -1;
 }
 
-lf_return_t fmr_pull(struct _fmr_push_pull_packet *packet) {
+LF_WEAK lf_return_t fmr_pull(struct _fmr_push_pull_packet *packet) {
 	return -1;
 }
