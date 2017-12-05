@@ -119,12 +119,8 @@ typedef struct _lf_ll *lf_device_list;
 extern lf_device_list lf_attached_devices;
 
 extern struct _lf_device *lf_current_device;
-static inline void lf_set_current_device(struct _lf_device *device) {
-	lf_current_device = device;
-}
-static inline struct _lf_device *lf_get_current_device(void) {
-	return lf_current_device;
-}
+void lf_set_current_device(struct _lf_device *device);
+struct _lf_device *lf_get_current_device(void);
 
 /* Standardizes the notion of a module. */
 struct _lf_module {

@@ -23,6 +23,14 @@ failure:
 	return NULL;
 }
 
+void lf_set_current_device(struct _lf_device *device) {
+	lf_current_device = device;
+}
+
+struct _lf_device *lf_get_current_device(void) {
+	return lf_current_device;
+}
+
 int lf_device_release(struct _lf_device *device) {
 	if (device) {
 		lf_endpoint_release(device->endpoint);
