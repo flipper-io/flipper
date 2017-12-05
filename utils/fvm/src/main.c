@@ -2,13 +2,66 @@
 /* POSIX networking for flipper. */
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <dlfcn.h>
 #include <flipper/posix/network.h>
 
 /* fserve - Creates a local server that acts as a virtual flipper device. */
 
+struct _fvm_module {
+	char name[32];
+	void **functions;
+};
+
+struct _fvm_module fvm_modules[16];
+int modulec = 0;
+
 struct _lf_endpoint *nep = NULL;
 
+int fld_index(lf_crc_t identifier) {
+	for (int i = 0; i < modulec; i ++) {
+		char *name = fvm_modules[i].name;
+		lf_crc_t _crc = lf_crc(name, strlen(name) + 1);
+		if (_crc == identifier) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+int fvm_load_module(char *path) {
+	void *dlm = dlopen(path, RTLD_LAZY);
+	lf_assert(dlm, failure, E_NULL, "Failed to open dynamic module with path '%s'.", path);
+	const char *name = dlsym(dlm, "_fmr_app_name");
+	lf_assert(name, failure, E_NULL, "Failed to get dynamic module name.");
+	printf("Opened module '%s'\n", name);
+	void **functions = dlsym(dlm, name);
+	printf("Got function table from module '%s'\n", name);
+	struct _fvm_module *module = &fvm_modules[modulec++];
+	strcpy(module->name, name);
+	module->functions = functions;
+	printf("Successfully loaded module '%s'.\n", name);
+	return lf_success;
+failure:
+	return lf_error;
+}
+
+int fmr_perform_user_invocation(struct _fmr_invocation *invocation, struct _fmr_result *result) {
+	lf_assert(invocation->index < modulec, failure, E_BOUNDARY, "Module index was out of bounds.");
+	lf_return_t (* function)(void) = fvm_modules[invocation->index].functions[invocation->function];
+	return fmr_call(function, invocation->ret, invocation->argc, invocation->types, invocation->parameters);
+failure:
+	return lf_error;
+}
+
 int main(int argc, char *argv[]) {
+
+	if (argc > 1) {
+		char **modules = &argv[1];
+		for (int i = 0; i < (argc-1); i ++) {
+			printf("Loading module '%s'\n", *modules);
+			fvm_load_module(*modules++);
+		}
+	}
 
 	/* Create a UDP server. */
 	struct sockaddr_in addr;
@@ -39,8 +92,6 @@ int main(int argc, char *argv[]) {
 	context = (struct _lf_network_context *)nep->_ctx;
 	context->fd = sd;
 
-	lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
-
 	while (1) {
 		struct _fmr_packet packet;
 		nep->pull(nep, &packet, sizeof(struct _fmr_packet));
@@ -48,6 +99,7 @@ int main(int argc, char *argv[]) {
 		struct _fmr_result result;
 		lf_error_clear();
 		fmr_perform(&packet, &result);
+		lf_debug_result(&result);
 		nep->push(nep, &result, sizeof(struct _fmr_result));
 	}
 
