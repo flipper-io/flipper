@@ -21,9 +21,9 @@ LF_WEAK int PACKAGE_configure(void) {
 	int _e;
 	suppress_errors(_e = lf_bind(&_app));
 	if (_e == lf_error) {
-		_e = lf_load(lf_get_current_device(), app_bin, app_bin_len);
+		_e = lf_load(app_bin, app_bin_len, lf_get_current_device());
 		lf_assert(_e == lf_success, failure, E_MODULE, "Failed to load module '%s'.", _PACKAGE.name);
-		_e = lf_bind(&_app);
+		_e = lf_bind(&_app, lf_get_current_device());
 		lf_assert(_e == lf_success, failure, E_MODULE, "Failed to bind module '%s'.", _PACKAGE.name);
 	}
 	return lf_success;

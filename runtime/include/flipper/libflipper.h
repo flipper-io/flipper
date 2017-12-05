@@ -122,7 +122,9 @@ extern struct _lf_device *lf_current_device;
 static inline void lf_set_current_device(struct _lf_device *device) {
 	lf_current_device = device;
 }
-#define lf_get_current_device() lf_current_device
+static inline struct _lf_device *lf_get_current_device(void) {
+	return lf_current_device;
+}
 
 /* Standardizes the notion of a module. */
 struct _lf_module {
@@ -198,10 +200,10 @@ int lf_transfer(struct _lf_device *device, struct _fmr_packet *packet);
 /* Retrieves a packet from the specified device. */
 int lf_retrieve(struct _lf_device *device, struct _fmr_result *response);
 /* Binds a module structure to its device counterpart. */
-int lf_bind(struct _lf_module *module);
+int lf_bind(struct _lf_module *module, struct _lf_device *device);
 
 /* Experimental: Load an application into RAM and execute it. */
-int lf_load(struct _lf_device *device, void *source, lf_size_t length);
+int lf_load(void *source, lf_size_t length, struct _lf_device *device);
 
 /* Prints verbose information about the packet disassembly. */
 void lf_debug_packet(struct _fmr_packet *packet, size_t length);

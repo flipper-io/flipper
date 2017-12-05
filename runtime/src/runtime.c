@@ -144,7 +144,7 @@ failure:
 	return lf_error;
 }
 
-int lf_load(struct _lf_device *device, void *source, lf_size_t length) {
+int lf_load(void *source, lf_size_t length, struct _lf_device *device) {
 	lf_assert(device, failure, E_NULL, "No device specified for RAM load.");
 	lf_assert(source, failure, E_NULL, "No source specified for RAM load to device '%s'.", device->configuration.name);
 	lf_assert(length, failure, E_NULL, "No length specified for RAM load to device '%s'.", device->configuration.name);

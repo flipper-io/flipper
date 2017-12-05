@@ -17,8 +17,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	/* Attach flipper. */
-	struct _lf_device *_device = flipper.attach();
-	lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
+	struct _lf_device *device = flipper.attach();
 
 	/* Obtain file size. */
 	size_t fsize = 0;
@@ -41,7 +40,7 @@ int main(int argc, char *argv[]) {
 	fclose(fp);
 
 	/* Load the application into RAM. */
-	lf_return_t value = lf_load(_device, fbuf, fsize);
+	lf_return_t value = lf_load(fbuf, fsize, device);
 	if ((int32_t)value == -1) {
 		fprintf(stderr, "Failed to load application into RAM.\n");
 		free(fbuf);

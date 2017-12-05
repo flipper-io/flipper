@@ -71,12 +71,12 @@ int __attribute__((__destructor__)) lf_exit(void) {
 }
 
 /* Binds the lf_module structure to its counterpart on the attached device. */
-int lf_bind(struct _lf_module *module) {
-	lf_assert(module, failure, E_MODULE, "NULL module passed to bind.");
+int lf_bind(struct _lf_module *module, struct _lf_device *device) {
+	lf_assert(module, failure, E_MODULE, "NULL module passed to '%s'.", __PRETTY_FUNCTION__);
+	lf_assert(device, failure, E_NULL, "NULL device passed to '%s'.", __PRETTY_FUNCTION__)
 	lf_assert(module->name, failure, E_MODULE, "Module has no name.");
+	module->device = device;
 	module->identifier = lf_crc(module->name, strlen(module->name) + 1);
-	if (!module->device) module->device = lf_get_current_device();
-
 	int index = fld_index(module->identifier) | FMR_USER_INVOCATION_BIT;
 	lf_assert(index != -1, failure, E_MODULE, "No counterpart for the module '%s' was found on the device '%s'. Load the module first.", module->name, module->device->configuration.name);
 	module->index = index;
