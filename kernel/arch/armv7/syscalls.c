@@ -50,16 +50,8 @@ extern int _read(int file, char *ptr, int len) {
 extern void uart0_put(char c);
 
 extern int _write(int file, char *ptr, int len) {
-	int pin = 0;
-	if (gpio_read(FMR_PIN)) {
-		pin = 1;
-		gpio_write(0, FMR_PIN);
-	}
 	for (int i = 0; i < len; i ++, ptr ++) {
 		uart0_put(*ptr);
-	}
-	if (pin) {
-		gpio_write(FMR_PIN, 0);
 	}
 	return 0;
 }

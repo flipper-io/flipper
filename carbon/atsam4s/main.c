@@ -100,7 +100,6 @@ void uart0_isr(void) {
 
 		gpio_write(0, FMR_PIN);
 	} else {
-		printf("uart error o:%li f:%li p:%li\n", (_sr & UART_SR_OVRE), (_sr & UART_SR_FRAME), (_sr & UART_SR_PARE));
 		UART0->UART_CR = UART_CR_RSTSTA;
 	}
 
