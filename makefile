@@ -152,7 +152,7 @@ utils: libflipper | $(BUILD)/utils/.dir
 	$(_v)$(X86_CC) $(X86_CFLAGS) $(BUILD)/$(X86_TARGET)/$(X86_TARGET).so utils/fdfu/src/*.c -o $(BUILD)/utils/fdfu
 	$(_v)$(X86_CC) $(X86_CFLAGS) $(shell pkg-config --libs libusb-1.0) utils/fdebug/src/*.c -o $(BUILD)/utils/fdebug
 	$(_v)$(X86_CC) $(X86_CFLAGS) $(BUILD)/$(X86_TARGET)/$(X86_TARGET).so utils/fload/src/*.c -o $(BUILD)/utils/fload
-	$(_v)$(X86_CC) $(X86_CFLAGS) $(BUILD)/$(X86_TARGET)/$(X86_TARGET).so utils/fvm/src/*.c -o $(BUILD)/utils/fvm
+	$(_v)$(X86_CC) $(X86_CFLAGS) $(BUILD)/$(X86_TARGET)/$(X86_TARGET).so -ldl utils/fvm/src/*.c -o $(BUILD)/utils/fvm
 	$(_v)cp utils/fdwarf/fdwarf.py $(BUILD)/utils/fdwarf
 	$(_v)chmod +x $(BUILD)/utils/fdwarf
 

@@ -71,7 +71,7 @@ int __attribute__((__destructor__)) lf_exit(void) {
 }
 
 /* Binds the lf_module structure to its counterpart on the attached device. */
-int lf_bind(struct _lf_module *module, struct _lf_device *device) {
+LF_WEAK int lf_bind(struct _lf_module *module, struct _lf_device *device) {
 	lf_assert(module, failure, E_MODULE, "NULL module passed to '%s'.", __PRETTY_FUNCTION__);
 	lf_assert(device, failure, E_NULL, "NULL device passed to '%s'.", __PRETTY_FUNCTION__)
 	lf_assert(module->name, failure, E_MODULE, "Module has no name.");
