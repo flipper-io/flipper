@@ -39,7 +39,8 @@ int main(void) {
 
 	sei();
 
-	SAM_POWER_PORT = (1 << SAM_POWER_PIN) | (1 << SAM_RESET_PIN);
+	/* Power on the 4S, put it in reset. */
+	SAM_POWER_PORT = (1 << SAM_POWER_PIN);
 	SAM_POWER_DDR = (1 << SAM_POWER_PIN) | (1 << SAM_RESET_PIN) | (1 << SAM_TEST_PIN) | (1 << SAM_ERASE_PIN);
 
 	FLASH_CS_PORT |= (1 << FLASH_CS_PIN);
@@ -67,6 +68,9 @@ int main(void) {
 	OCR1A = 15625; // 1s
 	TIMSK1 |= (1 << OCIE1A);
 	TCCR1B |= (1 << CS12) | (0 << CS11) | (1 << CS10);
+
+	/* Bring the 4S out of reset. */
+	SAM_POWER_PORT |= (1 << SAM_RESET_PIN);
 
 	/* Run the main loop. */
 	loop();
