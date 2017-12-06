@@ -45,8 +45,6 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr, "Failed to load application into RAM.\n");
 		free(fbuf);
 		exit(EXIT_FAILURE);
-	} else {
-		printf("Got return value 0x%08x.\n", value);
 	}
 
 	/* Free buffer. */

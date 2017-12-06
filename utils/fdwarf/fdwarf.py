@@ -6,9 +6,10 @@ from elftools.dwarf.enums import ENUM_DW_TAG
 from os.path import splitext
 
 class Function:
-	def __init__(self, type, name, params):
-		self.name = name
+	def __init__(self, type, name, ret, params):
 		self.type = type
+		self.name = name
+		self.ret = ret
 		self.parameters = params
 	def __str__(self):
 		params = ', '.join(map(str, self.parameters))
@@ -21,20 +22,12 @@ class Parameter:
 	def __str__(self):
 		return '%s %s' % (self.type, self.name)
 
-def get_name_of_die_at_offset(cu, offset):
+def get_die_at_offset(cu, offset):
 	die = None
 	top = cu.get_top_DIE()
 	for d in cu.iter_DIEs():
 		if (d.offset == offset): die = d
-	if (die):
-		if 'DW_AT_name' in die.attributes.keys():
-			return die.attributes['DW_AT_name'].value
-		else:
-			return 'void *'
-	else:
-		print 'No die found for type at offset ' + hex(offset)
-		sys.exit(1)
-	return None
+	return die
 
 def get_parameters_from_die(cu, die):
 	parameters = []
@@ -42,7 +35,13 @@ def get_parameters_from_die(cu, die):
 		if (child.tag == 'DW_TAG_formal_parameter'):
 			name = child.attributes['DW_AT_name'].value
 			# print 'n: ' + name
-			type = get_name_of_die_at_offset(cu, child.attributes['DW_AT_type'].value)
+			tdie = get_die_at_offset(cu, child.attributes['DW_AT_type'].value)
+			if tdie.tag == 'DW_TAG_typedef':
+				tdie = get_die_at_offset(cu, tdie.attributes['DW_AT_type'].value)
+			if 'DW_AT_name' in tdie.attributes:
+				type = tdie.attributes['DW_AT_name'].value
+			else:
+				type = 'void *'
 			# print 't: ' + type
 			p = Parameter(type, name)
 			parameters.append(p)
@@ -89,11 +88,20 @@ def process_file(filename, package):
 						name = child.attributes['DW_AT_name'].value
 						# print 'n: ' + name
 						if 'DW_AT_type' in child.attributes.keys():
-							type = get_name_of_die_at_offset(cu, child.attributes['DW_AT_type'].value)
-						else:
-							type = 'void'
+							tdie = get_die_at_offset(cu, child.attributes['DW_AT_type'].value)
+							while (tdie.tag == 'DW_TAG_typedef'):
+								tdie = get_die_at_offset(cu, tdie.attributes['DW_AT_type'].value)
+							if 'DW_AT_name' in tdie.attributes:
+								type = tdie.attributes['DW_AT_name'].value
+								ret = tdie.attributes['DW_AT_byte_size'].value
+							elif 'DW_AT_byte_size' in tdie.attributes:
+								type = 'void *'
+								ret = tdie.attributes['DW_AT_byte_size'].value
+							else:
+								type = 'void'
+								ret = 0x2
 						params = get_parameters_from_die(cu, child)
-						functions.append(Function(type, name, params))
+						functions.append(Function(type, name, ret, params))
 	h = open('template.h', 'rb')
 	htemplate = h.read()
 	htemplate = htemplate.replace('PACKAGE', package)
@@ -119,18 +127,19 @@ def process_file(filename, package):
 	functs = []
 	for f in functions:
 		struct.append('&%s' % f.name)
-		statement = 'lf_invoke(MODULE, FUNCTION, fmr_int_t, fmr_args(ARGS));'
+		statement = 'lf_invoke(MODULE, FUNCTION, RET, fmr_args(ARGS));'
 		args = []
 		for p in f.parameters:
 			args.append('fmr_infer(ARG)'.replace('ARG', p.name))
-		statement = statement.replace('MODULE', '&_' + package).replace('FUNCTION', '_' + package + '_' + f.name).replace('ARGS', ', '.join(args))
+		retl = ['fmr_void_t', '', 'fmr_int8_t', 'fmr_int16_t', '', 'fmr_int32_t']
+		statement = statement.replace('MODULE', '&_' + package).replace('FUNCTION', '_' + package + '_' + f.name).replace('RET', retl[f.ret + 1]).replace('ARGS', ', '.join(args))
 		if (f.type == 'void'):
-			body = statment
+			body = statement
 			ret = ';'
 		else:
 			body = ''
 			ret = ' ' + statement
-		functs.append('__attribute__((weak)) ' + str(f) + ' {\nBODY\treturnVALUE\n}\n'.replace('BODY', body).replace('VALUE', ret))
+		functs.append('LF_WEAK ' + str(f) + ' {\nBODY\treturnVALUE\n}\n'.replace('BODY', body).replace('VALUE', ret))
 	ctemplate = ctemplate.replace('VARIABLES\n\n', '')
 	ctemplate = ctemplate.replace('STRUCT', '\t' + ',\n\t'.join(struct))
 	ctemplate = ctemplate.replace('FUNCTIONS', '\n'.join(functs))

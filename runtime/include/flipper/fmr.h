@@ -17,7 +17,7 @@
 /* The variadic argument type. Used to hold argument metadata and value during parsing. */
 typedef uint64_t fmr_va;
 /* The largest argument type. All argument values are held within a variable of this type. */
-typedef uint32_t fmr_arg;
+typedef uint64_t fmr_arg;
 /* Used to hold the index of a standard or user module in which a function counterpart exists. */
 typedef uint32_t fmr_module;
 /* Used to hold the offset index of a function within a module. */
@@ -33,14 +33,34 @@ typedef uint8_t fmr_argc;
 */
 typedef uint32_t fmr_types;
 
+/* Converts a C type into an unsigned fmr_type. */
+#define fmr_utype(type) (sizeof(type) - 1)
+/* Converts a C type into a signed fmr_type. */
+#define fmr_stype(type) ((1 << 3) | fmr_utype(type))
+/* Calculates the length of an FMR type. */
+#define fmr_sizeof(type) ((type != fmr_void_t && type != fmr_int_t && type != fmr_ptr_t) ? ((type & 0x7) + 1) : 8)
+
 /* Enumerates the basic type signatures an argument can be classified as. */
 enum {
-	fmr_int8_t,
-	fmr_int16_t,
-	fmr_int32_t,
-	fmr_ptr_t,
-	fmr_int_t,
-	fmr_void_t
+
+	fmr_void_t = 2,                     // 2
+	fmr_int_t = 4,                      // 4
+	fmr_ptr_t = 6,                      // 6
+
+	/* Unsigned types. */
+	fmr_uint8_t = fmr_utype(uint8_t),   // 0
+	fmr_uint16_t = fmr_utype(uint16_t), // 1
+	fmr_uint32_t = fmr_utype(uint32_t), // 3
+	fmr_uint64_t = fmr_utype(uint64_t), // 7
+
+	/* Signed types. */
+	fmr_int8_t = fmr_stype(int8_t),     // 8
+	fmr_int16_t = fmr_stype(int16_t),   // 9
+	fmr_int32_t = fmr_stype(int32_t),   // 11
+	fmr_int64_t = fmr_stype(int64_t),   // 15
+
+	/* Max type is 15. */
+	fmr_max_t = 15
 };
 
 /* A type used to reference the values in the enum above. */
@@ -53,17 +73,12 @@ typedef uint8_t fmr_type;
 #define __fmr_count(...) __fmr_count_implicit(_, ##__VA_ARGS__, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 
 /* Generates and returns a pointer to an 'fmr_parameters' given a list of variadic arguments. */
-#define fmr_args(...) fmr_build(__fmr_count(__VA_ARGS__), ##__VA_ARGS__)
+#define fmr_args(...) fmr_build((__fmr_count(__VA_ARGS__)/2), ##__VA_ARGS__)
 
 /* ~ Parser macros for variables. */
 
-/* Converts a C type into an 'fmr_type'. */
-#define fmr_type(type) (sizeof(type) >> 1)
-/* Creates an 'fmr_va' from a C variable. */
-#define fmr_infer(variable) fmr_intx(fmr_type(variable), variable)
-
 /* Creates an 'fmr_va' from an 'fmr_type' and an immediate value. */
-#define fmr_intx(type, arg) (((fmr_va)type << (sizeof(fmr_arg) * 8)) | (fmr_arg)arg)
+#define fmr_intx(type, arg) (fmr_type)type, (fmr_arg)arg
 /* Gives the 'fmr_va' for a given 8-bit integer's value. */
 #define fmr_int8(arg) fmr_intx(fmr_int8_t, (uint8_t)arg)
 /* Gives the 'fmr_va' for a given 16-bit integer's value. */
@@ -72,12 +87,8 @@ typedef uint8_t fmr_type;
 #define fmr_int32(arg) fmr_intx(fmr_int32_t, (uint32_t)arg)
 /* Gives the 'fmr_va' for a pointer. */
 #define fmr_ptr(arg) fmr_intx(fmr_ptr_t, (uintptr_t)arg)
-
-/* Sends pointer data to the device, deallocated after function call. */
-fmr_va fmr_data(void *data, lf_size_t size);
-
-/* Calculates the length of an FMR type. */
-#define fmr_sizeof(type) ((type != fmr_ptr_t) ? (1 << type) : 4)
+/* Creates an 'fmr_va' from a C variable. */
+#define fmr_infer(variable) fmr_intx(fmr_utype(variable), variable)
 
 /* If this bit is set in the module's index, then it is a user module. */
 #define FMR_USER_INVOCATION_BIT (1 << 8)
@@ -170,7 +181,7 @@ struct LF_PACKED _fmr_push_pull_packet {
 /* A generic datastructure that is sent back following any message runtime transaction. */
 struct LF_PACKED _fmr_result {
 	/* The return value of the function called (if any). */
-	fmr_arg value;
+	lf_return_t value;
 	/* The error code generated on the device. */
 	lf_error_t error;
 	/* NOTE: Add bitfield indicating the need to poll for updates. */

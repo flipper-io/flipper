@@ -2,7 +2,6 @@
 #define __atsam4s16b_h__
 
 #include <flipper/libflipper.h>
-
 #include <flipper/atsam4s/sam4s16b.h>
 
 #define __use_adc__

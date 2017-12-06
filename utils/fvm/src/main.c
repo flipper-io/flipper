@@ -39,13 +39,13 @@ int fvm_load_module(char *path) {
 	struct _fvm_module *module = &fvm_modules[modulec++];
 	strcpy(module->name, name);
 	module->functions = functions;
-	printf("Successfully loaded module '%s'.\n", name);
+	printf("Successfully loaded module '%s'.\n\n", name);
 	return lf_success;
 failure:
 	return lf_error;
 }
 
-int fmr_perform_user_invocation(struct _fmr_invocation *invocation, struct _fmr_result *result) {
+lf_return_t fmr_perform_user_invocation(struct _fmr_invocation *invocation, struct _fmr_result *result) {
 	lf_assert(invocation->index < modulec, failure, E_BOUNDARY, "Module index was out of bounds.");
 	lf_return_t (* function)(void) = fvm_modules[invocation->index].functions[invocation->function];
 	return fmr_call(function, invocation->ret, invocation->argc, invocation->types, invocation->parameters);
@@ -54,6 +54,8 @@ failure:
 }
 
 int main(int argc, char *argv[]) {
+
+	//lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
 
 	if (argc > 1) {
 		char **modules = &argv[1];

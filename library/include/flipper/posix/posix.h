@@ -6,21 +6,6 @@
 #include <flipper/posix/network.h>
 #include <flipper/posix/usb.h>
 
-/* Terminal colors. */
-#ifndef __DISABLE_TERMINAL_COLORS__
-#define KNRM "\x1B[0m"
-#define KGRN "\x1B[32m"
-#define KRED "\x1B[31m"
-#define KBLU "\x1B[34m"
-#define KYEL "\x1B[33m"
-#else
-#define KNRM ""
-#define KGRN ""
-#define KRED ""
-#define KBLU ""
-#define KYEL ""
-#endif
-
 #define __use_adc__
 #define __use_button__
 #define __use_cpu__

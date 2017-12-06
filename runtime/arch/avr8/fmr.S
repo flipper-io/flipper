@@ -36,30 +36,35 @@ fmr_call:
 	; Load the address of register 25 into the X register.
 	clr XH
 	ldi XL, 25
+
 _load:
-	; Check if the argument count is zero.
 	tst argc
-	; If there are no arguments left to load, call the function.
 	breq _call
-	; Obtain the argument type from the lowest two bits by masking 0b11.
+
 	mov r16, argt_l
-	andi r16, 0xF
-	; Jump to the appropraite code for the argument's type.
+	andi r16, 0x7
+
 	; fmr_int8_t
 	cpi r16, 0
-	breq _load_8
+		breq _load_8
 	; fmr_int16_t
 	cpi r16, 1
-	breq _load_16
+		breq _load_16
 	; fmr_int32_t
-	cpi r16, 2
-	breq _load_32
-	; fmr_ptr_t
 	cpi r16, 3
-	breq _load_ptr
+		breq _load_32
 	; fmr_int_t
 	cpi r16, 4
-	breq _load_16
+		breq _load_int
+	; fmr_ptr_t
+	cpi r16, 6
+		breq _load_ptr
+	; fmr_int64_t
+	cpi r16, 7
+		breq _load_64
+
+	rjmp _failure
+
 _load_8:
 	ld r0, Z+
 	st -X, r0
@@ -85,6 +90,10 @@ _load_32:
 	st X, r0
 	subi XL, 0x04
 	rjmp _load_done
+_load_64:
+	rjmp _failure
+
+_load_int:
 _load_ptr:
 	dec XL
 	ld r0, Z+
@@ -92,9 +101,10 @@ _load_ptr:
 	ld r0, Z+
 	st X, r0
 	subi XL, 0x02
-	adiw ZL, 0x02
+	adiw ZL, 0x06
+	rjmp _load_done
+
 _load_done:
-	; Shift the encoded types four bits to the right.
 	asr argt_h
 	ror argt_l
 	asr argt_h
@@ -103,67 +113,89 @@ _load_done:
 	ror argt_l
 	asr argt_h
 	ror argt_l
-	; Decrease the argument count.
 	dec argc
-	; Contiunue loading arguments.
 	rjmp _load
+
 _call:
 	; Retrieve the function address from the stack.
 	pop ZL
 	pop ZH
 	; Call the target function.
 	icall
+
 _ret:
+
 	mov r16, retv
-	andi r16, 0xF
+	andi r16, 0x7
+
 	; fmr_int8_t
 	cpi r16, 0
-	breq _ret_8
+		breq _ret_8
 	; fmr_int16_t
 	cpi r16, 1
-	breq _ret_16
-	; fmr_int32_t
+		breq _ret_16
+	; fmr_void_t
 	cpi r16, 2
-	breq _ret_32
-	; fmr_ptr_t
+		breq _ret_void
+	; fmr_int32_t
 	cpi r16, 3
-	breq _ret_16
+		breq _ret_32
 	; fmr_int_t
 	cpi r16, 4
-	breq _ret_int
-	; fmr_void_t
-	cpi r16, 5
-	breq _ret_void
+		breq _ret_int
+	; fmr_ptr_t
+	cpi r16, 6
+		breq _ret_16
+	; fmr_int64_t
+	cpi r16, 7
+		breq _ret_64
+
+	rjmp _failure
+
 _ret_8:
 	clr r25
 	mov r22, r24
 	clr r24
 	clr r23
-	rjmp _call_done
+	sbrs r16, 4
+	rjmp _done
+	sbrs r22, 7
+	rjmp _done
+	com r25
+	com r24
+	com r23
+	rjmp _done
+_ret_int:
+	sbr r16, 4
 _ret_16:
 	mov r23, r25
 	clr r25
 	mov r22, r24
 	clr r24
-	rjmp _call_done
-_ret_32:
-	rjmp _call_done
-_ret_int:
-	mov r23, r25
-	clr r25
-	sbrc r23, 7
+	sbrs r16, 4
+	rjmp _done
+	sbrs r23, 7
+	rjmp _done
 	com r25
-	mov r22, r24
-	clr r24
-	sbrc r23, 7
 	com r24
-	rjmp _call_done
+	rjmp _done
+_ret_32:
+	rjmp _done
+_ret_64:
+	rjmp _failure
 _ret_void:
 	clr r25
 	clr r24
 	clr r23
 	clr r22
-_call_done:
+	rjmp _done
+
+_failure:
+	ser r25
+	ser r24
+	ser r23
+	ser r22
+_done:
 	; Restore the callee saved registers.
 	pop argt_h
 	pop argt_l

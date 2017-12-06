@@ -1,6 +1,8 @@
 #ifndef __atmega16u2_h__
 #define __atmega16u2_h__
 
+#include <flipper/libflipper.h>
+
 /* Include the avr-libc standard library headers. */
 #ifdef __ATMEGAU2__
 #include <avr/common.h>
@@ -12,7 +14,6 @@
 #include <avr/power.h>
 #include <avr/sleep.h>
 #include <avr/wdt.h>
-
 #endif
 
 #define __use_button__

@@ -11,13 +11,13 @@ struct _lf_ll *fmr_build(int argc, ...) {
 	/* Walk the variadic argument list, appending arguments to the list created above. */
 	while (argc --) {
 		/* Unstage the value of the argument from the variadic argument list. */
-		fmr_va value = va_arg(argv, fmr_va);
-		fmr_type type = (fmr_type)((value >> (sizeof(fmr_arg) * 8)) & 0xF);
-		lf_assert(type <= fmr_ptr_t, failure, E_TYPE, "An invalid type was provided while appending the parameter '0x%08x' with type '0x%02x' to the argument list.", (fmr_arg)value, (fmr_type)type);
+		int type = va_arg(argv, int);
+		fmr_arg value = va_arg(argv, fmr_arg);
+		lf_assert(type <= fmr_max_t, failure, E_TYPE, "An invalid type was provided while appending the parameter '%llx' with type '%x' to the argument list.", value, type);
 		struct _lf_arg *arg = malloc(sizeof(struct _lf_arg));
 		lf_assert(arg, failure, E_MALLOC, "Failed to allocate new lf_arg.");
-		arg->value = (fmr_arg)value;
 		arg->type = type;
+		arg->value = value;
 		lf_ll_append(&list, arg, free);
 	}
 	va_end(argv);
@@ -45,7 +45,7 @@ int fmr_create_call(fmr_module module, fmr_function function, fmr_type ret, stru
 		struct _lf_arg *arg = lf_ll_item(args, i);
 		lf_assert(arg, failure, E_NULL, "Invalid argument supplied to '%s'.", __PRETTY_FUNCTION__);
 		/* Encode the argument's type. */
-		call->types |= (arg->type & 0xF) << (i * 4);
+		call->types |= (arg->type & fmr_max_t) << (i * 4);
 		/* Calculate the size of the argument. */
 		uint8_t size = fmr_sizeof(arg->type);
 		/* Copy the argument into the parameter segment. */
@@ -77,7 +77,7 @@ failure:
 
 /* ~ Message runtime subclass handlers. ~ */
 
-LF_WEAK int fmr_perform_user_invocation(struct _fmr_invocation *invocation, struct _fmr_result *result) {
+LF_WEAK lf_return_t fmr_perform_user_invocation(struct _fmr_invocation *invocation, struct _fmr_result *result) {
 	printf("User invocation requested.\n");
 	return lf_error;
 }
@@ -93,7 +93,7 @@ int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
 	lf_assert(_crc == crc, failure, E_CHECKSUM, "Checksums do not match.");
 
 	/* Cast the incoming packet to the different packet structures for subclass handling. */
-	struct _fmr_invocation *call = &( (struct _fmr_invocation_packet *)packet)->call;
+	struct _fmr_invocation *call = &((struct _fmr_invocation_packet *)packet)->call;
 
 	/* Switch through the packet subclasses and invoke the appropriate handler for each. */
 	switch (packet->header.class) {
@@ -101,7 +101,7 @@ int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
 			result->value = fmr_execute(call->index, call->function, call->ret, call->argc, call->types, call->parameters);
 		break;
 		case fmr_user_invocation_class:
-			fmr_perform_user_invocation(call, result);
+			result->value = fmr_perform_user_invocation(call, result);
 		break;
 		case fmr_ram_load_class:
 		case fmr_send_class:

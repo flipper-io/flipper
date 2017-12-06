@@ -100,8 +100,8 @@ void lf_debug_call(struct _fmr_invocation *call) {
 	printf("call:\n");
 	printf("\t└─ module:\t0x%x\n", call->index);
 	printf("\t└─ function:\t0x%x\n", call->function);
-	char *typestrs[] = { "fmr_int8", "fmr_int16", "fmr_int32", "fmr_ptr", "fmr_int", "fmr_void" };
-	printf("\t└─ return:\t%s\n", typestrs[call->ret]);
+	char *typestrs[] = { "int8", "int16", "void", "int32", "int", "", "ptr", "int64" };
+	printf("\t└─ return:\t%s\n", typestrs[call->ret & 0x7]);
 	printf("\t└─ types:\t0x%x\n", call->types);
 	printf("\t└─ argc:\t0x%x (%d arguments)\n", call->argc, call->argc);
 	printf("arguments:\n");
@@ -109,10 +109,10 @@ void lf_debug_call(struct _fmr_invocation *call) {
 	uint8_t *offset = call->parameters;
 	fmr_types types = call->types;
 	for (fmr_argc i = 0; i < call->argc; i ++) {
-		fmr_type type = types & 0xF;
+		fmr_type type = types & fmr_max_t;
 		fmr_arg arg = 0;
 		memcpy(&arg, offset, fmr_sizeof(type));
-		printf("\t└─ %s:\t0x%x\n", typestrs[type], arg);
+		printf("\t└─ %c%s:\t0x%llx\n", ((type & (1 << 3)) ? '\0' : 'u'), typestrs[type & 0x7], arg);
 		offset += fmr_sizeof(type);
 		types >>= 4;
 	}
@@ -168,7 +168,7 @@ void lf_debug_result(struct _fmr_result *result) {
 	if (lf_debug_level != LF_DEBUG_LEVEL_ALL) return;
 
 	printf("response:\n");
-	printf("\t└─ value:\t0x%08x\n", result->value);
-	printf("\t└─ error:\t0x%02x\n", result->error);
+	printf("\t└─ value:\t0x%llx\n", result->value);
+	printf("\t└─ error:\t0x%x\n", result->error);
 	printf("\n-----------\n\n");
 }

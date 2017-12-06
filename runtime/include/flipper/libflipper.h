@@ -156,12 +156,6 @@ struct _lf_module {
 
 extern struct _lf_device lf_self;
 
-#ifdef PLATFORM_HEADER
-/* Include platform specific declarations. */
-#include PLATFORM_HEADER
-/* NOTE: The PLATFORM_HEADER macro is passed as a preprocessor flag during compilation. */
-#endif
-
 struct _lf_device *lf_device_create(struct _lf_endpoint *endpoint, int (* select)(struct _lf_device *device), int (* destroy)(struct _lf_device *device), size_t context_size);
 int lf_device_release(struct _lf_device *device);
 
@@ -204,5 +198,9 @@ int lf_load(void *source, lf_size_t length, struct _lf_device *device);
 /* Prints verbose information about the packet disassembly. */
 void lf_debug_packet(struct _fmr_packet *packet, size_t length);
 void lf_debug_result(struct _fmr_result *result);
+
+#ifdef PLATFORM_HEADER
+#include PLATFORM_HEADER
+#endif
 
 #endif

@@ -70,11 +70,6 @@ failure:
 	return -1;
 }
 
-/* Sends data to the address space of the device for a function call. Deallocated at the function return. */
-fmr_va fmr_data(void *data, lf_size_t size) {
-	return fmr_ptr(NULL);
-}
-
 lf_return_t lf_push(struct _lf_module *module, fmr_function function, void *source, lf_size_t length, struct _lf_ll *parameters) {
 	lf_assert(module, failure, E_NULL, "NULL module was specified for data push.");
 	lf_assert(module->index != -1, failure, E_MODULE, "The module '%s' has not been configured. Call '%s_configure()' first.", module->name, module->name);

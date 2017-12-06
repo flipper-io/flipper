@@ -4,7 +4,7 @@
 #define argt %r10
 #define argi %r11
 
-#define ret %r12
+#define retv %r12
 #define argv %r13
 #define temp %r14
 
@@ -18,12 +18,12 @@ _fmr_call:
 	push %r14
 	push %r13
 	push %r12
+	subq $8, %rsp
 
 	/* Put the function pointer on the stack. */
-	subq $8, %rsp
 	movq %rdi, -8(%rbp)
 
-	mov %rsi, ret
+	mov %rsi, retv
 	mov %rdx, argc
 	mov %rcx, argt
 	mov %r8, argv
@@ -34,17 +34,21 @@ _load:
 	je _do_call
 
 	movq argt, temp
-	and $0xF, temp
+	and $0x7, temp
+
+	# fmr_int8_t
 	cmp $0, temp
 		je _load_8
+	# fmr_int16_t
 	cmp $1, temp
 		je _load_16
-	cmp $2, temp
-		je _load_32
+	# fmr_int32_t
 	cmp $3, temp
-		je _load_ptr
-	cmp $4, temp
-		je _load_int
+		je _load_32
+	# fmr_int64_t
+	cmp $7, temp
+		je _load_64
+
 	jmp _failure
 
 _load_8:
@@ -63,25 +67,19 @@ _load_64:
 	movq (argv), %rax
 	add $8, argv
 	jmp _load_done
-_load_ptr:
-	jmp _load_64
-_load_int:
-	jmp _load_32
 
 _load_done:
-	mov argi, temp
-	and $0xF, temp
-	cmp $0, temp
+	cmp $0, argi
 		je _write_rdi
-	cmp $1, temp
+	cmp $1, argi
 		je _write_rsi
-	cmp $2, temp
+	cmp $2, argi
 		je _write_rdx
-	cmp $3, temp
+	cmp $3, argi
 		je _write_rcx
-	cmp $4, temp
+	cmp $4, argi
 		je _write_r8
-	cmp $4, temp
+	cmp $5, argi
 		je _write_r9
 	jmp _write_stack
 
@@ -114,12 +112,55 @@ _write_done:
 
 _do_call:
 	callq *-8(%rbp)
-	addq $8, %rsp
+
+_ret:
+
+	movq retv, temp
+	and $0x7, temp
+
+	# fmr_int8_t
+	cmp $0, temp
+		je _ret_8
+	# fmr_int16_t
+	cmp $1, temp
+		je _ret_16
+	# fmr_void_t
+	cmp $2, temp
+		je _ret_void
+	# fmr_int32_t
+	cmp $3, temp
+		je _ret_32
+	# fmr_int_t
+	cmp $4, temp
+		je _ret_int
+	# fmr_ptr_t
+	cmp $6, temp
+		je _ret_ptr
+	# fmr_int64_t
+	cmp $7, temp
+		je _ret_64
+
+	jmp _failure
+
+_ret_8:
+	jmp _done
+_ret_16:
+	jmp _done
+_ret_void:
+	jmp _done
+_ret_32:
+	jmp _done
+_ret_int:
+	jmp _done
+_ret_ptr:
+	jmp _done
+_ret_64:
 	jmp _done
 
 _failure:
 	mov $-1, %rax
 _done:
+	addq $8, %rsp
 	pop %r12
 	pop %r13
 	pop %r14

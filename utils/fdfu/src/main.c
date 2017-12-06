@@ -224,7 +224,6 @@ int enter_update_mode(void) {
 
 	printf("Entering update mode.\n");
 
-	uint8_t tries = 0;
 	uint8_t ack[3];
 
 repeat:
@@ -235,15 +234,10 @@ repeat:
 		goto done;
 	}
 
-	/* Enter DFU mode. */
 	sam_enter_dfu();
 
-	if (tries < 2) {
-		fprintf(stderr, KRED "Failed to enter update mode.\n" KNRM);
-		return lf_error;
-	}
-
-	tries ++;
+	fprintf(stderr, KRED "Failed to enter update mode.\n" KNRM);
+	return lf_error;
 
 	goto repeat;
 
@@ -283,6 +277,8 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr, "Please provide a path to the firmware.\n");
 		return EXIT_FAILURE;
 	}
+
+	//lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
 
 	/* Attach to a Flipper device. */
 	struct _lf_device *device = flipper.attach();

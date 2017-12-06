@@ -37,7 +37,7 @@ lf_return_t fmr_push(struct _fmr_push_pull_packet *packet) {
 		_e = os_load_image(push_buffer);
 		return lf_success;
 	} else {
-		*(uintptr_t *)(packet->call.parameters) = (uintptr_t)push_buffer;
+		*(uint64_t *)(packet->call.parameters) = (uintptr_t)push_buffer;
 		_e = fmr_execute(packet->call.index, packet->call.function, packet->call.ret, packet->call.argc, packet->call.types, (void *)(packet->call.parameters));
 		free(push_buffer);
 	}
@@ -48,14 +48,14 @@ lf_return_t fmr_pull(struct _fmr_push_pull_packet *packet) {
 	lf_return_t _e = lf_success;
 	if (packet->header.class == fmr_receive_class) {
 		/* If we are receiving data, simply push the memory. */
-		_e = uart0_push((uintptr_t *)*(uint32_t *)(packet->call.parameters), packet->length);
+		_e = uart0_push((void *)*(uint64_t *)(packet->call.parameters), packet->length);
 	} else {
 		void *pull_buffer = malloc(packet->length);
 		if (!pull_buffer) {
 			lf_error_raise(E_MALLOC, NULL);
 			return lf_error;
 		}
-		*(uintptr_t *)(packet->call.parameters) = (uintptr_t)pull_buffer;
+		*(uint64_t *)(packet->call.parameters) = (uintptr_t)pull_buffer;
 		_e = fmr_execute(packet->call.index, packet->call.function, packet->call.ret, packet->call.argc, packet->call.types, (void *)(packet->call.parameters));
 		uart0_push(pull_buffer, packet->length);
 		free(pull_buffer);

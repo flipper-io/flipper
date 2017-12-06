@@ -28,26 +28,33 @@ fmr_call:
 	/* Clear the argument index register. */
 	mov argi, #0
 _load:
-	/* Check if the argument count is zero. */
 	cmp argc, #0
-	/* If there are no arguments left to load, call the function. */
 	beq _call
-	/* Obtain the argument type from the lowest two bits by masking 0b1111. */
+
 	mov temp, argt
 	and temp, 0xF
-	/* Jump to the appropraite code for the argument's type. */
+
+	# fmr_int8_t
 	cmp temp, #0
 		beq _load_8
+	# fmr_int16_t
 	cmp temp, #1
 		beq _load_16
-	cmp temp, #2
-		beq _load_32
+	# fmr_int32_t
 	cmp temp, #3
-		beq _load_ptr
+		beq _load_32
+	# fmr_int_t
 	cmp temp, #4
+		beq _load_ptr
+	# fmr_ptr_t
+	cmp temp, #6
 		beq _load_int
-	/* If the type was encoded improperly, return with error. */
+	# fmr_int64_t
+	cmp temp, #7
+		beq _load_64
+
 	b _failure
+
 _load_8:
 	/* Load a byte from the argument list. */
 	ldrb temp, [_argv, #0]
@@ -66,21 +73,26 @@ _load_32:
 	/* Increment the argv pointer by four. */
 	add _argv, #4
 	b _load_done
-_load_ptr:
-	b _load_32
+_load_64:
+	b _failure
+
 _load_int:
-	b _load_32
+_load_ptr:
+	ldr temp, [_argv, #0]
+	add _argv, #8
+
 _load_done:
 	/* If the argument index is less than 4, load the argument into the appropriate register. */
 	cmp argi, #0
-	beq _write_r0
+		beq _write_r0
 	cmp argi, #1
-	beq _write_r1
+		beq _write_r1
 	cmp argi, #2
-	beq _write_r2
+		beq _write_r2
 	cmp argi, #3
-	beq _write_r3
+		beq _write_r3
 	b _write_stack
+
 _write_r0:
 	mov r0, temp
 	b _write_done
@@ -94,56 +106,60 @@ _write_r3:
 	mov r3, temp
 	b _write_done
 _write_stack:
-	/* Todo. */
 	b _failure
+
 _write_done:
-	/* Shift the encoded types two bits to the right. */
 	lsrs argt, #4
-	/* Decrease the argument count. */
 	sub argc, #1
-	/* Increase the argument index. */
 	add argi, #1
-	/* Contiunue loading arguments. */
 	b _load
+
 _call:
 	/* Jump to the function. */
 	blx _function
+
 _ret:
-	/* Obtain the argument type from the lowest two bits by masking 0b11. */
-	mov temp, retv
-	and temp, 0xF
-	/* Jump to the appropraite code for the argument's type. */
-	cmp temp, #0
+	# fmr_int8_t
+	cmp retv, #0
 		beq _ret_8
-	cmp temp, #1
+	# fmr_int16_t
+	cmp retv, #1
 		beq _ret_16
-	cmp temp, #2
-		beq _ret_32
-	cmp temp, #3
-		beq _ret_ptr
-	cmp temp, #4
-		beq _ret_int
-	cmp temp, #5
+	# fmr_void_t
+	cmp retv, #2
 		beq _ret_void
+	# fmr_int32_t
+	cmp retv, #3
+		beq _ret_32
+	# fmr_int_t
+	cmp retv, #4
+		beq _ret_int
+	# fmr_int_t
+	cmp retv, #6
+		beq _ret_ptr
+	# fmr_int
+	cmp retv, #7
+		beq _ret_64
+
 	b _failure
+
+_ret_void:
+	mov r0, #0
+	b _call_done
 _ret_8:
 	b _call_done
 _ret_16:
 	b _call_done
+_ret_int:
+_ret_ptr:
 _ret_32:
 	b _call_done
-_ret_ptr:
+_ret_64:
 	b _call_done
-_ret_int:
-	b _call_done
-_ret_void:
-	mov r0, #0
-	b _call_done
+
 _failure:
-	/* Return -1 if an error has occured. */
 	mov r0, #-1
 _call_done:
-	/* Restore registers and return to the top-level caller. */
 	pop { _function-temp, pc }
 
 .endfunc
