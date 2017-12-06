@@ -65,11 +65,11 @@ _load_16:
 	movw (argv), %ax
 	add $2, argv
 	jmp _load_done
-_load_int:
 _load_32:
 	movl (argv), %eax
 	add $4, argv
 	jmp _load_done
+_load_int:
 _load_ptr:
 _load_64:
 	movq (argv), %rax
