@@ -25,14 +25,7 @@ const void *const fmr_modules[] = {
 };
 
 LF_WEAK lf_return_t fmr_call(lf_return_t (* function)(void), fmr_type ret, uint8_t argc, uint16_t argt, void *argv) {
-	/* Grab the symbol name of the function for debugging purposes. */
-#ifdef __dl_info__
-	#include <dlfcn.h>
-	Dl_info info;
-	dladdr(function, &info);
-	printf("Calling local function '%s', with %i arguments, arg types %i, and va_list %p.\n", info.dli_sname, argc, argt, argv);
-#endif
-	return function();
+	return -1;
 }
 
 LF_WEAK lf_return_t fmr_push(struct _fmr_push_pull_packet *packet) {

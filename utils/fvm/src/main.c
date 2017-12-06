@@ -116,7 +116,7 @@ lf_return_t fmr_push(struct _fmr_push_pull_packet *packet) {
 	void *swap = malloc(packet->length);
 	lf_assert(swap, failure, E_MALLOC, "Failed to allocate push buffer");
 	nep->pull(nep, swap, packet->length);
-	*(uint32_t *)(packet->call.parameters) = (uintptr_t)swap;
+	*(uint64_t *)(packet->call.parameters) = (uintptr_t)swap;
 	retval = fmr_execute(packet->call.index, packet->call.function, packet->call.ret, packet->call.argc, packet->call.types, (void *)(packet->call.parameters));
 	free(swap);
 	return retval;
@@ -128,7 +128,7 @@ lf_return_t fmr_pull(struct _fmr_push_pull_packet *packet) {
 	lf_return_t retval;
 	void *swap = malloc(packet->length);
 	lf_assert(swap, failure, E_MALLOC, "Failed to allocate pull buffer");
-	*(uint32_t *)(packet->call.parameters) = (uintptr_t)swap;
+	*(uint64_t *)(packet->call.parameters) = (uintptr_t)swap;
 	retval = fmr_execute(packet->call.index, packet->call.function, packet->call.ret, packet->call.argc, packet->call.types, (void *)(packet->call.parameters));
 	nep->push(nep, swap, packet->length);
 	free(swap);

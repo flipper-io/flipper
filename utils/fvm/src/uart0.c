@@ -15,7 +15,7 @@ int uart0_ready(void) {
 }
 
 int uart0_push(void *source, lf_size_t length) {
-	printf("Pushing to the uart0 bus.\n");
+	printf("Pushing to the uart0 bus: %s\n", source);
 	return lf_success;
 }
 

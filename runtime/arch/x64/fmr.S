@@ -45,6 +45,12 @@ _load:
 	# fmr_int32_t
 	cmp $3, temp
 		je _load_32
+	# fmr_int_t
+	cmp $4, temp
+		je _load_int
+	# fmr_ptr_t
+	cmp $6, temp
+		je _load_ptr
 	# fmr_int64_t
 	cmp $7, temp
 		je _load_64
@@ -59,10 +65,12 @@ _load_16:
 	movw (argv), %ax
 	add $2, argv
 	jmp _load_done
+_load_int:
 _load_32:
 	movl (argv), %eax
 	add $4, argv
 	jmp _load_done
+_load_ptr:
 _load_64:
 	movq (argv), %rax
 	add $8, argv
