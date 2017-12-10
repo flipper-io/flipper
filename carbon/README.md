@@ -1,13 +1,44 @@
-Flipper: Carbon Edition
-===
+# Carbon
 
-This directory contains board-specific implementation for the **Flipper: Carbon Edition** hardware platform. Included within this directory are the definitions of the standard modules exposed by this board, as well as their platform specific implementations. A Hardware Abstraction Layer, or HAL, is provided for interfacing `libflipper` with the Carbon Edition board.
+This directory contains board-specific implementation for the **Flipper: Carbon** hardware platform.
 
-Hardware Architecture
+The firmware provides API for the **Carbon** board's hardware peripherals that can be controlled using `libflipper`. The Carbon board contains two CPUs: a microcontroller and a microprocessor.
+
 ---
-The Carbon edition platform incorperates two control units, a microcontroller for handling interactions with the host platform via USB, as well as the primary microprocessor that runs the our operating system, Osmium.
 
-An `ATMega16U2` (or **U2** for short) acts as the USB controller while the `ATSAM4S16B` (or **4S** for short) runs programs and handles interaction with the device peripherals. These devices share a USART bus, as well as exist in multi-master mode to a shared SPI flash device. The U2 is responsible for flashing firmware updates to the 4S, installing programs into flash memory, handing libflipper level interactions with the LED and button, powering and resetting the 4S, as well as acting as a bridge device between the host and the 4S.
+### Microcontroller (Atmel ATMEGA32U2)
 
-The U2 enables the host instance of `libflipper` to communicate with the 4S over its USART bus. This bus is run at `2M baud` so it does not impose a bandwith limitation between the host and the 4S; all bandwidth limitations between the host and the 4S device are a factor of such limitations imposed by the transfer rates of full-speed USB, as well as the workload of the host's USB controller. The HAL presents the U2 as an endpoint to which `libflipper` can be attached. As `libflipper` performs invocations through this
-endpoint, the HAL automatically routes packets to their corresponding devices. The active instance of `libflipper` is aware of which device certain modules belong on due to the fact that HAL sets the double pointer to the specific device upon which the standard or user module belongs when the U2 is set as the active endpoint.
+The microcontroller connects to the host via USB since we wanted to keep the microprocessor's USB controller available to user applications. The microcontroller serves a number of functions.
+
+- Control the power (ON/OFF) and reset state of the microprocessor.
+- Put the microprocessor into Device Firmware Update (DFU) mode.
+- Flash new firmware images to the microprocessor and verify them.
+- Halt the microprocessor and debug it using SWD.
+- Allow the host to talk to the device's filesystem.
+- Control the device's LED and button peripherals.
+- Send message runtime packets to the microprocessor.
+- Pass printf messages sent by the microprocessor back to the host.
+
+---
+
+### Microprocessor (Atmel ATSAM4S16BA)
+
+The microprocessor is the main CPU on the device.
+
+- Load and run programs from the filesystem.
+- Schedule the execution of multiple running programs.
+- Communicate with the device's hardware peripherals.
+- Execute message runtime packets.
+- Interact with backpacks plugged into the expansion connector.
+
+---
+
+### HAL
+
+The Hardware Abstraction Layer (HAL) exposes the **Carbon** hardware as a `struct _lf_device *` that can be interacted with by `libflipper`. The architecture of the HAL is described in terms of the procedure followed to attach a **Carbon** board.
+
+- Scan the USB bus using `libusb` to find boards with the VID/PID combo of **Carbon**. Get a list of the `struct _lf_endpoint *`s corresponding to the attached devices.
+- Iterate through this list of endpoints and create a new `struct _lf_device *` for each of them. This is the U2 device.
+- Create a new `struct _lf_endpoint *` to be used as the bridge endpoint and configure it to use the U2 device's `uart0` module.
+- Create a new `struct _lf_device *` using this bridge endpoint. This will be the 4S device.
+- Return the 4S device as the attached device.
