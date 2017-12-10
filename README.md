@@ -1,4 +1,4 @@
-# flipper.io
+# Flipper
 
 ### Our Goal
 
