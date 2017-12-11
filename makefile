@@ -149,10 +149,10 @@ uninstall-libflipper:
 .PHONY: utils install-utils uninstall-utils
 
 utils: libflipper | $(BUILD)/utils/.dir
-	$(_v)$(X86_CC) $(X86_CFLAGS) $(BUILD)/$(X86_TARGET)/$(X86_TARGET).so utils/fdfu/src/*.c -o $(BUILD)/utils/fdfu
-	$(_v)$(X86_CC) $(X86_CFLAGS) $(shell pkg-config --libs libusb-1.0) utils/fdebug/src/*.c -o $(BUILD)/utils/fdebug
-	$(_v)$(X86_CC) $(X86_CFLAGS) $(BUILD)/$(X86_TARGET)/$(X86_TARGET).so utils/fload/src/*.c -o $(BUILD)/utils/fload
-	$(_v)$(X86_CC) $(X86_CFLAGS) $(BUILD)/$(X86_TARGET)/$(X86_TARGET).so -ldl utils/fvm/src/*.c -o $(BUILD)/utils/fvm
+	$(_v)$(X86_CC) $(X86_CFLAGS) -o $(BUILD)/utils/fdfu utils/fdfu/src/*.c -L$(BUILD)/$(X86_TARGET) -lflipper
+	$(_v)$(X86_CC) $(X86_CFLAGS) -o $(BUILD)/utils/fdebug utils/fdebug/src/*.c $(shell pkg-config --libs libusb-1.0)
+	$(_v)$(X86_CC) $(X86_CFLAGS) -o $(BUILD)/utils/fload utils/fload/src/*.c -L$(BUILD)/$(X86_TARGET) -lflipper
+	$(_v)$(X86_CC) $(X86_CFLAGS) -o $(BUILD)/utils/fvm utils/fvm/src/*.c -L$(BUILD)/$(X86_TARGET) -lflipper -ldl
 	$(_v)cp utils/fdwarf/fdwarf.py $(BUILD)/utils/fdwarf
 	$(_v)chmod +x $(BUILD)/utils/fdwarf
 
@@ -237,7 +237,7 @@ $$($1_BIN): $$($1_ELF)
 
 # Linking rule
 $$($1_SO): $$($1_OBJS)
-	$$(_v)$$($1_LD) -shared $$($1_LDFLAGS) -o $$($1_BUILD)/$$@ $$^
+	$$(_v)$$($1_LD) -shared -o $$($1_BUILD)/$$@ $$^ $$($1_LDFLAGS)
 
 # Compiling rule for C sources
 $$($1_BUILD)/%.c.o: %.c | $$($1_BUILD_DIR_FILES)
