@@ -1,6 +1,6 @@
 sudo: required
 
-before_install:
+install:
   - sudo apt-get -qq update
   - sudo apt-get install build-essential
   - sudo apt-get install libusb-1.0-0-dev
@@ -14,5 +14,3 @@ compiler:
   - gcc
 
 script: make VERBOSE=1
-
-install: sudo make install VERBOSE=1
