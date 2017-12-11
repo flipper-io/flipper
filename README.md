@@ -1,5 +1,7 @@
 # Flipper
 
+[![Build Status](https://travis-ci.com/georgemorgan/flipper.svg?token=mWpYCFjw1S5VKLVNvZFo&branch=master)](https://travis-ci.com/georgemorgan/flipper)
+
 ### Our Goal
 
 Flipper is an embedded development platform that can be controlled from applications written for any platform using any programming language. Flipper accomplishes this by exposing functions that live on the hardware as methods or functions that can be called from applications running on a host device. Applications can also be developed to run directly on the hardware. Simply by marking each C function with `LF_FUNC`, our tools will automatically export device functions as a library that can be used from a higher level context.
