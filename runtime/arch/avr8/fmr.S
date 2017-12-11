@@ -1,3 +1,5 @@
+#include <avr/io.h>
+
 #define param_function_h	r25
 #define param_function_l	r24
 #define param_retv_h			r23
