@@ -45,7 +45,8 @@ use failure::Error;
 const ABOUT: &'static str = "flipper: Manage and control Flipper from the command line";
 
 fn main() {
-    match execute(&app().get_matches()) {
+    let matches = &app().get_matches();
+    match execute(&matches) {
         Ok(()) => return,
         Err(e) => println!("{}", e),
     }

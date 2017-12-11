@@ -57,7 +57,7 @@ pub fn parse_elf(file: &mut File) -> Result<(), Error> {
 }
 
 /// Parses a file to extract the debugging information.
-pub fn parse_dwarf(file: &mut File) {
+pub fn parse_dwarf(file: &mut File) -> Result<(), Error> {
 
     fn load_section<'input, 'file, S, Endian>(
         file: &'file object::File<'input>,
@@ -74,4 +74,5 @@ pub fn parse_dwarf(file: &mut File) {
 
     let buffer = { let mut v = Vec::new(); file.read_to_end(&mut v).unwrap(); v};
     let mut object_file = object::File::parse(&buffer);
+    Ok(())
 }
