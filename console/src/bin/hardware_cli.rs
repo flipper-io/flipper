@@ -2,6 +2,8 @@
 //! hardware which isn't remote module execution. This includes booting the
 //! board and installing and deploying modules.
 
+use std::fs::File;
+use std::io::Read;
 use console::CliError;
 use clap::{App, Arg, ArgMatches};
 use failure::Error;
@@ -67,6 +69,14 @@ pub mod flash {
         // This is safe because "image" is a required argument.
         let image = args.value_of("image").unwrap();
         println!("Flipper flash got image: {}", image);
-        fdfu::flash(image)
+
+        let firmware = File::open(image)
+            .and_then(|mut f| {
+                let mut v = Vec::new();
+                f.read_to_end(&mut v)?;
+                Ok(v)
+            })?;
+
+        fdfu::flash(&firmware)
     }
 }
