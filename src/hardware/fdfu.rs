@@ -120,7 +120,7 @@ fn enter_update_mode<B: Write + Read>(bus: &mut B) -> bool {
 
     println!("Setting uart0 to DFU baud");
     // FIXME
-    uart0::dfu();
+//    uart0::dfu();
     println!("Uart0 set to DFU baud");
 
     bus.write(&[b'#']);
@@ -152,10 +152,10 @@ pub fn flash<P: AsRef<Path>>(path: P) -> Result<(), Error> {
         .map_err(|e| FdfuError::FileError(e))?;
 
     let flipper = flipper::Flipper::attach_hostname("localhost");
-    let mut bus = flipper::fsm::uart0::Uart0::new(&flipper);
-    flipper::fsm::uart0::configure();
+//    let mut bus = flipper::fsm::uart0::Uart0::new(&flipper);
+//    flipper::fsm::uart0::configure();
 
-    let samba = SamBa { bus: &mut bus };
+//    let samba = SamBa { bus: &mut bus };
 
     Ok(())
 }
