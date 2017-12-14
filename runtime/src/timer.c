@@ -3,7 +3,7 @@
 
 #ifdef __use_timer__
 
-LF_MODULE(_timer, "timer", "Interfaces with the device's timer peripheral.");
+LF_MODULE(_timer, "timer", "Interfaces with the device's timer peripheral.", NULL, NULL);
 
 /* Define the virtual interface for this module. */
 const struct _timer timer = {

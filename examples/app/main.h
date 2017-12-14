@@ -1,9 +1,8 @@
-#ifndef __my_app_h__
-#define __my_app_h__
+#ifndef __main_h__
+#define __main_h__
 
-/* Include the platform header for the target platform. */
-#include <flipper/atsam4s/atsam4s.h>
+#include <flipper.h>
 
-void main(void) __attribute__((section (".main")));
+int my_func(uint8_t a);
 
 #endif

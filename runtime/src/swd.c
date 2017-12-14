@@ -3,7 +3,7 @@
 
 #ifdef __use_swd__
 
-LF_MODULE(_swd, "swd", "Interfaces with the device's single wire debug unit.");
+LF_MODULE(_swd, "swd", "Interfaces with the device's single wire debug unit.", NULL, NULL);
 
 /* Define the virtual interface for this module. */
 const struct _swd swd = {

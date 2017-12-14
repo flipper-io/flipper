@@ -86,6 +86,10 @@ LF_WEAK int lf_bind(struct _lf_module *module, struct _lf_device *device) {
 	module->device = device;
 	module->identifier = lf_crc(module->name, strlen(module->name) + 1);
 	int index = fld_index(module->identifier) | FMR_USER_INVOCATION_BIT;
+	if (index == -1) {
+		lf_load(module->data, *module->size, module->device);
+		index = fld_index(module->identifier) | FMR_USER_INVOCATION_BIT;
+	}
 	lf_assert(index != -1, failure, E_MODULE, "No counterpart for the module '%s' was found on the device '%s'. Load the module first.", module->name, module->device->configuration.name);
 	module->index = index;
 

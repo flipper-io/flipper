@@ -3,7 +3,7 @@
 
 #ifdef __use_button__
 
-LF_MODULE(_button, "button", "Interacts with the onboard button.");
+LF_MODULE(_button, "button", "Interacts with the onboard button.", NULL, NULL);
 
 /* Define the virtual interface for this module. */
 const struct _button button = {

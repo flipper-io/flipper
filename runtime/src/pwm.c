@@ -3,7 +3,7 @@
 
 #ifdef __use_pwm__
 
-LF_MODULE(_pwm, "pwm", "Interfaces with the device's pulse width modulation controller.");
+LF_MODULE(_pwm, "pwm", "Interfaces with the device's pulse width modulation controller.", NULL, NULL);
 
 /* Define the virtual interface for this module. */
 const struct _pwm pwm = {

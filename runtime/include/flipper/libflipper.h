@@ -136,20 +136,26 @@ struct _lf_module {
 	int index;
 	/* The pointer to a pointer to the device upon which the module's counterpart is located. */
 	struct _lf_device *device;
+	/* The module's binary data. */
+	void *data;
+	/* The binary data size. */
+	size_t *size;
 };
 
 #define LF_VAR __attribute__((section(".lf.vars")))
 #define LF_FUNC __attribute__((section(".lf.funcs")))
 
 /* Macro for easily generating module structures. */
-#define LF_MODULE(symbol, name, description) \
+#define LF_MODULE(symbol, name, description, data, len) \
 	struct _lf_module symbol = { \
 		name, \
 		description, \
 		LF_VERSION, \
 		-1, \
 		0, \
-		NULL \
+		NULL, \
+		data, \
+		len \
 	};
 
 #define LF_MODULE_SET_DEVICE_AND_ID(module, _device, _id) module.device = _device; module.index = _id;

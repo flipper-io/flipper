@@ -3,7 +3,7 @@
 
 #ifdef __use_i2c__
 
-LF_MODULE(_i2c, "i2c", "Interfaces with the device's I2C peripheral.");
+LF_MODULE(_i2c, "i2c", "Interfaces with the device's I2C peripheral.", NULL, NULL);
 
 /* Define the virtual interface for this module. */
 const struct _i2c i2c = {

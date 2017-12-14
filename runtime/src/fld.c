@@ -3,7 +3,7 @@
 
 #ifdef __use_fld__
 
-LF_MODULE(_fld, "fld", "Loads modules on the target device.");
+LF_MODULE(_fld, "fld", "Loads modules on the target device.", NULL, NULL);
 
 /* Define the virtual interface for this module. */
 const struct _fld fld = {

@@ -3,7 +3,7 @@
 
 #ifdef __use_usart__
 
-LF_MODULE(_usart, "usart", "Provides low level access to the device's UART bus.");
+LF_MODULE(_usart, "usart", "Provides low level access to the device's UART bus.", NULL, NULL);
 
 /* Define the virtual interface for this module. */
 const struct _usart usart = {

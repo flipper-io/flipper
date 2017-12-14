@@ -1,4 +1,3 @@
-/* Include the application header file. */
 #include "main.h"
 
 LF_FUNC int my_func(uint8_t a) {
