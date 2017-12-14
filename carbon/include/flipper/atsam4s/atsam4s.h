@@ -23,6 +23,11 @@
 #define __use_usb__
 #define __use_wdt__
 
+#ifdef __ATSAM4S__
+#define LF_VAR __attribute__((section(".lf.vars")))
+#define LF_FUNC __attribute__((section(".lf.funcs")))
+#endif
+
 /* Clock the CM4 CPU at 96 MHz. */
 #define F_CPU 96000000
 /* NOTE: The number of wait states is proportionate to the clock speed defined above. */

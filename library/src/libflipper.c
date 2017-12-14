@@ -83,16 +83,17 @@ LF_WEAK int lf_bind(struct _lf_module *module, struct _lf_device *device) {
 	lf_assert(module, failure, E_MODULE, "NULL module passed to '%s'.", __PRETTY_FUNCTION__);
 	lf_assert(device, failure, E_NULL, "NULL device passed to '%s'.", __PRETTY_FUNCTION__)
 	lf_assert(module->name, failure, E_MODULE, "Module has no name.");
+	lf_debug("Binding to module '%s'.", module->name);
 	module->device = device;
 	module->identifier = lf_crc(module->name, strlen(module->name) + 1);
-	int index = fld_index(module->identifier) | FMR_USER_INVOCATION_BIT;
+	int index = fld_index(module->identifier);
 	if (index == -1) {
+		lf_debug("Could not find counterpart for '%s'. Attempting to load it.", module->name);
 		lf_load(module->data, *module->size, module->device);
-		index = fld_index(module->identifier) | FMR_USER_INVOCATION_BIT;
+		index = fld_index(module->identifier);
 	}
 	lf_assert(index != -1, failure, E_MODULE, "No counterpart for the module '%s' was found on the device '%s'. Load the module first.", module->name, module->device->configuration.name);
-	module->index = index;
-
+	module->index = index | FMR_USER_INVOCATION_BIT;
 	return lf_success;
 failure:
 	return lf_error;
