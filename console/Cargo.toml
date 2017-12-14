@@ -24,7 +24,7 @@ name = "flipper_console"
 path = "src/lib.rs"
 
 [[bin]]
-name = "flipper_console"
+name = "flipper"
 path = "src/bin/main.rs"
 doc = false
 test = false
