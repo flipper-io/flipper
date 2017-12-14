@@ -1,6 +1,20 @@
 #define __private_include__
 #include <flipper/libflipper.h>
 
+struct _lf_arg *lf_arg_create(fmr_type type, fmr_arg value) {
+	struct _lf_arg *arg = malloc(sizeof(struct _lf_arg));
+	lf_assert(arg, failure, E_MALLOC, "Failed to allocate new lf_arg.");
+	arg->type = type;
+	arg->value = value;
+	return arg;
+failure:
+	return NULL;
+}
+
+void lf_arg_release(struct _lf_arg *arg) {
+	if (arg) free(arg);
+}
+
 struct _lf_ll *fmr_build(int argc, ...) {
 	lf_assert(argc < FMR_MAX_ARGC, failure, E_OVERFLOW, "Too many arguments were provided when building (%i) call.", argc);
 	struct _lf_ll *list = NULL;
@@ -14,11 +28,9 @@ struct _lf_ll *fmr_build(int argc, ...) {
 		int type = va_arg(argv, int);
 		fmr_arg value = va_arg(argv, fmr_arg);
 		lf_assert(type <= fmr_max_t, failure, E_TYPE, "An invalid type was provided while appending the parameter '%llx' with type '%x' to the argument list.", value, type);
-		struct _lf_arg *arg = malloc(sizeof(struct _lf_arg));
-		lf_assert(arg, failure, E_MALLOC, "Failed to allocate new lf_arg.");
-		arg->type = type;
-		arg->value = value;
-		lf_ll_append(&list, arg, free);
+		struct _lf_arg *arg = lf_arg_create(type, value);
+		lf_assert(arg, failure, E_MALLOC, "Failed to append new lf_arg.");
+		lf_ll_append(&list, arg, lf_arg_release);
 	}
 	va_end(argv);
 	return list;

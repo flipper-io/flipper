@@ -1,2 +1,2 @@
-from flipper import flipper
+from lf import flipper
 from led import led
