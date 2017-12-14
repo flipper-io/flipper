@@ -1,5 +1,6 @@
 # Directory where build products are stored.
 BUILD := build
+
 # Prefix where build projects are installed
 PREFIX := /usr/local
 
@@ -144,6 +145,35 @@ uninstall-libflipper:
 	$(_v)rm -r $(PREFIX)/include/flipper
 	$(_v)rm $(PREFIX)/lib/$(X86_TARGET).so
 
+# --- CONSOLE --- #
+
+.PHONY: console
+
+console: libflipper
+	$(_v)cargo build --manifest-path=console/Cargo.toml
+
+all:: console
+
+install-console: console
+	$(_v)cargo install --path=console --force
+
+install:: install-console
+
+# --- LANGUAGES --- #
+
+.PHONY: languages
+
+languages:: libflipper
+
+all:: languages
+
+.PHONY: language-rust
+
+language-rust: libflipper
+	$(_v)cargo build --manifest-path=languages/rust/Cargo.toml
+
+languages:: language-rust
+
 # --- UTILITIES --- #
 
 .PHONY: utils install-utils uninstall-utils
@@ -260,4 +290,6 @@ $(foreach target,$(TARGETS),$(call generate_target,$(target)))
 .PHONY: clean
 
 clean:
-	$(_v)rm -r $(BUILD)
+	$(_v)rm -r $(BUILD) || true
+	$(_v)cargo clean --manifest-path=console/Cargo.toml
+	$(_v)cargo clean --manifest-path=languages/rust/Cargo.toml
