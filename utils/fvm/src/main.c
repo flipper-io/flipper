@@ -18,10 +18,12 @@ int modulec = 0;
 struct _lf_endpoint *nep = NULL;
 
 int fld_index(lf_crc_t identifier) {
+	lf_debug("Searching for counterpart module to '0x%04x'.", identifier);
 	for (int i = 0; i < modulec; i ++) {
 		char *name = fvm_modules[i].name;
 		lf_crc_t _crc = lf_crc(name, strlen(name) + 1);
 		if (_crc == identifier) {
+			lf_debug("Found counterpart '%s' at index '%i'.", name, i);
 			return i;
 		}
 	}
@@ -30,24 +32,30 @@ int fld_index(lf_crc_t identifier) {
 
 int fvm_load_module(char *path) {
 	void *dlm = dlopen(path, RTLD_LAZY);
-	lf_assert(dlm, failure, E_NULL, "Failed to open dynamic module with path '%s'.", path);
-	const char *name = dlsym(dlm, "_fmr_app_name");
-	lf_assert(name, failure, E_NULL, "Failed to get dynamic module name.");
-	printf("Opened module '%s'\n", name);
-	void **functions = dlsym(dlm, name);
-	printf("Got function table from module '%s'\n", name);
-	struct _fvm_module *module = &fvm_modules[modulec++];
-	strcpy(module->name, name);
-	module->functions = functions;
-	printf("Successfully loaded module '%s'.\n\n", name);
+	lf_assert(dlm, failure, E_NULL, "Failed to open '%s'.", path);
+	struct _lf_module *module = dlsym(dlm, "_module");
+	lf_assert(module, failure, E_NULL, "Failed to read package.");
+	lf_debug("Loaded package '%s'.", module->name);
+	void **jumptable = dlsym(dlm, "_jumptable");
+	lf_assert(jumptable, failure, E_NULL, "Failed to read jumptable from package '%s'.", module->name);
+	lf_debug("Read jumptable from package '%s'.", module->name);
+	struct _fvm_module *m = &fvm_modules[modulec++];
+	strcpy(m->name, module->name);
+	m->functions = jumptable;
+	lf_debug("Successfully loaded package '%s'.", module->name);
 	return lf_success;
 failure:
 	return lf_error;
 }
 
 lf_return_t fmr_perform_user_invocation(struct _fmr_invocation *invocation, struct _fmr_result *result) {
+	lf_debug("Performing user invocation on function '%i' in module '%i'.", invocation->function, invocation->index);
 	lf_assert(invocation->index < modulec, failure, E_BOUNDARY, "Module index was out of bounds.");
 	lf_return_t (* function)(void) = fvm_modules[invocation->index].functions[invocation->function];
+	Dl_info info;
+	int i = dladdr(function, &info);
+	lf_assert(i != 0, failure, E_NULL, "Could not resolve dynamic symbol name.");
+	lf_debug("Invoking module function '%s'.", info.dli_sname);
 	return fmr_call(function, invocation->ret, invocation->argc, invocation->types, invocation->parameters);
 failure:
 	return lf_error;
@@ -60,7 +68,7 @@ int main(int argc, char *argv[]) {
 	if (argc > 1) {
 		char **modules = &argv[1];
 		for (int i = 0; i < (argc-1); i ++) {
-			printf("Loading module '%s'\n", *modules);
+			lf_debug("Loading package '%s'.", *modules);
 			fvm_load_module(*modules++);
 		}
 	}
@@ -93,6 +101,8 @@ int main(int argc, char *argv[]) {
 	lf_assert(nep, failure, E_ENDPOINT, "Failed to create endpoint for networked device.");
 	context = (struct _lf_network_context *)nep->_ctx;
 	context->fd = sd;
+
+	printf("Flipper Virtual Machine (FVM) v0.1.0\nListening on 'localhost'.\n\n");
 
 	while (1) {
 		struct _fmr_packet packet;

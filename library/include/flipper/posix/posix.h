@@ -28,4 +28,7 @@
 #define __use_usb__
 #define __use_wdt__
 
+#define LF_VAR __attribute__((section("__DATA,.lf.vars")))
+#define LF_FUNC __attribute__((section("__TEXT,.lf.funcs")))
+
 #endif

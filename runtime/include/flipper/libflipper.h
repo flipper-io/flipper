@@ -61,6 +61,13 @@ enum {
 	LF_DEBUG_LEVEL_ALL
 };
 
+//#define __LF_DEBUG__
+#ifdef __LF_DEBUG__
+#define lf_debug(format, ...) printf(format"\n", ##__VA_ARGS__)
+#else
+#define lf_debug(format, ...)
+#endif
+
 /* Sets library debug verbosity. */
 void lf_set_debug_level(int level);
 
@@ -132,7 +139,7 @@ struct _lf_module {
 	lf_version_t version;
 	/* The module's identifier. */
 	lf_crc_t identifier;
-	/* The module's index. */
+	/* The module's loaded index. */
 	int index;
 	/* The pointer to a pointer to the device upon which the module's counterpart is located. */
 	struct _lf_device *device;
@@ -142,17 +149,14 @@ struct _lf_module {
 	size_t *size;
 };
 
-#define LF_VAR __attribute__((section(".lf.vars")))
-#define LF_FUNC __attribute__((section(".lf.funcs")))
-
 /* Macro for easily generating module structures. */
 #define LF_MODULE(symbol, name, description, data, len) \
 	struct _lf_module symbol = { \
 		name, \
 		description, \
 		LF_VERSION, \
-		-1, \
 		0, \
+		-1, \
 		NULL, \
 		data, \
 		len \

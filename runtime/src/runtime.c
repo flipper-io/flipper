@@ -37,7 +37,10 @@ lf_return_t lf_invoke(struct _lf_module *module, fmr_function function, fmr_type
 	lf_assert(module, failure, E_NULL, "No module was specified for function invocation.");
 
 	/* If the module has no device, assume the invocation is for the current device. */
-	if (!module->device) module->device = lf_get_current_device();
+	if (!module->device) {
+		lf_debug("No device specified for module %s, using current device.", module->name);
+		module->device = lf_get_current_device();
+	}
 
 	lf_assert(module->device, failure, E_NO_DEVICE, "The module '%s' has no target device. Did you attach?", module->name);
 

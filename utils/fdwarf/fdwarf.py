@@ -36,6 +36,9 @@ def get_parameters_from_die(cu, die):
 			name = child.attributes['DW_AT_name'].value
 			# print 'n: ' + name
 			tdie = get_die_at_offset(cu, child.attributes['DW_AT_type'].value)
+			if not tdie:
+				print 'Failed to get type die at offset ' + hex(child.attributes['DW_AT_type'].value)
+				return parameters
 			if tdie.tag == 'DW_TAG_typedef':
 				tdie = get_die_at_offset(cu, tdie.attributes['DW_AT_type'].value)
 			if 'DW_AT_name' in tdie.attributes:
@@ -51,7 +54,7 @@ def generate_c(modulename, outputname, functions):
 
 	outc = open(outputname + '.c', 'wb')
 
-	ctemplate = '#include <flipper.h>\n\nstruct _PACKAGE {\nSTRUCTDEF\n};\n\nenum { TAGS };\n\nFUNCTIONPROTOS\n\n#ifdef __DEVICE__\n\nconst char _fmr_app_name[] __attribute__((section (".name"))) = "PACKAGE";\n\nVARIABLES\n\nconst struct _PACKAGE PACKAGE __attribute__((section (".module"))) = {\nSTRUCTBODY\n};\n\n#else\n\nextern uint8_t package_bin[];\nextern size_t package_bin_len;\n\nLF_MODULE(_PACKAGE, "PACKAGE", "DESCRIPTION", &package_bin, &package_bin_len);\n\nFUNCTIONS\n\n#endif'
+	ctemplate = '#include <flipper.h>\n\nstruct _PACKAGE {\nSTRUCTDEF\n};\n\nenum { TAGS };\n\nFUNCTIONPROTOS\n\nVARIABLES\n\n#ifdef __ATSAM4S__\n\nconst char _fmr_app_name[] __attribute__((section (".name"))) = "PACKAGE";\n\n#define JT_SECTION __attribute__((section (".module")))\n\n#else\n\n#define JT_SECTION\n\nextern uint8_t package_bin[];\nextern size_t package_bin_len;\n\nLF_MODULE(_module, "PACKAGE", "DESCRIPTION", &package_bin, &package_bin_len);\n\nFUNCTIONS\n\n#endif\n\nconst struct _PACKAGE _jumptable JT_SECTION= {\nSTRUCTBODY\n};\n'
 	ctemplate = ctemplate.replace('PACKAGE', modulename)
 
 	functs = []
@@ -69,12 +72,12 @@ def generate_c(modulename, outputname, functions):
 	struct = []
 	for f in functions:
 		struct.append('&%s' % f.name)
-		statement = 'lf_invoke(MODULE, FUNCTION, RET, fmr_args(ARGS));'
+		statement = 'lf_invoke(&_module, FUNCTION, RET, fmr_args(ARGS));'
 		args = []
 		for p in f.parameters:
 			args.append('fmr_infer(ARG)'.replace('ARG', p.name))
 		retl = ['fmr_void_t', '', 'fmr_int8_t', 'fmr_int16_t', '', 'fmr_int32_t']
-		statement = statement.replace('MODULE', '&_' + modulename).replace('FUNCTION', '_' + modulename + '_' + f.name).replace('RET', retl[f.ret + 1]).replace('ARGS', ', '.join(args))
+		statement = statement.replace('FUNCTION', '_' + modulename + '_' + f.name).replace('RET', retl[f.ret + 1]).replace('ARGS', ', '.join(args))
 		if (f.type == 'void'):
 			body = statement
 			ret = ';'
@@ -130,6 +133,9 @@ def process_file(filename, modulename, language, outputname):
 						# print 'n: ' + name
 						if 'DW_AT_type' in child.attributes.keys():
 							tdie = get_die_at_offset(cu, child.attributes['DW_AT_type'].value)
+							if tdie == None:
+								print 'Failed to get die at offset: ' + hex(child.attributes['DW_AT_type'].value)
+								return 1
 							while (tdie.tag == 'DW_TAG_typedef'):
 								tdie = get_die_at_offset(cu, tdie.attributes['DW_AT_type'].value)
 							if 'DW_AT_name' in tdie.attributes:
