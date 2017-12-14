@@ -10,9 +10,5 @@ projects
 xcuserdata
 __pycache__
 *.pyc
-
-target/
 .idea/
-.stack*
-**/*.rs.bk
-history.txt
+cmake-build-debug/
