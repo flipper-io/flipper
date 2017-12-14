@@ -3,7 +3,7 @@
 
 #ifdef __use_wdt__
 
-LF_MODULE(_wdt, "wdt", "Handles interaction with the internal watchdog timer.");
+LF_MODULE(_wdt, "wdt", "Handles interaction with the internal watchdog timer.", NULL, NULL);
 
 /* Define the virtual interface for this module. */
 const struct _wdt wdt = {

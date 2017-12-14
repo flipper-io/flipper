@@ -3,7 +3,7 @@
 
 #ifdef __use_adc__
 
-LF_MODULE(_adc, "adc", "Interfaces with the device's internal analog to digital converter.");
+LF_MODULE(_adc, "adc", "Interfaces with the device's internal analog to digital converter.", NULL, NULL);
 
 /* Define the virtual interface for this module. */
 const struct _adc adc = {

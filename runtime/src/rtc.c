@@ -3,7 +3,7 @@
 
 #ifdef __use_rtc__
 
-LF_MODULE(_rtc, "rtc", "Interfaces with the device's real time clock.");
+LF_MODULE(_rtc, "rtc", "Interfaces with the device's real time clock.", NULL, NULL);
 
 /* Define the virtual interface for this module. */
 const struct _rtc rtc = {

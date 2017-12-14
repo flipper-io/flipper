@@ -3,7 +3,7 @@
 
 #ifdef __use_spi__
 
-LF_MODULE(_spi, "spi", "Provides control over the device's SPI bus.");
+LF_MODULE(_spi, "spi", "Provides control over the device's SPI bus.", NULL, NULL);
 
 /* Define the virtual interface for this module. */
 const struct _spi spi = {

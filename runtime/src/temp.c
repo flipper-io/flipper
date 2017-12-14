@@ -3,7 +3,7 @@
 
 #ifdef __use_temp__
 
-LF_MODULE(_temp, "temp", "Interfaces with the device's temperature sensor.");
+LF_MODULE(_temp, "temp", "Interfaces with the device's temperature sensor.", NULL, NULL);
 
 /* Define the virtual interface for this module. */
 const struct _temp temp = {

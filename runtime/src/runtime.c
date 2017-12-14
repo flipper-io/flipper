@@ -35,8 +35,14 @@ failure:
 
 lf_return_t lf_invoke(struct _lf_module *module, fmr_function function, fmr_type ret, struct _lf_ll *parameters) {
 	lf_assert(module, failure, E_NULL, "No module was specified for function invocation.");
-	lf_assert(module->index != -1, failure, E_MODULE, "The module '%s' has not been configured. Call '%s_configure()' first.", module->name, module->name);
-	lf_assert(module->device, failure, E_NO_DEVICE, "The module '%s' has no target device. Did you attach before configuring?", module->name);
+
+	/* If the module has no device, assume the invocation is for the current device. */
+	if (!module->device) module->device = lf_get_current_device();
+
+	lf_assert(module->device, failure, E_NO_DEVICE, "The module '%s' has no target device. Did you attach?", module->name);
+
+	/* If the module has no index, try to bind it. */
+	if (module->index == -1) lf_bind(module, module->device);
 
 	/* The raw packet into which the invocation information will be loaded .*/
 	struct _fmr_packet _packet;

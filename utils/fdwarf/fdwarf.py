@@ -47,12 +47,53 @@ def get_parameters_from_die(cu, die):
 			parameters.append(p)
 	return parameters
 
-def process_file(filename, package):
+def generate_c(modulename, outputname, functions):
+
+	outc = open(outputname + '.c', 'wb')
+
+	ctemplate = '#include <flipper.h>\n\nstruct _PACKAGE {\nSTRUCTDEF\n};\n\nenum { TAGS };\n\nFUNCTIONPROTOS\n\n#ifdef __DEVICE__\n\nconst char _fmr_app_name[] __attribute__((section (".name"))) = "PACKAGE";\n\nVARIABLES\n\nconst struct _PACKAGE PACKAGE __attribute__((section (".module"))) = {\nSTRUCTBODY\n};\n\n#else\n\nextern uint8_t package_bin[];\nextern size_t package_bin_len;\n\nLF_MODULE(_PACKAGE, "PACKAGE", "DESCRIPTION", &package_bin, &package_bin_len);\n\nFUNCTIONS\n\n#endif'
+	ctemplate = ctemplate.replace('PACKAGE', modulename)
+
+	functs = []
+	struct = []
+	tags = []
+	for f in functions:
+		functs.append(str(f) + ';')
+		tags.append('_%s_%s' % (modulename, f.name))
+		struct.append('TYPE (* NAME)(PARAMETERS);'.replace('TYPE', f.type).replace('NAME', f.name).replace('PARAMETERS', ', '.join(map(str, f.parameters))))
+	ctemplate = ctemplate.replace('FUNCTIONPROTOS', '\n\t'.join(functs))
+	ctemplate = ctemplate.replace('STRUCTDEF', '\t' + '\n\t'.join(struct))
+	ctemplate = ctemplate.replace('TAGS', ', '.join(tags))
+
+	functs = []
+	struct = []
+	for f in functions:
+		struct.append('&%s' % f.name)
+		statement = 'lf_invoke(MODULE, FUNCTION, RET, fmr_args(ARGS));'
+		args = []
+		for p in f.parameters:
+			args.append('fmr_infer(ARG)'.replace('ARG', p.name))
+		retl = ['fmr_void_t', '', 'fmr_int8_t', 'fmr_int16_t', '', 'fmr_int32_t']
+		statement = statement.replace('MODULE', '&_' + modulename).replace('FUNCTION', '_' + modulename + '_' + f.name).replace('RET', retl[f.ret + 1]).replace('ARGS', ', '.join(args))
+		if (f.type == 'void'):
+			body = statement
+			ret = ';'
+		else:
+			body = ''
+			ret = ' ' + statement
+		functs.append('LF_WEAK ' + str(f) + ' {\nBODY\treturnVALUE\n}\n'.replace('BODY', body).replace('VALUE', ret))
+	ctemplate = ctemplate.replace('VARIABLES\n\n', '')
+	ctemplate = ctemplate.replace('STRUCTBODY', '\t' + ',\n\t'.join(struct))
+	ctemplate = ctemplate.replace('FUNCTIONS', '\n'.join(functs))
+
+	outc.write(ctemplate)
+
+def generate_py(modulename, outputname, functions):
+	return
+
+def process_file(filename, modulename, language, outputname):
 
 	functions = []
-
-	outh = open(package + '.h', 'wb')
-	outc = open(package + '.c', 'wb')
 
 	with open(filename, 'rb') as f:
 		elffile = ELFFile(f)
@@ -102,53 +143,20 @@ def process_file(filename, package):
 								ret = 0x2
 						params = get_parameters_from_die(cu, child)
 						functions.append(Function(type, name, ret, params))
-	h = open('template.h', 'rb')
-	htemplate = h.read()
-	htemplate = htemplate.replace('PACKAGE', package)
-	struct = []
-	functs = []
-	tags = []
-	for f in functions:
-		functs.append(str(f) + ';')
-		tags.append('_%s_%s' % (package, f.name))
-		# print 't:' + f.type
-		# print 'n: ' + f.name
-		# print 'p: ' + str(f.parameters)
-		struct.append('TYPE (* NAME)(PARAMETERS);'.replace('TYPE', f.type).replace('NAME', f.name).replace('PARAMETERS', ', '.join(map(str, f.parameters))))
-	htemplate = htemplate.replace('STRUCT', '\t' + '\n\t'.join(struct))
-	htemplate = htemplate.replace('FUNCTIONS', '\n'.join(functs))
-	htemplate = htemplate.replace('TAGS', ', '.join(tags))
-	outh.write(htemplate)
 
-	c = open('template.c', 'rb')
-	ctemplate = c.read()
-	ctemplate = ctemplate.replace('PACKAGE', package)
-	struct = []
-	functs = []
-	for f in functions:
-		struct.append('&%s' % f.name)
-		statement = 'lf_invoke(MODULE, FUNCTION, RET, fmr_args(ARGS));'
-		args = []
-		for p in f.parameters:
-			args.append('fmr_infer(ARG)'.replace('ARG', p.name))
-		retl = ['fmr_void_t', '', 'fmr_int8_t', 'fmr_int16_t', '', 'fmr_int32_t']
-		statement = statement.replace('MODULE', '&_' + package).replace('FUNCTION', '_' + package + '_' + f.name).replace('RET', retl[f.ret + 1]).replace('ARGS', ', '.join(args))
-		if (f.type == 'void'):
-			body = statement
-			ret = ';'
+		if language.lower() == 'c':
+			generate_c(modulename, outputname, functions)
+		elif language.lower() == 'python':
+			generate_py(modulename, outputname, functions)
 		else:
-			body = ''
-			ret = ' ' + statement
-		functs.append('LF_WEAK ' + str(f) + ' {\nBODY\treturnVALUE\n}\n'.replace('BODY', body).replace('VALUE', ret))
-	ctemplate = ctemplate.replace('VARIABLES\n\n', '')
-	ctemplate = ctemplate.replace('STRUCT', '\t' + ',\n\t'.join(struct))
-	ctemplate = ctemplate.replace('FUNCTIONS', '\n'.join(functs))
-
-	outc.write(ctemplate)
-
+			print 'Invalid language: ' + language
 
 if __name__ == '__main__':
-	if len(sys.argv) > 2:
-		process_file(sys.argv[1], sys.argv[2])
+	if len(sys.argv) > 4:
+		elf = sys.argv[1]
+		name = sys.argv[2]
+		language = sys.argv[3]
+		output = sys.argv[4]
+		process_file(elf, name, language, output)
 	else:
-		print ('fdwarf package.elf NAME')
+		print ('fdwarf [elf file] [module name] [language] [output file]')

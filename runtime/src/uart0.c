@@ -3,7 +3,7 @@
 
 #ifdef __use_uart0__
 
-LF_MODULE(_uart0, "uart0", "Provides low level access to the device's UART bus.");
+LF_MODULE(_uart0, "uart0", "Provides low level access to the device's UART bus.", NULL, NULL);
 
 /* Define the virtual interface for this endpoint. */
 const struct _uart0 uart0 = {
