@@ -1,16 +1,34 @@
 sudo: required
 
+before_install:
+- set -e
+
 install:
-  - sudo apt-get -qq update
-  - sudo apt-get install build-essential
-  - sudo apt-get install libusb-1.0-0-dev
-  - sudo apt-get install avr-libc binutils-avr gcc-avr
-  - sudo apt-get install libnewlib-arm-none-eabi binutils-arm-none-eabi gcc-arm-none-eabi
+- sudo apt-get -qq update
+- sudo apt-get install build-essential
+- sudo apt-get install libusb-1.0-0-dev
+- sudo apt-get install avr-libc binutils-avr gcc-avr
+- sudo apt-get install libnewlib-arm-none-eabi binutils-arm-none-eabi gcc-arm-none-eabi
 
-language: c
+matrix:
+  include:
+  - language: c
+    compiler:
+    - clang
+    - gcc
+    script: make libflipper atmegau2 atsam4s utils VERBOSE=1
 
-compiler:
-  - clang
-  - gcc
+  - language: rust
+    rust: stable
+    script: make console VERBOSE=1
 
-script: make VERBOSE=1
+  - language: rust
+    rust: beta
+    script: make console VERBOSE=1
+
+  - language: rust
+    rust: nightly
+    script: make console VERBOSE=1
+
+  allow_failures:
+  - rust: nightly
