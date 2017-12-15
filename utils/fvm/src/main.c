@@ -1,7 +1,7 @@
 #include <flipper.h>
-/* POSIX networking for flipper. */
 #include <unistd.h>
 #include <arpa/inet.h>
+#define _GNU_SOURCE
 #include <dlfcn.h>
 #include <flipper/posix/network.h>
 
@@ -49,13 +49,9 @@ failure:
 }
 
 lf_return_t fmr_perform_user_invocation(struct _fmr_invocation *invocation, struct _fmr_result *result) {
-	lf_debug("Performing user invocation on function '%i' in module '%i'.", invocation->function, invocation->index);
 	lf_assert(invocation->index < modulec, failure, E_BOUNDARY, "Module index was out of bounds.");
 	lf_return_t (* function)(void) = fvm_modules[invocation->index].functions[invocation->function];
-	Dl_info info;
-	int i = dladdr(function, &info);
-	lf_assert(i != 0, failure, E_NULL, "Could not resolve dynamic symbol name.");
-	lf_debug("Invoking module function '%s'.", info.dli_sname);
+	lf_assert(function, failure, E_NULL, "NULL function for user invocation.");
 	return fmr_call(function, invocation->ret, invocation->argc, invocation->types, invocation->parameters);
 failure:
 	return lf_error;
