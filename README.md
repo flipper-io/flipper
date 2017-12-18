@@ -12,9 +12,22 @@ Flipper is an embedded development platform that can be controlled from applicat
 
 To build Flipper, you first need to install the project dependancies:
 
-`gcc`, `pkg-config`, `rust`, `libusb-1.0`, `avr-gcc`, `avr-libc`, `dfu-programmer` `arm-none-eabi-gcc`, `newlib`
+#### Homebrew on macOS
 
-Once you've installed these dependancies, which should be as simple as `apt-install` or `brew install`, you should be able to build everything. If you don't want to install the toolchains needed to build the embedded operating system, you can optionally build only the platform library or the utils.
+```
+brew tap osx-cross/avr osx-cross/arm
+brew install rust libusb avr-gcc dfu-programmer arm-gcc-bin
+```
+
+#### APT on Linux
+
+```
+apt-get install build-essential libusb-1.0-0-dev
+apt-get install dfu-programmer avr-libc binutils-avr gcc-avr
+apt-get install libnewlib-arm-none-eabi binutils-arm-none-eabi gcc-arm-none-eabi
+```
+
+Once you've installed these dependancies you should be able to build everything. If you don't want to install the toolchains needed to build the embedded operating system, you can optionally build only the platform library or the utils.
 
 |       Target      |                            Description                       |
 |:-----------------:|:------------------------------------------------------------:|
