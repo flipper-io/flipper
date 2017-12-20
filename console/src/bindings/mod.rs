@@ -16,4 +16,4 @@
 //! high-level language packages which expose a functionally equivalent API
 //! whose implementation automatically executes the modules on Flipper.
 
-pub mod binary_parser;
+pub mod meta;
