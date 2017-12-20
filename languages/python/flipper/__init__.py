@@ -1,2 +1,5 @@
-from lf import flipper
-from led import led
+from lf import *
+
+# Enumerate the standard modules
+import led
+led = led.led()

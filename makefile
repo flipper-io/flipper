@@ -198,6 +198,17 @@ uninstall-utils:
 	$(_v)rm $(PREFIX)/bin/fdebug
 	$(_v)rm $(PREFIX)/bin/fload
 
+# --- LANGUAGES --- #
+
+PY_DIR = $(shell python -m site --user-site)
+
+install-python:
+	pip2 install languages/python --upgrade
+
+install:: install-python
+
+# -------------------------------------------------------------------- #
+
 # Print all commands executed when VERBOSE is defined
 ifdef VERBOSE
 _v :=
