@@ -523,3 +523,57 @@ pub fn parse_dwarf(buffer: &[u8]) -> Result<Vec<Subprogram>, Error> {
 
     Ok(resolved_subprograms)
 }
+
+/// Test the dwarf parser for correctness. These tests rely on the file
+/// `test_resources/dwarf_parse_test`, so any changes to that file may
+/// break tests.
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_parser() {
+        let dwarf: &[u8] = include_bytes!("./test_resources/dwarf_parse_test");
+        let result = parse_dwarf(dwarf);
+        assert!(result.is_ok());
+
+        // Expected values //
+
+        // Base types
+        let b0 = Rc::new(Type::Base { name: "int".to_owned(), offset: 59, size: 4 });
+        let b1 = Rc::new(Type::Base { name: "unsigned char".to_owned(), offset: 84, size: 1 });
+        let b2 = Rc::new(Type::Base { name: "short unsigned int".to_owned(), offset: 102, size: 2 });
+        let b3 = Rc::new(Type::Base { name: "unsigned int".to_owned(), offset: 120, size: 4 });
+        let b4 = Rc::new(Type::Base { name: "char".to_owned(), offset: 245, size: 1 });
+
+        // Alias types
+        let a0 = Rc::new(Type::Alias { name: "uint8_t".to_owned(), offset: 73, typ: b1.clone() });
+        let a1 = Rc::new(Type::Alias { name: "uint16_t".to_owned(), offset: 91, typ: b2.clone() });
+        let a2 = Rc::new(Type::Alias { name: "uint32_t".to_owned(), offset: 109, typ: b3.clone() });
+
+        // Reference types
+        let r0 = Rc::new(Type::Reference { offset: 239, typ: Some(b4.clone()) });
+
+        // Parameters
+        let p0 = Parameter { name: "first".to_owned(), typ: Some(a0.clone()) };
+        let p1 = Parameter { name: "second".to_owned(), typ: Some(a1.clone()) };
+        let p2 = Parameter { name: "third".to_owned(), typ: Some(a2.clone()) };
+        let p3 = Parameter { name: "letter".to_owned(), typ: Some(b4.clone()) };
+        let p4 = Parameter { name: "count".to_owned(), typ: Some(b0.clone()) };
+
+        // Subprograms
+        let expected_subprograms = vec![
+            Subprogram { name: "main".to_owned(), address: 1692, parameters: vec![], ret: Some(b0.clone()) },
+            Subprogram { name: "test_four".to_owned(), address: 1665, parameters: vec![p0, p1, p2], ret: Some(r0.clone()) },
+            Subprogram { name: "test_three".to_owned(), address: 1649, parameters: vec![p3], ret: Some(b0.clone()) },
+            Subprogram { name: "test_two".to_owned(), address: 1639, parameters: vec![p4], ret: None },
+            Subprogram { name: "test_one".to_owned(), address: 1632, parameters: vec![], ret: None },
+        ];
+
+        // Actual values //
+
+        let actual_subprograms = result.unwrap();
+
+        // Compare
+        assert_eq!(actual_subprograms, expected_subprograms);
+    }
+}
