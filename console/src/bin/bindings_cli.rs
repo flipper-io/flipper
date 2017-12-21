@@ -6,7 +6,7 @@ use std::io::Error as IoError;
 use clap::{App, AppSettings, Arg, ArgMatches};
 use failure::Error;
 use flipper_console::CliError;
-//use console::bindings::binary_parser;
+use console::bindings::parser;
 
 #[derive(Debug, Fail)]
 #[fail(display = "Errors that occur while generating bindings")]
@@ -96,7 +96,6 @@ pub mod dwarf {
         let mut file = File::open(filename)
             .map_err(|e| BindingError::FileError(filename.to_owned(), e))?;
 
-//        binary_parser::parse_dwarf(&mut file)
-        Ok(())
+        parser::parse_dwarf(&mut file).map(|_| ())
     }
 }

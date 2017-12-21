@@ -19,6 +19,7 @@
 #![allow(missing_docs)]
 
 pub mod meta;
+pub mod parser;
 
 use std::io::Read;
 use std::ops::Range;

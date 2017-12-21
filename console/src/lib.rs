@@ -22,6 +22,7 @@ extern crate toml;
 extern crate goblin;
 extern crate gimli;
 extern crate object;
+extern crate fallible_iterator;
 
 extern crate flipper;
 
