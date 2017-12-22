@@ -4,6 +4,12 @@
 //! to automatically generate the language bindings necessary to control Flipper
 //! from these high level languages.
 //!
+//! Public APIs are exported in a binary section called
+//! `.lf.funcs`. This module uses ELF and DWARF file metadata to read
+//! the signatures of each exported function in a flipper module. This metadata
+//! is the foundation for auto-generating high level language bindings to
+//! remotely execute the modules.
+//!
 //! The tasks necessary to perform binding generation are as follows:
 //!
 //! 1) Parse a Flipper module and read the signatures of functions in its
@@ -36,16 +42,10 @@ pub enum BindingError {
     ElfSectionError(String),
     #[fail(display = "failed to read dwarf section: {}", _0)]
     DwarfReadError(String),
-    #[fail(display = "failed to parse the attributes of a dwarf entry")]
-    DwarfAttributeParseError(gimli::Error),
-    #[fail(display = "required dwarf attribute is missing")]
-    DwarfAttributeMissingError,
-    #[fail(display = "failed to parse a base type")]
-    BaseTypeParseError,
-    #[fail(display = "failed to resolve a parameter's type")]
-    ParameterResolveError,
-    #[fail(display = "failed to resolve a subprogram return type")]
-    SubprogramResolveError,
+    #[fail(display = "failed to parse dwarf {}", _0)]
+    DwarfParseError(&'static str),
+    #[fail(display = "failed to resolve {}", _0)]
+    TypeResolutionError(&'static str),
 }
 
 /// Represents relevant binary sections of Flipper executables. This includes:

@@ -84,6 +84,6 @@ pub struct Subprogram {
     pub address: u64,
     /// A list of the parameters of this function.
     pub parameters: Vec<Parameter>,
-    /// The return type of this function.
-    pub ret: Rc<Type>,
+    /// The return type of this function. `None` indicates a `void` type.
+    pub ret: Option<Rc<Type>>,
 }
