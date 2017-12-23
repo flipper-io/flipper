@@ -1,12 +1,10 @@
-use std::ops::Deref;
-use std::path::PathBuf;
 use std::fs::File;
 use std::io::Read;
 use std::io::Error as IoError;
 use clap::{App, AppSettings, Arg, ArgMatches};
 use failure::Error;
 use flipper_console::CliError;
-use console::bindings::binary_parser;
+use console::bindings::parser;
 
 #[derive(Debug, Fail)]
 #[fail(display = "Errors that occur while generating bindings")]
@@ -31,12 +29,16 @@ pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
              USAGE: \n    {usage} \n\n\
              {all-args}"
         )
-        .subcommand(generate::make_subcommand())
+        .subcommands(vec![
+            generate::make_subcommand(),
+            dwarf::make_subcommand(),
+        ])
 }
 
 pub fn execute(args: &ArgMatches) -> Result<(), Error> {
     match args.subcommand() {
         ("generate", Some(m)) => generate::execute(m),
+        ("dwarf", Some(m)) => dwarf::execute(m),
         (unknown, _) => Err(CliError::UnrecognizedCommand(unknown.to_owned()).into()),
     }
 }
@@ -62,13 +64,42 @@ pub mod generate {
     }
 
     pub fn execute(args: &ArgMatches) -> Result<(), Error> {
-
         // Guaranteed to be safe because "file" is a required argument.
         let filename = args.value_of("file").unwrap();
 
         let mut file = File::open(filename)
             .map_err(|e| BindingError::FileError(filename.to_owned(), e))?;
 
-        binary_parser::parse_elf(&mut file)
+//        binary_parser::parse_elf(&mut file).map(|_| ())
+        Ok(())
+    }
+}
+
+pub mod dwarf {
+    use super::*;
+
+    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+        App::new("dwarf")
+            .arg(Arg::with_name("file")
+                .index(1)
+                .takes_value(true)
+                .required(true)
+            )
+    }
+
+    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
+        // Guaranteed to be safe because "file" is a required argument.
+        let filename = args.value_of("file").unwrap();
+
+        let mut file = File::open(filename)
+            .map_err(|e| BindingError::FileError(filename.to_owned(), e))?;
+
+        let buffer = {
+            let mut v = Vec::new();
+            file.read_to_end(&mut v).unwrap();
+            v
+        };
+
+        parser::parse_dwarf(&buffer).map(|_| ())
     }
 }

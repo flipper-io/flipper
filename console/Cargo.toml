@@ -18,6 +18,7 @@ gimli = "0.14.0"
 object = "0.4.0"
 failure = { git = "https://github.com/withoutboats/failure.git" }
 derive-fail = { git = "https://github.com/withoutboats/derive-fail.git" }
+fallible-iterator = "*"
 flipper = { path = "../languages/rust" }
 
 [lib]
