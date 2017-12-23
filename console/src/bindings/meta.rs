@@ -10,16 +10,12 @@
 //! [parser](./binary_parser)
 
 use std::rc::Rc;
-use std::collections::HashMap;
-use std::ops::{Deref, DerefMut};
-
 use gimli::DwAte;
 
 /// Represents a type in the program whose symbols are parsed. Types can be
-/// concrete base types such as `uint8_t` and `int`, pointers such as `char *`,
-/// or struct types. If a type is not a base type, it is represented by the
-/// `Reference` variant of Type.
-#[derive(Debug)]
+/// concrete base types such as `int`, aliases such as `uint8_t`, pointers
+/// such as `char *`, or unsupported types.
+#[derive(Debug, PartialOrd, PartialEq, Ord, Eq)]
 pub enum Type {
     /// Base types encapsulate all of the information necessary to represent
     /// a value in the program they were parsed from. This is used to
@@ -32,8 +28,22 @@ pub enum Type {
         offset: u64,
         /// The memory footprint of this type, e.g. 4 for `int`.
         size: u64,
-        /// The encoding of the value represented by this Type.
-        encoding: DwAte,
+    },
+    /// Aliases are used to represent types that stand in for other types.
+    /// Notably, they are used for `typedef`s in C. Aliased types indicate
+    /// that their value is exactly the type referred to (as opposed to
+    /// `Reference`s, which represent one level of indirection to their
+    /// referred type, i.e. a pointer).
+    Alias {
+        /// The name of the alias, e.g. the "int" in `typedef int uint32_t`
+        name: String,
+        /// A reference to the `Type` that this alias is equivalent to.
+        /// Note that one alias may refer to another alias or to a reference,
+        /// but that the chain of types must always terminate in a `Type::Base`
+        /// or a `Type::Reference` with a `None` type (i.e. `void *`).
+        typ: Rc<Type>,
+        /// The offset into the dwarf DIE tree that this alias was defined.
+        offset: u64,
     },
     /// A `Reference` is a type which is not complete on its own, but rather
     /// refers to one or more `Reference`s and eventually a `Base` type.
@@ -62,7 +72,7 @@ pub enum Type {
 ///
 /// The parameters would be named `letter` and `count`, and the types would refer
 /// to `Type`s named `char` and `uint8_t`.
-#[derive(Debug)]
+#[derive(Debug, PartialOrd, PartialEq, Ord, Eq)]
 pub struct Parameter {
     /// The name of the formal parameter as defined in the original program,
     /// e.g. "greeting" in `void say_hello(char *greeting);`.
@@ -75,7 +85,7 @@ pub struct Parameter {
 /// Represents a specific `subprogram` parsed from a DWARF file. The name will be
 /// used for generating FFI bindings to this function. The address is captured
 /// so it's possible to tell if the subprogram belongs to a certain binary section.
-#[derive(Debug)]
+#[derive(Debug, PartialOrd, PartialEq, Ord, Eq)]
 pub struct Subprogram {
     /// The name of the function as defined in the original program,
     /// e.g. "say_hello" in `void say_hello(char *greeting);`.

@@ -1,5 +1,3 @@
-use std::ops::Deref;
-use std::path::PathBuf;
 use std::fs::File;
 use std::io::Read;
 use std::io::Error as IoError;
@@ -96,6 +94,12 @@ pub mod dwarf {
         let mut file = File::open(filename)
             .map_err(|e| BindingError::FileError(filename.to_owned(), e))?;
 
-        parser::parse_dwarf(&mut file).map(|_| ())
+        let buffer = {
+            let mut v = Vec::new();
+            file.read_to_end(&mut v).unwrap();
+            v
+        };
+
+        parser::parse_dwarf(&buffer).map(|_| ())
     }
 }

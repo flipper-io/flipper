@@ -30,7 +30,6 @@ pub mod parser;
 use std::io::Read;
 use std::ops::Range;
 use failure::Error;
-use gimli;
 use goblin::elf::Elf;
 
 /// Represents errors that can occur when parsing ELF and/or DWARF files.
@@ -41,11 +40,11 @@ pub enum BindingError {
     #[fail(display = "failed to parse elf section: {}", _0)]
     ElfSectionError(String),
     #[fail(display = "failed to read dwarf section: {}", _0)]
-    DwarfReadError(String),
+    DwarfReadError(&'static str),
     #[fail(display = "failed to parse dwarf {}", _0)]
     DwarfParseError(&'static str),
     #[fail(display = "failed to resolve {}", _0)]
-    TypeResolutionError(&'static str),
+    ResolutionError(String),
 }
 
 /// Represents relevant binary sections of Flipper executables. This includes:

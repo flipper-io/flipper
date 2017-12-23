@@ -9,9 +9,10 @@
 //! `Type::Reference`s) are parsed into an "Unresolved" struct. The unresolved types
 //! are later resolved into references after the entire dwarf tree has been parsed.
 
+#![allow(non_snake_case)]
+
 use std::io::Read;
 use std::rc::Rc;
-use std::string::ToString;
 use std::collections::HashMap;
 
 use failure::Error;
@@ -35,19 +36,18 @@ use super::meta::{
     Subprogram,
 };
 
-/// Represents any parsed types which cannot be immediately resolved, such
-/// as pointers. Base types are always immediately resolved.
+/// Represents reference types, which cannot be immediately resolved.
 #[derive(Debug)]
-struct UnresolvedType {
+struct UnresolvedReference {
     /// The offset into the DIE tree which represents the type of this entry.
     typ: Option<u64>,
     /// The offset into the DIE tree at which this entry lives.
     offset: u64,
 }
 
-impl UnresolvedType {
-    /// Converts an `UnresolvedType` yielded by the parser into a fully
-    /// resolved `Type`.
+impl UnresolvedReference {
+    /// Converts an `UnresolvedReference` yielded by the parser into a fully
+    /// resolved `Type::Reference`.
     fn into_resolved(self, resolved_types: &HashMap<u64, Rc<Type>>) -> Result<Type, Error> {
         Ok(match self.typ {
             None => Type::Reference { typ: None, offset: self.offset },
@@ -57,7 +57,30 @@ impl UnresolvedType {
                     Some(typ) => Type::Reference { typ: Some(typ), offset: self.offset },
                     None => Type::Unsupported,
                 }
-            },
+            }
+        })
+    }
+}
+
+/// Represents alias types, which cannot be immediately resolved.
+#[derive(Debug)]
+struct UnresolvedAlias {
+    /// The name of the alias, e.g. the "int" in `typedef int uint32_t`.
+    name: String,
+    /// The offset into the DIE tree of the type this alias resolves to.
+    typ: u64,
+    /// The offset into the DIE tree at which this entry lives.
+    offset: u64,
+}
+
+impl UnresolvedAlias {
+    /// Converts an `UnresolvedAlias` yielded by the parser into a fully
+    /// resolved `Type::Alias`.
+    fn into_resolved(self, resolved_types: &HashMap<u64, Rc<Type>>) -> Result<Type, Error> {
+        let typ = resolved_types.get(&self.typ).map(|rc| rc.clone());
+        Ok(match typ {
+            Some(typ) => Type::Alias { name: self.name, typ, offset: self.offset },
+            None => Type::Unsupported,
         })
     }
 }
@@ -79,11 +102,11 @@ impl UnresolvedParameter {
     /// resolved `Parameter`.
     fn into_resolved(self, resolved_types: &HashMap<u64, Rc<Type>>) -> Result<Parameter, Error> {
         Ok(match self.typ {
-            None => Parameter{ typ: None, name: self.name },
+            None => Parameter { typ: None, name: self.name },
             Some(ref typ_offset) => {
                 let typ = resolved_types.get(typ_offset).map(|rc| rc.clone())
-                    .ok_or(BindingError::TypeResolutionError("parameter types"))?;
-                Parameter{ typ: Some(typ), name: self.name }
+                    .ok_or(BindingError::ResolutionError(format!("parameter type for {}", self.name)))?;
+                Parameter { typ: Some(typ), name: self.name }
             }
         })
     }
@@ -160,18 +183,16 @@ fn parse_base_type<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Off
             // Unwrap the elements in the tuple.
             name.ok_or(BindingError::DwarfParseError("base type name").into())
                 .and_then(|name|
-                    encoding.ok_or(BindingError::DwarfParseError("base type encoding").into())
-                        .and_then(|encoding|
-                            size.ok_or(BindingError::DwarfParseError("base type size").into())
-                                .map(|size| (name, encoding, size))))
+                    size.ok_or(BindingError::DwarfParseError("base type size").into())
+                        .map(|size| (name, size)))
         })
 
         // Use the name, encoding, and size to build a DwarfType representation of this entry.
-        .map(|(name, encoding, size)| Type::Base { name, encoding, size, offset: entry.offset().0.into_u64() })
+        .map(|(name, size)| Type::Base { name, size, offset: entry.offset().0.into_u64() })
 }
 
 /// Parses a pointer type from a `DW_TAG_pointer_type` entry in the DIE tree.
-fn parse_pointer_type<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Offset>, strings: &'a DebugStr<R>) -> Result<UnresolvedType, Error> {
+fn parse_pointer_type<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Offset>) -> Result<UnresolvedReference, Error> {
     entry.attrs()
 
         // Iterate over the attributes of the entry, collecting the size and type.
@@ -188,16 +209,54 @@ fn parse_pointer_type<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::
 
         // Unwrap the elements in the tuple.
         .and_then(|(size, typ)| {
-
             size.ok_or(BindingError::DwarfParseError("pointer size").into())
                 .map(|size| (size, typ.map(|typ| typ.0.into_u64())))
         })
 
         // Map the size and type into an unresolved Type to resolve later.
-        .map(|(size, typ)| {
-            UnresolvedType {
+        .map(|(_, typ)| {
+            UnresolvedReference {
                 typ,
-                offset: entry.offset().0.into_u64()
+                offset: entry.offset().0.into_u64(),
+            }
+        })
+}
+
+/// Parses an alias from a `DW_TAG_typedef` entry in the DIE tree.
+fn parse_typedef<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Offset>, strings: &'a DebugStr<R>) -> Result<UnresolvedAlias, Error> {
+    entry.attrs()
+
+        // Iterate over the attributes of the entry, collecting the name and type.
+        .fold((None, None), |(name, typ), attr| {
+            match (attr.name(), attr.value()) {
+                (DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), typ),
+                (DW_AT_type, AttributeValue::UnitRef(typ)) => (name, Some(typ)),
+                _ => (name, typ),
+            }
+        })
+
+        // If the `entry.attrs()` fallible iterator does fail, give an appropriate error
+        .map_err(|_| BindingError::DwarfParseError("typedef attributes").into())
+
+        // If we iterated through all attributes successfully, unwrap each property in the tuple
+        .and_then(|(name, typ)| {
+
+            // If the name is Some, convert it to Cow<str>, then convert it to a String
+            let name = name.and_then(|name| name.to_string().map(|name| (*name).to_owned()).ok());
+
+            // Unwrap the elements in the tuple
+            name.ok_or(BindingError::DwarfParseError("typedef name").into())
+                .and_then(|name|
+                    typ.ok_or(BindingError::DwarfParseError("typedef type").into())
+                        .map(|typ| (name, typ)))
+        })
+
+        // Map the parsed entry into an UnresolvedAlias
+        .map(|(name, typ)| {
+            UnresolvedAlias {
+                name,
+                typ: typ.0.into_u64(),
+                offset: entry.offset().0.into_u64(),
             }
         })
 }
@@ -231,7 +290,7 @@ fn parse_parameter<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Off
                         .map(|typ| (name, typ)))
         })
 
-        // Map the parsed entry into a DwarfParameter
+        // Map the parsed entry into an UnresolvedParameter
         .map(|(name, typ)| {
             UnresolvedParameter {
                 name,
@@ -256,11 +315,10 @@ fn parse_subprogram<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Of
         })
 
         // If the `entry.attrs()` fallible iterator does fail, give an appropriate error.
-        .map_err(|e| BindingError::DwarfParseError("subprogram attributes").into())
+        .map_err(|_| BindingError::DwarfParseError("subprogram attributes").into())
 
         // If we iterated successfully through the attributes, unwrap each property in the tuple.
         .and_then(|(name, address, ret)| {
-
             let name = name.and_then(|name| name.to_string().map(|name| (*name).to_owned()).ok());
 
             // Unwrap the elements in the tuple.
@@ -281,10 +339,33 @@ fn parse_subprogram<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Of
         })
 }
 
+/// The dwarf parser is modeled as a State machine in order to better reason about
+/// its behavior. This enum represents the states that the machine moves through
+/// while parsing subprograms.
 enum State {
+    /// The parser is in the `Search` state when it is not currently at a
+    /// `DW_TAG_subprogram` node or any child of a `DW_TAG_subprogram`. In this
+    /// state, the only input the machine is looking for is an `Event::NewSubprogram`,
+    /// at which point the machine transitions to `State::Read`.
     Search,
+    /// The `Read` state indicates that the parser has located a `DW_TAG_subprogram`
+    /// node and is now actively reading from it. The parser will remain in this state
+    /// until one of two things happens:
+    /// 1) The parser finds a new `DW_TAG_subprogram`, at which point the current
+    ///    subprogram is saved and a new one begins. The machine remains in the `Read`
+    ///    state, but begins reading a new subprogram.
+    /// 2) The parser steps above the depth in the tree that the `DW_TAG_subprogram`
+    ///    it's currently reading began. This means that incoming data is no longer
+    ///    associated with the previous subprogram. The machine transitions back to
+    ///    the `Search` state.
     Read {
+        /// When the parser is in the `Read` state, it actively looks for properties
+        /// to append to the current subprogram, such as `DW_AT_formal_parameter`s.
+        /// All relevant data is appended to the `func` field of this state.
         func: UnresolvedSubprogram,
+        /// When the parser begins reading a new subprogram, it notes the depth at
+        /// which it found the subprogram so it knows when to stop associating data
+        /// with that subprogram (when the DFS search steps above the subprogram).
         dep: isize,
     },
 }
@@ -333,7 +414,6 @@ impl DwarfParser {
             // If we were reading one subprogram but stepped up to a new one,
             // save the previous function we built and begin a new one.
             (State::Read { func, .. }, Event::NewSubprogram { function, depth }) => {
-                println!("Saved function: {:?}", func);
                 self.subprograms.push(func);
                 State::Read { func: function, dep: depth }
             }
@@ -354,16 +434,9 @@ impl DwarfParser {
     }
 }
 
-/// Parses a file to extract the debugging information.
-pub fn parse_dwarf<R: Read>(file: &mut R) -> Result<Vec<Subprogram>, Error> {
-    let buffer = {
-        let mut v = Vec::new();
-        file.read_to_end(&mut v).unwrap();
-        v
-    };
-
-    let elf = object::File::parse(&buffer).map_err(|_| BindingError::ElfReadError)?;
-
+/// Parses the buffer of a DWARF binary to extract the debugging information.
+pub fn parse_dwarf(buffer: &[u8]) -> Result<Vec<Subprogram>, Error> {
+    let elf = object::File::parse(buffer).map_err(|_| BindingError::ElfReadError)?;
     let endian = if elf.is_little_endian() {
         gimli::RunTimeEndian::Little
     } else {
@@ -372,23 +445,23 @@ pub fn parse_dwarf<R: Read>(file: &mut R) -> Result<Vec<Subprogram>, Error> {
 
     let debug_info = elf.get_section(".debug_info")
         .map(|info| DebugInfo::new(info, endian))
-        .ok_or(BindingError::DwarfReadError(".debug_info".to_owned()))?;
+        .ok_or(BindingError::DwarfReadError(".debug_info"))?;
 
     let debug_abbrev = elf.get_section(".debug_abbrev")
         .map(|abbrev| DebugAbbrev::new(abbrev, endian))
-        .ok_or(BindingError::DwarfReadError(".debug_abbrev".to_owned()))?;
+        .ok_or(BindingError::DwarfReadError(".debug_abbrev"))?;
 
     let debug_strings = elf.get_section(".debug_str")
         .map(|strings| DebugStr::new(strings, endian))
-        .ok_or(BindingError::DwarfReadError(".debug_str".to_owned()))?;
+        .ok_or(BindingError::DwarfReadError(".debug_str"))?;
 
     let mut resolved_types: HashMap<u64, Rc<Type>> = HashMap::new();
-    let mut unresolved_types: HashMap<u64, UnresolvedType> = HashMap::new();
+    let mut unresolved_aliases: HashMap<u64, UnresolvedAlias> = HashMap::new();
+    let mut unresolved_references: HashMap<u64, UnresolvedReference> = HashMap::new();
 
     let mut parser = DwarfParser::new();
-    let mut units = debug_info.units();
-
     let mut errors: Vec<Error> = Vec::new();
+    let mut units = debug_info.units();
 
     while let Some(unit) = units.next()? {
         let abbrevs = unit.abbreviations(&debug_abbrev)?;
@@ -397,55 +470,52 @@ pub fn parse_dwarf<R: Read>(file: &mut R) -> Result<Vec<Subprogram>, Error> {
 
         while let Some((delta, entry)) = entries.next_dfs()? {
             depth += delta;
-
-            // Self-executing closure to catch Result::Err's thrown by '?'.
-            let result: Result<(), Error> = (|| {
-                match (depth, entry.tag()) {
-                    (_, gimli::DW_TAG_base_type) => {
-                        let typ = parse_base_type(&entry, &debug_strings)?;
-                        let offset = match typ {
-                            Type::Base { offset, .. } => offset,
-                            _ => return Err(BindingError::DwarfParseError("base type").into()),
-                        };
-                        resolved_types.insert(offset, Rc::new(typ));
-                    }
-                    (_, gimli::DW_TAG_pointer_type) => {
-                        let typ = parse_pointer_type(&entry, &debug_strings)?;
-                        let offset = typ.offset;
-                        unresolved_types.insert(offset, typ);
-                    },
-                    (_, gimli::DW_TAG_formal_parameter) => {
-                        parser.step(Event::NewParameter(parse_parameter(&entry, &debug_strings)?));
-                    },
-                    (depth, gimli::DW_TAG_subprogram) => parser.step(Event::NewSubprogram {
-                        function: parse_subprogram(&entry, &debug_strings)?,
-                        depth,
-                    }),
-                    (depth, _) => parser.step(Event::Step(depth)),
-                }
-                Ok(())
-            })();
-            if let Err(e) = result {
-                errors.push(e);
+            match (depth, entry.tag()) {
+                (_, gimli::DW_TAG_base_type) => {
+                    let typ = parse_base_type(&entry, &debug_strings)?;
+                    let offset = match typ {
+                        Type::Base { offset, .. } => offset,
+                        _ => panic!("Successful return of parse_base_type should only be Type::Base"),
+                    };
+                    resolved_types.insert(offset, Rc::new(typ));
+                },
+                (_, gimli::DW_TAG_pointer_type) => {
+                    let reference = parse_pointer_type(&entry)?;
+                    let offset = reference.offset;
+                    unresolved_references.insert(offset, reference);
+                },
+                (_, gimli::DW_TAG_typedef) => {
+                    let alias = parse_typedef(&entry, &debug_strings)?;
+                    let offset = alias.offset;
+                    unresolved_aliases.insert(offset, alias);
+                },
+                (_, gimli::DW_TAG_formal_parameter) => {
+                    parser.step(Event::NewParameter(parse_parameter(&entry, &debug_strings)?));
+                },
+                (depth, gimli::DW_TAG_subprogram) => parser.step(Event::NewSubprogram {
+                    function: parse_subprogram(&entry, &debug_strings)?,
+                    depth,
+                }),
+                (depth, _) => parser.step(Event::Step(depth)),
             }
         }
         parser.step(Event::Step(0));
     }
 
-    if errors.len() > 0 {
-        println!("Got errors while parsing:");
-        for error in errors {
-            println!("{}", error);
-        }
+    // Resolve all typedefs/aliases
+    for (offset, unresolved_alias) in unresolved_aliases.into_iter() {
+        let resolved_alias = unresolved_alias.into_resolved(&resolved_types)?;
+        resolved_types.insert(offset, Rc::new(resolved_alias));
     }
 
-    for (offset, unresolved_type) in unresolved_types.into_iter() {
+    // Resolve all pointers/references
+    for (offset, unresolved_type) in unresolved_references.into_iter() {
         let resolved_type = unresolved_type.into_resolved(&resolved_types)?;
         resolved_types.insert(offset, Rc::new(resolved_type));
     }
 
+    // Resolve all subprograms
     let unresolved_subprograms = parser.subprograms;
-
     let mut resolved_subprograms = Vec::<Subprogram>::new();
     for subprogram in unresolved_subprograms.into_iter() {
         resolved_subprograms.push(subprogram.into_resolved(&resolved_types)?)
