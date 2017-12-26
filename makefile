@@ -297,6 +297,6 @@ $(foreach target,$(TARGETS),$(call generate_target,$(target)))
 .PHONY: clean
 
 clean:
-	$(_v)rm -r $(BUILD) || true
+	$(_v)rm -rf $(BUILD)
 	$(_v)cargo clean --manifest-path=console/Cargo.toml
 	$(_v)cargo clean --manifest-path=languages/rust/Cargo.toml
