@@ -152,12 +152,8 @@ uninstall-libflipper:
 console: libflipper
 	$(_v)cargo build --manifest-path=console/Cargo.toml
 
-all:: console
-
 install-console: console
 	$(_v)cargo install --path=console --force
-
-install:: install-console
 
 # --- LANGUAGES --- #
 
