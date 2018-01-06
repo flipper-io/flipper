@@ -43,7 +43,7 @@ pub struct Uart0 {
 impl Module for Uart0 {
     fn new() -> Self {
         unsafe {
-            let ffi = StandardModuleFFI { ffi: &mut _uart0 as *mut _lf_module };
+            let ffi = StandardModuleFFI { module_meta: &mut _uart0 };
             Uart0 {
                 ffi: ModuleFFI::Standard(ffi),
             }
@@ -56,7 +56,7 @@ impl Uart0 {
     pub fn bind(flipper: &Flipper) -> Self {
         let device = flipper.device;
         unsafe {
-            let ffi = StandardModuleFFI { ffi: &mut _uart0 as *mut _lf_module };
+            let ffi = StandardModuleFFI { module_meta: &mut _uart0 };
             Uart0 {
                 ffi: ModuleFFI::Standard(ffi),
             }

@@ -52,7 +52,8 @@ struct _lf_module {
 /// libflipper. This is a thin wrapper for the purpose of hiding the underlying
 /// representation.
 pub struct StandardModuleFFI {
-    ffi: *mut _lf_module,
+    /// A pointer to a standard module within libflipper.
+    module_meta: *mut _lf_module,
 }
 
 /// Contains owned metadata about a user module in the proper format for
@@ -64,7 +65,7 @@ pub struct UserModuleFFI {
     /// struct, we ensure that the string lives as long as
     /// the _lf_module.
     name: CString,
-    ffi: _lf_module,
+    module_meta: _lf_module,
 }
 
 impl<'a> From<(&'a str, u16, u16, u16)> for UserModuleFFI {
@@ -74,7 +75,7 @@ impl<'a> From<(&'a str, u16, u16, u16)> for UserModuleFFI {
         let string_ref = string.as_ptr();
         UserModuleFFI {
             name: string,
-            ffi: _lf_module {
+            module_meta: _lf_module {
                 name: string_ref,
                 description: ptr::null(),
                 version,
@@ -108,14 +109,14 @@ pub enum ModuleFFI {
 impl ModuleFFI {
     fn as_ptr(&self) -> *const _lf_module {
         match *self {
-            ModuleFFI::Standard(ref standard) => standard.ffi,
-            ModuleFFI::User(ref user) => &user.ffi,
+            ModuleFFI::Standard(ref standard) => standard.module_meta,
+            ModuleFFI::User(ref user) => &user.module_meta,
         }
     }
     fn as_mut_ptr(&mut self) -> *mut _lf_module {
         match *self {
-            ModuleFFI::Standard(ref mut standard) => standard.ffi,
-            ModuleFFI::User(ref mut user) => &mut user.ffi,
+            ModuleFFI::Standard(ref mut standard) => standard.module_meta,
+            ModuleFFI::User(ref mut user) => &mut user.module_meta,
         }
     }
 }
@@ -217,7 +218,7 @@ impl Flipper {
     pub fn bind<T: UserModule>(&self) -> T {
 
         let mut module = UserModuleFFI::uninitialized(T::name());
-        unsafe { lf_bind(&mut module.ffi, self.device); }
+        unsafe { lf_bind(&mut module.module_meta, self.device); }
         T::from(module)
     }
 }
