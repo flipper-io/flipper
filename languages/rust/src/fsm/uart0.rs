@@ -41,7 +41,6 @@ pub struct Uart0 {
 }
 
 impl Module for Uart0 {
-    fn name<'a>() -> &'a str { "uart0" }
     fn new() -> Self {
         unsafe {
             let ffi = StandardModuleFFI { ffi: &mut _uart0 as *mut _lf_module };

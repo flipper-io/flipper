@@ -8,7 +8,6 @@ struct GpioToggle {
 }
 
 impl Module for GpioToggle {
-    fn name<'a>() -> &'a str { "gpio" }
     fn new() -> Self {
         GpioToggle {
             ffi: ModuleFFI::User(UserModuleFFI::uninitialized(Self::name())),
@@ -24,7 +23,9 @@ impl From<UserModuleFFI> for GpioToggle {
     }
 }
 
-impl UserModule for GpioToggle { }
+impl UserModule for GpioToggle {
+    fn name<'a>() -> &'a str { "gpio" }
+}
 
 impl GpioToggle {
     fn toggle(&self) {

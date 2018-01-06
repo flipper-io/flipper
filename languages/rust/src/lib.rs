@@ -121,11 +121,11 @@ impl ModuleFFI {
 }
 
 pub trait Module {
-    fn name<'a>() -> &'a str;
     fn new() -> Self;
 }
 
 pub trait UserModule: Module + From<UserModuleFFI> {
+    fn name<'a>() -> &'a str;
     fn bind(flipper: &Flipper) -> Self { flipper.bind() }
 }
 
@@ -180,7 +180,6 @@ impl Flipper {
     /// }
     ///
     /// impl Module for MyModule {
-    ///     fn name<'a>() -> &'a str { "My module" }
     ///     fn new() -> Self {
     ///         MyModule {
     ///             ffi: ModuleFFI::User(UserModuleFFI::uninitialized(Self::name())),
@@ -188,7 +187,9 @@ impl Flipper {
     ///     }
     /// }
     ///
-    /// impl UserModule for MyModule { }
+    /// impl UserModule for MyModule {
+    ///     fn name<'a>() -> &'a str { "My module" }
+    /// }
     ///
     /// impl From<UserModuleFFI> for MyModule {
     ///     fn from(user: UserModuleFFI) -> Self {

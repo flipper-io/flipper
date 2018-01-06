@@ -127,28 +127,11 @@ impl FmrReturn {
 /// To invoke that function on the device, one would write:
 ///
 /// ```
-/// use flipper::{Module, ModuleFFI, UserModuleFFI};
+/// use flipper::{Module, ModuleFFI};
 /// use flipper::fmr::{FmrInvocation, FmrReturn};
 ///
 /// struct MyModule {
 ///     ffi: ModuleFFI,
-/// }
-///
-/// impl Module for MyModule {
-///     fn name<'a>() -> &'a str { "My module" }
-///     fn new() -> Self {
-///         MyModule {
-///             ffi: ModuleFFI::User(UserModuleFFI::uninitialized(Self::name())),
-///         }
-///     }
-/// }
-///
-/// impl From<UserModuleFFI> for MyModule {
-///     fn from(user: UserModuleFFI) -> Self {
-///         MyModule {
-///             ffi: ModuleFFI::User(user),
-///         }
-///     }
 /// }
 ///
 /// impl MyModule {
