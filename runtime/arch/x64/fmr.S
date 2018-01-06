@@ -9,18 +9,16 @@
 #define temp %r14
 
 #ifdef __APPLE__
-.global _fmr_call
+#define FMR_CALL _fmr_call
 #else
-.global fmr_call
+#define FMR_CALL fmr_call
 #endif
+
+.global FMR_CALL
 
 .text
 
-#ifdef __APPLE__
-_fmr_call:
-#else
-fmr_call:
-#endif
+FMR_CALL:
 	push %rbp
 	mov %rsp, %rbp
 	push %r14
