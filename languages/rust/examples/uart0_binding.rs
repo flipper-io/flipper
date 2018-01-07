@@ -1,7 +1,7 @@
 extern crate flipper;
 
 use std::io::Write;
-use flipper::{Flipper, Module};
+use flipper::{Flipper, StandardModule};
 use flipper::fsm::uart0::{Uart0, UartBaud};
 
 fn main() {

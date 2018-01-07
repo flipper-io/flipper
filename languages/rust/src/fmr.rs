@@ -127,7 +127,7 @@ impl FmrReturn {
 /// To invoke that function on the device, one would write:
 ///
 /// ```
-/// use flipper::{Module, ModuleFFI};
+/// use flipper::{ModuleFFI};
 /// use flipper::fmr::{FmrInvocation, FmrReturn};
 ///
 /// struct MyModule {
@@ -164,7 +164,7 @@ impl<'a> Deref for FmrInvocation<'a> {
 
 impl<'a> FmrInvocation<'a> {
     /// Creates a new FMR invocation.
-    pub fn new<M: Into<&'a ModuleFFI>>(module: M, name: &'a str, index: u8, return_type: FmrReturn) -> FmrInvocation<'a> {
+    pub fn new(module: &'a ModuleFFI, name: &'a str, index: u8, return_type: FmrReturn) -> FmrInvocation<'a> {
         FmrInvocation { module: module.into(), name, args: Vec::new(), index, return_type }
     }
 

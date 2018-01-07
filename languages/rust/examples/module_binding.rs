@@ -1,13 +1,16 @@
 extern crate flipper;
 
-use flipper::{Flipper, Module, ModuleFFI, UserModule, UserModuleFFI};
+use flipper::{Flipper, ModuleFFI, UserModule, UserModuleFFI};
 use flipper::fmr::{FmrInvocation, FmrReturn};
 
 struct GpioToggle {
     ffi: ModuleFFI,
 }
 
-impl Module for GpioToggle {
+impl UserModule for GpioToggle {
+    fn name<'a>() -> &'a str {
+        "gpio"
+    }
     fn new() -> Self {
         GpioToggle {
             ffi: ModuleFFI::User(UserModuleFFI::uninitialized(Self::name())),
@@ -21,10 +24,6 @@ impl From<UserModuleFFI> for GpioToggle {
             ffi: ModuleFFI::User(user),
         }
     }
-}
-
-impl UserModule for GpioToggle {
-    fn name<'a>() -> &'a str { "gpio" }
 }
 
 impl GpioToggle {

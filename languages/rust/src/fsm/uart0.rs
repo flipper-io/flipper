@@ -8,7 +8,7 @@ use libc::c_void;
 use ::{
     Flipper,
     DEFAULT_FLIPPER,
-    Module,
+    StandardModule,
     ModuleFFI,
     StandardModuleFFI,
     _lf_module,
@@ -40,8 +40,18 @@ pub struct Uart0 {
     ffi: ModuleFFI,
 }
 
-impl Module for Uart0 {
+impl StandardModule for Uart0 {
     fn new() -> Self {
+        unsafe {
+            let ffi = StandardModuleFFI { module_meta: &mut _uart0 };
+            Uart0 {
+                ffi: ModuleFFI::Standard(ffi),
+            }
+        }
+    }
+    /// Instantiates a Uart0 module bound to a specific Flipper device.
+    fn bind(flipper: &Flipper) -> Self {
+        let device = flipper.device;
         unsafe {
             let ffi = StandardModuleFFI { module_meta: &mut _uart0 };
             Uart0 {
@@ -52,17 +62,6 @@ impl Module for Uart0 {
 }
 
 impl Uart0 {
-    /// Instantiates a Uart0 module bound to a specific Flipper device.
-    pub fn bind(flipper: &Flipper) -> Self {
-        let device = flipper.device;
-        unsafe {
-            let ffi = StandardModuleFFI { module_meta: &mut _uart0 };
-            Uart0 {
-                ffi: ModuleFFI::Standard(ffi),
-            }
-        }
-    }
-
     /// Configures the Uart0 module with a given baud rate and
     /// interrupts enabled flag.
     pub fn configure(&self, baud: &UartBaud, interrupts: bool) {
