@@ -10,13 +10,11 @@ struct GpioToggle {
     ffi: ModuleFFI,
 }
 
-impl UserModule for GpioToggle {
-    fn name<'a>() -> &'a str {
-        "gpio"
-    }
+impl<'a> UserModule<'a> for GpioToggle {
+    const NAME: &'a str = "gpio";
     fn new() -> Self {
         GpioToggle {
-            ffi: ModuleFFI::User(UserModuleFFI::uninitialized(Self::name())),
+            ffi: ModuleFFI::User(UserModuleFFI::uninitialized(Self::NAME)),
         }
     }
 }

@@ -131,8 +131,8 @@ pub trait StandardModule {
 /// When a user creates a module, they give it a name which is used by
 /// Flipper to load and bind to it. To use it from the Rust bindings,
 /// the user must specify the name so that rust can find the module.
-pub trait UserModule: From<UserModuleFFI> {
-    fn name<'a>() -> &'a str;
+pub trait UserModule<'a>: From<UserModuleFFI> {
+    const NAME: &'a str;
     fn new() -> Self;
 
     /// Binds an instance of a User Module to the given Flipper.
@@ -144,11 +144,11 @@ pub trait UserModule: From<UserModuleFFI> {
     ///     ffi: ModuleFFI,
     /// }
     ///
-    /// impl UserModule for MyModule {
-    ///     fn name<'a>() -> &'a str { "My module" }
+    /// impl<'a> UserModule<'a> for MyModule {
+    ///     const NAME: &'a str = "My module";
     ///     fn new() -> Self {
     ///         MyModule {
-    ///             ffi: ModuleFFI::User(UserModuleFFI::uninitialized(Self::name())),
+    ///             ffi: ModuleFFI::User(UserModuleFFI::uninitialized(Self::NAME)),
     ///         }
     ///     }
     /// }
@@ -176,7 +176,7 @@ pub trait UserModule: From<UserModuleFFI> {
     /// myModule.myFunc();
     /// ```
     fn bind(flipper: &Flipper) -> Self {
-        let mut module = UserModuleFFI::uninitialized(Self::name());
+        let mut module = UserModuleFFI::uninitialized(Self::NAME);
         unsafe { lf_bind(&mut module.module_meta, flipper.device); }
         Self::from(module)
     }
