@@ -5,9 +5,7 @@
 //! as a desktop computer or phone.
 //!
 //! These utilities lay the groundwork for users to create bindings to custom
-//! Flipper "modules" (not to be confused with rust modules). Particularly,
-//! `FmrInvocation` provides a builder pattern for defining the arguments and
-//! return type of a call.
+//! Flipper "modules" (not to be confused with rust modules).
 
 #![allow(non_camel_case_types)]
 
@@ -18,21 +16,23 @@ use std::mem;
 use std::ptr;
 use ::{ModuleFFI, _lf_module};
 
-type _fmr_type = libc::uint8_t;
-type _fmr_arg_repr = libc::uint32_t;
-type _fmr_arg_index = libc::uint8_t;
-type _fmr_return = libc::uint32_t;
+/// Types transmitted over FMR are encoded in a u8.
+type _lf_type = libc::uint8_t;
 
-/// The libflipper internal representation of a uint8_t argument.
-const FMR_TYPE_U8: _fmr_type = 0;
-/// The libflipper internal representation of a uint16_t argument.
-const FMR_TYPE_U16: _fmr_type = 1;
-/// The libflipper internal representation of a uint32_t argument.
-const FMR_TYPE_U32: _fmr_type = 2;
-/// The libflipper internal representation of a pointer argument.
-const FMR_TYPE_PTR: _fmr_type = 3;
-/// The libflipper internal representation of a void type.
-const FMR_TYPE_VOID: _fmr_type = 4;
+/// Values transmitted over FMR are packaged in a u64.
+type _lf_value = libc::uint64_t;
+
+/// Function indices are represented by a u8.
+type _lf_index = libc::uint8_t;
+
+// The concrete encodings for types in libflipper.
+const LF_TYPE_U8: _lf_type = 0;
+const LF_TYPE_U16: _lf_type = 1;
+const LF_TYPE_VOID: _lf_type = 2;
+const LF_TYPE_U32: _lf_type = 3;
+const LF_TYPE_PTR: _lf_type = 4;
+const LF_TYPE_INT: _lf_type = 6;
+const LF_TYPE_U64: _lf_type = 7;
 
 /// The internal `libflipper` representation of a function argument.
 /// This is used for FFI when we ask libflipper to execute a function
@@ -40,8 +40,8 @@ const FMR_TYPE_VOID: _fmr_type = 4;
 #[repr(C)]
 #[derive(Debug, PartialEq, PartialOrd)]
 struct _lf_arg {
-    arg_type: _fmr_type,
-    arg_value: _fmr_arg_repr,
+    arg_type: _lf_type,
+    arg_value: _lf_value,
 }
 
 /// The libflipper native representation of a linked list. We need this
@@ -56,9 +56,9 @@ pub(crate) struct _lf_ll {
 #[link(name = "flipper")]
 extern {
     fn lf_ll_append(ll: *mut *mut _lf_ll, item: *const c_void, destructor: *const c_void) -> c_int;
-    fn lf_invoke(module: *const _lf_module, function: _fmr_arg_index, ret: u8, args: *const _lf_ll) -> _fmr_return;
-    fn lf_push(module: *const _lf_module, function: _fmr_arg_index, source: *const c_void, length: u32, args: *const _lf_ll) -> _fmr_return;
-    fn lf_pull(module: *const _lf_module, function: _fmr_arg_index, dest: *mut c_void, length: u32, args: *const _lf_ll) -> _fmr_return;
+    fn lf_invoke(module: *const _lf_module, function: _lf_index, ret: u8, args: *const _lf_ll) -> _lf_value;
+    fn lf_push(module: *const _lf_module, function: _lf_index, source: *const c_void, length: u32, args: *const _lf_ll) -> _lf_value;
+    fn lf_pull(module: *const _lf_module, function: _lf_index, dest: *mut c_void, length: u32, args: *const _lf_ll) -> _lf_value;
 }
 
 /// Represents valid argument types for FMR. Currently, this only
@@ -68,8 +68,8 @@ pub struct FmrArg(_lf_arg);
 impl From<u8> for FmrArg {
     fn from(value: u8) -> FmrArg {
         FmrArg(_lf_arg {
-            arg_type: FMR_TYPE_U8,
-            arg_value: value as _fmr_arg_repr,
+            arg_type: LF_TYPE_U8,
+            arg_value: value as _lf_value,
         })
     }
 }
@@ -77,8 +77,8 @@ impl From<u8> for FmrArg {
 impl From<u16> for FmrArg {
     fn from(value: u16) -> FmrArg {
         FmrArg(_lf_arg {
-            arg_type: FMR_TYPE_U16,
-            arg_value: value as _fmr_arg_repr,
+            arg_type: LF_TYPE_U16,
+            arg_value: value as _lf_value,
         })
     }
 }
@@ -86,8 +86,8 @@ impl From<u16> for FmrArg {
 impl From<u32> for FmrArg {
     fn from(value: u32) -> FmrArg {
         FmrArg(_lf_arg {
-            arg_type: FMR_TYPE_U32,
-            arg_value: value as _fmr_arg_repr,
+            arg_type: LF_TYPE_U32,
+            arg_value: value as _lf_value,
         })
     }
 }
@@ -105,12 +105,12 @@ pub enum FmrReturn {
 }
 
 impl FmrReturn {
-    fn fmr_type(&self) -> _fmr_type {
+    fn fmr_type(&self) -> _lf_type {
         match *self {
-            FmrReturn::U8  => FMR_TYPE_U8,
-            FmrReturn::U16 => FMR_TYPE_U16,
-            FmrReturn::U32 => FMR_TYPE_U32,
-            FmrReturn::Unit => FMR_TYPE_VOID,
+            FmrReturn::U8  => LF_TYPE_U8,
+            FmrReturn::U16 => LF_TYPE_U16,
+            FmrReturn::U32 => LF_TYPE_U32,
+            FmrReturn::Unit => LF_TYPE_VOID,
         }
     }
 }
@@ -176,7 +176,7 @@ impl<'a> FmrInvocation<'a> {
     }
 
     /// Performs the FMR call described by this `FmrInvocation`.
-    pub fn invoke(&self) -> u32 {
+    pub fn invoke(&self) -> u64 {
         unsafe {
             let mut arglist: *mut _lf_ll = ptr::null_mut();
             for arg in self.args.iter() {
@@ -188,7 +188,7 @@ impl<'a> FmrInvocation<'a> {
 
     /// Performs this FMR call as an `lf_push`, passing the data from the
     /// data slice to the device during the call.
-    pub fn invoke_push(&self, data: &[u8]) -> u32 {
+    pub fn invoke_push(&self, data: &[u8]) -> u64 {
         unsafe {
             let mut arglist: *mut _lf_ll = ptr::null_mut();
             for arg in self.args.iter() {
@@ -201,7 +201,7 @@ impl<'a> FmrInvocation<'a> {
     /// Performs this FMR call as an `lf_pull`, bringing data from the
     /// device and loading it into the buffer slice. This operation
     /// pulls exactly as much data as the size of the buffer slice.
-    pub fn invoke_pull(&self, buffer: &mut [u8]) -> u32 {
+    pub fn invoke_pull(&self, buffer: &mut [u8]) -> u64 {
         unsafe {
             let mut arglist: *mut _lf_ll = ptr::null_mut();
             for arg in self.args.iter() {
@@ -220,18 +220,18 @@ mod test {
     fn test_fmr_arg() {
         let argu8 = FmrArg::from(123u8);
         let argu8_native = argu8.0;
-        assert_eq!(argu8_native.arg_type, FMR_TYPE_U8);
-        assert_eq!(argu8_native.arg_value, 123u32);
+        assert_eq!(argu8_native.arg_type, LF_TYPE_U8);
+        assert_eq!(argu8_native.arg_value, 123u64);
 
         let argu16 = FmrArg::from(234u16);
         let argu16_native = argu16.0;
-        assert_eq!(argu16_native.arg_type, FMR_TYPE_U16);
-        assert_eq!(argu16_native.arg_value, 234u32);
+        assert_eq!(argu16_native.arg_type, LF_TYPE_U16);
+        assert_eq!(argu16_native.arg_value, 234u64);
 
         let argu32 = FmrArg::from(345u32);
         let argu32_native = argu32.0;
-        assert_eq!(argu32_native.arg_type, FMR_TYPE_U32);
-        assert_eq!(argu32_native.arg_value, 345u32);
+        assert_eq!(argu32_native.arg_type, LF_TYPE_U32);
+        assert_eq!(argu32_native.arg_value, 345u64);
     }
 
     #[test]
@@ -246,11 +246,11 @@ mod test {
             .append(5u16);
 
         let expected = vec![
-            _lf_arg { arg_type: FMR_TYPE_U8, arg_value: 1u32 },
-            _lf_arg { arg_type: FMR_TYPE_U16, arg_value: 2u32 },
-            _lf_arg { arg_type: FMR_TYPE_U32, arg_value: 3u32 },
-            _lf_arg { arg_type: FMR_TYPE_U8, arg_value: 4u32 },
-            _lf_arg { arg_type: FMR_TYPE_U16, arg_value: 5u32 },
+            _lf_arg { arg_type: LF_TYPE_U8, arg_value: 1u64 },
+            _lf_arg { arg_type: LF_TYPE_U16, arg_value: 2u64 },
+            _lf_arg { arg_type: LF_TYPE_U32, arg_value: 3u64 },
+            _lf_arg { arg_type: LF_TYPE_U8, arg_value: 4u64 },
+            _lf_arg { arg_type: LF_TYPE_U16, arg_value: 5u64 },
         ];
 
         for (actual, expected) in function.iter().zip(expected) {
