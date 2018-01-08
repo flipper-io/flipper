@@ -1,74 +1,98 @@
+#![allow(non_upper_case_globals)]
+
 use std::io::{Read, Write, Result};
+use std::ffi::CString;
+use std::ptr;
 use libc::c_void;
 
-use ::Flipper;
+use ::{
+    Flipper,
+    DEFAULT_FLIPPER,
+    StandardModule,
+    ModuleFFI,
+    StandardModuleFFI,
+    _lf_module,
+};
+
+use fmr::{
+    Args,
+    lf_invoke,
+    lf_push,
+    lf_pull,
+};
 
 #[link(name = "flipper")]
 extern {
-    fn uart0_configure() -> u32;
-    fn uart0_enable();
-    fn uart0_disable();
-    fn uart0_dfu();
-    fn uart0_ready() -> u8;
-    fn uart0_push(source: *const c_void, length: usize);
-    fn uart0_pull(dest: *mut c_void, length: usize, timeout: u32);
+    static _uart0: _lf_module;
 }
 
-pub struct Uart0<'a>(&'a Flipper);
-
-impl <'a> Uart0<'a> {
-    pub fn new(flipper: &'a Flipper) -> Self {
-        Uart0(flipper)
-    }
+pub enum UartBaud {
+    FMR,
+    DFU,
 }
 
-impl <'a> ::std::ops::Deref for Uart0<'a> {
-    type Target = &'a Flipper;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl <'a> Read for Uart0<'a> {
-    fn read(&mut self, buf: &mut [u8]) -> Result<usize> {
-        unsafe {
-            uart0_pull(buf.as_mut_ptr() as *mut c_void, buf.len(), 0xff)
-        };
-        Ok(buf.len())
-    }
-}
-
-impl <'a> Write for Uart0<'a> {
-    fn write(&mut self, buf: &[u8]) -> Result<usize> {
-        self.0.select();
-        unsafe {
-            uart0_push(buf.as_ptr() as *const c_void, buf.len())
+impl UartBaud {
+    fn to_baud(&self) -> u8 {
+        match *self {
+            UartBaud::FMR => 0x00,
+            UartBaud::DFU => 0x10,
         }
+    }
+}
+
+pub struct Uart0 {
+    ffi: ModuleFFI,
+}
+
+impl StandardModule for Uart0 {
+    fn new() -> Self {
+        unsafe {
+            let ffi = StandardModuleFFI { module_meta: &_uart0 };
+            Uart0 {
+                ffi: ModuleFFI::Standard(ffi),
+            }
+        }
+    }
+    /// Instantiates a Uart0 module bound to a specific Flipper device.
+    fn bind(flipper: &Flipper) -> Self {
+        let device = flipper.device;
+        unsafe {
+            let ffi = StandardModuleFFI { module_meta: &_uart0 };
+            Uart0 {
+                ffi: ModuleFFI::Standard(ffi),
+            }
+        }
+    }
+}
+
+impl Uart0 {
+    /// Configures the Uart0 module with a given baud rate and
+    /// interrupts enabled flag.
+    pub fn configure(&self, baud: &UartBaud, interrupts: bool) {
+        let args = Args::new()
+            .append(baud.to_baud())
+            .append(if interrupts { 1u8 } else { 0u8 });
+        lf_invoke(&self.ffi, 0, args)
+    }
+
+    /// Indicates whether the Uart0 bus is ready to read or write.
+    pub fn ready(&self) -> bool {
+        let ret: u8 = lf_invoke(&self.ffi, 1, Args::new());
+        ret != 0
+    }
+}
+
+impl Write for Uart0 {
+    fn write(&mut self, buf: &[u8]) -> Result<usize> {
+        lf_push::<()>(&self.ffi, 2, buf, Args::new());
         Ok(buf.len())
     }
+    fn flush(&mut self) -> Result<()> { Ok(()) }
+}
 
-    fn flush(&mut self) -> Result<()> {
-        unimplemented!()
+impl Read for Uart0 {
+    fn read(&mut self, buf: &mut [u8]) -> Result<usize> {
+        lf_pull::<()>(&self.ffi, 3, buf, Args::new());
+        Ok(buf.len())
     }
-}
-
-pub fn configure() {
-    unsafe { uart0_configure() };
-}
-
-pub fn ready() -> bool {
-    unsafe { uart0_ready() != 0 }
-}
-
-pub fn enable() {
-    unsafe { uart0_enable() }
-}
-
-pub fn disable() {
-    unsafe { uart0_disable() }
-}
-
-pub fn dfu() {
-    unsafe { uart0_dfu() };
 }

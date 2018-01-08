@@ -45,4 +45,4 @@ enum Error {
     Unimplemented,
 }
 
-pub type Result<T> = result::Result<T, Error>;
+type Result<T> = result::Result<T, Error>;
