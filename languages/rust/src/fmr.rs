@@ -53,192 +53,267 @@ pub(crate) struct _lf_ll {
     next: *const _lf_ll,
 }
 
-#[link(name = "flipper")]
-extern {
-    fn lf_ll_append(ll: *mut *mut _lf_ll, item: *const c_void, destructor: *const c_void) -> c_int;
-    fn lf_invoke(module: *const _lf_module, function: _lf_index, ret: u8, args: *const _lf_ll) -> _lf_value;
-    fn lf_push(module: *const _lf_module, function: _lf_index, source: *const c_void, length: u32, args: *const _lf_ll) -> _lf_value;
-    fn lf_pull(module: *const _lf_module, function: _lf_index, dest: *mut c_void, length: u32, args: *const _lf_ll) -> _lf_value;
+mod libflipper {
+    use super::*;
+    #[link(name = "flipper")]
+    extern {
+        pub(crate) fn lf_ll_append(ll: *mut *mut _lf_ll, item: *const c_void, destructor: *const c_void) -> c_int;
+        pub(crate) fn lf_invoke(module: *const _lf_module, function: _lf_index, ret: u8, args: *const _lf_ll) -> _lf_value;
+        pub(crate) fn lf_push(module: *const _lf_module, function: _lf_index, source: *const c_void, length: u32, args: *const _lf_ll) -> _lf_value;
+        pub(crate) fn lf_pull(module: *const _lf_module, function: _lf_index, dest: *mut c_void, length: u32, args: *const _lf_ll) -> _lf_value;
+    }
 }
 
-/// Represents valid argument types for FMR. Currently, this only
-/// includes `u8`, `u16`, and `u32`.
-pub struct FmrArg(_lf_arg);
+/// Represents an argument to an FMR call.
+///
+/// Any type which implement `Into<Arg>` can be appended to an `Args` list.
+/// This currently includes `u8`, `u16`, `u32`, and `u64`.
+///
+/// ```
+/// use flipper::fmr::Arg;
+///
+/// let one =   Arg::from(10 as u8);
+/// let two =   Arg::from(20 as u16);
+/// let three = Arg::from(30 as u32);
+/// let four =  Arg::from(40 as u64);
+/// ```
+pub struct Arg(_lf_arg);
 
-impl From<u8> for FmrArg {
-    fn from(value: u8) -> FmrArg {
-        FmrArg(_lf_arg {
+impl From<u8> for Arg {
+    fn from(value: u8) -> Arg {
+        Arg(_lf_arg {
             arg_type: LF_TYPE_U8,
             arg_value: value as _lf_value,
         })
     }
 }
 
-impl From<u16> for FmrArg {
-    fn from(value: u16) -> FmrArg {
-        FmrArg(_lf_arg {
+impl From<u16> for Arg {
+    fn from(value: u16) -> Arg {
+        Arg(_lf_arg {
             arg_type: LF_TYPE_U16,
             arg_value: value as _lf_value,
         })
     }
 }
 
-impl From<u32> for FmrArg {
-    fn from(value: u32) -> FmrArg {
-        FmrArg(_lf_arg {
+impl From<u32> for Arg {
+    fn from(value: u32) -> Arg {
+        Arg(_lf_arg {
             arg_type: LF_TYPE_U32,
             arg_value: value as _lf_value,
         })
     }
 }
 
-/// Describes the return types we can expect from an FMR call.
-///
-/// An FmrReturn is used when constructing an `FmrInvocation`
-/// and allows the message system to know what return type it
-/// will be carrying back from a successful invocation.
-pub enum FmrReturn {
-    U8,
-    U16,
-    U32,
-    Unit,
-}
-
-impl FmrReturn {
-    fn fmr_type(&self) -> _lf_type {
-        match *self {
-            FmrReturn::U8  => LF_TYPE_U8,
-            FmrReturn::U16 => LF_TYPE_U16,
-            FmrReturn::U32 => LF_TYPE_U32,
-            FmrReturn::Unit => LF_TYPE_VOID,
-        }
+impl From<u64> for Arg {
+    fn from(value: u64) -> Arg {
+        Arg(_lf_arg {
+            arg_type: LF_TYPE_U64,
+            arg_value: value as _lf_value,
+        })
     }
 }
 
-/// A struct for building and executing an FMR call.
-///
-/// Suppose there was a module loaded on Flipper with the following
-/// function:
-///
-/// ```c
-/// uint16_t foo(uint8_t a, uint16_t b, uint32_t c) { ... }
-/// ```
-///
-/// To invoke that function on the device, one would write:
+/// Represents an ordered, typed set of arguments to an FMR call. This is
+/// to be used for calling `lf_invoke`.
 ///
 /// ```
-/// use flipper::{ModuleFFI};
-/// use flipper::fmr::{FmrInvocation, FmrReturn};
+/// use flipper::fmr::Args;
 ///
-/// struct MyModule {
-///     ffi: ModuleFFI,
-/// }
-///
-/// impl MyModule {
-///     /// Here we make a function whose implementation is to create an
-///     /// FmrInvocation from its arguments and cast the proper return type.
-///     fn foo(&self, one: u8, two: u16, three: u32) -> u16 {
-///         const INDEX: u8 = 0;
-///         FmrInvocation::new(&self.ffi, "foo", INDEX, FmrReturn::U16)
-///             .append(one)
-///             .append(two)
-///             .append(three)
-///             .invoke() as u16
-///     }
-/// }
+/// let args = Args::new()
+///                .append(10 as u8)
+///                .append(20 as u16)
+///                .append(30 as u32)
+///                .append(40 as u64);
 /// ```
-pub struct FmrInvocation<'a> {
-    module: &'a ModuleFFI,
-    name: &'a str,
-    index: u8,
-    args: Vec<FmrArg>,
-    return_type: FmrReturn,
-}
+pub struct Args(Vec<Arg>);
 
-impl<'a> Deref for FmrInvocation<'a> {
-    type Target = Vec<FmrArg>;
-    fn deref(&self) -> &Self::Target {
-        &self.args
+impl Args {
+    pub fn new() -> Self {
+        Args(Vec::new())
     }
-}
-
-impl<'a> FmrInvocation<'a> {
-    /// Creates a new FMR invocation.
-    pub fn new(module: &'a ModuleFFI, name: &'a str, index: u8, return_type: FmrReturn) -> FmrInvocation<'a> {
-        FmrInvocation { module: module.into(), name, args: Vec::new(), index, return_type }
-    }
-
-    /// Appends an arg to this invocation. This allows invocations to be
-    /// built using a builder pattern.
-    pub fn append<T: Into<FmrArg>>(mut self, arg: T) -> Self {
-        self.args.push(arg.into());
+    pub fn append<T: Into<Arg>>(mut self, arg: T) -> Self {
+        self.0.push(arg.into());
         self
     }
+}
 
-    /// Performs the FMR call described by this `FmrInvocation`.
-    pub fn invoke(&self) -> u64 {
-        unsafe {
-            let mut arglist: *mut _lf_ll = ptr::null_mut();
-            for arg in self.args.iter() {
-                lf_ll_append(&mut arglist, &arg.0 as *const _lf_arg as *const c_void, ptr::null());
-            }
-            lf_invoke(self.module.as_ptr(), self.index, self.return_type.fmr_type(), arglist)
-        }
+impl Deref for Args {
+    type Target = Vec<Arg>;
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
+}
 
-    /// Performs this FMR call as an `lf_push`, passing the data from the
-    /// data slice to the device during the call.
-    pub fn invoke_push(&self, data: &[u8]) -> u64 {
-        unsafe {
-            let mut arglist: *mut _lf_ll = ptr::null_mut();
-            for arg in self.args.iter() {
-                lf_ll_append(&mut arglist, &arg.0 as *const _lf_arg as *const c_void, ptr::null());
-            }
-            lf_push(self.module.as_ptr(), self.index, data.as_ptr() as *const c_void, data.len() as u32, arglist)
-        }
+/// A container type for a value returned by performing an
+/// `lf_invoke` call. Types which implement `LfReturnable`
+/// must define how to extract their own representation
+/// from this container.
+pub struct LfReturn(u64);
+
+/// A trait to be implemented for types which can be returned
+/// from an `lf_invoke` call. Currently, only types up to
+/// 64 bits can be represented. Any type which implements
+/// `LfReturnable` must be able to extract itself from the
+/// 64 bit representation in `LfReturn`.
+///
+/// Current `LfReturnable` types are `()`, `u8,` `u16`, `u32`,
+/// and `u64`.
+pub trait LfReturnable: From<LfReturn> {
+    fn lf_type() -> _lf_type;
+}
+
+impl LfReturnable for () {
+    fn lf_type() -> _lf_type { LF_TYPE_VOID }
+}
+
+impl From<LfReturn> for () {
+    fn from(_: LfReturn) -> Self { () }
+}
+
+impl LfReturnable for u8 {
+    fn lf_type() -> _lf_type { LF_TYPE_U8 }
+}
+
+impl From<LfReturn> for u8 {
+    fn from(ret: LfReturn) -> Self {
+        ret.0 as u8
     }
+}
 
-    /// Performs this FMR call as an `lf_pull`, bringing data from the
-    /// device and loading it into the buffer slice. This operation
-    /// pulls exactly as much data as the size of the buffer slice.
-    pub fn invoke_pull(&self, buffer: &mut [u8]) -> u64 {
-        unsafe {
-            let mut arglist: *mut _lf_ll = ptr::null_mut();
-            for arg in self.args.iter() {
-                lf_ll_append(&mut arglist, &arg.0 as *const _lf_arg as *const c_void, ptr::null());
-            }
-            lf_pull(self.module.as_ptr(), self.index, buffer.as_mut_ptr() as *mut c_void, buffer.len() as u32, arglist)
+impl LfReturnable for u16 {
+    fn lf_type() -> _lf_type { LF_TYPE_U16 }
+}
+
+impl From<LfReturn> for u16 {
+    fn from(ret: LfReturn) -> Self {
+        ret.0 as u16
+    }
+}
+
+impl LfReturnable for u32 {
+    fn lf_type() -> _lf_type { LF_TYPE_U32 }
+}
+
+impl From<LfReturn> for u32 {
+    fn from(ret: LfReturn) -> Self {
+        ret.0 as u32
+    }
+}
+
+impl LfReturnable for u64 {
+    fn lf_type() -> _lf_type { LF_TYPE_U64 }
+}
+
+impl From<LfReturn> for u64 {
+    fn from(ret: LfReturn) -> Self { ret.0 as u64 }
+}
+
+/// Invokes a remote function call to a Flipper device.
+///
+/// All functions belong to a module, whether it's a Standard Module or a
+/// User Module. The module's FFI representation must be given in order
+/// for libflipper to find the module where the function resides.
+/// Within a module, functions are ordered by index, so the index of the
+/// desired function within the given module must be given. Then, the
+/// desired arguments with which to execute the function must be given.
+/// The arguments are type-sensitive and order-sensitive. Finally, the
+/// return type of `lf_invoke` must be bound with a type parameter, so
+/// that the FMR system can know what type to deliver back to Rust.
+///
+/// Consider the following C function, which belongs to a Flipper module.
+///
+/// ```c
+/// uint8_t foo(uint16_t bar, uint32_t baz, uint64_t qux);
+/// ```
+///
+/// To execute this function using `lf_invoke` would look like this:
+///
+/// ```
+/// use flipper::{ModuleFFI, UserModuleFFI};
+/// use flipper::fmr::{Args, lf_invoke};
+///
+/// // Don't do this, this is just to get the doc tests to compile.
+/// // See how to create a user module.
+/// let ffi = ModuleFFI::User(UserModuleFFI::uninitialized("some_module"));
+///
+/// let args = Args::new()
+///                .append(10 as u16)  // bar
+///                .append(20 as u32)  // baz
+///                .append(30 as u64); // qux
+///
+/// let output: u8 = lf_invoke(&ffi, 0, args);
+/// ```
+pub fn lf_invoke<'a, T: LfReturnable>(module: &'a ModuleFFI, index: u8, args: Args) -> T {
+    unsafe {
+        let mut arglist: *mut _lf_ll = ptr::null_mut();
+        for arg in args.iter() {
+            libflipper::lf_ll_append(&mut arglist, &arg.0 as *const _lf_arg as *const c_void, ptr::null());
         }
+        let ret = libflipper::lf_invoke(module.as_ptr(), index, T::lf_type(), arglist);
+        T::from(LfReturn(ret))
+    }
+}
+
+/// Invokes a remote function call to a Flipper device, passing a buffer of
+/// data with it.
+///
+/// This is currently only used for certain Standard Modules such as uart0
+/// for sending and receiving data over a bus. However, it may be expanded
+/// in the future to support user module functions as well.
+pub fn lf_push<'a, T: LfReturnable>(module: &'a ModuleFFI, index: u8, data: &[u8], args: Args) -> T {
+    unsafe {
+        let mut arglist: *mut _lf_ll = ptr::null_mut();
+        for arg in args.iter() {
+            libflipper::lf_ll_append(&mut arglist, &arg.0 as *const _lf_arg as *const c_void, ptr::null());
+        }
+        let ret = libflipper::lf_push(module.as_ptr(), index, data.as_ptr() as *const c_void, data.len() as u32, arglist);
+        T::from(LfReturn(ret))
+    }
+}
+
+/// Invokes a remote function call to a Flipper device, pulling a buffer of
+/// data back upon return.
+///
+/// This is currently only used for certain Standard Modules such as uart0
+/// for sending and receiving data over a bus. However, it may be expanded
+/// in the future to support user module functions as well.
+pub fn lf_pull<'a, T: LfReturnable>(module: &'a ModuleFFI, index: u8, buffer: &mut [u8], args: Args) -> T {
+    unsafe {
+        let mut arglist: *mut _lf_ll = ptr::null_mut();
+        for arg in args.iter() {
+            libflipper::lf_ll_append(&mut arglist, &arg.0 as *const _lf_arg as *const c_void, ptr::null());
+        }
+        let ret = libflipper::lf_pull(module.as_ptr(), index, buffer.as_mut_ptr() as *mut c_void, buffer.len() as u32, arglist);
+        T::from(LfReturn(ret))
     }
 }
 
 mod test {
     use super::*;
-    use ::UserModuleFFI;
 
     #[test]
-    fn test_fmr_arg() {
-        let argu8 = FmrArg::from(123u8);
+    fn test_arg() {
+        let argu8 = Arg::from(123u8);
         let argu8_native = argu8.0;
         assert_eq!(argu8_native.arg_type, LF_TYPE_U8);
         assert_eq!(argu8_native.arg_value, 123u64);
 
-        let argu16 = FmrArg::from(234u16);
+        let argu16 = Arg::from(234u16);
         let argu16_native = argu16.0;
         assert_eq!(argu16_native.arg_type, LF_TYPE_U16);
         assert_eq!(argu16_native.arg_value, 234u64);
 
-        let argu32 = FmrArg::from(345u32);
+        let argu32 = Arg::from(345u32);
         let argu32_native = argu32.0;
         assert_eq!(argu32_native.arg_type, LF_TYPE_U32);
         assert_eq!(argu32_native.arg_value, 345u64);
     }
 
     #[test]
-    fn test_fmr_builder() {
-        let module = UserModuleFFI::from(("testMod", 0, 0, 0));
-        let ffi = ModuleFFI::User(module);
-        let function = FmrInvocation::new(&ffi, "test", 0, FmrReturn::Unit)
+    fn test_arg_builder() {
+        let args = Args::new()
             .append(1u8)
             .append(2u16)
             .append(3u32)
@@ -253,7 +328,7 @@ mod test {
             _lf_arg { arg_type: LF_TYPE_U16, arg_value: 5u64 },
         ];
 
-        for (actual, expected) in function.iter().zip(expected) {
+        for (actual, expected) in args.iter().zip(expected) {
             assert_eq!(actual.0, expected);
         }
     }

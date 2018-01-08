@@ -1,7 +1,10 @@
 extern crate flipper;
 
 use flipper::{Flipper, ModuleFFI, UserModule, UserModuleFFI};
-use flipper::fmr::{FmrInvocation, FmrReturn};
+use flipper::fmr::{
+    Args,
+    lf_invoke,
+};
 
 struct GpioToggle {
     ffi: ModuleFFI,
@@ -28,9 +31,8 @@ impl From<UserModuleFFI> for GpioToggle {
 
 impl GpioToggle {
     fn toggle(&self) {
-        FmrInvocation::new(&self.ffi, "toggle", 0, FmrReturn::Unit)
-            .append(4u8)
-            .invoke();
+        let args = Args::new().append(4u8);
+        lf_invoke(&self.ffi, 0, args)
     }
 }
 

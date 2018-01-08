@@ -12,14 +12,18 @@ use ::{
     ModuleFFI,
     StandardModuleFFI,
     _lf_module,
-    _lf_device
 };
 
-use fmr::{FmrInvocation, FmrReturn};
+use fmr::{
+    Args,
+    lf_invoke,
+    lf_push,
+    lf_pull,
+};
 
 #[link(name = "flipper")]
 extern {
-    static mut _uart0: _lf_module;
+    static _uart0: _lf_module;
 }
 
 pub enum UartBaud {
@@ -43,7 +47,7 @@ pub struct Uart0 {
 impl StandardModule for Uart0 {
     fn new() -> Self {
         unsafe {
-            let ffi = StandardModuleFFI { module_meta: &mut _uart0 };
+            let ffi = StandardModuleFFI { module_meta: &_uart0 };
             Uart0 {
                 ffi: ModuleFFI::Standard(ffi),
             }
@@ -53,7 +57,7 @@ impl StandardModule for Uart0 {
     fn bind(flipper: &Flipper) -> Self {
         let device = flipper.device;
         unsafe {
-            let ffi = StandardModuleFFI { module_meta: &mut _uart0 };
+            let ffi = StandardModuleFFI { module_meta: &_uart0 };
             Uart0 {
                 ffi: ModuleFFI::Standard(ffi),
             }
@@ -65,31 +69,30 @@ impl Uart0 {
     /// Configures the Uart0 module with a given baud rate and
     /// interrupts enabled flag.
     pub fn configure(&self, baud: &UartBaud, interrupts: bool) {
-        FmrInvocation::new(&self.ffi, "configure", 0, FmrReturn::Unit)
+        let args = Args::new()
             .append(baud.to_baud())
-            .append(if interrupts { 1u8 } else { 0u8 })
-            .invoke();
+            .append(if interrupts { 1u8 } else { 0u8 });
+        lf_invoke(&self.ffi, 0, args)
     }
 
     /// Indicates whether the Uart0 bus is ready to read or write.
     pub fn ready(&self) -> bool {
-        FmrInvocation::new(&self.ffi, "ready", 1, FmrReturn::U8)
-            .invoke() as u8 != 0u8
+        let ret: u8 = lf_invoke(&self.ffi, 1, Args::new());
+        ret != 0
     }
 }
 
 impl Write for Uart0 {
     fn write(&mut self, buf: &[u8]) -> Result<usize> {
-        FmrInvocation::new(&self.ffi, "write", 2, FmrReturn::Unit).invoke_push(buf);
+        lf_push::<()>(&self.ffi, 2, buf, Args::new());
         Ok(buf.len())
     }
-
     fn flush(&mut self) -> Result<()> { Ok(()) }
 }
 
 impl Read for Uart0 {
     fn read(&mut self, buf: &mut [u8]) -> Result<usize> {
-        FmrInvocation::new(&self.ffi, "read", 3, FmrReturn::Unit).invoke_pull(buf);
+        lf_pull::<()>(&self.ffi, 3, buf, Args::new());
         Ok(buf.len())
     }
 }
