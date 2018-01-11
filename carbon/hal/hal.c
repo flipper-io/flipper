@@ -92,10 +92,12 @@ void carbon_attach_to_usb_endpoint_applier(const void *__u2_ep, void *_other) {
 
 /* Attaches to all of the Carbon devices available on the system. */
 int carbon_attach(void) {
+#ifdef __enable_usb__
 	/* Obtains a list of endpoints for all Carbon devices attached to the system. */
 	struct _lf_ll *endpoints = lf_libusb_endpoints_for_vid_pid(CARBON_USB_VENDOR_ID, CARBON_USB_PRODUCT_ID);
 	if (!endpoints) return lf_error;
 	lf_ll_apply_func(endpoints, carbon_attach_to_usb_endpoint_applier, NULL);
+#endif
 	return lf_success;
 }
 

@@ -2,7 +2,6 @@
 #define __atsam4s16b_h__
 
 #include <flipper/libflipper.h>
-#include <flipper/atsam4s/sam4s16b.h>
 
 #define __use_adc__
 #define __use_button__
@@ -24,6 +23,7 @@
 #define __use_wdt__
 
 #ifdef __ATSAM4S__
+#include <flipper/atsam4s/sam4s16b.h>
 #define LF_VAR __attribute__((section(".lf.vars")))
 #define LF_FUNC __attribute__((section(".lf.funcs")))
 #endif

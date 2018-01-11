@@ -7,7 +7,7 @@
 *.o
 build
 projects
-xcuserdata
+xcuserdata/
 __pycache__
 *.pyc
 .idea/

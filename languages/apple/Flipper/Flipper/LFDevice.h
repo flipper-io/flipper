@@ -2,20 +2,33 @@
 //  LFDevice.h
 //  Flipper
 //
-//  Created by George Morgan on 12/27/16.
-//  Copyright © 2016 Flipper. All rights reserved.
+//  Created by George Morgan on 1/11/18.
+//  Copyright © 2018 Flipper. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
-#import "LED.h"
+#import "LFGPIO.h"
+#import "LFLED.h"
 
 @interface LFDevice : NSObject {
-
+    LFGPIO *_gpio;
+    LFLED *_led;
 }
 
-@property (readonly) LFLED *led;
+@property (strong) LFGPIO *gpio;
+@property (strong) LFLED *led;
 
-+ (void) attach;
-+ (void) attachDevice:(NSString *)name withHostname:(NSString *)hostname;
+- (LFDevice *) initOverUSB;
+- (LFDevice *) initOverNetwork:(NSString *)host;
+
+@end
+
+@interface Flipper : NSObject
+
++ (LFDevice *) attach;
++ (LFDevice *) attachNetwork:(NSString *)host;
+
++ (LFGPIO *) gpio;
++ (LFLED *) led;
 
 @end

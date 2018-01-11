@@ -4,6 +4,8 @@
 #include <flipper/libflipper.h>
 #include <libusb.h>
 
+#ifdef __enable_usb__
+
 struct _lf_libusb_context {
 	struct libusb_device_handle *handle;
 	struct libusb_context *context;
@@ -128,3 +130,5 @@ failure:
 	//libusb_exit(context);
 	return endpoints;
 }
+
+#endif

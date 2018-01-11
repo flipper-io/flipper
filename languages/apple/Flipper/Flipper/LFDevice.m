@@ -2,24 +2,25 @@
 //  LFDevice.m
 //  Flipper
 //
-//  Created by George Morgan on 12/27/16.
-//  Copyright © 2016 Flipper. All rights reserved.
+//  Created by George Morgan on 1/11/18.
+//  Copyright © 2018 Flipper. All rights reserved.
 //
 
 #import "LFDevice.h"
-#include <flipper/libflipper.h>
-#include <flipper/carbon.h>
+#include <flipper.h>
 
 @implementation LFDevice
 
-+ (void) attach {
-    lf_error_pause();
+- (LFDevice *) initOverUSB {
+    self = [super init];
     flipper_attach();
+    return self;
 }
 
-+ (void) attachDevice:(NSString *)name withHostname:(NSString *)hostname {
-    lf_error_pause();
-    carbon_attach_hostname([hostname cStringUsingEncoding:NSUTF8StringEncoding]);
+- (LFDevice *) initOverNetwork:(NSString *)host {
+    self = [super init];
+    carbon_attach_hostname([host UTF8String]);
+    return self;
 }
 
 @end

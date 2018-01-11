@@ -9,15 +9,18 @@
 			<key>orderHint</key>
 			<integer>1</integer>
 		</dict>
-		<key>LFMacOS.xcscheme</key>
+		<key>Universal.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
-		<key>LFiOS.xcscheme</key>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>5E0390DC20080183007553DB</key>
 		<dict>
-			<key>orderHint</key>
-			<integer>1</integer>
+			<key>primary</key>
+			<true/>
 		</dict>
 	</dict>
 </dict>
