@@ -187,6 +187,7 @@ pub trait UserModule<'a>: From<UserModuleFFI> {
 extern {
     fn flipper_attach() -> _lf_device;
     fn carbon_attach_hostname(hostname: *const c_char) -> _lf_device;
+    fn carbon_select_u2_gpio(device: _lf_device); // TODO remove after loader improvements
     fn lf_bind(module: *mut _lf_module, device: *const c_void) -> c_int;
 }
 
@@ -212,5 +213,9 @@ impl Flipper {
                 device: carbon_attach_hostname(CString::new(hostname).unwrap().as_ptr())
             }
         }
+    }
+
+    pub fn select_u2_gpio(&self) {
+        unsafe { carbon_select_u2_gpio(self.device) };
     }
 }
