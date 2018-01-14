@@ -155,7 +155,8 @@ fn parse_base_type<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Off
         // Iterate over the attributes of the entry to collect the name, encoding, and size
         .fold((None, None, None), |(name, encoding, size), attr| {
             match (attr.name(), attr.value()) {
-                (gimli::DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), encoding, size),
+                (gimli::DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), encoding, size), // Used for elf files
+                (gimli::DW_AT_name, AttributeValue::String(name)) => (Some(name), encoding, size), // Used for mach-o files
                 (gimli::DW_AT_encoding, AttributeValue::Encoding(encoding)) => (name, Some(encoding), size),
                 (gimli::DW_AT_byte_size, AttributeValue::Udata(size)) => (name, encoding, Some(size)),
                 _ => (name, encoding, size),
@@ -163,7 +164,7 @@ fn parse_base_type<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Off
         })
 
         // If the `entry.attrs()` fallible iterator does fail, give an appropriate error
-        .map_err(|_| BindingError::DwarfParseError("base type attributes").into())
+        .map_err(|_| BindingError::DwarfParseError(format!("base type attributes at 0x{:08X}", entry.offset().0.into_u64())).into())
 
         // If we iterated through all attributes successfully, unwrap each property in the tuple
         .and_then(|(name, encoding, size)| {
@@ -182,9 +183,9 @@ fn parse_base_type<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Off
             };
 
             // Unwrap the elements in the tuple.
-            name.ok_or(BindingError::DwarfParseError("base type name").into())
+            name.ok_or(BindingError::DwarfParseError(format!("base type name at 0x{:08X}", entry.offset().0.into_u64())).into())
                 .and_then(|name|
-                    size.ok_or(BindingError::DwarfParseError("base type size").into())
+                    size.ok_or(BindingError::DwarfParseError(format!("base type size at 0x{:08X}", entry.offset().0.into_u64())).into())
                         .map(|size| (name, size)))
         })
 
@@ -206,11 +207,11 @@ fn parse_pointer_type<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::
         })
 
         // If the iterator fails, give an appropriate error.
-        .map_err(|_| BindingError::DwarfParseError("pointer type attributes").into())
+        .map_err(|_| BindingError::DwarfParseError(format!("pointer type attributes at 0x{:08X}", entry.offset().0.into_u64())).into())
 
         // Unwrap the elements in the tuple.
         .and_then(|(size, typ)| {
-            size.ok_or(BindingError::DwarfParseError("pointer size").into())
+            size.ok_or(BindingError::DwarfParseError(format!("pointer size at 0x{:08X}", entry.offset().0.into_u64())).into())
                 .map(|size| (size, typ.map(|typ| typ.0.into_u64())))
         })
 
@@ -231,13 +232,14 @@ fn parse_typedef<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Offse
         .fold((None, None), |(name, typ), attr| {
             match (attr.name(), attr.value()) {
                 (DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), typ),
+                (DW_AT_name, AttributeValue::String(name)) => (Some(name), typ),
                 (DW_AT_type, AttributeValue::UnitRef(typ)) => (name, Some(typ)),
                 _ => (name, typ),
             }
         })
 
         // If the `entry.attrs()` fallible iterator does fail, give an appropriate error
-        .map_err(|_| BindingError::DwarfParseError("typedef attributes").into())
+        .map_err(|_| BindingError::DwarfParseError(format!("typedef attributes at 0x{:08X}", entry.offset().0.into_u64())).into())
 
         // If we iterated through all attributes successfully, unwrap each property in the tuple
         .and_then(|(name, typ)| {
@@ -246,9 +248,9 @@ fn parse_typedef<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Offse
             let name = name.and_then(|name| name.to_string().map(|name| (*name).to_owned()).ok());
 
             // Unwrap the elements in the tuple
-            name.ok_or(BindingError::DwarfParseError("typedef name").into())
+            name.ok_or(BindingError::DwarfParseError(format!("typedef name at 0x{:08X}", entry.offset().0.into_u64())).into())
                 .and_then(|name|
-                    typ.ok_or(BindingError::DwarfParseError("typedef type").into())
+                    typ.ok_or(BindingError::DwarfParseError(format!("typedef type at 0x{:08X}", entry.offset().0.into_u64())).into())
                         .map(|typ| (name, typ)))
         })
 
@@ -276,7 +278,7 @@ fn parse_parameter<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Off
         })
 
         // If the `entry.attrs()` fallible iterator does fail, give an appropriate error
-        .map_err(|_| BindingError::DwarfParseError("parameter attributes").into())
+        .map_err(|_| BindingError::DwarfParseError(format!("parameter attributes at 0x{:08}", entry.offset().0.into_u64())).into())
 
         // If we iterated through all attributes successfully, unwrap each property in the tuple
         .and_then(|(name, typ)| {
@@ -285,9 +287,9 @@ fn parse_parameter<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Off
             let name = name.and_then(|name| name.to_string().map(|name| (*name).to_owned()).ok());
 
             // Unwrap the elements in the tuple
-            name.ok_or(BindingError::DwarfParseError("parameter name").into())
+            name.ok_or(BindingError::DwarfParseError(format!("parameter name at 0x{:08X}", entry.offset().0.into_u64())).into())
                 .and_then(|name|
-                    typ.ok_or(BindingError::DwarfParseError("parameter type").into())
+                    typ.ok_or(BindingError::DwarfParseError(format!("parameter type at 0x{:08X}", entry.offset().0.into_u64())).into())
                         .map(|typ| (name, typ)))
         })
 
@@ -316,16 +318,16 @@ fn parse_subprogram<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Of
         })
 
         // If the `entry.attrs()` fallible iterator does fail, give an appropriate error.
-        .map_err(|_| BindingError::DwarfParseError("subprogram attributes").into())
+        .map_err(|_| BindingError::DwarfParseError(format!("subprogram attributes at 0x{:08}", entry.offset().0.into_u64())).into())
 
         // If we iterated successfully through the attributes, unwrap each property in the tuple.
         .and_then(|(name, address, ret)| {
             let name = name.and_then(|name| name.to_string().map(|name| (*name).to_owned()).ok());
 
             // Unwrap the elements in the tuple.
-            name.ok_or(BindingError::DwarfParseError("subprogram name").into())
+            name.ok_or(BindingError::DwarfParseError(format!("subprogram name at 0x{:08X}", entry.offset().0.into_u64())).into())
                 .and_then(|name|
-                    address.ok_or(BindingError::DwarfParseError("subprogram address").into())
+                    address.ok_or(BindingError::DwarfParseError(format!("subprogram address at 0x{:08X}", entry.offset().0.into_u64())).into())
                         .map(|address| (name, address, ret.map(|ret| ret.0.into_u64()))))
         })
 
