@@ -31,7 +31,7 @@ impl UartBaud {
     fn to_baud(&self) -> u8 {
         match *self {
             UartBaud::FMR => 0x00,
-            UartBaud::DFU => 0x10,
+            UartBaud::DFU => 0x08,
         }
     }
 }
