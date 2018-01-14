@@ -18,6 +18,7 @@ use std::collections::HashMap;
 use failure::Error;
 use fallible_iterator::FallibleIterator;
 use object;
+use object::Object;
 use gimli;
 use gimli::{
     Reader,
@@ -436,22 +437,22 @@ impl DwarfParser {
 
 /// Parses the buffer of a DWARF binary to extract the debugging information.
 pub fn parse_dwarf(buffer: &[u8]) -> Result<Vec<Subprogram>, Error> {
-    let elf = object::File::parse(buffer).map_err(|_| BindingError::ElfReadError)?;
-    let endian = if elf.is_little_endian() {
+    let bin = object::File::parse(buffer).map_err(|_| BindingError::ElfReadError)?;
+    let endian = if bin.is_little_endian() {
         gimli::RunTimeEndian::Little
     } else {
         gimli::RunTimeEndian::Big
     };
 
-    let debug_info = elf.get_section(".debug_info")
+    let debug_info = bin.section_data_by_name(".debug_info")
         .map(|info| DebugInfo::new(info, endian))
         .ok_or(BindingError::DwarfReadError(".debug_info"))?;
 
-    let debug_abbrev = elf.get_section(".debug_abbrev")
+    let debug_abbrev = bin.section_data_by_name(".debug_abbrev")
         .map(|abbrev| DebugAbbrev::new(abbrev, endian))
         .ok_or(BindingError::DwarfReadError(".debug_abbrev"))?;
 
-    let debug_strings = elf.get_section(".debug_str")
+    let debug_strings = bin.section_data_by_name(".debug_str")
         .map(|strings| DebugStr::new(strings, endian))
         .ok_or(BindingError::DwarfReadError(".debug_str"))?;
 
