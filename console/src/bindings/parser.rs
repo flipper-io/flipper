@@ -231,8 +231,8 @@ fn parse_typedef<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Offse
         // Iterate over the attributes of the entry, collecting the name and type.
         .fold((None, None), |(name, typ), attr| {
             match (attr.name(), attr.value()) {
-                (DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), typ),
-                (DW_AT_name, AttributeValue::String(name)) => (Some(name), typ),
+                (DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), typ), // Used for elf files
+                (DW_AT_name, AttributeValue::String(name)) => (Some(name), typ), // Used for macho files
                 (DW_AT_type, AttributeValue::UnitRef(typ)) => (name, Some(typ)),
                 _ => (name, typ),
             }
@@ -271,7 +271,8 @@ fn parse_parameter<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Off
         // Iterate over the attributes of the entry, collecting the name and type.
         .fold((None, None), |(name, typ), attr| {
             match (attr.name(), attr.value()) {
-                (DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), typ),
+                (DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), typ), // Used for elf files
+                (DW_AT_name, AttributeValue::String(name)) => (Some(name), typ), // Used for macho files
                 (DW_AT_type, AttributeValue::UnitRef(typ)) => (name, Some(typ)),
                 _ => (name, typ),
             }
@@ -310,7 +311,8 @@ fn parse_subprogram<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Of
         // Iterate over the entry attributes to collect the function's name and address
         .fold((None, None, None), |(name, address, ret), attr| {
             match (attr.name(), attr.value()) {
-                (gimli::DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), address, ret),
+                (gimli::DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), address, ret), // Used for elf files
+                (gimli::DW_AT_name, AttributeValue::String(name)) => (Some(name), address, ret), // Used for macho files
                 (gimli::DW_AT_low_pc, AttributeValue::Addr(a)) => (name, Some(a), ret),
                 (gimli::DW_AT_type, AttributeValue::UnitRef(r)) => (name, address, Some(r)),
                 _ => (name, address, ret),
@@ -374,11 +376,8 @@ enum State {
 }
 
 enum Event {
-    NewSubprogram {
-        function: UnresolvedSubprogram,
-        depth: isize,
-    },
-    NewParameter(UnresolvedParameter),
+    NewSubprogram(isize),
+    NewParameter,
     Step(isize),
 }
 
@@ -399,26 +398,29 @@ impl DwarfParser {
         }
     }
 
-    fn step(&mut self, event: Event) {
+    fn step<'a, R: Reader>(&mut self, event: Event, entry: &'a DebuggingInformationEntry<R, R::Offset>, strings: &'a DebugStr<R>) -> Result<(), Error> {
         let state = match (self.state.take().unwrap(), event) {
             // If we were searching for a subprogram and have just found one,
             // begin reading the subprogram, noting its depth so we know when
             // to quit.
-            (State::Search, Event::NewSubprogram { function, depth, .. }) => {
-                State::Read { func: function, dep: depth }
+            (State::Search, Event::NewSubprogram(dep)) => {
+                let func = parse_subprogram(entry, strings)?;
+                State::Read { func, dep }
             }
             // If we're reading a subprogram and find a new parameter, push
             // the parameter onto our parameter list and continue searching
             // for more parameters.
-            (State::Read { mut func, dep, .. }, Event::NewParameter(param)) => {
+            (State::Read { mut func, dep, .. }, Event::NewParameter) => {
+                let param = parse_parameter(entry, strings)?;
                 func.parameters.push(param);
                 State::Read { func, dep }
             }
             // If we were reading one subprogram but stepped up to a new one,
             // save the previous function we built and begin a new one.
-            (State::Read { func, .. }, Event::NewSubprogram { function, depth }) => {
+            (State::Read { func, .. }, Event::NewSubprogram(dep)) => {
                 self.subprograms.push(func);
-                State::Read { func: function, dep: depth }
+                let func = parse_subprogram(entry, strings)?;
+                State::Read { func, dep }
             }
             // If we step up in the DIE tree to a depth higher than the one we
             // began reading this subprogram in, save the function we were building
@@ -434,6 +436,16 @@ impl DwarfParser {
             (state, _) => state,
         };
         self.state.get_or_insert(state);
+        Ok(())
+    }
+
+    /// If, at the end of reading an entry, there is a function that has yet to
+    /// be saved, save it.
+    fn step_zero(&mut self) {
+        if let State::Read { func, .. } = self.state.take().unwrap() {
+            self.subprograms.push(func);
+        }
+        self.state.get_or_insert(State::Search);
     }
 }
 
@@ -493,16 +505,15 @@ pub fn parse_dwarf(buffer: &[u8]) -> Result<Vec<Subprogram>, Error> {
                     unresolved_aliases.insert(offset, alias);
                 },
                 (_, gimli::DW_TAG_formal_parameter) => {
-                    parser.step(Event::NewParameter(parse_parameter(&entry, &debug_strings)?));
+                    parser.step(Event::NewParameter, &entry, &debug_strings)?;
                 },
-                (depth, gimli::DW_TAG_subprogram) => parser.step(Event::NewSubprogram {
-                    function: parse_subprogram(&entry, &debug_strings)?,
-                    depth,
-                }),
-                (depth, _) => parser.step(Event::Step(depth)),
+                (depth, gimli::DW_TAG_subprogram) => {
+                    parser.step(Event::NewSubprogram(depth), &entry, &debug_strings)?;
+                },
+                (depth, _) => parser.step(Event::Step(depth), &entry, &debug_strings)?,
             }
         }
-        parser.step(Event::Step(0));
+        parser.step_zero();
     }
 
     // Resolve all typedefs/aliases
