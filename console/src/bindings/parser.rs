@@ -590,4 +590,34 @@ mod test {
         // Compare
         assert_eq!(actual_subprograms, expected_subprograms);
     }
+
+    #[test]
+    fn test_parser_macho() {
+        let dwarf: &[u8] = include_bytes!("./test_resources/dwarf_parse_test_macho");
+        let result = parse_dwarf(dwarf);
+        assert!(result.is_ok());
+
+        // Expected values //
+
+        // Base types
+        let b0 = Rc::new(Type::Base { name: "int".to_owned(), offset: 202, size: 4 });
+        let b1 = Rc::new(Type::Base { name: "char".to_owned(), offset: 403, size: 1 });
+        let b2 = Rc::new(Type::Base { name: "long int".to_owned(), offset: 190, size: 8 });
+
+        // Parameters
+        let p0 = Parameter { name: "a".to_owned(), typ: Some(b0.clone()) };
+        let p1 = Parameter { name: "b".to_owned(), typ: Some(b1.clone()) };
+        let p2 = Parameter { name: "c".to_owned(), typ: Some(b2.clone()) };
+
+        let expected_subprograms = vec![
+            Subprogram { name: "test".to_owned(), address: 0, parameters: vec![p0, p1, p2], ret: Some(b0.clone()) },
+        ];
+
+        // Actual values //
+
+        let actual_subprograms = result.unwrap();
+
+        // Compare
+        assert_eq!(actual_subprograms, expected_subprograms);
+    }
 }
