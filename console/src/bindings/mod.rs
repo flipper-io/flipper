@@ -42,7 +42,7 @@ pub enum BindingError {
     #[fail(display = "failed to read dwarf section: {}", _0)]
     DwarfReadError(&'static str),
     #[fail(display = "failed to parse dwarf {}", _0)]
-    DwarfParseError(&'static str),
+    DwarfParseError(String),
     #[fail(display = "failed to resolve {}", _0)]
     ResolutionError(String),
 }
