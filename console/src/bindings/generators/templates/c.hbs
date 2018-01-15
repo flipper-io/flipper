@@ -1,0 +1,12 @@
+#include <flipper.h>
+
+LF_MODULE(_{{name}}, "{{name}}", "{{description}}", NULL, NULL);
+
+const struct _{{name}} {{name}} {
+    {{struct_expansion funcs name}}
+};
+{{#each funcs}}
+LF_WEAK {{ret}} {{../name}}_{{name}}({{param_expansion params}}) {
+    {{ret}} result = ({{ret}}) lf_invoke(&_{{../name}}, _{{../name}}_{{name}}, {{ret_fmr}}, fmr_args({{#each params}}fmr_infer({{name}}){{/each}}));
+}
+{{/each}}

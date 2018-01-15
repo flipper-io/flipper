@@ -70,7 +70,19 @@ pub mod generate {
         let mut file = File::open(filename)
             .map_err(|e| BindingError::FileError(filename.to_owned(), e))?;
 
-//        binary_parser::parse_elf(&mut file).map(|_| ())
+        let buffer = {
+            let mut v = Vec::new();
+            file.read_to_end(&mut v);
+            v
+        };
+
+        let meta = parser::parse_dwarf(&buffer)?;
+
+        let mut out = File::create("./binding.c")
+            .map_err(|e| BindingError::FileError("binding.c".to_owned(), e))?;
+
+        ::flipper_console::bindings::generators::c::generate_functions(meta, &mut out);
+
         Ok(())
     }
 }

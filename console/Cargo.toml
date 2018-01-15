@@ -16,6 +16,7 @@ xmodem = "0.1.3"
 goblin = "0.0.11"
 gimli = "0.14.0"
 object = "0.6.0"
+handlebars = "0.29.1"
 failure = { git = "https://github.com/withoutboats/failure.git" }
 derive-fail = { git = "https://github.com/withoutboats/derive-fail.git" }
 fallible-iterator = "*"

@@ -26,6 +26,7 @@
 
 pub mod meta;
 pub mod parser;
+pub mod generators;
 
 use std::io::Read;
 use std::ops::Range;
