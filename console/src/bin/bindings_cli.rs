@@ -4,7 +4,6 @@ use std::io::Error as IoError;
 use clap::{App, AppSettings, Arg, ArgMatches};
 use failure::Error;
 use flipper_console::CliError;
-use console::bindings::dwarf;
 
 #[derive(Debug, Fail)]
 #[fail(display = "Errors that occur while generating bindings")]
@@ -49,6 +48,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Error> {
 /// such as a laptop or mobile phone.
 pub mod generate {
     use super::*;
+    use flipper_console::bindings;
 
     pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
         App::new("generate")
@@ -76,12 +76,10 @@ pub mod generate {
             v
         };
 
-        let meta = parser::parse_dwarf(&buffer)?;
+        let meta = bindings::dwarf::parse(&buffer)?;
 
         let mut out = File::create("./binding.c")
             .map_err(|e| BindingError::FileError("binding.c".to_owned(), e))?;
-
-        bindings::generators::c::generate_functions(meta, &mut out);
 
         Ok(())
     }
@@ -89,6 +87,7 @@ pub mod generate {
 
 pub mod dwarf {
     use super::*;
+    use flipper_console::bindings::dwarf;
 
     pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
         App::new("dwarf")

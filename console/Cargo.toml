@@ -30,4 +30,4 @@ path = "src/lib.rs"
 name = "flipper"
 path = "src/bin/main.rs"
 doc = false
-test = false
+test = true
