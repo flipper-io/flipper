@@ -4,7 +4,7 @@ use std::io::Error as IoError;
 use clap::{App, AppSettings, Arg, ArgMatches};
 use failure::Error;
 use flipper_console::CliError;
-use console::bindings::parser;
+use console::bindings::dwarf;
 
 #[derive(Debug, Fail)]
 #[fail(display = "Errors that occur while generating bindings")]
@@ -81,7 +81,7 @@ pub mod generate {
         let mut out = File::create("./binding.c")
             .map_err(|e| BindingError::FileError("binding.c".to_owned(), e))?;
 
-        ::flipper_console::bindings::generators::c::generate_functions(meta, &mut out);
+        bindings::generators::c::generate_functions(meta, &mut out);
 
         Ok(())
     }
@@ -112,6 +112,8 @@ pub mod dwarf {
             v
         };
 
-        parser::parse_dwarf(&buffer).map(|_| ())
+        dwarf::parse(&buffer);
+
+        Ok(())
     }
 }
