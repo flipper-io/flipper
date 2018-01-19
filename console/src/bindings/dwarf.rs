@@ -11,7 +11,6 @@
 
 #![allow(non_snake_case)]
 
-use std::io::Read;
 use std::rc::Rc;
 use std::collections::HashMap;
 use std::ops::{
@@ -204,8 +203,8 @@ fn parse_pointer_type<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::
         // Iterate over the attributes of the entry, collecting the size and type.
         .fold((None, None), |(size, typ), attr| {
             match (attr.name(), attr.value()) {
-                (DW_AT_byte_size, AttributeValue::Udata(size)) => (Some(size), typ),
-                (DW_AT_type, AttributeValue::UnitRef(typ)) => (size, Some(typ)),
+                (gimli::DW_AT_byte_size, AttributeValue::Udata(size)) => (Some(size), typ),
+                (gimli::DW_AT_type, AttributeValue::UnitRef(typ)) => (size, Some(typ)),
                 _ => (size, typ),
             }
         })
@@ -235,9 +234,9 @@ fn parse_typedef<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Offse
         // Iterate over the attributes of the entry, collecting the name and type.
         .fold((None, None), |(name, typ), attr| {
             match (attr.name(), attr.value()) {
-                (DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), typ), // Used for elf files
-                (DW_AT_name, AttributeValue::String(name)) => (Some(name), typ), // Used for macho files
-                (DW_AT_type, AttributeValue::UnitRef(typ)) => (name, Some(typ)),
+                (gimli::DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), typ), // Used for elf files
+                (gimli::DW_AT_name, AttributeValue::String(name)) => (Some(name), typ), // Used for macho files
+                (gimli::DW_AT_type, AttributeValue::UnitRef(typ)) => (name, Some(typ)),
                 _ => (name, typ),
             }
         })
@@ -275,9 +274,9 @@ fn parse_parameter<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Off
         // Iterate over the attributes of the entry, collecting the name and type.
         .fold((None, None), |(name, typ), attr| {
             match (attr.name(), attr.value()) {
-                (DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), typ), // Used for elf files
-                (DW_AT_name, AttributeValue::String(name)) => (Some(name), typ), // Used for macho files
-                (DW_AT_type, AttributeValue::UnitRef(typ)) => (name, Some(typ)),
+                (gimli::DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), typ), // Used for elf files
+                (gimli::DW_AT_name, AttributeValue::String(name)) => (Some(name), typ), // Used for macho files
+                (gimli::DW_AT_type, AttributeValue::UnitRef(typ)) => (name, Some(typ)),
                 _ => (name, typ),
             }
         })
@@ -510,7 +509,6 @@ pub fn parse(buffer: &[u8]) -> Result<Vec<Subprogram>, Error> {
     let mut unresolved_references: HashMap<u64, UnresolvedReference> = HashMap::new();
 
     let mut parser = DwarfParser::new();
-    let mut errors: Vec<Error> = Vec::new();
     let mut units = debug_info.units();
 
     while let Some(unit) = units.next()? {

@@ -39,12 +39,8 @@ pub mod dwarf;
 pub mod elf;
 pub mod generators;
 
-use std::io::Read;
-use std::ops::Range;
 use std::rc::Rc;
 use failure::Error;
-
-use self::elf::FlipperSection;
 
 /// Represents errors that can occur when parsing ELF and/or DWARF files.
 #[derive(Debug, Fail)]
@@ -212,7 +208,6 @@ impl Module {
 mod test {
     use super::*;
     use super::generators::c::*;
-    use std::fs::File;
     use std::io::Cursor;
 
     /// Performs an end-to-end test for parsing a Flipper module binary and generating

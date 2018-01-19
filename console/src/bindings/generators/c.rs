@@ -1,14 +1,7 @@
-use std::fs::File;
 use std::io::Write;
 use std::io::Cursor;
 use std::rc::Rc;
-use handlebars;
-use serde_derive;
-
-use failure::{
-    Error,
-    Compat,
-};
+use failure::Error;
 
 use handlebars::{
     Handlebars,
@@ -100,21 +93,24 @@ impl From<Module> for CModule {
 /// a custom handlebars helper which takes the appropriate struct contents
 /// and appends them to the template, omitting the last comma of each entry.
 fn struct_helper(h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> Result<(), RenderError> {
-    let values = h.param(0).unwrap().value().as_array().unwrap();
-    let module_name = h.param(1).unwrap().value().as_str().unwrap();
+    let values = h.param(0).map(|p| p.value())
+        .and_then(|value| value.as_array())
+        .ok_or(RenderError::new("struct_expansion requires an array as the first argument"))?;
+
+    let module_name = h.param(1).map(|p| p.value())
+        .and_then(|value| value.as_str())
+        .ok_or(RenderError::new("struct_expansion requires a string as the second argument"))?;
+
     let mut funcs = String::new();
-
-    if values.len() > 0 {
+    for (i, value) in values.iter().enumerate() {
+        if i > 0 { funcs.push_str(",\n    "); }
         funcs.push_str(module_name);
         funcs.push('_');
-        funcs.push_str(values[0].as_object().unwrap().get("name").unwrap().as_str().unwrap());
-    }
-
-    for value in values.iter().skip(1) {
-        funcs.push_str(",\n    ");
-        funcs.push_str(module_name);
-        funcs.push('_');
-        funcs.push_str(value.as_object().unwrap().get("name").unwrap().as_str().unwrap());
+        funcs.push_str(value.as_object()
+            .and_then(|obj| obj.get("name"))
+            .and_then(|name| name.as_str())
+            .ok_or(RenderError::new("struct_expansion failed to print 'name'"))?
+        );
     }
 
     rc.writer.write(funcs.into_bytes().as_ref())?;
@@ -187,7 +183,7 @@ pub fn generate_module<W: Write>(module: Module, out: &mut W) -> Result<(), Erro
     let template_bytes: &[u8] = include_bytes!("./templates/c.hbs");
     let mut template = Cursor::new(template_bytes);
     reg.register_template_source("c", &mut template)
-        .map_err(|_| GeneratorError::CRenderError("malformed template file 'c.hbs'".to_owned()))?;
+        .map_err(|_| GeneratorError::CRenderError("missing or malformed template file 'c.hbs'".to_owned()))?;
 
     let module: CModule = module.into();
 

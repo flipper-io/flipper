@@ -36,7 +36,6 @@ mod packages_cli;
 mod hardware_cli;
 mod bindings_cli;
 
-use std::process;
 use flipper_console::CliError;
 use flipper_console as console;
 use clap::{App, AppSettings, Arg, ArgMatches};
