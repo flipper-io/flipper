@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::io::Write;
+use std::io::Cursor;
 use std::rc::Rc;
 use handlebars;
 use serde_derive;
@@ -182,12 +183,15 @@ pub fn generate_module<W: Write>(module: Module, out: &mut W) -> Result<(), Erro
     reg.register_helper("param_expansion", Box::new(param_helper));
     reg.register_helper("struct_expansion", Box::new(struct_helper));
     reg.register_helper("fmr_expansion", Box::new(fmr_expansion_helper));
-    reg.register_template_file("c", "./src/bindings/generators/templates/c.hbs")
+
+    let template_bytes: &[u8] = include_bytes!("./templates/c.hbs");
+    let mut template = Cursor::new(template_bytes);
+    reg.register_template_source("c", &mut template)
         .map_err(|_| GeneratorError::CRenderError("malformed template file 'c.hbs'".to_owned()))?;
 
     let module: CModule = module.into();
 
-    write!(out, "{}", reg.render("c", &module)
+    let _ = write!(out, "{}", reg.render("c", &module)
         .map_err(|e| GeneratorError::CRenderError(e.desc))?
     );
 
