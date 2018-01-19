@@ -1,3 +1,8 @@
+use std::ops::Range;
+use goblin::elf::Elf;
+use failure::Error;
+
+use bindings::BindingError;
 
 /// Represents relevant binary sections of Flipper executables. This includes:
 ///
@@ -19,19 +24,18 @@ pub enum FlipperSection {
     Other,
 }
 
-/// Parses a binary file and prints information about the sections.
-pub fn parse_elf<R: Read>(file: &mut R) -> Result<FlipperSection, Error> {
-    let buffer = {
-        let mut v = Vec::new();
-        file.read_to_end(&mut v).unwrap();
-        v
-    };
-    read_section_offset(&buffer, ".lf.funcs")
+impl FlipperSection {
+    pub fn range(&self) -> Range<u64> {
+        match *self {
+            FlipperSection::Funcs(ref range) => range.clone(),
+            _ => unimplemented!(),
+        }
+    }
 }
 
 /// Given the binary of an ELF file and the name of an ELF section, return
 /// the address range of that section.
-fn read_section_offset(buffer: &[u8], section: &str) -> Result<FlipperSection, Error> {
+pub fn read_section_offset(buffer: &[u8], section: &str) -> Result<FlipperSection, Error> {
     let elf: Elf = Elf::parse(&buffer).map_err(|_| BindingError::ElfReadError)?;
 
     for header in &elf.section_headers {

@@ -36,13 +36,15 @@
 #![allow(missing_docs)]
 
 pub mod dwarf;
+pub mod elf;
 pub mod generators;
 
 use std::io::Read;
 use std::ops::Range;
 use std::rc::Rc;
 use failure::Error;
-use goblin::elf::Elf;
+
+use self::elf::FlipperSection;
 
 /// Represents errors that can occur when parsing ELF and/or DWARF files.
 #[derive(Debug, Fail)]
@@ -192,13 +194,40 @@ pub struct Module {
 }
 
 impl Module {
+    /// Parse Flipper module metadata from a debug-enabled binary.
     pub fn parse(name: String, description: String, binary: &[u8]) -> Result<Self, Error> {
         let functions = dwarf::parse(binary)?;
+        let range = elf::read_section_offset(binary, ".lf.funcs")?.range();
+        let functions: Vec<_> = functions.into_iter().filter(|f| range.start <= f.address && f.address < range.end).collect();
 
         Ok(Module {
             name,
             description,
             functions,
         })
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use super::generators::c::*;
+    use std::fs::File;
+    use std::io::Cursor;
+
+    /// Performs an end-to-end test for parsing a Flipper module binary and generating
+    /// an appropriate C binding.
+    #[test]
+    fn test_parse_generate_c() {
+        let dwarf: &[u8] = include_bytes!("./test_resources/module_binding_test");
+        let expected: &[u8] = include_bytes!("./test_resources/module_binding_test_expected.c");
+
+        let module = Module::parse("user".to_owned(), "User module description".to_owned(), dwarf);
+        assert!(module.is_ok());
+        let module = module.unwrap();
+        let mut binding: Cursor<Vec<u8>> = Cursor::new(Vec::new());
+        let _ = generate_module(module, &mut binding);
+
+        assert_eq!(&*binding.into_inner(), expected);
     }
 }
