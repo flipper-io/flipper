@@ -24,7 +24,9 @@
 #define __use_wdt__
 
 #ifdef __ATSAM4S__
+#undef LF_VAR
 #define LF_VAR __attribute__((section(".lf.vars")))
+#undef LF_FUNC
 #define LF_FUNC __attribute__((section(".lf.funcs")))
 #endif
 

@@ -211,6 +211,8 @@ void lf_debug_result(struct _fmr_result *result);
 
 #ifdef PLATFORM_HEADER
 #include PLATFORM_HEADER
+#else
+#include <flipper/posix/posix.h>
 #endif
 
 #endif

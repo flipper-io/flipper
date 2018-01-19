@@ -89,8 +89,8 @@ ISR (PCINT1_vect) {
 }
 
 ISR(TIMER1_COMPA_vect) {
-	static int b = 0;
-	led_rgb(0, 0, (b^=1)*10);
+	// static int b = 0;
+	// led_rgb(0, 0, (b^=1)*10);
 	// static int heartbeat = 0;
 	// uint8_t _sreg = SREG;
 	// cli();
