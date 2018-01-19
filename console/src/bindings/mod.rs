@@ -181,19 +181,24 @@ pub struct Subprogram {
     pub ret: Rc<Type>,
 }
 
+/// Represents a fully formed Flipper module which can have bindings generated
+/// for it. This is created by parsing the module metadata from the DWARF debug
+/// symbols of a Flipper module binary.
 #[derive(Debug, PartialOrd, PartialEq, Ord, Eq)]
 pub struct Module {
     name: String,
-    types: Vec<Rc<Type>>,
+    description: String,
     functions: Vec<Subprogram>,
 }
 
 impl Module {
-    pub fn parse(binary: &[u8]) -> Self {
-        Module {
-            name: "blah".to_owned(),
-            functions: Vec::new(),
-            types: Vec::new(),
-        }
+    pub fn parse(name: String, description: String, binary: &[u8]) -> Result<Self, Error> {
+        let functions = dwarf::parse(binary)?;
+
+        Ok(Module {
+            name,
+            description,
+            functions,
+        })
     }
 }
