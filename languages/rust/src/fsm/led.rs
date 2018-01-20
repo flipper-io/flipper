@@ -1,3 +1,5 @@
+#![allow(non_upper_case_globals)]
+
 use ::{
     Flipper,
     StandardModule,
@@ -30,7 +32,7 @@ impl StandardModule for Led {
         }
     }
 
-    fn bind(flipper: &Flipper) -> Self {
+    fn bind(_: &Flipper) -> Self {
         unsafe {
             let module = StandardModuleFFI { module_meta: &_led };
             Led {
