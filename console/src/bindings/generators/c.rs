@@ -1,3 +1,12 @@
+//! Generates remote C bindings for a given Flipper module.
+//!
+//! This mod makes use of the `handlebars` rust crate. There's
+//! a `templates/c.hbs` file which describes the layout of a
+//! C module. To populate the template, we create serializable
+//! representations of all the parameters and functions in the
+//! Flipper module and pass that data to the handlebars
+//! renderer.
+
 use std::io::Write;
 use std::io::Cursor;
 use std::rc::Rc;
@@ -14,7 +23,7 @@ use bindings::generators::GeneratorError;
 use bindings::{
     Type,
     Parameter,
-    Subprogram,
+    Function,
     Module,
 };
 
@@ -54,8 +63,8 @@ impl From<Parameter> for CParameter {
     }
 }
 
-impl From<Subprogram> for CFunction {
-    fn from(func: Subprogram) -> Self {
+impl From<Function> for CFunction {
+    fn from(func: Function) -> Self {
         let params: Vec<CParameter> = func.parameters.into_iter().map(|param| param.into()).collect();
 
         let ret = func.ret.name();

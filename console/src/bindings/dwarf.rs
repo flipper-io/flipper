@@ -1,3 +1,5 @@
+//! Parse function signature metadata from DWARF debug symbols.
+//!
 //! Within the DIE tree, entries refer to one another by specifying the
 //! offset of the other entry. After fully parsing the information we want
 //! from the DIE tree, we resolve these offset links into more traceable
@@ -36,7 +38,7 @@ use gimli::{
 use super::{
     Type,
     Parameter,
-    Subprogram,
+    Function,
     BindingError,
 };
 
@@ -134,7 +136,7 @@ struct UnresolvedSubprogram {
 impl UnresolvedSubprogram {
     /// Converts an `UnresolvedSubprogram` yielded by the parser into a fully
     /// resolved `Subprogram`.
-    fn into_resolved(self, types: &TypeRegistry) -> Result<Subprogram, Error> {
+    fn into_resolved(self, types: &TypeRegistry) -> Result<Function, Error> {
         let mut parameters: Vec<Parameter> = Vec::with_capacity(self.parameters.capacity());
         for parameter in self.parameters.into_iter() {
             parameters.push(parameter.into_resolved(types)?);
@@ -142,7 +144,7 @@ impl UnresolvedSubprogram {
 
         let ret = self.ret.and_then(|ref key| types.get(key).map(|rc| rc.clone())).unwrap_or(types.void());
 
-        Ok(Subprogram {
+        Ok(Function {
             name: self.name,
             address: self.address,
             parameters,
@@ -452,6 +454,13 @@ impl DwarfParser {
     }
 }
 
+/// A thin wrapper around HashMap for storing parsed Types.
+///
+/// This is used primarily as a means to store a common `void`
+/// type. Previously, Types were represented as `Option`s, and
+/// `void` was simply a `None` variant. This led to unnecessarily
+/// complicated code, so now instead we use the concrete `void`
+/// type.
 struct TypeRegistry {
     types: HashMap<u64, Rc<Type>>,
     void: Rc<Type>,
@@ -471,6 +480,7 @@ impl DerefMut for TypeRegistry {
 }
 
 impl TypeRegistry {
+    /// Creates a new, empty `TypeRegistry`.
     fn new() -> Self {
         TypeRegistry {
             types: HashMap::new(),
@@ -478,13 +488,14 @@ impl TypeRegistry {
         }
     }
 
+    /// Returns a reference to the `void` type.
     fn void(&self) -> Rc<Type> {
         self.void.clone()
     }
 }
 
 /// Parses the buffer of a DWARF binary to extract the debugging information.
-pub fn parse(buffer: &[u8]) -> Result<Vec<Subprogram>, Error> {
+pub fn parse(buffer: &[u8]) -> Result<Vec<Function>, Error> {
     let bin = object::File::parse(buffer).map_err(|_| BindingError::ElfReadError)?;
     let endian = if bin.is_little_endian() {
         gimli::RunTimeEndian::Little
@@ -559,7 +570,7 @@ pub fn parse(buffer: &[u8]) -> Result<Vec<Subprogram>, Error> {
 
     // Resolve all subprograms
     let unresolved_subprograms = parser.subprograms;
-    let mut resolved_subprograms = Vec::<Subprogram>::new();
+    let mut resolved_subprograms = Vec::<Function>::new();
     for subprogram in unresolved_subprograms.into_iter() {
         resolved_subprograms.push(subprogram.into_resolved(&resolved_types)?)
     }
@@ -567,9 +578,11 @@ pub fn parse(buffer: &[u8]) -> Result<Vec<Subprogram>, Error> {
     Ok(resolved_subprograms)
 }
 
-/// Test the dwarf parser for correctness. These tests rely on the file
-/// `test_resources/dwarf_parse_test`, so any changes to that file may
-/// break tests.
+/// Test the dwarf parser for correctness.
+///
+/// These tests rely on files in `test_resources/`, so any changes to that
+/// directory may break tests.
+#[cfg(test)]
 mod test {
     use super::*;
 
@@ -606,11 +619,11 @@ mod test {
 
         // Subprograms
         let expected_subprograms = vec![
-            Subprogram { name: "main".to_owned(), address: 1692, parameters: vec![], ret: b0.clone() },
-            Subprogram { name: "test_four".to_owned(), address: 1665, parameters: vec![p0, p1, p2], ret: r0.clone() },
-            Subprogram { name: "test_three".to_owned(), address: 1649, parameters: vec![p3], ret: b0.clone() },
-            Subprogram { name: "test_two".to_owned(), address: 1639, parameters: vec![p4], ret: void.clone() },
-            Subprogram { name: "test_one".to_owned(), address: 1632, parameters: vec![], ret: void.clone() },
+            Function { name: "main".to_owned(), address: 1692, parameters: vec![], ret: b0.clone() },
+            Function { name: "test_four".to_owned(), address: 1665, parameters: vec![p0, p1, p2], ret: r0.clone() },
+            Function { name: "test_three".to_owned(), address: 1649, parameters: vec![p3], ret: b0.clone() },
+            Function { name: "test_two".to_owned(), address: 1639, parameters: vec![p4], ret: void.clone() },
+            Function { name: "test_one".to_owned(), address: 1632, parameters: vec![], ret: void.clone() },
         ];
 
         // Actual values //
@@ -640,7 +653,7 @@ mod test {
         let p2 = Parameter { name: "c".to_owned(), typ: b2.clone() };
 
         let expected_subprograms = vec![
-            Subprogram { name: "test".to_owned(), address: 0, parameters: vec![p0, p1, p2], ret: b0.clone() },
+            Function { name: "test".to_owned(), address: 0, parameters: vec![p0, p1, p2], ret: b0.clone() },
         ];
 
         // Actual values //

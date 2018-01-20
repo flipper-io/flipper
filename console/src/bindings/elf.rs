@@ -1,10 +1,14 @@
+//! Read the addresses and offsets of elf binary sections.
+
 use std::ops::Range;
 use goblin::elf::Elf;
 use failure::Error;
 
 use bindings::BindingError;
 
-/// Represents relevant binary sections of Flipper executables. This includes:
+/// Represents relevant binary sections of Flipper executables.
+///
+/// This includes:
 ///
 /// 1) ".lf.funcs", which stores the binary of functions which are FMR compatible.
 #[derive(Debug)]
@@ -50,6 +54,7 @@ pub fn read_section_offset(buffer: &[u8], section: &str) -> Result<FlipperSectio
     Err(BindingError::ElfSectionError(section.to_owned()).into())
 }
 
+#[cfg(test)]
 mod test {
     use super::*;
 

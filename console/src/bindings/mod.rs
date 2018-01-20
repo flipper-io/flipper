@@ -1,3 +1,5 @@
+//! Generate high level language bindings from native Flipper modules.
+//!
 //! Flipper modules can define a public API which becomes remotely executable
 //! from host platforms like mobile and desktop machines. These platforms can
 //! make use of higher level programming languages. This bindings module serves
@@ -18,9 +20,9 @@
 //! 2) Store the module API in an intermediary format which can be generically
 //! translated into any high-level language API.
 //!
-//! 3) Pass the API description into binding deserializers which generate
+//! 3) Pass the API description into binding generators which create
 //! high-level language packages which expose a functionally equivalent API
-//! whose implementation automatically executes the modules on Flipper.
+//! whose implementation remotely executes the modules on Flipper.
 //!
 //! This module exposes structs which represent type information parsed from a
 //! binary with DWARF debug information. The DWARF format contains enough
@@ -28,10 +30,6 @@
 //! binary. We parse this information into a general format given by the types
 //! in this module, and later use this format to generate high level language
 //! bindings.
-//!
-//! See the [parser] to see how the type information is read from DWARF.
-//!
-//! [parser](./binary_parser)
 
 #![allow(missing_docs)]
 
@@ -57,9 +55,12 @@ pub enum BindingError {
     ResolutionError(String),
 }
 
-/// Represents a type in the program whose symbols are parsed. Types can be
-/// concrete base types such as `int`, aliases such as `uint8_t`, pointers
-/// such as `char *`, or unsupported types.
+/// Represents a type of value which can be expressed in a Flipper module.
+///
+/// Types can be concrete base types such as `int`, aliases (typedefs) such
+/// as `uint8_t`, pointers such as `char *`, or other types which are
+/// currently unsupported in a concrete sense but which can be referenced
+/// as generic data (such as structs).
 #[derive(Debug, PartialOrd, PartialEq, Ord, Eq)]
 pub enum Type {
     /// Base types encapsulate all of the information necessary to represent
@@ -67,7 +68,7 @@ pub enum Type {
     /// generate high level bindings using representations that match those
     /// of the low level code.
     Base {
-        /// The name of this base type, e.g. `int` or `uint16_t`.
+        /// The name of this base type, e.g. `int` or `char`.
         name: String,
         /// The memory footprint of this type, e.g. 4 for `int`.
         size: u64,
@@ -131,8 +132,6 @@ impl Type {
     }
 
     /// Returns the size of this `Type`.
-    ///
-    ///
     pub fn size(&self) -> u64 {
         match *self {
             Type::Base { size, .. } => size,
@@ -143,7 +142,7 @@ impl Type {
     }
 }
 
-/// Represents a parameter to a subprogram as given by the subprogram definition.
+/// A single parameter of a Flipper function.
 ///
 /// For example, given the following function in C:
 ///
@@ -163,11 +162,13 @@ pub struct Parameter {
     pub typ: Rc<Type>,
 }
 
-/// Represents a specific `subprogram` parsed from a DWARF file. The name will be
-/// used for generating FFI bindings to this function. The address is captured
-/// so it's possible to tell if the subprogram belongs to a certain binary section.
+/// A single function signature of a Flipper module.
+///
+/// The name and parameters are used for generating FFI bindings to this function.
+/// The address is captured so it's possible to tell if the function belongs to a
+/// certain binary section.
 #[derive(Debug, PartialOrd, PartialEq, Ord, Eq)]
-pub struct Subprogram {
+pub struct Function {
     /// The name of the function as defined in the original program,
     /// e.g. "say_hello" in `void say_hello(char *greeting);`.
     pub name: String,
@@ -179,14 +180,12 @@ pub struct Subprogram {
     pub ret: Rc<Type>,
 }
 
-/// Represents a fully formed Flipper module which can have bindings generated
-/// for it. This is created by parsing the module metadata from the DWARF debug
-/// symbols of a Flipper module binary.
+/// A fully formed Flipper module which can have bindings generated for it.
 #[derive(Debug, PartialOrd, PartialEq, Ord, Eq)]
 pub struct Module {
     name: String,
     description: String,
-    functions: Vec<Subprogram>,
+    functions: Vec<Function>,
 }
 
 impl Module {
