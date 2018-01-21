@@ -1,13 +1,9 @@
 #![allow(non_upper_case_globals)]
 
 use std::io::{Read, Write, Result};
-use std::ffi::CString;
-use std::ptr;
-use libc::c_void;
 
 use ::{
     Flipper,
-    DEFAULT_FLIPPER,
     StandardModule,
     ModuleFFI,
     StandardModuleFFI,
@@ -54,8 +50,8 @@ impl StandardModule for Uart0 {
         }
     }
     /// Instantiates a Uart0 module bound to a specific Flipper device.
-    fn bind(flipper: &Flipper) -> Self {
-        let device = flipper.device;
+    // TODO implement binding
+    fn bind(_: &Flipper) -> Self {
         unsafe {
             let ffi = StandardModuleFFI { module_meta: &_uart0 };
             Uart0 {
