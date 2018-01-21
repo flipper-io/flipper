@@ -1,3 +1,5 @@
+//! Parse function signature metadata from DWARF debug symbols.
+//!
 //! Within the DIE tree, entries refer to one another by specifying the
 //! offset of the other entry. After fully parsing the information we want
 //! from the DIE tree, we resolve these offset links into more traceable
@@ -11,9 +13,12 @@
 
 #![allow(non_snake_case)]
 
-use std::io::Read;
 use std::rc::Rc;
 use std::collections::HashMap;
+use std::ops::{
+    Deref,
+    DerefMut,
+};
 
 use failure::Error;
 use fallible_iterator::FallibleIterator;
@@ -30,11 +35,11 @@ use gimli::{
     DebuggingInformationEntry,
 };
 
-use super::BindingError;
-use super::meta::{
+use super::{
     Type,
     Parameter,
-    Subprogram,
+    Function,
+    BindingError,
 };
 
 /// Represents reference types, which cannot be immediately resolved.
@@ -49,13 +54,13 @@ struct UnresolvedReference {
 impl UnresolvedReference {
     /// Converts an `UnresolvedReference` yielded by the parser into a fully
     /// resolved `Type::Reference`.
-    fn into_resolved(self, resolved_types: &HashMap<u64, Rc<Type>>) -> Result<Type, Error> {
+    fn into_resolved(self, types: &TypeRegistry) -> Result<Type, Error> {
         Ok(match self.typ {
-            None => Type::Reference { typ: None, offset: self.offset },
+            None => Type::Reference { typ: types.void() },
             Some(ref typ_offset) => {
-                let typ = resolved_types.get(typ_offset).map(|rc| rc.clone());
+                let typ = types.get(typ_offset).map(|rc| rc.clone());
                 match typ {
-                    Some(typ) => Type::Reference { typ: Some(typ), offset: self.offset },
+                    Some(typ) => Type::Reference { typ },
                     None => Type::Unsupported,
                 }
             }
@@ -77,10 +82,10 @@ struct UnresolvedAlias {
 impl UnresolvedAlias {
     /// Converts an `UnresolvedAlias` yielded by the parser into a fully
     /// resolved `Type::Alias`.
-    fn into_resolved(self, resolved_types: &HashMap<u64, Rc<Type>>) -> Result<Type, Error> {
-        let typ = resolved_types.get(&self.typ).map(|rc| rc.clone());
+    fn into_resolved(self, types: &TypeRegistry) -> Result<Type, Error> {
+        let typ = types.get(&self.typ).map(|rc| rc.clone());
         Ok(match typ {
-            Some(typ) => Type::Alias { name: self.name, typ, offset: self.offset },
+            Some(typ) => Type::Alias { name: self.name, typ },
             None => Type::Unsupported,
         })
     }
@@ -101,13 +106,13 @@ struct UnresolvedParameter {
 impl UnresolvedParameter {
     /// Converts an `UnresolvedParameter` yielded by the parser into a fully
     /// resolved `Parameter`.
-    fn into_resolved(self, resolved_types: &HashMap<u64, Rc<Type>>) -> Result<Parameter, Error> {
+    fn into_resolved(self, types: &TypeRegistry) -> Result<Parameter, Error> {
         Ok(match self.typ {
-            None => Parameter { typ: None, name: self.name },
+            None => Parameter { typ: types.void(), name: self.name },
             Some(ref typ_offset) => {
-                let typ = resolved_types.get(typ_offset).map(|rc| rc.clone())
+                let typ = types.get(typ_offset).map(|rc| rc.clone())
                     .ok_or(BindingError::ResolutionError(format!("parameter type for {}", self.name)))?;
-                Parameter { typ: Some(typ), name: self.name }
+                Parameter { typ, name: self.name }
             }
         })
     }
@@ -131,15 +136,15 @@ struct UnresolvedSubprogram {
 impl UnresolvedSubprogram {
     /// Converts an `UnresolvedSubprogram` yielded by the parser into a fully
     /// resolved `Subprogram`.
-    fn into_resolved(self, resolved_types: &HashMap<u64, Rc<Type>>) -> Result<Subprogram, Error> {
+    fn into_resolved(self, types: &TypeRegistry) -> Result<Function, Error> {
         let mut parameters: Vec<Parameter> = Vec::with_capacity(self.parameters.capacity());
         for parameter in self.parameters.into_iter() {
-            parameters.push(parameter.into_resolved(resolved_types)?);
+            parameters.push(parameter.into_resolved(types)?);
         }
 
-        let ret = self.ret.and_then(|ref key| resolved_types.get(key).map(|rc| rc.clone()));
+        let ret = self.ret.and_then(|ref key| types.get(key).map(|rc| rc.clone())).unwrap_or(types.void());
 
-        Ok(Subprogram {
+        Ok(Function {
             name: self.name,
             address: self.address,
             parameters,
@@ -149,7 +154,7 @@ impl UnresolvedSubprogram {
 }
 
 /// Parses a base type from a `DW_TAG_base_type` entry in the DIE tree.
-fn parse_base_type<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Offset>, strings: &'a DebugStr<R>) -> Result<Type, Error> {
+fn parse_base_type<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Offset>, strings: &'a DebugStr<R>) -> Result<(u64, Type), Error> {
     entry.attrs()
 
         // Iterate over the attributes of the entry to collect the name, encoding, and size
@@ -190,7 +195,7 @@ fn parse_base_type<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Off
         })
 
         // Use the name, encoding, and size to build a DwarfType representation of this entry.
-        .map(|(name, size)| Type::Base { name, size, offset: entry.offset().0.into_u64() })
+        .map(|(name, size)| (entry.offset().0.into_u64(), Type::Base { name, size }))
 }
 
 /// Parses a pointer type from a `DW_TAG_pointer_type` entry in the DIE tree.
@@ -200,8 +205,8 @@ fn parse_pointer_type<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::
         // Iterate over the attributes of the entry, collecting the size and type.
         .fold((None, None), |(size, typ), attr| {
             match (attr.name(), attr.value()) {
-                (DW_AT_byte_size, AttributeValue::Udata(size)) => (Some(size), typ),
-                (DW_AT_type, AttributeValue::UnitRef(typ)) => (size, Some(typ)),
+                (gimli::DW_AT_byte_size, AttributeValue::Udata(size)) => (Some(size), typ),
+                (gimli::DW_AT_type, AttributeValue::UnitRef(typ)) => (size, Some(typ)),
                 _ => (size, typ),
             }
         })
@@ -231,9 +236,9 @@ fn parse_typedef<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Offse
         // Iterate over the attributes of the entry, collecting the name and type.
         .fold((None, None), |(name, typ), attr| {
             match (attr.name(), attr.value()) {
-                (DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), typ), // Used for elf files
-                (DW_AT_name, AttributeValue::String(name)) => (Some(name), typ), // Used for macho files
-                (DW_AT_type, AttributeValue::UnitRef(typ)) => (name, Some(typ)),
+                (gimli::DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), typ), // Used for elf files
+                (gimli::DW_AT_name, AttributeValue::String(name)) => (Some(name), typ), // Used for macho files
+                (gimli::DW_AT_type, AttributeValue::UnitRef(typ)) => (name, Some(typ)),
                 _ => (name, typ),
             }
         })
@@ -271,9 +276,9 @@ fn parse_parameter<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Off
         // Iterate over the attributes of the entry, collecting the name and type.
         .fold((None, None), |(name, typ), attr| {
             match (attr.name(), attr.value()) {
-                (DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), typ), // Used for elf files
-                (DW_AT_name, AttributeValue::String(name)) => (Some(name), typ), // Used for macho files
-                (DW_AT_type, AttributeValue::UnitRef(typ)) => (name, Some(typ)),
+                (gimli::DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), typ), // Used for elf files
+                (gimli::DW_AT_name, AttributeValue::String(name)) => (Some(name), typ), // Used for macho files
+                (gimli::DW_AT_type, AttributeValue::UnitRef(typ)) => (name, Some(typ)),
                 _ => (name, typ),
             }
         })
@@ -449,9 +454,51 @@ impl DwarfParser {
     }
 }
 
+/// A thin wrapper around HashMap for storing parsed Types.
+///
+/// This is used primarily as a means to store a common `void`
+/// type. Previously, Types were represented as `Option`s, and
+/// `void` was simply a `None` variant. This led to unnecessarily
+/// complicated code, so now instead we use the concrete `void`
+/// type.
+struct TypeRegistry {
+    types: HashMap<u64, Rc<Type>>,
+    void: Rc<Type>,
+}
+
+impl Deref for TypeRegistry {
+    type Target = HashMap<u64, Rc<Type>>;
+    fn deref(&self) -> &Self::Target {
+        &self.types
+    }
+}
+
+impl DerefMut for TypeRegistry {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.types
+    }
+}
+
+impl TypeRegistry {
+    /// Creates a new, empty `TypeRegistry`.
+    fn new() -> Self {
+        TypeRegistry {
+            types: HashMap::new(),
+            void: Rc::new(Type::Base{ name: "void".to_owned(), size: 0 }),
+        }
+    }
+
+    /// Returns a reference to the `void` type.
+    fn void(&self) -> Rc<Type> {
+        self.void.clone()
+    }
+}
+
 /// Parses the buffer of a DWARF binary to extract the debugging information.
-pub fn parse_dwarf(buffer: &[u8]) -> Result<Vec<Subprogram>, Error> {
-    let bin = object::File::parse(buffer).map_err(|_| BindingError::ElfReadError)?;
+pub fn parse(buffer: &[u8]) -> Result<Vec<Function>, Error> {
+    let bin = object::File::parse(buffer)
+        .map_err(|_| BindingError::DwarfReadError("binary file".to_owned()))?;
+
     let endian = if bin.is_little_endian() {
         gimli::RunTimeEndian::Little
     } else {
@@ -460,22 +507,21 @@ pub fn parse_dwarf(buffer: &[u8]) -> Result<Vec<Subprogram>, Error> {
 
     let debug_info = bin.section_data_by_name(".debug_info")
         .map(|info| DebugInfo::new(info, endian))
-        .ok_or(BindingError::DwarfReadError(".debug_info"))?;
+        .ok_or(BindingError::DwarfReadError(".debug_info".to_owned()))?;
 
     let debug_abbrev = bin.section_data_by_name(".debug_abbrev")
         .map(|abbrev| DebugAbbrev::new(abbrev, endian))
-        .ok_or(BindingError::DwarfReadError(".debug_abbrev"))?;
+        .ok_or(BindingError::DwarfReadError(".debug_abbrev".to_owned()))?;
 
     let debug_strings = bin.section_data_by_name(".debug_str")
         .map(|strings| DebugStr::new(strings, endian))
-        .ok_or(BindingError::DwarfReadError(".debug_str"))?;
+        .ok_or(BindingError::DwarfReadError(".debug_str".to_owned()))?;
 
-    let mut resolved_types: HashMap<u64, Rc<Type>> = HashMap::new();
+    let mut resolved_types = TypeRegistry::new();
     let mut unresolved_aliases: HashMap<u64, UnresolvedAlias> = HashMap::new();
     let mut unresolved_references: HashMap<u64, UnresolvedReference> = HashMap::new();
 
     let mut parser = DwarfParser::new();
-    let mut errors: Vec<Error> = Vec::new();
     let mut units = debug_info.units();
 
     while let Some(unit) = units.next()? {
@@ -487,11 +533,7 @@ pub fn parse_dwarf(buffer: &[u8]) -> Result<Vec<Subprogram>, Error> {
             depth += delta;
             match (depth, entry.tag()) {
                 (_, gimli::DW_TAG_base_type) => {
-                    let typ = parse_base_type(&entry, &debug_strings)?;
-                    let offset = match typ {
-                        Type::Base { offset, .. } => offset,
-                        _ => panic!("Successful return of parse_base_type should only be Type::Base"),
-                    };
+                    let (offset, typ) = parse_base_type(&entry, &debug_strings)?;
                     resolved_types.insert(offset, Rc::new(typ));
                 },
                 (_, gimli::DW_TAG_pointer_type) => {
@@ -530,7 +572,7 @@ pub fn parse_dwarf(buffer: &[u8]) -> Result<Vec<Subprogram>, Error> {
 
     // Resolve all subprograms
     let unresolved_subprograms = parser.subprograms;
-    let mut resolved_subprograms = Vec::<Subprogram>::new();
+    let mut resolved_subprograms = Vec::<Function>::new();
     for subprogram in unresolved_subprograms.into_iter() {
         resolved_subprograms.push(subprogram.into_resolved(&resolved_types)?)
     }
@@ -538,49 +580,52 @@ pub fn parse_dwarf(buffer: &[u8]) -> Result<Vec<Subprogram>, Error> {
     Ok(resolved_subprograms)
 }
 
-/// Test the dwarf parser for correctness. These tests rely on the file
-/// `test_resources/dwarf_parse_test`, so any changes to that file may
-/// break tests.
+/// Test the dwarf parser for correctness.
+///
+/// These tests rely on files in `test_resources/`, so any changes to that
+/// directory may break tests.
+#[cfg(test)]
 mod test {
     use super::*;
 
     #[test]
     fn test_parser() {
         let dwarf: &[u8] = include_bytes!("./test_resources/dwarf_parse_test");
-        let result = parse_dwarf(dwarf);
+        let result = parse(dwarf);
         assert!(result.is_ok());
 
         // Expected values //
 
         // Base types
-        let b0 = Rc::new(Type::Base { name: "int".to_owned(), offset: 59, size: 4 });
-        let b1 = Rc::new(Type::Base { name: "unsigned char".to_owned(), offset: 84, size: 1 });
-        let b2 = Rc::new(Type::Base { name: "short unsigned int".to_owned(), offset: 102, size: 2 });
-        let b3 = Rc::new(Type::Base { name: "unsigned int".to_owned(), offset: 120, size: 4 });
-        let b4 = Rc::new(Type::Base { name: "char".to_owned(), offset: 245, size: 1 });
+        let void = Rc::new(Type::Base { name: "void".to_owned(), size: 0 });
+        let b0 = Rc::new(Type::Base { name: "int".to_owned(), size: 4 });
+        let b1 = Rc::new(Type::Base { name: "unsigned char".to_owned(), size: 1 });
+        let b2 = Rc::new(Type::Base { name: "short unsigned int".to_owned(), size: 2 });
+        let b3 = Rc::new(Type::Base { name: "unsigned int".to_owned(), size: 4 });
+        let b4 = Rc::new(Type::Base { name: "char".to_owned(), size: 1 });
 
         // Alias types
-        let a0 = Rc::new(Type::Alias { name: "uint8_t".to_owned(), offset: 73, typ: b1.clone() });
-        let a1 = Rc::new(Type::Alias { name: "uint16_t".to_owned(), offset: 91, typ: b2.clone() });
-        let a2 = Rc::new(Type::Alias { name: "uint32_t".to_owned(), offset: 109, typ: b3.clone() });
+        let a0 = Rc::new(Type::Alias { name: "uint8_t".to_owned(), typ: b1.clone() });
+        let a1 = Rc::new(Type::Alias { name: "uint16_t".to_owned(), typ: b2.clone() });
+        let a2 = Rc::new(Type::Alias { name: "uint32_t".to_owned(), typ: b3.clone() });
 
         // Reference types
-        let r0 = Rc::new(Type::Reference { offset: 239, typ: Some(b4.clone()) });
+        let r0 = Rc::new(Type::Reference { typ: b4.clone() });
 
         // Parameters
-        let p0 = Parameter { name: "first".to_owned(), typ: Some(a0.clone()) };
-        let p1 = Parameter { name: "second".to_owned(), typ: Some(a1.clone()) };
-        let p2 = Parameter { name: "third".to_owned(), typ: Some(a2.clone()) };
-        let p3 = Parameter { name: "letter".to_owned(), typ: Some(b4.clone()) };
-        let p4 = Parameter { name: "count".to_owned(), typ: Some(b0.clone()) };
+        let p0 = Parameter { name: "first".to_owned(), typ: a0.clone() };
+        let p1 = Parameter { name: "second".to_owned(), typ: a1.clone() };
+        let p2 = Parameter { name: "third".to_owned(), typ: a2.clone() };
+        let p3 = Parameter { name: "letter".to_owned(), typ: b4.clone() };
+        let p4 = Parameter { name: "count".to_owned(), typ: b0.clone() };
 
         // Subprograms
         let expected_subprograms = vec![
-            Subprogram { name: "main".to_owned(), address: 1692, parameters: vec![], ret: Some(b0.clone()) },
-            Subprogram { name: "test_four".to_owned(), address: 1665, parameters: vec![p0, p1, p2], ret: Some(r0.clone()) },
-            Subprogram { name: "test_three".to_owned(), address: 1649, parameters: vec![p3], ret: Some(b0.clone()) },
-            Subprogram { name: "test_two".to_owned(), address: 1639, parameters: vec![p4], ret: None },
-            Subprogram { name: "test_one".to_owned(), address: 1632, parameters: vec![], ret: None },
+            Function { name: "main".to_owned(), address: 1692, parameters: vec![], ret: b0.clone() },
+            Function { name: "test_four".to_owned(), address: 1665, parameters: vec![p0, p1, p2], ret: r0.clone() },
+            Function { name: "test_three".to_owned(), address: 1649, parameters: vec![p3], ret: b0.clone() },
+            Function { name: "test_two".to_owned(), address: 1639, parameters: vec![p4], ret: void.clone() },
+            Function { name: "test_one".to_owned(), address: 1632, parameters: vec![], ret: void.clone() },
         ];
 
         // Actual values //
@@ -594,23 +639,23 @@ mod test {
     #[test]
     fn test_parser_macho() {
         let dwarf: &[u8] = include_bytes!("./test_resources/dwarf_parse_test_macho");
-        let result = parse_dwarf(dwarf);
+        let result = parse(dwarf);
         assert!(result.is_ok());
 
         // Expected values //
 
         // Base types
-        let b0 = Rc::new(Type::Base { name: "int".to_owned(), offset: 202, size: 4 });
-        let b1 = Rc::new(Type::Base { name: "char".to_owned(), offset: 403, size: 1 });
-        let b2 = Rc::new(Type::Base { name: "long int".to_owned(), offset: 190, size: 8 });
+        let b0 = Rc::new(Type::Base { name: "int".to_owned(), size: 4 });
+        let b1 = Rc::new(Type::Base { name: "char".to_owned(), size: 1 });
+        let b2 = Rc::new(Type::Base { name: "long int".to_owned(), size: 8 });
 
         // Parameters
-        let p0 = Parameter { name: "a".to_owned(), typ: Some(b0.clone()) };
-        let p1 = Parameter { name: "b".to_owned(), typ: Some(b1.clone()) };
-        let p2 = Parameter { name: "c".to_owned(), typ: Some(b2.clone()) };
+        let p0 = Parameter { name: "a".to_owned(), typ: b0.clone() };
+        let p1 = Parameter { name: "b".to_owned(), typ: b1.clone() };
+        let p2 = Parameter { name: "c".to_owned(), typ: b2.clone() };
 
         let expected_subprograms = vec![
-            Subprogram { name: "test".to_owned(), address: 0, parameters: vec![p0, p1, p2], ret: Some(b0.clone()) },
+            Function { name: "test".to_owned(), address: 0, parameters: vec![p0, p1, p2], ret: b0.clone() },
         ];
 
         // Actual values //
