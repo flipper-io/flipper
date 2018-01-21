@@ -34,21 +34,29 @@
 #![allow(missing_docs)]
 
 pub mod dwarf;
-pub mod elf;
 pub mod generators;
 
+use std::io::Cursor;
 use std::rc::Rc;
+use std::ops::Range;
+use object::{
+    self,
+    Object,
+    ObjectSection,
+};
 use failure::Error;
 
 /// Represents errors that can occur when parsing ELF and/or DWARF files.
 #[derive(Debug, Fail)]
 pub enum BindingError {
-    #[fail(display = "failed to read elf file")]
-    ElfReadError,
+    #[fail(display = "failed to read binary section: {}", _0)]
+    SectionReadError(String),
     #[fail(display = "failed to parse elf section: {}", _0)]
-    ElfSectionError(String),
-    #[fail(display = "failed to read dwarf section: {}", _0)]
-    DwarfReadError(&'static str),
+    ElfReadError(String),
+    #[fail(display = "failed to parse macho section: {}", _0)]
+    MachoReadError(String),
+    #[fail(display = "failed to read dwarf {}", _0)]
+    DwarfReadError(String),
     #[fail(display = "failed to parse dwarf {}", _0)]
     DwarfParseError(String),
     #[fail(display = "failed to resolve {}", _0)]
@@ -192,7 +200,7 @@ impl Module {
     /// Parse Flipper module metadata from a debug-enabled binary.
     pub fn parse(name: String, description: String, binary: &[u8]) -> Result<Self, Error> {
         let functions = dwarf::parse(binary)?;
-        let range = elf::read_section_offset(binary, ".lf.funcs")?.range();
+        let range = read_section_address(binary, ".lf.funcs")?;
         let functions: Vec<_> = functions.into_iter().filter(|f| range.start <= f.address && f.address < range.end).collect();
 
         Ok(Module {
@@ -201,6 +209,24 @@ impl Module {
             functions,
         })
     }
+}
+
+fn read_section_address(data: &[u8], section_name: &str) -> Result<Range<u64>, Error> {
+    let mut cursor = Cursor::new(data);
+    let bin = object::File::parse(data)
+        .map_err(|_| BindingError::SectionReadError(section_name.to_owned()))?;
+
+    for section in bin.sections() {
+        if let Some(name) = section.name() {
+            if name == section_name {
+                let address = section.address();
+                let size = section.size();
+                return Ok(address..address + size);
+            }
+        }
+    }
+
+    Err(BindingError::SectionReadError(section_name.to_owned()).into())
 }
 
 #[cfg(test)]
@@ -215,6 +241,20 @@ mod test {
     fn test_parse_generate_c() {
         let dwarf: &[u8] = include_bytes!("./test_resources/module_binding_test");
         let expected: &[u8] = include_bytes!("./test_resources/module_binding_test_expected.c");
+
+        let module = Module::parse("user".to_owned(), "User module description".to_owned(), dwarf);
+        assert!(module.is_ok());
+        let module = module.unwrap();
+        let mut binding: Cursor<Vec<u8>> = Cursor::new(Vec::new());
+        let _ = generate_module(module, &mut binding);
+
+        assert_eq!(&*binding.into_inner(), expected);
+    }
+
+    #[test]
+    fn test_parse_generate_c_macho() {
+        let dwarf: &[u8] = include_bytes!("./test_resources/dwarf_parse_test_macho");
+        let expected: &[u8] = include_bytes!("./test_resources/dwarf_parse_test_macho_expected.c");
 
         let module = Module::parse("user".to_owned(), "User module description".to_owned(), dwarf);
         assert!(module.is_ok());

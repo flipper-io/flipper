@@ -496,7 +496,9 @@ impl TypeRegistry {
 
 /// Parses the buffer of a DWARF binary to extract the debugging information.
 pub fn parse(buffer: &[u8]) -> Result<Vec<Function>, Error> {
-    let bin = object::File::parse(buffer).map_err(|_| BindingError::ElfReadError)?;
+    let bin = object::File::parse(buffer)
+        .map_err(|_| BindingError::DwarfReadError("binary file".to_owned()))?;
+
     let endian = if bin.is_little_endian() {
         gimli::RunTimeEndian::Little
     } else {
@@ -505,15 +507,15 @@ pub fn parse(buffer: &[u8]) -> Result<Vec<Function>, Error> {
 
     let debug_info = bin.section_data_by_name(".debug_info")
         .map(|info| DebugInfo::new(info, endian))
-        .ok_or(BindingError::DwarfReadError(".debug_info"))?;
+        .ok_or(BindingError::DwarfReadError(".debug_info".to_owned()))?;
 
     let debug_abbrev = bin.section_data_by_name(".debug_abbrev")
         .map(|abbrev| DebugAbbrev::new(abbrev, endian))
-        .ok_or(BindingError::DwarfReadError(".debug_abbrev"))?;
+        .ok_or(BindingError::DwarfReadError(".debug_abbrev".to_owned()))?;
 
     let debug_strings = bin.section_data_by_name(".debug_str")
         .map(|strings| DebugStr::new(strings, endian))
-        .ok_or(BindingError::DwarfReadError(".debug_str"))?;
+        .ok_or(BindingError::DwarfReadError(".debug_str".to_owned()))?;
 
     let mut resolved_types = TypeRegistry::new();
     let mut unresolved_aliases: HashMap<u64, UnresolvedAlias> = HashMap::new();

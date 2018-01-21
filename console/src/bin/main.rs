@@ -27,7 +27,6 @@
 extern crate rustyline;
 extern crate byteorder;
 extern crate libc;
-extern crate goblin;
 extern crate flipper;
 extern crate flipper_console;
 
