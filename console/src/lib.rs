@@ -13,8 +13,8 @@
 #![deny(unused_qualifications)]
 
 #[macro_use] extern crate serde_derive;
-#[macro_use] extern crate failure;
 #[macro_use] extern crate derive_fail;
+extern crate failure;
 extern crate byteorder;
 extern crate xmodem;
 extern crate serde;
@@ -24,14 +24,14 @@ extern crate object;
 extern crate handlebars;
 extern crate fallible_iterator;
 
+// This crate interacts directly with Flipper.
+// The console makes this functionality available on the command line.
 extern crate flipper;
 
-pub mod packages;
 pub mod hardware;
 pub mod bindings;
 
-/// Defines the errors that may be encountered while parsing and executing
-/// commands.
+/// Defines the errors that may be encountered while parsing and executing commands.
 #[derive(Debug, Fail)]
 #[fail(display = "Command line error")]
 pub enum CliError {
