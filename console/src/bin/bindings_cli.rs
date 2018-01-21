@@ -1,9 +1,9 @@
 use std::fs::File;
-use std::io::Read;
+#[allow(unused_imports)] use std::io::Read;
 use std::io::Error as IoError;
 use clap::{App, AppSettings, Arg, ArgMatches};
 use failure::Error;
-use flipper_console::CliError;
+use console::CliError;
 
 #[derive(Debug, Fail)]
 #[fail(display = "Errors that occur while generating bindings")]
@@ -46,7 +46,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Error> {
 /// such as a laptop or mobile phone.
 pub mod generate {
     use super::*;
-    use flipper_console::bindings;
+    use console::bindings;
 
     pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
         App::new("generate")
