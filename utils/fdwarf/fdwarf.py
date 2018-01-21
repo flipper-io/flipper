@@ -53,42 +53,42 @@ def generate_c(modulename, outputname, functions):
 	outc = open(outputname, "w")
 	
 	ctemplate = """\
-		#include <flipper.h>
-		
-		struct _$PACKAGE$ {
-			$STRUCTDEF$
-		};
-		
-		enum { $TAGS$ };
-		
-		$FUNCTIONPROTOS$
-		
-		$VARIABLES$
-		
-		#ifdef __ATSAM4S__
-		
-		const char _fmr_app_name[] __attribute__((section(".name"))) = "$PACKAGE$";
-		
-		#define JT_SECTION __attribute__((section(".module")))
-		
-		#else /* __ATSAM4S__ */
-		
-		#define JT_SECTION
-		
-		extern unsigned char package_bin[];
-		extern unsigned package_bin_len;
-		
-		LF_MODULE(_module, "$PACKAGE$", "$DESCRIPTION$", &package_bin, &package_bin_len);
-		
-		$FUNCTIONS$
-		
-		#endif /* __ATSAM4S__ */
-		
-		const struct _$PACKAGE$_jumptable JT_SECTION = {
-			$STRUCTBODY$
-		};
-		"""
-	ctemplate = ctemplate.replace("$PACKAGE$", modulename)
+#include <flipper.h>
+
+struct _$MODULE$ {
+$STRUCTDEF$
+};
+
+enum { $TAGS$ };
+
+$FUNCTIONPROTOS$
+
+$VARIABLES$
+
+#ifdef __ATSAM4S__
+
+const char _fmr_app_name[] __attribute__((section(".name"))) = "$MODULE$";
+
+#define JT_SECTION __attribute__((section(".module")))
+
+#else /* __ATSAM4S__ */
+
+#define JT_SECTION
+
+extern unsigned char $MODULE$_bin[];
+extern unsigned $MODULE$_bin_len;
+
+LF_MODULE(_module, "$MODULE$", "$DESCRIPTION$", &$MODULE$_bin, &$MODULE$_bin_len);
+
+$FUNCTIONS$
+
+#endif /* __ATSAM4S__ */
+
+const struct _$MODULE$ _jumptable JT_SECTION = {
+$STRUCTBODY$
+};
+"""
+	ctemplate = ctemplate.replace("$MODULE$", modulename)
 	
 	functs = []
 	struct = []

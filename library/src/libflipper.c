@@ -89,7 +89,7 @@ LF_WEAK int lf_bind(struct _lf_module *module, struct _lf_device *device) {
 	int index = fld_index(module->identifier);
 	if (index == -1) {
 		lf_debug("Could not find counterpart for '%s'. Attempting to load it.", module->name);
-		lf_load(module->data, *module->size, module->device);
+		lf_load(module->data, *module->psize, module->device);
 		index = fld_index(module->identifier);
 	}
 	lf_assert(index != -1, failure, E_MODULE, "No counterpart for the module '%s' was found on the device '%s'. Load the module first.", module->name, module->device->configuration.name);
@@ -173,7 +173,7 @@ void lf_debug_result(struct _fmr_result *result) {
 	if (lf_debug_level != LF_DEBUG_LEVEL_ALL) return;
 
 	printf("response:\n");
-	printf("\t└─ value:\t0x%llx\n", result->value);
-	printf("\t└─ error:\t0x%x\n", result->error);
+	printf("\t└─ value:\t0x%x\n", result->value);
+	printf("\t└─ error:\t0x%hhx\n", result->error);
 	printf("\n-----------\n\n");
 }
