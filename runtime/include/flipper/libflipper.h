@@ -131,26 +131,26 @@ struct _lf_device *lf_get_current_device(void);
 
 /* Standardizes the notion of a module. */
 struct _lf_module {
-	/* A string containing the module's name. */
-	char *name;
-	/* A string giving the description of a module. */
-	char *description;
-	/* The version of the module. */
+	/*! A string containing the module's name. */
+	const char *name;
+	/*! A string giving the description of a module. */
+	const char *description;
+	/*! The version of the module. */
 	lf_version_t version;
-	/* The module's identifier. */
+	/*! The module's identifier. */
 	lf_crc_t identifier;
-	/* The module's loaded index. */
+	/*! The module's loaded index. */
 	int index;
-	/* The pointer to a pointer to the device upon which the module's counterpart is located. */
+	/*! The pointer to a pointer to the device upon which the module's counterpart is located. */
 	struct _lf_device *device;
-	/* The module's binary data. */
+	/*! The module's binary data. */
 	void *data;
-	/* The binary data size. */
-	size_t *size;
+	/*! The binary data size. */
+	uint32_t *psize;
 };
 
 /* Macro for easily generating module structures. */
-#define LF_MODULE(symbol, name, description, data, len) \
+#define LF_MODULE(symbol, name, description, pdata, plen) \
 	struct _lf_module symbol = { \
 		name, \
 		description, \
@@ -158,8 +158,8 @@ struct _lf_module {
 		0, \
 		-1, \
 		NULL, \
-		data, \
-		len \
+		pdata, \
+		plen \
 	};
 
 #define LF_MODULE_SET_DEVICE_AND_ID(module, _device, _id) module.device = _device; module.index = _id;
@@ -191,7 +191,7 @@ int lf_exit(void);
 /* Load the device's configuration information. */
 int lf_load_configuration(struct _lf_device *device);
 /* Provides a checksum for a given block of data. */
-lf_crc_t lf_crc(void *source, size_t length);
+lf_crc_t lf_crc(const void *source, size_t length);
 
 /* Obtains a result from a device. */
 int lf_get_result(struct _lf_device *device, struct _fmr_result *result);
