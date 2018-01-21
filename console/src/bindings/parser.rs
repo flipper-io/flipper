@@ -18,6 +18,7 @@ use std::collections::HashMap;
 use failure::Error;
 use fallible_iterator::FallibleIterator;
 use object;
+use object::Object;
 use gimli;
 use gimli::{
     Reader,
@@ -154,7 +155,8 @@ fn parse_base_type<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Off
         // Iterate over the attributes of the entry to collect the name, encoding, and size
         .fold((None, None, None), |(name, encoding, size), attr| {
             match (attr.name(), attr.value()) {
-                (gimli::DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), encoding, size),
+                (gimli::DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), encoding, size), // Used for elf files
+                (gimli::DW_AT_name, AttributeValue::String(name)) => (Some(name), encoding, size), // Used for mach-o files
                 (gimli::DW_AT_encoding, AttributeValue::Encoding(encoding)) => (name, Some(encoding), size),
                 (gimli::DW_AT_byte_size, AttributeValue::Udata(size)) => (name, encoding, Some(size)),
                 _ => (name, encoding, size),
@@ -162,7 +164,7 @@ fn parse_base_type<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Off
         })
 
         // If the `entry.attrs()` fallible iterator does fail, give an appropriate error
-        .map_err(|_| BindingError::DwarfParseError("base type attributes").into())
+        .map_err(|_| BindingError::DwarfParseError(format!("base type attributes at 0x{:08X}", entry.offset().0.into_u64())).into())
 
         // If we iterated through all attributes successfully, unwrap each property in the tuple
         .and_then(|(name, encoding, size)| {
@@ -181,9 +183,9 @@ fn parse_base_type<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Off
             };
 
             // Unwrap the elements in the tuple.
-            name.ok_or(BindingError::DwarfParseError("base type name").into())
+            name.ok_or(BindingError::DwarfParseError(format!("base type name at 0x{:08X}", entry.offset().0.into_u64())).into())
                 .and_then(|name|
-                    size.ok_or(BindingError::DwarfParseError("base type size").into())
+                    size.ok_or(BindingError::DwarfParseError(format!("base type size at 0x{:08X}", entry.offset().0.into_u64())).into())
                         .map(|size| (name, size)))
         })
 
@@ -205,11 +207,11 @@ fn parse_pointer_type<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::
         })
 
         // If the iterator fails, give an appropriate error.
-        .map_err(|_| BindingError::DwarfParseError("pointer type attributes").into())
+        .map_err(|_| BindingError::DwarfParseError(format!("pointer type attributes at 0x{:08X}", entry.offset().0.into_u64())).into())
 
         // Unwrap the elements in the tuple.
         .and_then(|(size, typ)| {
-            size.ok_or(BindingError::DwarfParseError("pointer size").into())
+            size.ok_or(BindingError::DwarfParseError(format!("pointer size at 0x{:08X}", entry.offset().0.into_u64())).into())
                 .map(|size| (size, typ.map(|typ| typ.0.into_u64())))
         })
 
@@ -229,14 +231,15 @@ fn parse_typedef<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Offse
         // Iterate over the attributes of the entry, collecting the name and type.
         .fold((None, None), |(name, typ), attr| {
             match (attr.name(), attr.value()) {
-                (DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), typ),
+                (DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), typ), // Used for elf files
+                (DW_AT_name, AttributeValue::String(name)) => (Some(name), typ), // Used for macho files
                 (DW_AT_type, AttributeValue::UnitRef(typ)) => (name, Some(typ)),
                 _ => (name, typ),
             }
         })
 
         // If the `entry.attrs()` fallible iterator does fail, give an appropriate error
-        .map_err(|_| BindingError::DwarfParseError("typedef attributes").into())
+        .map_err(|_| BindingError::DwarfParseError(format!("typedef attributes at 0x{:08X}", entry.offset().0.into_u64())).into())
 
         // If we iterated through all attributes successfully, unwrap each property in the tuple
         .and_then(|(name, typ)| {
@@ -245,9 +248,9 @@ fn parse_typedef<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Offse
             let name = name.and_then(|name| name.to_string().map(|name| (*name).to_owned()).ok());
 
             // Unwrap the elements in the tuple
-            name.ok_or(BindingError::DwarfParseError("typedef name").into())
+            name.ok_or(BindingError::DwarfParseError(format!("typedef name at 0x{:08X}", entry.offset().0.into_u64())).into())
                 .and_then(|name|
-                    typ.ok_or(BindingError::DwarfParseError("typedef type").into())
+                    typ.ok_or(BindingError::DwarfParseError(format!("typedef type at 0x{:08X}", entry.offset().0.into_u64())).into())
                         .map(|typ| (name, typ)))
         })
 
@@ -268,14 +271,15 @@ fn parse_parameter<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Off
         // Iterate over the attributes of the entry, collecting the name and type.
         .fold((None, None), |(name, typ), attr| {
             match (attr.name(), attr.value()) {
-                (DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), typ),
+                (DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), typ), // Used for elf files
+                (DW_AT_name, AttributeValue::String(name)) => (Some(name), typ), // Used for macho files
                 (DW_AT_type, AttributeValue::UnitRef(typ)) => (name, Some(typ)),
                 _ => (name, typ),
             }
         })
 
         // If the `entry.attrs()` fallible iterator does fail, give an appropriate error
-        .map_err(|_| BindingError::DwarfParseError("parameter attributes").into())
+        .map_err(|_| BindingError::DwarfParseError(format!("parameter attributes at 0x{:08}", entry.offset().0.into_u64())).into())
 
         // If we iterated through all attributes successfully, unwrap each property in the tuple
         .and_then(|(name, typ)| {
@@ -284,9 +288,9 @@ fn parse_parameter<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Off
             let name = name.and_then(|name| name.to_string().map(|name| (*name).to_owned()).ok());
 
             // Unwrap the elements in the tuple
-            name.ok_or(BindingError::DwarfParseError("parameter name").into())
+            name.ok_or(BindingError::DwarfParseError(format!("parameter name at 0x{:08X}", entry.offset().0.into_u64())).into())
                 .and_then(|name|
-                    typ.ok_or(BindingError::DwarfParseError("parameter type").into())
+                    typ.ok_or(BindingError::DwarfParseError(format!("parameter type at 0x{:08X}", entry.offset().0.into_u64())).into())
                         .map(|typ| (name, typ)))
         })
 
@@ -307,7 +311,8 @@ fn parse_subprogram<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Of
         // Iterate over the entry attributes to collect the function's name and address
         .fold((None, None, None), |(name, address, ret), attr| {
             match (attr.name(), attr.value()) {
-                (gimli::DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), address, ret),
+                (gimli::DW_AT_name, AttributeValue::DebugStrRef(name)) => (strings.get_str(name).ok(), address, ret), // Used for elf files
+                (gimli::DW_AT_name, AttributeValue::String(name)) => (Some(name), address, ret), // Used for macho files
                 (gimli::DW_AT_low_pc, AttributeValue::Addr(a)) => (name, Some(a), ret),
                 (gimli::DW_AT_type, AttributeValue::UnitRef(r)) => (name, address, Some(r)),
                 _ => (name, address, ret),
@@ -315,16 +320,16 @@ fn parse_subprogram<'a, R: Reader>(entry: &'a DebuggingInformationEntry<R, R::Of
         })
 
         // If the `entry.attrs()` fallible iterator does fail, give an appropriate error.
-        .map_err(|_| BindingError::DwarfParseError("subprogram attributes").into())
+        .map_err(|_| BindingError::DwarfParseError(format!("subprogram attributes at 0x{:08}", entry.offset().0.into_u64())).into())
 
         // If we iterated successfully through the attributes, unwrap each property in the tuple.
         .and_then(|(name, address, ret)| {
             let name = name.and_then(|name| name.to_string().map(|name| (*name).to_owned()).ok());
 
             // Unwrap the elements in the tuple.
-            name.ok_or(BindingError::DwarfParseError("subprogram name").into())
+            name.ok_or(BindingError::DwarfParseError(format!("subprogram name at 0x{:08X}", entry.offset().0.into_u64())).into())
                 .and_then(|name|
-                    address.ok_or(BindingError::DwarfParseError("subprogram address").into())
+                    address.ok_or(BindingError::DwarfParseError(format!("subprogram address at 0x{:08X}", entry.offset().0.into_u64())).into())
                         .map(|address| (name, address, ret.map(|ret| ret.0.into_u64()))))
         })
 
@@ -371,11 +376,8 @@ enum State {
 }
 
 enum Event {
-    NewSubprogram {
-        function: UnresolvedSubprogram,
-        depth: isize,
-    },
-    NewParameter(UnresolvedParameter),
+    NewSubprogram(isize),
+    NewParameter,
     Step(isize),
 }
 
@@ -396,26 +398,29 @@ impl DwarfParser {
         }
     }
 
-    fn step(&mut self, event: Event) {
+    fn step<'a, R: Reader>(&mut self, event: Event, entry: &'a DebuggingInformationEntry<R, R::Offset>, strings: &'a DebugStr<R>) -> Result<(), Error> {
         let state = match (self.state.take().unwrap(), event) {
             // If we were searching for a subprogram and have just found one,
             // begin reading the subprogram, noting its depth so we know when
             // to quit.
-            (State::Search, Event::NewSubprogram { function, depth, .. }) => {
-                State::Read { func: function, dep: depth }
+            (State::Search, Event::NewSubprogram(dep)) => {
+                let func = parse_subprogram(entry, strings)?;
+                State::Read { func, dep }
             }
             // If we're reading a subprogram and find a new parameter, push
             // the parameter onto our parameter list and continue searching
             // for more parameters.
-            (State::Read { mut func, dep, .. }, Event::NewParameter(param)) => {
+            (State::Read { mut func, dep, .. }, Event::NewParameter) => {
+                let param = parse_parameter(entry, strings)?;
                 func.parameters.push(param);
                 State::Read { func, dep }
             }
             // If we were reading one subprogram but stepped up to a new one,
             // save the previous function we built and begin a new one.
-            (State::Read { func, .. }, Event::NewSubprogram { function, depth }) => {
+            (State::Read { func, .. }, Event::NewSubprogram(dep)) => {
                 self.subprograms.push(func);
-                State::Read { func: function, dep: depth }
+                let func = parse_subprogram(entry, strings)?;
+                State::Read { func, dep }
             }
             // If we step up in the DIE tree to a depth higher than the one we
             // began reading this subprogram in, save the function we were building
@@ -431,27 +436,37 @@ impl DwarfParser {
             (state, _) => state,
         };
         self.state.get_or_insert(state);
+        Ok(())
+    }
+
+    /// If, at the end of reading an entry, there is a function that has yet to
+    /// be saved, save it.
+    fn step_zero(&mut self) {
+        if let State::Read { func, .. } = self.state.take().unwrap() {
+            self.subprograms.push(func);
+        }
+        self.state.get_or_insert(State::Search);
     }
 }
 
 /// Parses the buffer of a DWARF binary to extract the debugging information.
 pub fn parse_dwarf(buffer: &[u8]) -> Result<Vec<Subprogram>, Error> {
-    let elf = object::File::parse(buffer).map_err(|_| BindingError::ElfReadError)?;
-    let endian = if elf.is_little_endian() {
+    let bin = object::File::parse(buffer).map_err(|_| BindingError::ElfReadError)?;
+    let endian = if bin.is_little_endian() {
         gimli::RunTimeEndian::Little
     } else {
         gimli::RunTimeEndian::Big
     };
 
-    let debug_info = elf.get_section(".debug_info")
+    let debug_info = bin.section_data_by_name(".debug_info")
         .map(|info| DebugInfo::new(info, endian))
         .ok_or(BindingError::DwarfReadError(".debug_info"))?;
 
-    let debug_abbrev = elf.get_section(".debug_abbrev")
+    let debug_abbrev = bin.section_data_by_name(".debug_abbrev")
         .map(|abbrev| DebugAbbrev::new(abbrev, endian))
         .ok_or(BindingError::DwarfReadError(".debug_abbrev"))?;
 
-    let debug_strings = elf.get_section(".debug_str")
+    let debug_strings = bin.section_data_by_name(".debug_str")
         .map(|strings| DebugStr::new(strings, endian))
         .ok_or(BindingError::DwarfReadError(".debug_str"))?;
 
@@ -490,16 +505,15 @@ pub fn parse_dwarf(buffer: &[u8]) -> Result<Vec<Subprogram>, Error> {
                     unresolved_aliases.insert(offset, alias);
                 },
                 (_, gimli::DW_TAG_formal_parameter) => {
-                    parser.step(Event::NewParameter(parse_parameter(&entry, &debug_strings)?));
+                    parser.step(Event::NewParameter, &entry, &debug_strings)?;
                 },
-                (depth, gimli::DW_TAG_subprogram) => parser.step(Event::NewSubprogram {
-                    function: parse_subprogram(&entry, &debug_strings)?,
-                    depth,
-                }),
-                (depth, _) => parser.step(Event::Step(depth)),
+                (depth, gimli::DW_TAG_subprogram) => {
+                    parser.step(Event::NewSubprogram(depth), &entry, &debug_strings)?;
+                },
+                (depth, _) => parser.step(Event::Step(depth), &entry, &debug_strings)?,
             }
         }
-        parser.step(Event::Step(0));
+        parser.step_zero();
     }
 
     // Resolve all typedefs/aliases
@@ -567,6 +581,36 @@ mod test {
             Subprogram { name: "test_three".to_owned(), address: 1649, parameters: vec![p3], ret: Some(b0.clone()) },
             Subprogram { name: "test_two".to_owned(), address: 1639, parameters: vec![p4], ret: None },
             Subprogram { name: "test_one".to_owned(), address: 1632, parameters: vec![], ret: None },
+        ];
+
+        // Actual values //
+
+        let actual_subprograms = result.unwrap();
+
+        // Compare
+        assert_eq!(actual_subprograms, expected_subprograms);
+    }
+
+    #[test]
+    fn test_parser_macho() {
+        let dwarf: &[u8] = include_bytes!("./test_resources/dwarf_parse_test_macho");
+        let result = parse_dwarf(dwarf);
+        assert!(result.is_ok());
+
+        // Expected values //
+
+        // Base types
+        let b0 = Rc::new(Type::Base { name: "int".to_owned(), offset: 202, size: 4 });
+        let b1 = Rc::new(Type::Base { name: "char".to_owned(), offset: 403, size: 1 });
+        let b2 = Rc::new(Type::Base { name: "long int".to_owned(), offset: 190, size: 8 });
+
+        // Parameters
+        let p0 = Parameter { name: "a".to_owned(), typ: Some(b0.clone()) };
+        let p1 = Parameter { name: "b".to_owned(), typ: Some(b1.clone()) };
+        let p2 = Parameter { name: "c".to_owned(), typ: Some(b2.clone()) };
+
+        let expected_subprograms = vec![
+            Subprogram { name: "test".to_owned(), address: 0, parameters: vec![p0, p1, p2], ret: Some(b0.clone()) },
         ];
 
         // Actual values //
