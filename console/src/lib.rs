@@ -19,9 +19,9 @@ extern crate byteorder;
 extern crate xmodem;
 extern crate serde;
 extern crate toml;
-extern crate goblin;
 extern crate gimli;
 extern crate object;
+extern crate handlebars;
 extern crate fallible_iterator;
 
 extern crate flipper;

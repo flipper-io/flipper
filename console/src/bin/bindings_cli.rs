@@ -4,7 +4,6 @@ use std::io::Error as IoError;
 use clap::{App, AppSettings, Arg, ArgMatches};
 use failure::Error;
 use flipper_console::CliError;
-use console::bindings::parser;
 
 #[derive(Debug, Fail)]
 #[fail(display = "Errors that occur while generating bindings")]
@@ -31,14 +30,12 @@ pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
         )
         .subcommands(vec![
             generate::make_subcommand(),
-            dwarf::make_subcommand(),
         ])
 }
 
 pub fn execute(args: &ArgMatches) -> Result<(), Error> {
     match args.subcommand() {
         ("generate", Some(m)) => generate::execute(m),
-        ("dwarf", Some(m)) => dwarf::execute(m),
         (unknown, _) => Err(CliError::UnrecognizedCommand(unknown.to_owned()).into()),
     }
 }
@@ -49,57 +46,43 @@ pub fn execute(args: &ArgMatches) -> Result<(), Error> {
 /// such as a laptop or mobile phone.
 pub mod generate {
     use super::*;
+    use flipper_console::bindings;
 
     pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
         App::new("generate")
             .alias("gen")
             .about("Generate Flipper language bindings")
-            .before_help("Generate bindings for the current-project module, or [module] if given")
+            .before_help("Generate bindings for the specified module")
             .arg(Arg::with_name("file")
                 .index(1)
                 .takes_value(true)
                 .required(true)
-                .help("The name of the module to generate language bindings for")
-            )
-    }
-
-    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
-        // Guaranteed to be safe because "file" is a required argument.
-        let filename = args.value_of("file").unwrap();
-
-        let mut file = File::open(filename)
-            .map_err(|e| BindingError::FileError(filename.to_owned(), e))?;
-
-//        binary_parser::parse_elf(&mut file).map(|_| ())
-        Ok(())
-    }
-}
-
-pub mod dwarf {
-    use super::*;
-
-    pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
-        App::new("dwarf")
-            .arg(Arg::with_name("file")
-                .index(1)
+                .help("The module file to generate language bindings for"))
+            .arg(Arg::with_name("name")
+                .index(2)
                 .takes_value(true)
                 .required(true)
-            )
+                .help("The name of the module"))
     }
 
     pub fn execute(args: &ArgMatches) -> Result<(), Error> {
-        // Guaranteed to be safe because "file" is a required argument.
+        // Guaranteed to be safe because these are required arguments.
         let filename = args.value_of("file").unwrap();
+        let module_name = args.value_of("name").unwrap();
 
         let mut file = File::open(filename)
             .map_err(|e| BindingError::FileError(filename.to_owned(), e))?;
 
-        let buffer = {
+        let module_binary = {
             let mut v = Vec::new();
-            file.read_to_end(&mut v).unwrap();
+            let _ = file.read_to_end(&mut v);
             v
         };
 
-        parser::parse_dwarf(&buffer).map(|_| ())
+        let mut out = File::create("./binding.c")
+            .map_err(|e| BindingError::FileError("binding.c".to_owned(), e))?;
+
+        let module = bindings::Module::parse(String::from(module_name), "".to_owned(), &module_binary)?;
+        bindings::generators::c::generate_module(module, &mut out)
     }
 }
