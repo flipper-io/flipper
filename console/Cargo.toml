@@ -1,6 +1,6 @@
 [package]
 name = "flipper_console"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Nick Mosher <nicholastmosher@gmail.com>"]
 links = "flipper"
 
