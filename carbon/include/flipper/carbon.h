@@ -1,3 +1,6 @@
+#ifndef __carbon_h__
+#define __carbon_h__
+
 /* Flipper: Carbon Edition board header file. */
 #include <flipper/libflipper.h>
 
@@ -22,6 +25,8 @@
 #include <flipper/usb.h>
 #include <flipper/wdt.h>
 
+#include <flipper/atsam4s/atsam4s.h>
+
 struct _carbon_context {
 	/* Device that handles interacting with the 4s. (ATMEGA16U2) */
 	struct _lf_device *_u2;
@@ -33,3 +38,5 @@ struct _carbon_context {
 int carbon_attach(void);
 /* Attaches to a carbon device over the network. */
 struct _lf_device *carbon_attach_hostname(char *hostname);
+
+#endif

@@ -5,12 +5,12 @@
    This is the CCITT CRC 16 polynomial X  + X  + X  + 1. */
 #define POLY 0x1021
 
-uint16_t calcrc(char *ptr, int32_t count) {
-	int  crc;
-	char i;
+uint16_t calcrc(const char *ptr, uint32_t count) {
+	uint16_t crc;
+	uint8_t i;
 	crc = 0;
-	while (-- count >= 0) {
-		crc = crc ^ (int) *ptr ++ << 8;
+	while (count-- != 0) {
+		crc = crc ^ (uint16_t)*ptr ++ << 8;
 		i = 8;
 		do {
 			if (crc & 0x8000) {
@@ -24,6 +24,6 @@ uint16_t calcrc(char *ptr, int32_t count) {
 }
 
 /* This function uses the CCITT crc16 algorithm. */
-lf_crc_t lf_crc(void *source, size_t length) {
+lf_crc_t lf_crc(const void *source, size_t length) {
 	return calcrc(source, (uint32_t)length);
 }
