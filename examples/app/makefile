@@ -1,8 +1,8 @@
 ##
-## Example Makefile for a Flipper app
+## Example Makefile for a Flipper package
 ##
 
-# This sets the name of the Flipper module being built
+# This sets the name of the Flipper package being built
 MODULE := example
 
 # This next line *MUST* come after MODULE has been set

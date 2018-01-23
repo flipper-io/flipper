@@ -1,28 +1,29 @@
 # Library
 
-`libflipper` is the platform level library that brings the message runtime to a host wishing to control a Flipper device.
+`libflipper` is the platform level library that gives developers access to Flipper hardware.
 
 ### Quickstart
 
-Attach to the first available Flipper device.
+#### C example
 
-```
+```c
 flipper_attach();
-```
-
-Turn the device's pin 8 on.
-
-```
 gpio_write(8, 0);
 ```
 
-That's literally it.
+#### Python example
+
+```
+from flipper import *
+lf.attach()
+gpio.write(8, 0)
+```
 
 #### Networking
 
 You can also connect to a Flipper device over a network.
 
-```
+```c
 flipper_attach_network("192.168.1.1")
 gpio_write(8, 0);
 ```
@@ -37,3 +38,5 @@ gpio_write(8, 0);
 ```
 
 You should see a message printed saying `Turning GPIO pin 8 ON.` FVM is excellent for debugging changes made to the message runtime or `libflipper` itself.
+
+To learn more about using fvm, see the WiKi page (here)[].

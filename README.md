@@ -68,21 +68,13 @@ cp assets/99-flipper.rules /etc/udev/rules.d
 udevadm trigger
 ```
 
-## Flashing the Hardware
+## Updating the Firmware
 
-The firmare images must be flashed in two steps. First, the ATMEGAU2 must be flashed - followed by the ATSAM4S.
+Once you get everything installed, you should update your board's firmware. Attach only one Flipper device to your computer via USB, and then run the following command.
 
-#### Step 1: Flashing firmware to the microcontroller. (ATMEGAU2)
 ```
-make install-atmegau2
+make update
 ```
-
-#### Step 2: Flashing firmware to the microprocessor. (ATSAM4S)
-```
-make install-atsam4s
-```
-
-You must reflash the hardware if firmware changes are made. The firmware on the microcontroller does not need to be reflashed if work is being done on the frimware for the microprocessor. The microcontroller only needs to be reflashed if its firmware is modified or changes to the runtime have been made.
 
 ## Example
 
@@ -92,7 +84,7 @@ cd examples/app
 make
 ```
 
-This will build an application for the device. You can then install this application on any attached device.
+This will build an application for the device. You can then install this application onto the attached device.
 ```
 make install
 ```
