@@ -105,4 +105,4 @@ See [LICENSE](./LICENSE) for details.
 
 ---
 
-###### Copyright © 2013-2017 Flipper Engineering - All rights reserved.
+###### Copyright © 2013-2018 Flipper Engineering

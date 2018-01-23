@@ -42,7 +42,7 @@ Work needs to be done to improve language binding generation, improve management
 
 **Source -** [`library`](../../tree/master/library)
 
-The platform level library, libflipper, is the foundation upon which higher level language bindings are constructed. It provides all of the boilerplate needed to talk to Flipper hardware over a variety of endpoints (USB, network, etc). It is reposnible for the following:
+The platform level library, libflipper, is the foundation upon which higher level language bindings are constructed. It provides all of the boilerplate needed to talk to Flipper hardware over a variety of endpoints (USB, network, etc). It is responsible for the following:
 
 - Construct message runtime packets and send them to the hardware
 - Define and managing the data structures that communicate information between the host and device

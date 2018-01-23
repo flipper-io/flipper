@@ -1,6 +1,6 @@
 # Package Example
 
-This example demonstrates how to build a package. A package is a collection of functions that are installed on the device and can be remotely invoked from any device running libflipper.
+This example demonstrates how to build a package. A package is a collection of functions that are installed on the device and can be remotely invoked from any device with libflipper installed.
 
 ### Build the Package
 ```
