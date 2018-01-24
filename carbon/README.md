@@ -1,14 +1,19 @@
 # Carbon: Hardware Abstraction Layer
 
-This directory contains board-specific implementation for the **Flipper: Carbon** hardware platform.
+This directory contains board-specific implementation for the
+**Flipper: Carbon** hardware platform.
 
-The firmware exposes API that enables (libflipper)[./] to control the **Carbon** board's hardware peripherals. The Carbon board contains two CPUs: a microcontroller and a microprocessor.
+The firmware exposes API that enables (libflipper)[./] to control the
+**Carbon** board's hardware peripherals. The Carbon board contains two CPUs: a
+microcontroller and a microprocessor.
 
 ---
 
 ### Microcontroller (Atmel ATMEGA32U2) Firmware
 
-The microcontroller connects to the host via USB since we wanted to keep the microprocessor's USB controller available to user applications. The microcontroller serves a number of functions.
+The microcontroller connects to the host via USB since we wanted to keep the
+microprocessor's USB controller available to user applications. The
+microcontroller serves a number of functions.
 
 - Control the power (ON/OFF) and reset state of the microprocessor
 - Put the microprocessor into Device Firmware Update (DFU) mode
@@ -34,10 +39,16 @@ The microprocessor is the main CPU on the device.
 
 ### HAL
 
-The Hardware Abstraction Layer (HAL) exposes the **Carbon** hardware as a `struct _lf_device *` that can be interacted with by `libflipper`.
+The Hardware Abstraction Layer (HAL) exposes the **Carbon** hardware as a
+`struct _lf_device *` that can be interacted with by `libflipper`.
 
-- Scan the USB bus using `libusb` to find boards with the VID/PID combo of **Carbon**. Get a list of the `struct _lf_endpoint *`s corresponding to the attached devices.
-- Iterate through this list of endpoints and create a new `struct _lf_device *` for each of them. This is the U2 device.
-- Create a new `struct _lf_endpoint *` to be used as the bridge endpoint and configure it to use the U2 device's `uart0` module.
-- Create a new `struct _lf_device *` using this bridge endpoint. This will be the 4S device.
+- Scan the USB bus using `libusb` to find boards with the VID/PID combo of
+**Carbon**. Get a list of the `struct _lf_endpoint *`s corresponding to the
+attached devices.
+- Iterate through this list of endpoints and create a new `struct _lf_device *`
+for each of them. This is the U2 device.
+- Create a new `struct _lf_endpoint *` to be used as the bridge endpoint and
+configure it to use the U2 device's `uart0` module.
+- Create a new `struct _lf_device *` using this bridge endpoint. This will be
+the 4S device.
 - Return the 4S device as the attached device.

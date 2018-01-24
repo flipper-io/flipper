@@ -1,6 +1,8 @@
 # Languges
 
-Due to the versatility of the Flipper platform, we are able to create language bindings that extend the capabilities of the Flipper hardware to higher level programming languages.
+Due to the versatility of the Flipper platform, we are able to create language
+bindings that extend the capabilities of the Flipper hardware to higher level
+programming languages.
 
 Many of the programming languages are still work in progress.
 
