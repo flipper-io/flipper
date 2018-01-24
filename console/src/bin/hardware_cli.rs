@@ -38,7 +38,7 @@ pub mod boot {
 
     pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
         App::new("boot")
-            .about("Boots Flipper into interactive mode")
+            .about("Boot Flipper into interactive mode")
     }
 
     pub fn execute(_: &ArgMatches) -> Result<(), Error> {
