@@ -28,6 +28,7 @@ pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
             AppSettings::AllowExternalSubcommands,
             AppSettings::ArgRequiredElseHelp,
             AppSettings::DeriveDisplayOrder,
+            AppSettings::ColoredHelp,
         ])
         .template(
             "{bin} \n\

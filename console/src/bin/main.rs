@@ -77,12 +77,9 @@ pub fn app() -> App<'static, 'static> {
 pub fn execute(args: &ArgMatches) -> Result<(), Error> {
     match args.subcommand() {
         ("module", Some(m)) => modules_cli::execute(m),
-        ("binding", Some(m)) => bindings_cli::execute(m),
+        ("generate", Some(m)) => bindings_cli::execute(m),
         (c @ "boot", Some(m)) => hardware_cli::execute(c, m),
-        (c @ "reset", Some(m)) => hardware_cli::execute(c, m),
         (c @ "flash", Some(m)) => hardware_cli::execute(c, m),
-        (c @ "install", Some(m)) => hardware_cli::execute(c, m),
-        (c @ "deploy", Some(m)) => hardware_cli::execute(c, m),
         (unknown, _) => Err(CliError::UnrecognizedCommand(unknown.to_owned()).into()),
     }
 }
