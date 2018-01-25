@@ -9,7 +9,6 @@
 
 use std::io::Write;
 use std::io::Cursor;
-use std::rc::Rc;
 use failure::Error;
 
 use handlebars::{
@@ -21,11 +20,15 @@ use handlebars::{
 
 use bindings::generators::GeneratorError;
 use bindings::{
-    Type,
     Parameter,
     Function,
     Module,
 };
+
+// For some reason the compiler gives "unused imports" warnings for these items
+// even though they're used and we can't compile without them. Suppress warnings.
+#[allow(unused_imports)] use std::rc::Rc;
+#[allow(unused_imports)] use bindings::Type;
 
 /// A serializable representation of a Parameter in C.
 /// This is used by handlebars to populate the C template.

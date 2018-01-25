@@ -36,7 +36,6 @@
 pub mod dwarf;
 pub mod generators;
 
-use std::io::Cursor;
 use std::rc::Rc;
 use std::ops::Range;
 use object::{
@@ -212,7 +211,6 @@ impl Module {
 }
 
 fn read_section_address(data: &[u8], section_name: &str) -> Result<Range<u64>, Error> {
-    let mut cursor = Cursor::new(data);
     let bin = object::File::parse(data)
         .map_err(|_| BindingError::SectionReadError(section_name.to_owned()))?;
 

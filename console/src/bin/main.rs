@@ -22,21 +22,19 @@
 #![deny(unused_qualifications)]
 
 #[macro_use] extern crate clap;
-#[macro_use] extern crate failure;
 #[macro_use] extern crate derive_fail;
+extern crate failure;
 extern crate rustyline;
 extern crate byteorder;
 extern crate libc;
 extern crate flipper;
-extern crate flipper_console;
+extern crate flipper_console as console;
 
 mod modules_cli;
-mod packages_cli;
 mod hardware_cli;
 mod bindings_cli;
 
-use flipper_console::CliError;
-use flipper_console as console;
+use console::CliError;
 use clap::{App, AppSettings, Arg, ArgMatches};
 use failure::Error;
 
@@ -69,7 +67,6 @@ pub fn app() -> App<'static, 'static> {
         .subcommand(modules_cli::make_subcommand())
         .subcommand(bindings_cli::make_subcommand())
         .subcommands(hardware_cli::make_subcommands())
-        .subcommands(packages_cli::make_subcommands())
 }
 
 /// Determine which child rust module is responsible for the command and pass
@@ -80,16 +77,9 @@ pub fn app() -> App<'static, 'static> {
 pub fn execute(args: &ArgMatches) -> Result<(), Error> {
     match args.subcommand() {
         ("module", Some(m)) => modules_cli::execute(m),
-        ("binding", Some(m)) => bindings_cli::execute(m),
+        ("generate", Some(m)) => bindings_cli::execute(m),
         (c @ "boot", Some(m)) => hardware_cli::execute(c, m),
-        (c @ "reset", Some(m)) => hardware_cli::execute(c, m),
         (c @ "flash", Some(m)) => hardware_cli::execute(c, m),
-        (c @ "install", Some(m)) => hardware_cli::execute(c, m),
-        (c @ "deploy", Some(m)) => hardware_cli::execute(c, m),
-        (c @ "init", Some(m)) => packages_cli::execute(c, m),
-        (c @ "new", Some(m)) => packages_cli::execute(c, m),
-        (c @ "remove", Some(m)) => packages_cli::execute(c, m),
-        (c @ "update", Some(m)) => packages_cli::execute(c, m),
         (unknown, _) => Err(CliError::UnrecognizedCommand(unknown.to_owned()).into()),
     }
 }
