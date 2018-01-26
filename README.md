@@ -2,8 +2,6 @@
 
 [![Build Status](https://travis-ci.com/georgemorgan/flipper.svg?token=mWpYCFjw1S5VKLVNvZFo&branch=master)](https://travis-ci.com/georgemorgan/flipper)
 
-<div style="text-align:center"><img src ="https://www.flipper.io/assets/img/landing.png" style="width: 200px;"/></div>
-
 ## About
 
 Flipper is a development platform that offers a new take on the traditional
