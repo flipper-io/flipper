@@ -53,9 +53,6 @@ fn main() {
 /// those subcommands.
 pub fn app() -> App<'static, 'static> {
     App::new("flipper")
-        .author(crate_authors!())
-        .version(crate_version!())
-        .about(ABOUT)
         .max_term_width(100)
         .settings(&[
             AppSettings::AllowExternalSubcommands,

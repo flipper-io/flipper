@@ -1,12 +1,24 @@
 #include <flipper.h>
 
-LF_MODULE(_{{name}}, "{{name}}", "{{description}}", NULL, NULL);
+extern unsigned char {{name}}_bin[];
+extern unsigned {{name}}_bin_len;
 
-const struct _{{name}} {{name}} {
-    {{struct_expansion funcs name}}
+LF_MODULE(_{{name}}, "{{name}}", "{{description}}", &{{name}}_bin, &{{name}}_bin_len);
+
+enum {
+    {{#each funcs}}_{{name}},{{/each}}
 };
+
 {{#each funcs}}
-LF_WEAK {{ret}} {{../name}}_{{name}}({{param_expansion params}}) {
-    {{ret}} result = lf_invoke(&_{{../name}}, _{{../name}}_{{name}}, {{ret_fmr}}, fmr_args({{fmr_expansion params}}));
+{{ret}} {{name}}({{param_expansion params}}) {
+    return lf_invoke(&_{{../name}}, _{{name}}, {{ret_fmr}}, fmr_args({{fmr_expansion params}}));
 }
 {{/each}}
+
+const struct _{{name}}_jumptable {
+    {{#each funcs}}{{ret}} (* {{name}})({{param_expansion params}});{{/each}}
+} {{name}}_jumptable = {
+    {{#each funcs}}{{name}},
+    {{/each}}
+};
+
