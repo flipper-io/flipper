@@ -3,6 +3,7 @@
 //! board and installing and deploying modules.
 
 use std::fs::File;
+#[allow(unused_imports)]
 use std::io::Read;
 use console::CliError;
 use clap::{App, Arg, ArgMatches};
@@ -60,6 +61,9 @@ pub mod flash {
     pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
         App::new("flash")
             .about("Flash a new firmware image onto Flipper")
+            .arg(Arg::with_name("verify")
+                .long("verify")
+                .help("After uploading, verify the firmware was written correctly"))
             .arg(Arg::with_name("image")
                 .required(true)
                 .takes_value(true))
@@ -77,6 +81,6 @@ pub mod flash {
                 Ok(v)
             })?;
 
-        fdfu::flash(&firmware)
+        fdfu::flash(&firmware, args.is_present("verify"))
     }
 }

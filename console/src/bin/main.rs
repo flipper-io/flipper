@@ -21,8 +21,11 @@
 #![deny(unused_import_braces)]
 #![deny(unused_qualifications)]
 
-#[macro_use] extern crate clap;
-#[macro_use] extern crate failure;
+#[macro_use]
+extern crate clap;
+#[macro_use]
+extern crate failure;
+extern crate simplelog;
 extern crate rustyline;
 extern crate byteorder;
 extern crate libc;
@@ -33,9 +36,16 @@ mod modules_cli;
 mod hardware_cli;
 mod bindings_cli;
 
-use console::CliError;
-use clap::{App, AppSettings, Arg, ArgMatches};
+use simplelog::*;
 use failure::Error;
+use console::CliError;
+
+use clap::{
+    App,
+    AppSettings,
+    Arg,
+    ArgMatches,
+};
 
 const ABOUT: &'static str = "flipper: Manage and control Flipper from the command line";
 
@@ -74,6 +84,8 @@ pub fn app() -> App<'static, 'static> {
 /// itself. Because of this, we have to explicitly pass the name of the matched
 /// command to the child module (e.g. the "c" in `(c @ "boot")`).
 pub fn execute(args: &ArgMatches) -> Result<(), Error> {
+    SimpleLogger::init(LogLevelFilter::Debug, Config::default()).unwrap();
+
     match args.subcommand() {
         ("module", Some(m)) => modules_cli::execute(m),
         ("generate", Some(m)) => bindings_cli::execute(m),

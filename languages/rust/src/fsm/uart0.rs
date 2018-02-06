@@ -1,6 +1,10 @@
 #![allow(non_upper_case_globals)]
 
-use std::io::{Read, Write, Result};
+use std::io::{
+    Read,
+    Write,
+    Result,
+};
 
 use ::{
     Flipper,
@@ -83,11 +87,14 @@ impl Write for Uart0 {
         lf_push::<()>(&self.ffi, 2, buf, Args::new());
         Ok(buf.len())
     }
-    fn flush(&mut self) -> Result<()> { Ok(()) }
+    fn flush(&mut self) -> Result<()> {
+        Ok(())
+    }
 }
 
 impl Read for Uart0 {
     fn read(&mut self, buf: &mut [u8]) -> Result<usize> {
+        if buf.len() == 0 { return Ok(0) }
         lf_pull::<()>(&self.ffi, 3, buf, Args::new());
         Ok(buf.len())
     }

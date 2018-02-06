@@ -5,6 +5,9 @@
 #![deny(unused_qualifications)]
 #![deny(warnings)]
 
+#[allow(unused_imports)]
+#[macro_use]
+extern crate log;
 extern crate libc;
 
 pub mod fsm;

@@ -7,6 +7,8 @@ links = "flipper"
 [dependencies]
 libc = "0.2.0"
 clap = "2"
+log = "0.4.1"
+simplelog = "0.4.4"
 rustyline = "1.0.0"
 byteorder = "1.1.0"
 serde = "1.0.9"

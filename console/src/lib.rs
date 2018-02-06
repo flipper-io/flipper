@@ -12,6 +12,7 @@
 #![deny(unused_import_braces)]
 #![deny(unused_qualifications)]
 
+#[macro_use] extern crate log;
 #[macro_use] extern crate serde_derive;
 #[macro_use] extern crate failure;
 extern crate byteorder;
@@ -22,6 +23,7 @@ extern crate gimli;
 extern crate object;
 extern crate handlebars;
 extern crate fallible_iterator;
+extern crate libc;
 
 // This crate interacts directly with Flipper.
 // The console makes this functionality available on the command line.

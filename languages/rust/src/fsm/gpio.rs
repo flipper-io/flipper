@@ -32,7 +32,7 @@ impl StandardModule for Gpio {
         }
     }
 
-    fn bind(flipper: &Flipper) -> Self {
+    fn bind(_: &Flipper) -> Self {
         unsafe {
             let module = StandardModuleFFI { module_meta: &_gpio };
             Gpio {
