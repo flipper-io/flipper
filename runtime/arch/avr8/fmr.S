@@ -15,7 +15,7 @@
 #define param_argv_h		r17
 #define param_argv_l		r16
 
-; lf_return_t fmr_call(lf_return_t (* function)(void), fmr_type ret, uint8_t argc, uint16_t argt, void *argv);
+; lf_return_t fmr_call(lf_return_t (* function)(void), lf_type ret, uint8_t argc, uint16_t argt, void *argv);
 
 .global fmr_call
 
@@ -46,22 +46,22 @@ _load:
 	mov r16, argt_l
 	andi r16, 0x7
 
-	; fmr_int8_t
+	; lf_int8_t
 	cpi r16, 0
 		breq _load_8
-	; fmr_int16_t
+	; lf_int16_t
 	cpi r16, 1
 		breq _load_16
-	; fmr_int32_t
+	; lf_int32_t
 	cpi r16, 3
 		breq _load_32
-	; fmr_int_t
+	; lf_int_t
 	cpi r16, 4
 		breq _load_int
-	; fmr_ptr_t
+	; lf_ptr_t
 	cpi r16, 6
 		breq _load_ptr
-	; fmr_int64_t
+	; lf_int64_t
 	cpi r16, 7
 		breq _load_64
 
@@ -130,25 +130,25 @@ _ret:
 	mov r16, retv
 	andi r16, 0x7
 
-	; fmr_int8_t
+	; lf_int8_t
 	cpi r16, 0
 		breq _ret_8
-	; fmr_int16_t
+	; lf_int16_t
 	cpi r16, 1
 		breq _ret_16
-	; fmr_void_t
+	; lf_void_t
 	cpi r16, 2
 		breq _ret_void
-	; fmr_int32_t
+	; lf_int32_t
 	cpi r16, 3
 		breq _ret_32
-	; fmr_int_t
+	; lf_int_t
 	cpi r16, 4
 		breq _ret_int
-	; fmr_ptr_t
+	; lf_ptr_t
 	cpi r16, 6
 		breq _ret_16
-	; fmr_int64_t
+	; lf_int64_t
 	cpi r16, 7
 		breq _ret_64
 

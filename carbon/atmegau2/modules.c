@@ -3,7 +3,7 @@
 #include <flipper/atmegau2/modules.h>
 
 /* Define the standard module array for this platform. */
-const void *const fmr_modules[] = {
+const void *const lf_modules[] = {
 	&button,
 	&gpio,
 	&led,

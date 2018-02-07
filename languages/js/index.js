@@ -6,18 +6,18 @@ var Struct = require('ref-struct');
 const lf_version_t = ref.types.uint16;
 const lf_crc_t = ref.types.uint16;
 
-const fmr_arg = ref.types.uint32;
-const fmr_function = ref.types.uint8;
-const fmr_argc = ref.types.uint8;
+const lf_arg = ref.types.uint32;
+const lf_function = ref.types.uint8;
+const lf_argc = ref.types.uint8;
 const lf_return_t = ref.types.uint32;
 
-const _fmr_type = [
+const _lf_type = [
   ref.types.uint8,
   ref.types.uint16,
   ref.types.uint32
 ];
 
-const fmr_type = ref.types.uint8;
+const lf_type = ref.types.uint8;
 
 const _lf_module = Struct({
   'name': 'string',
@@ -35,15 +35,15 @@ const libflipper = ffi.Library('libflipper', {
 
   'flipper_select': [ 'int', [ 'pointer' ] ],
 
-  // lf_return_t lf_invoke(struct _lf_module *module, fmr_function function, struct _fmr_parameters *parameters)
-  'lf_invoke': [ lf_return_t, [ ref.refType(_lf_module), fmr_function, 'pointer' ] ],
+  // lf_return_t lf_invoke(struct _lf_module *module, lf_function function, struct _fmr_parameters *parameters)
+  'lf_invoke': [ lf_return_t, [ ref.refType(_lf_module), lf_function, 'pointer' ] ],
 
   // int lf_bind(struct _lf_module *module, String name)
   'lf_bind': [ 'int', [ ref.refType(_lf_module), 'string' ] ],
 
-  'fmr_build': [ 'pointer', [ fmr_argc ] ],
+  'fmr_build': [ 'pointer', [ lf_argc ] ],
 
-  'fmr_append': [ ref.types.void, [ 'pointer', fmr_type, fmr_arg ] ],
+  'lf_append': [ ref.types.void, [ 'pointer', lf_type, lf_arg ] ],
 
   // led_configure()
   'led_configure': [ ref.types.void, [ ] ],
@@ -59,7 +59,7 @@ const _create_fmr_parameters = function (paramTypes, args) {
   for (i = 0; i < args.length; i++) {
     arg = args[i];
     argType = paramTypes[i];
-    libflipper.fmr_append(list, _fmr_type.indexOf(argType), arg);
+    libflipper.lf_append(list, _lf_type.indexOf(argType), arg);
   }
 
   return list;

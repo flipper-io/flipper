@@ -18,7 +18,7 @@ public class ModuleInvocationHandler <T> implements InvocationHandler {
     private final Class<T> moduleInterface;
     private final Flipper.FMRInvoker invoker;
 
-    private final Map<String, Byte> fmr_types = new HashMap<String, Byte>(){{
+    private final Map<String, Byte> lf_types = new HashMap<String, Byte>(){{
         put("byte",  (byte) 0);
         put("short", (byte) 1);
         put("int",   (byte) 2);
@@ -42,10 +42,10 @@ public class ModuleInvocationHandler <T> implements InvocationHandler {
             String pName;
             for (int i = 0; i < args.length; i++) {
                 param = parameters[i];
-                if (!fmr_types.containsKey(pName = param.getType().getName())) {
+                if (!lf_types.containsKey(pName = param.getType().getName())) {
                     throw new IllegalArgumentException("Illegal fmr argument type: " + pName);
                 }
-                Flipper.libflipper.fmr_append(list, fmr_types.get(pName), (Integer) args[i]);
+                Flipper.libflipper.lf_append(list, lf_types.get(pName), (Integer) args[i]);
             }
         }
 

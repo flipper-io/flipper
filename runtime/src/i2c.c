@@ -11,7 +11,7 @@ const struct _i2c i2c = {
 };
 
 LF_WEAK int i2c_configure(void) {
-	return lf_invoke(&_i2c, _i2c_configure, fmr_int_t, NULL);
+	return lf_invoke(&_i2c, _i2c_configure, lf_int_t, NULL);
 }
 
 #endif

@@ -73,20 +73,20 @@ impl From<Function> for CFunction {
         let ret = func.ret.name();
         let ret_size = func.ret.size();
 
-        let fmr_type = match ret_size {
-            0 => "fmr_void_t".to_owned(),
-            1 => "fmr_uint8_t".to_owned(),
-            2 => "fmr_uint16_t".to_owned(),
-            4 => "fmr_uint32_t".to_owned(),
-            8 => "fmr_uint64_t".to_owned(),
-            _ => "fmr_void_t".to_owned(),
+        let lf_type = match ret_size {
+            0 => "lf_void_t".to_owned(),
+            1 => "lf_uint8_t".to_owned(),
+            2 => "lf_uint16_t".to_owned(),
+            4 => "lf_uint32_t".to_owned(),
+            8 => "lf_uint64_t".to_owned(),
+            _ => "lf_void_t".to_owned(),
         };
 
         CFunction {
             name: func.name,
             params,
             ret,
-            ret_fmr: fmr_type,
+            ret_fmr: lf_type,
         }
     }
 }
@@ -161,25 +161,25 @@ fn param_helper(h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> Result<()
 
 /// C does not allow trailing commas in parameter lists, so we need
 /// a custom handlebars helper. However, fmr parameters need to be wrapped
-/// in a `fmr_infer( )` macro, so this helper does that as well.
+/// in a `lf_infer( )` macro, so this helper does that as well.
 fn fmr_expansion_helper(h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> Result<(), RenderError> {
     let values = h.param(0).map(|p| p.value())
         .and_then(|value| value.as_array())
         .ok_or(RenderError::new("fmr_expansion requires an array as the first argument"))?;
 
-    let mut fmr_args = String::new();
+    let mut lf_args = String::new();
     for (i, value) in values.iter().enumerate() {
-        if i > 0 { fmr_args.push_str(", "); }
-        fmr_args.push_str("fmr_infer(");
-        fmr_args.push_str(value.as_object()
+        if i > 0 { lf_args.push_str(", "); }
+        lf_args.push_str("lf_infer(");
+        lf_args.push_str(value.as_object()
             .and_then(|obj| obj.get("name"))
             .and_then(|name| name.as_str())
             .ok_or(RenderError::new("fmr_expansion failed to print 'name'"))?
         );
-        fmr_args.push(')');
+        lf_args.push(')');
     }
 
-    rc.writer.write(fmr_args.into_bytes().as_ref())?;
+    rc.writer.write(lf_args.into_bytes().as_ref())?;
 
     Ok(())
 }

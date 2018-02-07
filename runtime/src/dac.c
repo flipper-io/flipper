@@ -11,7 +11,7 @@ const struct _dac dac = {
 };
 
 LF_WEAK int dac_configure(void) {
-	return lf_invoke(&_dac, _dac_configure, fmr_int_t, NULL);
+	return lf_invoke(&_dac, _dac_configure, lf_int_t, NULL);
 }
 
 #endif

@@ -14,12 +14,12 @@ const struct _usart usart = {
 };
 
 LF_WEAK int usart_configure(void) {
-	lf_invoke(&_usart, _usart_configure, fmr_int_t, NULL);
+	lf_invoke(&_usart, _usart_configure, lf_int_t, NULL);
 	return lf_success;
 }
 
 LF_WEAK int usart_ready(void) {
-	return lf_invoke(&_usart, _usart_ready, fmr_int_t, NULL);
+	return lf_invoke(&_usart, _usart_ready, lf_int_t, NULL);
 }
 
 LF_WEAK int usart_push(void *source, lf_size_t length) {

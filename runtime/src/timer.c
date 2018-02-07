@@ -11,7 +11,7 @@ const struct _timer timer = {
 };
 
 LF_WEAK int timer_configure(void) {
-	return lf_invoke(&_timer, _timer_configure, fmr_int_t, NULL);
+	return lf_invoke(&_timer, _timer_configure, lf_int_t, NULL);
 }
 
 #endif
