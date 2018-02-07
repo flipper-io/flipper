@@ -1,10 +1,17 @@
-Package
-===
+# Application
 
-This example demonstrates the structure necessary to build a package that encapsulates a module as well as the C bindings and test program needed to communicate with the module from the host.
+This example demonstrates how to build an application for the device.
 
-**For the sake of naming disambiguation, the following names have been giving to the subcomponents of this package.**
+#### Building
 
-- **qux** - the device module
-- **quxc** - the C bindings to the module
-- **quxtest** - the test application
+```sh
+make
+```
+
+#### Running
+
+```sh
+make install
+```
+
+By running `make install` the application will be loaded onto the attached device and start executing immediately.
