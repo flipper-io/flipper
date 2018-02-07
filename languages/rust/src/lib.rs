@@ -3,6 +3,7 @@
 #![deny(unstable_features)]
 #![deny(unused_import_braces)]
 #![deny(unused_qualifications)]
+#![deny(warnings)]
 
 extern crate libc;
 
@@ -195,13 +196,6 @@ pub struct Flipper {
     /// device functions should be executed on.
     device: _lf_device,
 }
-
-/// A Flipper with NULL as its device pointer is interpreted to be the
-/// "active device", which is determined by libflipper. This is usually
-/// the first device discovered over USB, or the "selected" device.
-pub const DEFAULT_FLIPPER: Flipper = Flipper {
-    device: 0 as *const c_void,
-};
 
 impl Flipper {
     pub fn attach() -> Self {

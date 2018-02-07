@@ -2,7 +2,7 @@
 BUILD := build
 
 # Prefix where build projects are installed
-PREFIX := /usr/local
+PREFIX ?= /usr/local
 
 # List of all target types
 TARGETS := ARM AVR X86
@@ -137,6 +137,9 @@ libflipper: $(X86_TARGET).so | $(BUILD)/include/flipper/.dir
 install-libflipper: libflipper
 	$(_v)cp $(BUILD)/$(X86_TARGET)/$(X86_TARGET).so $(PREFIX)/lib/
 	$(_v)cp -r $(BUILD)/include/* $(PREFIX)/include/
+	$(_v)cp assets/flipper.mk $(PREFIX)/include/
+	$(_v)mkdir -p $(PREFIX)/share/flipper
+	$(_v)cp assets/ram.ld $(PREFIX)/share/flipper/
 
 install:: install-libflipper
 
@@ -144,6 +147,7 @@ uninstall-libflipper:
 	$(_v)rm $(PREFIX)/include/flipper.h
 	$(_v)rm -r $(PREFIX)/include/flipper
 	$(_v)rm $(PREFIX)/lib/$(X86_TARGET).so
+	$(_v)rm -rf $(PREFIX)/share/flipper
 
 # --- CONSOLE --- #
 
