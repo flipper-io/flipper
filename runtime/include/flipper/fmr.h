@@ -42,7 +42,6 @@ typedef uint32_t lf_types;
 
 /* Enumerates the basic type signatures an argument can be classified as. */
 enum {
-
 	lf_void_t = 2,                    // 2
 	lf_int_t = 4,                     // 4
 	lf_ptr_t = 6,                     // 6
@@ -138,7 +137,7 @@ struct LF_PACKED _fmr_header {
 
 /* Standardizes the notion of an argument. */
 struct _lf_arg {
-	/* The type signature of the argument. */
+	/* The type of the argument. */
 	lf_type type;
 	/* The value of the argument. */
 	lf_arg value;
@@ -200,12 +199,13 @@ extern const void *const lf_modules[];
 
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
 
-/* Builds an fmr_parameters from a set of variadic arguments provided by the fmr_parameters macro. */
-struct _lf_ll *fmr_build(int argc, ...);
 /* Appends an argument to an fmr_parameters. */
 int lf_append(struct _lf_ll *list, lf_type type, lf_arg value);
 /* Generates the appropriate data structure needed for the remote procedure call of 'funtion' in 'module'. */
 int lf_create_call(lf_module module, lf_function function, lf_type ret, struct _lf_ll *args, struct _fmr_header *header, struct _fmr_invocation *call);
+
+/* Builds an fmr_parameters from a set of variadic arguments provided by the fmr_parameters macro. */
+struct _lf_ll *fmr_build(int argc, ...);
 /* Executes a standard module. */
 lf_return_t fmr_execute(lf_module module, lf_function function, lf_type ret, lf_argc argc, lf_types argt, void *arguments);
 /* Executes an fmr_packet and stores the result of the operation in the result buffer provided. */
