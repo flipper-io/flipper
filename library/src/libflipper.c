@@ -112,13 +112,13 @@ void lf_debug_call(struct _fmr_invocation *call) {
 	printf("arguments:\n");
 	/* Calculate the offset into the packet at which the arguments will be loaded. */
 	uint8_t *offset = call->parameters;
-	fmr_types types = call->types;
-	for (fmr_argc i = 0; i < call->argc; i ++) {
-		fmr_type type = types & fmr_max_t;
-		fmr_arg arg = 0;
-		memcpy(&arg, offset, fmr_sizeof(type));
+	lf_types types = call->types;
+	for (lf_argc i = 0; i < call->argc; i ++) {
+		lf_type type = types & lf_max_t;
+		lf_arg arg = 0;
+		memcpy(&arg, offset, lf_sizeof(type));
 		printf("\t└─ %c%s:\t0x%llx\n", ((type & (1 << 3)) ? '\0' : 'u'), typestrs[type & 0x7], arg);
-		offset += fmr_sizeof(type);
+		offset += lf_sizeof(type);
 		types >>= 4;
 	}
 	printf("\n");

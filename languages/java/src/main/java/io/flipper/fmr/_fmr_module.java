@@ -6,7 +6,7 @@ import jnr.ffi.Struct;
 /**
  * @author Nick Mosher <nicholastmosher@gmail.com>
  */
-public class _fmr_module extends Struct {
+public class _lf_module extends Struct {
 
     public Struct.UTF8StringRef name = new Struct.UTF8StringRef(64);
     public Struct.UTF8StringRef description = new Struct.UTF8StringRef(64);
@@ -15,7 +15,7 @@ public class _fmr_module extends Struct {
     public Struct.u_int16_t index = new Struct.u_int16_t();
     public Struct.Pointer device = new Struct.Pointer();
 
-    public _fmr_module(Runtime runtime) {
+    public _lf_module(Runtime runtime) {
         super(runtime);
     }
 

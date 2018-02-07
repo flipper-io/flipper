@@ -15,15 +15,15 @@
 /* ~ Define types exposed by the FMR API. ~ */
 
 /* The variadic argument type. Used to hold argument metadata and value during parsing. */
-typedef uint64_t fmr_va;
+typedef uint64_t lf_va;
 /* The largest argument type. All argument values are held within a variable of this type. */
-typedef uint64_t fmr_arg;
+typedef uint64_t lf_arg;
 /* Used to hold the index of a standard or user module in which a function counterpart exists. */
-typedef uint32_t fmr_module;
+typedef uint32_t lf_module;
 /* Used to hold the offset index of a function within a module. */
-typedef uint8_t fmr_function;
+typedef uint8_t lf_function;
 /* Used to hold the number of parameters that are to be passed during a procedure call. */
-typedef uint8_t fmr_argc;
+typedef uint8_t lf_argc;
 
 /* The maximum number of arguments that can be encoded into a packet. */
 #define FMR_MAX_ARGC 16
@@ -31,40 +31,40 @@ typedef uint8_t fmr_argc;
    NOTE: This type must be capable of encoding the exact number of bits
 		 given by (FMR_MAX_ARGC * 2).
 */
-typedef uint32_t fmr_types;
+typedef uint32_t lf_types;
 
-/* Converts a C type into an unsigned fmr_type. */
-#define fmr_utype(type) (sizeof(type) - 1)
-/* Converts a C type into a signed fmr_type. */
-#define fmr_stype(type) ((1 << 3) | fmr_utype(type))
+/* Converts a C type into an unsigned lf_type. */
+#define lf_utype(type) (sizeof(type) - 1)
+/* Converts a C type into a signed lf_type. */
+#define lf_stype(type) ((1 << 3) | lf_utype(type))
 /* Calculates the length of an FMR type. */
-#define fmr_sizeof(type) ((type != fmr_void_t && type != fmr_int_t && type != fmr_ptr_t) ? ((type & 0x7) + 1) : 8)
+#define lf_sizeof(type) ((type != lf_void_t && type != lf_int_t && type != lf_ptr_t) ? ((type & 0x7) + 1) : 8)
 
 /* Enumerates the basic type signatures an argument can be classified as. */
 enum {
 
-	fmr_void_t = 2,                     // 2
-	fmr_int_t = 4,                      // 4
-	fmr_ptr_t = 6,                      // 6
+	lf_void_t = 2,                    // 2
+	lf_int_t = 4,                     // 4
+	lf_ptr_t = 6,                     // 6
 
 	/* Unsigned types. */
-	fmr_uint8_t = fmr_utype(uint8_t),   // 0
-	fmr_uint16_t = fmr_utype(uint16_t), // 1
-	fmr_uint32_t = fmr_utype(uint32_t), // 3
-	fmr_uint64_t = fmr_utype(uint64_t), // 7
+	lf_uint8_t = lf_utype(uint8_t),   // 0
+	lf_uint16_t = lf_utype(uint16_t), // 1
+	lf_uint32_t = lf_utype(uint32_t), // 3
+	lf_uint64_t = lf_utype(uint64_t), // 7
 
 	/* Signed types. */
-	fmr_int8_t = fmr_stype(int8_t),     // 8
-	fmr_int16_t = fmr_stype(int16_t),   // 9
-	fmr_int32_t = fmr_stype(int32_t),   // 11
-	fmr_int64_t = fmr_stype(int64_t),   // 15
+	lf_int8_t = lf_stype(int8_t),     // 8
+	lf_int16_t = lf_stype(int16_t),   // 9
+	lf_int32_t = lf_stype(int32_t),   // 11
+	lf_int64_t = lf_stype(int64_t),   // 15
 
 	/* Max type is 15. */
-	fmr_max_t = 15
+	lf_max_t = 15
 };
 
 /* A type used to reference the values in the enum above. */
-typedef uint8_t fmr_type;
+typedef uint8_t lf_type;
 
 /* ~ Parameter list building macros. */
 
@@ -73,22 +73,30 @@ typedef uint8_t fmr_type;
 #define __fmr_count(...) __fmr_count_implicit(_, ##__VA_ARGS__, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 
 /* Generates and returns a pointer to an 'fmr_parameters' given a list of variadic arguments. */
-#define fmr_args(...) fmr_build((__fmr_count(__VA_ARGS__)/2), ##__VA_ARGS__)
+#define lf_args(...) fmr_build((__fmr_count(__VA_ARGS__)/2), ##__VA_ARGS__)
 
 /* ~ Parser macros for variables. */
 
-/* Creates an 'fmr_va' from an 'fmr_type' and an immediate value. */
-#define fmr_intx(type, arg) (fmr_type)type, (fmr_arg)arg
-/* Gives the 'fmr_va' for a given 8-bit integer's value. */
-#define fmr_int8(arg) fmr_intx(fmr_int8_t, (uint8_t)arg)
-/* Gives the 'fmr_va' for a given 16-bit integer's value. */
-#define fmr_int16(arg) fmr_intx(fmr_int16_t, (uint16_t)arg)
-/* Gives the 'fmr_va' for a given 32-bit integer's value. */
-#define fmr_int32(arg) fmr_intx(fmr_int32_t, (uint32_t)arg)
-/* Gives the 'fmr_va' for a pointer. */
-#define fmr_ptr(arg) fmr_intx(fmr_ptr_t, (uintptr_t)arg)
-/* Creates an 'fmr_va' from a C variable. */
-#define fmr_infer(variable) fmr_intx(fmr_utype(variable), variable)
+/* Creates an 'lf_va' from an 'lf_type' and an immediate value. */
+#define lf_intx(type, arg) (lf_type)type, (lf_arg)arg
+/* Gives the 'lf_va' for a given integer's value. */
+#define lf_int(arg) lf_intx(lf_int_t, arg)
+/* Gives the 'lf_va' for a given 8-bit integer's value. */
+#define lf_int8(arg) lf_intx(lf_int8_t, (uint8_t)arg)
+/* Gives the 'lf_va' for a given 16-bit integer's value. */
+#define lf_int16(arg) lf_intx(lf_int16_t, (uint16_t)arg)
+/* Gives the 'lf_va' for a given 32-bit integer's value. */
+#define lf_int32(arg) lf_intx(lf_int32_t, (uint32_t)arg)
+/* Gives the 'lf_va' for a given 8-bit integer's value. */
+#define lf_uint8(arg) lf_intx(lf_uint8_t, (uint8_t)arg)
+/* Gives the 'lf_va' for a given 16-bit integer's value. */
+#define lf_uint16(arg) lf_intx(lf_uint16_t, (uint16_t)arg)
+/* Gives the 'lf_va' for a given 32-bit integer's value. */
+#define lf_uint32(arg) lf_intx(lf_uint32_t, (uint32_t)arg)
+/* Gives the 'lf_va' for a pointer. */
+#define lf_ptr(arg) lf_intx(lf_ptr_t, (uintptr_t)arg)
+/* Creates an 'lf_va' from a C variable. */
+#define lf_infer(variable) lf_intx(lf_utype(variable), variable)
 
 /* If this bit is set in the module's index, then it is a user module. */
 #define FMR_USER_INVOCATION_BIT (1 << 8)
@@ -131,9 +139,9 @@ struct LF_PACKED _fmr_header {
 /* Standardizes the notion of an argument. */
 struct _lf_arg {
 	/* The type signature of the argument. */
-	fmr_type type;
+	lf_type type;
 	/* The value of the argument. */
-	fmr_arg value;
+	lf_arg value;
 };
 
 /* Generic packet data type that can be passed around by packet parsing equipment. */
@@ -151,11 +159,11 @@ struct LF_PACKED _fmr_invocation {
 	/* The index of the function within the module. */
 	uint8_t function;
 	/* The return type. */
-	fmr_type ret;
+	lf_type ret;
 	/* The types of the encoded parameters. */
-	fmr_types types;
+	lf_types types;
 	/* The number of encoded parameters. */
-	fmr_argc argc;
+	lf_argc argc;
 	/* The encoded values of the parameters to be passed to the callee. */
 	uint8_t parameters[];
 };
@@ -187,19 +195,19 @@ struct LF_PACKED _fmr_result {
 	/* NOTE: Add bitfield indicating the need to poll for updates. */
 };
 
-/* A reference to the fmr_modules array. */
-extern const void *const fmr_modules[];
+/* A reference to the lf_modules array. */
+extern const void *const lf_modules[];
 
 /* ~ Declare the prototypes for all functions exposed by this driver. ~ */
 
 /* Builds an fmr_parameters from a set of variadic arguments provided by the fmr_parameters macro. */
 struct _lf_ll *fmr_build(int argc, ...);
 /* Appends an argument to an fmr_parameters. */
-int fmr_append(struct _lf_ll *list, fmr_type type, fmr_arg value);
+int lf_append(struct _lf_ll *list, lf_type type, lf_arg value);
 /* Generates the appropriate data structure needed for the remote procedure call of 'funtion' in 'module'. */
-int fmr_create_call(fmr_module module, fmr_function function, fmr_type ret, struct _lf_ll *args, struct _fmr_header *header, struct _fmr_invocation *call);
+int lf_create_call(lf_module module, lf_function function, lf_type ret, struct _lf_ll *args, struct _fmr_header *header, struct _fmr_invocation *call);
 /* Executes a standard module. */
-lf_return_t fmr_execute(fmr_module module, fmr_function function, fmr_type ret, fmr_argc argc, fmr_types argt, void *arguments);
+lf_return_t fmr_execute(lf_module module, lf_function function, lf_type ret, lf_argc argc, lf_types argt, void *arguments);
 /* Executes an fmr_packet and stores the result of the operation in the result buffer provided. */
 int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result);
 
@@ -211,6 +219,6 @@ extern lf_return_t fmr_pull(struct _fmr_push_pull_packet *packet);
 /* ~ Functions with platform specific implementation. ~ */
 
 /* Unpacks the argument buffer into the CPU following the native architecture's calling convention and jumps to the given function pointer. */
-extern lf_return_t fmr_call(lf_return_t (* function)(void), fmr_type ret, uint8_t argc, uint16_t argt, void *argv);
+extern lf_return_t fmr_call(lf_return_t (* function)(void), lf_type ret, uint8_t argc, uint16_t argt, void *argv);
 
 #endif

@@ -42,22 +42,22 @@ _load:
 	movq argt, temp
 	and $0x7, temp
 
-	# fmr_int8_t
+	# lf_int8_t
 	cmp $0, temp
 		je _load_8
-	# fmr_int16_t
+	# lf_int16_t
 	cmp $1, temp
 		je _load_16
-	# fmr_int32_t
+	# lf_int32_t
 	cmp $3, temp
 		je _load_32
-	# fmr_int_t
+	# lf_int_t
 	cmp $4, temp
 		je _load_int
-	# fmr_ptr_t
+	# lf_ptr_t
 	cmp $6, temp
 		je _load_ptr
-	# fmr_int64_t
+	# lf_int64_t
 	cmp $7, temp
 		je _load_64
 
@@ -132,25 +132,25 @@ _ret:
 	movq retv, temp
 	and $0x7, temp
 
-	# fmr_int8_t
+	# lf_int8_t
 	cmp $0, temp
 		je _ret_8
-	# fmr_int16_t
+	# lf_int16_t
 	cmp $1, temp
 		je _ret_16
-	# fmr_void_t
+	# lf_void_t
 	cmp $2, temp
 		je _ret_void
-	# fmr_int32_t
+	# lf_int32_t
 	cmp $3, temp
 		je _ret_32
-	# fmr_int_t
+	# lf_int_t
 	cmp $4, temp
 		je _ret_int
-	# fmr_ptr_t
+	# lf_ptr_t
 	cmp $6, temp
 		je _ret_ptr
-	# fmr_int64_t
+	# lf_int64_t
 	cmp $7, temp
 		je _ret_64
 

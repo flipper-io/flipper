@@ -3,7 +3,7 @@
 #include <flipper/atsam4s/modules.h>
 
 /* Define the standard modules based on platform specific usage declarations. */
-const void *const fmr_modules[] = {
+const void *const lf_modules[] = {
 	&adc,
 	&button,
 	&dac,

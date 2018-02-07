@@ -14,12 +14,12 @@ const struct _uart0 uart0 = {
 };
 
 LF_WEAK int uart0_configure(uint8_t baud, uint8_t interrupts) {
-	lf_invoke(&_uart0, _uart0_configure, fmr_int_t, fmr_args(fmr_infer(baud), fmr_infer(interrupts)));
+	lf_invoke(&_uart0, _uart0_configure, lf_int_t, lf_args(lf_infer(baud), lf_infer(interrupts)));
 	return lf_success;
 }
 
 LF_WEAK int uart0_ready(void) {
-	return lf_invoke(&_uart0, _uart0_ready, fmr_int_t, NULL);
+	return lf_invoke(&_uart0, _uart0_ready, lf_int_t, NULL);
 }
 
 LF_WEAK int uart0_push(void *source, lf_size_t length) {
