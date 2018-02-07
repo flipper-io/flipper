@@ -3,7 +3,7 @@
 This directory contains board-specific implementation for the
 **Flipper: Carbon** hardware platform.
 
-The firmware exposes API that enables (libflipper)[./] to control the
+The firmware exposes API that enables [libflipper](../library) to control the
 **Carbon** board's hardware peripherals. The Carbon board contains two CPUs: a
 microcontroller and a microprocessor.
 
