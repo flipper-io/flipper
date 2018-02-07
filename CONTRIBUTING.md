@@ -46,7 +46,8 @@ line application written in Rust and is responsible for the following:
 
 Work needs to be done to improve language binding generation, improve management
 of the build system used to compile packages for the device, and more. To learn
-more about the console, see the Wiki page here.
+more about the console, see the Wiki page
+[here](https://github.com/georgemorgan/flipper/wiki/Console).
 
 ## libflipper
 
@@ -64,7 +65,8 @@ etc). It is responsible for the following:
 - Load and update packages, and launch applications
 
 Work needs to be done to improve error handling, improve load times, memory
-footprint, and more. To learn more about libflipper, see the Wiki page here.
+footprint, and more. To learn more about libflipper, see the Wiki page
+[here](https://github.com/georgemorgan/flipper/wiki/Understanding-Libflipper).
 
 ## Firmware / Kernel
 
@@ -97,7 +99,8 @@ we support. Currently, Carbon is the only Flipper device.
 - Hardware abstraction layer
 - Platform specific code
 
-To learn more about the Carbon device, see the Wiki page here.
+To learn more about the Carbon device, see the Wiki page
+[here](https://github.com/georgemorgan/flipper/wiki/Flipper-Carbon).
 
 ## Hardware
 
@@ -110,4 +113,5 @@ plug into the Carbon platform and extend the device's functionality.
 - Sensor Backpack
 - Display Backpack
 
-To learn more about the expansion interface, see the Wiki page here.
+To learn more about the expansion interface, see the Wiki page
+[here](https://github.com/georgemorgan/flipper/wiki/Backpacks).
