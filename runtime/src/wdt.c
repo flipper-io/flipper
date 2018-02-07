@@ -12,11 +12,11 @@ const struct _wdt wdt = {
 };
 
 LF_WEAK int wdt_configure(void) {
-	return lf_invoke(&_wdt, _wdt_configure, fmr_int_t, NULL);
+	return lf_invoke(&_wdt, _wdt_configure, lf_int_t, NULL);
 }
 
 LF_WEAK void wdt_fire(void) {
-	lf_invoke(&_wdt, _wdt_fire, fmr_int_t, NULL);
+	lf_invoke(&_wdt, _wdt_fire, lf_int_t, NULL);
 }
 
 #endif

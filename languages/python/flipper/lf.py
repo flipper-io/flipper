@@ -6,14 +6,15 @@ types = dict(
 	int = 4,
 	ptr = 6,
 
-	u8 = 0,
-	u16 = 1,
-	u32 = 3,
-	u64 = 7,
-	s8 = 8,
-	s16 = 9,
-	s32 = 11,
-	s64 = 15,
+	uint8 = 0,
+	uint16 = 1,
+	uint32 = 3,
+	uint64 = 7,
+
+	int8 = 8,
+	int16 = 9,
+	int32 = 11,
+	int64 = 15,
 
 	_default_ = -1,
 )
@@ -26,8 +27,23 @@ class lf_type:
 		self.value = value
 		return
 
-def u8(a):
-	return lf_type(types['u8'], a)
+def uint8(value):
+	return lf_type(types['uint8'], value)
+def uint16(value):
+	return lf_type(types['uint16'], value)
+def uint32(value):
+	return lf_type(types['uint32'], value)
+def uint64(value):
+	return lf_type(types['uint64'], value)
+
+def int8(value):
+	return lf_type(types['int8'], value)
+def int16(value):
+	return lf_type(types['int16'], value)
+def int32(value):
+	return lf_type(types['int32'], value)
+def int64(value):
+	return lf_type(types['int64'], value)
 
 libflipper = CDLL('libflipper.so')
 #libflipper.lf_set_debug_level(3)

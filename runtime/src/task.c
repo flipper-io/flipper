@@ -13,15 +13,15 @@ const struct _task task = {
 };
 
 LF_WEAK int os_task_pause(int pid) {
-	return lf_invoke(&_task, _task_pause, fmr_int_t, fmr_args(fmr_infer(pid)));
+	return lf_invoke(&_task, _task_pause, lf_int_t, lf_args(lf_infer(pid)));
 }
 
 LF_WEAK int os_task_resume(int pid) {
-	return lf_invoke(&_task, _task_resume, fmr_int_t, fmr_args(fmr_infer(pid)));
+	return lf_invoke(&_task, _task_resume, lf_int_t, lf_args(lf_infer(pid)));
 }
 
 LF_WEAK int os_task_stop(int pid) {
-	return lf_invoke(&_task, _task_stop, fmr_int_t, fmr_args(fmr_infer(pid)));
+	return lf_invoke(&_task, _task_stop, lf_int_t, lf_args(lf_infer(pid)));
 }
 
 #endif

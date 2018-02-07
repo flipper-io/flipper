@@ -18,27 +18,27 @@ const struct _spi spi = {
 };
 
 LF_WEAK int spi_configure() {
-	return lf_invoke(&_spi, _spi_configure, fmr_int_t, NULL);
+	return lf_invoke(&_spi, _spi_configure, lf_int_t, NULL);
 }
 
 LF_WEAK void spi_enable(void) {
-	lf_invoke(&_spi, _spi_enable, fmr_int_t, NULL);
+	lf_invoke(&_spi, _spi_enable, lf_int_t, NULL);
 }
 
 LF_WEAK void spi_disable(void) {
-	lf_invoke(&_spi, _spi_disable, fmr_int_t, NULL);
+	lf_invoke(&_spi, _spi_disable, lf_int_t, NULL);
 }
 
 LF_WEAK uint8_t spi_ready(void) {
-	return lf_invoke(&_spi, _spi_ready, fmr_int_t, NULL);
+	return lf_invoke(&_spi, _spi_ready, lf_int_t, NULL);
 }
 
 LF_WEAK void spi_put(uint8_t byte) {
-	lf_invoke(&_spi, _spi_put, fmr_int_t, fmr_args(fmr_infer(byte)));
+	lf_invoke(&_spi, _spi_put, lf_int_t, lf_args(lf_infer(byte)));
 }
 
 LF_WEAK uint8_t spi_get(void) {
-	return lf_invoke(&_spi, _spi_get, fmr_int_t, NULL);
+	return lf_invoke(&_spi, _spi_get, lf_int_t, NULL);
 }
 
 LF_WEAK int spi_push(void *source, uint32_t length) {

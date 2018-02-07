@@ -7,12 +7,9 @@
 //! These utilities lay the groundwork for users to create bindings to custom
 //! Flipper "modules" (not to be confused with rust modules).
 
-#![allow(non_camel_case_types)]
-
 use libc;
-use libc::{c_void, c_int, size_t};
+use libc::{c_void, c_int};
 use std::ops::Deref;
-use std::mem;
 use std::ptr;
 use ::{ModuleFFI, _lf_module};
 
@@ -30,8 +27,8 @@ const LF_TYPE_U8: _lf_type = 0;
 const LF_TYPE_U16: _lf_type = 1;
 const LF_TYPE_VOID: _lf_type = 2;
 const LF_TYPE_U32: _lf_type = 3;
-const LF_TYPE_PTR: _lf_type = 4;
-const LF_TYPE_INT: _lf_type = 6;
+const _LF_TYPE_PTR: _lf_type = 4;
+const _LF_TYPE_INT: _lf_type = 6;
 const LF_TYPE_U64: _lf_type = 7;
 
 /// The internal `libflipper` representation of a function argument.
@@ -291,6 +288,7 @@ pub fn lf_pull<'a, T: LfReturnable>(module: &'a ModuleFFI, index: u8, buffer: &m
 }
 
 mod test {
+    #[allow(unused_imports)]
     use super::*;
 
     #[test]

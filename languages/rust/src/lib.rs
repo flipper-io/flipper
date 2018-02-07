@@ -3,6 +3,7 @@
 #![deny(unstable_features)]
 #![deny(unused_import_braces)]
 #![deny(unused_qualifications)]
+#![deny(warnings)]
 
 extern crate libc;
 
@@ -14,7 +15,7 @@ use std::ffi::CString;
 use libc::{c_void, c_char, c_int};
 
 type _lf_device = *const c_void;
-type _fmr_function_index = u8;
+type _lf_function_index = u8;
 type _fmr_return = u32;
 
 pub const LF_VERSION: u16 = 0x0001;
@@ -195,13 +196,6 @@ pub struct Flipper {
     /// device functions should be executed on.
     device: _lf_device,
 }
-
-/// A Flipper with NULL as its device pointer is interpreted to be the
-/// "active device", which is determined by libflipper. This is usually
-/// the first device discovered over USB, or the "selected" device.
-pub const DEFAULT_FLIPPER: Flipper = Flipper {
-    device: 0 as *const c_void,
-};
 
 impl Flipper {
     pub fn attach() -> Self {

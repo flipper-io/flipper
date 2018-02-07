@@ -1,6 +1,6 @@
 package io.flipper;
 
-import io.flipper.fmr._fmr_module;
+import io.flipper.fmr._lf_module;
 import jnr.ffi.LibraryLoader;
 import jnr.ffi.Pointer;
 import jnr.ffi.Runtime;
@@ -21,7 +21,7 @@ public class Flipper {
         Pointer flipper_attach();
 
         // FMR bindings
-        int lf_invoke(_fmr_module module, byte function, Pointer parameters);
+        int lf_invoke(_lf_module module, byte function, Pointer parameters);
         int lf_bind(Pointer module);
 
         Pointer fmr_build(byte argc);
@@ -44,7 +44,7 @@ public class Flipper {
 
     public <T> T bindModule(Class<T> moduleInterface, String name) {
 
-        _fmr_module module = new _fmr_module(getRuntime());
+        _lf_module module = new _lf_module(getRuntime());
 
         module.setName(name);
 

@@ -1,27 +1,21 @@
-# Package Example
+# Application
 
-This example demonstrates how to build a package. A package is a collection of functions that are installed on the device and can be remotely invoked from any device with libflipper installed.
+This example demonstrates how to build an application for the device. An
+application is  standalone code that runs on the hardware without intervention
+from a host computer. This example application blinks an LED that is attached
+to `IO_1`.
 
-### Build the Package
-```
+#### Building
+
+```sh
 make
 ```
 
-### Install the Package
-```
+#### Running
+
+```sh
 make install
 ```
 
-The executable code will now be on the attached Flipper device.
-
-## Running
-
-A package doesn't have an entry point or main function, so no code is run when it is loaded. Instead, code is run when a call is made to a function that exists inside the package.
-
-This example provides a test program in the `host` folder. This program calls the `my_func` function and is built for the host. To execute the function `my_func` on the device, simply call the host program.
-
-```
-./build/host/example
-```
-
-If you have an LED attached to a pin on the board, it will change state each time the test program is run. The host program is remotely invoking the function that does this on the attached device.
+By running `make install` the application will be loaded onto the attached
+device and start executing immediately. If there is an LED attached to `IO_1`, it will begin to blink.

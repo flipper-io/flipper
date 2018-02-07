@@ -1,7 +1,7 @@
 #define __private_include__
 #include <flipper/libflipper.h>
 
-struct _lf_arg *lf_arg_create(fmr_type type, fmr_arg value) {
+struct _lf_arg *lf_arg_create(lf_type type, lf_arg value) {
 	struct _lf_arg *arg = malloc(sizeof(struct _lf_arg));
 	lf_assert(arg, failure, E_MALLOC, "Failed to allocate new lf_arg.");
 	arg->type = type;
@@ -26,8 +26,8 @@ struct _lf_ll *fmr_build(int argc, ...) {
 	while (argc --) {
 		/* Unstage the value of the argument from the variadic argument list. */
 		int type = va_arg(argv, int);
-		fmr_arg value = va_arg(argv, fmr_arg);
-		lf_assert(type <= fmr_max_t, failure, E_TYPE, "An invalid type was provided while appending the parameter '%llx' with type '%x' to the argument list.", value, type);
+		lf_arg value = va_arg(argv, lf_arg);
+		lf_assert(type <= lf_max_t, failure, E_TYPE, "An invalid type was provided while appending the parameter '%llx' with type '%x' to the argument list.", value, type);
 		struct _lf_arg *arg = lf_arg_create(type, value);
 		lf_assert(arg, failure, E_MALLOC, "Failed to append new lf_arg.");
 		lf_ll_append(&list, arg, lf_arg_release);
@@ -40,7 +40,7 @@ failure:
 	return NULL;
 }
 
-int fmr_create_call(fmr_module module, fmr_function function, fmr_type ret, struct _lf_ll *args, struct _fmr_header *header, struct _fmr_invocation *call) {
+int lf_create_call(lf_module module, lf_function function, lf_type ret, struct _lf_ll *args, struct _fmr_header *header, struct _fmr_invocation *call) {
 	lf_assert(header, failure, E_NULL, "NULL header passed to '%s'.", __PRETTY_FUNCTION__);
 	lf_assert(call, failure, E_NULL, "NULL call passed to '%s'.", __PRETTY_FUNCTION__);
 	/* Store the target module, function, and argument count in the packet. */
@@ -57,9 +57,9 @@ int fmr_create_call(fmr_module module, fmr_function function, fmr_type ret, stru
 		struct _lf_arg *arg = lf_ll_item(args, i);
 		lf_assert(arg, failure, E_NULL, "Invalid argument supplied to '%s'.", __PRETTY_FUNCTION__);
 		/* Encode the argument's type. */
-		call->types |= (arg->type & fmr_max_t) << (i * 4);
+		call->types |= (arg->type & lf_max_t) << (i * 4);
 		/* Calculate the size of the argument. */
-		uint8_t size = fmr_sizeof(arg->type);
+		uint8_t size = lf_sizeof(arg->type);
 		/* Copy the argument into the parameter segment. */
 		memcpy(offset, &(arg->value), size);
 		/* Increment the offset appropriately. */
@@ -74,9 +74,9 @@ failure:
 	return lf_error;
 }
 
-lf_return_t fmr_execute(fmr_module module, fmr_function function, fmr_type ret, fmr_argc argc, fmr_types argt, void *arguments) {
+lf_return_t fmr_execute(lf_module module, lf_function function, lf_type ret, lf_argc argc, lf_types argt, void *arguments) {
 	/* Dereference the pointer to the target module. */
-	void *const *object = fmr_modules[module];
+	void *const *object = lf_modules[module];
 	/* Dereference and return a pointer to the target function. */
 	void *address = object[function];
 	/* Ensure that the function address is valid. */

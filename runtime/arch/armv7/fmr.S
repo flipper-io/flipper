@@ -6,7 +6,7 @@
 #define argi r10
 #define temp r11
 
-/* lf_return_t fmr_call(lf_return_t (* function)(void), fmr_type ret, uint8_t argc, uint16_t argt, void *argv); */
+/* lf_return_t fmr_call(lf_return_t (* function)(void), lf_type ret, uint8_t argc, uint16_t argt, void *argv); */
 
 .syntax unified
 .global fmr_call
@@ -34,22 +34,22 @@ _load:
 	mov temp, argt
 	and temp, 0xF
 
-	# fmr_int8_t
+	# lf_int8_t
 	cmp temp, #0
 		beq _load_8
-	# fmr_int16_t
+	# lf_int16_t
 	cmp temp, #1
 		beq _load_16
-	# fmr_int32_t
+	# lf_int32_t
 	cmp temp, #3
 		beq _load_32
-	# fmr_int_t
+	# lf_int_t
 	cmp temp, #4
 		beq _load_ptr
-	# fmr_ptr_t
+	# lf_ptr_t
 	cmp temp, #6
 		beq _load_int
-	# fmr_int64_t
+	# lf_int64_t
 	cmp temp, #7
 		beq _load_64
 
@@ -119,22 +119,22 @@ _call:
 	blx _function
 
 _ret:
-	# fmr_int8_t
+	# lf_int8_t
 	cmp retv, #0
 		beq _ret_8
-	# fmr_int16_t
+	# lf_int16_t
 	cmp retv, #1
 		beq _ret_16
-	# fmr_void_t
+	# lf_void_t
 	cmp retv, #2
 		beq _ret_void
-	# fmr_int32_t
+	# lf_int32_t
 	cmp retv, #3
 		beq _ret_32
-	# fmr_int_t
+	# lf_int_t
 	cmp retv, #4
 		beq _ret_int
-	# fmr_int_t
+	# lf_int_t
 	cmp retv, #6
 		beq _ret_ptr
 	# fmr_int
