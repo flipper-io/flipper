@@ -51,7 +51,7 @@ def get_parameters_from_die(cu, die):
 
 def generate_c(modulename, outputname, functions):
 	outc = open(outputname, "w")
-	
+
 	ctemplate = """\
 #include <flipper.h>
 
@@ -89,7 +89,7 @@ $STRUCTBODY$
 };
 """
 	ctemplate = ctemplate.replace("$MODULE$", modulename)
-	
+
 	functs = []
 	struct = []
 	tags = []
@@ -100,18 +100,17 @@ $STRUCTBODY$
 	ctemplate = ctemplate.replace("$FUNCTIONPROTOS$", "\n\t".join(functs))
 	ctemplate = ctemplate.replace("$STRUCTDEF$", "\t" + "\n\t".join(struct))
 	ctemplate = ctemplate.replace("$TAGS$", ", ".join(tags))
-	
+
 	functs = []
 	struct = []
 	for f in functions:
 		struct.append("&%s" % f.name)
-		
+
 		args = []
 		for p in f.parameters:
 			args.append("lf_infer(%s)" % p.name)
-		retl = ["lf_void_t", "", "fmr_int8_t", "fmr_int16_t", "", "fmr_int32_t"]
+		retl = ["lf_void_t", "", "lf_int8_t", "lf_int16_t", "", "lf_int32_t"]
 		statement = "lf_invoke(&_module, %s, %s, lf_args(%s));" % ("_" + modulename + "_" + f.name, retl[f.ret + 1], ", ".join(args))
-		
 		if f.type == "void":
 			body = statement
 			ret = ";"
@@ -122,7 +121,7 @@ $STRUCTBODY$
 	ctemplate = ctemplate.replace("$VARIABLES$\n\n", "")
 	ctemplate = ctemplate.replace("$STRUCTBODY$", "\t" + ",\n\t".join(struct))
 	ctemplate = ctemplate.replace("$FUNCTIONS$", "\n".join(functs))
-	
+
 	outc.write(ctemplate)
 	outc.close()
 
@@ -132,16 +131,16 @@ def generate_py(modulename, outputname, functions):
 
 def process_file(filename, modulename, language, outputname):
 	functions = []
-	
+
 	with open(filename, "rb") as f:
 		elffile = ELFFile(f)
-		
+
 		if not elffile.has_dwarf_info():
 			print("File has no DWARF info. Compile with -g.")
 			sys.exit(1)
-		
+
 		dwarfinfo = elffile.get_dwarf_info()
-		
+
 		funcs_addr = 0
 		funcs_size = 0
 		vars_addr = 0
@@ -153,11 +152,11 @@ def process_file(filename, modulename, language, outputname):
 			if section.name == ".lf.vars":
 				vars_addr = section["sh_addr"]
 				vars_size = section["sh_size"]
-		
+
 		if funcs_addr == 0:
-			print("Couldn't find required .lf.funcs section in %s!" % filename)
-			sys.exit(1)
-		
+			outc = open(outputname, "w")
+			sys.exit(0)
+
 		# This iterates through all CUs, even the ones without .lf.funcs section
 		i = 0
 		for cu in dwarfinfo.iter_CUs():
@@ -186,7 +185,7 @@ def process_file(filename, modulename, language, outputname):
 								ret = 0x2
 						params = get_parameters_from_die(cu, child)
 						functions.append(Function(type, name, ret, params))
-		
+
 		if language.lower() == "c":
 			generate_c(modulename, outputname, functions)
 		elif language.lower() == "python":

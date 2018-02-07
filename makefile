@@ -203,7 +203,7 @@ uninstall-utils:
 PY_DIR = $(shell python -m site --user-site)
 
 install-python:
-	pip2 install languages/python --upgrade
+	$(_v)pip2 install languages/python --upgrade -q
 
 install:: install-python
 

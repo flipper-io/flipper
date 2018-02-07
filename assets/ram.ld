@@ -1,7 +1,7 @@
 /* RAM loading linker script for Osmium modules and application. */
 
 /* Obtain the entry point address if the main symbol is defined. */
-_ENTRY = DEFINED(main) ? ADDR(.main) + 1: 0;
+_ENTRY = DEFINED(main) ? ABSOLUTE(main) + 1: 0;
 /* Define the entry point. */
 ENTRY(_ENTRY);
 

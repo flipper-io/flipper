@@ -10,7 +10,7 @@ ASSETS := $(realpath $(dir $(SELF))../share/flipper)
 # Build settings for code that runs natively on the Flipper device
 FLIPPER_BUILD := $(BUILD)/atsam4s
 FLIPPER_TARGET := $(FLIPPER_BUILD)/$(MODULE).bin
-FLIPPER_SRCS := $(wildcard flipper/*.c) $(wildcard shared/*.c)
+FLIPPER_SRCS := $(wildcard src/*.c)
 FLIPPER_OBJS := $(patsubst %,$(FLIPPER_BUILD)/%.o,$(FLIPPER_SRCS))
 FLIPPER_DEPS := $(FLIPPER_OBJS:.o=.d)
 FLIPPER_BUILD_DIRS := $(addsuffix /.dir,$(patsubst %/,%,$(sort $(dir $(FLIPPER_OBJS))))) $(FLIPPER_BUILD)/$(FLIPPER_BUILD)/.dir
@@ -20,6 +20,8 @@ FLIPPER_OBJCOPY := arm-none-eabi-objcopy
 FLIPPER_OBJDUMP := arm-none-eabi-objdump
 
 FLIPPER_CFLAGS := \
+	-march=armv7e-m \
+	-mtune=cortex-m4 \
 	-mcpu=cortex-m4 \
 	-g \
 	-ffreestanding \
@@ -28,7 +30,7 @@ FLIPPER_CFLAGS := \
 	-Os \
 	-I/usr/local/include \
 	-I. \
-	-Ishared \
+	-Iinclude \
 	-D__ATSAM4S__ \
 	-DPLATFORM_HEADER="<flipper/atsam4s/atsam4s.h>"
 
@@ -40,14 +42,13 @@ FLIPPER_LDFLAGS := \
 	-fPIC \
 	-Os
 
-
 # Build settings for code that runs on the host and communicates with the Flipper device
 HOST_BUILD := $(BUILD)/local
 HOST_TARGET := $(HOST_BUILD)/$(MODULE)
 HOST_GLUE_TARGET := $(HOST_TARGET).a
 HOST_GLUE_SRCS := $(FLIPPER_BUILD)/cbind.c $(HOST_BUILD)/package_data.c
 HOST_GLUE_OBJS := $(patsubst %,$(HOST_BUILD)/%.o,$(HOST_GLUE_SRCS))
-HOST_SRCS := $(wildcard host/*.c) $(wildcard shared/*.c)
+HOST_SRCS := $(wildcard host/*.c)
 HOST_OBJS := $(patsubst %,$(HOST_BUILD)/%.o,$(HOST_SRCS))
 HOST_DEPS := $(HOST_GLUE_OBJS:.o=.d) $(HOST_OBJS:.o=.d)
 HOST_BUILD_DIRS := $(addsuffix /.dir,$(patsubst %/,%,$(sort $(dir $(HOST_OBJS))))) $(HOST_BUILD)/$(FLIPPER_BUILD)/.dir $(HOST_BUILD)/$(HOST_BUILD)/.dir
@@ -55,9 +56,8 @@ HOST_CC := gcc
 HOST_LD := gcc
 HOST_AR := ar
 
-HOST_CFLAGS := -I. -Ishared -g
+HOST_CFLAGS := -I. -Iinclude -g
 HOST_LDFLAGS := -g
-
 
 # Build settings for code that runs on the Flipper Virtual Machine
 FVM_BUILD := $(BUILD)/fvm
@@ -69,14 +69,16 @@ FVM_BUILD_DIRS := $(addsuffix /.dir,$(patsubst %/,%,$(sort $(dir $(FVM_OBJS)))))
 FVM_CC := gcc
 FVM_LD := gcc
 
-FVM_CFLAGS := -I. -Ishared -g -DPLATFORM_HEADER="<flipper/posix/posix.h>"
+FVM_CFLAGS := -I. -Iinclude -g -DPLATFORM_HEADER="<flipper/posix/posix.h>"
 FVM_LDFLAGS := -g
 
-
-
 # Build for the Flipper device and host by default, but not FVM
-all: $(FLIPPER_TARGET) $(HOST_TARGET)
+all:: $(FLIPPER_TARGET)
 
+ifeq ($(HOST_SRCS), )
+else
+all:: $(HOST_TARGET)
+endif
 
 # Target when building for the Flipper Virtual Machine
 fvm: $(FVM_TARGET)
@@ -103,7 +105,6 @@ $(FLIPPER_TARGET): $(FLIPPER_BUILD)/$(MODULE).elf
 # Keep track of #include dependencies for incremental builds
 -include $(FLIPPER_DEPS)
 
-
 # Host build targets
 $(HOST_BUILD)/package_data.c: $(FLIPPER_TARGET) | $(HOST_BUILD_DIRS)
 	(cd $(<D) && xxd -i $(<F)) > $@
@@ -117,10 +118,8 @@ $(HOST_GLUE_TARGET): $(HOST_GLUE_OBJS)
 $(HOST_TARGET): $(HOST_BUILD)/$(MODULE).a $(HOST_OBJS)
 	$(HOST_LD) $(HOST_LDFLAGS) -lflipper -o $@ $^
 
-
 # Keep track of #include dependencies for incremental builds
 -include $(HOST_DEPS)
-
 
 # FVM build targets
 $(FVM_BUILD)/%.c.o: %.c | $(FVM_BUILD_DIRS)
@@ -132,10 +131,8 @@ $(FVM_BUILD)/package_data.c: | $(FVM_BUILD_DIRS)
 $(FVM_TARGET): $(FVM_OBJS)
 	$(FVM_LD) $(FVM_LDFLAGS) -shared -lflipper -o $@ $^
 
-
 # Keep track of #include dependencies for incremental builds
 -include $(FVM_DEPS)
-
 
 # Display the disassembly of the compiled Flipper module
 dump: $(FLIPPER_BUILD)/$(MODULE).elf
@@ -148,7 +145,6 @@ install: $(FLIPPER_TARGET)
 # Remove built products
 clean:
 	rm -rf $(BUILD)
-
 
 # Display usage information
 help:
@@ -171,7 +167,6 @@ help:
 # Disable built-in rules
 MAKEFLAGS += --no-builtin-rules
 .SUFFIXES:
-
 
 # Targets that don't name files to be created
 .PHONY: all fvm dump install clean help
