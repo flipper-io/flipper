@@ -9,15 +9,17 @@ Flipper hardware.
 
 ```c
 flipper_attach();
-gpio_write(8, 0);
+gpio.enable(IO_1, 0); // Enable IO1
+gpio.write(IO_1, 0); // Set IO1 HIGH
 ```
 
 #### Python example
 
-```
+```python
 from flipper import *
 lf.attach()
-gpio.write(8, 0)
+gpio.enable(gpio.IO_1, 0) # Enable IO1
+gpio.write(gpio.IO_1, 0) # Set IO1 HIGH
 ```
 
 #### Networking
@@ -25,8 +27,9 @@ gpio.write(8, 0)
 You can also connect to a Flipper device over a network.
 
 ```c
-flipper_attach_network("192.168.1.1")
-gpio_write(8, 0);
+flipper_attach_network("192.168.1.1");
+gpio.enable(IO_1, 0); // Enable IO1
+gpio.write(IO_1, 0); // Set IO1 HIGH
 ```
 
 Simple.
@@ -35,13 +38,15 @@ If you don't have a WiFi shield for your device, you can test `libflipper`
 right now locally using the Flipper Virtual Machine (FVM). After installing
 the`utils`, simply run FVM and then attach to `localhost`.
 
-```
-flipper_attach_network("localhost")
-gpio_write(8, 0);
+```c
+flipper_attach_network("localhost");
+gpio.enable(IO_1, 0); // Enable IO1
+gpio.write(IO_1, 0); // Set IO1 HIGH
 ```
 
 You should see a message printed saying `Turning GPIO pin 8 ON.` FVM is
 excellent for debugging changes made to the message runtime or `libflipper`
 itself.
 
-To learn more about using fvm, see the WiKi page (here)[].
+To learn more about using fvm, see the WiKi page
+[here](https://github.com/georgemorgan/flipper/wiki/Flipper-Virtual-Machine).
