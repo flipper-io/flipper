@@ -203,6 +203,8 @@ extern const void *const lf_modules[];
 int lf_append(struct _lf_ll *list, lf_type type, lf_arg value);
 /* Generates the appropriate data structure needed for the remote procedure call of 'funtion' in 'module'. */
 int lf_create_call(lf_module module, lf_function function, lf_type ret, struct _lf_ll *args, struct _fmr_header *header, struct _fmr_invocation *call);
+/* Creates a struct _lf_arg * type. */
+struct _lf_arg *lf_arg_create(lf_type type, lf_arg value);
 
 /* Builds an fmr_parameters from a set of variadic arguments provided by the fmr_parameters macro. */
 struct _lf_ll *fmr_build(int argc, ...);
