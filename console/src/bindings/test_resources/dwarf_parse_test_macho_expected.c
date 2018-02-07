@@ -7,5 +7,5 @@ const struct _user user {
 };
 
 LF_WEAK int user_test(int a, char b, long int c) {
-    int result = lf_invoke(&_user, _user_test, fmr_uint32_t, fmr_args(fmr_infer(a), fmr_infer(b), fmr_infer(c)));
+    int result = lf_invoke(&_user, _user_test, lf_uint32_t, lf_args(lf_infer(a), lf_infer(b), lf_infer(c)));
 }

@@ -11,7 +11,7 @@ const struct _pwm pwm = {
 };
 
 LF_WEAK int pwm_configure(void) {
-	return lf_invoke(&_pwm, _pwm_configure, fmr_int_t, NULL);
+	return lf_invoke(&_pwm, _pwm_configure, lf_int_t, NULL);
 }
 
 #endif

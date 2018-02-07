@@ -13,8 +13,7 @@
 #![deny(unused_qualifications)]
 
 #[macro_use] extern crate serde_derive;
-#[macro_use] extern crate derive_fail;
-extern crate failure;
+#[macro_use] extern crate failure;
 extern crate byteorder;
 extern crate xmodem;
 extern crate serde;

@@ -11,7 +11,7 @@ const struct _temp temp = {
 };
 
 LF_WEAK int temp_configure(void) {
-	return lf_invoke(&_temp, _temp_configure, fmr_int_t, NULL);
+	return lf_invoke(&_temp, _temp_configure, lf_int_t, NULL);
 }
 
 #endif

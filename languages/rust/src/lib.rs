@@ -15,7 +15,7 @@ use std::ffi::CString;
 use libc::{c_void, c_char, c_int};
 
 type _lf_device = *const c_void;
-type _fmr_function_index = u8;
+type _lf_function_index = u8;
 type _fmr_return = u32;
 
 pub const LF_VERSION: u16 = 0x0001;

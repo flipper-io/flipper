@@ -108,10 +108,9 @@ $STRUCTBODY$
 
 		args = []
 		for p in f.parameters:
-			args.append("fmr_infer(%s)" % p.name)
-		retl = ["fmr_void_t", "", "fmr_int8_t", "fmr_int16_t", "", "fmr_int32_t"]
-		statement = "lf_invoke(&_module, %s, %s, fmr_args(%s));" % ("_" + modulename + "_" + f.name, retl[f.ret + 1], ", ".join(args))
-
+			args.append("lf_infer(%s)" % p.name)
+		retl = ["lf_void_t", "", "lf_int8_t", "lf_int16_t", "", "lf_int32_t"]
+		statement = "lf_invoke(&_module, %s, %s, lf_args(%s));" % ("_" + modulename + "_" + f.name, retl[f.ret + 1], ", ".join(args))
 		if f.type == "void":
 			body = statement
 			ret = ";"

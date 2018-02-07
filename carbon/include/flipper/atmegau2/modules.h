@@ -6,4 +6,4 @@ enum {
 	_uart0_id,
 	_wdt_id,
 };
-/* NOTE: The identifiers in this enumeration must match the order of the module addresses stored in the 'fmr_modules' array. */
+/* NOTE: The identifiers in this enumeration must match the order of the module addresses stored in the 'lf_modules' array. */

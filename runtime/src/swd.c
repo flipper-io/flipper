@@ -11,7 +11,7 @@ const struct _swd swd = {
 };
 
 LF_WEAK int swd_configure(void) {
-	return lf_invoke(&_swd, _swd_configure, fmr_int_t, NULL);
+	return lf_invoke(&_swd, _swd_configure, lf_int_t, NULL);
 }
 
 #endif
