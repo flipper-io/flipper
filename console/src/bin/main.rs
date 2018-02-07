@@ -22,8 +22,7 @@
 #![deny(unused_qualifications)]
 
 #[macro_use] extern crate clap;
-#[macro_use] extern crate derive_fail;
-extern crate failure;
+#[macro_use] extern crate failure;
 extern crate rustyline;
 extern crate byteorder;
 extern crate libc;
