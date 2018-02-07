@@ -52,30 +52,64 @@
 
 struct _user_modules user_modules;
 
+struct _os_app {
+	struct _lf_abi_header *header;
+	struct _os_task *task;
+};
+
+struct _lf_ll *apps;
+
+struct _os_app *get_app(struct _lf_abi_header *header) {
+	char *name = (void *)header + header->name_offset;
+	struct _os_app *app = NULL;
+	int count = lf_ll_count(apps);
+	for (int i = 0; i < count; i ++) {
+		struct _os_app *item = lf_ll_item(apps, i);
+		char *_name = (void *)header + header->name_offset;
+		if (strcmp(name, _name)) continue;
+		app = item;
+		break;
+	}
+	return app;
+}
+
 /* Loads an application into RAM. */
 int os_load_application(void *base, struct _lf_abi_header *header) {
-	/* Obtain the address of the application's main function. */
-	void *_main = base + header->entry;
+	struct _os_app *app = get_app(header);
+	int had_app = 0;
+	os_stack_t *stack = NULL;
+	struct _os_task *task = NULL;
+	if (app) {
+		had_app = 1;
+		/* Unload the current task. */
+		os_task_release(app->task);
+	} else {
+		app = malloc(sizeof(struct _os_app));
+	}
+	lf_assert(app, failure, E_NULL, "Failed to allocate memory to create app.");
+	app->header = header;
 	/* Allocate the application's stack. */
-	os_stack_t *_stack = malloc(APPLICATION_STACK_SIZE_WORDS * sizeof(uint32_t));
-	if (!_stack) {
-		lf_error_raise(E_MALLOC, NULL);
-		return lf_error;
-	}
-	/* Register the task for launch. */
-	struct _os_task *task = os_task_create(_main, _stack, APPLICATION_STACK_SIZE_WORDS * sizeof(uint32_t));
-	/* Verify that the task was created successfully. */
-	if (!task) {
-		lf_error_raise(E_UNIMPLEMENTED, NULL);
-		/* Free the memory allocated for the application's stack. */
-		free(_stack);
-		return lf_error;
-	}
+	stack = malloc(APPLICATION_STACK_SIZE_WORDS * sizeof(uint32_t));
+	lf_assert(stack, failure, E_NULL, "Failed to allocate memory to create task stack.");
+	void *_main = base + header->entry;
+	task = os_task_create(_main, stack, APPLICATION_STACK_SIZE_WORDS * sizeof(uint32_t));
+	lf_assert(task, failure, E_NULL, "Failed to allocate memory for task");
+	app->task = task;
 	/* Set the task's base address. */
 	task->base = base;
+	/* Add the task. */
+	os_task_add(task);
+	/* Append the app. */
+	if (!had_app) lf_ll_append(&apps, app, free);
 	/* Launch the task. */
 	os_task_next();
 	return lf_success;
+failure:
+	if (app) free(app);
+	if (stack) free(stack);
+	if (task) free(task);
+	if (base) free(base);
+	return lf_error;
 }
 
 /* Releases a previously loaded module. */

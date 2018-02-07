@@ -2,7 +2,7 @@
 
 const char _name[] __attribute__((section(".name"))) = "example";
 
-#define PIN IO_1
+#define PIN IO_2
 
 void delay(int time) {
     for (volatile uint64_t i = 0; i < time * 10000; i ++);

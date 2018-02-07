@@ -33,6 +33,8 @@ void os_scheduler_init(void) {
 
 	/* Create the system task. */
 	struct _os_task *task = os_task_create(os_kernel_task, kernel_task_stack, KERNEL_TASK_STACK_SIZE_WORDS * sizeof(uint32_t));
+	/* Add the task. */
+	os_task_add(task);
 	/* Make the current task and the head of the task list the system task. */
 	os_current_task = schedule.head = task;
 	/* Make the system task's next task point back to the system task. */
@@ -56,14 +58,7 @@ void os_scheduler_init(void) {
 	while (1) __asm__ __volatile__ ("nop");
 }
 
-struct _os_task *os_task_create(void *handler, os_stack_t *stack, uint32_t stack_size) {
-	/* Allocate the next available task slot. */
-	struct _os_task *task = malloc(sizeof(struct _os_task));
-	/* Ensure memory was allocated for the new task. */
-	if (!task) {
-		lf_error_raise(E_MALLOC, NULL);
-		return NULL;
-	}
+int os_task_add(struct _os_task *task) {
 
 	if (schedule.count) {
 		/* Walk to the end of the task list. */
@@ -72,6 +67,20 @@ struct _os_task *os_task_create(void *handler, os_stack_t *stack, uint32_t stack
 		while (-- count) _tail = _tail->next;
 		/* Set the tail of the task list's next task equal to the newly allocated task. */
 		_tail->next = task;
+	}
+
+	/* Increment the number of active tasks. */
+	schedule.count ++;
+
+}
+
+struct _os_task *os_task_create(void *handler, os_stack_t *stack, uint32_t stack_size) {
+	/* Allocate the next available task slot. */
+	struct _os_task *task = malloc(sizeof(struct _os_task));
+	/* Ensure memory was allocated for the new task. */
+	if (!task) {
+		lf_error_raise(E_MALLOC, NULL);
+		return NULL;
 	}
 
 	/* Set the task's stack pointer to the top of the task's stack. */
@@ -110,9 +119,6 @@ struct _os_task *os_task_create(void *handler, os_stack_t *stack, uint32_t stack
 	_tsk->r9 = 9;
 	_tsk->r10 = 10;
 	_tsk->r11 = 11;
-
-	/* Increment the number of active tasks. */
-	schedule.count ++;
 
 	return task;
 }

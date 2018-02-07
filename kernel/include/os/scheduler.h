@@ -76,6 +76,7 @@ void os_kernel_task(void);
 void os_scheduler_init(void);
 
 struct _os_task *os_task_create(void *handler, os_stack_t *stack, uint32_t stack_size);
+int os_task_add(struct _os_task *task);
 int os_task_release(struct _os_task *task);
 void os_task_next(void);
 
