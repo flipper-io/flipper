@@ -24,10 +24,12 @@ struct _os_task {
 	void (* handler)(void);
 	/* The task's status (active or idle). */
 	volatile os_task_status status;
-	/* The base address of the task's allocated memory, stored for deallocation. */
-	void *base;
 	/* The base address of the task's stack, stored for task deallocation. */
-	void *stack_base;
+	void *stack;
+	/* The task's exit function. */
+	void (* exit)(void *_ctx);
+	/* The task's exit context. */
+	void *_ctx;
 	/* The next task to be executed. */
 	struct _os_task *next;
 };
@@ -75,7 +77,7 @@ struct _task_ctx {
 void os_kernel_task(void);
 void os_scheduler_init(void);
 
-struct _os_task *os_task_create(void *handler, os_stack_t *stack, uint32_t stack_size);
+struct _os_task *os_task_create(void *_entry, void (* _exit)(void *_ctx), void *_ctx, uint32_t stack_size);
 int os_task_add(struct _os_task *task);
 int os_task_release(struct _os_task *task);
 void os_task_next(void);

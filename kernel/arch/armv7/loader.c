@@ -53,7 +53,11 @@
 struct _user_modules user_modules;
 
 struct _os_app {
-	struct _lf_abi_header *header;
+	/* Where the app was loaded. */
+	void *base;
+	/* The name of the app. */
+	char *name;
+	/* The task running the app. */
 	struct _os_task *task;
 };
 
@@ -65,50 +69,49 @@ struct _os_app *get_app(struct _lf_abi_header *header) {
 	int count = lf_ll_count(apps);
 	for (int i = 0; i < count; i ++) {
 		struct _os_app *item = lf_ll_item(apps, i);
-		char *_name = (void *)header + header->name_offset;
-		if (strcmp(name, _name)) continue;
+		if (strcmp(name, item->name)) continue;
 		app = item;
 		break;
 	}
 	return app;
 }
 
+void os_app_exit(void *_app) {
+	if (!_app) return;
+	struct _os_app *app = (struct _os_app *)_app;
+	free(app->base);
+	lf_ll_remove(&apps, app);
+}
+
 /* Loads an application into RAM. */
-int os_load_application(void *base, struct _lf_abi_header *header) {
-	struct _os_app *app = get_app(header);
-	int had_app = 0;
-	os_stack_t *stack = NULL;
+int os_load_application(void *_base) {
 	struct _os_task *task = NULL;
-	if (app) {
-		had_app = 1;
-		/* Unload the current task. */
-		os_task_release(app->task);
-	} else {
-		app = malloc(sizeof(struct _os_app));
-	}
+
+	struct _lf_abi_header *header = (struct _lf_abi_header *)_base;
+	struct _os_app *app = get_app(header);
+	if (app) os_task_release(app->task);
+
+	app = malloc(sizeof(struct _os_app));
 	lf_assert(app, failure, E_NULL, "Failed to allocate memory to create app.");
-	app->header = header;
-	/* Allocate the application's stack. */
-	stack = malloc(APPLICATION_STACK_SIZE_WORDS * sizeof(uint32_t));
-	lf_assert(stack, failure, E_NULL, "Failed to allocate memory to create task stack.");
-	void *_main = base + header->entry;
-	task = os_task_create(_main, stack, APPLICATION_STACK_SIZE_WORDS * sizeof(uint32_t));
+	app->task = NULL;
+	app->base = _base;
+	app->name = _base + header->name_offset;
+
+	void *_main = _base + header->entry;
+	task = os_task_create(_main, os_app_exit, app, APPLICATION_STACK_SIZE_WORDS * sizeof(uint32_t));
 	lf_assert(task, failure, E_NULL, "Failed to allocate memory for task");
 	app->task = task;
-	/* Set the task's base address. */
-	task->base = base;
+
+	lf_ll_append(&apps, app, free);
+
 	/* Add the task. */
 	os_task_add(task);
-	/* Append the app. */
-	if (!had_app) lf_ll_append(&apps, app, free);
 	/* Launch the task. */
 	os_task_next();
 	return lf_success;
 failure:
 	if (app) free(app);
-	if (stack) free(stack);
-	if (task) free(task);
-	if (base) free(base);
+	if (task) os_task_release(task);
 	return lf_error;
 }
 
@@ -192,7 +195,7 @@ int os_load_image(void *base) {
 
 	if (header->entry) {
 		/* If the image has an entry point, load it as an application. */
-		if ((retval = os_load_application(base, header)) != lf_success) {
+		if ((retval = os_load_application(base)) != lf_success) {
 			goto failure;
 		}
 	} else {

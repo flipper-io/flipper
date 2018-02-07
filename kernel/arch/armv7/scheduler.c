@@ -32,7 +32,7 @@ void os_scheduler_init(void) {
 	memset(&schedule, 0, sizeof(struct _os_schedule));
 
 	/* Create the system task. */
-	struct _os_task *task = os_task_create(os_kernel_task, kernel_task_stack, KERNEL_TASK_STACK_SIZE_WORDS * sizeof(uint32_t));
+	struct _os_task *task = os_task_create(os_kernel_task, NULL, NULL, KERNEL_TASK_STACK_SIZE_WORDS * sizeof(uint32_t));
 	/* Add the task. */
 	os_task_add(task);
 	/* Make the current task and the head of the task list the system task. */
@@ -72,40 +72,43 @@ int os_task_add(struct _os_task *task) {
 	/* Increment the number of active tasks. */
 	schedule.count ++;
 
+	return lf_success;
 }
 
-struct _os_task *os_task_create(void *handler, os_stack_t *stack, uint32_t stack_size) {
+struct _os_task *os_task_create(void *_entry, void (* _exit)(void *_ctx), void *_ctx, uint32_t stack_size) {
 	/* Allocate the next available task slot. */
 	struct _os_task *task = malloc(sizeof(struct _os_task));
-	/* Ensure memory was allocated for the new task. */
-	if (!task) {
-		lf_error_raise(E_MALLOC, NULL);
-		return NULL;
-	}
+	lf_assert(task, failure, E_NULL, "Failed to allocate memory to create task");
+	os_stack_t *stack = malloc(stack_size);
+	lf_assert(stack, failure, E_NULL, "Failed to allocate memory to create stack.");
 
 	/* Set the task's stack pointer to the top of the task's stack. */
 	task->sp = (uintptr_t)stack + stack_size;
 	/* Set the PID of the task. */
 	task->pid = schedule.next_pid ++;
 	/* Set the entry point of the task. */
-	task->handler = handler;
+	task->handler = _entry;
 	/* Mark the task as idle. */
 	task->status = os_task_status_idle;
-	/* Set the base address of the task's stack. */
-	task->stack_base = stack;
+	/* Store the address of the task's stack. */
+	task->stack = stack;
+	/* Set the task's exit function. */
+	task->exit = _exit;
+	/* Set the task's exit context. */
+	task->_ctx = _ctx;
 	/* Set the task's next task equal to the head of the task list. */
 	task->next = schedule.head;
 
 	/* Push the stack context onto the process' stack. */
 	task->sp -= sizeof(struct _stack_ctx);
 
-	struct _stack_ctx *_ctx = (struct _stack_ctx *)(task->sp);
+	struct _stack_ctx *_stack = (struct _stack_ctx *)(task->sp);
 	/* Write the default value of the status register. */
-	_ctx->psr = 0x01000000;
-	/* Write the handler address to the program counter. */
-	_ctx->pc = (uintptr_t)handler;
-	/* Write the finished handler address into the link register. */
-	_ctx->lr = (uintptr_t)os_task_finished;
+	_stack->psr = 0x01000000;
+	/* Write the entry point address to the program counter. */
+	_stack->pc = (uintptr_t)_entry;
+	/* Write the exit handler address into the link register. */
+	_stack->lr = (uintptr_t)os_task_finished;
 
 	/* Push the stack context onto the process stack. */
 	task->sp -= sizeof(struct _task_ctx);
@@ -121,29 +124,19 @@ struct _os_task *os_task_create(void *handler, os_stack_t *stack, uint32_t stack
 	_tsk->r11 = 11;
 
 	return task;
+failure:
+	return NULL;
 }
 
 int os_task_release(struct _os_task *task) {
-	/* Ensure that the task pointer is valid. */
-	if (!task) {
-		lf_error_raise(E_NULL, NULL);
-		return lf_error;
-	}
-	/* Don't allow the user to release the system task. */
-	if (task == schedule.head) {
-		lf_error_raise(E_INVALID_TASK, NULL);
-		return lf_error;
-	}
+	lf_assert(task, failure, E_NULL, "Invalid task pointer provided to '%s'.", __PRETTY_FUNCTION__);
+	lf_assert(task != schedule.head, failure, E_INVALID_TASK, "Tried to release task head.");
 	/* Disallow interrupts while freeing memory. */
 	__disable_irq();
-	/* If it was allocated, free the memory associated with the task's base. */
-	if (task->base) {
-		free(task->base);
-	}
+	/* Call the task's exit function. */
+	if (task->exit) task->exit(task->_ctx);
 	/* If it was allocated, free the memory associated with the task's stack. */
-	if (task->stack_base) {
-		free(task->stack_base);
-	}
+	if (task->stack) free(task->stack);
 	/* Allow interrupts again. */
 	__enable_irq();
 	/* Update the parent task's next pointer. */
@@ -165,6 +158,8 @@ int os_task_release(struct _os_task *task) {
 	/* Decrement the number of active tasks. */
 	schedule.count --;
 	return lf_success;
+failure:
+	return lf_error;
 }
 
 /* Schedules the next task for exeuction. */
