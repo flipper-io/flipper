@@ -23,7 +23,7 @@ Flipper makes it easy to write applications in any programming language, on any
 platform, that control real hardware.
 
 To purchase a Flipper device, please visit our store
-[here](https://www.flipper.io/buy).
+[here](https://flipper.io/products/flipper-carbon-developer-unit).
 
 ## Quickstart
 
