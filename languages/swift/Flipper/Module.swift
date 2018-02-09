@@ -39,7 +39,7 @@ func buildLinkedList(_ args: [LFArg]) -> UnsafeMutablePointer<_lf_ll>? {
   return argList
 }
 
-enum ModuleFFI {
+public enum ModuleFFI {
   case standard(StandardModuleFFI)
   case user(UserModuleFFI)
 
