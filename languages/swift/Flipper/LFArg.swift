@@ -14,6 +14,10 @@ public enum LFType: UInt8 {
   case u64 = 7
 }
 
+public struct DevicePointer {
+  public let bitPattern: UInt64
+}
+
 extension SignedInteger {
   var toLFArg: fmr_arg {
     return fmr_arg(bitPattern: Int64(truncatingIfNeeded: self))
@@ -90,16 +94,8 @@ extension UInt64: LFArg {
   }
 }
 
-extension UnsafeRawPointer: LFArg {
+extension DevicePointer: LFArg {
   public var asLFArg: _lf_arg {
-    return _lf_arg(type: LFType.ptr.rawValue,
-                   value: UInt64(bitPattern: Int64(Int(bitPattern: self))))
-  }
-}
-
-extension UnsafeMutableRawPointer: LFArg {
-  public var asLFArg: _lf_arg {
-    return _lf_arg(type: LFType.ptr.rawValue,
-                   value: UInt64(bitPattern: Int64(Int(bitPattern: self))))
+    return _lf_arg(type: LFType.ptr.rawValue, value: bitPattern)
   }
 }

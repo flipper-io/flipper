@@ -119,24 +119,11 @@ extension UInt64: LFReturnable {
   }
 }
 
-extension UnsafeRawPointer: LFReturnable {
+extension DevicePointer: LFReturnable {
   public static var lfType: LFType {
     return .ptr
   }
   public init(lfReturn: lf_return_t) {
-    // FIXME: Handle `null`.
-    self = UnsafeRawPointer(bitPattern:
-      UInt(truncatingIfNeeded: lfReturn))!
-  }
-}
-
-extension UnsafeMutableRawPointer: LFReturnable {
-  public static var lfType: LFType {
-    return .ptr
-  }
-  public init(lfReturn: lf_return_t) {
-    // FIXME: Handle `null`.
-    self = UnsafeMutableRawPointer(bitPattern:
-      UInt(truncatingIfNeeded: lfReturn))!
+    self = DevicePointer(bitPattern: UInt64(lfReturn))
   }
 }
