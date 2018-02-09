@@ -32,7 +32,7 @@ extension Int: LFReturnable {
 
 extension Int8: LFReturnable {
   public static var lfType: LFType {
-    return .int
+    return .i8
   }
 
   public init(lfReturn: lf_return_t) {
@@ -42,7 +42,7 @@ extension Int8: LFReturnable {
 
 extension Int16: LFReturnable {
   public static var lfType: LFType {
-    return .int
+    return .i16
   }
 
   public init(lfReturn: lf_return_t) {
@@ -52,7 +52,7 @@ extension Int16: LFReturnable {
 
 extension Int32: LFReturnable {
   public static var lfType: LFType {
-    return .int
+    return .i32
   }
 
   public init(lfReturn: lf_return_t) {
@@ -62,7 +62,7 @@ extension Int32: LFReturnable {
 
 extension Int64: LFReturnable {
   public static var lfType: LFType {
-    return .int
+    return .i64
   }
 
   public init(lfReturn: lf_return_t) {
