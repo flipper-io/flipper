@@ -70,10 +70,11 @@ enum ModuleFFI {
 
   func push<Ret: LFReturnable>(index: UInt8, data: Data, args: [LFArg]) -> Ret {
     var mod = modulePtr
-    let ret = data.withUnsafeBytes {
-      lf_push(&mod, index, UnsafeMutablePointer(mutating: $0),
-              UInt32(data.count), buildLinkedList(args))
-    }
+    let ret = 
+      data.withUnsafeBytes { (ptr: UnsafePointer<UInt32>) -> lf_return_t in
+        return lf_push(&mod, index, UnsafeMutableRawPointer(mutating: ptr),
+                       UInt32(data.count), buildLinkedList(args))
+      }
     return Ret.init(lfReturn: ret)
   }
 

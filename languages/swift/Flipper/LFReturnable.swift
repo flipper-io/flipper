@@ -20,6 +20,10 @@ struct LFVoid: LFReturnable {
   init(lfReturn: lf_return_t) { self = LFVoid() }
 }
 
+public struct DevicePointer {
+  let bitPattern: UInt64
+}
+
 extension Int: LFReturnable {
   public static var lfType: LFType {
     return .int
