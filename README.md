@@ -1,6 +1,6 @@
 # Flipper
 
-[![Build Status](https://travis-ci.com/georgemorgan/flipper.svg?token=mWpYCFjw1S5VKLVNvZFo&branch=master)](https://travis-ci.com/georgemorgan/flipper)
+[![Build Status](https://travis-ci.org/flipper-io/flipper.svg?branch=master)](https://travis-ci.org/flipper-io/flipper)
 
 ## About
 
