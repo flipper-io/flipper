@@ -5,22 +5,27 @@ public protocol LFArg {
 }
 
 public enum LFType: UInt8 {
+  /* unsigned types */
   case u8 = 0
   case u16 = 1
-  case void = 2
   case u32 = 3
-  case ptr = 4
-  case int = 6
   case u64 = 7
-}
 
-public struct DevicePointer {
-  public let bitPattern: UInt64
+  /* signed types */
+  case i8 = 8
+  case i16 = 9
+  case i32 = 11
+  case i64 = 15
+
+  /* misc types */
+  case void = 2
+  case int = 4
+  case ptr = 6
 }
 
 extension SignedInteger {
-  var toLFArg: fmr_arg {
-    return fmr_arg(bitPattern: Int64(truncatingIfNeeded: self))
+  var toLFArg: lf_arg {
+    return lf_arg(bitPattern: Int64(truncatingIfNeeded: self))
   }
 }
 
@@ -33,28 +38,28 @@ extension Int: LFArg {
 
 extension Int8: LFArg {
   public var asLFArg: _lf_arg {
-    return _lf_arg(type: LFType.int.rawValue,
+    return _lf_arg(type: LFType.i8.rawValue,
                    value: toLFArg)
   }
 }
 
 extension Int16: LFArg {
   public var asLFArg: _lf_arg {
-    return _lf_arg(type: LFType.int.rawValue,
+    return _lf_arg(type: LFType.i16.rawValue,
                    value: toLFArg)
   }
 }
 
 extension Int32: LFArg {
   public var asLFArg: _lf_arg {
-    return _lf_arg(type: LFType.int.rawValue,
+    return _lf_arg(type: LFType.i32.rawValue,
                    value: toLFArg)
   }
 }
 
 extension Int64: LFArg {
   public var asLFArg: _lf_arg {
-    return _lf_arg(type: LFType.int.rawValue,
+    return _lf_arg(type: LFType.i64.rawValue,
                    value: toLFArg)
   }
 }
