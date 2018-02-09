@@ -2,6 +2,7 @@
 //!
 //!
 
+#![deny(warnings)]
 #![deny(missing_docs)]
 #![deny(missing_debug_implementations)]
 #![deny(missing_copy_implementations)]
@@ -12,9 +13,12 @@
 #![deny(unused_import_braces)]
 #![deny(unused_qualifications)]
 
-#[macro_use] extern crate log;
-#[macro_use] extern crate serde_derive;
-#[macro_use] extern crate failure;
+#[macro_use]
+extern crate log;
+#[macro_use]
+extern crate serde_derive;
+#[macro_use]
+extern crate failure;
 extern crate byteorder;
 extern crate xmodem;
 extern crate serde;

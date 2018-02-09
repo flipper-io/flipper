@@ -1,9 +1,9 @@
 use std::fs::File;
-#[allow(unused_imports)] use std::io::Read;
+#[allow(unused_imports)]
+use std::io::Read;
 use std::io::Error as IoError;
 use clap::{App, AppSettings, Arg, ArgMatches};
 use failure::Error;
-use console::CliError;
 use console::bindings;
 
 #[derive(Debug, Fail)]

@@ -68,7 +68,7 @@ impl StandardModule for Uart0 {
 impl Uart0 {
     /// Configures the Uart0 module with a given baud rate and
     /// interrupts enabled flag.
-    pub fn configure(&self, baud: &UartBaud, interrupts: bool) {
+    pub fn configure(&self, baud: UartBaud, interrupts: bool) {
         let args = Args::new()
             .append(baud.to_baud())
             .append(if interrupts { 1u8 } else { 0u8 });

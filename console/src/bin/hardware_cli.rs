@@ -72,7 +72,7 @@ pub mod flash {
     pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         // This is safe because "image" is a required argument.
         let image = args.value_of("image").unwrap();
-        println!("Flipper flash got image: {}", image);
+        info!("Flipper flash got image: {}", image);
 
         let firmware = File::open(image)
             .and_then(|mut f| {
@@ -81,6 +81,6 @@ pub mod flash {
                 Ok(v)
             })?;
 
-        fdfu::flash(&firmware, args.is_present("verify"))
+        fdfu::flash(&firmware)
     }
 }
