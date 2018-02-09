@@ -27,7 +27,7 @@ To purchase a Flipper device, please visit our store
 
 ## Quickstart
 
-### Install the dependancies
+### Install the dependencies
 
 To build Flipper, you first need to install the project dependencies. To build
 firmware images for the device you will need to install two GNU cross
