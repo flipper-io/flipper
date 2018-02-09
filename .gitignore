@@ -1,5 +1,6 @@
 .DS_Store
 .clang_complete
+.build/
 *.so
 *.bin
 *.hex
@@ -11,4 +12,5 @@ xcuserdata
 __pycache__
 *.pyc
 .idea/
+Flipper.xcodeproj
 cmake-build-debug/

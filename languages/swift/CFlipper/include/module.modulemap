@@ -1,0 +1,5 @@
+module CFlipper [system] {
+  header "/usr/local/include/flipper.h"
+  link "flipper"
+  export *
+}
