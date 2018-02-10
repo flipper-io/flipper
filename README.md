@@ -2,28 +2,103 @@
 
 [![Build Status](https://travis-ci.org/flipper-io/flipper.svg?branch=master)](https://travis-ci.org/flipper-io/flipper)
 
-## About
+An embedded development platform that can be controlled remotely from any
+programming language. [flipper.io](https://flipper.io)
 
-Flipper is a development platform that offers a new take on the traditional
-embedded software development cycle.
+# Why did we make Flipper?
 
-Using Flipper, a developer creates and debugs program logic on a development
-machine instead of deploying code onto an embedded device and debugging it
-there. Our library performs remote procedure calls to a connected device
-instead of emulating the hardware. This makes it possible to use real hardware
-to test program behavior in real time. When development is complete, the
-project can be cross compiled and loaded onto a Flipper device for native
-performance.
+At the highest level, Flipper is just like any embedded development platform:
+it's a tool for using software to interact with and control electronic
+hardware. All embedded platforms have limited resources, often orders of
+magnitude smaller than those available on a typical desktop computer. These
+limitations impose heavy constraints on the type of applications that you can
+write for these platforms. For example, nearly all embedded programs are
+written in C or C++
+([though Rust is getting there](http://www.rust-embedded.org/)), many lack
+access to resources like heap memory, and simple tasks like communicating with
+other devices can involve a lot of manual protocol implementation. Quite
+frankly, embedded development is really hard, especially for beginners. With
+Flipper, we're trying to make embedded development easier by moving the
+application logic to a more comfortable place - the developer's computer.
 
-This new embedded development workflow makes it simple to use widely adopted
-and industry standard tools, like Xcode and Visual Studio, to develop and debug
-applications that interact with embedded hardware peripherals. The capabilities
-of the platform extend beyond the scope of embedded software development;
-Flipper makes it easy to write applications in any programming language, on any
-platform, that control real hardware.
+# What's special about Flipper?
 
-To purchase a Flipper device, please visit our store
-[here](https://flipper.io/products/flipper-carbon-developer-unit).
+Flipper has two core components: a lightweight operating system for the
+device, and a library to install on "host machines", such as the developer's
+computer. Together, these form a system that we like to call the Flipper
+Message Runtime, or FMR. FMR allows you to write programs that execute on the
+host machine but directly control the hardware. I like to think of it as
+hardware-as-a-library. This ability to remotely execute functions on the
+device from a host machine has far-reaching implications, and opens up a
+whole new world of possibilities for embedded projects. The most exciting
+feature of Flipper is the ability to control it from any platform (Linux,
+MacOS, Windows, Android, or iOS), using any programming language.
+
+## An example
+
+Flipper has a concept of "packages", which are just compiled code that live
+on the device. The simplest package is the LED, and looks something like this:
+
+```c
+// led.c
+void led_rgb(int r, int g, int b) {
+    // Twiddle some bits, set the LED color
+}
+```
+
+Every package can have language bindings generated for it. This means that
+once we have `led.c`, we can get `led.py` for free:
+
+```py
+# led.py
+from Flipper import led
+led.rgb(0, 255, 0); # Sets the LED to green!
+```
+
+Any language that can execute C under the hood (pretty much all of them!) is
+capable of controlling Flipper like this. So far we're well underway to support
+C/C++, Rust, Python, and Swift, and we plan on adding Objective-C, Java, and
+Javascript in the near future.
+
+# How it works
+
+Let's go through a brief tour of Flipper's major components and explain how
+they all work together. Hopefully this will help to paint a clearer picture
+of what Flipper is capable of.
+
+```
+---------------------                        -------------
+| Language bindings |                        |  Packages |
+---------------------                        -------------
+---------------------                        -------------
+|    Libflipper     |                        |  Osmium   |
+---------------------                        -------------
+---------------------                        -------------
+|                   |                        |           |
+|                   |                        |           |
+|       Host        |  USB, Wifi, Bluetooth  |  Flipper  |
+|                   |  <~~~~~~~~~~~~~~~~~~>  |           |
+|                   |                        |           |
+---------------------                        -------------
+```
+
+Libflipper is the name of the library which captures function calls on the
+host machine and sends them to Flipper. A host machine can be a desktop
+computer, smartphone, or even a server. Hosts can communicate with Flipper
+using any form of communication, with usb, wifi, and bluetooth being the main
+three. In order to use high level programming languages, we have
+"language bindings" which make use of libflipper in order to control Flipper.
+
+Osmium is our affectionate name for Flipper's operating system. It's in charge
+of communicating with libflipper and receiving instructions, then executing
+code in the correct package and returning the result. Flipper comes with
+several "standard" packages, which provide the core functionality of the board.
+These correspond pretty closely to the peripherals in the hardware, giving
+access to GPIO, USART, SPI, I2C, and more. However, Flipper allows you to
+write your own packages. Packages always run directly on the device, meaning
+that you get native performance, but every package can have language bindings
+generated for it, allowing you to execute functions in that package remotely
+from your language of choice.
 
 ## Quickstart
 
@@ -38,12 +113,14 @@ device, you will need `dfu-programmer`. You may selectively install dependencies
 depending on what you wish to contribute to.
 
 #### [Homebrew](https://brew.sh/)
+
 ```
 brew tap osx-cross/avr osx-cross/arm
 brew install rust libusb avr-gcc dfu-programmer arm-gcc-bin
 ```
 
 #### APT
+
 ```
 apt-get install build-essential libusb-1.0-0-dev
 apt-get install dfu-programmer avr-libc binutils-avr gcc-avr
@@ -51,6 +128,7 @@ apt-get install libnewlib-arm-none-eabi binutils-arm-none-eabi gcc-arm-none-eabi
 ```
 
 ### Clone and build the repository
+
 ```
 git clone https://github.com/georgemorgan/flipper.git
 cd flipper
