@@ -12,13 +12,17 @@ it's a tool for using software to interact with and control electronic
 hardware. All embedded platforms have limited resources, often orders of
 magnitude smaller than those available on a typical desktop computer. These
 limitations impose heavy constraints on the type of applications that you can
-write for these platforms. For example, nearly all embedded programs are
-written in C or C++
-([though Rust is getting there](http://www.rust-embedded.org/)), many lack
-access to resources like heap memory, and simple tasks like communicating with
-other devices can involve a lot of manual protocol implementation. Quite
-frankly, embedded development is really hard, especially for beginners. With
-Flipper, we're trying to make embedded development easier by moving the
+write for these platforms.
+For example, nearly all embedded programs are written in C or C++, meaning
+that developers of other languages are either out of luck or have a steep
+learning curve to overcome to work with hardware. Additionally, the limited
+resources means that developers often don't have access to tools they're
+accustomed to, such as dynamically sized arrays, lots of heap space, etc.
+And finally, communicating and dynamically interacting with an embedded
+device can involve a lot of manual protocol implementation, such as reading
+and writing a byte stream and interpreting what to do.
+Quite frankly, embedded development is really hard, especially for beginners.
+With Flipper, we're trying to make embedded development easier by moving the
 application logic to a more comfortable place - the developer's computer.
 
 # What's special about Flipper?
