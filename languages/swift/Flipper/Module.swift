@@ -101,6 +101,10 @@ public protocol UserModule {
 }
 
 public extension UserModule {
+  init() {
+    self.init(ffi: .user(.uninitialized(name: Self.name)))
+  }
+
   init(flipper: Flipper) {
     var ffi = UserModuleFFI(name: Self.name, version: 0, crc: 0, index: 0)
     lf_bind(&ffi.moduleMetadata, flipper.device)
@@ -115,6 +119,10 @@ public protocol StandardModule {
 }
 
 public extension StandardModule {
+  init() {
+    self.init(ffi: .standard(StandardModuleFFI(moduleMetadata: _lf_module())))
+  }
+
   init(flipper: Flipper) {
     var mod = _lf_module()
     lf_bind(&mod, flipper.device)
