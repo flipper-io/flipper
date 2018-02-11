@@ -7,110 +7,16 @@
 Flipper is a development platform that offers a new take on the traditional
 embedded software development cycle.
 
-Using Flipper, a developer creates and debugs program logic on a development
-machine instead of deploying code onto an embedded device and debugging it
-there. Our library performs remote procedure calls to a connected device
-instead of emulating the hardware. This makes it possible to use real hardware
-to test program behavior in real time. When development is complete, the
-project can be cross compiled and loaded onto a Flipper device for native
-performance.
 
-This new embedded development workflow makes it simple to use widely adopted
-and industry standard tools, like Xcode and Visual Studio, to develop and debug
-applications that interact with embedded hardware peripherals. The capabilities
-of the platform extend beyond the scope of embedded software development;
-Flipper makes it easy to write applications in any programming language, on any
-platform, that control real hardware.
+We're trying to make embedded development easier. Our goal is to make an embedded development platform that lets you program in any language, with tools you're already familiar with.
+
 
 To purchase a Flipper device, please visit our store
 [here](https://flipper.io/products/flipper-carbon-developer-unit).
 
 ## Quickstart
 
-### Install the dependencies
-
-To build Flipper, you first need to install the project dependencies. To build
-firmware images for the device you will need to install two GNU cross
-compilers: `avr-gcc` and `arm-none-eabi-gcc`. To build and use libflipper you
-will need to install `libusb-1.0`. To build and install the console you will
-need to install the `rust` compiler and tools. To write firmware images to the
-device, you will need `dfu-programmer`. You may selectively install dependencies
-depending on what you wish to contribute to.
-
-#### [Homebrew](https://brew.sh/)
-```
-brew tap osx-cross/avr osx-cross/arm
-brew install rust libusb avr-gcc dfu-programmer arm-gcc-bin
-```
-
-#### APT
-```
-apt-get install build-essential libusb-1.0-0-dev
-apt-get install dfu-programmer avr-libc binutils-avr gcc-avr
-apt-get install libnewlib-arm-none-eabi binutils-arm-none-eabi gcc-arm-none-eabi
-```
-
-### Clone and build the repository
-```
-git clone https://github.com/georgemorgan/flipper.git
-cd flipper
-make
-```
-
-To selectively build components of the project, see the table below.
-
-|      Target     |                      Description                      |
-|-----------------|-------------------------------------------------------|
-| `make libflipper` | Builds the [`library`](./library) that talks to the hardware. |
-| `make console` | Builds the [`console`](./console) tool that creates and manages projects. |
-| `make atmegau2` | Builds the firmware for the [`microcontroller`](./carbon/atmegau2). |
-| `make atsam4s`| Build the embedded operating system for the [`microprocessor`](./carbon/atsam4s). |
-| `make utils` | Builds the [`utilities`](./utils) needed to flash and debug the hardware. |
-
-> All of the intermediates are placed in the `build` directory.
-
-### Install the tools
-
-Once you've built, you can install the platform library and tools.
-
-```
-make install
-```
-> The default `PREFIX` for installation is `/usr/local/`. If you wish to change the prefix, set the prefix before the install like `PREFIX=/path/to/prefix make install`
-
-If you are on Linux, you will need to install the `udev` rule that lets
-`libflipper` talk to the hardware. You will then need to trigger a rule reload:
-
-```
-cp assets/99-flipper.rules /etc/udev/rules.d
-udevadm trigger
-```
-
-## Updating the Firmware
-
-Once you get everything installed, you should update your board's firmware.
-Attach only one Flipper device to your computer via USB, and then run the
-following command.
-
-```
-make update
-```
-
-## Example
-
-Once you've installed the platform library and tools, you can try the example.
-```
-cd examples/app
-make
-```
-
-This will build an application for the device. You can then install this
-application onto the attached device.
-```
-make install
-```
-
-See the README for each example for details.
+To get started, head over to [Getting Started](https://github.com/flipper-io/flipper/wiki/Getting-Started)
 
 ## Contribution
 
