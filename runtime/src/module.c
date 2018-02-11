@@ -1,4 +1,4 @@
-#include <flipper/libflipper.h>
+#include <flipper.h>
 
 struct _lf_module *lf_module_create(char *name) {
 	struct _lf_module *module = malloc(sizeof(struct _lf_module));

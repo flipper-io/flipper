@@ -2,7 +2,7 @@
 
 #define __private_include__
 #include <flipper/uart0.h>
-#include <flipper/atsam4s/atsam4s.h>
+
 
 int uart0_configure(uint8_t baud, uint8_t interrupts) {
 	/* Create a pinmask for the peripheral pins. */

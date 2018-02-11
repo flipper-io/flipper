@@ -29,20 +29,23 @@ ARM_SRC_DIRS := carbon/atsam4s										\
 				runtime/arch/armv7									\
 				runtime/src
 
-ARM_CFLAGS	 := -std=gnu99											\
+ARM_CFLAGS	 := -std=c99											\
 				-Wall												\
 				-Wextra												\
 				-Wno-unused-parameter								\
 				-Os													\
-				-mcpu=cortex-m4										\
+																	\
 				-mthumb												\
-				-nostartfiles										\
+				-march=armv7e-m										\
+				-mtune=cortex-m4									\
+				-mfloat-abi=soft									\
+																	\
 				-D__disable_error_side_effects__					\
-				-D__ATSAM4SB__										\
-				-DPLATFORM_HEADER="<flipper/atsam4s/atsam4s.h>"		\
+				-D__ATSAM4S__										\
 				$(foreach inc,$(ARM_INC_DIRS),-I$(inc))
 
-ARM_LDFLAGS  := -Wl,-T carbon/atsam4s/sam4s16.ld					\
+ARM_LDFLAGS  := -nostartfiles										\
+				-Wl,-T carbon/atsam4s/sam4s16.ld					\
 				-Wl,--gc-sections
 
 $(ARM_TARGET): $(ARM_TARGET).bin
@@ -68,7 +71,7 @@ AVR_SRC_DIRS := carbon/atmegau2 									\
 				runtime/arch/avr8									\
 				runtime/src
 
-AVR_CFLAGS 	 := -std=gnu99											\
+AVR_CFLAGS 	 := -std=c99											\
 				-Wall												\
 				-Wextra												\
 				-Wno-unused-parameter								\
@@ -79,7 +82,6 @@ AVR_CFLAGS 	 := -std=gnu99											\
 				-DF_CPU=16000000UL									\
 				-D__disable_error_side_effects__					\
 				-D__ATMEGAU2__										\
-				-DPLATFORM_HEADER="<flipper/atmegau2/atmegau2.h>"	\
 				$(foreach inc,$(AVR_INC_DIRS),-I$(inc))
 
 AVR_LDFLAGS  := -mmcu=atmega32u2									\
@@ -118,7 +120,7 @@ X86_CFLAGS	 := -std=gnu99											\
 				-Wno-unused-parameter								\
 				-g													\
 				-fpic												\
-				-DPLATFORM_HEADER="<flipper/posix/posix.h>"			\
+				-D__POSIX__											\
 				$(shell pkg-config --cflags libusb-1.0)				\
 				$(foreach inc,$(X86_INC_DIRS),-I$(inc))				\
 

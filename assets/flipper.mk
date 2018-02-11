@@ -19,28 +19,26 @@ FLIPPER_LD := arm-none-eabi-gcc
 FLIPPER_OBJCOPY := arm-none-eabi-objcopy
 FLIPPER_OBJDUMP := arm-none-eabi-objdump
 
-FLIPPER_CFLAGS := \
-	-march=armv7e-m \
-	-mtune=cortex-m4 \
-	-mcpu=cortex-m4 \
-	-g \
-	-ffreestanding \
-	-nostdlib \
-	-fPIC \
-	-Os \
-	-I/usr/local/include \
-	-I. \
-	-Iinclude \
-	-D__ATSAM4S__ \
-	-DPLATFORM_HEADER="<flipper/atsam4s/atsam4s.h>"
+ARM_CFLAGS := -std=c99											\
+			  -Wall												\
+			  -Wextra											\
+			  -Wno-unused-parameter								\
+			  -Os												\
+			  													\
+			  -mthumb											\
+			  -march=armv7e-m									\
+			  -mtune=cortex-m4									\
+			  -mfloat-abi=soft									\
+			  													\
+			  -g												\
+			  -ffreestanding									\
+			  -fPIC												\
+			  -I/usr/local/include								\
+			  -Iinclude											\
+			  													\
+			  -D__ATSAM4S__
 
-FLIPPER_LDFLAGS := \
-	-mcpu=cortex-m4 \
-	-g \
-	-ffreestanding \
-	-nostdlib \
-	-fPIC \
-	-Os
+FLIPPER_LDFLAGS := -nostdlib
 
 # Build settings for code that runs on the host and communicates with the Flipper device
 HOST_BUILD := $(BUILD)/local
@@ -56,7 +54,7 @@ HOST_CC := gcc
 HOST_LD := gcc
 HOST_AR := ar
 
-HOST_CFLAGS := -I. -Iinclude -g
+HOST_CFLAGS := -I. -Iinclude -g -D__POSIX__
 HOST_LDFLAGS := -g
 
 # Build settings for code that runs on the Flipper Virtual Machine
@@ -69,7 +67,7 @@ FVM_BUILD_DIRS := $(addsuffix /.dir,$(patsubst %/,%,$(sort $(dir $(FVM_OBJS)))))
 FVM_CC := gcc
 FVM_LD := gcc
 
-FVM_CFLAGS := -I. -Iinclude -g -DPLATFORM_HEADER="<flipper/posix/posix.h>"
+FVM_CFLAGS := -I. -Iinclude -g -D__POSIX__
 FVM_LDFLAGS := -g
 
 # Build for the Flipper device and host by default, but not FVM
@@ -88,7 +86,7 @@ echo[%]:
 
 # Flipper build targets
 $(FLIPPER_BUILD)/%.c.o: %.c | $(FLIPPER_BUILD_DIRS)
-	$(FLIPPER_CC) -c $(FLIPPER_CFLAGS) -I$(<D) -MD -MP -MF $(FLIPPER_BUILD)/$*.c.d -o $@ $<
+	$(FLIPPER_CC) $(ARM_CFLAGS) -MD -MP -MF $(FLIPPER_BUILD)/$*.c.d -c -o $@ $<
 
 $(FLIPPER_BUILD)/main.elf: $(FLIPPER_OBJS)
 	$(FLIPPER_LD) $(FLIPPER_LDFLAGS) -o $@ $^
@@ -110,7 +108,7 @@ $(HOST_BUILD)/package_data.c: $(FLIPPER_TARGET) | $(HOST_BUILD_DIRS)
 	(cd $(<D) && xxd -i $(<F)) > $@
 
 $(HOST_BUILD)/%.c.o: %.c | $(HOST_BUILD_DIRS)
-	$(HOST_CC) -c $(HOST_CFLAGS) -I$(<D) -MD -MP -MF $(HOST_BUILD)/$*.c.d -o $@ $<
+	$(HOST_CC) $(HOST_CFLAGS) -MD -MP -MF $(HOST_BUILD)/$*.c.d -c -o $@ $<
 
 $(HOST_GLUE_TARGET): $(HOST_GLUE_OBJS)
 	$(HOST_AR) -rcs $@ $^
@@ -123,7 +121,7 @@ $(HOST_TARGET): $(HOST_BUILD)/$(MODULE).a $(HOST_OBJS)
 
 # FVM build targets
 $(FVM_BUILD)/%.c.o: %.c | $(FVM_BUILD_DIRS)
-	$(FVM_CC) -c $(FVM_CFLAGS) -I$(<D) -MD -MP -MF $(FVM_BUILD)/$*.c.d -o $@ $<
+	$(FVM_CC) $(FVM_CFLAGS) -MD -MP -MF $(FVM_BUILD)/$*.c.d -c -o $@ $<
 
 $(FVM_BUILD)/package_data.c: | $(FVM_BUILD_DIRS)
 	echo "unsigned char package_bin[] = {\n};\nunsigned package_bin_len = 0;" > $@
@@ -155,7 +153,6 @@ help:
 	"  dump          - Display the assembly code listing of the built Flipper module\n" \
 	"  install       - Build the Flipper module and upload it to a connected Flipper device\n" \
 	"  clean         - Remove the entire build directory, containing all build products"
-
 
 # Make sure that the .dir files aren't automatically deleted after building.
 .SECONDARY:

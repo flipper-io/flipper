@@ -1,4 +1,4 @@
-#include <flipper/libflipper.h>
+#include <flipper.h>
 
 #define __private_include__
 #include <flipper/error.h>

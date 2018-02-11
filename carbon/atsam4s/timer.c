@@ -1,7 +1,6 @@
 #define __private_include__
 #include <flipper/timer.h>
 #include <flipper/error.h>
-#include <flipper/atsam4s/atsam4s.h>
 
 /* NOTE: TC0 is reserved by the system scheduler. */
 

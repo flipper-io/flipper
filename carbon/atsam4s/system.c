@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/atsam4s/atsam4s.h>
+
 #include <flipper/uart0.h>
 #include <os/loader.h>
 

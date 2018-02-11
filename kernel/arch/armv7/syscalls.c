@@ -3,7 +3,6 @@
 #define __private_include__
 #include <flipper/usart.h>
 #include <flipper/gpio.h>
-#include <flipper/atsam4s/atsam4s.h>
 
 extern int errno;
 extern int _end;

@@ -2,7 +2,7 @@
 #define __uart0_h__
 
 /* Include all types and macros exposed by the Flipper Toolbox. */
-#include <flipper/libflipper.h>
+#include <flipper.h>
 #include <flipper/usart.h>
 
 #ifdef __private_include__

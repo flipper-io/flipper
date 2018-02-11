@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/libflipper.h>
+#include <flipper.h>
 
 struct _lf_arg *lf_arg_create(lf_type type, lf_arg value) {
 	struct _lf_arg *arg = malloc(sizeof(struct _lf_arg));

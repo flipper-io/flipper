@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper.h>
-#include <flipper/atmegau2/atmegau2.h>
+
 #include <flipper/atmegau2/megausb.h>
 
 int debug_putchar(char c, FILE *stream) {

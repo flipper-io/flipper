@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/libflipper.h>
+#include <flipper.h>
 #include <flipper/fmr.h>
 
 /* Include the Carbon board file. */

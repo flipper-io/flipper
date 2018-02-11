@@ -164,8 +164,6 @@ struct _lf_module {
 
 #define LF_MODULE_SET_DEVICE_AND_ID(module, _device, _id) module.device = _device; module.index = _id;
 
-extern struct _lf_device lf_self;
-
 struct _lf_device *lf_device_create(struct _lf_endpoint *endpoint, int (* select)(struct _lf_device *device), int (* destroy)(struct _lf_device *device), size_t context_size);
 int lf_device_release(struct _lf_device *device);
 
@@ -208,11 +206,5 @@ int lf_load(void *source, lf_size_t length, struct _lf_device *device);
 /* Prints verbose information about the packet disassembly. */
 void lf_debug_packet(struct _fmr_packet *packet, size_t length);
 void lf_debug_result(struct _fmr_result *result);
-
-#ifdef PLATFORM_HEADER
-#include PLATFORM_HEADER
-#else
-#include <flipper/posix/posix.h>
-#endif
 
 #endif
