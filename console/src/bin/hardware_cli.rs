@@ -56,7 +56,10 @@ pub mod boot {
 
 pub mod flash {
     use super::*;
-    use console::hardware::fdfu;
+    use console::hardware::fdfu::{
+        self,
+        Progress,
+    };
 
     pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
         App::new("flash")
@@ -74,13 +77,41 @@ pub mod flash {
         let image = args.value_of("image").unwrap();
         info!("Flipper flash got image: {}", image);
 
-        let firmware = File::open(image)
+        let firmware: Vec<_> = File::open(image)
             .and_then(|mut f| {
                 let mut v = Vec::new();
                 f.read_to_end(&mut v)?;
                 Ok(v)
             })?;
 
-        fdfu::flash(&firmware, args.is_present("verify"))
+        let verify = args.is_present("verify");
+        let receiver = fdfu::flash(firmware.into(), verify);
+
+        loop {
+            let progress = receiver.recv().unwrap();
+            match progress {
+                Progress::UpdateMode => println!("Entered update mode"),
+                Progress::NormalMode => println!("Entered normal mode"),
+                Progress::Applet => println!("Uploaded copy applet"),
+                Progress::Flashing(done, total) => println!("Uploaded page {} of {}", done, total),
+                Progress::FlashComplete => {
+                    print!("Finished flashing firmware");
+                    if verify { print!(", verifying"); }
+                    println!();
+                },
+                Progress::Verifying(done, total) => println!("Verified word {} of {}", done, total),
+                Progress::VerifyComplete(errors) => {
+                    if errors > 0 {
+                        println!("Verification failed: found {} errors", errors);
+                    } else {
+                        println!("Firmware verified! No errors found");
+                    }
+                }
+                Progress::Failed(e) => Err(e)?,
+                Progress::Complete => break,
+            }
+        }
+
+        Ok(())
     }
 }

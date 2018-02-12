@@ -20,6 +20,11 @@ use flipper::StandardModule;
 use flipper::fsm::uart0::{Uart0, UartBaud};
 use flipper::fsm::gpio::Gpio;
 
+use std::sync::{
+    Arc,
+    mpsc,
+};
+
 #[derive(Debug, Fail)]
 enum FdfuError {
     #[fail(display = "failed to enter normal mode")]
@@ -38,8 +43,6 @@ enum FdfuError {
     SecurityBit,
     #[fail(display = "failed to upload page {} to flash", _0)]
     FlashWrite(usize),
-    #[fail(display = "firmware verification failed. Found {} errors", _0)]
-    Verify(usize),
 }
 
 impl From<xmodem::Error> for FdfuError {
@@ -52,6 +55,35 @@ impl From<xmodem::Error> for FdfuError {
         };
         FdfuError::XModem(message)
     }
+}
+
+/// Reports the progress of the flashing and/or verification of a firmware image.
+/// Since the `flash` function is asynchronous, `Progress` variants are sent
+/// through the returned channel in order to report the status of flashing.
+#[derive(Debug)]
+pub enum Progress {
+    /// Indicates that the device was successfully placed in update mode.
+    UpdateMode,
+    /// Indicates that the device was successfully placed in normal mode.
+    NormalMode,
+    /// Indicates that the copy applet was successfully uploaded to the device.
+    Applet,
+    /// Indicates that page _0 of _1 was successfully flashed.
+    Flashing(usize, usize),
+    /// Indicates that the flashing process completed without errors.
+    FlashComplete,
+    /// Indicates that word _0 of _1 has been checked. Note that this does _not_ mean
+    /// that word _0 was verified to be correct. The total number of verification
+    /// errors is reported by `VerifyComplete`.
+    Verifying(usize, usize),
+    /// Indicates that the verification process completed without failure. The number
+    /// _0 given is the number of words checked which did not match the verification
+    /// image.
+    VerifyComplete(usize),
+    /// Indicates that some failure occurred while flashing or verifying the firmware.
+    Failed(Error),
+    /// Indicates that the flashing and/or verifying process completed successfully.
+    Complete,
 }
 
 const IRAM_ADDR: u32 = 0x20000000;
@@ -99,12 +131,13 @@ struct SamBa<'a> {
     applet: &'a [u8],
     bus: &'a mut Uart0,
     gpio: &'a mut Gpio,
+    sender: &'a mut mpsc::Sender<Progress>,
 }
 
 impl<'a> SamBa<'a> {
-    fn new(bus: &'a mut Uart0, gpio: &'a mut Gpio) -> SamBa<'a> {
+    fn new(bus: &'a mut Uart0, gpio: &'a mut Gpio, sender: &'a mut mpsc::Sender<Progress>) -> SamBa<'a> {
         let applet: &[u8] = include_bytes!("./copy.bin");
-        SamBa { applet, bus, gpio }
+        SamBa { applet, bus, gpio, sender }
     }
 
     /// Tells the SAM to branch to a given address and begin executing code.
@@ -188,6 +221,7 @@ impl<'a> SamBa<'a> {
 
             if &ack[..] == b"\n\r>" {
                 debug!("Entered update mode");
+                let _ = self.sender.send(Progress::UpdateMode);
                 return Ok(())
             }
             self.enter_dfu();
@@ -207,6 +241,7 @@ impl<'a> SamBa<'a> {
 
             if ack == [0x0A, 0x0D] {
                 debug!("Entered normal mode");
+                let _ = self.sender.send(Progress::NormalMode);
                 return Ok(());
             }
         }
@@ -234,103 +269,122 @@ impl<'a> SamBa<'a> {
     ///    a) Upload a 512-byte page of the firmware into RAM using the SAM-BA
     ///    b) Configure the copy applet to copy the page to an address in internal flash
     ///    c) Use SAM-BA to execute the copy applet
-    fn upload(&mut self, destination: u32, data: &[u8]) -> Result<(), Error> {
+    fn upload(&mut self, destination: u32, data: &[u8]) {
         info!("Uploading {} byte image to address 0x{:08X}", data.len(), destination);
-        self.enter_update_mode()?;
-        self.enter_normal_mode()?;
+        let result = (||{
+            self.enter_update_mode()?;
+            self.enter_normal_mode()?;
 
-        // Check the device's security bit
-        self.write_efc_fcr(EFC_GGPB, 0x0)?;
-        let word = self.read_word(EEFC_FRR)?;
-        if word & 0x01 != 0 { Err(FdfuError::SecurityBit)? }
-
-        // Write the copy applet into RAM
-        self.copy(APPLET_ADDR, self.applet)?;
-
-        // Configure the applet's stack, entry point, destination, and source
-        self.write_word(APPLET_STACK, IRAM_ADDR + IRAM_SIZE)?;
-        self.write_word(APPLET_ENTRY, APPLET_ADDR + 0x09)?;
-        self.write_word(APPLET_DESTINATION, destination)?;
-        self.write_word(APPLET_SOURCE, PAGE_BUFFER(self.applet.len()))?;
-
-        // Send the firmware, page by page
-        for (i, page) in data.chunks(512).enumerate() {
-            debug!("Writing page {}", i);
-            self.copy(PAGE_BUFFER(self.applet.len()), page)?;
-            self.write_word(APPLET_PAGE, EEFC_FCR_FARG(i as u32))?;
-            self.jump(APPLET_ADDR)?;
-            for _ in 0..4 {
-                let fsr: u8 = self.read_byte(EEFC_FSR)?;
-                if fsr & 0x01 != 0 { break; }
-                if fsr & 0x0E != 0 { Err(FdfuError::FlashWrite(i))? }
-            }
-        };
-
-        let retries = 4u8;
-        for i in 0..retries {
-            // Set the GPNVM1 to boot from flash memory.
-            self.write_efc_fcr(EFC_SGPB, 0x1)?;
-
-            // Check that the GPNVM1 bit is set.
+            // Check the device's security bit
             self.write_efc_fcr(EFC_GGPB, 0x0)?;
-            let byte = self.read_byte(EEFC_FRR)?;
-            if byte & (1 << 1) != 0 { break }
+            let word = self.read_word(EEFC_FRR)?;
+            if word & 0x01 != 0 { Err(FdfuError::SecurityBit)? }
 
-            // If the bit is still not set after all retries, return an error
-            if i >= retries - 1 { Err(FdfuError::SecurityBit)? }
-        }
+            // Write the copy applet into RAM
+            self.copy(APPLET_ADDR, self.applet)?;
+            let _ = self.sender.send(Progress::Applet);
 
-        Ok(())
+            // Configure the applet's stack, entry point, destination, and source
+            self.write_word(APPLET_STACK, IRAM_ADDR + IRAM_SIZE)?;
+            self.write_word(APPLET_ENTRY, APPLET_ADDR + 0x09)?;
+            self.write_word(APPLET_DESTINATION, destination)?;
+            self.write_word(APPLET_SOURCE, PAGE_BUFFER(self.applet.len()))?;
+
+            // Send the firmware, page by page
+            let page_size = 512;
+            let pages = data.len() / page_size;
+            for (i, page) in data.chunks(page_size).enumerate() {
+                debug!("Writing page {}", i);
+                self.copy(PAGE_BUFFER(self.applet.len()), page)?;
+                self.write_word(APPLET_PAGE, EEFC_FCR_FARG(i as u32))?;
+                self.jump(APPLET_ADDR)?;
+                for _ in 0..4 {
+                    let fsr: u8 = self.read_byte(EEFC_FSR)?;
+                    if fsr & 0x01 != 0 { break; }
+                    if fsr & 0x0E != 0 { Err(FdfuError::FlashWrite(i))? }
+                }
+                let _ = self.sender.send(Progress::Flashing(i, pages));
+            };
+
+            let retries = 4u8;
+            for i in 0..retries {
+                // Set the GPNVM1 to boot from flash memory.
+                self.write_efc_fcr(EFC_SGPB, 0x1)?;
+
+                // Check that the GPNVM1 bit is set.
+                self.write_efc_fcr(EFC_GGPB, 0x0)?;
+                let byte = self.read_byte(EEFC_FRR)?;
+                if byte & (1 << 1) != 0 { break }
+
+                // If the bit is still not set after all retries, return an error
+                if i >= retries - 1 { Err(FdfuError::SecurityBit)? }
+            }
+
+            Ok(())
+        })();
+
+        let _ = match result {
+            Ok(_) => self.sender.send(Progress::FlashComplete),
+            Err(e) => self.sender.send(Progress::Failed(e)),
+        };
     }
 
     /// Verifies that the data from the given buffer matches the data on the ATSAM
     /// beginning at the base Flash address of the device. This is used to check that
     /// a firmware image was uploaded correctly.
-    fn verify(&mut self, data: &[u8]) -> Result<usize, Error> {
-        let word_size = 4;
-        let mut errors = 0;
-        let words = data.len() / 4;
-        for (word_count, word_bytes) in data.chunks(word_size).enumerate() {
-            let firmware_word = Cursor::new(word_bytes).read_u32::<BigEndian>().unwrap();
-            let address = IFLASH0_ADDR + (word_count * word_size) as u32;
-            let sam_word = self.read_word(address)?;
-            trace!("Verifying word {:04} of {:04} at address 0x{:08X}", word_count, words, address);
+    fn verify(&mut self, data: &[u8]) {
+        let result = (|| {
+            let word_size = 4;
+            let mut errors = 0;
+            let words = data.len() / 4;
+            for (word_count, word_bytes) in data.chunks(word_size).enumerate() {
+                let firmware_word = Cursor::new(word_bytes).read_u32::<BigEndian>().unwrap();
+                let address = IFLASH0_ADDR + (word_count * word_size) as u32;
+                let sam_word = self.read_word(address)?;
+                trace!("Verifying word {:04} of {:04} at address 0x{:08X}", word_count, words, address);
+                let _ = self.sender.send(Progress::Verifying(word_count, words));
 
-            // Compare the top 2 bytes of every word
-            let mask = 0xFFFF0000;
-            if sam_word & mask != firmware_word & mask {
-                errors += 1;
+                // Compare the top 2 bytes of every word
+                let mask = 0xFFFF0000;
+                if sam_word & mask != firmware_word & mask {
+                    errors += 1;
+                }
             }
-        }
+            Ok(errors)
+        })();
 
-        Ok(errors)
+        let _ = match result {
+            Ok(num) => self.sender.send(Progress::VerifyComplete(num)),
+            Err(e) => self.sender.send(Progress::Failed(e)),
+        };
     }
 }
 
-/// Given a binary buffer, flash the contents of the buffer onto Flipper.
-pub fn flash(firmware: &[u8], verify: bool) -> Result<(), Error> {
-    let flipper = Flipper::attach();
-    flipper.select_u2_gpio();
+/// Flashes the contents of `firmware` onto Flipper. If `verify` is true, also read
+/// back each byte in memory from the device and compare it to the original firmware.
+///
+/// Returns a channel receiver of `Progress`, which reports the status of the flashing
+/// process. This is arranged this way so that the console binary can simply display
+/// a TUI output based on progress, but any library consumers can programmatically
+/// watch progress (and respond accordingly) without their standard output being polluted.
+pub fn flash(firmware: Arc<[u8]>, verify: bool) -> mpsc::Receiver<Progress> {
 
-    let mut bus = Uart0::new();
-    bus.configure(UartBaud::DFU, false);
-    let mut gpio = Gpio::new();
-    {
-        let mut samba = SamBa::new(&mut bus, &mut gpio);
-        samba.upload(IFLASH0_ADDR, &firmware)?;
-        println!("Flash successful");
+    let (mut sender, receiver) = mpsc::channel();
 
-        if verify {
-            println!("Begin verifying");
-            let error_count = samba.verify(&firmware)?;
-            if error_count > 0 {
-                Err(FdfuError::Verify(error_count))?;
-            }
-            println!("Firmware verified successfully");
-        }
+    thread::spawn(move || {
+        let flipper = Flipper::attach();
+        flipper.select_u2_gpio();
+
+        let mut bus = Uart0::new();
+        bus.configure(UartBaud::DFU, false);
+        let mut gpio = Gpio::new();
+        let mut samba = SamBa::new(&mut bus, &mut gpio, &mut sender);
+
+        samba.upload(IFLASH0_ADDR, &firmware);
+        if verify { samba.verify(&firmware); }
         samba.reset();
-    }
-    bus.configure(UartBaud::FMR, true);
+        let _ = samba.sender.send(Progress::Complete);
+    });
 
-    Ok(())
+    receiver
 }
