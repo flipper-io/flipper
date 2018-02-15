@@ -14,6 +14,12 @@
 #error "Invalid target platform."
 #endif
 
+/* Descriptor information for USB. */
+#define CARBON_USB_MANUFACTURER    L"flipper.io"
+#define CARBON_USB_PRODUCT         L"Flipper: Carbon"
+#define CARBON_USB_VENDOR_ID       0x16C0
+#define CARBON_USB_PRODUCT_ID      0x0480
+
 /* Define the IO pins for this board. */
 
 /* GPIO signals */

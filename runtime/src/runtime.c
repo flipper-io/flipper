@@ -1,9 +1,5 @@
 #define __private_include__
 #include <flipper.h>
-#include <flipper/fmr.h>
-
-/* Include the Carbon board file. */
-#include <flipper/carbon.h>
 
 int lf_get_result(struct _lf_device *device, struct _fmr_result *result) {
 	/* Obtain the response packet from the device. */

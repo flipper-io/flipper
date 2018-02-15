@@ -13,12 +13,6 @@
 /* The current version of libflipper. */
 #define LF_VERSION 0x0001
 
-/* Configuration information for USB. */
-#define CARBON_USB_MANUFACTURER    L"flipper.io"
-#define CARBON_USB_PRODUCT         L"Flipper: Carbon"
-#define CARBON_USB_VENDOR_ID       0x16C0
-#define CARBON_USB_PRODUCT_ID      0x0480
-
 /* If defined, imposes a timeout on USB transactions. */
 #define __lf_usb_timeout__
 #ifdef __lf_usb_timeout__

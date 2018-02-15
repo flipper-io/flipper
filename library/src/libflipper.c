@@ -1,5 +1,5 @@
 #define __private_include__
-#include <flipper/libflipper.h>
+#include <flipper.h>
 
 lf_device_list lf_attached_devices;
 struct _lf_device *lf_current_device;
