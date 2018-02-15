@@ -1,4 +1,4 @@
-#include <flipper/libflipper.h>
+#include <flipper.h>
 
 #ifdef __use_button__
 #define __private_include__

@@ -6,9 +6,6 @@
 #ifndef __lf_platform_h__
 #define __lf_platform_h__
 
-/* Include the base types. */
-#include <flipper/types.h>
-
 /* Include the avr-libc standard library headers. */
 #include <avr/common.h>
 #include <util/delay.h>

@@ -2,11 +2,7 @@
 #ifndef __lf_platform_h__
 #define __lf_platform_h__
 
-/* Include the base types. */
-#include <flipper/types.h>
-
-/* Top-level POSIX platform support header. */
-
+#include <unistd.h>
 #include <flipper/posix/network.h>
 #include <flipper/posix/usb.h>
 

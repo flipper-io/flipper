@@ -3,7 +3,7 @@
 #ifndef __scheduler_h__
 #define __scheduler_h__
 
-#include <flipper/libflipper.h>
+#include <flipper.h>
 
 /* An enumerated type of possible task states. */
 typedef enum {
