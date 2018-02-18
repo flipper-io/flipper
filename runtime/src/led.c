@@ -1,4 +1,3 @@
-#define __private_include__
 #include <flipper/led.h>
 
 #ifdef __use_led__

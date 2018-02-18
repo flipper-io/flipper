@@ -1,4 +1,3 @@
-#define __private_include__
 #include <flipper/uart0.h>
 
 #ifdef __use_uart0__

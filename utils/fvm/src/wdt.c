@@ -1,7 +1,6 @@
 #include <flipper.h>
 
 #ifdef __use_wdt__
-#define __private_include__
 #include <flipper/wdt.h>
 
 int wdt_configure(void) {

@@ -1,7 +1,6 @@
 #include <flipper.h>
 
 #ifdef __use_task__
-#define __private_include__
 #include <flipper/task.h>
 
 int os_task_pause(int pid) {

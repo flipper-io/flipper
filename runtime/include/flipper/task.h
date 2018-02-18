@@ -14,8 +14,6 @@ extern const struct _task_interface {
 	int (* stop)(int pid);
 } task;
 
-#ifdef __private_include__
-
 /* Declare the _lf_module structure for this module. */
 extern struct _lf_module _task;
 
@@ -26,5 +24,4 @@ int os_task_pause(int pid);
 int os_task_resume(int pid);
 int os_task_stop(int pid);
 
-#endif
 #endif

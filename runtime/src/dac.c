@@ -1,4 +1,3 @@
-#define __private_include__
 #include <flipper/dac.h>
 
 #ifdef __use_dac__

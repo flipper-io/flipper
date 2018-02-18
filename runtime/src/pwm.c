@@ -1,4 +1,3 @@
-#define __private_include__
 #include <flipper/pwm.h>
 
 #ifdef __use_pwm__

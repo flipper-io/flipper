@@ -20,7 +20,6 @@
  *                        ------                    ------
  */
 
-#define __private_include__
 #include <flipper.h>
 #include <flipper/posix/usb.h>
 #include <flipper/posix/network.h>

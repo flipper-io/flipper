@@ -11,8 +11,6 @@ extern const struct _pwm_interface {
 
 } pwm;
 
-#ifdef __private_include__
-
 /* Declare the _lf_module structure for this module. */
 extern struct _lf_module _pwm;
 
@@ -22,5 +20,4 @@ enum { _pwm_configure };
 /* Declare the prototypes for all of the functions within this module. */
 int pwm_configure(void);
 
-#endif
 #endif

@@ -1,6 +1,5 @@
 /* This is done in a separate compilation unit so that the atsam4s module index enumerations are correct. */
 
-#define __private_include__
 #include <flipper.h>
 #include <flipper/atsam4s/modules.h>
 

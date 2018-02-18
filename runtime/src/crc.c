@@ -1,4 +1,3 @@
-#define __private_include__
 #include <flipper.h>
 
 /*                                      16   12   5

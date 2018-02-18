@@ -1,4 +1,3 @@
-#define __private_include__
 #include <flipper/gpio.h>
 
 int gpio_configure(void) {

@@ -1,4 +1,3 @@
-#define __private_include__
 #include <flipper/fld.h>
 
 #ifdef __use_fld__

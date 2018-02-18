@@ -1,4 +1,3 @@
-#define __private_include__
 #include <flipper.h>
 
 int lf_get_result(struct _lf_device *device, struct _fmr_result *result) {

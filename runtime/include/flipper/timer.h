@@ -9,8 +9,6 @@ extern const struct _timer_interface {
 	int (* configure)(void);
 } timer;
 
-#ifdef __private_include__
-
 /* Declare the _lf_module structure for this module. */
 extern struct _lf_module _timer;
 
@@ -20,5 +18,4 @@ enum { _timer_configure };
 /* Declare the prototypes for all of the functions within this module. */
 int timer_configure(void);
 
-#endif
 #endif

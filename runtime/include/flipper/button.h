@@ -12,8 +12,6 @@ extern const struct _button_interface {
 	uint8_t (* read)(void);
 } button;
 
-#ifdef __private_include__
-
 /* Declare the _lf_module structure for this module. */
 extern struct _lf_module _button;
 
@@ -24,5 +22,4 @@ enum { _button_configure, _button_read };
 int button_configure(void);
 uint8_t button_read(void);
 
-#endif
 #endif

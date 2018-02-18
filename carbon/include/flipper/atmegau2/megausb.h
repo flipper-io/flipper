@@ -4,8 +4,6 @@
 /* Include all types and macros exposed by the Flipper Toolbox. */
 #include <flipper.h>
 
-#ifdef __private_include__
-
 extern volatile uint8_t megausb_configuration;
 
 /* USB endpoint configuration macros. */
@@ -72,4 +70,4 @@ int8_t megausb_bulk_transmit(void *source, lf_size_t length);
 int usb_debug_putchar(uint8_t c);
 
 #endif
-#endif
+

@@ -7,7 +7,6 @@
 //
 
 #import "LED.h"
-#define __private_include__
 #import <flipper/led.h>
 
 @implementation LFLED

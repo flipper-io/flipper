@@ -1,7 +1,6 @@
 #include <flipper.h>
 
 #ifdef __use_button__
-#define __private_include__
 #include <flipper/button.h>
 
 int button_configure(void) {

@@ -15,8 +15,6 @@ extern const struct _gpio_interface {
 	uint32_t (* read)(uint32_t mask);
 } gpio;
 
-#ifdef __private_include__
-
 /* Declare the _lf_module structure for this module. */
 extern struct _lf_module _gpio;
 
@@ -29,5 +27,4 @@ void gpio_enable(uint32_t enable, uint32_t disable);
 void gpio_write(uint32_t set, uint32_t clear);
 uint32_t gpio_read(uint32_t mask);
 
-#endif
 #endif

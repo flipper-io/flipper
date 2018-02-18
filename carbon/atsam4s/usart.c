@@ -1,4 +1,3 @@
-#define __private_include__
 #include <flipper/usart.h>
 
 #define USART0_BAUDRATE 230400
