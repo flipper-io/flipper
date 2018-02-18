@@ -96,5 +96,5 @@ def getModule(name):
 	return module(name, None, byref(_module))
 
 def invoke(module, function, ret, arguments):
-	libflipper.lf_invoke(lf_get_current_device(), module.ref, c_byte(function), c_byte(ret), lf_ll_from_list(arguments))
+	libflipper.lf_invoke(current_device(), module.ref, c_byte(function), c_byte(ret), lf_ll_from_list(arguments))
 	return
