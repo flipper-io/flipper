@@ -145,54 +145,53 @@ pub trait StandardModule {
 /// When a user creates a module, they give it a name which is used by
 /// Flipper to load and bind to it. To use it from the Rust bindings,
 /// the user must specify the name so that rust can find the module.
-pub trait UserModule<'a>: From<UserModuleFFI> {
+pub trait UserModule<'a>: From<(&'a Flipper, UserModuleFFI)> {
     const NAME: &'a str;
-    fn new() -> Self;
 
     /// Binds an instance of a User Module to the given Flipper.
     ///
     /// ```rust,no_run
     /// use flipper::{Flipper, UserModule, ModuleFFI, UserModuleFFI};
     ///
-    /// struct MyModule {
-    ///     ffi: ModuleFFI,
+    /// struct MyModule<'a> {
+    ///     flipper: &'a Flipper,
+    ///     module: ModuleFFI,
     /// }
     ///
-    /// impl<'a> UserModule<'a> for MyModule {
+    /// impl<'a> UserModule<'a> for MyModule<'a> {
     ///     const NAME: &'a str = "My module";
-    ///     fn new() -> Self {
+    ///     fn new(flipper: &'a Flipper) -> Self {
     ///         MyModule {
-    ///             ffi: ModuleFFI::User(UserModuleFFI::uninitialized(Self::NAME)),
+    ///             flipper,
+    ///             module: ModuleFFI::User(UserModuleFFI::uninitialized(Self::NAME)),
     ///         }
     ///     }
     /// }
     ///
-    /// impl From<UserModuleFFI> for MyModule {
-    ///     fn from(module: UserModuleFFI) -> Self {
+    /// impl<'a> From<(&'a Flipper, UserModuleFFI)> for MyModule<'a> {
+    ///     fn from((flipper, module): (&'a Flipper, UserModuleFFI)) -> Self {
     ///         MyModule {
-    ///             ffi: ModuleFFI::User(module),
+    ///             flipper,
+    ///             module: ModuleFFI::User(module),
     ///         }
     ///     }
     /// }
     ///
-    /// impl MyModule {
-    ///     fn my_func(&self) {
+    /// impl<'a> MyModule<'a> {
+    ///     fn myFunc(&self) {
     ///         // Do FMR invocation
     ///     }
     /// }
     ///
-    /// let flipper = Flipper::attach().expect("should attach to Flipper");
-    ///
-    /// // Any of the following will bind "MyModule"
-    /// let my_module = MyModule::new();          // Attaches to default ("active") flipper
-    /// let my_module = MyModule::bind(&flipper); // Attaches to specified flipper
+    /// let flipper = Flipper::attach();
+    /// let myModule = MyModule::new(&flipper); // Binds "MyModule" to control "flipper".
     ///
     /// my_module.my_func();
     /// ```
-    fn bind(flipper: &Flipper) -> Self {
+    fn new(flipper: &'a Flipper) -> Self {
         let mut module = UserModuleFFI::uninitialized(Self::NAME);
         unsafe { lf_bind(flipper.device, &mut module.module_meta); }
-        Self::from(module)
+        Self::from((flipper, module))
     }
 }
 
