@@ -66,8 +66,8 @@ const APPLET_SOURCE: u32 = APPLET_DESTINATION + 0x04;
 const APPLET_PAGE: u32 = APPLET_SOURCE + 0x04;
 const PAGE_BUFFER: &'static Fn(usize) -> u32 = &|applet_size| (APPLET_ADDR + applet_size as u32);
 
+const SAM_RESET_PIN: u32 = 0x04;
 const SAM_ERASE_PIN: u32 = 0x06;
-const SAM_RESET_PIN: u32 = 0x05;
 
 const EFC0: u32 = 0x400E0A00;
 const EEFC_FCR: u32 = EFC0 + 0x04;
@@ -218,7 +218,6 @@ impl<'a> SamBa<'a> {
     /// Moves data from the host to the device's RAM using the SAM-BA
     /// and XMODEM protocol.
     fn copy(&mut self, address: u32, data: &[u8]) -> Result<(), Error> {
-        debug!("Copying {} bytes to 0x{:08}", data.len(), address);
         let command = CString::new(format!("S{:08X},{:08X}#", address, data.len())).unwrap();
         self.bus.write(command.as_bytes())?;
 
@@ -313,8 +312,12 @@ pub fn flash(firmware: &[u8]) -> Result<(), Error> {
     let mut bus = Uart0::new();
     bus.configure(UartBaud::DFU, false);
     let mut gpio = Gpio::new();
-    let mut samba = SamBa::new(&mut bus, &mut gpio);
-    samba.upload(IFLASH0_ADDR, &firmware)?;
+    {
+        let mut samba = SamBa::new(&mut bus, &mut gpio);
+        samba.upload(IFLASH0_ADDR, &firmware)?;
+        samba.reset();
+    }
+    bus.configure(UartBaud::FMR, true);
 
     println!("Flash successful");
     Ok(())
