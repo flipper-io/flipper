@@ -13,40 +13,38 @@ all::
 install::
 
 # ARM target variables
-ARM_TARGET	 := atsam4s
+ARM_TARGET     := atsam4s
 
-ARM_PREFIX	 := arm-none-eabi-
+ARM_PREFIX     := arm-none-eabi-
 
 # Directories that need to be included for this target.
-ARM_INC_DIRS := carbon/include 										\
-				kernel/include 										\
-				library/include										\
-				runtime/include										\
+ARM_INC_DIRS := carbon/include        \
+                kernel/include        \
+                library/include       \
+                runtime/include
 
-ARM_SRC_DIRS := carbon/atsam4s										\
-				kernel/src											\
-				kernel/arch/armv7									\
-				runtime/arch/armv7									\
-				runtime/src
+ARM_SRC_DIRS := carbon/atsam4s        \
+                kernel/src            \
+                kernel/arch/armv7     \
+                runtime/arch/armv7    \
+                runtime/src
 
-ARM_CFLAGS	 := -std=c99											\
-				-Wall												\
-				-Wextra												\
-				-Wno-unused-parameter								\
-				-Os													\
-																	\
-				-mthumb												\
-				-march=armv7e-m										\
-				-mtune=cortex-m4									\
-				-mfloat-abi=soft									\
-																	\
-				-D__disable_error_side_effects__					\
-				-D__ATSAM4S__										\
-				$(foreach inc,$(ARM_INC_DIRS),-I$(inc))
+ARM_CFLAGS     := -std=c99            \
+                -Wall                 \
+                -Wextra               \
+                -Wno-unused-parameter \
+                -Os                   \
+                -mthumb               \
+                -march=armv7e-m       \
+                -mtune=cortex-m4      \
+                -mfloat-abi=soft      \
+                -D__no_err_str__      \
+                -D__ATSAM4S__         \
+            	$(foreach inc,$(ARM_INC_DIRS),-I$(inc))
 
-ARM_LDFLAGS  := -nostartfiles										\
-				-Wl,-T carbon/atsam4s/sam4s16.ld					\
-				-Wl,--gc-sections
+ARM_LDFLAGS  := -nostartfiles                    \
+                -Wl,-T carbon/atsam4s/sam4s16.ld \
+                -Wl,--gc-sections
 
 $(ARM_TARGET): $(ARM_TARGET).bin
 
@@ -56,36 +54,36 @@ install-atsam4s: utils $(ARM_TARGET).bin
 	$(_v)$(BUILD)/utils/fdfu $(BUILD)/$(ARM_TARGET)/$(ARM_TARGET).bin
 
 # AVR target variables
-AVR_TARGET	 := atmegau2
+AVR_TARGET     := atmegau2
 
-AVR_PREFIX	 := avr-
+AVR_PREFIX     := avr-
 
 # Directories that need to be included for this target.
-AVR_INC_DIRS := carbon/include 										\
-				kernel/include 										\
-				library/include										\
-				runtime/include										\
+AVR_INC_DIRS := carbon/include        \
+                kernel/include        \
+                library/include       \
+                runtime/include		  \
 
-AVR_SRC_DIRS := carbon/atmegau2 									\
-				kernel/src 											\
-				runtime/arch/avr8									\
-				runtime/src
+AVR_SRC_DIRS := carbon/atmegau2       \
+                kernel/src            \
+                runtime/arch/avr8     \
+                runtime/src
 
-AVR_CFLAGS 	 := -std=c99											\
-				-Wall												\
-				-Wextra												\
-				-Wno-unused-parameter								\
-				-Os													\
-				-mmcu=atmega32u2									\
-				-DARCH=ARCH_AVR8									\
-				-D__AVR_ATmega32U2__								\
-				-DF_CPU=16000000UL									\
-				-D__disable_error_side_effects__					\
-				-D__ATMEGAU2__										\
-				$(foreach inc,$(AVR_INC_DIRS),-I$(inc))
+AVR_CFLAGS      := -std=c99           \
+                -Wall                 \
+                -Wextra               \
+                -Wno-unused-parameter \
+                -Os                   \
+                -mmcu=atmega32u2      \
+                -DARCH=ARCH_AVR8      \
+                -D__AVR_ATmega32U2__  \
+                -DF_CPU=16000000UL    \
+                -D__no_err_str__      \
+                -D__ATMEGAU2__        \
+            	$(foreach inc,$(AVR_INC_DIRS),-I$(inc))
 
-AVR_LDFLAGS  := -mmcu=atmega32u2									\
-				-Wl,--gc-sections
+AVR_LDFLAGS  := -mmcu=atmega32u2 \
+                -Wl,--gc-sections
 
 $(AVR_TARGET): $(AVR_TARGET).hex
 
@@ -99,30 +97,29 @@ install-atmegau2: atmegau2
 # install:: install-atmegau2
 
 # x86 target variables
-X86_TARGET	 := libflipper
+X86_TARGET     := libflipper
 
-X86_PREFIX	 :=
+X86_PREFIX     :=
 
 # Directories that need to be included for this target.
-X86_INC_DIRS := carbon/include 										\
-				library/include 									\
-				runtime/include
+X86_INC_DIRS := carbon/include          \
+                library/include         \
+                runtime/include
 
-X86_SRC_DIRS := carbon/hal											\
-				library/src											\
-				runtime/arch/x64									\
-				library/platforms/posix								\
-				runtime/src
+X86_SRC_DIRS := carbon/hal              \
+                library/src             \
+                runtime/arch/x64        \
+                library/platforms/posix \
+                runtime/src
 
-X86_CFLAGS	 := -std=gnu99											\
-				-Wall												\
-				-Wextra												\
-				-Wno-unused-parameter								\
-				-g													\
-				-fpic												\
-				-D__POSIX__											\
-				$(shell pkg-config --cflags libusb-1.0)				\
-				$(foreach inc,$(X86_INC_DIRS),-I$(inc))				\
+X86_CFLAGS :=   -std=gnu99              \
+                -Wall                   \
+                -Wextra                 \
+                -Wno-unused-parameter   \
+                -fpic                   \
+                -D__POSIX__             \
+            	$(foreach inc,$(X86_INC_DIRS),-I$(inc)) \
+				$(shell pkg-config --cflags-only-I libusb-1.0)
 
 X86_LDFLAGS  := $(shell pkg-config --libs libusb-1.0)
 
@@ -268,27 +265,27 @@ all:: $$($1_TARGET)
 
 # Linking rule
 $$($1_ELF): $$($1_OBJS)
-	$$(_v)$$($1_LD) $$($1_LDFLAGS) -o $$($1_BUILD)/$$@ $$^
+	$(_v)$$($1_LD) $$($1_LDFLAGS) -o $$($1_BUILD)/$$@ $$^
 
 # Objcopy-ing rule
 $$($1_HEX): $$($1_ELF)
-	$$(_v)$$($1_OBJCOPY) -O ihex $$($1_BUILD)/$$< $$($1_BUILD)/$$@
+	$(_v)$$($1_OBJCOPY) -O ihex $$($1_BUILD)/$$< $$($1_BUILD)/$$@
 
 # Objcopy-ing rule
 $$($1_BIN): $$($1_ELF)
-	$$(_v)$$($1_OBJCOPY) -O binary $$($1_BUILD)/$$< $$($1_BUILD)/$$@
+	$(_v)$$($1_OBJCOPY) -O binary $$($1_BUILD)/$$< $$($1_BUILD)/$$@
 
 # Linking rule
 $$($1_SO): $$($1_OBJS)
-	$$(_v)$$($1_LD) -shared -o $$($1_BUILD)/$$@ $$^ $$($1_LDFLAGS)
+	$(_v)$$($1_LD) -shared -o $$($1_BUILD)/$$@ $$^ $$($1_LDFLAGS)
 
 # Compiling rule for C sources
 $$($1_BUILD)/%.c.o: %.c | $$($1_BUILD_DIR_FILES)
-	$$(_v)$$($1_CC) $$($1_CFLAGS) -I$$(<D) -MD -MP -MF $$($1_BUILD)/$$*.c.d -c -o $$@ $$<
+	$(_v)$$($1_CC) $$($1_CFLAGS) -I$$(<D) -MD -MP -MF $$($1_BUILD)/$$*.c.d -c -o $$@ $$<
 
 # Compiling rule for S sources
 $$($1_BUILD)/%.S.o: %.S | $$($1_BUILD_DIR_FILES)
-	$$(_v)$$($1_AS) $$($1_ASFLAGS) $$($1_CFLAGS) -I$$(<D) -MD -MP -MF $$($1_BUILD)/$$*.S.d -c -o $$@ $$<
+	$(_v)$$($1_AS) $$($1_ASFLAGS) $$($1_CFLAGS) -I$$(<D) -MD -MP -MF $$($1_BUILD)/$$*.S.d -c -o $$@ $$<
 
 # Build dependency rules
 -include $$($1_DEPS)
