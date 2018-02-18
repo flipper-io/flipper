@@ -229,7 +229,7 @@ MAKEFLAGS += --no-builtin-rules
 #####
 # find_srcs($1: source directories, $2: source file extensions)
 #####
-find_srcs = $(foreach sd,$1,$(foreach ext,$2,$(wildcard $(sd)/*.$(ext))))
+find_srcs = $(foreach e,$2,$(shell find $1 -name "*.$(e)"))
 #####
 
 # All supported source file extensions.
