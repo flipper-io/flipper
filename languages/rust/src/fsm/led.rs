@@ -2,7 +2,6 @@
 
 use ::{
     Flipper,
-    StandardModule,
     StandardModuleFFI,
     ModuleFFI,
     _lf_module,
@@ -18,33 +17,20 @@ extern {
     static _led: _lf_module;
 }
 
-pub struct Led {
+pub struct Led<'a> {
+    flipper: &'a Flipper,
     module: ModuleFFI,
 }
 
-impl StandardModule for Led {
-    fn new() -> Self {
-        unsafe {
-            let module = StandardModuleFFI { module_meta: &_led };
-            Led {
-                module: ModuleFFI::Standard(module),
-            }
-        }
+impl<'a> Led<'a> {
+    pub fn new(flipper: &'a Flipper) -> Self {
+        let module = unsafe { StandardModuleFFI { module_meta: &_led } };
+        let module = ModuleFFI::Standard(module);
+        Led { flipper, module }
     }
 
-    fn bind(_: &Flipper) -> Self {
-        unsafe {
-            let module = StandardModuleFFI { module_meta: &_led };
-            Led {
-                module: ModuleFFI::Standard(module),
-            }
-        }
-    }
-}
-
-impl Led {
     pub fn configure(&self) {
-        lf_invoke(lf_get_current_device(), &self.module, 0, Args::new())
+        lf_invoke(self.flipper, &self.module, 0, Args::new())
     }
 
     pub fn rgb(&self, r: u8, g: u8, b: u8) {
@@ -52,6 +38,6 @@ impl Led {
             .append(r)
             .append(g)
             .append(b);
-        lf_invoke(lf_get_current_device(), &self.module, 1, args)
+        lf_invoke(self.flipper, &self.module, 1, args)
     }
 }

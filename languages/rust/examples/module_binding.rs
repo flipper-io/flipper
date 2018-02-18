@@ -6,36 +6,39 @@ use flipper::fmr::{
     lf_invoke,
 };
 
-struct GpioToggle {
-    ffi: ModuleFFI,
+struct GpioToggle<'a> {
+    flipper: &'a Flipper,
+    module: ModuleFFI,
 }
 
-impl<'a> UserModule<'a> for GpioToggle {
+impl<'a> UserModule<'a> for GpioToggle<'a> {
     const NAME: &'a str = "gpio";
-    fn new() -> Self {
+    fn new(flipper: &'a Flipper) -> Self {
         GpioToggle {
-            ffi: ModuleFFI::User(UserModuleFFI::uninitialized(Self::NAME)),
+            flipper,
+            module: ModuleFFI::User(UserModuleFFI::uninitialized(Self::NAME)),
         }
     }
 }
 
-impl From<UserModuleFFI> for GpioToggle {
-    fn from(user: UserModuleFFI) -> Self {
+impl<'a> From<(&'a Flipper, UserModuleFFI)> for GpioToggle<'a> {
+    fn from((flipper, module): (&'a Flipper, UserModuleFFI)) -> Self {
         GpioToggle {
-            ffi: ModuleFFI::User(user),
+            flipper,
+            module: ModuleFFI::User(module),
         }
     }
 }
 
-impl GpioToggle {
+impl<'a> GpioToggle<'a> {
     fn toggle(&self) {
         let args = Args::new().append(4u8);
-        lf_invoke(lf_get_current_device(), &self.ffi, 0, args)
+        lf_invoke(self.flipper, &self.module, 0, args)
     }
 }
 
 fn main() {
     let flipper = Flipper::attach().expect("should attach to Flipper");
-    let gpio: GpioToggle = GpioToggle::bind(&flipper);
+    let gpio: GpioToggle = GpioToggle::new(&flipper);
     gpio.toggle();
 }

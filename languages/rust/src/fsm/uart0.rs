@@ -8,7 +8,6 @@ use std::io::{
 
 use ::{
     Flipper,
-    StandardModule,
     ModuleFFI,
     StandardModuleFFI,
     _lf_module,
@@ -40,51 +39,37 @@ impl UartBaud {
     }
 }
 
-pub struct Uart0 {
-    ffi: ModuleFFI,
+pub struct Uart0<'a> {
+    flipper: &'a Flipper,
+    module: ModuleFFI,
 }
 
-impl StandardModule for Uart0 {
-    fn new() -> Self {
-        unsafe {
-            let ffi = StandardModuleFFI { module_meta: &_uart0 };
-            Uart0 {
-                ffi: ModuleFFI::Standard(ffi),
-            }
-        }
+impl<'a> Uart0<'a> {
+    pub fn new(flipper: &'a Flipper) -> Self {
+        let module = unsafe { StandardModuleFFI { module_meta: &_uart0 } };
+        let module = ModuleFFI::Standard(module);
+        Uart0 { flipper, module }
     }
-    /// Instantiates a Uart0 module bound to a specific Flipper device.
-    // TODO implement binding
-    fn bind(_: &Flipper) -> Self {
-        unsafe {
-            let ffi = StandardModuleFFI { module_meta: &_uart0 };
-            Uart0 {
-                ffi: ModuleFFI::Standard(ffi),
-            }
-        }
-    }
-}
 
-impl Uart0 {
     /// Configures the Uart0 module with a given baud rate and
     /// interrupts enabled flag.
     pub fn configure(&self, baud: UartBaud, interrupts: bool) {
         let args = Args::new()
             .append(baud.to_baud())
             .append(if interrupts { 1u8 } else { 0u8 });
-        lf_invoke(lf_get_current_device(), &self.ffi, 0, args)
+        lf_invoke(self.flipper, &self.module, 0, args)
     }
 
     /// Indicates whether the Uart0 bus is ready to read or write.
     pub fn ready(&self) -> bool {
-        let ret: u8 = lf_invoke(lf_get_current_device(), &self.ffi, 1, Args::new());
+        let ret: u8 = lf_invoke(self.flipper, &self.module, 1, Args::new());
         ret != 0
     }
 }
 
-impl Write for Uart0 {
+impl<'a> Write for Uart0<'a> {
     fn write(&mut self, buf: &[u8]) -> Result<usize> {
-        lf_push::<()>(&self.ffi, 2, buf, Args::new());
+        lf_push::<()>(self.flipper, &self.module, 2, buf, Args::new());
         Ok(buf.len())
     }
     fn flush(&mut self) -> Result<()> {
@@ -92,10 +77,10 @@ impl Write for Uart0 {
     }
 }
 
-impl Read for Uart0 {
+impl<'a> Read for Uart0<'a> {
     fn read(&mut self, buf: &mut [u8]) -> Result<usize> {
         if buf.len() == 0 { return Ok(0) }
-        lf_pull::<()>(&self.ffi, 3, buf, Args::new());
+        lf_pull::<()>(self.flipper, &self.module, 3, buf, Args::new());
         Ok(buf.len())
     }
 }
