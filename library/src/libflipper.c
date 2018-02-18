@@ -5,12 +5,12 @@ struct _lf_device *lf_current_device;
 lf_event_list lf_registered_events;
 
 /* Creates a new libflipper device. */
-struct _lf_device *lf_device_create(struct _lf_endpoint *endpoint, int (* select)(struct _lf_device *device), int (* destroy)(struct _lf_device *device), size_t context_size) {
+struct _lf_device *lf_device_create(struct _lf_endpoint *endpoint, int (* select)(struct _lf_device *device), int (* release)(struct _lf_device *device), size_t context_size) {
 	struct _lf_device *device = (struct _lf_device *)calloc(1, sizeof(struct _lf_device));
 	lf_assert(device, failure, E_MALLOC, "Failed to allocate memory for new device.");
 	device->endpoint = endpoint;
 	device->select = select;
-	device->destroy = destroy;
+	device->release = release;
 	device->_ctx = calloc(1, context_size);
 	return device;
 failure:
@@ -29,7 +29,7 @@ struct _lf_device *lf_get_current_device(void) {
 int lf_device_release(struct _lf_device *device) {
 	if (device) {
 		lf_endpoint_release(device->endpoint);
-		if (device->destroy) device->destroy(device);
+		if (device->release) device->release(device);
 		free(device->_ctx);
 		free(device);
 	}
@@ -74,20 +74,19 @@ int __attribute__((__destructor__)) lf_exit(void) {
 }
 
 /* Binds the lf_module structure to its counterpart on the attached device. */
-LF_WEAK int lf_bind(struct _lf_module *module, struct _lf_device *device) {
+LF_WEAK int lf_bind(struct _lf_device *device, struct _lf_module *module) {
 	lf_assert(module, failure, E_MODULE, "NULL module passed to '%s'.", __PRETTY_FUNCTION__);
 	lf_assert(device, failure, E_NULL, "NULL device passed to '%s'.", __PRETTY_FUNCTION__)
 	lf_assert(module->name, failure, E_MODULE, "Module has no name.");
 	lf_debug("Binding to module '%s'.", module->name);
-	module->device = device;
 	module->identifier = lf_crc(module->name, strlen(module->name) + 1);
 	int index = fld_index(module->identifier);
 	if (index == -1) {
 		lf_debug("Could not find counterpart for '%s'. Attempting to load it.", module->name);
-		lf_load(module->data, *module->psize, module->device);
+		lf_load(device, module->data, *module->psize);
 		index = fld_index(module->identifier);
 	}
-	lf_assert(index != -1, failure, E_MODULE, "No counterpart for the module '%s' was found on the device '%s'. Load the module first.", module->name, module->device->configuration.name);
+	lf_assert(index != -1, failure, E_MODULE, "No counterpart for the module '%s' was found on the device '%s'. Load the module first.", module->name, device->configuration.name);
 	module->index = index | FMR_USER_INVOCATION_BIT;
 	return lf_success;
 failure:

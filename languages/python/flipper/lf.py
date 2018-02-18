@@ -77,7 +77,7 @@ def attach_network(hostname):
 	return libflipper.carbon_attach_hostname(c_char_p(hostname))
 
 def bind(module, device):
-	libflipper.lf_bind(c_void_p(module.ref), c_void_p(device.ref))
+	libflipper.lf_bind(c_void_p(device.ref), c_void_p(module.ref))
 
 def current_device():
 	libflipper.lf_get_current_device.restype = c_void_p
@@ -96,5 +96,5 @@ def getModule(name):
 	return module(name, None, byref(_module))
 
 def invoke(module, function, ret, arguments):
-	libflipper.lf_invoke(module.ref, c_byte(function), c_byte(ret), lf_ll_from_list(arguments))
+	libflipper.lf_invoke(lf_get_current_device(), module.ref, c_byte(function), c_byte(ret), lf_ll_from_list(arguments))
 	return

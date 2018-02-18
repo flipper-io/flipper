@@ -191,7 +191,7 @@ pub trait UserModule<'a>: From<UserModuleFFI> {
     /// ```
     fn bind(flipper: &Flipper) -> Self {
         let mut module = UserModuleFFI::uninitialized(Self::NAME);
-        unsafe { lf_bind(&mut module.module_meta, flipper.device); }
+        unsafe { lf_bind(flipper.device, &mut module.module_meta); }
         Self::from(module)
     }
 }
@@ -200,8 +200,7 @@ pub trait UserModule<'a>: From<UserModuleFFI> {
 extern {
     fn flipper_attach() -> _lf_device;
     fn carbon_attach_hostname(hostname: *const c_char) -> _lf_device;
-    fn carbon_select_u2_gpio(device: _lf_device); // TODO remove after loader improvements
-fn lf_bind(module: *mut _lf_module, device: *const c_void) -> c_int;
+    fn lf_bind(device: *const c_void, module: *mut _lf_module) -> c_int;
 }
 
 pub struct Flipper {

@@ -10,7 +10,7 @@ const struct _timer_interface timer = {
 };
 
 LF_WEAK int timer_configure(void) {
-	return lf_invoke(&_timer, _timer_configure, lf_int_t, NULL);
+	return lf_invoke(lf_get_current_device(), &_timer, _timer_configure, lf_int_t, NULL);
 }
 
 #endif

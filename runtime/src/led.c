@@ -11,12 +11,12 @@ const struct _led_interface led = {
 };
 
 LF_WEAK int led_configure(void) {
-	lf_invoke(&_led, _led_configure, lf_int_t, NULL);
+	lf_invoke(lf_get_current_device(), &_led, _led_configure, lf_int_t, NULL);
 	return lf_success;
 }
 
 LF_WEAK void led_rgb(uint8_t r, uint8_t g, uint8_t b) {
-	lf_invoke(&_led, _led_rgb, lf_void_t, lf_args(lf_infer(r), lf_infer(g), lf_infer(b)));
+	lf_invoke(lf_get_current_device(), &_led, _led_rgb, lf_void_t, lf_args(lf_infer(r), lf_infer(g), lf_infer(b)));
 }
 
 #endif

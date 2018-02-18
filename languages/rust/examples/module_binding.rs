@@ -30,7 +30,7 @@ impl From<UserModuleFFI> for GpioToggle {
 impl GpioToggle {
     fn toggle(&self) {
         let args = Args::new().append(4u8);
-        lf_invoke(&self.ffi, 0, args)
+        lf_invoke(lf_get_current_device(), &self.ffi, 0, args)
     }
 }
 

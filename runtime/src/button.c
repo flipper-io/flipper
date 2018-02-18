@@ -11,11 +11,11 @@ const struct _button_interface button = {
 };
 
 LF_WEAK int button_configure(void) {
-	return lf_invoke(&_button, _button_configure, lf_int_t, NULL);
+	return lf_invoke(lf_get_current_device(), &_button, _button_configure, lf_int_t, NULL);
 }
 
 LF_WEAK uint8_t button_read(void) {
-	return lf_invoke(&_button, _button_read, lf_int8_t, NULL);
+	return lf_invoke(lf_get_current_device(), &_button, _button_read, lf_int8_t, NULL);
 }
 
 #endif

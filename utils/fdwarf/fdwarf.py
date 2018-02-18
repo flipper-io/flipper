@@ -110,7 +110,7 @@ $STRUCTBODY$
 		for p in f.parameters:
 			args.append("lf_infer(%s)" % p.name)
 		retl = ["lf_void_t", "", "lf_int8_t", "lf_int16_t", "", "lf_int32_t"]
-		statement = "lf_invoke(&_module, %s, %s, lf_args(%s));" % ("_" + modulename + "_" + f.name, retl[f.ret + 1], ", ".join(args))
+		statement = "lf_invoke(lf_get_current_device(), &_module, %s, %s, lf_args(%s));" % ("_" + modulename + "_" + f.name, retl[f.ret + 1], ", ".join(args))
 		if f.type == "void":
 			body = statement
 			ret = ";"
