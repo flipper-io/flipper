@@ -5,7 +5,7 @@
 #include <flipper.h>
 
 /* Declare the virtual interface for this modules. */
-extern const struct _usart {
+extern const struct _usart_interface {
 	int (* configure)(void);
 	int (* ready)(void);
 	int (* push)(void *source, lf_size_t length);

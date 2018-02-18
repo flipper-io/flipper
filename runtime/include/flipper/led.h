@@ -13,7 +13,7 @@
 #define LED_GREEN 0, 10, 0
 
 /* Declare the virtual interface for this module. */
-extern const struct _led {
+extern const struct _led_interface {
 	int (* configure)(void);
 	/* Write an RGB value to the onboard RGB led. */
 	void (* rgb)(uint8_t r, uint8_t g, uint8_t b);

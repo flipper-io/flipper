@@ -6,7 +6,7 @@
 LF_MODULE(_led, "led", "Interacts with the built-in status LED.", NULL, NULL);
 
 /* Define the virtual interface for this module. */
-const struct _led led = {
+const struct _led_interface led = {
 	led_configure,
 	led_rgb
 };

@@ -6,7 +6,7 @@
 LF_MODULE(_task, "task", "Pause, resume, or stop tasks running in the scheduler.", NULL, NULL);
 
 /* Define the virtual interface for this module. */
-const struct _task task = {
+const struct _task_interface task = {
 	os_task_pause,
 	os_task_resume,
 	os_task_stop

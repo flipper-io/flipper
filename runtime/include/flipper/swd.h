@@ -5,7 +5,7 @@
 #include <flipper.h>
 
 /* Declare the virtual interface for this module. */
-extern const struct _swd {
+extern const struct _swd_interface {
 
 	int (* configure)(void);
 

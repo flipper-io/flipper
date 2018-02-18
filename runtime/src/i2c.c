@@ -6,7 +6,7 @@
 LF_MODULE(_i2c, "i2c", "Interfaces with the device's I2C peripheral.", NULL, NULL);
 
 /* Define the virtual interface for this module. */
-const struct _i2c i2c = {
+const struct _i2c_interface i2c = {
 	i2c_configure
 };
 

@@ -5,7 +5,7 @@
 #include <flipper.h>
 
 /* Declare the virtual interface for this module. */
-extern const struct _wdt {
+extern const struct _wdt_interface {
 	int (* configure)(void);
 	void (* fire)(void);
 } wdt;

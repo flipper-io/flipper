@@ -5,7 +5,7 @@
 #include <flipper.h>
 
 /* Declare the virtual interface for this module. */
-extern const struct _temp {
+extern const struct _temp_interface {
 	int (* configure)(void);
 } temp;
 

@@ -5,7 +5,7 @@
 #include <flipper.h>
 
 /* Declare the virtual interface for this module. */
-extern const struct _gpio {
+extern const struct _gpio_interface {
 	int (* configure)(void);
 	/* Sets the pin mask and proprties of the PIO array. */
 	void (* enable)(uint32_t enable, uint32_t disable);

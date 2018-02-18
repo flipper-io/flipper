@@ -6,7 +6,7 @@
 LF_MODULE(_adc, "adc", "Interfaces with the device's internal analog to digital converter.", NULL, NULL);
 
 /* Define the virtual interface for this module. */
-const struct _adc adc = {
+const struct _adc_interface adc = {
 	adc_configure
 };
 

@@ -5,7 +5,7 @@
 #include <flipper.h>
 
 /* Declare the virtual interface for this module. */
-extern const struct _adc {
+extern const struct _adc_interface {
 	int (* configure)(void);
 } adc;
 

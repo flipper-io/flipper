@@ -5,7 +5,7 @@
 #include <flipper.h>
 
 /* Declare the virtual interface for this module. */
-extern const struct _task {
+extern const struct _task_interface {
 	/* Pasues the running task. */
 	int (* pause)(int pid);
 	/* Resumes the running task. */

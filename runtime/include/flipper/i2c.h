@@ -5,7 +5,7 @@
 #include <flipper.h>
 
 /* Declare the virtual interface for this module. */
-extern const struct _i2c {
+extern const struct _i2c_interface {
 	int (* configure)(void);
 } i2c;
 

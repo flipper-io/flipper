@@ -5,7 +5,7 @@
 #include <flipper.h>
 
 /* Declare the virtual interface for this module. */
-extern const struct _button {
+extern const struct _button_interface {
 	/* Configures the button hardware. */
 	int (* configure)(void);
 	/* Reads back the button state; returns 0 when released and 1 when pressed. */

@@ -5,7 +5,7 @@
 #include <flipper.h>
 
 /* Declare the virtual interface for this module. */
-extern const struct _usb {
+extern const struct _usb_interface {
 	int (* configure)(void);
 } usb;
 

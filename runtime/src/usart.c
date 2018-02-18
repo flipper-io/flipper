@@ -6,7 +6,7 @@
 LF_MODULE(_usart, "usart", "Provides low level access to the device's UART bus.", NULL, NULL);
 
 /* Define the virtual interface for this module. */
-const struct _usart usart = {
+const struct _usart_interface usart = {
 	usart_configure,
 	usart_ready,
 	usart_push,

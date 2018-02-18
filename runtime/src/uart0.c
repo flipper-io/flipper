@@ -6,7 +6,7 @@
 LF_MODULE(_uart0, "uart0", "Provides low level access to the device's UART bus.", NULL, NULL);
 
 /* Define the virtual interface for this endpoint. */
-const struct _uart0 uart0 = {
+const struct _uart0_interface uart0 = {
 	uart0_configure,
 	uart0_ready,
 	uart0_push,

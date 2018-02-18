@@ -6,7 +6,7 @@
 LF_MODULE(_fld, "fld", "Loads modules on the target device.", NULL, NULL);
 
 /* Define the virtual interface for this module. */
-const struct _fld fld = {
+const struct _fld_interface fld = {
 	fld_configure,
 	fld_index
 };

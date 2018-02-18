@@ -6,7 +6,7 @@
 LF_MODULE(_temp, "temp", "Interfaces with the device's temperature sensor.", NULL, NULL);
 
 /* Define the virtual interface for this module. */
-const struct _temp temp = {
+const struct _temp_interface temp = {
 	temp_configure
 };
 

@@ -5,7 +5,7 @@
 #include <flipper.h>
 
 /* Declare the virtual interface for this module. */
-extern const struct _dac {
+extern const struct _dac_interface {
 	int (* configure)(void);
 } dac;
 

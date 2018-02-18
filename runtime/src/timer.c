@@ -6,7 +6,7 @@
 LF_MODULE(_timer, "timer", "Interfaces with the device's timer peripheral.", NULL, NULL);
 
 /* Define the virtual interface for this module. */
-const struct _timer timer = {
+const struct _timer_interface timer = {
 	timer_configure
 };
 

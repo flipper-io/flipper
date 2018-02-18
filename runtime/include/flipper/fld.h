@@ -7,7 +7,7 @@
 #ifdef __private_include__
 
 /* Declare the virtual interface for this module. */
-extern const struct _fld {
+extern const struct _fld_interface {
 	int (* configure)(void);
 	int (* index)(lf_crc_t identifier);
 } fld;

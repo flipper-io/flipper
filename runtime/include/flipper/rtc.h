@@ -5,7 +5,7 @@
 #include <flipper.h>
 
 /* Declare the virtual interface for this module. */
-extern const struct _rtc {
+extern const struct _rtc_interface {
 	int (* configure)(void);
 } rtc;
 
