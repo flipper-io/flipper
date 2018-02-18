@@ -10,7 +10,7 @@ const struct _adc_interface adc = {
 };
 
 LF_WEAK int adc_configure(void) {
-	return lf_invoke(&_adc, _adc_configure, lf_int_t, NULL);
+	return lf_invoke(lf_get_current_device(), &_adc, _adc_configure, lf_int_t, NULL);
 }
 
 #endif

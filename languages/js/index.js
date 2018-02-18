@@ -35,7 +35,7 @@ const libflipper = ffi.Library('libflipper', {
 
   'flipper_select': [ 'int', [ 'pointer' ] ],
 
-  // lf_return_t lf_invoke(struct _lf_module *module, lf_function function, struct _fmr_parameters *parameters)
+  // lf_return_t lf_invoke(lf_get_current_device(), struct _lf_module *module, lf_function function, struct _fmr_parameters *parameters)
   'lf_invoke': [ lf_return_t, [ ref.refType(_lf_module), lf_function, 'pointer' ] ],
 
   // int lf_bind(struct _lf_module *module, String name)
@@ -100,7 +100,7 @@ Flipper.prototype.bindModule = function(iface, name) {
 
       var params = _create_fmr_parameters(paramTypes, arguments);
 
-      return libflipper.lf_invoke(module.ref(), i, params);
+      return libflipper.lf_invoke(lf_get_current_device(), module.ref(), i, params);
     }
   });
 

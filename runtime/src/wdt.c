@@ -11,11 +11,11 @@ const struct _wdt_interface wdt = {
 };
 
 LF_WEAK int wdt_configure(void) {
-	return lf_invoke(&_wdt, _wdt_configure, lf_int_t, NULL);
+	return lf_invoke(lf_get_current_device(), &_wdt, _wdt_configure, lf_int_t, NULL);
 }
 
 LF_WEAK void wdt_fire(void) {
-	lf_invoke(&_wdt, _wdt_fire, lf_int_t, NULL);
+	lf_invoke(lf_get_current_device(), &_wdt, _wdt_fire, lf_int_t, NULL);
 }
 
 #endif

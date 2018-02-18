@@ -10,7 +10,7 @@ const struct _dac_interface dac = {
 };
 
 LF_WEAK int dac_configure(void) {
-	return lf_invoke(&_dac, _dac_configure, lf_int_t, NULL);
+	return lf_invoke(lf_get_current_device(), &_dac, _dac_configure, lf_int_t, NULL);
 }
 
 #endif

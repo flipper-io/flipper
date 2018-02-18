@@ -13,20 +13,20 @@ const struct _uart0_interface uart0 = {
 };
 
 LF_WEAK int uart0_configure(uint8_t baud, uint8_t interrupts) {
-	lf_invoke(&_uart0, _uart0_configure, lf_int_t, lf_args(lf_infer(baud), lf_infer(interrupts)));
+	lf_invoke(lf_get_current_device(), &_uart0, _uart0_configure, lf_int_t, lf_args(lf_infer(baud), lf_infer(interrupts)));
 	return lf_success;
 }
 
 LF_WEAK int uart0_ready(void) {
-	return lf_invoke(&_uart0, _uart0_ready, lf_int_t, NULL);
+	return lf_invoke(lf_get_current_device(), &_uart0, _uart0_ready, lf_int_t, NULL);
 }
 
 LF_WEAK int uart0_push(void *source, lf_size_t length) {
-	return lf_push(&_uart0, _uart0_push, source, length, NULL);
+	return lf_push(lf_get_current_device(), &_uart0, _uart0_push, source, length, NULL);
 }
 
 LF_WEAK int uart0_pull(void *destination, lf_size_t length) {
-	return lf_pull(&_uart0, _uart0_pull, destination, length, NULL);
+	return lf_pull(lf_get_current_device(), &_uart0, _uart0_pull, destination, length, NULL);
 }
 
 #endif

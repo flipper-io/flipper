@@ -12,15 +12,15 @@ const struct _task_interface task = {
 };
 
 LF_WEAK int os_task_pause(int pid) {
-	return lf_invoke(&_task, _task_pause, lf_int_t, lf_args(lf_infer(pid)));
+	return lf_invoke(lf_get_current_device(), &_task, _task_pause, lf_int_t, lf_args(lf_infer(pid)));
 }
 
 LF_WEAK int os_task_resume(int pid) {
-	return lf_invoke(&_task, _task_resume, lf_int_t, lf_args(lf_infer(pid)));
+	return lf_invoke(lf_get_current_device(), &_task, _task_resume, lf_int_t, lf_args(lf_infer(pid)));
 }
 
 LF_WEAK int os_task_stop(int pid) {
-	return lf_invoke(&_task, _task_stop, lf_int_t, lf_args(lf_infer(pid)));
+	return lf_invoke(lf_get_current_device(), &_task, _task_stop, lf_int_t, lf_args(lf_infer(pid)));
 }
 
 #endif
