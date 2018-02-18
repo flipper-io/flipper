@@ -24,3 +24,19 @@ public struct Flipper {
     }
   }
 }
+
+public struct LED: StandardModule {
+  let ffi: ModuleFFI
+
+  public init(ffi: ModuleFFI) {
+    self.ffi = ffi
+  }
+
+  func configure() {
+    ffi.invoke(index: 0, args: [])
+  }
+
+  func rgb(_ r: UInt8, _ g: UInt8, _ b: UInt8) {
+    ffi.invoke(index: 1, args: [r, g, b])
+  }
+}
