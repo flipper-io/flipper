@@ -26,6 +26,10 @@ public struct Flipper {
 }
 
 public struct LED: StandardModule {
+  public static var underlyingModule: _lf_module {
+    return 
+  }
+
   let ffi: ModuleFFI
 
   public init(ffi: ModuleFFI) {
