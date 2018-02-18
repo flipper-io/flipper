@@ -117,7 +117,7 @@ pub mod led {
         let blue = args.value_of("blue").unwrap().parse::<u8>().unwrap();
 
         let flipper = flipper::Flipper::attach();
-        let led = flipper::fsm::led::Led::bind(&flipper);
+        let led = flipper::fsm::led::Led::new(&flipper);
         led.rgb(red, green, blue);
         Ok(())
     }
