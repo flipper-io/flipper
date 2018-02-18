@@ -44,7 +44,7 @@ impl StandardModule for Led {
 
 impl Led {
     pub fn configure(&self) {
-        lf_invoke(&self.module, 0, Args::new())
+        lf_invoke(lf_get_current_device(), &self.module, 0, Args::new())
     }
 
     pub fn rgb(&self, r: u8, g: u8, b: u8) {
@@ -52,6 +52,6 @@ impl Led {
             .append(r)
             .append(g)
             .append(b);
-        lf_invoke(&self.module, 1, args)
+        lf_invoke(lf_get_current_device(), &self.module, 1, args)
     }
 }

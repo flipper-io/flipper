@@ -72,12 +72,12 @@ impl Uart0 {
         let args = Args::new()
             .append(baud.to_baud())
             .append(if interrupts { 1u8 } else { 0u8 });
-        lf_invoke(&self.ffi, 0, args)
+        lf_invoke(lf_get_current_device(), &self.ffi, 0, args)
     }
 
     /// Indicates whether the Uart0 bus is ready to read or write.
     pub fn ready(&self) -> bool {
-        let ret: u8 = lf_invoke(&self.ffi, 1, Args::new());
+        let ret: u8 = lf_invoke(lf_get_current_device(), &self.ffi, 1, Args::new());
         ret != 0
     }
 }

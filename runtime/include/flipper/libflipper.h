@@ -105,7 +105,7 @@ struct _lf_device {
 	/* The device's selector function. Mutates modules state as appropriate for the device. */
 	int (* select)(struct _lf_device *device);
 	/* The device's destructor. */
-	int (* destroy)(struct _lf_device *device);
+	int (* release)(struct _lf_device *device);
 	/* The device's context. */
 	void *_ctx;
 	/* The current error state of the device. */
@@ -135,8 +135,6 @@ struct _lf_module {
 	lf_crc_t identifier;
 	/*! The module's loaded index. */
 	int index;
-	/*! The pointer to a pointer to the device upon which the module's counterpart is located. */
-	struct _lf_device *device;
 	/*! The module's binary data. */
 	void *data;
 	/*! The binary data size. */
@@ -151,14 +149,11 @@ struct _lf_module {
 		LF_VERSION, \
 		0, \
 		-1, \
-		NULL, \
 		pdata, \
 		plen \
 	};
 
-#define LF_MODULE_SET_DEVICE_AND_ID(module, _device, _id) do { module.device = _device; module.index = _id; } while (0);
-
-struct _lf_device *lf_device_create(struct _lf_endpoint *endpoint, int (* select)(struct _lf_device *device), int (* destroy)(struct _lf_device *device), size_t context_size);
+struct _lf_device *lf_device_create(struct _lf_endpoint *endpoint, int (* select)(struct _lf_device *device), int (* release)(struct _lf_device *device), size_t context_size);
 int lf_device_release(struct _lf_device *device);
 
 /* Attaches to a device. */
@@ -171,11 +166,11 @@ int lf_select(struct _lf_device *device);
 #include <flipper/ll.h>
 
 /* Performs a remote procedure call to a module's function. */
-lf_return_t lf_invoke(struct _lf_module *module, lf_function function, lf_type ret, struct _lf_ll *args);
+lf_return_t lf_invoke(struct _lf_device *device, struct _lf_module *module, lf_function function, lf_type ret, struct _lf_ll *args);
 /* Moves data from the address space of the host to that of the device. */
-lf_return_t lf_push(struct _lf_module *module, lf_function function, void *source, lf_size_t length, struct _lf_ll *args);
+lf_return_t lf_push(struct _lf_device *device, struct _lf_module *module, lf_function function, void *source, lf_size_t length, struct _lf_ll *args);
 /* Moves data from the address space of the device to that of the host. */
-lf_return_t lf_pull(struct _lf_module *module, lf_function function, void *destination, lf_size_t length, struct _lf_ll *args);
+lf_return_t lf_pull(struct _lf_device *device, struct _lf_module *module, lf_function function, void *destination, lf_size_t length, struct _lf_ll *args);
 
 /* Closes the library. */
 int lf_exit(void);
@@ -192,10 +187,10 @@ int lf_transfer(struct _lf_device *device, struct _fmr_packet *packet);
 /* Retrieves a packet from the specified device. */
 int lf_retrieve(struct _lf_device *device, struct _fmr_result *response);
 /* Binds a module structure to its device counterpart. */
-int lf_bind(struct _lf_module *module, struct _lf_device *device);
+int lf_bind(struct _lf_device *device, struct _lf_module *module);
 
 /* Experimental: Load an application into RAM and execute it. */
-int lf_load(void *source, lf_size_t length, struct _lf_device *device);
+int lf_load(struct _lf_device *device, void *source, lf_size_t length);
 
 /* Prints verbose information about the packet disassembly. */
 void lf_debug_packet(struct _fmr_packet *packet, size_t length);

@@ -21,7 +21,7 @@ public class Flipper {
         Pointer flipper_attach();
 
         // FMR bindings
-        int lf_invoke(_lf_module module, byte function, Pointer parameters);
+        int lf_invoke(lf_get_current_device(), _lf_module module, byte function, Pointer parameters);
         int lf_bind(Pointer module);
 
         Pointer fmr_build(byte argc);
@@ -55,7 +55,7 @@ public class Flipper {
          * Upon receiving an invoke call, the ModuleInvocationHandler constructs a _fmr_list parameter list from the
          * function call and uses this FMRInvoker to deliver it back to us, where we can pass it to lf_invoke.
          */
-        ModuleInvocationHandler invoker = new ModuleInvocationHandler(moduleInterface, (func, params) -> libflipper.lf_invoke(module, func, params));
+        ModuleInvocationHandler invoker = new ModuleInvocationHandler(moduleInterface, (func, params) -> libflipper.lf_invoke(lf_get_current_device(), module, func, params));
 
         return moduleInterface.cast(Proxy.newProxyInstance(moduleInterface.getClassLoader(), new Class[] { moduleInterface }, invoker));
     }
