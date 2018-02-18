@@ -113,6 +113,7 @@ public extension UserModule {
 }
 
 public protocol StandardModule {
+  static var underlyingModule: _lf_module { get }
   init(flipper: Flipper)
   init(ffi: ModuleFFI)
   init()
@@ -120,11 +121,11 @@ public protocol StandardModule {
 
 public extension StandardModule {
   init() {
-    self.init(ffi: .standard(StandardModuleFFI(moduleMetadata: _lf_module())))
+    self.init(ffi: .standard(StandardModuleFFI(moduleMetadata: Self.underlyingModule)))
   }
 
   init(flipper: Flipper) {
-    var mod = _lf_module()
+    var mod = Self.underlyingModule
     lf_bind(&mod, flipper.device)
     self.init(ffi: .standard(StandardModuleFFI(moduleMetadata: mod)))
   }
