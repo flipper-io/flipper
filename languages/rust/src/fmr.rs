@@ -55,9 +55,9 @@ mod libflipper {
     #[link(name = "flipper")]
     extern {
         pub(crate) fn lf_ll_append(ll: *mut *mut _lf_ll, item: *const c_void, destructor: *const c_void) -> c_int;
-        pub(crate) fn lf_invoke(module: *const _lf_module, function: _lf_index, ret: u8, args: *const _lf_ll) -> _lf_value;
-        pub(crate) fn lf_push(module: *const _lf_module, function: _lf_index, source: *const c_void, length: u32, args: *const _lf_ll) -> _lf_value;
-        pub(crate) fn lf_pull(module: *const _lf_module, function: _lf_index, dest: *mut c_void, length: u32, args: *const _lf_ll) -> _lf_value;
+        pub(crate) fn lf_invoke(lf_get_current_device(), module: *const _lf_module, function: _lf_index, ret: u8, args: *const _lf_ll) -> _lf_value;
+        pub(crate) fn lf_push(lf_get_current_device(), module: *const _lf_module, function: _lf_index, source: *const c_void, length: u32, args: *const _lf_ll) -> _lf_value;
+        pub(crate) fn lf_pull(lf_get_current_device(), module: *const _lf_module, function: _lf_index, dest: *mut c_void, length: u32, args: *const _lf_ll) -> _lf_value;
     }
 }
 
@@ -240,7 +240,7 @@ impl From<LfReturn> for u64 {
 ///                .append(20 as u32)  // baz
 ///                .append(30 as u64); // qux
 ///
-/// let output: u8 = lf_invoke(&ffi, 0, args);
+/// let output: u8 = lf_invoke(lf_get_current_device(), &ffi, 0, args);
 /// ```
 pub fn lf_invoke<'a, T: LfReturnable>(module: &'a ModuleFFI, index: u8, args: Args) -> T {
     unsafe {
@@ -248,7 +248,7 @@ pub fn lf_invoke<'a, T: LfReturnable>(module: &'a ModuleFFI, index: u8, args: Ar
         for arg in args.iter() {
             libflipper::lf_ll_append(&mut arglist, &arg.0 as *const _lf_arg as *const c_void, ptr::null());
         }
-        let ret = libflipper::lf_invoke(module.as_ptr(), index, T::lf_type(), arglist);
+        let ret = libflipper::lf_invoke(lf_get_current_device(), module.as_ptr(), index, T::lf_type(), arglist);
         T::from(LfReturn(ret))
     }
 }
@@ -265,7 +265,7 @@ pub fn lf_push<'a, T: LfReturnable>(module: &'a ModuleFFI, index: u8, data: &[u8
         for arg in args.iter() {
             libflipper::lf_ll_append(&mut arglist, &arg.0 as *const _lf_arg as *const c_void, ptr::null());
         }
-        let ret = libflipper::lf_push(module.as_ptr(), index, data.as_ptr() as *const c_void, data.len() as u32, arglist);
+        let ret = libflipper::lf_push(lf_get_current_device(), module.as_ptr(), index, data.as_ptr() as *const c_void, data.len() as u32, arglist);
         T::from(LfReturn(ret))
     }
 }
@@ -282,7 +282,7 @@ pub fn lf_pull<'a, T: LfReturnable>(module: &'a ModuleFFI, index: u8, buffer: &m
         for arg in args.iter() {
             libflipper::lf_ll_append(&mut arglist, &arg.0 as *const _lf_arg as *const c_void, ptr::null());
         }
-        let ret = libflipper::lf_pull(module.as_ptr(), index, buffer.as_mut_ptr() as *mut c_void, buffer.len() as u32, arglist);
+        let ret = libflipper::lf_pull(lf_get_current_device(), module.as_ptr(), index, buffer.as_mut_ptr() as *mut c_void, buffer.len() as u32, arglist);
         T::from(LfReturn(ret))
     }
 }
