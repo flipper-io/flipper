@@ -33,7 +33,7 @@ ARM_CFLAGS := -std=c99              \
               -fPIC                 \
               -I/usr/local/include  \
               -Iinclude             \
-              -D__ATSAM4S__
+              -DATSAM4S
 
 FLIPPER_LDFLAGS := -nostdlib
 
@@ -51,7 +51,7 @@ HOST_CC := gcc
 HOST_LD := gcc
 HOST_AR := ar
 
-HOST_CFLAGS := -I. -Iinclude -g -D__POSIX__
+HOST_CFLAGS := -I. -Iinclude -g -DPOSIX
 HOST_LDFLAGS := -g
 
 # Build settings for code that runs on the Flipper Virtual Machine
@@ -64,7 +64,7 @@ FVM_BUILD_DIRS := $(addsuffix /.dir,$(patsubst %/,%,$(sort $(dir $(FVM_OBJS)))))
 FVM_CC := gcc
 FVM_LD := gcc
 
-FVM_CFLAGS := -I. -Iinclude -g -D__POSIX__
+FVM_CFLAGS := -I. -Iinclude -g -DPOSIX
 FVM_LDFLAGS := -g
 
 # Build for the Flipper device and host by default, but not FVM

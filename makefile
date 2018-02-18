@@ -39,7 +39,7 @@ ARM_CFLAGS     := -std=c99            \
                 -mtune=cortex-m4      \
                 -mfloat-abi=soft      \
                 -D__no_err_str__      \
-                -D__ATSAM4S__         \
+                -DATSAM4S             \
             	$(foreach inc,$(ARM_INC_DIRS),-I$(inc))
 
 ARM_LDFLAGS  := -nostartfiles                    \
@@ -79,7 +79,7 @@ AVR_CFLAGS      := -std=c99           \
                 -D__AVR_ATmega32U2__  \
                 -DF_CPU=16000000UL    \
                 -D__no_err_str__      \
-                -D__ATMEGAU2__        \
+                -DATMEGAU2            \
             	$(foreach inc,$(AVR_INC_DIRS),-I$(inc))
 
 AVR_LDFLAGS  := -mmcu=atmega32u2 \
@@ -117,7 +117,7 @@ X86_CFLAGS :=   -std=gnu99              \
                 -Wextra                 \
                 -Wno-unused-parameter   \
                 -fpic                   \
-                -D__POSIX__             \
+                -DPOSIX                 \
             	$(foreach inc,$(X86_INC_DIRS),-I$(inc)) \
 				$(shell pkg-config --cflags-only-I libusb-1.0)
 

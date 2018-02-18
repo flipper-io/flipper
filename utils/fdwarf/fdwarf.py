@@ -65,13 +65,13 @@ $FUNCTIONPROTOS$
 
 $VARIABLES$
 
-#ifdef __ATSAM4S__
+#ifdef ATSAM4S
 
 const char _fmr_app_name[] __attribute__((section(".name"))) = "$MODULE$";
 
 #define JT_SECTION __attribute__((section(".module")))
 
-#else /* __ATSAM4S__ */
+#else /* ATSAM4S */
 
 #define JT_SECTION
 
@@ -82,7 +82,7 @@ LF_MODULE(_module, "$MODULE$", "$DESCRIPTION$", &$MODULE$_bin, &$MODULE$_bin_len
 
 $FUNCTIONS$
 
-#endif /* __ATSAM4S__ */
+#endif /* ATSAM4S */
 
 const struct _$MODULE$ _jumptable JT_SECTION = {
 $STRUCTBODY$

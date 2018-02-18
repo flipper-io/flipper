@@ -4,11 +4,11 @@
 #define __carbon_h__
 
 /* Include the appropriate platform support header. */
-#if defined(__ATSAM4S__)
+#if defined(ATSAM4S)
 #include <flipper/atsam4s/atsam4s.h>
-#elif defined(__ATMEGAU2__)
+#elif defined(ATMEGAU2)
 #include <flipper/atmegau2/atmegau2.h>
-#elif defined(__POSIX__)
+#elif defined(POSIX)
 #include <flipper/posix/posix.h>
 #else
 #error "Invalid target platform."
