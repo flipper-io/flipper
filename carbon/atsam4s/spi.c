@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/spi.h>
-#include <flipper/atsam4s/atsam4s.h>
+
 
 int spi_configure() {
 	/* Enable the SPI clock. */

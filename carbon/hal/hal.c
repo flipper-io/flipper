@@ -21,12 +21,9 @@
  */
 
 #define __private_include__
-#include <flipper/libflipper.h>
-#include <flipper/carbon.h>
+#include <flipper.h>
 #include <flipper/posix/usb.h>
 #include <flipper/posix/network.h>
-#include <flipper/atmegau2/atmegau2.h>
-#include <flipper/atsam4s/atsam4s.h>
 
 extern int carbon_select_atmegau2(struct _lf_device *device);
 extern int carbon_select_atsam4s(struct _lf_device *device);
@@ -70,11 +67,29 @@ bool uart0_bridge_ready(struct _lf_endpoint *endpoint) {
 }
 
 int uart0_bridge_push(struct _lf_endpoint *endpoint, void *source, lf_size_t length) {
-	return uart0_push(source, length);
+	lf_size_t size = 128;
+	lf_size_t packets = lf_ceiling(length, size);
+	for (lf_size_t i = 0; i < packets; i ++) {
+		lf_size_t len = (length > size) ? size : length;
+		int err = uart0_push(source, len);
+		if (err) return err;
+		source += size;
+		length -= size;
+	}
+	return lf_success;
 }
 
 int uart0_bridge_pull(struct _lf_endpoint *endpoint, void *destination, lf_size_t length) {
-	return uart0_pull(destination, length);
+	lf_size_t size = 128;
+	lf_size_t packets = lf_ceiling(length, size);
+	for (lf_size_t i = 0; i < packets; i ++) {
+		lf_size_t len = (length > size) ? size : length;
+		int err = uart0_pull(destination, len);
+		if (err) return err;
+		destination += size;
+		length -= size;
+	}
+	return lf_success;
 }
 
 void carbon_attach_to_usb_endpoint_applier(const void *__u2_ep, void *_other) {

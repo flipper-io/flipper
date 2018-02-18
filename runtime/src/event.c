@@ -1,4 +1,4 @@
-#include <flipper/libflipper.h>
+#include <flipper.h>
 
 struct _lf_event *lf_event_create(lf_event_id _id, lf_event_handler_func handler, void *_ctx) {
 	struct _lf_event *event = malloc(sizeof(struct _lf_event));

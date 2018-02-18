@@ -1,4 +1,4 @@
-#include <flipper/libflipper.h>
+#include <flipper.h>
 
 #ifdef __use_usb__
 #define __private_include__

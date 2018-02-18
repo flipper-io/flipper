@@ -1,7 +1,9 @@
 #define __private_include__
 #include <flipper.h>
-#include <flipper/atsam4s/atsam4s.h>
 #include <os/scheduler.h>
+
+/* How many clock cycles to wait before giving up initialization. */
+#define CLOCK_TIMEOUT 5000
 
 struct _fmr_packet packet;
 

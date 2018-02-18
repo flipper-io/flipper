@@ -2,7 +2,7 @@
 #define __fld_h__
 
 /* Include all types and macros exposed by the Flipper Toolbox. */
-#include <flipper/libflipper.h>
+#include <flipper.h>
 
 #ifdef __private_include__
 

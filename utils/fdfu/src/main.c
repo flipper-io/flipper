@@ -1,9 +1,11 @@
 #define __private_include__
 #include <unistd.h>
 #include <flipper.h>
-#include <flipper/posix/posix.h>
-#include <flipper/atmegau2/atmegau2.h>
-#include <flipper/atsam4s/atsam4s.h>
+
+/* Include the SAM peripheral definitions. */
+#include <flipper/atsam4s/sam4s16b.h>
+
+
 #include <stdio.h>
 
 /* Defines the XMODEM flow control bytes. */
@@ -88,11 +90,15 @@ void sam_pull(void *destination, size_t len) {
 	uart0_pull(destination, len);
 }
 
+#define SAM_RESET_PIN 0x04
+
 void sam_reset() {
 	gpio.write(0, (1 << SAM_RESET_PIN));
 	usleep(10000);
 	gpio.write((1 << SAM_RESET_PIN), 0);
 }
+
+#define SAM_ERASE_PIN 0x06
 
 int sam_enter_dfu(void) {
 	gpio.write((1 << SAM_ERASE_PIN), 0);

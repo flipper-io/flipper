@@ -3,7 +3,7 @@
 #ifndef __loader_h__
 #define __loader_h__
 
-#include <flipper/libflipper.h>
+#include <flipper.h>
 
 /* The default stack size for applications. */
 #define APPLICATION_STACK_SIZE_WORDS 256

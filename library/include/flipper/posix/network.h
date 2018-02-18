@@ -2,9 +2,9 @@
 
 #ifndef __lf_network_h__
 #define __lf_network_h__
-#include <flipper/types.h>
-#include <flipper/endpoint.h>
-#include <unistd.h>
+
+#include <flipper.h>
+
 #include <arpa/inet.h>
 #include <netdb.h>
 

@@ -2,7 +2,7 @@
 #define __adc_h__
 
 /* Include all types and macros exposed by the Flipper Toolbox. */
-#include <flipper/libflipper.h>
+#include <flipper.h>
 
 /* Declare the virtual interface for this module. */
 extern const struct _adc {

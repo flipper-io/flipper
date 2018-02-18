@@ -1,6 +1,6 @@
 #define __private_include__
 #include <flipper/button.h>
-#include <flipper/atmegau2/atmegau2.h>
+
 
 int button_configure(void) {
 	BUTTON_DDR &= ~(1 << BUTTON_PIN);
