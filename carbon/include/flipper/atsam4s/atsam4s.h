@@ -6,8 +6,9 @@
 #ifndef __lf_platform_h__
 #define __lf_platform_h__
 
+#include <flipper/types.h>
 /* Include the chip support headers. */
-#include <flipper/atsam4s/sam4s16b.h>
+#include <flipper/atsam4s/asf/sam4s.h>
 
 /* Define the modules that this platform uses. */
 #define __use_adc__
