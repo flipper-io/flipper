@@ -5,7 +5,7 @@
 #define BOARD_FREQ_MAINCK_BYPASS    (12000000U)
 
 /** Master clock frequency */
-#define BOARD_MCK CHIP_FREQ_CPU_MAX
+#define BOARD_MCK F_CPU
 
 /** board main clock xtal startup time */
 #define BOARD_OSC_STARTUP_US   15625

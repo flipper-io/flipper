@@ -9,6 +9,7 @@
 #include <flipper/types.h>
 /* Include the chip support headers. */
 #include <flipper/atsam4s/asf/sam4s.h>
+#include <flipper/atsam4s/asf/gpio.h>
 
 /* Define the modules that this platform uses. */
 #define __use_adc__
