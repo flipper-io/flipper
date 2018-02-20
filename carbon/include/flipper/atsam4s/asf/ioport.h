@@ -51,8 +51,8 @@
 extern "C" {
 #endif
 
-#include <parts.h>
-#include <compiler.h>
+#include "parts.h"
+#include "compiler.h"
 
 /**
  * \defgroup ioport_group Common IOPORT API

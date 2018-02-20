@@ -228,7 +228,7 @@ void WDT_Handler        ( void );
  * \brief CMSIS includes
  */
 
-#include <core_cm4.h>
+#include "cmsis/core_cm4.h"
 #if !defined DONT_USE_CMSIS_INIT
 #include "system_sam4s.h"
 #endif /* DONT_USE_CMSIS_INIT */

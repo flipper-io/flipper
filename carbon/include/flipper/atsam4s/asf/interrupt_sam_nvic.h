@@ -47,8 +47,8 @@
 #ifndef UTILS_INTERRUPT_INTERRUPT_H
 #define UTILS_INTERRUPT_INTERRUPT_H
 
-#include <compiler.h>
-#include <parts.h>
+#include "compiler.h"
+#include "parts.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -61,10 +61,10 @@
 #  include <intrinsics.h>
 #endif
 
-#include <parts.h>
+#include "parts.h"
 #include "preprocessor.h"
 
-#include <io.h>
+#include "io.h"
 
 //_____ D E C L A R A T I O N S ____________________________________________
 

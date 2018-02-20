@@ -49,7 +49,7 @@ ARM_CFLAGS   := -std=c99              \
                 -mfloat-abi=soft      \
                 -D__no_err_str__      \
                 -DATSAM4S             \
-			    -D__SAM4S16B__        \
+                -D__SAM4S16B__        \
                 $(foreach inc,$(ARM_INC_DIRS),-I$(inc))
 
 ARM_LDFLAGS  := -nostartfiles                    \
