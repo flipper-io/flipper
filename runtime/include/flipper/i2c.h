@@ -5,11 +5,10 @@
 #include <flipper.h>
 
 /* Declare the virtual interface for this module. */
-extern const struct _i2c {
+extern const struct _i2c_interface {
 	int (* configure)(void);
 } i2c;
 
-#ifdef __private_include__
 
 /* Declare the _lf_module structure for this module. */
 extern struct _lf_module _i2c;
@@ -20,5 +19,4 @@ enum { _i2c_configure };
 /* Declare the prototypes for all of the functions within this module. */
 int i2c_configure(void);
 
-#endif
 #endif

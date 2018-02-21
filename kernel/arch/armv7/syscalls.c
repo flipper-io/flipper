@@ -1,6 +1,5 @@
 #include <sys/stat.h>
 #include <sys/types.h>
-#define __private_include__
 #include <flipper/usart.h>
 #include <flipper/gpio.h>
 

@@ -1,4 +1,3 @@
-#define __private_include__
 #include <flipper.h>
 
 /* Define the standard modules based on platform specific usage declarations. */

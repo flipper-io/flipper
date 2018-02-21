@@ -5,13 +5,11 @@
 #include <flipper.h>
 
 /* Declare the virtual interface for this module. */
-extern const struct _swd {
+extern const struct _swd_interface {
 
 	int (* configure)(void);
 
 } swd;
-
-#ifdef __private_include__
 
 /* Declare the _lf_module structure for this module. */
 extern struct _lf_module _swd;
@@ -22,5 +20,4 @@ enum { _swd_configure };
 /* Declare the prototypes for all of the functions within this module. */
 int swd_configure(void);
 
-#endif
 #endif

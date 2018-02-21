@@ -1,4 +1,3 @@
-#define __private_include__
 #include <flipper/atmegau2/megausb.h>
 
 /* Has bulk already timed out? */

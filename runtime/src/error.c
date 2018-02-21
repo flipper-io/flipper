@@ -1,6 +1,5 @@
 #include <flipper.h>
 
-#define __private_include__
 #include <flipper/error.h>
 
 /* Expose the error message strings. */

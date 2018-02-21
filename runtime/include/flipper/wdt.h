@@ -5,12 +5,10 @@
 #include <flipper.h>
 
 /* Declare the virtual interface for this module. */
-extern const struct _wdt {
+extern const struct _wdt_interface {
 	int (* configure)(void);
 	void (* fire)(void);
 } wdt;
-
-#ifdef __private_include__
 
 /* Declare the _lf_module structure for this module. */
 extern struct _lf_module _wdt;
@@ -22,5 +20,4 @@ enum { _wdt_configure, _wdt_fire };
 int wdt_configure(void);
 void wdt_fire(void);
 
-#endif
 #endif

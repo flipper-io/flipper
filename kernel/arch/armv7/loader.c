@@ -1,6 +1,5 @@
 /* The Osmium loader implementation. */
 
-#define __private_include__
 #include <os/loader.h>
 #include <os/scheduler.h>
 

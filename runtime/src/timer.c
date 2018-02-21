@@ -1,4 +1,3 @@
-#define __private_include__
 #include <flipper/timer.h>
 
 #ifdef __use_timer__
@@ -6,7 +5,7 @@
 LF_MODULE(_timer, "timer", "Interfaces with the device's timer peripheral.", NULL, NULL);
 
 /* Define the virtual interface for this module. */
-const struct _timer timer = {
+const struct _timer_interface timer = {
 	timer_configure
 };
 

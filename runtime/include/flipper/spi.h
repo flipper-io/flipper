@@ -5,7 +5,7 @@
 #include <flipper.h>
 
 /* Declare the virtual interface for this modules. */
-extern const struct _spi {
+extern const struct _spi_interface {
 	int (* configure)(void);
 	void (* enable)(void);
 	void (* disable)(void);
@@ -15,8 +15,6 @@ extern const struct _spi {
 	int (* push)(void *source, uint32_t length);
 	int (* pull)(void *destination, uint32_t length);
 } spi;
-
-#ifdef __private_include__
 
 /* Declare the _lf_module structure for this module. */
 extern struct _lf_module _spi;
@@ -35,5 +33,4 @@ uint8_t spi_get(void);
 int spi_push(void *source, uint32_t length);
 int spi_pull(void *destination, uint32_t length);
 
-#endif
 #endif

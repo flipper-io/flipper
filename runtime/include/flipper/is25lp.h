@@ -62,9 +62,6 @@ enum IS25LP_SR {
 	IS25LP_SRWD
 };
 
-#ifdef __private_include__
-
 int is25lp_configure(void);
 
-#endif
 #endif

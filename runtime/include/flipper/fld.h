@@ -4,10 +4,8 @@
 /* Include all types and macros exposed by the Flipper Toolbox. */
 #include <flipper.h>
 
-#ifdef __private_include__
-
 /* Declare the virtual interface for this module. */
-extern const struct _fld {
+extern const struct _fld_interface {
 	int (* configure)(void);
 	int (* index)(lf_crc_t identifier);
 } fld;
@@ -23,5 +21,4 @@ int fld_configure(void);
 /* Returns the index of a loaded module. */
 int fld_index(lf_crc_t identifier);
 
-#endif
 #endif

@@ -1,4 +1,3 @@
-#define __private_include__
 #include <unistd.h>
 #include <flipper.h>
 

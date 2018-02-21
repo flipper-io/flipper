@@ -5,14 +5,12 @@
 #include <flipper.h>
 
 /* Declare the virtual interface for this module. */
-extern const struct _button {
+extern const struct _button_interface {
 	/* Configures the button hardware. */
 	int (* configure)(void);
 	/* Reads back the button state; returns 0 when released and 1 when pressed. */
 	uint8_t (* read)(void);
 } button;
-
-#ifdef __private_include__
 
 /* Declare the _lf_module structure for this module. */
 extern struct _lf_module _button;
@@ -24,5 +22,4 @@ enum { _button_configure, _button_read };
 int button_configure(void);
 uint8_t button_read(void);
 
-#endif
 #endif

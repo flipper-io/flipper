@@ -1,4 +1,3 @@
-#define __private_include__
 #include <flipper/atmegau2/megausb.h>
 
 volatile uint8_t debug_flush_timer=0;

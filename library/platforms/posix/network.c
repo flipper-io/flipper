@@ -1,4 +1,3 @@
-#define __private_include__
 #include <flipper/posix/network.h>
 #include <flipper/error.h>
 #include <flipper.h>

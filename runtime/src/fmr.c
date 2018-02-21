@@ -1,4 +1,3 @@
-#define __private_include__
 #include <flipper.h>
 
 struct _lf_arg *lf_arg_create(lf_type type, lf_arg value) {

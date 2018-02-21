@@ -1,6 +1,5 @@
 /* Osmium scheduler implementation. */
 
-#define __private_include__
 #include <flipper.h>
 #include <os/scheduler.h>
 

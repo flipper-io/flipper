@@ -1,4 +1,3 @@
-#define __private_include__
 #include <flipper/is25lp.h>
 #include <flipper/spi.h>
 

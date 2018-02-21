@@ -1,4 +1,3 @@
-#define __private_include__
 #include <flipper.h>
 
 lf_device_list lf_attached_devices;
