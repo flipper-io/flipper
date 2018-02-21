@@ -107,6 +107,8 @@ enum {
 /* Prevents the execution of a statement from producing error-related side effects. */
 #define suppress_errors(statement) lf_error_pause(); statement; lf_error_resume();
 
+extern int lf_debug_level;
+
 /* Configures the error module. */
 extern int lf_error_configure(void);
 /* Raises an error internally to the current context of libflipper. */

@@ -120,7 +120,7 @@ void lf_debug_call(struct _fmr_invocation *call) {
 	printf("\n");
 }
 
-static int lf_debug_level = LF_DEBUG_LEVEL_OFF;
+int lf_debug_level = LF_DEBUG_LEVEL_OFF;
 
 void lf_set_debug_level(int level) {
 	lf_debug_level = level;

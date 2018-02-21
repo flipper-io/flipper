@@ -21,34 +21,36 @@ void lf_error_raise(lf_error_t error, const char *format, ...) {
 	/* Record the observed error. */
 	error_code = error;
 #ifndef __no_err_str__
-	lf_error_t _error = error;
-	if (error && errors_cause_side_effects) {
-		/* Construct a va_list to acmmcess variadic arguments. */
-		va_list argv;
-		/* Initialize the va_list that we created above. */
-		va_start(argv, format);
-		if (_error > (sizeof(lf_error_messages) / sizeof(char *))) {
-			_error = E_STRING;
-		}
-		/* Get the variadic argument string. */
-		vsprintf(last_error, format, argv);
-		/* Print the exception if a message is provided. */
-		if (format) {
-			fprintf(stderr, KYEL "\nThe Flipper runtime encountered the following error:\n  " KNRM "↳ " KRED);
-			if (_error == E_STRING) {
-				fprintf(stderr, "An invalid error code (%i) was provided.\n", error);
-			} else {
-				fprintf(stderr, "%s\n", last_error);
+    if (lf_debug_level > LF_DEBUG_LEVEL_OFF) {
+		lf_error_t _error = error;
+		if (error && errors_cause_side_effects) {
+			/* Construct a va_list to acmmcess variadic arguments. */
+			va_list argv;
+			/* Initialize the va_list that we created above. */
+			va_start(argv, format);
+			if (_error > (sizeof(lf_error_messages) / sizeof(char *))) {
+				_error = E_STRING;
 			}
-		}
-		/* Release the va_list. */
-		va_end(argv);
-		if (errors_cause_side_effects) {
-            if (_error >= E_MAX) {
-                _error = E_UNIMPLEMENTED;
-            }
-			/* Print the error code. */
-			fprintf(stderr, KNRM "Error code (%i): '" KBLU "%s" KNRM "'\n\n", _error, lf_error_messages[_error]);
+			/* Get the variadic argument string. */
+			vsprintf(last_error, format, argv);
+			/* Print the exception if a message is provided. */
+			if (format) {
+				fprintf(stderr, KYEL "\nThe Flipper runtime encountered the following error:\n  " KNRM "↳ " KRED);
+				if (_error == E_STRING) {
+					fprintf(stderr, "An invalid error code (%i) was provided.\n", error);
+				} else {
+					fprintf(stderr, "%s\n", last_error);
+				}
+			}
+			/* Release the va_list. */
+			va_end(argv);
+			if (errors_cause_side_effects) {
+				if (_error >= E_MAX) {
+					_error = E_UNIMPLEMENTED;
+				}
+				/* Print the error code. */
+				fprintf(stderr, KNRM "Error code (%i): '" KBLU "%s" KNRM "'\n\n", _error, lf_error_messages[_error]);
+			}
 		}
 	}
 #endif
