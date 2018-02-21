@@ -93,13 +93,13 @@ pub mod flash {
 
         let flash_bar = ProgressBar::new(flash_total as u64);
         flash_bar.set_style(ProgressStyle::default_bar()
-            .template("{spinner:.green} {msg} [{elapsed_precise}] [{bar:40.cyan/blue}] {percent}% ({eta})")
+            .template("{spinner:.green} {msg:20} [{elapsed_precise}] [{bar:40.cyan/blue}] {percent:>3}% ({eta})")
             .progress_chars("##-"));
 
         let verify_bar = if !verify { None } else {
             let bar = ProgressBar::new(verify_total as u64);
             bar.set_style(ProgressStyle::default_bar()
-                .template("{spinner:.green} {msg} [{elapsed_precise}] [{bar:40.cyan/blue}] {percent}% ({eta})")
+                .template("{spinner:.green} {msg:20} [{elapsed_precise}] [{bar:40.cyan/blue}] {percent:>3}% ({eta})")
                 .progress_chars("##-"));
             Some(bar)
         };
@@ -121,9 +121,9 @@ pub mod flash {
                 },
                 Progress::VerifyComplete(errors) => {
                     if errors > 0 {
-                        verify_bar.as_ref().unwrap().finish_with_message(&format!("Verification failed: found {} errors", errors));
+                        verify_bar.as_ref().unwrap().set_message("Verification failed");
                     } else {
-                        verify_bar.as_ref().unwrap().finish_with_message("Firmware verified, no errors found");
+                        verify_bar.as_ref().unwrap().finish();
                     }
                 }
                 Progress::Failed(e) => Err(e)?,
