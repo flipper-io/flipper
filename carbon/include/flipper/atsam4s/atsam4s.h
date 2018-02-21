@@ -4,7 +4,11 @@
 #ifndef __atsam4s_h__
 #define __atsam4s_h__
 
-/* Include the chip support headers. */
+#ifndef __SAM4S16B__
+#define __SAM4S16B__
+#endif
+
+/* Include ASF header. */
 #include <flipper/atsam4s/asf/sam4s.h>
 
 /* Define the modules that this platform uses. */
