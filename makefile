@@ -13,26 +13,35 @@ all::
 install::
 
 # ARM target variables
-ARM_TARGET     := atsam4s
+ARM_TARGET   := atsam4s
 
-ARM_PREFIX     := arm-none-eabi-
+ARM_PREFIX   := arm-none-eabi-
+
+ASF_SRCS     := $(shell find carbon/atsam4s/drivers -type d)
+
+ASF_INC      := carbon/include/flipper/atsam4s/asf \
+                carbon/include/flipper/atsam4s/asf/cmsis \
+				$(shell find carbon/atsam4s/drivers -type d)
 
 # Directories that need to be included for this target.
 ARM_INC_DIRS := carbon/include        \
                 kernel/include        \
                 library/include       \
-                runtime/include
+                runtime/include		  \
+				$(ASF_INC)
 
 ARM_SRC_DIRS := carbon/atsam4s        \
                 kernel/src            \
                 kernel/arch/armv7     \
                 runtime/arch/armv7    \
-                runtime/src
+                runtime/src           \
+				$(ASF_SRCS)
 
-ARM_CFLAGS     := -std=c99            \
+ARM_CFLAGS   := -std=c99              \
                 -Wall                 \
                 -Wextra               \
                 -Wno-unused-parameter \
+                -Wno-expansion-to-defined \
                 -Os                   \
                 -mthumb               \
                 -march=armv7e-m       \
@@ -40,7 +49,8 @@ ARM_CFLAGS     := -std=c99            \
                 -mfloat-abi=soft      \
                 -D__no_err_str__      \
                 -DATSAM4S             \
-            	$(foreach inc,$(ARM_INC_DIRS),-I$(inc))
+                -D__SAM4S16B__        \
+                $(foreach inc,$(ARM_INC_DIRS),-I$(inc))
 
 ARM_LDFLAGS  := -nostartfiles                    \
                 -Wl,-T carbon/atsam4s/sam4s16.ld \
