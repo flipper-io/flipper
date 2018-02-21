@@ -154,7 +154,7 @@ impl<'a> SamBa<'a> {
         self.bus.write(command.as_bytes())?;
 
         let mut buffer = [0u8; 4];
-        self.bus.read(&mut buffer)
+        self.bus.read_exact(&mut buffer)
             .map_err(|_| FdfuError::SamBaRead(format!("a word from {:08X}", address)))?;
         let word = Cursor::new(buffer).read_u32::<BigEndian>().unwrap();
         Ok(word)
@@ -179,7 +179,6 @@ impl<'a> SamBa<'a> {
 
     /// Sets the ATSAM into Device Firmware Update (DFU) mode.
     fn enter_update_mode(&mut self) -> Result<(), Error> {
-        debug!("Entering update mode");
         self.bus.configure(UartBaud::DFU, false);
 
         let mut ack = [0u8; 3];
@@ -188,7 +187,7 @@ impl<'a> SamBa<'a> {
             self.bus.read_exact(&mut ack).map_err(|_| FdfuError::SamBaRead("update mode ack 0x0A0D3E".to_owned()))?;
 
             if &ack[..] == b"\n\r>" {
-                info!("Successfully entered update mode");
+                debug!("Entered update mode");
                 return Ok(())
             }
             self.enter_dfu();
@@ -199,7 +198,6 @@ impl<'a> SamBa<'a> {
 
     /// Sets the ATSAM into normal mode (i.e. not firmware update mode).
     fn enter_normal_mode(&mut self) -> Result<(), Error> {
-        debug!("Entering normal mode");
         self.bus.configure(UartBaud::DFU, false);
 
         let mut ack = [0u8; 2];
@@ -208,7 +206,7 @@ impl<'a> SamBa<'a> {
             self.bus.read_exact(&mut ack).map_err(|_| FdfuError::SamBaRead("normal mode ack 0x0A0D".to_owned()))?;
 
             if ack == [0x0A, 0x0D] {
-                info!("Successfully entered normal mode");
+                debug!("Entered normal mode");
                 return Ok(());
             }
         }
@@ -237,6 +235,7 @@ impl<'a> SamBa<'a> {
     ///    b) Configure the copy applet to copy the page to an address in internal flash
     ///    c) Use SAM-BA to execute the copy applet
     fn upload(&mut self, destination: u32, data: &[u8]) -> Result<(), Error> {
+        info!("Uploading {} byte image to address 0x{:08X}", data.len(), destination);
         self.enter_update_mode()?;
         self.enter_normal_mode()?;
 
@@ -290,12 +289,16 @@ impl<'a> SamBa<'a> {
     fn verify(&mut self, data: &[u8]) -> Result<usize, Error> {
         let word_size = 4;
         let mut errors = 0;
+        let words = data.len() / 4;
         for (word_count, word_bytes) in data.chunks(word_size).enumerate() {
+            let firmware_word = Cursor::new(word_bytes).read_u32::<BigEndian>().unwrap();
             let address = IFLASH0_ADDR + (word_count * word_size) as u32;
             let sam_word = self.read_word(address)?;
-            let firmware_word = Cursor::new(word_bytes).read_u32::<BigEndian>().unwrap();
+            trace!("Verifying word {:04} of {:04} at address 0x{:08X}", word_count, words, address);
 
-            if sam_word != firmware_word {
+            // Compare the top 2 bytes of every word
+            let mask = 0xFFFF0000;
+            if sam_word & mask != firmware_word & mask {
                 errors += 1;
             }
         }
@@ -305,7 +308,7 @@ impl<'a> SamBa<'a> {
 }
 
 /// Given a binary buffer, flash the contents of the buffer onto Flipper.
-pub fn flash(firmware: &[u8]) -> Result<(), Error> {
+pub fn flash(firmware: &[u8], verify: bool) -> Result<(), Error> {
     let flipper = Flipper::attach();
     flipper.select_u2_gpio();
 
@@ -315,28 +318,19 @@ pub fn flash(firmware: &[u8]) -> Result<(), Error> {
     {
         let mut samba = SamBa::new(&mut bus, &mut gpio);
         samba.upload(IFLASH0_ADDR, &firmware)?;
+        println!("Flash successful");
+
+        if verify {
+            println!("Begin verifying");
+            let error_count = samba.verify(&firmware)?;
+            if error_count > 0 {
+                Err(FdfuError::Verify(error_count))?;
+            }
+            println!("Firmware verified successfully");
+        }
         samba.reset();
     }
     bus.configure(UartBaud::FMR, true);
 
-    println!("Flash successful");
     Ok(())
-}
-
-/// Given a binary buffer, verify that the boot image on Flipper matches.
-pub fn verify(firmware: &[u8]) -> Result<(), Error> {
-    let flipper = Flipper::attach();
-    flipper.select_u2_gpio();
-
-    let mut bus = Uart0::new();
-    bus.configure(UartBaud::DFU, false);
-    let mut gpio = Gpio::new();
-    let mut samba = SamBa::new(&mut bus, &mut gpio);
-
-    let error_count = samba.verify(&firmware)?;
-    if error_count > 0 {
-        Err(FdfuError::Verify(error_count).into())
-    } else {
-        Ok(())
-    }
 }

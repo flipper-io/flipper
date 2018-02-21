@@ -81,6 +81,6 @@ pub mod flash {
                 Ok(v)
             })?;
 
-        fdfu::flash(&firmware)
+        fdfu::flash(&firmware, args.is_present("verify"))
     }
 }
