@@ -7,6 +7,7 @@ use std::fs::File;
 use std::io::Read;
 use console::CliError;
 use clap::{App, Arg, ArgMatches};
+use indicatif::{ProgressBar, ProgressStyle};
 use failure::Error;
 
 #[derive(Debug, Fail)]
@@ -84,27 +85,45 @@ pub mod flash {
                 Ok(v)
             })?;
 
+        let flash_total = firmware.len() / 512;
+        let verify_total = firmware.len() / 4;
+
         let verify = args.is_present("verify");
         let receiver = fdfu::flash(firmware.into(), verify);
+
+        let flash_bar = ProgressBar::new(flash_total as u64);
+        flash_bar.set_style(ProgressStyle::default_bar()
+            .template("{spinner:.green} {msg} [{elapsed_precise}] [{bar:40.cyan/blue}] {percent}% ({eta})")
+            .progress_chars("##-"));
+
+        let verify_bar = if !verify { None } else {
+            let bar = ProgressBar::new(verify_total as u64);
+            bar.set_style(ProgressStyle::default_bar()
+                .template("{spinner:.green} {msg} [{elapsed_precise}] [{bar:40.cyan/blue}] {percent}% ({eta})")
+                .progress_chars("##-"));
+            Some(bar)
+        };
 
         loop {
             let progress = receiver.recv().unwrap();
             match progress {
-                Progress::UpdateMode => println!("Entered update mode"),
-                Progress::NormalMode => println!("Entered normal mode"),
-                Progress::Applet => println!("Uploaded copy applet"),
-                Progress::Flashing(done, total) => println!("Uploaded page {} of {}", done, total),
-                Progress::FlashComplete => {
-                    print!("Finished flashing firmware");
-                    if verify { print!(", verifying"); }
-                    println!();
+                Progress::UpdateMode => flash_bar.set_message("Entered update mode"),
+                Progress::NormalMode => flash_bar.set_message("Entered normal mode"),
+                Progress::Applet => flash_bar.set_message("Uploaded copy applet"),
+                Progress::Flashing(done) => {
+                    flash_bar.set_message("Flashing firmware");
+                    flash_bar.set_position(done as u64);
                 },
-                Progress::Verifying(done, total) => println!("Verified word {} of {}", done, total),
+                Progress::FlashComplete => flash_bar.finish_with_message("Firmware flashed"),
+                Progress::Verifying(done) => {
+                    verify_bar.as_ref().unwrap().set_message("Verifying firmware");
+                    verify_bar.as_ref().unwrap().set_position(done as u64);
+                },
                 Progress::VerifyComplete(errors) => {
                     if errors > 0 {
-                        println!("Verification failed: found {} errors", errors);
+                        verify_bar.as_ref().unwrap().finish_with_message(&format!("Verification failed: found {} errors", errors));
                     } else {
-                        println!("Firmware verified! No errors found");
+                        verify_bar.as_ref().unwrap().finish_with_message("Firmware verified, no errors found");
                     }
                 }
                 Progress::Failed(e) => Err(e)?,

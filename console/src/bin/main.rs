@@ -32,6 +32,7 @@ extern crate failure;
 extern crate rustyline;
 extern crate byteorder;
 extern crate libc;
+extern crate indicatif;
 extern crate flipper;
 extern crate flipper_console as console;
 

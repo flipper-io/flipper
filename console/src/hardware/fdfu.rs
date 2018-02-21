@@ -68,14 +68,14 @@ pub enum Progress {
     NormalMode,
     /// Indicates that the copy applet was successfully uploaded to the device.
     Applet,
-    /// Indicates that page _0 of _1 was successfully flashed.
-    Flashing(usize, usize),
+    /// Indicates that page _0 was successfully flashed.
+    Flashing(usize),
     /// Indicates that the flashing process completed without errors.
     FlashComplete,
-    /// Indicates that word _0 of _1 has been checked. Note that this does _not_ mean
-    /// that word _0 was verified to be correct. The total number of verification
+    /// Indicates that word _0 has been checked. Note that this does _not_ mean
+    /// that the word was verified to be correct. The total number of verification
     /// errors is reported by `VerifyComplete`.
-    Verifying(usize, usize),
+    Verifying(usize),
     /// Indicates that the verification process completed without failure. The number
     /// _0 given is the number of words checked which did not match the verification
     /// image.
@@ -292,7 +292,6 @@ impl<'a> SamBa<'a> {
 
             // Send the firmware, page by page
             let page_size = 512;
-            let pages = data.len() / page_size;
             for (i, page) in data.chunks(page_size).enumerate() {
                 debug!("Writing page {}", i);
                 self.copy(PAGE_BUFFER(self.applet.len()), page)?;
@@ -303,7 +302,7 @@ impl<'a> SamBa<'a> {
                     if fsr & 0x01 != 0 { break; }
                     if fsr & 0x0E != 0 { Err(FdfuError::FlashWrite(i))? }
                 }
-                let _ = self.sender.send(Progress::Flashing(i, pages));
+                let _ = self.sender.send(Progress::Flashing(i));
             };
 
             let retries = 4u8;
@@ -342,7 +341,7 @@ impl<'a> SamBa<'a> {
                 let address = IFLASH0_ADDR + (word_count * word_size) as u32;
                 let sam_word = self.read_word(address)?;
                 trace!("Verifying word {:04} of {:04} at address 0x{:08X}", word_count, words, address);
-                let _ = self.sender.send(Progress::Verifying(word_count, words));
+                let _ = self.sender.send(Progress::Verifying(word_count));
 
                 // Compare the top 2 bytes of every word
                 let mask = 0xFFFF0000;
