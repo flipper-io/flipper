@@ -11,6 +11,7 @@
 //! itself typically only need to interpret each command enough to
 //! decide which child module to pass the execution onto.
 
+#![deny(warnings)]
 #![deny(missing_docs)]
 #![deny(missing_debug_implementations)]
 #![deny(missing_copy_implementations)]
