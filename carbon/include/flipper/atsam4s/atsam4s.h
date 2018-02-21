@@ -1,13 +1,15 @@
 /* Flipper Platform Support Header for the Atmel ATSAM4S */
 
-/* NOTE: Only one target platform can be included at a time. */
-
 /* Guard whether or not a target platform has already been defined. */
-#ifndef __lf_platform_h__
-#define __lf_platform_h__
+#ifndef __atsam4s_h__
+#define __atsam4s_h__
 
-/* Include the chip support headers. */
-#include <flipper/atsam4s/sam4s16b.h>
+#ifndef __SAM4S16B__
+#define __SAM4S16B__
+#endif
+
+/* Include ASF header. */
+#include <flipper/atsam4s/asf/sam4s.h>
 
 /* Define the modules that this platform uses. */
 #define __use_adc__
@@ -59,6 +61,4 @@
 #define USER_PCS 1
 #define USER_PCS_PIN PIO_PA31A_NPCS1
 
-#else
-#error "Error: Multiple platforms targeted."
 #endif
