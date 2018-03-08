@@ -1,19 +1,9 @@
-/**
- * @author Nick Mosher <nicholastmosher@gmail.com>
- */
-ref = require('ref');
-Flipper = require('./index.js');
+// This is a test file representing code that a user would write
+// to control Flipper. This example demonstrates using the LED.
 
-var flipper = new Flipper();
+const { Flipper, Led }  = require('./index');
 
-const gpioModuleDef = {
-  'gpio_configure': [ 'int', [ ] ],
-  'gpio_enable': [ ref.types.void, [ ref.types.uint32, ref.types.uint32 ] ],
-  'gpio_write': [ ref.types.void, [ ref.types.uint32, ref.types.uint32 ] ]
-};
+const flipper = new Flipper();
+const led = new Led(flipper);
 
-var gpioModule = flipper.bindModule(gpioModuleDef, "gpio");
-
-gpioModule.gpio_configure();
-gpioModule.gpio_enable(1, 0);
-gpioModule.gpio_write(1, 0);
+led.rgb(0, 0, 10);
