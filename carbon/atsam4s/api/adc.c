@@ -1,6 +1,5 @@
 #include <flipper/adc.h>
 
-
-int adc_configure(void) {
+LF_FUNC("adc") int adc_configure(void) {
 	return lf_success;
 }

@@ -22,7 +22,7 @@ struct _lf_timer timers[] = { { &(TC0->TC_CHANNEL[0]), true, NULL },
 							  { &(TC0->TC_CHANNEL[2]), true, NULL },
 							  { &(TC0->TC_CHANNEL[3]), true, NULL } };
 
-int timer_configure(void) {
+LF_FUNC("timer") int timer_configure(void) {
 	/* Iterate through the timers and configure their defaults. */
 	for (size_t i = 0; i < sizeof(timers)/sizeof(struct _lf_timer); i ++) {
 		/* Enable the timer's peripheral clock. */
@@ -42,7 +42,7 @@ int timer_configure(void) {
 }
 
 /* Registers a callback with the next available timer. */
-int timer_register(uint32_t ticks, void *callback) {
+LF_FUNC("timer") int timer_register(uint32_t ticks, void *callback) {
 	/* Loop through the timers until a free timer is found. */
 	for (size_t i = 0; i < sizeof(timers); i ++) {
 		if (timers[i].available) {

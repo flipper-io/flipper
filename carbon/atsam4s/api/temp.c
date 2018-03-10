@@ -1,6 +1,5 @@
 #include <flipper/temp.h>
 
-
-int temp_configure(void) {
+LF_FUNC("swd") int temp_configure(void) {
 	return lf_success;
 }

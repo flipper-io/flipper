@@ -2,7 +2,7 @@
 
 #define USART0_BAUDRATE 230400
 
-int usart_configure(void) {
+LF_FUNC("usart") int usart_configure(void) {
 	/* Create a pinmask for the peripheral pins. */
 	const unsigned int USART0_PIN_MASK = (PIO_PA5A_RXD0 | PIO_PA6A_TXD0);
 	/* Enable the peripheral clock. */
@@ -35,35 +35,34 @@ int usart_configure(void) {
 	return lf_success;
 }
 
-void usart_enable(void) {
+LF_FUNC("usart") void usart_enable(void) {
 	/* Enable the transmitter and receiver. */
 	USART0 -> US_CR = US_CR_TXEN | US_CR_RXEN;
 }
 
-void usart_disable(void) {
+LF_FUNC("usart") void usart_disable(void) {
 	/* Disable the transmitter and receiver. */
 	USART0 -> US_CR = US_CR_TXDIS | US_CR_RXDIS;
 }
 
-int usart_ready(void) {
+LF_FUNC("usart") int usart_ready(void) {
 	/* Return the empty condition of the transmitter FIFO. */
 	return (USART0 -> US_CSR & US_CSR_TXEMPTY);
 }
 
-void usart_put(uint8_t byte) {
+LF_FUNC("usart") void usart_put(uint8_t byte) {
 	/* Wait until ready to transmit. */
 	while (!(USART0 -> US_CSR & US_CSR_TXEMPTY));
 	/* Load the byte into the transmitter FIFO. */
 	USART0 -> US_THR = byte;
 }
 
-
-uint8_t usart_get(void) {
+LF_FUNC("usart") uint8_t usart_get(void) {
 	/* Retrieve a byte from the receiver FIFO. */
 	return USART0 -> US_RHR;
 }
 
-int usart_push(void *source, lf_size_t length) {
+LF_FUNC("usart") int usart_push(void *source, lf_size_t length) {
 	/* Set the transmission length and source pointer. */
 	USART0 -> US_TCR = length;
 	USART0 -> US_TPR = (uintptr_t)(source);
@@ -76,7 +75,7 @@ int usart_push(void *source, lf_size_t length) {
 	return lf_success;
 }
 
-int usart_pull(void *destination, lf_size_t length) {
+LF_FUNC("usart") int usart_pull(void *destination, lf_size_t length) {
 	/* Set the transmission length and destination pointer. */
 	USART0 -> US_RCR = length;
 	USART0 -> US_RPR = (uintptr_t)(destination);

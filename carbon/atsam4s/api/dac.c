@@ -1,6 +1,5 @@
 #include <flipper/dac.h>
 
-
-int dac_configure(void) {
+LF_FUNC("dac") int dac_configure(void) {
 	return lf_success;
 }

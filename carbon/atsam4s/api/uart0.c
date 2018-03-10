@@ -1,9 +1,6 @@
 #include <flipper.h>
 
-#include <flipper/uart0.h>
-
-
-int uart0_configure(uint8_t baud, uint8_t interrupts) {
+LF_FUNC("uart0") int uart0_configure(uint8_t baud, uint8_t interrupts) {
 	/* Create a pinmask for the peripheral pins. */
 	const unsigned int UART0_PIN_MASK = (PIO_PA9A_URXD0 | PIO_PA10A_UTXD0);
 	/* Enable the peripheral clock. */
@@ -32,24 +29,24 @@ int uart0_configure(uint8_t baud, uint8_t interrupts) {
 	return lf_success;
 }
 
-int uart0_ready(void) {
+LF_FUNC("uart0") int uart0_ready(void) {
 	/* Return the empty condition of the transmitter FIFO. */
 	return (UART0->UART_SR & UART_SR_TXEMPTY);
 }
 
-void uart0_put(uint8_t byte) {
+LF_FUNC("uart0") void uart0_put(uint8_t byte) {
 	/* Wait until ready to transmit. */
 	while (!(UART0->UART_SR & UART_SR_TXEMPTY));
 	/* Load the byte into the transmitter FIFO. */
 	UART0->UART_THR = byte;
 }
 
-uint8_t uart0_get(uint32_t timeout) {
+LF_FUNC("uart0") uint8_t uart0_get(uint32_t timeout) {
 	/* Retrieve a byte from the receiver FIFO. */
 	return UART0->UART_RHR;
 }
 
-int uart0_push(void *source, lf_size_t length) {
+LF_FUNC("uart0") int uart0_push(void *source, lf_size_t length) {
 	UART0->UART_TCR = length;
 	UART0->UART_TPR = (uintptr_t)(source);
 	UART0->UART_PTCR = UART_PTCR_TXTEN;
@@ -58,7 +55,7 @@ int uart0_push(void *source, lf_size_t length) {
 	return lf_success;
 }
 
-int uart0_pull(void *destination, lf_size_t length) {
+LF_FUNC("uart0") int uart0_pull(void *destination, lf_size_t length) {
 	UART0->UART_RCR = length;
 	UART0->UART_RPR = (uintptr_t)(destination);
 	UART0->UART_PTCR = UART_PTCR_RXTEN;

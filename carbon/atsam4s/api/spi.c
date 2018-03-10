@@ -1,7 +1,6 @@
 #include <flipper/spi.h>
 
-
-int spi_configure() {
+LF_FUNC("spi") int spi_configure() {
 	/* Enable the SPI clock. */
 	PMC->PMC_PCER0 = (1 << ID_SPI);
 	/* Create a pinmask for the peripheral pins. */
@@ -35,30 +34,30 @@ int spi_configure() {
 	return lf_success;
 }
 
-void spi_enable(void) {
+LF_FUNC("spi") void spi_enable(void) {
 	SPI->SPI_CR = SPI_CR_SPIEN;
 }
 
-void spi_disable(void) {
+LF_FUNC("spi") void spi_disable(void) {
 	SPI->SPI_CR = SPI_CR_SPIDIS;
 }
 
-uint8_t spi_ready(void) {
+LF_FUNC("spi") uint8_t spi_ready(void) {
 	return (SPI->SPI_SR & SPI_SR_TXEMPTY);
 }
 
-void spi_end(void) {
+LF_FUNC("spi") void spi_end(void) {
 	SPI->SPI_CR |= SPI_CR_LASTXFER;
 }
 
-void spi_put(uint8_t byte) {
+LF_FUNC("spi") void spi_put(uint8_t byte) {
 	/* Transmit the byte. */
 	SPI->SPI_TDR = byte;
 	/* Wait until data has been transmitted. */
 	while (!(SPI->SPI_SR & SPI_SR_TDRE));
 }
 
-uint8_t spi_get(void) {
+LF_FUNC("spi") uint8_t spi_get(void) {
 	/* Write a dummy byte. */
 	spi_put(0xff);
 	/* Wait until data has been received. */
@@ -67,7 +66,7 @@ uint8_t spi_get(void) {
 	return SPI->SPI_RDR;
 }
 
-int spi_push(void *source, uint32_t length) {
+LF_FUNC("spi") int spi_push(void *source, uint32_t length) {
 	/* Set the transmission length and destination pointer. */
 	SPI->SPI_TCR = length;
 	SPI->SPI_TPR = (uintptr_t)(source);
@@ -80,7 +79,7 @@ int spi_push(void *source, uint32_t length) {
 	return lf_success;
 }
 
-int spi_pull(void *destination, uint32_t length) {
+LF_FUNC("spi") int spi_pull(void *destination, uint32_t length) {
 	/* Set the transmission length and destination pointer. */
 	SPI->SPI_RCR = length;
 	SPI->SPI_RPR = (uintptr_t)(destination);

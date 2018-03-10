@@ -1,11 +1,9 @@
 #include <flipper/uart0.h>
 
-#include <flipper/atmegau2/megausb.h>
-
 uint8_t uart0_buffer[256];
 uint8_t idx = 0;
 
-int uart0_configure(uint8_t baud, uint8_t interrupts) {
+LF_FUNC("uart0") int uart0_configure(uint8_t baud, uint8_t interrupts) {
 
 	UBRR1L = baud;
 	UCSR1A &= ~(1 << U2X1);
@@ -25,11 +23,11 @@ int uart0_configure(uint8_t baud, uint8_t interrupts) {
 	return lf_success;
 }
 
-int uart0_ready(void) {
+LF_FUNC("uart0") int uart0_ready(void) {
 	return (UCSR1A & (1 << RXC1));
 }
 
-int uart0_push(void *source, lf_size_t length) {
+LF_FUNC("uart0") int uart0_push(void *source, lf_size_t length) {
 	while (length --) {
 		uint8_t timeout = UDFNUML + LF_UART_TIMEOUT_MS;
 		while (!(UCSR1A & (1 << UDRE1))) {
@@ -42,7 +40,7 @@ failure:
 	return lf_error;
 }
 
-int uart0_pull(void *destination, lf_size_t length) {
+LF_FUNC("uart0") int uart0_pull(void *destination, lf_size_t length) {
 	/* Drain the buffered data. */
 	if (idx) {
 		if (length > idx) {
@@ -68,6 +66,7 @@ int uart0_pull(void *destination, lf_size_t length) {
 failure:
 	return lf_error;
 }
+#include <flipper/atmegau2/megausb.h>
 
 ISR(USART1_RX_vect) {
 	if (FSI_IN & (1 << FSI_PIN)) {
