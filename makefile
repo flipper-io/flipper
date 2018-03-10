@@ -28,8 +28,6 @@ ARM_TARGET   := atsam4s
 
 ARM_PREFIX   := arm-none-eabi-
 
-ASF_SRCS     := $(shell find carbon/atsam4s/drivers -type d)
-
 ASF_INC      := carbon/include/flipper/atsam4s/asf \
                 carbon/include/flipper/atsam4s/asf/cmsis \
                 $(shell find carbon/atsam4s/drivers -type d)
@@ -46,7 +44,6 @@ ARM_SRC_DIRS := carbon/atsam4s        \
                 kernel/arch/armv7     \
                 runtime/arch/armv7    \
                 runtime/src           \
-                $(ASF_SRCS)
 
 ARM_CFLAGS   := -std=c99              \
                 -Wall                 \
@@ -61,8 +58,7 @@ ARM_CFLAGS   := -std=c99              \
                 -mfloat-abi=soft      \
                 -D__no_err_str__      \
                 -DATSAM4S             \
-                -D__SAM4S16B__        \
-                $(foreach inc,$(ARM_INC_DIRS),-I$(inc))
+                -D__SAM4S16B__
 
 ARM_LDFLAGS  := -nostartfiles                    \
                 -mcpu=cortex-m4       \
@@ -89,7 +85,7 @@ AVR_PREFIX     := avr-
 AVR_INC_DIRS := carbon/include        \
                 kernel/include        \
                 library/include       \
-                runtime/include		  \
+                runtime/include
 
 AVR_SRC_DIRS := carbon/atmegau2       \
                 kernel/src            \
@@ -106,8 +102,7 @@ AVR_CFLAGS      := -std=c99           \
                 -D__AVR_ATmega32U2__  \
                 -DF_CPU=16000000UL    \
                 -D__no_err_str__      \
-                -DATMEGAU2            \
-            	$(foreach inc,$(AVR_INC_DIRS),-I$(inc))
+                -DATMEGAU2
 
 AVR_LDFLAGS  := -mmcu=atmega32u2 \
                 -Wl,--gc-sections
@@ -277,7 +272,7 @@ MAKEFLAGS += --no-builtin-rules
 #####
 # find_srcs($1: source directories, $2: source file extensions)
 #####
-find_srcs = $(foreach sd,$1,$(foreach ext,$2,$(wildcard $(sd)/*.$(ext))))
+find_srcs = $(foreach sd,$1,$(foreach ext,$2,$(shell find $(sd) -name '*.$(ext)')))
 #####
 
 # All supported source file extensions.
@@ -298,8 +293,9 @@ $1_SO := $$($1_TARGET).so
 $1_SRCS := $$(call find_srcs,$$($1_SRC_DIRS),$$(SRC_EXTS))
 $1_OBJS := $$(patsubst %,$$($1_BUILD)/%.o,$$($1_SRCS))
 $1_DEPS := $$($1_OBJS:.o=.d)
-$1_BUILD_DIRS := $$($1_BUILD) $$(addprefix $$($1_BUILD)/,$$($1_SRC_DIRS))
+$1_BUILD_DIRS := $$($1_BUILD) $$(addprefix $$($1_BUILD)/,$$(shell find $$($1_SRC_DIRS) -type d))
 $1_BUILD_DIR_FILES := $$(addsuffix /.dir,$$($1_BUILD_DIRS))
+$1_CFLAGS += $$(foreach inc,$$($1_INC_DIRS),-I$$(inc))
 $1_CC := $$($1_PREFIX)gcc
 $1_AS := $$($1_PREFIX)gcc
 $1_LD := $$($1_PREFIX)gcc
