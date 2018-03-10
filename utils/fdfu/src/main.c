@@ -89,18 +89,18 @@ void sam_pull(void *destination, size_t len) {
 #define SAM_RESET_PIN 0x04
 
 void sam_reset() {
-	gpio.write(0, (1 << SAM_RESET_PIN));
-	usleep(10000);
-	gpio.write((1 << SAM_RESET_PIN), 0);
+	// gpio.write(0, (1 << SAM_RESET_PIN));
+	// usleep(10000);
+	// gpio.write((1 << SAM_RESET_PIN), 0);
 }
 
 #define SAM_ERASE_PIN 0x06
 
 int sam_enter_dfu(void) {
-	gpio.write((1 << SAM_ERASE_PIN), 0);
-	usleep(8000000);
-	gpio.write(0, (1 << SAM_ERASE_PIN));
-	sam_reset();
+	// gpio.write((1 << SAM_ERASE_PIN), 0);
+	// usleep(8000000);
+	// gpio.write(0, (1 << SAM_ERASE_PIN));
+	// sam_reset();
 	return lf_success;
 }
 
@@ -222,7 +222,7 @@ void *load_page_data(FILE *firmware, size_t size) {
 int enter_update_mode(void) {
 
 	/* Go to DFU baud. */
-	uart0_configure(DFU_BAUD, false);
+//	uart0_configure(DFU_BAUD, false);
 
 	printf("Entering update mode.\n");
 

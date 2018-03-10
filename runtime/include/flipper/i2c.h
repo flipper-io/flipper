@@ -4,19 +4,12 @@
 /* Include all types and macros exposed by the Flipper Toolbox. */
 #include <flipper.h>
 
-/* Declare the virtual interface for this module. */
-extern const struct _i2c_interface {
-	int (* configure)(void);
-} i2c;
-
-
-/* Declare the _lf_module structure for this module. */
-extern struct _lf_module _i2c;
-
-/* Declare the FMR overlay for this module. */
-enum { _i2c_configure };
-
 /* Declare the prototypes for all of the functions within this module. */
 int i2c_configure(void);
+void i2c_start_read(uint8_t address, uint8_t length);
+uint8_t i2c_read(void);
+void i2c_start_write(uint8_t address, uint8_t length);
+void i2c_write(uint8_t byte);
+void i2c_stop(void);
 
 #endif

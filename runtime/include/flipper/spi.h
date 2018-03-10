@@ -4,24 +4,6 @@
 /* Include all types and macros exposed by the Flipper Toolbox. */
 #include <flipper.h>
 
-/* Declare the virtual interface for this modules. */
-extern const struct _spi_interface {
-	int (* configure)(void);
-	void (* enable)(void);
-	void (* disable)(void);
-	uint8_t (* ready)(void);
-	void (* put)(uint8_t byte);
-	uint8_t (* get)(void);
-	int (* push)(void *source, uint32_t length);
-	int (* pull)(void *destination, uint32_t length);
-} spi;
-
-/* Declare the _lf_module structure for this module. */
-extern struct _lf_module _spi;
-
-/* Declare the FMR overlay for this module. */
-enum { _spi_configure, _spi_enable, _spi_disable, _spi_ready, _spi_put, _spi_get, _spi_push, _spi_pull };
-
 /* Declare the prototypes for all of the functions within this module. */
 int spi_configure(void);
 void spi_enable(void);

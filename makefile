@@ -52,7 +52,8 @@ ARM_CFLAGS   := -std=c99              \
                 -Wno-expansion-to-defined \
                 -Os                   \
                 -mcpu=cortex-m4       \
-				-mthumb               \
+                -g                    \
+                -mthumb               \
                 -march=armv7e-m       \
                 -mtune=cortex-m4      \
                 -mfloat-abi=soft      \
@@ -88,11 +89,12 @@ AVR_SRC_DIRS := carbon/atmegau2       \
                 runtime/arch/avr8     \
                 runtime/src
 
-AVR_CFLAGS   := -std=c99           \
+AVR_CFLAGS   := -std=c99              \
                 -Wall                 \
                 -Wextra               \
                 -Wno-unused-parameter \
                 -Os                   \
+                -g                    \
                 -mmcu=atmega32u2      \
                 -DARCH=ARCH_AVR8      \
                 -D__AVR_ATmega32U2__  \
@@ -100,8 +102,7 @@ AVR_CFLAGS   := -std=c99           \
                 -D__no_err_str__      \
                 -DATMEGAU2
 
-AVR_LDFLAGS  := -mmcu=atmega32u2 \
-                -Wl,--gc-sections
+AVR_LDFLAGS  := -mmcu=atmega32u2
 
 PKGCONFIG_DIR := $(PREFIX)/lib/pkgconfig
 PKGCONFIG_PATH := $(PKGCONFIG_DIR)/libflipper.pc
@@ -117,6 +118,9 @@ install-atmegau2: atmegau2
 
 # install:: install-atmegau2
 
+carbon-hal: $(ARM_TARGET).elf | $(BUILD)/carbon-hal/.dir
+	python utils/fdwarf/fdwarf.py $(BUILD)/$(ARM_TARGET)/$(ARM_TARGET).elf c $(BUILD)/carbon-hal
+
 # x86 target variables
 X86_TARGET   := libflipper
 
@@ -131,7 +135,8 @@ X86_SRC_DIRS := carbon/hal              \
                 library/src             \
                 runtime/arch/x64        \
                 library/platforms/posix \
-                runtime/src
+                runtime/src             \
+				$(BUILD)/carbon-hal
 
 X86_CFLAGS   := -std=gnu99              \
                 -Wall                   \
