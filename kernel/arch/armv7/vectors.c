@@ -11,6 +11,8 @@ extern uint32_t _ezero;
 extern uint32_t _sstack;
 extern uint32_t _estack;
 
+volatile bool g_interrupt_enabled;
+
 __attribute__((section(".vectors"))) isr_t vector_table[] = {
 
 	(isr_t)(&_estack),

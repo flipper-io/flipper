@@ -3,9 +3,9 @@
 
 /* Define the standard module array for this platform. */
 const void *const lf_modules[] = {
-	&button,
-	&gpio,
-	&led,
-	&uart0,
-	&wdt
+	// &button,
+	// &gpio,
+	// &led,
+	// &uart0,
+	// &wdt
 };

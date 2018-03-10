@@ -36,9 +36,9 @@
 #define LF_MACRO_STRCAT_EVAL(x, y) LF_MACRO_STRCAT(x,y)
 
 #ifdef __clang__
-#define LF_FUNC(MODULE) __attribute__((section("__TEXT,.lf.module."MODULE)))
+#define LF_FUNC(MODULE) __attribute__((section("__TEXT,.lf.module."MODULE), used))
 #else
-#define LF_FUNC(MODULE) __attribute__((section(".lf.module."MODULE)))
+#define LF_FUNC(MODULE) __attribute__((section(".lf.module."MODULE), used))
 #endif
 
 /* Used to contain the result of checksumming operations. */

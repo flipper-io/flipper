@@ -41,7 +41,7 @@ LF_FUNC("uart0") void uart0_put(uint8_t byte) {
 	UART0->UART_THR = byte;
 }
 
-LF_FUNC("uart0") uint8_t uart0_get(uint32_t timeout) {
+LF_FUNC("uart0") uint8_t uart0_get(void) {
 	/* Retrieve a byte from the receiver FIFO. */
 	return UART0->UART_RHR;
 }
