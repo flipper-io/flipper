@@ -77,9 +77,9 @@ install-atsam4s: utils $(ARM_TARGET).bin
 	$(_v)$(BUILD)/utils/fdfu $(BUILD)/$(ARM_TARGET)/$(ARM_TARGET).bin
 
 # AVR target variables
-AVR_TARGET     := atmegau2
+AVR_TARGET   := atmegau2
 
-AVR_PREFIX     := avr-
+AVR_PREFIX   := avr-
 
 # Directories that need to be included for this target.
 AVR_INC_DIRS := carbon/include        \
@@ -92,7 +92,7 @@ AVR_SRC_DIRS := carbon/atmegau2       \
                 runtime/arch/avr8     \
                 runtime/src
 
-AVR_CFLAGS      := -std=c99           \
+AVR_CFLAGS   := -std=c99           \
                 -Wall                 \
                 -Wextra               \
                 -Wno-unused-parameter \
@@ -122,9 +122,9 @@ install-atmegau2: atmegau2
 # install:: install-atmegau2
 
 # x86 target variables
-X86_TARGET     := libflipper
+X86_TARGET   := libflipper
 
-X86_PREFIX     :=
+X86_PREFIX   :=
 
 # Directories that need to be included for this target.
 X86_INC_DIRS := carbon/include          \
@@ -137,13 +137,12 @@ X86_SRC_DIRS := carbon/hal              \
                 library/platforms/posix \
                 runtime/src
 
-X86_CFLAGS :=   -std=gnu99              \
+X86_CFLAGS   := -std=gnu99              \
                 -Wall                   \
                 -Wextra                 \
                 -Wno-unused-parameter   \
                 -fpic                   \
                 -DPOSIX                 \
-            	$(foreach inc,$(X86_INC_DIRS),-I$(inc)) \
 				$(shell pkg-config --cflags-only-I libusb-1.0)
 
 X86_LDFLAGS  := $(shell pkg-config --libs libusb-1.0)
