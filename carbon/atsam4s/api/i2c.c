@@ -1,7 +1,6 @@
 #include <flipper/i2c.h>
 
-
-int i2c_configure(void) {
+LF_FUNC("i2c") int i2c_configure(void) {
 	/* Enable the TWI clock. */
 	PMC -> PMC_PCER0 = (1 << ID_TWI0);
 	/* Create a pinmask for the peripheral pins. */
@@ -22,26 +21,26 @@ int i2c_configure(void) {
 }
 
 /* Starts a read session. */
-void i2c_start_read(uint8_t address, uint8_t length) {
+LF_FUNC("i2c") void i2c_start_read(uint8_t address, uint8_t length) {
 
 }
 
 /* Contiunues reading once a read session has begun. */
-uint8_t i2c_read(void) {
+LF_FUNC("i2c") uint8_t i2c_read(void) {
 	return 0;
 }
 
 /* Starts a write session. */
-void i2c_start_write(uint8_t address, uint8_t length) {
+LF_FUNC("i2c") void i2c_start_write(uint8_t address, uint8_t length) {
 
 }
 
 /* Continues writing once a write session has begun. */
-void i2c_write(uint8_t byte) {
+LF_FUNC("i2c") void i2c_write(uint8_t byte) {
 
 }
 
 /* Stops the active session. */
-void i2c_stop(void) {
+LF_FUNC("i2c") void i2c_stop(void) {
 
 }

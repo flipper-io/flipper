@@ -31,10 +31,6 @@
 #define __use_usb__
 #define __use_wdt__
 
-/* Declare the LF_VAR and LF_FUNC types for this platform. */
-#define LF_VAR __attribute__((section(".lf.vars")))
-#define LF_FUNC __attribute__((section(".lf.funcs")))
-
 /* Run at a base frequency of 96MHz. */
 #define F_CPU 96000000
 /* NOTE: The number of wait states is proportionate to the clock speed defined above. */
