@@ -9,6 +9,7 @@ install:
 - sudo apt-get install libusb-1.0-0-dev
 - sudo apt-get install avr-libc binutils-avr gcc-avr
 - sudo apt-get install libnewlib-arm-none-eabi binutils-arm-none-eabi gcc-arm-none-eabi
+- pip3 install pyelfutils
 
 matrix:
   include:
