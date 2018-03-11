@@ -81,10 +81,11 @@ def get_parameters_from_die(cu, die):
 			parameters.append(p)
 	return parameters
 
-def generate_c(modulename, outputname, functions):
-	outc = open(outputname, "w")
+def generate_c(modules, outfile):
+	outc = open(outfile, "w")
 
-	ctemplate = """\
+	for m in modules:
+		ctemplate = """\
 #include <flipper.h>
 
 LF_MODULE(_$MODULE$, "$MODULE$", NULL, NULL, NULL);
@@ -97,41 +98,41 @@ $STRUCTBODY$
 
 $FUNCTIONS$
 """
-	functs = []
-	struct = []
-	tags = []
-	for f in functions:
-		functs.append(str(f) + ";")
-		tags.append("_" + f.name)
-		struct.append("%s (*%s)(%s);" % (f.type, f.name, ", ".join(map(str, f.parameters))))
-	ctemplate = ctemplate.replace("$FUNCTIONPROTOS$", "\n\t".join(functs))
-	ctemplate = ctemplate.replace("$STRUCTDEF$", "\t" + "\n\t".join(struct))
-	ctemplate = ctemplate.replace("$TAGS$", ", ".join(tags))
+		functs = []
+		struct = []
+		tags = []
+		for f in m.funcs:
+			functs.append(str(f) + ";")
+			tags.append("_" + f.name)
+			struct.append("%s (*%s)(%s);" % (f.type, f.name, ", ".join(map(str, f.parameters))))
+		ctemplate = ctemplate.replace("$FUNCTIONPROTOS$", "\n\t".join(functs))
+		ctemplate = ctemplate.replace("$STRUCTDEF$", "\t" + "\n\t".join(struct))
+		ctemplate = ctemplate.replace("$TAGS$", ", ".join(tags))
 
-	functs = []
-	struct = []
-	for f in functions:
-		struct.append("&%s" % f.name)
+		functs = []
+		struct = []
+		for f in m.funcs:
+			struct.append("&%s" % f.name)
 
-		args = []
-		for p in f.parameters:
-			args.append("lf_infer(%s)" % p.name)
-		retl = ["lf_void_t", "", "lf_int8_t", "lf_int16_t", "", "lf_int32_t"]
-		statement = "lf_invoke(lf_get_current_device(), &_$MODULE$, %s, %s, lf_args(%s));" % ("_" + f.name, retl[f.ret + 1], ", ".join(args))
-		if f.type == "void":
-			body = statement
-		else:
-			body = "return " + statement
-		functs.append("LF_WEAK " + str(f) + " {\n\t%s\n}\n" % body)
-	ctemplate = ctemplate.replace("$VARIABLES$\n\n", "")
-	ctemplate = ctemplate.replace("$STRUCTBODY$", "\t" + ",\n\t".join(struct))
-	ctemplate = ctemplate.replace("$FUNCTIONS$", "\n".join(functs))
-	ctemplate = ctemplate.replace("$MODULE$", modulename)
+			args = []
+			for p in f.parameters:
+				args.append("lf_infer(%s)" % p.name)
+			retl = ["lf_void_t", "", "lf_int8_t", "lf_int16_t", "", "lf_int32_t"]
+			statement = "lf_invoke(lf_get_current_device(), &_$MODULE$, %s, %s, lf_args(%s));" % ("_" + f.name, retl[f.ret + 1], ", ".join(args))
+			if f.type == "void":
+				body = statement
+			else:
+				body = "return " + statement
+			functs.append("LF_WEAK " + str(f) + " {\n\t%s\n}\n" % body)
+		ctemplate = ctemplate.replace("$VARIABLES$\n\n", "")
+		ctemplate = ctemplate.replace("$STRUCTBODY$", "\t" + ",\n\t".join(struct))
+		ctemplate = ctemplate.replace("$FUNCTIONS$", "\n".join(functs))
+		ctemplate = ctemplate.replace("$MODULE$", m.name)
+		outc.write(ctemplate)
 
-	outc.write(ctemplate)
 	outc.close()
 
-def generate_py(modulename, outputname, functions):
+def generate_py(modules, outfile):
 	print("Not yet implemented!")
 	sys.exit(1)
 
@@ -171,7 +172,7 @@ def test():
 		for f in m.funcs:
 			print("\t%s" % str(f))
 
-def process_file(filename, language, outdir):
+def process_file(filename, language, outfile):
 	functions = []
 
 	with open(filename, "rb") as f:
@@ -185,17 +186,13 @@ def process_file(filename, language, outdir):
 
 		modules = get_modules(elffile, dwarfinfo)
 
-		if not os.path.exists(outdir):
-			os.makedir(outdir)
-
-		for m in modules:
-			if language.lower() == "c":
-				generate_c(m.name, os.path.join(outdir, m.name + '.c'), m.funcs)
-			elif language.lower() == "python":
-				generate_py(m.name, os.path.join(outdir, m.name + '.c'), m.funcs)
-			else:
-				print("Invalid language: " + language)
-				sys.exit(1)
+		if language.lower() == "c":
+			generate_c(modules, outfile)
+		elif language.lower() == "python":
+			generate_py(modules, outfile)
+		else:
+			print("Invalid language: " + language)
+			sys.exit(1)
 
 if __name__ == "__main__":
 	if len(sys.argv) >= 4:
@@ -204,5 +201,5 @@ if __name__ == "__main__":
 		outdir = sys.argv[3]
 		process_file(elf, language, outdir)
 	else:
-		print("Usage: fdwarf <input file.elf> <language [c|py])> <output directory>")
+		print("Usage: fdwarf <input file.elf> <language [c|py])> <output file>")
 		sys.exit(1)

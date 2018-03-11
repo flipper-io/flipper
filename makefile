@@ -122,9 +122,6 @@ install-atmegau2: atmegau2
 
 # install:: install-atmegau2
 
-carbon-hal: $(ARM_TARGET).elf | $(BUILD)/carbon-hal/.dir
-	python utils/fdwarf/fdwarf.py $(BUILD)/$(ARM_TARGET)/$(ARM_TARGET).elf c $(BUILD)/carbon-hal
-
 # x86 target variables
 X86_TARGET   := libflipper
 
@@ -139,8 +136,12 @@ X86_SRC_DIRS := carbon/hal              \
                 library/src             \
                 runtime/arch/x64        \
                 library/platforms/posix \
-                runtime/src             \
-				$(BUILD)/carbon-hal
+                runtime/src
+
+X86_SRCS     := carbon.c
+
+carbon.c: $(ARM_TARGET).elf
+	$(_v)python utils/fdwarf/fdwarf.py $(BUILD)/$(ARM_TARGET)/$(ARM_TARGET).elf c carbon.c
 
 X86_CFLAGS   := -std=gnu99              \
                 -Wall                   \
@@ -294,7 +295,7 @@ $1_ELF :=  $$($1_TARGET).elf
 $1_HEX := $$($1_TARGET).hex
 $1_BIN := $$($1_TARGET).bin
 $1_SO := $$($1_TARGET).so
-$1_SRCS := $$(call find_srcs,$$($1_SRC_DIRS),$$(SRC_EXTS))
+$1_SRCS += $$(call find_srcs,$$($1_SRC_DIRS),$$(SRC_EXTS))
 $1_OBJS := $$(patsubst %,$$($1_BUILD)/%.o,$$($1_SRCS))
 $1_DEPS := $$($1_OBJS:.o=.d)
 $1_BUILD_DIRS := $$($1_BUILD) $$(addprefix $$($1_BUILD)/,$$(shell find $$($1_SRC_DIRS) -type d))
