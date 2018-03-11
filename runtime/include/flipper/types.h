@@ -32,9 +32,6 @@
 /* Weak attribute. */
 #define LF_WEAK __attribute__((weak))
 
-#define LF_MACRO_STRCAT(x, y) x ## y
-#define LF_MACRO_STRCAT_EVAL(x, y) LF_MACRO_STRCAT(x,y)
-
 #ifdef __clang__
 #define LF_FUNC(MODULE) __attribute__((section("__TEXT,.lf.module."MODULE), used))
 #else
