@@ -18,10 +18,34 @@ ifeq ($(UNAME), Linux)
 DFU_LAUNCH := start
 endif
 
-.PHONY: all install
+.PHONY: all install uninstall help
 
 all::
 install::
+uninstall::
+
+help:
+	@echo \
+	"\nBuildable targets:\n" \
+	"  all (default)       - Build everything\n" \
+	"  console             - Build the Flipper console\n" \
+	"  libflipper          - Build libflipper\n" \
+	"  atmegau2            - Build the co-processor firmware image\n" \
+	"  atsam4s             - Build the embedded operating system\n" \
+	"\nBuildable languages:\n" \
+	"  language-rust       - Build the Rust language bindings\n" \
+	"\nInstallable targets:\n" \
+	"  install             - Install everything to '$(PREFIX)'\n" \
+	"  install-console     - Install the Flipper console to '$(PREFIX)/bin'\n" \
+	"  install-libflipper  - Install libflipper to '$(PREFIX)/lib'\n" \
+	"  install-atmegau2    - Flash the firmware on the co-processor on the attached device\n" \
+	"  install-atsam4s     - Flash the operating system to the attached device\n" \
+	"\nInstallable languages:\n" \
+	"  install-rust        - Install the Rust language bindings using '$(shell which cargo)'\n" \
+	"  install-python      - Install the Python language bindings using '$(shell which pip)'\n" \
+	"\nTools:\n" \
+	"  update              - Flash the built firmware images to the attached device\n" \
+	"  clean               - Remove the entire build directory, containing all built products\n"
 
 # ARM target variables
 ARM_TARGET   := atsam4s
@@ -69,12 +93,14 @@ ARM_LDFLAGS  := -nostartfiles                    \
                 -Wl,-T carbon/atsam4s/sam4s16.ld \
                 -Wl,--gc-sections
 
-$(ARM_TARGET): $(ARM_TARGET).bin
+atsam4s: $(ARM_TARGET).bin
 
 .PHONY: install-atsam4s
 
 install-atsam4s: utils $(ARM_TARGET).bin
 	$(_v)$(BUILD)/utils/fdfu $(BUILD)/$(ARM_TARGET)/$(ARM_TARGET).bin
+
+update: install-atmegau2 install-atsam4s
 
 # AVR target variables
 AVR_TARGET   := atmegau2
@@ -177,6 +203,8 @@ uninstall-libflipper:
 	$(_v)rm $(PREFIX)/lib/$(X86_TARGET).so
 	$(_v)rm -rf $(PREFIX)/share/flipper
 
+uninstall:: uninstall-libflipper
+
 define PKGCONFIG_BODY
 Name: libflipper
 Description: The libflipper C library
@@ -207,16 +235,14 @@ install-console: console
 
 # --- LANGUAGES --- #
 
-.PHONY: languages
-
-languages:: libflipper
-
-all:: languages
-
 .PHONY: language-rust
 
 language-rust: libflipper
 	$(_v)cargo build --manifest-path=languages/rust/Cargo.toml
+
+languages:: language-rust
+
+.PHONY: languages
 
 languages:: language-rust
 
