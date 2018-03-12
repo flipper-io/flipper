@@ -1,18 +1,18 @@
 # Flipper
 
-[![Build Status](https://travis-ci.org/flipper-io/flipper.svg?branch=master)](https://travis-ci.org/flipper-io/flipper) [![flipper.io](https://img.shields.io/badge/store-flipper.io-lightgray.svg)](https://flipper.io) [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://github.com/flipper-io/flipper/blob/master/README.md#license) [![Email us](https://img.shields.io/badge/email-opensource%40flipper.io-lightgray.svg)](mailto:opensource@flipper.io)
+[![Build Status](https://travis-ci.org/flipper-io/flipper.svg?branch=master)](https://travis-ci.org/flipper-io/flipper) [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://github.com/flipper-io/flipper/blob/master/README.md#license) [![flipper.io](https://img.shields.io/badge/store-flipper.io-green.svg)](https://flipper.io) [![Chat on discord](https://img.shields.io/badge/chat-on%20discord-7289DA.svg)](https://discord.gg/R5zdK4m) [![Email us](https://img.shields.io/badge/email-opensource%40flipper.io-lightgray.svg)](mailto:opensource@flipper.io)
 
 ## About
 
 Flipper is a new kind of embedded development platform that lets developers use familiar tools
 to use to create amazing applications that interact with embedded hardware. Flipper can be controlled
-from **any programming language** on **any platform**.
+from [these](./languages) programming langauges running on desktop, mobile, and web applications.
 
 ### Getting started
 
 1. **Purchase a board from our web store
    [here](https://flipper.io/products/flipper-carbon-developer-unit).**
-    - You can't get started without a board. Pick one up today.
+    - You can't get started without a board. Pick one up today!
 2. **Visit [this](https://github.com/flipper-io/flipper/wiki/Getting-Started)
 Wiki page to set up your environment.**
     - Our Wiki is easy to navigate. Start at the top and work your way through it.
