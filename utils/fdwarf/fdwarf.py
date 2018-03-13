@@ -27,6 +27,39 @@ def get_die_at_offset(cu, offset):
 	for d in cu.iter_DIEs():
 		if d.offset == offset:
 			return d
+	print("Fatal: Failed to find die at offset %s in CU '%s'" % (str(hex(offset)), cu.get_top_DIE().attributes["DW_AT_name"].value))
+
+def get_name(cu, die):
+	while "DW_AT_abstract_origin" in die.attributes:
+		die = get_die_at_offset(cu, die.attributes["DW_AT_abstract_origin"].value)
+	if "DW_AT_name" in die.attributes:
+		return die.attributes["DW_AT_name"].value.decode("utf-8")
+	print("Fatal: Encountered nameless subprogram at offset %s in CU %s" % (hex(die.offset), cu.get_top_DIE().attributes["DW_AT_name"].value))
+	print(die)
+
+def get_type(cu, die):
+	while "DW_AT_abstract_origin" in die.attributes:
+		die = get_die_at_offset(cu, die.attributes["DW_AT_abstract_origin"].value)
+	if "DW_AT_type" in die.attributes:
+		tdie = get_die_at_offset(cu, die.attributes["DW_AT_type"].value)
+		# while tdie.tag == "DW_TAG_typedef":
+		# 	tdie = get_die_at_offset(cu, tdie.attributes["DW_AT_type"].value)
+		if "DW_AT_name" in tdie.attributes:
+			return tdie.attributes["DW_AT_name"].value.decode("utf-8")
+		else:
+			return "void*"
+	return "void"
+
+def get_size(cu, die):
+	while "DW_AT_abstract_origin" in die.attributes:
+		die = get_die_at_offset(cu, die.attributes["DW_AT_abstract_origin"].value)
+	if "DW_AT_type" in die.attributes:
+		tdie = get_die_at_offset(cu, die.attributes["DW_AT_type"].value)
+		# while tdie.tag == "DW_TAG_typedef":
+		# 	tdie = get_die_at_offset(cu, tdie.attributes["DW_AT_type"].value)
+		if "DW_AT_byte_size" in tdie.attributes:
+			return tdie.attributes["DW_AT_byte_size"].value
+	return -1 # void
 
 def get_parameters_from_die(cu, die):
 	parameters = []
