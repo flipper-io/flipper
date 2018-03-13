@@ -1,10 +1,8 @@
-#![allow(non_upper_case_globals)]
-
+use std::io::{Read, Write, Result};
 use ::{
     lf,
     Flipper,
 };
-use std::io::{Read, Write, Result};
 
 pub enum UartBaud {
     FMR,

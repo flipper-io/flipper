@@ -25,3 +25,4 @@ impl<'a> Led<'a> {
         lf::invoke(self.flipper, "led", 0, args)
     }
 }
+

@@ -2,7 +2,7 @@ extern crate flipper;
 
 use flipper::{
     Flipper,
-    fsm::led::Led,
+    api::led::Led,
 };
 
 fn main() {

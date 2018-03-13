@@ -12,7 +12,7 @@ extern crate log;
 extern crate failure;
 extern crate libc;
 
-pub mod fsm;
+pub mod api;
 pub mod lf;
 
 use libc::{c_void, c_char};

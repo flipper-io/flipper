@@ -59,6 +59,7 @@ mod libflipper {
     use super::*;
     #[link(name = "flipper")]
     extern {
+        pub(crate) fn lf_get_current_device() -> _lf_device;
         pub(crate) fn lf_ll_append(ll: *mut *mut _lf_ll, item: *const c_void, destructor: *const c_void) -> c_int;
         pub(crate) fn lf_invoke(device: _lf_device, module: *const c_char, function: _lf_index, ret: u8, args: *const _lf_ll) -> _lf_value;
         pub(crate) fn lf_push(device: _lf_device, module: *const c_char, function: _lf_index, source: *const c_void, length: u32, args: *const _lf_ll) -> _lf_value;
@@ -210,6 +211,12 @@ impl LfReturnable for u64 {
 
 impl From<LfReturn> for u64 {
     fn from(ret: LfReturn) -> Self { ret.0 as u64 }
+}
+
+pub fn current_device() -> _lf_device {
+    unsafe {
+        libflipper::lf_get_current_device()
+    }
 }
 
 /// Invokes a remote function call to a Flipper device.
