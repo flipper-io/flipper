@@ -7,6 +7,9 @@
 
 /* fvm - Creates a local server that acts as a virtual flipper device. */
 
+#undef lf_debug
+#define lf_debug(format, ...) printf(format"\n", __VA_ARGS__)
+
 int fvm_load_module(char *path, char *module) {
 	void *dlm = dlopen(path, RTLD_LAZY);
 	lf_assert(dlm, failure, E_NULL, "Failed to open module '%s'.", path);
@@ -29,10 +32,11 @@ int main(int argc, char *argv[]) {
 	//lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
 
 	if (argc > 1) {
-		char **modules = &argv[1];
-		for (int i = 0; i < (argc-1); i ++) {
-			lf_debug("Loading package '%s'.", *modules);
-			fvm_load_module(*modules++, "test");
+		char *lib = argv[1];
+		char **modules = &argv[2];
+		for (int i = 0; i < (argc-2); i ++) {
+			lf_debug("Loading module '%s' from '%s'.", *modules, lib);
+			fvm_load_module(lib, *modules++);
 		}
 	}
 

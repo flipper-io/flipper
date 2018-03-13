@@ -3,6 +3,6 @@
 
 #include <flipper.h>
 
-int my_func(uint8_t a);
+int qux_func(uint8_t a);
 
 #endif

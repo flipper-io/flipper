@@ -1,11 +1,12 @@
 #include "main.h"
 
-#define PIN IO_1
+void *qux_interface[] = {
+    &qux_func
+};
 
-LF_FUNC int my_func(uint8_t a) {
-    PIOA->PIO_PER = PIN;
-	PIOA->PIO_OER = PIN;
-	PIOA->PIO_OWER = PIN;
-	PIOA->PIO_ODSR ^= PIN;
+LF_MODULE(qux, "qux", qux_interface);
+
+LF_FUNC("qux") int qux_func(uint8_t a) {
+    printf("Hello world!");
     return 0;
 }
