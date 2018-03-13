@@ -32,7 +32,7 @@ failure:
 lf_event *lf_event_register(lf_event_id id, lf_event_handler_func handler, void *ctx) {
 	struct _lf_event *event = lf_event_create(id, handler, ctx);
 	lf_assert(event, failure, E_NULL, "NULL");
-	lf_ll_append(&lf_get_event_list(), event, lf_event_release);
+	lf_ll_append(&lf_registered_events, event, lf_event_release);
 	return event;
 failure:
 	return NULL;

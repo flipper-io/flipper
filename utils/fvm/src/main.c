@@ -5,30 +5,7 @@
 #include <dlfcn.h>
 #include <flipper/posix/network.h>
 
-/* fserve - Creates a local server that acts as a virtual flipper device. */
-
-struct _fvm_module {
-	char name[32];
-	void **functions;
-};
-
-struct _fvm_module fvm_modules[16];
-int modulec = 0;
-
-struct _lf_endpoint *nep = NULL;
-
-int fld_index(lf_crc_t identifier) {
-	lf_debug("Searching for counterpart module to '0x%04x'.", identifier);
-	for (int i = 0; i < modulec; i ++) {
-		char *name = fvm_modules[i].name;
-		lf_crc_t _crc = lf_crc(name, strlen(name) + 1);
-		if (_crc == identifier) {
-			lf_debug("Found counterpart '%s' at index '%i'.", name, i);
-			return i;
-		}
-	}
-	return -1;
-}
+/* fvm - Creates a local server that acts as a virtual flipper device. */
 
 int fvm_load_module(char *path) {
 	void *dlm = dlopen(path, RTLD_LAZY);
@@ -39,23 +16,19 @@ int fvm_load_module(char *path) {
 	void **jumptable = dlsym(dlm, "_jumptable");
 	lf_assert(jumptable, failure, E_NULL, "Failed to read jumptable from package '%s'.", module->name);
 	lf_debug("Read jumptable from package '%s'.", module->name);
-	struct _fvm_module *m = &fvm_modules[modulec++];
-	strcpy(m->name, module->name);
-	m->functions = jumptable;
+
+#warning Use dyld here.
+
 	lf_debug("Successfully loaded package '%s'.", module->name);
 	return lf_success;
 failure:
 	return lf_error;
 }
 
-lf_return_t fmr_perform_user_invocation(struct _fmr_invocation *invocation, struct _fmr_result *result) {
-	lf_assert(invocation->index < modulec, failure, E_BOUNDARY, "Module index was out of bounds.");
-	lf_return_t (* function)(void) = fvm_modules[invocation->index].functions[invocation->function];
-	lf_assert(function, failure, E_NULL, "NULL function for user invocation.");
-	return fmr_call(function, invocation->ret, invocation->argc, invocation->types, invocation->parameters);
-failure:
-	return lf_error;
-}
+struct _lf_endpoint *nep = NULL;
+
+/* Modules. */
+extern void *led;
 
 int main(int argc, char *argv[]) {
 
@@ -68,6 +41,8 @@ int main(int argc, char *argv[]) {
 			fvm_load_module(*modules++);
 		}
 	}
+
+	THIS_DEVICE.name = "fvm";
 
 	/* Create a UDP server. */
 	struct sockaddr_in addr;
@@ -99,6 +74,9 @@ int main(int argc, char *argv[]) {
 	context->fd = sd;
 
 	printf("Flipper Virtual Machine (FVM) v0.1.0\nListening on 'localhost'.\n\n");
+
+	/* Register the modules. */
+	dyld_register(&THIS_DEVICE, "led", &led);
 
 	while (1) {
 		struct _fmr_packet packet;

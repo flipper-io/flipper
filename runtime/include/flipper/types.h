@@ -46,5 +46,7 @@ typedef uint32_t lf_size_t;
 typedef uint16_t lf_version_t;
 /* Used to specify return types. */
 typedef uint32_t lf_return_t;
+/* Describes a type used to contain libflipper error codes. */
+typedef uint8_t lf_error_t;
 
 #endif

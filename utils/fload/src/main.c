@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
 	fclose(fp);
 
 	/* Load the application into RAM. */
-	lf_return_t value = lf_load(device, fbuf, fsize);
+	lf_return_t value = dyld_load(device, fbuf, fsize);
 	if ((int32_t)value == -1) {
 		fprintf(stderr, "Failed to load application into RAM.\n");
 		free(fbuf);

@@ -7,6 +7,8 @@
 #include <flipper/error.h>
 #include <flipper/ll.h>
 
+extern struct _lf_device THIS_DEVICE;
+
 /* The size of a single FMR packet expressed in bytes. */
 #define FMR_PACKET_SIZE 64
 /* The magic number that indicates the start of a packet. */
@@ -103,21 +105,13 @@ typedef uint8_t lf_type;
 /* Exposes all message runtime packet classes. */
 enum {
 	/* Invokes a function in a standard module. */
-	fmr_standard_invocation_class,
-	/* Invokes a function in user module. */
-	fmr_user_invocation_class,
+	fmr_execute_class,
 	/* Causes a push operation to begin. */
 	fmr_push_class,
 	/* Causes a pull operation to begin. */
 	fmr_pull_class,
-	/* Sends data to device. */
-	fmr_send_class,
-	/* Receives data from the device. */
-	fmr_receive_class,
-	/* Experimental: Caused a RAM load and launch. */
-	fmr_ram_load_class,
-	/* Signals the occurance an event. */
-	fmr_event_class
+	/* Communicates with the device's dynamic loader. */
+	fmr_dyld_class
 };
 
 /* A type used to reference the values in the enum above. */
@@ -169,7 +163,7 @@ struct LF_PACKED _fmr_invocation {
 
 /* Contains metadata needed to perform a remote procedure call on a device. */
 struct LF_PACKED _fmr_invocation_packet {
-	/* The packet header programmed with 'fmr_standard_invocation_class' or 'fmr_user_invocation_class'. */
+	/* The packet header programmed with 'fmr_execute_class'. */
 	struct _fmr_header header;
 	/* The procedure call information of the invocation. */
 	struct _fmr_invocation call;
@@ -185,7 +179,15 @@ struct LF_PACKED _fmr_push_pull_packet {
 	struct _fmr_invocation call;
 };
 
-/* A generic datastructure that is sent back following any message runtime transaction. */
+/* Asks the dynamic loader for a module index. */
+struct LF_PACKED _fmr_dyld_packet {
+	/* The packet header programmed with 'fmr_dyld_class'. */
+	struct _fmr_header header;
+	/* The module name. */
+	char module[16];
+};
+
+/* A generic datastructure that is sent back following any message runtime trancsaction. */
 struct LF_PACKED _fmr_result {
 	/* The return value of the function called (if any). */
 	lf_return_t value;
@@ -217,6 +219,8 @@ int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result);
 extern lf_return_t fmr_push(struct _fmr_push_pull_packet *packet);
 /* Helper function for lf_pull. */
 extern lf_return_t fmr_pull(struct _fmr_push_pull_packet *packet);
+/* Helper function for lf_dyld. */
+extern lf_return_t fmr_dyld(struct _fmr_dyld_packet *packet);
 
 /* ~ Functions with platform specific implementation. ~ */
 

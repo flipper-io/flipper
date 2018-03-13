@@ -17,9 +17,6 @@
 		goto label; \
 	}
 
-/* Describes a type used to contain libflipper error codes. */
-typedef uint8_t lf_error_t;
-
 /* Enumerate all of the error codes. */
 enum {
 	E_OK,
