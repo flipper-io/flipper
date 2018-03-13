@@ -78,43 +78,8 @@ void lf_set_debug_level(int level);
 
 #include <flipper/error.h>
 
-/* Macros that quantify device attributes. */
-#define lf_device_8bit (1 << 1)
-#define lf_device_16bit (1 << 2)
-#define lf_device_32bit (1 << 3)
-#define lf_device_big_endian    1
-#define lf_device_little_endian 0
-
-/* Standardizes a way to obtain the name, version, and attributes of a Flipper device. */
-struct LF_PACKED _lf_configuration {
-	/* The human readable name of the device. */
-	char name[16];
-	/* An identifier unique to the device. */
-	lf_crc_t identifier;
-	/* The device's firmware version. */
-	lf_version_t version;
-	/* The attributes of the device. 3 (attach by default), 2:1 (word length), 0 (endianness) */
-	uint8_t attributes;
-};
-
-/* Describes a device capible of responding to FMR packets. */
-struct _lf_device {
-	struct _lf_configuration configuration;
-	/* A pointer to the endpoint through which packets will be transferred. */
-	struct _lf_endpoint *endpoint;
-	/* The device's selector function. Mutates modules state as appropriate for the device. */
-	int (* select)(struct _lf_device *device);
-	/* The device's destructor. */
-	int (* release)(struct _lf_device *device);
-	/* The device's context. */
-	void *_ctx;
-	/* The current error state of the device. */
-	lf_error_t error;
-};
-
 typedef struct _lf_ll *lf_event_list;
 extern lf_event_list lf_registered_events;
-#define lf_get_event_list() lf_registered_events
 
 typedef struct _lf_ll *lf_device_list;
 extern lf_device_list lf_attached_devices;
@@ -123,38 +88,9 @@ extern struct _lf_device *lf_current_device;
 void lf_set_current_device(struct _lf_device *device);
 struct _lf_device *lf_get_current_device(void);
 
-/* Standardizes the notion of a module. */
-struct _lf_module {
-	/*! A string containing the module's name. */
-	const char *name;
-	/*! A string giving the description of a module. */
-	const char *description;
-	/*! The version of the module. */
-	lf_version_t version;
-	/*! The module's identifier. */
-	lf_crc_t identifier;
-	/*! The module's loaded index. */
-	int index;
-	/*! The module's binary data. */
-	void *data;
-	/*! The binary data size. */
-	uint32_t *psize;
-};
-
-/* Macro for easily generating module structures. */
-#define LF_MODULE(symbol, name, description, pdata, plen) \
-	struct _lf_module symbol = { \
-		name, \
-		description, \
-		LF_VERSION, \
-		0, \
-		-1, \
-		pdata, \
-		plen \
-	};
-
-struct _lf_device *lf_device_create(struct _lf_endpoint *endpoint, int (* select)(struct _lf_device *device), int (* release)(struct _lf_device *device), size_t context_size);
-int lf_device_release(struct _lf_device *device);
+#include <flipper/endpoint.h>
+#include <flipper/device.h>
+#include <flipper/module.h>
 
 /* Attaches to a device. */
 int lf_attach(struct _lf_device *device);
@@ -162,15 +98,18 @@ int lf_detach(struct _lf_device *device);
 int lf_select(struct _lf_device *device);
 
 #include <flipper/fmr.h>
-#include <flipper/endpoint.h>
 #include <flipper/ll.h>
 
+#include <flipper/dyld.h>
+
 /* Performs a remote procedure call to a module's function. */
-lf_return_t lf_invoke(struct _lf_device *device, struct _lf_module *module, lf_function function, lf_type ret, struct _lf_ll *args);
+lf_return_t lf_invoke(struct _lf_device *device, char *module, lf_function function, lf_type ret, struct _lf_ll *args);
 /* Moves data from the address space of the host to that of the device. */
-lf_return_t lf_push(struct _lf_device *device, struct _lf_module *module, lf_function function, void *source, lf_size_t length, struct _lf_ll *args);
+lf_return_t lf_push(struct _lf_device *device, char *module, lf_function function, void *source, lf_size_t length, struct _lf_ll *args);
 /* Moves data from the address space of the device to that of the host. */
-lf_return_t lf_pull(struct _lf_device *device, struct _lf_module *module, lf_function function, void *destination, lf_size_t length, struct _lf_ll *args);
+lf_return_t lf_pull(struct _lf_device *device, char *module, lf_function function, void *destination, lf_size_t length, struct _lf_ll *args);
+/* Gets index of module. */
+int lf_dyld(struct _lf_device *device, char *module);
 
 /* Closes the library. */
 int lf_exit(void);
@@ -186,8 +125,6 @@ int lf_get_result(struct _lf_device *device, struct _fmr_result *result);
 int lf_transfer(struct _lf_device *device, struct _fmr_packet *packet);
 /* Retrieves a packet from the specified device. */
 int lf_retrieve(struct _lf_device *device, struct _fmr_result *response);
-/* Binds a module structure to its device counterpart. */
-int lf_bind(struct _lf_device *device, struct _lf_module *module);
 
 /* Experimental: Load an application into RAM and execute it. */
 int lf_load(struct _lf_device *device, void *source, lf_size_t length);

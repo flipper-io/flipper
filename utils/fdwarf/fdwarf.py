@@ -88,8 +88,6 @@ def generate_c(modules, outfile):
 		ctemplate = """\
 #include <flipper.h>
 
-LF_MODULE(_$MODULE$, "$MODULE$", NULL, NULL, NULL);
-
 enum { $TAGS$ };
 
 const void *$MODULE$[] = {
@@ -118,7 +116,7 @@ $FUNCTIONS$
 			for p in f.parameters:
 				args.append("lf_infer(%s)" % p.name)
 			retl = ["lf_void_t", "", "lf_int8_t", "lf_int16_t", "", "lf_int32_t"]
-			statement = "lf_invoke(lf_get_current_device(), &_$MODULE$, %s, %s, lf_args(%s));" % ("_" + f.name, retl[f.ret + 1], ", ".join(args))
+			statement = "lf_invoke(lf_get_current_device(), \"$MODULE$\", %s, %s, lf_args(%s));" % ("_" + f.name, retl[f.ret + 1], ", ".join(args))
 			if f.type == "void":
 				body = statement
 			else:

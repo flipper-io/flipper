@@ -270,7 +270,6 @@ int enter_normal_mode(void) {
 	return lf_error;
 }
 
-int carbon_select_u2_gpio(struct _lf_device *device);
 
 int main(int argc, char *argv[]) {
 
@@ -284,7 +283,7 @@ int main(int argc, char *argv[]) {
 
 	/* Attach to a Flipper device. */
 	struct _lf_device *device = flipper.attach();
-	carbon_select_u2_gpio(device);
+#warning Select u2!
 
 
 begin: ;

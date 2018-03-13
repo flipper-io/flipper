@@ -75,9 +75,9 @@ failure:
 
 lf_return_t fmr_execute(lf_module module, lf_function function, lf_type ret, lf_argc argc, lf_types argt, void *arguments) {
 	/* Dereference the pointer to the target module. */
-	void *const *object = lf_modules[module];
+	struct _lf_module *m = lf_ll_item(THIS_DEVICE.modules, module);
 	/* Dereference and return a pointer to the target function. */
-	void *address = object[function];
+	void *address = m->jumptable[function];
 	/* Ensure that the function address is valid. */
 	lf_assert(address, failure, E_NULL, "NULL address supplied to '%s'.", __PRETTY_FUNCTION__);
 	/* Perform the function call internally. */
@@ -86,12 +86,16 @@ failure:
 	return lf_error;
 }
 
-/* ~ Message runtime subclass handlers. ~ */
-
-LF_WEAK lf_return_t fmr_perform_user_invocation(struct _fmr_invocation *invocation, struct _fmr_result *result) {
-	printf("User invocation requested.\n");
+lf_return_t fmr_dyld(struct _fmr_dyld_packet *packet) {
+	lf_debug("Trying to find module '%s'.", packet->module);
+	struct _lf_module *module = dyld_module(&THIS_DEVICE, packet->module);
+	lf_assert(module, failure, E_MODULE, "No module '%s' has been registered.", packet->module);
+	return module->idx;
+failure:
 	return lf_error;
 }
+
+/* ~ Message runtime subclass handlers. ~ */
 
 int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
 	/* Check that the magic number matches. */
@@ -107,23 +111,18 @@ int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
 	struct _fmr_invocation *call = &((struct _fmr_invocation_packet *)packet)->call;
 
 	/* Switch through the packet subclasses and invoke the appropriate handler for each. */
-	switch (packet->header.type) {
-		case fmr_standard_invocation_class:
+	switch (packet->header.class) {
+		case fmr_execute_class:
 			result->value = fmr_execute(call->index, call->function, call->ret, call->argc, call->types, call->parameters);
 		break;
-		case fmr_user_invocation_class:
-			result->value = fmr_perform_user_invocation(call, result);
-		break;
-		case fmr_ram_load_class:
-		case fmr_send_class:
 		case fmr_push_class:
 			result->value = fmr_push((struct _fmr_push_pull_packet *)(packet));
 		break;
-		case fmr_receive_class:
 		case fmr_pull_class:
 			result->value = fmr_pull((struct _fmr_push_pull_packet *)(packet));
 		break;
-		case fmr_event_class:
+		case fmr_dyld_class:
+			result->value = fmr_dyld((struct _fmr_dyld_packet *)(packet));
 		break;
 		default:
 			lf_assert(true, failure, E_SUBCLASS, "An invalid message runtime subclass was provided.");

@@ -2,7 +2,6 @@
 #define __lf_endpoint_h__
 
 #include <flipper/types.h>
-#include <flipper/ll.h>
 #include <flipper/message.h>
 
 typedef struct _lf_ll lf_msg_queue;
