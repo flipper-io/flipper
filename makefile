@@ -165,7 +165,7 @@ X86_SRC_DIRS := carbon/hal              \
 X86_SRCS     := carbon.c
 
 carbon.c: $(ARM_TARGET).elf
-	$(_v)python utils/fdwarf/fdwarf.py $(BUILD)/$(ARM_TARGET)/$(ARM_TARGET).elf c carbon.c
+	$(_v)python3 utils/fdwarf/fdwarf.py $(BUILD)/$(ARM_TARGET)/$(ARM_TARGET).elf c carbon.c
 
 X86_CFLAGS   := -std=gnu99              \
                 -g                      \
@@ -272,10 +272,10 @@ uninstall-utils:
 
 # --- LANGUAGES --- #
 
-PY_DIR = $(shell python -m site --user-site)
+PY_DIR = $(shell python3 -m site --user-site)
 
 install-python:
-	$(_v)pip install languages/python --upgrade -q
+	$(_v)pip3 install languages/python --upgrade -q
 
 install:: install-python
 
