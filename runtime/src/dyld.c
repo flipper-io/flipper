@@ -1,12 +1,11 @@
 #include <flipper.h>
 
-struct _lf_module *dyld_register(struct _lf_device *device, char *module, void **jumptable) {
-    struct _lf_module *m = lf_module_create(module, lf_ll_count(device->modules), jumptable);
-    lf_assert(m, failure, E_NULL, "Failed to register module '%s'.", module);
-    lf_ll_append(&device->modules, m, lf_module_release);
-    return m;
+int dyld_register(struct _lf_device *device, struct _lf_module *module) {
+    lf_assert(module, failure, E_NULL, "No module provided to '%s'.", __PRETTY_FUNCTION__);
+    module->idx = lf_ll_count(device->modules);
+    return lf_ll_append(&device->modules, module, lf_module_release);
 failure:
-    return NULL;
+    return lf_error;
 }
 
 /* Load a module onto the device. */
@@ -30,7 +29,11 @@ struct _lf_module *dyld_module(struct _lf_device *device, char *module) {
         /* If the module hasn't already been registered, try to register it. */
         int idx = lf_dyld(device, module);
         lf_assert(idx != lf_error, failure, E_MODULE, "Failed to find counterpart for module '%s' on device '%s'.", module, device->name);
-        return dyld_register(device, module, NULL);
+        struct _lf_module *m = lf_module_create(module);
+        lf_assert(module, failure, E_NULL, "Failed to create new module '%s'.", module);
+        int _e = dyld_register(device, m);
+        lf_assert(_e == lf_success, failure, E_MODULE, "Failed to register module '%s'.", module);
+        return m;
     }
 
 failure:

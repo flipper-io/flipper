@@ -15,7 +15,15 @@ struct _lf_module {
 	void **jumptable;
 };
 
-struct _lf_module *lf_module_create(char *name, int idx, void **jumptable);
+#define LF_MODULE(sym, name, jumptable) \
+	struct _lf_module sym = {           \
+		name,                           \
+		0,                              \
+		0,                              \
+		jumptable                       \
+	};
+
+struct _lf_module *lf_module_create(char *name);
 int lf_module_release(struct _lf_module *module);
 
 #endif
