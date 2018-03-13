@@ -7,19 +7,13 @@
 
 /* fvm - Creates a local server that acts as a virtual flipper device. */
 
-int fvm_load_module(char *path) {
+int fvm_load_module(char *path, char *module) {
 	void *dlm = dlopen(path, RTLD_LAZY);
-	lf_assert(dlm, failure, E_NULL, "Failed to open '%s'.", path);
-	struct _lf_module *module = dlsym(dlm, "_module");
-	lf_assert(module, failure, E_NULL, "Failed to read package.");
-	lf_debug("Loaded package '%s'.", module->name);
-	void **jumptable = dlsym(dlm, "_jumptable");
-	lf_assert(jumptable, failure, E_NULL, "Failed to read jumptable from package '%s'.", module->name);
-	lf_debug("Read jumptable from package '%s'.", module->name);
-
-#warning Use dyld here.
-
-	lf_debug("Successfully loaded package '%s'.", module->name);
+	lf_assert(dlm, failure, E_NULL, "Failed to open module '%s'.", path);
+	struct _lf_module *m = dlsym(dlm, module);
+	lf_assert(m, failure, E_NULL, "Failed to read module '%s' from '%s'.", m->name, path);
+	dyld_register(&THIS_DEVICE, m);
+	lf_debug("Successfully loaded module '%s'.", module);
 	return lf_success;
 failure:
 	return lf_error;
@@ -28,7 +22,7 @@ failure:
 struct _lf_endpoint *nep = NULL;
 
 /* Modules. */
-extern void *led;
+extern struct _lf_module led;
 
 int main(int argc, char *argv[]) {
 
@@ -38,7 +32,7 @@ int main(int argc, char *argv[]) {
 		char **modules = &argv[1];
 		for (int i = 0; i < (argc-1); i ++) {
 			lf_debug("Loading package '%s'.", *modules);
-			fvm_load_module(*modules++);
+			fvm_load_module(*modules++, "test");
 		}
 	}
 
@@ -76,7 +70,7 @@ int main(int argc, char *argv[]) {
 	printf("Flipper Virtual Machine (FVM) v0.1.0\nListening on 'localhost'.\n\n");
 
 	/* Register the modules. */
-	dyld_register(&THIS_DEVICE, "led", &led);
+	dyld_register(&THIS_DEVICE, &led);
 
 	while (1) {
 		struct _fmr_packet packet;

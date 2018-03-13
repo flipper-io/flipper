@@ -90,9 +90,11 @@ def generate_c(modules, outfile):
 
 enum { $TAGS$ };
 
-const void *$MODULE$[] = {
+void *$MODULE$_interface[] = {
 $STRUCTBODY$
 };
+
+LF_MODULE($MODULE$, "$MODULE$", $MODULE$_interface);
 
 $FUNCTIONS$
 """
