@@ -2,7 +2,7 @@
 
 int dyld_register(struct _lf_device *device, struct _lf_module *module) {
     lf_assert(module, failure, E_NULL, "No module provided to '%s'.", __PRETTY_FUNCTION__);
-    module->idx = lf_ll_count(device->modules);
+    if (module->idx == -1) module->idx = lf_ll_count(device->modules);
     return lf_ll_append(&device->modules, module, lf_module_release);
 failure:
     return lf_error;
@@ -31,6 +31,7 @@ struct _lf_module *dyld_module(struct _lf_device *device, char *module) {
         lf_assert(idx != lf_error, failure, E_MODULE, "Failed to find counterpart for module '%s' on device '%s'.", module, device->name);
         struct _lf_module *m = lf_module_create(module);
         lf_assert(module, failure, E_NULL, "Failed to create new module '%s'.", module);
+        m->idx = idx;
         int _e = dyld_register(device, m);
         lf_assert(_e == lf_success, failure, E_MODULE, "Failed to register module '%s'.", module);
         return m;

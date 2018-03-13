@@ -1,8 +1,5 @@
 #include <flipper.h>
 
-#ifdef __use_uart0__
-#include <flipper/uart0.h>
-
 int uart0_configure(uint8_t baud, uint8_t interrupts) {
 	printf("Configuring the uart0.\n");
 	return lf_success;
@@ -22,5 +19,3 @@ int uart0_pull(void *destination, lf_size_t length) {
 	printf("Pulling from the uart0 bus.\n");
 	return lf_success;
 }
-
-#endif

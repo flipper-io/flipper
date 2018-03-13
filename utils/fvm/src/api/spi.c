@@ -1,8 +1,5 @@
 #include <flipper.h>
 
-#ifdef __use_spi__
-#include <flipper/spi.h>
-
 int spi_configure() {
 	printf("Configuring the spi bus.\n");
 	return lf_success;
@@ -39,5 +36,3 @@ int spi_pull(void *destination, uint32_t length) {
 	printf("Pulling from the spi bus.\n");
 	return lf_success;
 }
-
-#endif
