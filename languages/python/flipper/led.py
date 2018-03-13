@@ -1,9 +1,6 @@
-import lf
+from . import lf
 
-funcs = dict(
-	_led_configure = 1,
-	_led_rgb = 0,
-)
-
+def configure():
+	lf.invoke("led", 1, lf.types['void'], [lf.uint8(r), lf.uint8(g), lf.uint8(b)])
 def rgb(r, g, b):
-	lf.invoke("led", funcs['_led_rgb'], lf.types['void'], [lf.uint8(r), lf.uint8(g), lf.uint8(b)])
+	lf.invoke("led", 0, lf.types['void'], [lf.uint8(r), lf.uint8(g), lf.uint8(b)])
