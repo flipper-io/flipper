@@ -1,9 +1,5 @@
 import lf
 
-# ! KEEP IN SYNC WITH THE FILES BELOW
-# carbon/include/flipper/carbon.h
-# runtime/include/flipper/gpio.h
-
 # GPIO signals
 IO_1 = (1 << 22)
 IO_2 = (1 << 23)
@@ -45,17 +41,15 @@ IO_A7 = (1 << 1)
 IO_A8 = (1 << 0)
 
 funcs = dict(
-	_gpio_configure = 0,
-	_gpio_enable = 1,
-    _gpio_write = 2,
-    _gpio_read = 3
+	_gpio_configure = 3,
+	_gpio_enable = 2,
+    _gpio_write = 1,
+    _gpio_read = 0
 )
 
-module = lf.getModule("gpio")
-
 def enable(enable, disable):
-	lf.invoke(module, funcs['_gpio_enable'], lf.types['void'], [lf.uint32(enable), lf.uint32(disable)])
+	lf.invoke("gpio", funcs['_gpio_enable'], lf.types['void'], [lf.uint32(enable), lf.uint32(disable)])
 def write(set, clear):
-	lf.invoke(module, funcs['_gpio_write'], lf.types['void'], [lf.uint32(set), lf.uint32(clear)])
+	lf.invoke("gpio", funcs['_gpio_write'], lf.types['void'], [lf.uint32(set), lf.uint32(clear)])
 def read(mask):
-	lf.invoke(module, funcs['_gpio_read'], lf.types['void'], [lf.uint32(mask)])
+	lf.invoke("gpio", funcs['_gpio_read'], lf.types['void'], [lf.uint32(mask)])

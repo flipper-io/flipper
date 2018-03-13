@@ -64,11 +64,11 @@ int main(int argc, char *argv[]) {
 	/* The network endpoint for the virtual flipper device. */
 	struct _lf_network_context *context = NULL;
 	nep = lf_endpoint_create(lf_network_configure,
-												  lf_network_ready,
-												  lf_network_push,
-												  lf_network_pull,
-												  lf_network_destroy,
-												  sizeof(struct _lf_network_context));
+							 lf_network_ready,
+							 lf_network_push,
+							 lf_network_pull,
+							 lf_network_destroy,
+							 sizeof(struct _lf_network_context));
 	lf_assert(nep, failure, E_ENDPOINT, "Failed to create endpoint for networked device.");
 	context = (struct _lf_network_context *)nep->_ctx;
 	context->fd = sd;
