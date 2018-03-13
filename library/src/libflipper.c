@@ -88,11 +88,11 @@ void lf_debug_packet(struct _fmr_packet *packet, size_t length) {
 		printf("\t└─ checksum:\t0x%x\n", packet->header.checksum);
 		printf("\t└─ length:\t\t%d bytes (%.02f%%)\n", packet->header.length, (float) packet->header.length/sizeof(struct _fmr_packet)*100);
 		char *classstrs[] = { "exec", "push", "pull", "dyld" };
-		printf("\t└─ class\t\t%s\n", classstrs[packet->header.class]);
+		printf("\t└─ class\t\t%s\n", classstrs[packet->header.type]);
 		struct _fmr_invocation_packet *invocation = (struct _fmr_invocation_packet *)(packet);
 		struct _fmr_push_pull_packet *pushpull = (struct _fmr_push_pull_packet *)(packet);
 		struct _fmr_dyld_packet *dyld = (struct _fmr_dyld_packet *)(packet);
-		switch (packet->header.class) {
+		switch (packet->header.type) {
 			case fmr_execute_class:
 				lf_debug_call(&invocation->call);
 			break;
