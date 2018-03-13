@@ -1,9 +1,5 @@
-#![allow(non_upper_case_globals)]
-
-use ::{
-    lf,
-    Flipper,
-};
+use lf;
+use Flipper;
 
 pub struct Gpio<'a> {
     flipper: &'a Flipper,

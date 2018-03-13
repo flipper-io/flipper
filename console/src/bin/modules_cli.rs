@@ -19,7 +19,7 @@
 use Result;
 use flipper::{
     Flipper,
-    fsm::led::Led,
+    api::led::Led,
 };
 use console::CliError;
 use clap::{App, AppSettings, Arg, ArgMatches};

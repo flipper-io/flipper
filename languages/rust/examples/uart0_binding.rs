@@ -2,7 +2,7 @@ extern crate flipper;
 
 use std::io::Write;
 use flipper::Flipper;
-use flipper::fsm::uart0::{Uart0, UartBaud};
+use flipper::api::uart0::{Uart0, UartBaud};
 
 fn main() {
     let flipper = Flipper::attach_hostname("localhost").expect("should attach to fvm");

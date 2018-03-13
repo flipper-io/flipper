@@ -15,9 +15,13 @@ use xmodem;
 use xmodem::Xmodem;
 use failure::Error;
 
-use flipper::Flipper;
-use flipper::fsm::uart0::{Uart0, UartBaud};
-use flipper::fsm::gpio::Gpio;
+use flipper::{
+    Flipper,
+    api::{
+        gpio::Gpio,
+        uart0::{Uart0, UartBaud},
+    }
+};
 
 use std::sync::{
     Arc,
