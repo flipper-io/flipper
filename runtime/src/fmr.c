@@ -111,7 +111,7 @@ int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result) {
 	struct _fmr_invocation *call = &((struct _fmr_invocation_packet *)packet)->call;
 
 	/* Switch through the packet subclasses and invoke the appropriate handler for each. */
-	switch (packet->header.class) {
+	switch (packet->header.type) {
 		case fmr_execute_class:
 			result->value = fmr_execute(call->index, call->function, call->ret, call->argc, call->types, call->parameters);
 		break;

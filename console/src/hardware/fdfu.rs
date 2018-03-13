@@ -16,7 +16,6 @@ use xmodem::Xmodem;
 use failure::Error;
 
 use flipper::Flipper;
-use flipper::StandardModule;
 use flipper::fsm::uart0::{Uart0, UartBaud};
 use flipper::fsm::gpio::Gpio;
 
@@ -127,15 +126,15 @@ const EEFC_FCR_FKEY: &'static Fn(u32) -> u32 = &|value| EEFC_FCR_FKEY_MSK & (val
 /// with the SAM-BA, and includes references to the Copy Applet binary, the
 /// Uart0 bus used to talk to the SAM-BA, and the Gpio driver used to set
 /// required modes on the SAM.
-struct SamBa<'a> {
+struct SamBa<'a, 'b> {
     applet: &'a [u8],
-    bus: &'a mut Uart0,
-    gpio: &'a mut Gpio,
-    sender: &'a mut mpsc::Sender<Progress>,
+    bus: Uart0<'a>,
+    gpio: Gpio<'a>,
+    sender: &'b mut mpsc::Sender<Progress>,
 }
 
-impl<'a> SamBa<'a> {
-    fn new(bus: &'a mut Uart0, gpio: &'a mut Gpio, sender: &'a mut mpsc::Sender<Progress>) -> SamBa<'a> {
+impl<'a, 'b> SamBa<'a, 'b> {
+    fn new(bus: Uart0<'a>, gpio: Gpio<'a>, sender: &'b mut mpsc::Sender<Progress>) -> SamBa<'a, 'b> {
         let applet: &[u8] = include_bytes!("./copy.bin");
         SamBa { applet, bus, gpio, sender }
     }
@@ -378,12 +377,13 @@ pub fn flash(firmware: Arc<[u8]>, verify: bool) -> mpsc::Receiver<Progress> {
                 return;
             }
         };
-        flipper.select_u2_gpio();
+        // TODO implement new select_u2_gpio
+        // flipper.select_u2_gpio();
 
-        let mut bus = Uart0::new();
+        let bus = Uart0::new(&flipper);
         bus.configure(UartBaud::DFU, false);
-        let mut gpio = Gpio::new();
-        let mut samba = SamBa::new(&mut bus, &mut gpio, &mut sender);
+        let gpio = Gpio::new(&flipper);
+        let mut samba = SamBa::new(bus, gpio, &mut sender);
 
         samba.upload(IFLASH0_ADDR, &firmware);
         if verify { samba.verify(&firmware); }

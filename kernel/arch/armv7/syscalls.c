@@ -20,7 +20,7 @@ extern caddr_t _sbrk(int increment) {
 	return (caddr_t)(previous);
 }
 
-extern void uart0_put(char c);
+extern void uart0_put(uint8_t c);
 
 extern int _write(int file, char *ptr, int len) {
 	for (int i = 0; i < len; i ++, ptr ++) {

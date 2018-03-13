@@ -1,39 +1,23 @@
 extern crate flipper;
 
-use flipper::{Flipper, ModuleFFI, UserModule, UserModuleFFI};
-use flipper::fmr::{
-    Args,
-    lf_invoke,
+use flipper::{
+    lf,
+    Flipper,
 };
 
 struct GpioToggle<'a> {
     flipper: &'a Flipper,
-    module: ModuleFFI,
-}
-
-impl<'a> UserModule<'a> for GpioToggle<'a> {
-    const NAME: &'a str = "gpio";
-    fn new(flipper: &'a Flipper) -> Self {
-        GpioToggle {
-            flipper,
-            module: ModuleFFI::User(UserModuleFFI::uninitialized(Self::NAME)),
-        }
-    }
-}
-
-impl<'a> From<(&'a Flipper, UserModuleFFI)> for GpioToggle<'a> {
-    fn from((flipper, module): (&'a Flipper, UserModuleFFI)) -> Self {
-        GpioToggle {
-            flipper,
-            module: ModuleFFI::User(module),
-        }
-    }
 }
 
 impl<'a> GpioToggle<'a> {
-    fn toggle(&self) {
-        let args = Args::new().append(4u8);
-        lf_invoke(self.flipper, &self.module, 0, args)
+    pub fn new(flipper: &'a Flipper) -> GpioToggle<'a> {
+        GpioToggle { flipper }
+    }
+
+    pub fn toggle(&self) {
+        let args = lf::Args::new()
+            .append(4u8);
+        lf::invoke(self.flipper, "gpio", 0, args)
     }
 }
 

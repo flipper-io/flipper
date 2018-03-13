@@ -144,7 +144,7 @@ int lf_dyld(struct _lf_device *device, char *module) {
 	memset(&_packet, 0, sizeof(struct _fmr_packet));
 	_packet.header.magic = FMR_MAGIC_NUMBER;
 	_packet.header.length = sizeof(struct _fmr_dyld_packet);
-	_packet.header.class = fmr_dyld_class;
+	_packet.header.type = fmr_dyld_class;
 
 	struct _fmr_dyld_packet *packet = (struct _fmr_dyld_packet *)(&_packet);
 	strcpy(packet->module, module);
