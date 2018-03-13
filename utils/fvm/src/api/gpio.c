@@ -1,8 +1,5 @@
 #include <flipper.h>
 
-#ifdef __use_gpio__
-#include <flipper/gpio.h>
-
 int gpio_configure(void) {
 	printf("Configuring gpio controller.\n");
 	return lf_success;
@@ -20,5 +17,3 @@ uint32_t gpio_read(uint32_t mask) {
 	printf("Reading gpio pins with mask 0x%08x.\n", mask);
 	return lf_success;
 }
-
-#endif

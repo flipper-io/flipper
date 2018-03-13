@@ -1,8 +1,5 @@
 #include <flipper.h>
 
-#ifdef __use_usart__
-#include <flipper/usart.h>
-
 int usart_configure(void) {
 	printf("Configuring the usart.\n");
 	return lf_success;
@@ -22,5 +19,3 @@ int usart_pull(void *destination, lf_size_t length) {
 	printf("Pulling from the usart bus.\n");
 	return lf_success;
 }
-
-#endif

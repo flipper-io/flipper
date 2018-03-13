@@ -1,8 +1,5 @@
 #include <flipper.h>
 
-#ifdef __use_fs__
-#include <flipper/fs.h>
-
 int fs_configure(void) {
 	printf("Configuring the filesystem.\n");
 	return lf_success;
@@ -52,5 +49,3 @@ void fs_close(void) {
 void fs_format(void) {
 	printf("Formatting the filesystem.\n");
 }
-
-#endif

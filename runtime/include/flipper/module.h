@@ -19,7 +19,7 @@ struct _lf_module {
 	struct _lf_module sym = {           \
 		name,                           \
 		0,                              \
-		0,                              \
+		-1,                             \
 		jumptable                       \
 	};
 
