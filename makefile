@@ -160,7 +160,14 @@ X86_SRC_DIRS := carbon/hal              \
                 library/src             \
                 runtime/arch/x64        \
                 library/platforms/posix \
-                runtime/src
+                runtime/src             \
+				$(BUILD)/carbon
+
+-include $(BUILD)/carbon.mk
+
+$(BUILD)/carbon.mk: atsam4s.elf | $(BUILD)/carbon/.dir
+	$(_v)python3 utils/fdwarf/fdwarf.py $(BUILD)/atsam4s/atsam4s.elf c $(BUILD)/carbon
+	$(_v)echo "HAL_DIRS = $(BUILD)/carbon" > $(BUILD)/carbon.mk
 
 X86_CFLAGS   := -std=gnu99              \
                 -g                      \
@@ -249,7 +256,7 @@ utils: libflipper | $(BUILD)/utils/.dir
 	$(_v)$(X86_CC) $(X86_CFLAGS) -o $(BUILD)/utils/fdfu utils/fdfu/src/*.c -L$(BUILD)/$(X86_TARGET) -lflipper
 	$(_v)$(X86_CC) $(X86_CFLAGS) -o $(BUILD)/utils/fdebug utils/fdebug/src/*.c $(shell pkg-config --libs libusb-1.0)
 	$(_v)$(X86_CC) $(X86_CFLAGS) -o $(BUILD)/utils/fload utils/fload/src/*.c -L$(BUILD)/$(X86_TARGET) -lflipper
-	$(_v)$(X86_CC) $(X86_CFLAGS) -o $(BUILD)/utils/fvm $(shell find utils/fvm/src -name '*.c') -L$(BUILD)/$(X86_TARGET) -lflipper -ldl
+	$(_v)$(X86_CC) $(X86_CFLAGS) -o $(BUILD)/utils/fvm $(call find_srcs, utils/fvm/src) -L$(BUILD)/$(X86_TARGET) -lflipper -ldl
 	$(_v)cp utils/fdwarf/fdwarf.py $(BUILD)/utils/fdwarf
 	$(_v)chmod +x $(BUILD)/utils/fdwarf
 
@@ -295,7 +302,7 @@ MAKEFLAGS += --no-builtin-rules
 #####
 # find_srcs($1: source directories, $2: source file extensions)
 #####
-find_srcs = $(foreach sd,$1,$(foreach ext,$2,$(shell find $(sd) -name '*.$(ext)')))
+find_srcs = $(foreach sd,$1,$(foreach ext,$(SRC_EXTS),$(shell find $(sd) -name '*.$(ext)')))
 #####
 
 # All supported source file extensions.
@@ -313,7 +320,7 @@ $1_ELF :=  $$($1_TARGET).elf
 $1_HEX := $$($1_TARGET).hex
 $1_BIN := $$($1_TARGET).bin
 $1_SO := $$($1_TARGET).so
-$1_SRCS += $$(call find_srcs,$$($1_SRC_DIRS),$$(SRC_EXTS))
+$1_SRCS += $$(call find_srcs,$$($1_SRC_DIRS))
 $1_OBJS := $$(patsubst %,$$($1_BUILD)/%.o,$$($1_SRCS))
 $1_DEPS := $$($1_OBJS:.o=.d)
 $1_BUILD_DIRS := $$($1_BUILD) $$(addprefix $$($1_BUILD)/,$$(shell find $$($1_SRC_DIRS) -type d))
