@@ -1,160 +1,112 @@
 # This line *MUST* come before any includes
 SELF := $(realpath $(lastword $(MAKEFILE_LIST)))
 
-# Build products directory
+# Navigate from /usr/local/include/flipper.mk to /usr/local/share/flipper
+INCLUDE := $(realpath $(dir $(SELF)))
+ASSETS := $(INCLUDE)/../share/flipper
+
+# Directory where build products are stored.
 BUILD := build
 
-# Navigate from /usr/local/include/flipper.mk to /usr/local/share/flipper
-ASSETS := $(realpath $(dir $(SELF))../share/flipper)
+# Prefix where build projects are installed
+PREFIX ?= /usr/local
 
-# Build settings for code that runs natively on the Flipper device
-FLIPPER_BUILD := $(BUILD)/atsam4s
-FLIPPER_TARGET := $(FLIPPER_BUILD)/$(MODULE).bin
-FLIPPER_SRCS := $(wildcard src/*.c)
-FLIPPER_OBJS := $(patsubst %,$(FLIPPER_BUILD)/%.o,$(FLIPPER_SRCS))
-FLIPPER_DEPS := $(FLIPPER_OBJS:.o=.d)
-FLIPPER_BUILD_DIRS := $(addsuffix /.dir,$(patsubst %/,%,$(sort $(dir $(FLIPPER_OBJS))))) $(FLIPPER_BUILD)/$(FLIPPER_BUILD)/.dir
-FLIPPER_CC := arm-none-eabi-gcc
-FLIPPER_LD := arm-none-eabi-gcc
-FLIPPER_OBJCOPY := arm-none-eabi-objcopy
-FLIPPER_OBJDUMP := arm-none-eabi-objdump
+# List of all target types
+TARGETS :=
 
-ARM_CFLAGS := -std=c99              \
-              -Wall                 \
-              -Wextra               \
-              -Wno-unused-parameter \
-              -Os                   \
-              -mthumb               \
-              -march=armv7e-m       \
-              -mtune=cortex-m4      \
-              -mfloat-abi=soft      \
-              -g                    \
-              -ffreestanding        \
-              -fPIC                 \
-              -I/usr/local/include  \
-              -Iinclude             \
-              -DATSAM4S
+.PHONY: all clean install uninstall help
 
-FLIPPER_LDFLAGS := -nostdlib
+all::
+install::
+uninstall::
 
-# Build settings for code that runs on the host and communicates with the Flipper device
-HOST_BUILD := $(BUILD)/local
-HOST_TARGET := $(HOST_BUILD)/$(MODULE)
-HOST_GLUE_TARGET := $(HOST_TARGET).a
-HOST_GLUE_SRCS := $(FLIPPER_BUILD)/cbind.c $(HOST_BUILD)/package_data.c
-HOST_GLUE_OBJS := $(patsubst %,$(HOST_BUILD)/%.o,$(HOST_GLUE_SRCS))
-HOST_SRCS := $(wildcard host/*.c)
-HOST_OBJS := $(patsubst %,$(HOST_BUILD)/%.o,$(HOST_SRCS))
-HOST_DEPS := $(HOST_GLUE_OBJS:.o=.d) $(HOST_OBJS:.o=.d)
-HOST_BUILD_DIRS := $(addsuffix /.dir,$(patsubst %/,%,$(sort $(dir $(HOST_OBJS))))) $(HOST_BUILD)/$(FLIPPER_BUILD)/.dir $(HOST_BUILD)/$(HOST_BUILD)/.dir
-HOST_CC := gcc
-HOST_LD := gcc
-HOST_AR := ar
+help:
+	echo "Make"
 
-HOST_CFLAGS := -I. -Iinclude -g -DPOSIX
-HOST_LDFLAGS := -g
+clean:
+	$(_v)rm -rf $(BUILD)
 
-# Build settings for code that runs on the Flipper Virtual Machine
-FVM_BUILD := $(BUILD)/fvm
-FVM_TARGET := $(FVM_BUILD)/$(MODULE).so
-FVM_SRCS := $(FLIPPER_SRCS) $(FVM_BUILD)/package_data.c
-FVM_OBJS := $(patsubst %,$(FVM_BUILD)/%.o,$(FVM_SRCS))
-FVM_DEPS := $(FVM_OBJS:.o=.d)
-FVM_BUILD_DIRS := $(addsuffix /.dir,$(patsubst %/,%,$(sort $(dir $(FVM_OBJS)))))
-FVM_CC := gcc
-FVM_LD := gcc
+# ---------------------- DEVICE ---------------------- #
 
-FVM_CFLAGS := -I. -Iinclude -g -DPOSIX
-FVM_LDFLAGS := -g
+DEVICE_TARGET   := $(MODULE)
 
-# Build for the Flipper device and host by default, but not FVM
-all:: $(FLIPPER_TARGET)
+DEVICE_PREFIX   := arm-none-eabi-
 
-ifeq ($(HOST_SRCS), )
-else
-all:: $(HOST_TARGET)
+DEVICE_INC_DIRS := include $(INCLUDE)
+
+DEVICE_SRC_DIRS := src
+
+DEVICE_CFLAGS   := -std=c99                    \
+                   -Os                         \
+                   -g                          \
+                   -mthumb                     \
+                   -march=armv7e-m             \
+                   -mtune=cortex-m4            \
+                   -mfloat-abi=soft            \
+                   -D__no_err_str__            \
+                   -fPIC                       \
+                   -DATSAM4S                   \
+                   -D__SAM4S16B__              \
+
+DEVICE_LDFLAGS  := -nostartfiles               \
+                   -Wl,-T $(ASSETS)/ram.ld     \
+                   -Wl,-R $(ASSETS)/osmium.elf \
+
+device: $(DEVICE_TARGET).bin
+
+all:: device
+
+.PHONY: install-device
+
+install-device: $(DEVICE_TARGET).bin
+	$(_v)fdfu $(BUILD)/$(DEVICE_TARGET)/$(DEVICE_TARGET).bin
+
+install:: install-atsam4s
+
+# Build the device code
+TARGETS += DEVICE
+
+# ---------------------- HOST ---------------------- #
+
+HOST_TARGET   := $(MODULE)_host
+
+HOST_INC_DIRS := include
+
+-include $(BUILD)/gen.mk
+
+HOST_SRC_DIRS := host $(GEN_DIRS)
+
+$(BUILD)/gen.mk: $(DEVICE_TARGET).elf | $(BUILD)/gen/.dir
+	$(_v)fdwarf $(BUILD)/$(DEVICE_TARGET)/$(DEVICE_TARGET).elf c $(BUILD)/gen
+	$(_v)echo "GEN_DIRS = $(BUILD)/gen" > $(BUILD)/gen.mk
+
+HOST_CFLAGS   := -std=gnu99             \
+                 -g                     \
+                 -Wall                  \
+                 -Wextra                \
+                 -Wno-unused-parameter  \
+                 -DPOSIX                \
+
+HOST_LDFLAGS  := -lflipper
+
+# Check if this is a module
+ifneq ("$(wildcard host)","")
+TARGETS += HOST
+host: $(HOST_TARGET)
+all:: host
 endif
 
-# Target when building for the Flipper Virtual Machine
-fvm: $(FVM_TARGET)
+# ---------------------- MAKE MAGIC ---------------------- #
 
-echo[%]:
-	@echo 'Variable "$*" = "$($*)"'
-
-# Flipper build targets
-$(FLIPPER_BUILD)/%.c.o: %.c | $(FLIPPER_BUILD_DIRS)
-	$(FLIPPER_CC) $(ARM_CFLAGS) -MD -MP -MF $(FLIPPER_BUILD)/$*.c.d -c -o $@ $<
-
-$(FLIPPER_BUILD)/main.elf: $(FLIPPER_OBJS)
-	$(FLIPPER_LD) $(FLIPPER_LDFLAGS) -o $@ $^
-
-$(FLIPPER_BUILD)/cbind.c: $(FLIPPER_BUILD)/main.elf
-	fdwarf $< $(MODULE) c $(FLIPPER_BUILD)/cbind.c
-
-$(FLIPPER_BUILD)/$(MODULE).elf: $(ASSETS)/ram.ld $(FLIPPER_OBJS) $(FLIPPER_BUILD)/$(FLIPPER_BUILD)/cbind.c.o
-	$(FLIPPER_LD) $(FLIPPER_LDFLAGS) -o $@ -Wl,-T$^
-
-$(FLIPPER_TARGET): $(FLIPPER_BUILD)/$(MODULE).elf
-	$(FLIPPER_OBJCOPY) --set-section-flags .bss=alloc,load,contents -O binary $< $@
-
-# Keep track of #include dependencies for incremental builds
--include $(FLIPPER_DEPS)
-
-# Host build targets
-$(HOST_BUILD)/package_data.c: $(FLIPPER_TARGET) | $(HOST_BUILD_DIRS)
-	(cd $(<D) && xxd -i $(<F)) > $@
-
-$(HOST_BUILD)/%.c.o: %.c | $(HOST_BUILD_DIRS)
-	$(HOST_CC) $(HOST_CFLAGS) -MD -MP -MF $(HOST_BUILD)/$*.c.d -c -o $@ $<
-
-$(HOST_GLUE_TARGET): $(HOST_GLUE_OBJS)
-	$(HOST_AR) -rcs $@ $^
-
-$(HOST_TARGET): $(HOST_BUILD)/$(MODULE).a $(HOST_OBJS)
-	$(HOST_LD) $(HOST_LDFLAGS) -lflipper -o $@ $^
-
-# Keep track of #include dependencies for incremental builds
--include $(HOST_DEPS)
-
-# FVM build targets
-$(FVM_BUILD)/%.c.o: %.c | $(FVM_BUILD_DIRS)
-	$(FVM_CC) $(FVM_CFLAGS) -MD -MP -MF $(FVM_BUILD)/$*.c.d -c -o $@ $<
-
-$(FVM_BUILD)/package_data.c: | $(FVM_BUILD_DIRS)
-	echo "unsigned char package_bin[] = {\n};\nunsigned package_bin_len = 0;" > $@
-
-$(FVM_TARGET): $(FVM_OBJS)
-	$(FVM_LD) $(FVM_LDFLAGS) -shared -lflipper -o $@ $^
-
-# Keep track of #include dependencies for incremental builds
--include $(FVM_DEPS)
-
-# Display the disassembly of the compiled Flipper module
-dump: $(FLIPPER_BUILD)/$(MODULE).elf
-	$(FLIPPER_OBJDUMP) -S -z -D $< | less
-
-# Upload the compiled module to the connected Flipper device
-install: $(FLIPPER_TARGET)
-	fload $<
-
-# Remove built products
-clean:
-	rm -rf $(BUILD)
-
-# Display usage information
-help:
-	@echo \
-	"Make subcommands:\n" \
-	"  all (default) - Build the Flipper module ($(FLIPPER_TARGET)) and the host client ($(HOST_TARGET))\n" \
-	"  fvm           - Build the Flipper module for the Flipper Virtual Machine ($(FVM_TARGET))\n" \
-	"  dump          - Display the assembly code listing of the built Flipper module\n" \
-	"  install       - Build the Flipper module and upload it to a connected Flipper device\n" \
-	"  clean         - Remove the entire build directory, containing all build products"
+ifdef VERBOSE
+_v :=
+else
+_v := @
+endif
 
 # Make sure that the .dir files aren't automatically deleted after building.
 .SECONDARY:
 
-# Automatically create any directory containing a .dir file, for use in target dependencies
 %/.dir:
 	$(_v)mkdir -p $* && touch $@
 
@@ -162,5 +114,80 @@ help:
 MAKEFLAGS += --no-builtin-rules
 .SUFFIXES:
 
-# Targets that don't name files to be created
-.PHONY: all fvm dump install clean help
+#####
+# find_srcs($1: source directories, $2: source file extensions)
+#####
+find_srcs = $(foreach sd,$1,$(foreach ext,$(SRC_EXTS),$(shell find $(sd) -name '*.$(ext)')))
+#####
+
+# All supported source file extensions.
+SRC_EXTS := c S
+
+#####
+# generate_target($1: target prefix)
+#
+# Generate all of the target-specific build rules for the given target.
+#####
+define _generate_target
+# Generate remaining variables
+$1_BUILD := $$(BUILD)/$$($1_TARGET)
+$1_ELF :=  $$($1_TARGET).elf
+$1_HEX := $$($1_TARGET).hex
+$1_BIN := $$($1_TARGET).bin
+$1_SO := $$($1_TARGET).so
+$1_SRCS += $$(call find_srcs,$$($1_SRC_DIRS))
+$1_OBJS := $$(patsubst %,$$($1_BUILD)/%.o,$$($1_SRCS))
+$1_DEPS := $$($1_OBJS:.o=.d)
+$1_BUILD_DIRS := $$($1_BUILD) $$(addprefix $$($1_BUILD)/,$$(shell find $$($1_SRC_DIRS) -type d))
+$1_BUILD_DIR_FILES := $$(addsuffix /.dir,$$($1_BUILD_DIRS))
+$1_CFLAGS += $$(foreach inc,$$($1_INC_DIRS),-I$$(inc))
+$1_CC := $$($1_PREFIX)gcc
+$1_AS := $$($1_PREFIX)gcc
+$1_LD := $$($1_PREFIX)gcc
+$1_OBJCOPY := $$($1_PREFIX)objcopy
+$1_OBJDUMP := $$($1_PREFIX)objdump
+
+# Add target to the all rule
+all:: $$($1_TARGET)
+
+.PHONY: $$($1_TARGET)
+
+# Linking rule
+$$($1_TARGET): $$($1_OBJS)
+	$(_v)$$($1_LD) $$($1_LDFLAGS) -o $$($1_BUILD)/$$@ $$^
+
+# Linking rule
+$$($1_ELF): $$($1_OBJS)
+	$(_v)$$($1_LD) $$($1_LDFLAGS) -o $$($1_BUILD)/$$@ $$^
+
+# Objcopy-ing rule
+$$($1_HEX): $$($1_ELF)
+	$(_v)$$($1_OBJCOPY) -O ihex $$($1_BUILD)/$$< $$($1_BUILD)/$$@
+
+# Objcopy-ing rule
+$$($1_BIN): $$($1_ELF)
+	$(_v)$$($1_OBJCOPY) -O binary $$($1_BUILD)/$$< $$($1_BUILD)/$$@
+
+# Linking rule
+$$($1_SO): $$($1_OBJS)
+	$(_v)$$($1_LD) -shared -o $$($1_BUILD)/$$@ $$^ $$($1_LDFLAGS)
+
+# Compiling rule for C sources
+$$($1_BUILD)/%.c.o: %.c | $$($1_BUILD_DIR_FILES)
+	$(_v)$$($1_CC) $$($1_CFLAGS) -I$$(<D) -MD -MP -MF $$($1_BUILD)/$$*.c.d -c -o $$@ $$<
+
+# Compiling rule for S sources
+$$($1_BUILD)/%.S.o: %.S | $$($1_BUILD_DIR_FILES)
+	$(_v)$$($1_AS) $$($1_ASFLAGS) $$($1_CFLAGS) -I$$(<D) -MD -MP -MF $$($1_BUILD)/$$*.S.d -c -o $$@ $$<
+
+# Build dependency rules
+-include $$($1_DEPS)
+
+endef
+generate_target = $(eval $(call _generate_target,$1))
+#####
+
+# Generate all of the rules for every target
+$(foreach target,$(TARGETS),$(call generate_target,$(target)))
+
+# --------------------------------------------------------- #

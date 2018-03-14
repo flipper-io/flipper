@@ -1,9 +1,10 @@
-#include "main.h"
+#include <flipper.h>
+#include <qux.h>
 
 int main(int argc, char *argv[]) {
 
 	flipper_attach();
-	my_func(0x10);
+	qux_func(0x10);
 
 	return 0;
 }

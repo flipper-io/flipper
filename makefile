@@ -190,12 +190,13 @@ libflipper: $(X86_TARGET).so | $(BUILD)/include/flipper/.dir
 
 .PHONY: install-libflipper uninstall-libflipper
 
-install-libflipper: libflipper
+install-libflipper: libflipper atsam4s
 	$(_v)cp $(BUILD)/$(X86_TARGET)/$(X86_TARGET).so $(PREFIX)/lib/
 	$(_v)cp -r $(BUILD)/include/* $(PREFIX)/include/
 	$(_v)cp assets/flipper.mk $(PREFIX)/include/
 	$(_v)mkdir -p $(PREFIX)/share/flipper
 	$(_v)cp assets/ram.ld $(PREFIX)/share/flipper/
+	$(_v)cp $(BUILD)/atsam4s/atsam4s.elf $(PREFIX)/share/flipper/osmium.elf
 
 install:: install-libflipper
 
