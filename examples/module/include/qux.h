@@ -1,5 +1,5 @@
-#ifndef __main_h__
-#define __main_h__
+#ifndef __qux__
+#define __qux__
 
 #include <flipper.h>
 

@@ -90,6 +90,8 @@ def generate_c(modules, outdir):
 
 enum { $TAGS$ };
 
+$FUNCTIONPROTOS$
+
 void *$MODULE$_interface[] = {
 $STRUCTBODY$
 };
