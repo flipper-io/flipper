@@ -81,10 +81,10 @@ def get_parameters_from_die(cu, die):
 			parameters.append(p)
 	return parameters
 
-def generate_c(modules, outfile):
-	outc = open(outfile, "w")
+def generate_c(modules, outdir):
 
 	for m in modules:
+		outc = open(os.path.join(outdir, m.name + ".c"), "w")
 		ctemplate = """\
 #include <flipper.h>
 
@@ -129,8 +129,7 @@ $FUNCTIONS$
 		ctemplate = ctemplate.replace("$FUNCTIONS$", "\n".join(functs))
 		ctemplate = ctemplate.replace("$MODULE$", m.name)
 		outc.write(ctemplate)
-
-	outc.close()
+		outc.close()
 
 def generate_py(modules, outfile):
 	print("Not yet implemented!")
@@ -172,7 +171,7 @@ def test():
 		for f in m.funcs:
 			print("\t%s" % str(f))
 
-def process_file(filename, language, outfile):
+def process_file(filename, language, outdir):
 	functions = []
 
 	with open(filename, "rb") as f:
@@ -183,13 +182,15 @@ def process_file(filename, language, outfile):
 			sys.exit(1)
 
 		dwarfinfo = elffile.get_dwarf_info()
-
 		modules = get_modules(elffile, dwarfinfo)
 
+		if not os.path.exists(outdir):
+			os.makedirs(outdir)
+
 		if language.lower() == "c":
-			generate_c(modules, outfile)
+			generate_c(modules, outdir)
 		elif language.lower() == "python":
-			generate_py(modules, outfile)
+			generate_py(modules, outdir)
 		else:
 			print("Invalid language: " + language)
 			sys.exit(1)
@@ -201,5 +202,5 @@ if __name__ == "__main__":
 		outdir = sys.argv[3]
 		process_file(elf, language, outdir)
 	else:
-		print("Usage: fdwarf <input file.elf> <language [c|py])> <output file>")
+		print("Usage: fdwarf <input file.elf> <language [c|py])> <output directory>")
 		sys.exit(1)

@@ -162,11 +162,6 @@ X86_SRC_DIRS := carbon/hal              \
                 library/platforms/posix \
                 runtime/src
 
-X86_SRCS     := carbon.c
-
-carbon.c: $(ARM_TARGET).elf
-	$(_v)python3 utils/fdwarf/fdwarf.py $(BUILD)/$(ARM_TARGET)/$(ARM_TARGET).elf c carbon.c
-
 X86_CFLAGS   := -std=gnu99              \
                 -g                      \
                 -Wall                   \
@@ -271,8 +266,6 @@ uninstall-utils:
 	$(_v)rm $(PREFIX)/bin/fload
 
 # --- LANGUAGES --- #
-
-PY_DIR = $(shell python3 -m site --user-site)
 
 install-python:
 	$(_v)pip3 install languages/python --upgrade -q
