@@ -24,26 +24,6 @@ failure:
 
 struct _lf_endpoint *nep = NULL;
 
-/* Modules. */
-extern struct _lf_module adc;
-extern struct _lf_module button;
-extern struct _lf_module dac;
-extern struct _lf_module fld;
-extern struct _lf_module fs;
-extern struct _lf_module gpio;
-extern struct _lf_module i2c;
-extern struct _lf_module led;
-extern struct _lf_module pwm;
-extern struct _lf_module rtc;
-extern struct _lf_module spi;
-extern struct _lf_module swd;
-extern struct _lf_module temp;
-extern struct _lf_module timer;
-extern struct _lf_module uart0;
-extern struct _lf_module usart;
-extern struct _lf_module usb;
-extern struct _lf_module wdt;
-
 int main(int argc, char *argv[]) {
 
 	//lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
@@ -90,22 +70,39 @@ int main(int argc, char *argv[]) {
 
 	printf("Flipper Virtual Machine (FVM) v0.1.0\nListening on 'localhost'.\n\n");
 
-	adc_configure();
-	button_configure();
-	dac_configure();
-	gpio_configure();
-	i2c_configure();
-	led_configure();
-	pwm_configure();
-	rtc_configure();
-	spi_configure();
-	swd_configure();
-	temp_configure();
-	timer_configure();
-	uart0_configure();
-	usart_configure();
-	usb_configure();
-	wdt_configure();
+	extern struct _lf_module adc;
+	extern struct _lf_module button;
+	extern struct _lf_module dac;
+	extern struct _lf_module gpio;
+	extern struct _lf_module i2c;
+	extern struct _lf_module led;
+	extern struct _lf_module pwm;
+	extern struct _lf_module rtc;
+	extern struct _lf_module spi;
+	extern struct _lf_module swd;
+	extern struct _lf_module temp;
+	extern struct _lf_module timer;
+	extern struct _lf_module uart0;
+	extern struct _lf_module usart;
+	extern struct _lf_module usb;
+	extern struct _lf_module wdt;
+
+	dyld_register(&THIS_DEVICE, &adc);
+	dyld_register(&THIS_DEVICE, &button);
+	dyld_register(&THIS_DEVICE, &dac);
+	dyld_register(&THIS_DEVICE, &gpio);
+	dyld_register(&THIS_DEVICE, &i2c);
+	dyld_register(&THIS_DEVICE, &led);
+	dyld_register(&THIS_DEVICE, &pwm);
+	dyld_register(&THIS_DEVICE, &rtc);
+	dyld_register(&THIS_DEVICE, &spi);
+	dyld_register(&THIS_DEVICE, &swd);
+	dyld_register(&THIS_DEVICE, &temp);
+	dyld_register(&THIS_DEVICE, &timer);
+	dyld_register(&THIS_DEVICE, &uart0);
+	dyld_register(&THIS_DEVICE, &usart);
+	dyld_register(&THIS_DEVICE, &usb);
+	dyld_register(&THIS_DEVICE, &wdt);
 
 	while (1) {
 		struct _fmr_packet packet;

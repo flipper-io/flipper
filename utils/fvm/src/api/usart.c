@@ -1,9 +1,6 @@
 #include <flipper.h>
 
-extern struct _lf_module usart;
-
 LF_FUNC("usart") int usart_configure(void) {
-	dyld_register(&THIS_DEVICE, &usart);
 	printf("Configured the usart.\n");
 	return lf_success;
 }
