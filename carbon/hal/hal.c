@@ -27,7 +27,7 @@
 struct _lf_device *carbon_attach_endpoint(struct _lf_endpoint *endpoint, struct _lf_device *_u2, struct _lf_device *_4s) {
 	/* Create the parent carbon device. */
 	struct _lf_device *carbon = lf_device_create("carbon", endpoint);
-#warning Free this.
+#warning Free the carbon context on release. Do we need this?
 	carbon->_ctx = calloc(1, sizeof(struct _carbon_context));
 	/* Set the 4s's context. */
 	struct _carbon_context *context = carbon->_ctx;

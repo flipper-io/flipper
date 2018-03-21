@@ -1,6 +1,9 @@
 #include <flipper.h>
 
+extern struct _lf_module swd;
+
 int swd_configure(void) {
-	printf("Configuring the swd.\n");
+	dyld_register(&THIS_DEVICE, &swd);
+	printf("Configured the swd.\n");
 	return lf_success;
 }

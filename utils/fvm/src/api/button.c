@@ -1,7 +1,10 @@
 #include <flipper.h>
 
+extern struct _lf_module button;
+
 int button_configure(void) {
-	printf("Configuring the button.\n");
+	dyld_register(&THIS_DEVICE, &button);
+	printf("Configured the button.\n");
 	return lf_success;
 }
 

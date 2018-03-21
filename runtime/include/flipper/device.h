@@ -19,10 +19,10 @@ struct _lf_device {
 	lf_version_t version;
 	/* A pointer to the endpoint through which packets will be transferred. */
 	struct _lf_endpoint *endpoint;
-	/* The device's context. */
-	void *_ctx;
 	/* The modules loaded on the device. */
 	struct _lf_ll *modules;
+	/* The device's context. */
+	void *_ctx;
 };
 
 struct _lf_device *lf_device_create(char *name, struct _lf_endpoint *endpoint);

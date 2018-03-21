@@ -1,7 +1,10 @@
 #include <flipper.h>
 
+extern struct _lf_module wdt;
+
 int wdt_configure(void) {
-	printf("Configuring the watchdog.\n");
+	dyld_register(&THIS_DEVICE, &wdt);
+	printf("Configured the watchdog.\n");
 	return 0;
 }
 

@@ -49,9 +49,11 @@
   |             .bss             |
   +------------------------------*/
 
+struct _lf_ll *tasks;
+
 /* Called when an app finishes running. */
 void os_app_exit(struct _lf_abi_header *header) {
-
+	free(header);
 }
 
 /* Loads an application into RAM. */
