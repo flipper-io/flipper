@@ -40,7 +40,7 @@ struct _lf_device *carbon_attach_endpoint(struct _lf_endpoint *endpoint, struct 
 }
 
 int uart0_bridge_configure(struct _lf_endpoint *endpoint, void *_configuration) {
-	return uart0_configure(FMR_BAUD, true);
+	return uart0_configure();
 }
 
 bool uart0_bridge_ready(struct _lf_endpoint *endpoint) {

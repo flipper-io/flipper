@@ -5,7 +5,7 @@
 #include <flipper.h>
 
 /* Declare the prototypes for all of the functions within this module. */
-int uart0_configure(uint8_t baud, uint8_t interrupts);
+int uart0_configure(void);
 int uart0_ready(void);
 void uart0_enable(void);
 void uart0_disable(void);

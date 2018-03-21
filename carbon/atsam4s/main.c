@@ -53,16 +53,22 @@ int main(void) {
 	/* Allow the reset pin to reset the device. */
 	RSTC->RSTC_MR = RSTC_MR_KEY_PASSWD | RSTC_MR_URSTEN;
 
-	/* Configure the USART peripheral. */
-	usart_configure();
-	/* Configure the UART peripheral. */
-	uart0_configure(0, true);
-	/* Configure the GPIO peripheral. */
+	adc_configure();
+	button_configure();
+	dac_configure();
 	gpio_configure();
-	/* Configure the SPI peripheral. */
+	i2c_configure();
+	led_configure();
+	pwm_configure();
+	rtc_configure();
 	spi_configure();
-	/* Configure the flash chip. */
-	is25lp_configure();
+	swd_configure();
+	temp_configure();
+	timer_configure();
+	uart0_configure();
+	usart_configure();
+	usb_configure();
+	wdt_configure();
 
 	/* Enable the FSI pin. */
 	gpio_enable(FMR_PIN, 0);
