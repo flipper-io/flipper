@@ -77,6 +77,12 @@ void lf_set_debug_level(int level);
 #define little32(x) ((((uint32_t)(x)) << 16 ) | (((uint32_t)(x)) >> 16))
 
 #include <flipper/error.h>
+#include <flipper/endpoint.h>
+#include <flipper/device.h>
+#include <flipper/module.h>
+#include <flipper/fmr.h>
+#include <flipper/ll.h>
+#include <flipper/dyld.h>
 
 typedef struct _lf_ll *lf_event_list;
 extern lf_event_list lf_registered_events;
@@ -88,19 +94,10 @@ extern struct _lf_device *lf_current_device;
 void lf_set_current_device(struct _lf_device *device);
 struct _lf_device *lf_get_current_device(void);
 
-#include <flipper/endpoint.h>
-#include <flipper/device.h>
-#include <flipper/module.h>
-
 /* Attaches to a device. */
 int lf_attach(struct _lf_device *device);
 int lf_detach(struct _lf_device *device);
 int lf_select(struct _lf_device *device);
-
-#include <flipper/fmr.h>
-#include <flipper/ll.h>
-
-#include <flipper/dyld.h>
 
 /* Performs a remote procedure call to a module's function. */
 lf_return_t lf_invoke(struct _lf_device *device, char *module, lf_function function, lf_type ret, struct _lf_ll *args);
@@ -114,8 +111,6 @@ int lf_dyld(struct _lf_device *device, char *module);
 /* Closes the library. */
 int lf_exit(void);
 
-/* Load the device's configuration information. */
-int lf_load_configuration(struct _lf_device *device);
 /* Provides a checksum for a given block of data. */
 lf_crc_t lf_crc(const void *source, size_t length);
 
@@ -125,9 +120,6 @@ int lf_get_result(struct _lf_device *device, struct _fmr_result *result);
 int lf_transfer(struct _lf_device *device, struct _fmr_packet *packet);
 /* Retrieves a packet from the specified device. */
 int lf_retrieve(struct _lf_device *device, struct _fmr_result *response);
-
-/* Experimental: Load an application into RAM and execute it. */
-int lf_load(struct _lf_device *device, void *source, lf_size_t length);
 
 /* Prints verbose information about the packet disassembly. */
 void lf_debug_packet(struct _fmr_packet *packet, size_t length);
