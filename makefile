@@ -54,7 +54,7 @@ ARM_PREFIX   := arm-none-eabi-
 
 ASF_INC      := carbon/include/flipper/atsam4s/asf \
                 carbon/include/flipper/atsam4s/asf/cmsis \
-                $(shell find carbon/atsam4s/drivers -type d)
+				$(shell find carbon/atsam4s/asf -type d)
 
 # Directories that need to be included for this target.
 ARM_INC_DIRS := carbon/include        \
