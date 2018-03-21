@@ -33,9 +33,9 @@
 #define LF_WEAK __attribute__((weak))
 
 #ifdef __clang__
-#define LF_FUNC(MODULE) __attribute__((used, section("__TEXT,.lf.module."MODULE)))
+#define LF_FUNC(MODULE) __attribute__((used, section("__TEXT,.lm."MODULE)))
 #else
-#define LF_FUNC(MODULE) __attribute__((used, section(".lf.module."MODULE)))
+#define LF_FUNC(MODULE) __attribute__((used, section(".lm."MODULE)))
 #endif
 
 /* Used to contain the result of checksumming operations. */
