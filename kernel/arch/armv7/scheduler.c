@@ -75,7 +75,7 @@ int os_task_add(struct _os_task *task) {
 	return lf_success;
 }
 
-struct _os_task *os_task_create(void *_entry, void (* _exit)(void *_ctx), void *_ctx, uint32_t stack_size) {
+struct _os_task *os_task_create(void *_entry, void (* _exit)(struct _lf_abi_header *header), struct _lf_abi_header *header, uint32_t stack_size) {
 	/* Allocate the next available task slot. */
 	struct _os_task *task = malloc(sizeof(struct _os_task));
 	lf_assert(task, failure, E_NULL, "Failed to allocate memory to create task");
@@ -95,7 +95,7 @@ struct _os_task *os_task_create(void *_entry, void (* _exit)(void *_ctx), void *
 	/* Set the task's exit function. */
 	task->exit = _exit;
 	/* Set the task's exit context. */
-	task->_ctx = _ctx;
+	task->header = header;
 	/* Set the task's next task equal to the head of the task list. */
 	task->next = schedule.head;
 
@@ -134,7 +134,7 @@ int os_task_release(struct _os_task *task) {
 	/* Disallow interrupts while freeing memory. */
 	__disable_irq();
 	/* Call the task's exit function. */
-	if (task->exit) task->exit(task->_ctx);
+	if (task->exit) task->exit(task->header);
 	/* If it was allocated, free the memory associated with the task's stack. */
 	if (task->stack) free(task->stack);
 	/* Allow interrupts again. */
