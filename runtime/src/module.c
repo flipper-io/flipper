@@ -7,7 +7,7 @@ struct _lf_module *lf_module_create(char *name, int idx) {
 	lf_assert(module, failure, E_MALLOC, "Failed to allocate memory for new _lf_module.");
 	size_t len = strlen(name) + 1;
 	module->name = malloc(len);
-	memcpy(&module->name, name, len);
+	strcpy(module->name, name);
 	module->idx = idx;
 	return module;
 failure:

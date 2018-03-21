@@ -7,21 +7,6 @@
 
 /* fvm - Creates a local server that acts as a virtual flipper device. */
 
-#undef lf_debug
-#define lf_debug(format, ...) printf(format"\n", __VA_ARGS__)
-
-int fvm_load_module(char *path, char *module) {
-	void *dlm = dlopen(path, RTLD_LAZY);
-	lf_assert(dlm, failure, E_NULL, "Failed to open module '%s'.", path);
-	struct _lf_module *m = dlsym(dlm, module);
-	lf_assert(m, failure, E_NULL, "Failed to read module '%s' from '%s'.", m->name, path);
-	dyld_register(&THIS_DEVICE, m);
-	lf_debug("Successfully loaded module '%s'.", module);
-	return lf_success;
-failure:
-	return lf_error;
-}
-
 struct _lf_endpoint *nep = NULL;
 
 int main(int argc, char *argv[]) {
@@ -30,10 +15,17 @@ int main(int argc, char *argv[]) {
 
 	if (argc > 1) {
 		char *lib = argv[1];
-		char **modules = &argv[2];
-		for (int i = 0; i < (argc-2); i ++) {
-			lf_debug("Loading module '%s' from '%s'.", *modules, lib);
-			fvm_load_module(lib, *modules++);
+		char *module, **modules = &argv[2];
+		while ((module = *modules++)) {
+			lf_debug("Loading module '%s' from '%s'.", module, lib);
+			void *dlm = dlopen(lib, RTLD_LAZY);
+			lf_assert(dlm, failure, E_NULL, "Failed to open module '%s'.", lib);
+			struct _lf_module *m = dlsym(dlm, module);
+			lf_assert(m, failure, E_NULL, "Failed to read module '%s' from '%s'.", module, lib);
+			lf_debug("Successfully loaded module '%s'.", module);
+			int _e = dyld_register(&THIS_DEVICE, m);
+			lf_assert(_e == lf_success, failure, E_NULL, "Failed to register module '%s'.", m->name);
+			lf_debug("Successfully registered module '%s'.", module);
 		}
 	}
 
