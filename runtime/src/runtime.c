@@ -161,35 +161,3 @@ int lf_dyld(struct _lf_device *device, char *module) {
 failure:
 	return lf_error;
 }
-
-#warning Use dyld_load instead
-// int lf_load(struct _lf_device *device, void *source, lf_size_t length) {
-// 	lf_assert(device, failure, E_NULL, "No device was provided to '%s'.", __PRETTY_FUNCTION__);
-// 	lf_assert(source, failure, E_NULL, "No source was provided to '%s'.", __PRETTY_FUNCTION__);
-// 	lf_assert(length, failure, E_NULL, "No length was provided to '%s'.", __PRETTY_FUNCTION__);
-//
-// 	struct _fmr_packet _packet;
-// 	memset(&_packet, 0, sizeof(struct _fmr_packet));
-// 	_packet.header.magic = FMR_MAGIC_NUMBER;
-// 	_packet.header.length = sizeof(struct _fmr_push_pull_packet);
-// 	_packet.header.class = fmr_ram_load_class;
-//
-// 	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
-// 	packet->length = length;
-// 	_packet.header.checksum = lf_crc(packet, _packet.header.length);
-//
-// 	/* Send the packet to the target device. */
-// 	int _e = lf_transfer(device, &_packet);
-// 	lf_assert(_e == lf_success, failure, E_FMR, "Failed to transfer load command to device '%s'.", device->name);
-//
-// 	/* Transfer the data through to the address space of the device. */
-// 	_e = device->endpoint->push(device->endpoint, source, length);
-// 	lf_assert(_e == lf_success, failure, E_FMR, "Failed to push image data to device '%s'.", device->name);
-//
-// 	struct _fmr_result result;
-// 	lf_get_result(device, &result);
-// 	return result.value;
-//
-// failure:
-// 	return lf_error;
-// }

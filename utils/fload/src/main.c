@@ -39,12 +39,11 @@ int main(int argc, char *argv[]) {
 	fclose(fp);
 
 	/* Load the application into RAM. */
-	lf_return_t value = dyld_load(device, fbuf, fsize);
-	if ((int32_t)value == -1) {
-		fprintf(stderr, "Failed to load application into RAM.\n");
-		free(fbuf);
-		exit(EXIT_FAILURE);
-	}
+	int _e = dyld_load(device, fbuf, fsize);
+
+	lf_assert(_e == lf_success, failure, E_MODULE, "Failed to load module.");
+
+failure:
 
 	/* Free buffer. */
 	free(fbuf);

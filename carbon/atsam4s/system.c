@@ -1,6 +1,7 @@
-
 #include <flipper/uart0.h>
 #include <os/loader.h>
+
+struct _lf_device THIS_DEVICE;
 
 /* Buffer space for incoming message runtime packets. */
 struct _fmr_packet packet;
@@ -20,8 +21,6 @@ void uart0_pull_wait(void *destination, lf_size_t length) {
 	/* Enable the PDC receive complete interrupt. */
 	UART0->UART_IER = UART_IER_ENDRX;
 }
-
-struct _lf_device THIS_DEVICE;
 
 #warning This is broken
 lf_return_t fmr_push(struct _fmr_push_pull_packet *packet) {
