@@ -1,9 +1,6 @@
 #include <flipper.h>
 
-extern struct _lf_module led;
-
 LF_FUNC("led") int led_configure(void) {
-	dyld_register(&THIS_DEVICE, &led);
 	printf("Configured the led.\n");
 	return lf_success;
 }

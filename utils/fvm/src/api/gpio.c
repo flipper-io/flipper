@@ -1,9 +1,6 @@
 #include <flipper.h>
 
-extern struct _lf_module gpio;
-
 LF_FUNC("gpio") int gpio_configure(void) {
-	dyld_register(&THIS_DEVICE, &gpio);
 	printf("Configured gpio controller.\n");
 	return lf_success;
 }

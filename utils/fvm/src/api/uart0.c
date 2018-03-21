@@ -1,9 +1,6 @@
 #include <flipper.h>
 
-extern struct _lf_module uart0;
-
 LF_FUNC("uart0") int uart0_configure(void) {
-	dyld_register(&THIS_DEVICE, &uart0);
 	printf("Configured the uart0.\n");
 	return lf_success;
 }
