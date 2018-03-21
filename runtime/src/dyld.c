@@ -31,9 +31,8 @@ struct _lf_module *dyld_module(struct _lf_device *device, char *module) {
         /* If the module hasn't already been registered, try to register it. */
         int idx = lf_dyld(device, module);
         lf_assert(idx != lf_error, failure, E_MODULE, "Failed to find counterpart for module '%s' on device '%s'.", module, device->name);
-        struct _lf_module *m = lf_module_create(module);
+        struct _lf_module *m = lf_module_create(module, idx);
         lf_assert(module, failure, E_NULL, "Failed to create new module '%s'.", module);
-        m->idx = idx;
         int _e = dyld_register(device, m);
         lf_assert(_e == lf_success, failure, E_MODULE, "Failed to register module '%s'.", module);
         return m;
