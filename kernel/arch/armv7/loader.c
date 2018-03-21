@@ -50,7 +50,7 @@
   +------------------------------*/
 
 /* Called when an app finishes running. */
-void os_app_exit(void *_app) {
+void os_app_exit(struct _lf_abi_header *header) {
 
 }
 
@@ -61,7 +61,7 @@ int os_load_application(struct _lf_abi_header *header) {
 #warning Check here if the task exists.
 
 	void *_main = header + header->entry;
-	task = os_task_create(_main, os_app_exit, NULL, APPLICATION_STACK_SIZE_WORDS * sizeof(uint32_t));
+	task = os_task_create(_main, os_app_exit, header, APPLICATION_STACK_SIZE_WORDS * sizeof(uint32_t));
 	lf_assert(task, failure, E_NULL, "Failed to allocate memory for task");
 
 	/* Add the task. */
@@ -83,19 +83,19 @@ int os_load_image(struct _lf_abi_header *header) {
 
 	/* Patch the function pointers in the module structure. */
 	void **_functions = (void **)header + header->module_offset;
-	for (int i = 0; i < header->module_size / sizeof(uintptr_t); i ++) {
+	for (unsigned i = 0; i < header->module_size / sizeof(void **); i ++) {
 		_functions[i] += (uintptr_t)header;
 	}
 
 	/* Patch the Global Offset Table of the image. */
-	uintptr_t *_got = (uintptr_t *)header + header->got_offset;
-	for (int i = 0; i < header->got_size / sizeof(uintptr_t); i ++) {
+	void **_got = (void **)header + header->got_offset;
+	for (unsigned i = 0; i < header->got_size / sizeof(void **); i ++) {
 		_got[i] += (uintptr_t)header;
 	}
 
 	/* Zero the BSS. */
-	uint32_t *_bss = (uint32_t *)header + header->got_offset;
-	for (int i = 0; i < header->bss_size; i ++) {
+	uint32_t *_bss = (void *)header + header->got_offset;
+	for (unsigned i = 0; i < header->bss_size / sizeof(uint32_t); i ++) {
 		_bss[i] = 0;
 	}
 
@@ -103,6 +103,7 @@ int os_load_image(struct _lf_abi_header *header) {
 
 	if (header->entry) {
 		/* Load an application. */
+
 	} else {
 		/* Load a module. */
 		struct _lf_module *_module = (struct _lf_module *)header + header->module_offset;
