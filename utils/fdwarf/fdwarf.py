@@ -141,10 +141,10 @@ def get_modules(elffile, dwarfinfo):
 	modules = []
 
 	for section in elffile.iter_sections():
-		if section.name.startswith(".lf.module."):
+		if section.name.startswith(".lm."):
 			funcs_addr = section["sh_addr"]
 			funcs_size = section["sh_size"]
-			module = Module(section.name.split(".lf.module.",1)[1], funcs_addr, funcs_addr + funcs_size)
+			module = Module(section.name.split(".lm.",1)[1], funcs_addr, funcs_addr + funcs_size)
 			modules.append(module)
 
 	# This iterates through all CUs, even the ones without .lf.funcs section
