@@ -2,7 +2,9 @@
 
 int dyld_register(struct _lf_device *device, struct _lf_module *module) {
     lf_assert(module, failure, E_NULL, "No module provided to '%s'.", __PRETTY_FUNCTION__);
+#warning This is not a good way to increment the count.
     if (module->idx == -1) module->idx = lf_ll_count(device->modules);
+#warning Need to handle reloading an existing moudle here.
     return lf_ll_append(&device->modules, module, lf_module_release);
 failure:
     return lf_error;
@@ -24,7 +26,7 @@ struct _lf_module *dyld_module(struct _lf_device *device, char *module) {
         if (!strcmp(m->name, module)) return m;
     }
 
-    #warning This is not optimal.
+#warning This is not optimal.
     if (device != &THIS_DEVICE) {
         /* If the module hasn't already been registered, try to register it. */
         int idx = lf_dyld(device, module);
