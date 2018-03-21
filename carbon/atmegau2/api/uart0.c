@@ -1,22 +1,19 @@
 #include <flipper/uart0.h>
 
-uint8_t uart0_buffer[256];
-uint8_t idx = 0;
+LF_FUNC("uart0") int uart0_configure(void) {
 
-LF_FUNC("uart0") int uart0_configure(uint8_t baud, uint8_t interrupts) {
+#warning No way to get into DFU baud here.
+	UBRR1L = FMR_BAUD;
 
-	UBRR1L = baud;
 	UCSR1A &= ~(1 << U2X1);
 	/* 8n1 */
 	UCSR1C = (1 << UCSZ11) | (1 << UCSZ10);
 	/* Enable the receiver, transmitter, and receiver interrupt. */
 	UCSR1B = (1 << RXEN1) | (1 << TXEN1);
 
-	if (interrupts) {
-		UCSR1B |= (1 << RXCIE1);
-	} else {
-		UCSR1B &= ~(1 << RXCIE1);
-	}
+	/* Disable interrupts. */
+#warning This will break FDFU
+	UCSR1B &= ~(1 << RXCIE1);
 
 	/* Enable the FSI line as an input. */
 	FSI_DDR &= ~(1 << FSI_PIN);
@@ -39,6 +36,9 @@ LF_FUNC("uart0") int uart0_push(void *source, lf_size_t length) {
 failure:
 	return lf_error;
 }
+
+uint8_t uart0_buffer[256];
+uint8_t idx = 0;
 
 LF_FUNC("uart0") int uart0_pull(void *destination, lf_size_t length) {
 	/* Drain the buffered data. */

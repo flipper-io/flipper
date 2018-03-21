@@ -1,6 +1,6 @@
 #include <flipper.h>
 
-LF_FUNC("uart0") int uart0_configure(uint8_t baud, uint8_t interrupts) {
+LF_FUNC("uart0") int uart0_configure(void) {
 	/* Create a pinmask for the peripheral pins. */
 	const unsigned int UART0_PIN_MASK = (PIO_PA9A_URXD0 | PIO_PA10A_UTXD0);
 	/* Enable the peripheral clock. */

@@ -221,9 +221,6 @@ void *load_page_data(FILE *firmware, size_t size) {
 
 int enter_update_mode(void) {
 
-	/* Go to DFU baud. */
-//	uart0_configure(DFU_BAUD, false);
-
 	printf("Entering update mode.\n");
 
 	uint8_t ack[3];
@@ -250,8 +247,7 @@ done:
 
 int enter_normal_mode(void) {
 
-	/* Go to DFU baud. */
-	uart0_configure(DFU_BAUD, false);
+#warning Go to DFU baud here.
 
 	/* Set normal mode. */
 	printf("Entering normal mode.\n");
@@ -430,7 +426,7 @@ done:
 
 	printf(KGRN " Successfully reset the CPU.\n" KNRM "----------------------");
 
-	uart0_configure(FMR_BAUD, true);
+#warning Go back to FMR baud here.
 
 	/* If there were no errors, offer to flash again. */
 	if (!(_e < lf_success)) {

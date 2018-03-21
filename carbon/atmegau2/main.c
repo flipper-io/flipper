@@ -53,9 +53,11 @@ int main(void) {
 	PCICR |= (1 << PCIE1);
 
 	button_configure();
+	gpio_configure();
 	led_configure();
-	usb_configure();
-	uart0_configure(FMR_BAUD, true);
+	spi_configure();
+	uart0_configure();
+	wdt_configure();
 
 	/* Use USB debug as STDOUT. */
 	FILE debug_f = FDEV_SETUP_STREAM(debug_putchar, NULL, _FDEV_SETUP_RW);

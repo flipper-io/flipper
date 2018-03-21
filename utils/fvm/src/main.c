@@ -90,25 +90,22 @@ int main(int argc, char *argv[]) {
 
 	printf("Flipper Virtual Machine (FVM) v0.1.0\nListening on 'localhost'.\n\n");
 
-	/* Register the modules. */
-	dyld_register(&THIS_DEVICE, &adc);
-	dyld_register(&THIS_DEVICE, &button);
-	dyld_register(&THIS_DEVICE, &dac);
-//	dyld_register(&THIS_DEVICE, &fld);
-//	dyld_register(&THIS_DEVICE, &fs);
-	dyld_register(&THIS_DEVICE, &gpio);
-	dyld_register(&THIS_DEVICE, &i2c);
-	dyld_register(&THIS_DEVICE, &led);
-	dyld_register(&THIS_DEVICE, &pwm);
-	dyld_register(&THIS_DEVICE, &rtc);
-	dyld_register(&THIS_DEVICE, &spi);
-	dyld_register(&THIS_DEVICE, &swd);
-	dyld_register(&THIS_DEVICE, &temp);
-	dyld_register(&THIS_DEVICE, &timer);
-	dyld_register(&THIS_DEVICE, &uart0);
-	dyld_register(&THIS_DEVICE, &usart);
-	dyld_register(&THIS_DEVICE, &usb);
-	dyld_register(&THIS_DEVICE, &wdt);
+	adc_configure();
+	button_configure();
+	dac_configure();
+	gpio_configure();
+	i2c_configure();
+	led_configure();
+	pwm_configure();
+	rtc_configure();
+	spi_configure();
+	swd_configure();
+	temp_configure();
+	timer_configure();
+	uart0_configure();
+	usart_configure();
+	usb_configure();
+	wdt_configure();
 
 	while (1) {
 		struct _fmr_packet packet;

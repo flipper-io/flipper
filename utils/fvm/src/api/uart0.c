@@ -1,6 +1,6 @@
 #include <flipper.h>
 
-int uart0_configure(uint8_t baud, uint8_t interrupts) {
+int uart0_configure(void) {
 	printf("Configuring the uart0.\n");
 	return lf_success;
 }
