@@ -69,7 +69,7 @@ int main(void) {
 	// extern struct _lf_module usart;
 	// extern struct _lf_module usb;
 	// extern struct _lf_module wdt;
-	//
+	
 	// dyld_register(&THIS_DEVICE, &adc);
 	// dyld_register(&THIS_DEVICE, &button);
 	// dyld_register(&THIS_DEVICE, &dac);

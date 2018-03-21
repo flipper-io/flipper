@@ -1,6 +1,6 @@
 #include <flipper.h>
 
-struct _lf_module *lf_module_create(char *name) {
+struct _lf_module *lf_module_create(char *name, int idx) {
 	lf_assert(name, failure, E_NULL, "No name provided to '%s'.", __PRETTY_FUNCTION__);
 	lf_assert(strlen(name) < 16, failure, E_OVERFLOW, "Module name '%s' is invalid. Module names must be 16 characters or less.", name);
 	struct _lf_module *module = calloc(1, sizeof(struct _lf_module));
@@ -8,6 +8,7 @@ struct _lf_module *lf_module_create(char *name) {
 	size_t len = strlen(name) + 1;
 	module->name = malloc(len);
 	memcpy(&module->name, name, len);
+	module->idx = idx;
 	return module;
 failure:
 	return NULL;

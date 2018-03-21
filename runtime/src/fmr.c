@@ -77,7 +77,7 @@ lf_return_t fmr_execute(lf_module module, lf_function function, lf_type ret, lf_
 	/* Dereference the pointer to the target module. */
 	struct _lf_module *m = lf_ll_item(THIS_DEVICE.modules, module);
 	/* Dereference and return a pointer to the target function. */
-	void *address = m->jumptable[function];
+	void *address = m->interface[function];
 	/* Ensure that the function address is valid. */
 	lf_assert(address, failure, E_NULL, "NULL address supplied to '%s'.", __PRETTY_FUNCTION__);
 	/* Perform the function call internally. */

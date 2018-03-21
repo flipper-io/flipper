@@ -11,19 +11,19 @@ struct _lf_module {
 	lf_version_t version;
 	/* The loaded index of the module on the device. */
 	int idx;
-	/* The module's jumptable. */
-	void **jumptable;
+	/* The module's interface. */
+	void **interface;
 };
 
-#define LF_MODULE(sym, name, jumptable) \
+#define LF_MODULE(sym, name, interface) \
 	struct _lf_module sym = {           \
 		name,                           \
 		0,                              \
 		-1,                             \
-		jumptable                       \
+		interface                       \
 	};
 
-struct _lf_module *lf_module_create(char *name);
+struct _lf_module *lf_module_create(char *name, int idx);
 int lf_module_release(struct _lf_module *module);
 
 #endif
