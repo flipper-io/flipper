@@ -1,7 +1,7 @@
 #include <flipper.h>
 
 int spi_configure() {
-	printf("Configuring the spi bus.\n");
+	printf("Configured the spi bus.\n");
 	return lf_success;
 }
 

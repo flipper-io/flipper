@@ -278,9 +278,8 @@ int main(int argc, char *argv[]) {
 	//lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
 
 	/* Attach to a Flipper device. */
-	struct _lf_device *device = flipper.attach();
-#warning Select u2!
-
+	flipper.attach();
+#warning Select U2 from the current device.
 
 begin: ;
 

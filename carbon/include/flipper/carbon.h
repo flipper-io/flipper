@@ -66,8 +66,6 @@
 #define DFU_BAUD 0x08
 #define FMR_BAUD 0x00
 
-/* Miscelaneous context for the HAL. */
-
 struct _carbon_context {
 	/* Device that handles interacting with the u2. (ATMEGA16U2) */
 	struct _lf_device *_u2;

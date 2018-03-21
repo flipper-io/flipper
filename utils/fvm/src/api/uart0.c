@@ -1,7 +1,10 @@
 #include <flipper.h>
 
+extern struct _lf_module uart0;
+
 int uart0_configure(void) {
-	printf("Configuring the uart0.\n");
+	dyld_register(&THIS_DEVICE, &uart0);
+	printf("Configured the uart0.\n");
 	return lf_success;
 }
 
