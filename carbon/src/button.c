@@ -3,7 +3,7 @@
 enum { _button_read, _button_configure };
 
 uint8_t button_read(void);
-	int button_configure(void);
+int button_configure(void);
 
 void *button_interface[] = {
 	&button_read,

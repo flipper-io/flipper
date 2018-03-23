@@ -3,7 +3,7 @@
 enum { _wdt_fire, _wdt_configure };
 
 void wdt_fire(void);
-	int wdt_configure(void);
+int wdt_configure(void);
 
 void *wdt_interface[] = {
 	&wdt_fire,
