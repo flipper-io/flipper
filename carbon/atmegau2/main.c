@@ -52,12 +52,22 @@ int main(void) {
 	PCMSK1 |= (1 << PCINT8);
 	PCICR |= (1 << PCIE1);
 
-	button_configure();
-	gpio_configure();
-	led_configure();
-	spi_configure();
-	uart0_configure();
-	wdt_configure();
+	struct _lf_device *_u2 = lf_device_create("atmegau2", NULL);
+	lf_attach(_u2);
+
+	extern struct _lf_module button;
+	extern struct _lf_module gpio;
+	extern struct _lf_module led;
+	extern struct _lf_module spi;
+	extern struct _lf_module uart0;
+	extern struct _lf_module wdt;
+
+	dyld_register(_u2, &button);
+	dyld_register(_u2, &gpio);
+	dyld_register(_u2, &led);
+	dyld_register(_u2, &spi);
+	dyld_register(_u2, &uart0);
+	dyld_register(_u2, &wdt);
 
 	/* Use USB debug as STDOUT. */
 	FILE debug_f = FDEV_SETUP_STREAM(debug_putchar, NULL, _FDEV_SETUP_RW);

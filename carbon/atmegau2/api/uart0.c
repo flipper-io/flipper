@@ -37,7 +37,7 @@ failure:
 	return lf_error;
 }
 
-uint8_t uart0_buffer[256];
+uint8_t uart0_buffer[64];
 uint8_t idx = 0;
 
 LF_FUNC("uart0") int uart0_pull(void *destination, lf_size_t length) {

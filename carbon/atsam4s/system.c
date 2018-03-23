@@ -1,8 +1,6 @@
 #include <flipper/uart0.h>
 #include <os/loader.h>
 
-struct _lf_device THIS_DEVICE;
-
 /* Buffer space for incoming message runtime packets. */
 struct _fmr_packet packet;
 

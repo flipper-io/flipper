@@ -7,8 +7,6 @@
 #include <flipper/error.h>
 #include <flipper/ll.h>
 
-extern struct _lf_device THIS_DEVICE;
-
 /* The size of a single FMR packet expressed in bytes. */
 #define FMR_PACKET_SIZE 64
 /* The magic number that indicates the start of a packet. */
@@ -79,7 +77,7 @@ typedef uint8_t lf_type;
 /* ~ Parser macros for variables. */
 
 /* Creates an 'lf_va' from an 'lf_type' and an immediate value. */
-#define lf_intx(type, arg) (lf_type)type, (lf_arg)arg
+#define lf_intx(type, arg) (lf_type)type, (lf_arg)(uintptr_t)arg
 /* Gives the 'lf_va' for a given integer's value. */
 #define lf_int(arg) lf_intx(lf_int_t, arg)
 /* Gives the 'lf_va' for a given 8-bit integer's value. */

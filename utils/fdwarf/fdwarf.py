@@ -107,7 +107,7 @@ $FUNCTIONS$
 			functs.append(str(f) + ";")
 			tags.append("_" + f.name)
 			struct.append("%s (*%s)(%s);" % (f.type, f.name, ", ".join(map(str, f.parameters))))
-		ctemplate = ctemplate.replace("$FUNCTIONPROTOS$", "\n\t".join(functs))
+		ctemplate = ctemplate.replace("$FUNCTIONPROTOS$", "\n".join(functs))
 		ctemplate = ctemplate.replace("$STRUCTDEF$", "\t" + "\n\t".join(struct))
 		ctemplate = ctemplate.replace("$TAGS$", ", ".join(tags))
 
@@ -120,7 +120,10 @@ $FUNCTIONS$
 			for p in f.parameters:
 				args.append("lf_infer(%s)" % p.name)
 			retl = ["lf_void_t", "", "lf_int8_t", "lf_int16_t", "", "lf_int32_t"]
-			statement = "lf_invoke(lf_get_current_device(), \"$MODULE$\", %s, %s, lf_args(%s));" % ("_" + f.name, retl[f.ret + 1], ", ".join(args))
+			lf_args = "lf_args(%s)" % ", ".join(args)
+			if len(args) == 0:
+				lf_args = "NULL"
+			statement = "lf_invoke(lf_get_current_device(), \"$MODULE$\", %s, %s, %s);" % ("_" + f.name, retl[f.ret + 1], lf_args)
 			if f.type == "void":
 				body = statement
 			else:
