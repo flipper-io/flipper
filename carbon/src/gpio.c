@@ -3,9 +3,9 @@
 enum { _gpio_read, _gpio_write, _gpio_enable, _gpio_configure };
 
 uint32_t gpio_read(uint32_t mask);
-	void gpio_write(uint32_t set, uint32_t clear);
-	void gpio_enable(uint32_t enable, uint32_t disable);
-	int gpio_configure(void);
+void gpio_write(uint32_t set, uint32_t clear);
+void gpio_enable(uint32_t enable, uint32_t disable);
+int gpio_configure(void);
 
 void *gpio_interface[] = {
 	&gpio_read,

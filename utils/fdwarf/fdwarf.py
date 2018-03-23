@@ -123,7 +123,15 @@ $FUNCTIONS$
 			lf_args = "lf_args(%s)" % ", ".join(args)
 			if len(args) == 0:
 				lf_args = "NULL"
-			statement = "lf_invoke(lf_get_current_device(), \"$MODULE$\", %s, %s, %s);" % ("_" + f.name, retl[f.ret + 1], lf_args)
+			invoke_statement = "lf_invoke(lf_get_current_device(), \"$MODULE$\", %s, %s, %s);" % ("_" + f.name, retl[f.ret + 1], lf_args)
+			push_statement = "lf_push(lf_get_current_device(), \"$MODULE$\", %s, %s, length, %s);" % ("_" + f.name, "source", lf_args)
+			pull_statement = "lf_pull(lf_get_current_device(), \"$MODULE$\", %s, %s, length, %s);" % ("_" + f.name, "destination", lf_args)
+			if f.name.endswith("_push"):
+				statement = push_statement
+			elif f.name.endswith("pull"):
+				statement = pull_statement
+			else:
+				statement = invoke_statement
 			if f.type == "void":
 				body = statement
 			else:

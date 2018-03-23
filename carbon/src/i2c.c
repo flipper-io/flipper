@@ -3,10 +3,10 @@
 enum { _i2c_stop, _i2c_write, _i2c_read, _i2c_configure, _i2c_start_read };
 
 void i2c_stop(void);
-	void i2c_write(uint8_t byte);
-	uint8_t i2c_read(void);
-	int i2c_configure(void);
-	void i2c_start_read(uint8_t address, uint8_t length);
+void i2c_write(uint8_t byte);
+uint8_t i2c_read(void);
+int i2c_configure(void);
+void i2c_start_read(uint8_t address, uint8_t length);
 
 void *i2c_interface[] = {
 	&i2c_stop,

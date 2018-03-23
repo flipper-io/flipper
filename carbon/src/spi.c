@@ -3,14 +3,14 @@
 enum { _spi_pull, _spi_push, _spi_get, _spi_put, _spi_end, _spi_ready, _spi_disable, _spi_enable, _spi_configure };
 
 int spi_pull(void* destination, uint32_t length);
-	int spi_push(void* source, uint32_t length);
-	uint8_t spi_get(void);
-	void spi_put(uint8_t byte);
-	void spi_end(void);
-	uint8_t spi_ready(void);
-	void spi_disable(void);
-	void spi_enable(void);
-	int spi_configure(void);
+int spi_push(void* source, uint32_t length);
+uint8_t spi_get(void);
+void spi_put(uint8_t byte);
+void spi_end(void);
+uint8_t spi_ready(void);
+void spi_disable(void);
+void spi_enable(void);
+int spi_configure(void);
 
 void *spi_interface[] = {
 	&spi_pull,
@@ -27,11 +27,11 @@ void *spi_interface[] = {
 LF_MODULE(spi, "spi", spi_interface);
 
 LF_WEAK int spi_pull(void* destination, uint32_t length) {
-	return lf_invoke(lf_get_current_device(), "spi", _spi_pull, lf_int32_t, lf_args(lf_infer(destination), lf_infer(length)));
+	return lf_pull(lf_get_current_device(), "spi", _spi_pull, destination, length, lf_args(lf_infer(destination), lf_infer(length)));
 }
 
 LF_WEAK int spi_push(void* source, uint32_t length) {
-	return lf_invoke(lf_get_current_device(), "spi", _spi_push, lf_int32_t, lf_args(lf_infer(source), lf_infer(length)));
+	return lf_push(lf_get_current_device(), "spi", _spi_push, source, length, lf_args(lf_infer(source), lf_infer(length)));
 }
 
 LF_WEAK uint8_t spi_get(void) {

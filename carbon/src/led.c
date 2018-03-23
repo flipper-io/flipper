@@ -3,7 +3,7 @@
 enum { _led_rgb, _led_configure };
 
 void led_rgb(uint8_t r, uint8_t g, uint8_t b);
-	int led_configure(void);
+int led_configure(void);
 
 void *led_interface[] = {
 	&led_rgb,

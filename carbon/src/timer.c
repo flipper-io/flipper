@@ -3,7 +3,7 @@
 enum { _timer_register, _timer_configure };
 
 int timer_register(uint32_t ticks, void* callback);
-	int timer_configure(void);
+int timer_configure(void);
 
 void *timer_interface[] = {
 	&timer_register,
