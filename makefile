@@ -173,6 +173,7 @@ X86_CFLAGS   := -std=gnu99              \
                 -Wno-unused-parameter   \
                 -fpic                   \
                 -DPOSIX                 \
+				-D__LF_DEBUG__          \
 				$(shell pkg-config --cflags-only-I libusb-1.0)
 
 X86_LDFLAGS  := $(shell pkg-config --libs libusb-1.0)

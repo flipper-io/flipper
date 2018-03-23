@@ -73,10 +73,11 @@ def current_device():
 
 def lf_ll_from_list(l):
 	ll = c_void_p(0)
-	for i in l:
-		libflipper.lf_arg_create.restype = c_void_p
-		arg = libflipper.lf_arg_create(c_byte(i.type), c_ulonglong(i.value))
-		libflipper.lf_ll_append(byref(ll), c_void_p(arg), libflipper.lf_arg_release)
+	if l:
+		for i in l:
+			libflipper.lf_arg_create.restype = c_void_p
+			arg = libflipper.lf_arg_create(c_byte(i.type), c_ulonglong(i.value))
+			libflipper.lf_ll_append(byref(ll), c_void_p(arg), libflipper.lf_arg_release)
 	return ll
 
 def getModule(name):

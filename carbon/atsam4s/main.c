@@ -53,7 +53,7 @@ int main(void) {
 	/* Allow the reset pin to reset the device. */
 	RSTC->RSTC_MR = RSTC_MR_KEY_PASSWD | RSTC_MR_URSTEN;
 
-	struct _lf_device *_4s = lf_device_create("atmegau2", NULL);
+	struct _lf_device *_4s = lf_device_create("atmegau2", (void *)0xdeadbeef);
 	lf_attach(_4s);
 
 	extern struct _lf_module adc;

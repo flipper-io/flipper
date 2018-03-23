@@ -8,7 +8,7 @@ struct _lf_endpoint *lf_endpoint_create(int (* configure)(struct _lf_endpoint *e
 										int (* pull)(struct _lf_endpoint *endpoint, void *destination, lf_size_t length),
 										int (* destroy)(struct _lf_endpoint *endpoint),
 										size_t ctx_size) {
-	lf_assert(configure && ready && push && pull && destroy, failure, E_NULL, "NULL function provided to '%s'.", __PRETTY_FUNCTION__);
+	lf_assert(configure && ready && push && pull, failure, E_NULL, "NULL function provided to '%s'.", __PRETTY_FUNCTION__);
 	struct _lf_endpoint *endpoint = calloc(1, sizeof(struct _lf_endpoint));
 	lf_assert(endpoint, failure, E_MALLOC, "Failed to allocate memory for new endpoint.");
 	endpoint->configure = configure;
