@@ -273,6 +273,14 @@ uninstall-utils:
 	$(_v)rm $(PREFIX)/bin/fdebug
 	$(_v)rm $(PREFIX)/bin/fload
 
+# --- TESTS --- #
+
+.PHONY: test
+
+test: libflipper
+	$(_v)$(X86_CC) $(X86_CFLAGS) -Itests/include -o $(BUILD)/test $(call find_srcs, tests/src) -L$(BUILD)/$(X86_TARGET) -lflipper
+	$(_v)./$(BUILD)/test
+
 # --- LANGUAGES --- #
 
 install-python:
