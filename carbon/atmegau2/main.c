@@ -52,7 +52,7 @@ int main(void) {
 	PCMSK1 |= (1 << PCINT8);
 	PCICR |= (1 << PCIE1);
 
-	struct _lf_device *_u2 = lf_device_create("atmegau2", NULL);
+	struct _lf_device *_u2 = lf_device_create("atmegau2", (void *)0xdeadbeef);
 	lf_attach(_u2);
 
 	extern struct _lf_module button;
@@ -69,11 +69,11 @@ int main(void) {
 	dyld_register(_u2, &uart0);
 	dyld_register(_u2, &wdt);
 
+	usb_configure();
+
 	/* Use USB debug as STDOUT. */
 	FILE debug_f = FDEV_SETUP_STREAM(debug_putchar, NULL, _FDEV_SETUP_RW);
 	stdout = &debug_f;
-
-	led_rgb(LED_GREEN);
 
 	TCCR1B |= (1 << WGM12);
 	OCR1A = 15625; // 1s
@@ -82,6 +82,8 @@ int main(void) {
 
 	/* Bring the 4S out of reset. */
 	SAM_POWER_PORT |= (1 << SAM_RESET_PIN);
+
+	led_rgb(LED_GREEN);
 
 	/* Run the main loop. */
 	loop();

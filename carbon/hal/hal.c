@@ -24,11 +24,6 @@
 #include <flipper/posix/usb.h>
 #include <flipper/posix/network.h>
 
-struct _lf_device *carbon_get_u2(struct _lf_device *device) {
-	struct _carbon_context *ctx = (struct _carbon_context *)device->_ctx;
-	return ctx->_u2;
-}
-
 struct _lf_device *carbon_attach_endpoint(struct _lf_endpoint *endpoint, struct _lf_device *_u2, struct _lf_device *_4s) {
 	/* Create the parent carbon device. */
 	struct _lf_device *carbon = lf_device_create("carbon", endpoint);
@@ -40,8 +35,9 @@ struct _lf_device *carbon_attach_endpoint(struct _lf_endpoint *endpoint, struct 
 	context->_u2 = _u2;
 	context->_4s = _4s;
 	/* Attach to the new carbon device. */
-	lf_attach(carbon);
-	return carbon;
+#warning Attach to carbon instead!
+	lf_attach(_u2);
+	return _u2;
 }
 
 int uart0_bridge_configure(struct _lf_endpoint *endpoint, void *_configuration) {

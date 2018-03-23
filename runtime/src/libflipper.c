@@ -48,6 +48,8 @@ int __attribute__((__destructor__)) lf_exit(void) {
 	return lf_success;
 }
 
+#ifdef __LF_DEBUG__
+
 /* Debugging functions for displaying the contents of various FMR related data structures. */
 
 void lf_debug_call(struct _fmr_invocation *call) {
@@ -128,3 +130,5 @@ void lf_debug_result(struct _fmr_result *result) {
 	printf("\t└─ error:\t0x%hhx\n", result->error);
 	printf("\n-----------\n\n");
 }
+
+#endif
