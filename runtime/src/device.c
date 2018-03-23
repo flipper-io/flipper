@@ -7,7 +7,9 @@ struct _lf_device *lf_device_create(char *name, struct _lf_endpoint *endpoint) {
 	lf_assert(endpoint, failure, E_NULL, "NULL endpoint provided to '%s'.", __PRETTY_FUNCTION__);
 	device = (struct _lf_device *)calloc(1, sizeof(struct _lf_device));
 	lf_assert(device, failure, E_MALLOC, "Failed to allocate memory for new device.");
-	device->name = strdup(name);
+	size_t len = strlen(name) + 1;
+	device->name = malloc(len);
+	strcpy(device->name, name);
 	device->endpoint = endpoint;
 	return device;
 failure:

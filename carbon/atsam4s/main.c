@@ -53,39 +53,42 @@ int main(void) {
 	/* Allow the reset pin to reset the device. */
 	RSTC->RSTC_MR = RSTC_MR_KEY_PASSWD | RSTC_MR_URSTEN;
 
-	// extern struct _lf_module adc;
-	// extern struct _lf_module button;
-	// extern struct _lf_module dac;
-	// extern struct _lf_module gpio;
-	// extern struct _lf_module i2c;
-	// extern struct _lf_module led;
-	// extern struct _lf_module pwm;
-	// extern struct _lf_module rtc;
-	// extern struct _lf_module spi;
-	// extern struct _lf_module swd;
-	// extern struct _lf_module temp;
-	// extern struct _lf_module timer;
-	// extern struct _lf_module uart0;
-	// extern struct _lf_module usart;
-	// extern struct _lf_module usb;
-	// extern struct _lf_module wdt;
-	
-	// dyld_register(&THIS_DEVICE, &adc);
-	// dyld_register(&THIS_DEVICE, &button);
-	// dyld_register(&THIS_DEVICE, &dac);
-	// dyld_register(&THIS_DEVICE, &gpio);
-	// dyld_register(&THIS_DEVICE, &i2c);
-	// dyld_register(&THIS_DEVICE, &led);
-	// dyld_register(&THIS_DEVICE, &pwm);
-	// dyld_register(&THIS_DEVICE, &rtc);
-	// dyld_register(&THIS_DEVICE, &spi);
-	// dyld_register(&THIS_DEVICE, &swd);
-	// dyld_register(&THIS_DEVICE, &temp);
-	// dyld_register(&THIS_DEVICE, &timer);
-	// dyld_register(&THIS_DEVICE, &uart0);
-	// dyld_register(&THIS_DEVICE, &usart);
-	// dyld_register(&THIS_DEVICE, &usb);
-	// dyld_register(&THIS_DEVICE, &wdt);
+	struct _lf_device *_4s = lf_device_create("atmegau2", NULL);
+	lf_attach(_4s);
+
+	extern struct _lf_module adc;
+	extern struct _lf_module button;
+	extern struct _lf_module dac;
+	extern struct _lf_module gpio;
+	extern struct _lf_module i2c;
+	extern struct _lf_module led;
+	extern struct _lf_module pwm;
+	extern struct _lf_module rtc;
+	extern struct _lf_module spi;
+	extern struct _lf_module swd;
+	extern struct _lf_module temp;
+	extern struct _lf_module timer;
+	extern struct _lf_module uart0;
+	extern struct _lf_module usart;
+	extern struct _lf_module usb;
+	extern struct _lf_module wdt;
+
+	dyld_register(_4s, &adc);
+	dyld_register(_4s, &button);
+	dyld_register(_4s, &dac);
+	dyld_register(_4s, &gpio);
+	dyld_register(_4s, &i2c);
+	dyld_register(_4s, &led);
+	dyld_register(_4s, &pwm);
+	dyld_register(_4s, &rtc);
+	dyld_register(_4s, &spi);
+	dyld_register(_4s, &swd);
+	dyld_register(_4s, &temp);
+	dyld_register(_4s, &timer);
+	dyld_register(_4s, &uart0);
+	dyld_register(_4s, &usart);
+	dyld_register(_4s, &usb);
+	dyld_register(_4s, &wdt);
 
 	/* Enable the FSI pin. */
 	gpio_enable(FMR_PIN, 0);

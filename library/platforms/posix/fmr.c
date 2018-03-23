@@ -1,7 +1,5 @@
 #include <flipper.h>
 
-LF_WEAK struct _lf_device THIS_DEVICE;
-
 LF_WEAK lf_return_t fmr_call(lf_return_t (* function)(void), lf_type ret, uint8_t argc, uint16_t argt, void *argv) {
 	return -1;
 }

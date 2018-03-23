@@ -13,24 +13,6 @@ int main(int argc, char *argv[]) {
 
 	//lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
 
-	if (argc > 1) {
-		char *lib = argv[1];
-		char *module, **modules = &argv[2];
-		while ((module = *modules++)) {
-			lf_debug("Loading module '%s' from '%s'.", module, lib);
-			void *dlm = dlopen(lib, RTLD_LAZY);
-			lf_assert(dlm, failure, E_NULL, "Failed to open module '%s'.", lib);
-			struct _lf_module *m = dlsym(dlm, module);
-			lf_assert(m, failure, E_NULL, "Failed to read module '%s' from '%s'.", module, lib);
-			lf_debug("Successfully loaded module '%s'.", module);
-			int _e = dyld_register(&THIS_DEVICE, m);
-			lf_assert(_e == lf_success, failure, E_NULL, "Failed to register module '%s'.", m->name);
-			lf_debug("Successfully registered module '%s'.", module);
-		}
-	}
-
-	THIS_DEVICE.name = "fvm";
-
 	/* Create a UDP server. */
 	struct sockaddr_in addr;
 	int sd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -60,6 +42,9 @@ int main(int argc, char *argv[]) {
 	context = (struct _lf_network_context *)nep->_ctx;
 	context->fd = sd;
 
+	struct _lf_device *fvm = lf_device_create("fvm", nep);
+	lf_attach(fvm);
+
 	printf("Flipper Virtual Machine (FVM) v0.1.0\nListening on 'localhost'.\n\n");
 
 	extern struct _lf_module adc;
@@ -79,22 +64,39 @@ int main(int argc, char *argv[]) {
 	extern struct _lf_module usb;
 	extern struct _lf_module wdt;
 
-	dyld_register(&THIS_DEVICE, &adc);
-	dyld_register(&THIS_DEVICE, &button);
-	dyld_register(&THIS_DEVICE, &dac);
-	dyld_register(&THIS_DEVICE, &gpio);
-	dyld_register(&THIS_DEVICE, &i2c);
-	dyld_register(&THIS_DEVICE, &led);
-	dyld_register(&THIS_DEVICE, &pwm);
-	dyld_register(&THIS_DEVICE, &rtc);
-	dyld_register(&THIS_DEVICE, &spi);
-	dyld_register(&THIS_DEVICE, &swd);
-	dyld_register(&THIS_DEVICE, &temp);
-	dyld_register(&THIS_DEVICE, &timer);
-	dyld_register(&THIS_DEVICE, &uart0);
-	dyld_register(&THIS_DEVICE, &usart);
-	dyld_register(&THIS_DEVICE, &usb);
-	dyld_register(&THIS_DEVICE, &wdt);
+	dyld_register(fvm, &adc);
+	dyld_register(fvm, &button);
+	dyld_register(fvm, &dac);
+	dyld_register(fvm, &gpio);
+	dyld_register(fvm, &i2c);
+	dyld_register(fvm, &led);
+	dyld_register(fvm, &pwm);
+	dyld_register(fvm, &rtc);
+	dyld_register(fvm, &spi);
+	dyld_register(fvm, &swd);
+	dyld_register(fvm, &temp);
+	dyld_register(fvm, &timer);
+	dyld_register(fvm, &uart0);
+	dyld_register(fvm, &usart);
+	dyld_register(fvm, &usb);
+	dyld_register(fvm, &wdt);
+
+	if (argc > 1) {
+		char *lib = argv[1];
+		char *module, **modules = &argv[2];
+		while ((module = *modules++)) {
+			lf_debug("Loading module '%s' from '%s'.", module, lib);
+			void *dlm = dlopen(lib, RTLD_LAZY);
+			lf_assert(dlm, failure, E_NULL, "Failed to open module '%s'.", lib);
+			struct _lf_module *m = dlsym(dlm, module);
+			lf_assert(m, failure, E_NULL, "Failed to read module '%s' from '%s'.", module, lib);
+			lf_debug("Successfully loaded module '%s'.", module);
+			int _e = dyld_register(lf_get_current_device(), m);
+			lf_assert(_e == lf_success, failure, E_NULL, "Failed to register module '%s'.", m->name);
+			lf_debug("Successfully registered module '%s'.", module);
+		}
+		printf("\n");
+	}
 
 	while (1) {
 		struct _fmr_packet packet;

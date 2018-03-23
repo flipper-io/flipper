@@ -1,8 +1,6 @@
 #include <flipper.h>
 #include <flipper/atmegau2/megausb.h>
 
-struct _lf_device THIS_DEVICE;
-
 lf_return_t fmr_push(struct _fmr_push_pull_packet *packet) {
 	int retval;
 	void *swap = malloc(packet->length);

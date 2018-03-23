@@ -75,7 +75,7 @@ failure:
 
 lf_return_t fmr_execute(lf_module module, lf_function function, lf_type ret, lf_argc argc, lf_types argt, void *arguments) {
 	/* Dereference the pointer to the target module. */
-	struct _lf_module *m = lf_ll_item(THIS_DEVICE.modules, module);
+	struct _lf_module *m = lf_ll_item(lf_get_current_device()->modules, module);
 	/* Dereference and return a pointer to the target function. */
 	void *address = m->interface[function];
 	/* Ensure that the function address is valid. */
@@ -88,7 +88,7 @@ failure:
 
 lf_return_t fmr_dyld(struct _fmr_dyld_packet *packet) {
 	lf_debug("Trying to find module '%s'.", packet->module);
-	struct _lf_module *module = dyld_module(&THIS_DEVICE, packet->module);
+	struct _lf_module *module = dyld_module(lf_get_current_device(), packet->module);
 	lf_assert(module, failure, E_MODULE, "No module '%s' has been registered.", packet->module);
 	return module->idx;
 failure:
