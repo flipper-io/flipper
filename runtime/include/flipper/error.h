@@ -49,6 +49,7 @@ enum {
 	E_INVALID_TASK,
 	E_SUBCLASS,
 	E_UNIMPLEMENTED,
+	E_TEST,
 
 	/* uart0 */
 	E_UART0_PUSH_TIMEOUT,
@@ -88,6 +89,7 @@ enum {
 								 "invalid task specified", \
 								 "packet subclass error", \
 								 "unimplemented error",	\
+								 "test failed", \
 								 "uart0 push timeout", \
 								 "uart0 pull timeout"
 
@@ -102,7 +104,7 @@ enum {
 #endif
 
 /* Prevents the execution of a statement from producing error-related side effects. */
-#define suppress_errors(statement) lf_error_pause(); statement; lf_error_resume();
+#define lf_try(statement) lf_error_pause(); statement; lf_error_resume();
 
 extern int lf_debug_level;
 
