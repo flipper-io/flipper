@@ -94,6 +94,23 @@ int main(void) {
 	dyld_register(_4s, &usb);
 	dyld_register(_4s, &wdt);
 
+	adc_configure();
+	button_configure();
+	dac_configure();
+	gpio_configure();
+	i2c_configure();
+	led_configure();
+	pwm_configure();
+	rtc_configure();
+	spi_configure();
+	swd_configure();
+	temp_configure();
+	timer_configure();
+	uart0_configure();
+	usart_configure();
+	usb_configure();
+	wdt_configure();
+
 	/* Enable the FSI pin. */
 	gpio_enable(FMR_PIN, 0);
 	gpio_write(0, FMR_PIN);
