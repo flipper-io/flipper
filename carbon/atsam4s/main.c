@@ -14,8 +14,12 @@ int debug_putchar(char c, FILE *stream) {
 }
 
 void os_kernel_task(void) {
+	gpio_enable(IO_1, 0);
 	while (1) {
 		printf("Hello!\n");
+		gpio_write(IO_1, 0);
+		for (int i = 0x1FFFFFC; i > 0; i --) __asm__ __volatile__ ("nop");
+		gpio_write(0, IO_1);
 		for (int i = 0x1FFFFFC; i > 0; i --) __asm__ __volatile__ ("nop");
 	}
 }

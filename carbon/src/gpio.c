@@ -17,7 +17,7 @@ void *gpio_interface[] = {
 LF_MODULE(gpio, "gpio", gpio_interface);
 
 LF_WEAK uint32_t gpio_read(uint32_t mask) {
-	return lf_invoke(lf_get_current_device(), "gpio", _gpio_read, lf_void_t, lf_args(lf_infer(mask)));
+	return lf_invoke(lf_get_current_device(), "gpio", _gpio_read, lf_int32_t, lf_args(lf_infer(mask)));
 }
 
 LF_WEAK void gpio_write(uint32_t set, uint32_t clear) {

@@ -78,4 +78,12 @@ int carbon_attach(void);
 /* Attaches to a carbon device over the network. */
 struct _lf_device *carbon_attach_hostname(char *hostname);
 
+struct _lf_device *carbon_select_4s(struct _lf_device *device);
+struct _lf_device *carbon_select_u2(struct _lf_device *device);
+
+void sam_reset(void);
+int sam_enter_dfu(void);
+int sam_off(void);
+int sam_on(void);
+
 #endif

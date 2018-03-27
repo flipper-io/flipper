@@ -47,37 +47,33 @@ def get_name(cu, die):
 	print("Fatal: Encountered nameless subprogram at offset %s in CU %s" % (hex(die.offset), cu.get_top_DIE().attributes["DW_AT_name"].value))
 	print(die)
 
+def get_bytesize(cu, die):
+	while "DW_AT_abstract_origin" in die.attributes:
+		die = get_die_at_offset(cu, die.attributes["DW_AT_abstract_origin"].value)
+	if "DW_AT_type" in die.attributes:
+		tdie = get_die_at_offset(cu, die.attributes["DW_AT_type"].value)
+		while tdie.tag == "DW_TAG_typedef":
+			tdie = get_die_at_offset(cu, tdie.attributes["DW_AT_type"].value)
+		if "DW_AT_byte_size" in tdie.attributes:
+			return tdie.attributes["DW_AT_byte_size"].value
+	return -1
+
 def get_type(cu, die):
 	while "DW_AT_abstract_origin" in die.attributes:
 		die = get_die_at_offset(cu, die.attributes["DW_AT_abstract_origin"].value)
 	if "DW_AT_type" in die.attributes:
 		tdie = get_die_at_offset(cu, die.attributes["DW_AT_type"].value)
-		# while tdie.tag == "DW_TAG_typedef":
-		# 	tdie = get_die_at_offset(cu, tdie.attributes["DW_AT_type"].value)
 		if "DW_AT_name" in tdie.attributes:
 			return tdie.attributes["DW_AT_name"].value.decode("utf-8")
 		else:
 			return "void*"
 	return "void"
 
-def get_size(cu, die):
-	while "DW_AT_abstract_origin" in die.attributes:
-		die = get_die_at_offset(cu, die.attributes["DW_AT_abstract_origin"].value)
-	if "DW_AT_type" in die.attributes:
-		tdie = get_die_at_offset(cu, die.attributes["DW_AT_type"].value)
-		# while tdie.tag == "DW_TAG_typedef":
-		# 	tdie = get_die_at_offset(cu, tdie.attributes["DW_AT_type"].value)
-		if "DW_AT_byte_size" in tdie.attributes:
-			return tdie.attributes["DW_AT_byte_size"].value
-	return -1 # void
-
 def get_parameters_from_die(cu, die):
 	parameters = []
 	for child in die.iter_children():
 		if child.tag == "DW_TAG_formal_parameter":
-			name = get_name(cu, child)
-			type = get_type(cu, child)
-			p = Parameter(type, name)
+			p = Parameter(get_type(cu, child), get_name(cu, child))
 			parameters.append(p)
 	return parameters
 
@@ -123,15 +119,12 @@ $FUNCTIONS$
 			lf_args = "lf_args(%s)" % ", ".join(args)
 			if len(args) == 0:
 				lf_args = "NULL"
-			invoke_statement = "lf_invoke(lf_get_current_device(), \"$MODULE$\", %s, %s, %s);" % ("_" + f.name, retl[f.ret + 1], lf_args)
-			push_statement = "lf_push(lf_get_current_device(), \"$MODULE$\", %s, %s, length, %s);" % ("_" + f.name, "source", lf_args)
-			pull_statement = "lf_pull(lf_get_current_device(), \"$MODULE$\", %s, %s, length, %s);" % ("_" + f.name, "destination", lf_args)
 			if f.name.endswith("_push"):
-				statement = push_statement
+				statement = "lf_push(lf_get_current_device(), \"$MODULE$\", %s, %s, length, %s);" % ("_" + f.name, "source", lf_args)
 			elif f.name.endswith("pull"):
-				statement = pull_statement
+				statement = "lf_pull(lf_get_current_device(), \"$MODULE$\", %s, %s, length, %s);" % ("_" + f.name, "destination", lf_args)
 			else:
-				statement = invoke_statement
+				statement = "lf_invoke(lf_get_current_device(), \"$MODULE$\", %s, %s, %s);" % ("_" + f.name, retl[f.ret + 1], lf_args)
 			if f.type == "void":
 				body = statement
 			else:
@@ -166,11 +159,11 @@ def get_modules(elffile, dwarfinfo):
 					address = child.attributes["DW_AT_low_pc"].value
 					for module in modules:
 						if address in range(module.start, module.end):
-							name = get_name(cu, child)
-							type = get_type(cu, child)
-							size = get_size(cu, child)
 							params = get_parameters_from_die(cu, child)
-							module.funcs.append(Function(type, name, size, params))
+							type = get_type(cu, child)
+							name = get_name(cu, child)
+							bs = get_bytesize(cu, child)
+							module.funcs.append(Function(type, name, bs, params))
 							break
 	return modules
 

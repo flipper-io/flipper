@@ -64,87 +64,52 @@ uint8_t applet[] = {
 /* Defines the number of times communication will be retried. */
 #define RETRIES 4
 
-bool sam_ready(void) {
-	return uart0_ready();
-}
-
-void sam_put(uint8_t c) {
-	uart0_push(&c, 1);
-}
-
-uint8_t sam_get(void) {
-	uint8_t c;
-	uart0_pull(&c, 1);
-	return c;
-}
-
-void sam_push(void *source, size_t len) {
-	uart0_push(source, len);
-}
-
-void sam_pull(void *destination, size_t len) {
-	uart0_pull(destination, len);
-}
-
-#define SAM_RESET_PIN 0x04
-
-void sam_reset() {
-	// gpio.write(0, (1 << SAM_RESET_PIN));
-	// usleep(10000);
-	// gpio.write((1 << SAM_RESET_PIN), 0);
-}
-
-#define SAM_ERASE_PIN 0x06
-
-int sam_enter_dfu(void) {
-	// gpio.write((1 << SAM_ERASE_PIN), 0);
-	// usleep(8000000);
-	// gpio.write(0, (1 << SAM_ERASE_PIN));
-	// sam_reset();
-	return lf_success;
-}
-
 /* Instructs the SAM-BA to jump to the given address. */
 void sam_ba_jump(uint32_t address) {
 	char buffer[11];
 	sprintf(buffer, "G%08X#", address);
-	sam_push(buffer, sizeof(buffer) - 1);
+	uart0_push(buffer, sizeof(buffer) - 1);
 }
 
 /* Instructs the SAM-BA to write a word to the address provided. */
 void sam_ba_write_word(uint32_t destination, uint32_t word) {
 	char buffer[20];
 	sprintf(buffer, "W%08X,%08X#", destination, word);
-	sam_push(buffer, sizeof(buffer) - 1);
+	uart0_push(buffer, sizeof(buffer) - 1);
 }
 
 /* Instructs the SAM-BA to read a byte from the address provided. */
 uint8_t sam_ba_read_byte(uint32_t source) {
 	char buffer[12];
 	sprintf(buffer, "o%08X,#", source);
-	sam_push(buffer, sizeof(buffer) - 1);
+	uart0_push(buffer, sizeof(buffer) - 1);
 	uint32_t retries = 0;
-	while(!sam_ready() && retries ++ < 8);
-	return sam_get();
+	while(!uart0_ready() && retries ++ < 8);
+	return uart0_get();
 }
 
 /* Instructs the SAM-BA to write a byte from the address provided. */
 void sam_ba_write_byte(uint32_t destination, uint8_t byte) {
 	char buffer[20];
 	sprintf(buffer, "O%08X,%02X#", destination, byte);
-	sam_push(buffer, sizeof(buffer) - 1);
+	uart0_push(buffer, sizeof(buffer) - 1);
 }
 
 /* Instructs the SAM-BA to read a word from the address provided. */
 uint32_t sam_ba_read_word(uint32_t source) {
 	char buffer[12];
 	sprintf(buffer, "w%08X,#", source);
-	sam_push(buffer, sizeof(buffer) - 1);
+	uart0_push(buffer, sizeof(buffer) - 1);
 	uint8_t retries = 0;
-	while(!sam_ready() && retries ++ < 8);
+	while(!uart0_ready() && retries ++ < 8);
 	uint32_t result = 0;
-	sam_pull(&result, sizeof(uint32_t));
+	uart0_pull(&result, sizeof(uint32_t));
 	return result;
+}
+
+/* Drains the data in the uart0 buffer. */
+void uart0_drain(void) {
+	while (!uart0_ready()) (void)uart0_get();
 }
 
 /* Writes the given command and argument into the EFC0->EEFC_FCR register. */
@@ -154,24 +119,24 @@ void sam_ba_write_efc_fcr(uint8_t command, uint32_t arg) {
 
 /* Moves data from the host to the device's RAM using the SAM-BA and XMODEM protocol. */
 int sam_ba_copy(uint32_t destination, void *source, uint32_t length) {
-	/* Initialize the transfer. */
+
 	char buffer[20];
+	uart0_reset();
 	sprintf(buffer, "S%08X,%08X#", destination, length);
-	sam_push(buffer, sizeof(buffer) - 1);
-	uint8_t retries = 0;
-	while(!sam_ready() && retries ++ < 8);
-	/* Check for the clear to send byte. */
-	if (sam_get() != 'C') {
-		return lf_error;
-	}
-	retries = 0;
+	uart0_push(buffer, sizeof(buffer) - 1);
+
 	/* Calculate the number of packets needed to perform the transfer. */
 	int packets = lf_ceiling(length, XLEN);
 	for (int packet = 0; packet < packets; packet ++) {
+
+
+		uart0_reset();
+
 		uint32_t _len = XLEN;
 		if (length < _len) {
 			_len = length;
 		}
+
 		/* Construct the XMODEM packet. */
 		struct _xpacket _packet = { SOH, (packet + 1), ~(packet + 1), { 0 }, 0x00 };
 		/* Copy the chunk of data into the packet. */
@@ -179,25 +144,23 @@ int sam_ba_copy(uint32_t destination, void *source, uint32_t length) {
 		/* Calculate the checksum of the data and write it to the packet in little endian format. */
 		_packet.checksum = little(lf_crc(_packet.data, sizeof(_packet.data)));
 		/* Transfer the packet to the SAM-BA. */
-		sam_push(&_packet, sizeof(struct _xpacket));
-		/* Obtain acknowledgement. */
-		retries = 0;
-		while(!sam_ready() && retries ++ < 8);
-		if (sam_get() != ACK) {
-			return lf_error;
-		}
+		uart0_push(&_packet, sizeof(struct _xpacket));
+
+		lf_assert(uart0_get() == ACK, failure, E_UNIMPLEMENTED, "Failed to get ACK.");
+
 		/* Decrement the length appropriately. */
 		length -= _len;
 	}
+
 	/* Send end of transmission. */
-	sam_put(EOT);
-	/* Obtain acknowledgement. */
-	retries = 0;
-	while(!sam_ready() && retries ++ < 8);
-	if (sam_get() != ACK) {
-		return lf_error;
-	}
+	uart0_put(EOT);
+
+	lf_assert(uart0_get() == ACK, failure, E_UNIMPLEMENTED, "Failed to get EOT ACK.");
+
 	return lf_success;
+
+failure:
+	return lf_error;
 }
 
 void *load_page_data(FILE *firmware, size_t size) {
@@ -219,55 +182,33 @@ void *load_page_data(FILE *firmware, size_t size) {
 	return raw;
 }
 
-int enter_update_mode(void) {
-
-	printf("Entering update mode.\n");
-
-	uint8_t ack[3];
-
-repeat:
-
-	sam_put('#');
-	sam_pull(ack, sizeof(ack));
-	if (!memcmp(ack, (const uint8_t []){ '\n', '\r', '>' }, sizeof(ack))) {
-		goto done;
-	}
-
-	sam_enter_dfu();
-
-	fprintf(stderr, KRED "Failed to enter update mode.\n" KNRM);
-	return lf_error;
-
-	goto repeat;
-
-done:
-	fprintf(stderr, KGRN " Successfully entered update mode.\n" KNRM);
-	return lf_success;
-}
-
 int enter_normal_mode(void) {
+	int tries = 0;
+	char ack[2];
 
-#warning Go to DFU baud here.
+	do {
+		uart0_reset();
+		uart0_push("N#", 2);
+		usleep(1000);
+		uart0_pull(ack, sizeof(ack));
+		if (!memcmp(ack, (const uint8_t []){ '\n', '\r' }, 2)) return lf_success;
 
-	/* Set normal mode. */
-	printf("Entering normal mode.\n");
-	char n_ack[2];
-	uint8_t retries = 0;
-	while(retries++ < 8) {
-		sam_push("N#", 2);
-		sam_pull(n_ack, sizeof(n_ack));
-		if (!memcmp(n_ack, (const uint8_t []){ 0x0A, 0x0D }, sizeof(n_ack))) {
-			printf(KGRN " Successfully entered normal mode.\n" KNRM);
-			return lf_success;
+		/* If we failed the first time around, enter DFU. */
+		if (!tries) {
+			lf_debug("Entering DFU mode.");
+			sam_enter_dfu();
 		}
-		printf("0x%04x\n", *(uint16_t *)(n_ack));
-	}
-	fprintf(stderr, "Failed to enter normal mode.\n");
+
+	} while (tries++ < 4);
+
 	return lf_error;
 }
 
 
 int main(int argc, char *argv[]) {
+
+	void *pagedata = NULL;
+	FILE *firmware = NULL;
 
 	/* Ensure the correct argument count. */
 	if (argc < 2) {
@@ -278,50 +219,36 @@ int main(int argc, char *argv[]) {
 	//lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
 
 	/* Attach to a Flipper device. */
-	flipper.attach();
-#warning Select U2 from the current device.
-
-begin: ;
+	struct _lf_device *device = flipper.attach();
+	carbon_select_u2(device);
 
 	/* Open the firmware image. */
-	FILE *firmware = fopen(argv[1], "rb");
-	if (!firmware) {
-		fprintf(stderr, "The file being opened, '%s', does not exist.\n", argv[1]);
-		return EXIT_FAILURE;
-	}
+	firmware = fopen(argv[1], "rb");
+	lf_assert(firmware, failure, E_UNIMPLEMENTED, "The file being opened, '%s', does not exist.\n", argv[1]);
 
 	/* Determine the size of the file. */
 	fseek(firmware, 0L, SEEK_END);
 	size_t firmware_size = ftell(firmware);
 	fseek(firmware, 0L, SEEK_SET);
 
-	/* Put the CPU in update mode. */
-	int _e = enter_update_mode();
-	if (_e < lf_success) {
-		return EXIT_FAILURE;
-	}
+	/* Reset the 4S. */
+	sam_reset();
 
-	_e = enter_normal_mode();
-	if (_e < lf_success) {
-		return EXIT_FAILURE;
-	}
+	/* Enter normal mode. (Values are sent as binary.)*/
+	lf_debug("Entering normal mode.");
+	lf_assert(enter_normal_mode() == lf_success, failure, E_UNIMPLEMENTED, "Failed to enter normal mode.");
+	lf_debug(KGRN " Successfully entered normal mode." KNRM);
 
-	printf("Checking security bit.\n");
+	/* Ensure the security bit is clear. */
+	lf_debug("Checking security bit.");
 	sam_ba_write_efc_fcr(EEFC_FCR_FCMD_GGPB, 0);
-	if (sam_ba_read_word(REGADDR(EFC0->EEFC_FRR)) & 0x01) {
-		fprintf(stderr, KRED "The device's security bit is set. Please erase again.\n");
-		return EXIT_FAILURE;
-	}
-	printf(KGRN " Security bit is clear.\n" KNRM);
+	lf_assert((sam_ba_read_word(REGADDR(EFC0->EEFC_FRR)) & 0x01) == 0, failure, E_UNIMPLEMENTED, KRED "The device's security bit is set." KNRM);
+	lf_debug(KGRN " Security bit is clear." KNRM);
 
-	printf("Uploading copy applet.\n");
 	/* Move the copy applet into RAM. */
-	_e = sam_ba_copy(_APPLET, applet, sizeof(applet));
-	if (_e < lf_success) {
-		fprintf(stderr, KRED "Failed to upload copy applet.\n" KNRM);
-		return EXIT_FAILURE;
-	}
-	printf(KGRN " Successfully uploaded copy applet.\n" KNRM);
+	lf_debug("Uploading copy applet.");
+	lf_assert(sam_ba_copy(_APPLET, applet, sizeof(applet)) == lf_success, failure, E_UNIMPLEMENTED, KRED "Failed to upload copy applet." KNRM);
+	lf_debug(KGRN " Successfully uploaded copy applet." KNRM);
 
 	/* Write the stack address into the applet. */
 	sam_ba_write_word(_APPLET_STACK, IRAM_ADDR + IRAM_SIZE);
@@ -333,7 +260,7 @@ begin: ;
 	sam_ba_write_word(_APPLET_SOURCE, _PAGEBUFFER);
 
 	/* Obtain a linear buffer of the firmware precalculated by page. */
-	void *pagedata = load_page_data(firmware, firmware_size);
+	pagedata = load_page_data(firmware, firmware_size);
 
 	/* Calculate the number of pages to send. */
 	lf_size_t pages = lf_ceiling(firmware_size, IFLASH0_PAGE_SIZE);
@@ -344,14 +271,13 @@ begin: ;
 		fflush(stdout);
 		/* Copy the page. */
 		int _e = sam_ba_copy(_PAGEBUFFER, (void *)(pagedata + (page * IFLASH0_PAGE_SIZE)), IFLASH0_PAGE_SIZE);
-		if (_e < lf_success) {
-			fprintf(stderr, KRED "\nFailed to upload page %i of %i.\n" KNRM, page + 1, pages);
-			goto done;
-		}
+		lf_assert(_e == lf_success, failure, E_UNIMPLEMENTED, KRED "Failed to upload page %i of %i." KNRM, page + 1, pages);
+
 		/* Write the page number into the applet. */
 		sam_ba_write_word(_APPLET_PAGE, EEFC_FCR_FARG(page));
 		/* Execute the applet to load the page into flash. */
 		sam_ba_jump(_APPLET);
+
 		/* Wait until the EFC has finished writing the page. */
 		uint8_t retries = 0, fsr = 0;
 		while(!((fsr = sam_ba_read_byte(REGADDR(EFC0->EEFC_FSR))) & 1) && retries ++ < 4) {
@@ -359,6 +285,7 @@ begin: ;
 				fprintf(stderr, KRED "Flash write error on page %u.\n" KNRM, page);
 			}
 		}
+
 		retries = 0;
 		/* Clear the progress message. */
 		if (page < pages - 1) printf("\33[2K\r");
@@ -414,44 +341,18 @@ begin: ;
 		}
 	}
 
-done:
-
-	/* Free the memory allocated to store the page data. */
 	free(pagedata);
-
-	printf("Resetting the CPU.\n");
-
+	lf_debug("Resetting the CPU.");
 	sam_reset();
-
-	printf(KGRN " Successfully reset the CPU.\n" KNRM "----------------------");
+	lf_debug(KGRN " Successfully reset the CPU.\n" KNRM "----------------------");
 
 #warning Go back to FMR baud here.
 
-	/* If there were no errors, offer to flash again. */
-	if (!(_e < lf_success)) {
-		printf("\n\nWould you like to place the CPU in update mode again? ([y]/n): ");
-		size_t len = 0;
-		// Probably need to free this but I can't test it(travis):
-		char *line = NULL;
-		getline(&line, &len, stdin);
-		if (len == 0 || (*line == 'y' || *line == '\n' || *line == '\0')) {
-			printf("\n");
-			/* Enter update mode again. */
-			enter_update_mode();
-			printf("\nWould you like to reload the target file and flash it? ([y]/n): ");
-			len = 0;
-			line = NULL;
-			// Probably need to free line again but I can't test it(travis):
-			getline(&line, &len, stdin);
-			if (len == 0 || (*line == 'y' || *line == '\n' || *line == '\0')) {
-				printf("\n");
-				/* Repeat the whole process. */
-				goto begin;
-			}
-		}
-
-		printf(KGRN "\nSuccessfully uploaded new firmware.\n" KNRM);
-	}
+	lf_debug(KGRN "\nSuccessfully uploaded new firmware.\n" KNRM);
 
 	return EXIT_SUCCESS;
+
+failure:
+	free(pagedata);
+	return EXIT_FAILURE;
 }

@@ -3,10 +3,11 @@
 /* NOTE: Only one target platform can be included at a time. */
 
 /* Guard whether or not a target platform has already been defined. */
-#ifndef __lf_platform_h__
-#define __lf_platform_h__
+#ifndef __atmegau2__
+#define __atmegau2__
 
 /* Include the avr-libc standard library headers. */
+#ifdef __AVR__
 #include <avr/common.h>
 #include <util/delay.h>
 #include <avr/eeprom.h>
@@ -16,6 +17,7 @@
 #include <avr/power.h>
 #include <avr/sleep.h>
 #include <avr/wdt.h>
+#endif
 
 /* Define the modules that this platform uses. */
 #define __use_button__
@@ -72,6 +74,4 @@
 #define FSI_IN PINC
 #define FSI_PIN 0x07
 
-#else
-#error "Error: Multiple platforms targeted."
 #endif

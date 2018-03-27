@@ -29,9 +29,21 @@ LF_FUNC("uart0") int uart0_configure(void) {
 	return lf_success;
 }
 
+LF_FUNC("uart0") int uart0_reset(void) {
+	return lf_success;
+}
+
 LF_FUNC("uart0") int uart0_ready(void) {
 	/* Return the empty condition of the transmitter FIFO. */
 	return (UART0->UART_SR & UART_SR_TXEMPTY);
+}
+
+LF_FUNC("uart0") void uart0_enable(void) {
+
+}
+
+LF_FUNC("uart0") void uart0_disable(void) {
+
 }
 
 LF_FUNC("uart0") void uart0_put(uint8_t byte) {
