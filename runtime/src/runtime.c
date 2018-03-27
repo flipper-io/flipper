@@ -17,7 +17,7 @@ int lf_transfer(struct _lf_device *device, struct _fmr_packet *packet) {
 #ifdef __LF_DEBUG__
 	lf_debug_packet(packet, sizeof(struct _fmr_packet));
 #endif
-	int _e = device->endpoint->push(device->endpoint, packet, sizeof(struct _fmr_packet));
+	int _e = device->endpoint->push(device, packet, sizeof(struct _fmr_packet));
 	lf_assert(_e == lf_success, failure, E_ENDPOINT, "Failed to transfer packet to device '%s'.", device->name);
 	return lf_success;
 failure:
@@ -25,7 +25,7 @@ failure:
 }
 
 int lf_retrieve(struct _lf_device *device, struct _fmr_result *result) {
-	int _e = device->endpoint->pull(device->endpoint, result, sizeof(struct _fmr_result));
+	int _e = device->endpoint->pull(device, result, sizeof(struct _fmr_result));
 	lf_assert(_e == lf_success, failure, E_ENDPOINT, "Failed to retrieve packet from the device '%s'.", device->name);
 	return lf_success;
 failure:
@@ -87,7 +87,7 @@ lf_return_t lf_push(struct _lf_device *device, char *module, lf_function functio
 	lf_assert(_e == lf_success, failure, E_FMR, "Failed to transfer push command to module '%s'.", module);
 
 	/* Transfer the data through to the address space of the device. */
-	_e = device->endpoint->push(device->endpoint, source, length);
+	_e = device->endpoint->push(device, source, length);
 	lf_assert(_e == lf_success, failure, E_FMR, "Failed to push data to module '%s'.", module);
 
 	struct _fmr_result result;
@@ -124,7 +124,7 @@ lf_return_t lf_pull(struct _lf_device *device, char *module, lf_function functio
 	lf_assert(_e == lf_success, failure, E_FMR, "Failed to transfer pull command to module '%s'.", module);
 
 	/* Obtain the data from the address space of the device. */
-	_e = device->endpoint->pull(device->endpoint, destination, length);
+	_e = device->endpoint->pull(device, destination, length);
 	lf_assert(_e == lf_success, failure, E_FMR, "Failed to pull data from module '%s'.", module);
 
 	struct _fmr_result result;

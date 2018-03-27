@@ -72,53 +72,66 @@ failure:
 	return NULL;
 }
 
-struct _lf_device *carbon_attach_endpoint(struct _lf_endpoint *endpoint, struct _lf_device *_u2, struct _lf_device *_4s) {
-	/* Create the parent carbon device. */
-	struct _lf_device *carbon = lf_device_create("carbon", endpoint);
-#warning Free the carbon context on release. Do we need this?
-	carbon->_ctx = calloc(1, sizeof(struct _carbon_context));
-	/* Set the 4s's context. */
-	struct _carbon_context *context = carbon->_ctx;
-	/* Set the carbon's u2 and 4s sub-devices. */
-	context->_u2 = _u2;
-	context->_4s = _4s;
-	/* Attach to the new carbon device. */
-	lf_attach(carbon);
-	return carbon;
+int uart0_bridge_configure(struct _lf_device *device, void *_configuration) {
+	lf_assert(device, failure, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
+	carbon_select_u2(device);
+	int _e = uart0_configure();
+	carbon_select_4s(device);
+	return _e;
+failure:
+	return lf_error;
 }
 
-int uart0_bridge_configure(struct _lf_endpoint *endpoint, void *_configuration) {
-	return uart0_configure();
+bool uart0_bridge_ready(struct _lf_device *device) {
+	lf_assert(device, failure, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
+	carbon_select_u2(device);
+	int _e = uart0_ready();
+	carbon_select_4s(device);
+	return _e;
+failure:
+	return false;
 }
 
-bool uart0_bridge_ready(struct _lf_endpoint *endpoint) {
-	return uart0_ready();
-}
-
-int uart0_bridge_push(struct _lf_endpoint *endpoint, void *source, lf_size_t length) {
+int uart0_bridge_push(struct _lf_device *device, void *source, lf_size_t length) {
+	lf_assert(device, failure, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
+	carbon_select_u2(device);
 	lf_size_t size = 128;
 	lf_size_t packets = lf_ceiling(length, size);
 	for (lf_size_t i = 0; i < packets; i ++) {
 		lf_size_t len = (length > size) ? size : length;
-		int err = uart0_push(source, len);
-		if (err) return err;
+		int _e = uart0_push(source, len);
+		if (_e) {
+			carbon_select_4s(device);
+			return _e;
+		}
 		source += size;
 		length -= size;
 	}
+	carbon_select_4s(device);
 	return lf_success;
+failure:
+	return lf_error;
 }
 
-int uart0_bridge_pull(struct _lf_endpoint *endpoint, void *destination, lf_size_t length) {
+int uart0_bridge_pull(struct _lf_device *device, void *destination, lf_size_t length) {
+	lf_assert(device, failure, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
+	carbon_select_u2(device);
 	lf_size_t size = 128;
 	lf_size_t packets = lf_ceiling(length, size);
 	for (lf_size_t i = 0; i < packets; i ++) {
 		lf_size_t len = (length > size) ? size : length;
-		int err = uart0_pull(destination, len);
-		if (err) return err;
+		int _e = uart0_pull(destination, len);
+		if (_e) {
+			carbon_select_4s(device);
+			return _e;
+		}
 		destination += size;
 		length -= size;
 	}
+	carbon_select_4s(device);
 	return lf_success;
+failure:
+	return lf_error;
 }
 
 void carbon_attach_to_usb_endpoint_applier(const void *__u2_ep, void *_other) {
@@ -130,8 +143,19 @@ void carbon_attach_to_usb_endpoint_applier(const void *__u2_ep, void *_other) {
 	struct _lf_endpoint *_4s_ep = lf_endpoint_create(uart0_bridge_configure, uart0_bridge_ready, uart0_bridge_push, uart0_bridge_pull, NULL, 0);
 	/* Create the 4s sub-device. */
 	struct _lf_device *_4s = lf_device_create("4s", _4s_ep);
-	/* Attach to a carbon device over the 4s' endpoint. */
-	carbon_attach_endpoint(_4s_ep, _u2, _4s);
+	/* Set the 4s's context. */
+	struct _carbon_context *context = calloc(1, sizeof(struct _carbon_context));
+	lf_assert(context, failure, E_MALLOC, "Failed to allocate memory for carbon context.");
+	/* Set the carbon's u2 and 4s sub-devices. */
+	context->_u2 = _u2;
+	context->_4s = _4s;
+	/* Write back the contexts. */
+	_u2->_ctx = context;
+	_4s->_ctx = context;
+	/* Attach to the new carbon device. */
+	lf_attach(_4s);
+failure:
+	return;
 }
 
 /* Attaches to all of the Carbon devices available on the system. */
@@ -146,7 +170,8 @@ int carbon_attach(void) {
 struct _lf_device *carbon_attach_hostname(char *hostname) {
 	struct _lf_endpoint *endpoint = lf_network_endpoint_for_hostname(hostname);
 	lf_assert(endpoint, failure, E_NO_DEVICE, "Failed to find Carbon device using hostname '%s'.", hostname);
-	return carbon_attach_endpoint(endpoint, NULL, NULL);
+	struct _lf_device *carbon = lf_device_create("carbon", endpoint);
+	return carbon;
 failure:
 	return NULL;
 }
