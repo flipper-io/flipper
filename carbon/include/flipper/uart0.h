@@ -6,6 +6,7 @@
 
 /* Declare the prototypes for all of the functions within this module. */
 int uart0_configure(void);
+int uart0_setbaud(uint32_t baud);
 int uart0_reset(void);
 int uart0_ready(void);
 void uart0_put(uint8_t byte);
