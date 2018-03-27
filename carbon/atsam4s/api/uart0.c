@@ -29,6 +29,10 @@ LF_FUNC("uart0") int uart0_configure(void) {
 	return lf_success;
 }
 
+LF_FUNC("uart0") int uart0_setbaud(uint32_t baud) {
+	return lf_success;
+}
+
 LF_FUNC("uart0") int uart0_reset(void) {
 	return lf_success;
 }

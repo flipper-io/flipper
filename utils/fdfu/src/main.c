@@ -231,6 +231,9 @@ int main(int argc, char *argv[]) {
 	size_t firmware_size = ftell(firmware);
 	fseek(firmware, 0L, SEEK_SET);
 
+	/* DFU baud. */
+	uart0_setbaud(DFU_BAUD);
+
 	/* Reset the 4S. */
 	sam_reset();
 
@@ -342,6 +345,10 @@ int main(int argc, char *argv[]) {
 	}
 
 	free(pagedata);
+
+	/* Go back to FMR mode. */
+	uart0_setbaud(FMR_BAUD);
+
 	lf_debug("Resetting the CPU.");
 	sam_reset();
 	lf_debug(KGRN " Successfully reset the CPU.\n" KNRM "----------------------");

@@ -1,6 +1,6 @@
 #include <flipper.h>
 
-enum { _uart0_pull, _uart0_push, _uart0_get, _uart0_put, _uart0_ready, _uart0_reset, _uart0_configure, _uart0_enable };
+enum { _uart0_pull, _uart0_push, _uart0_get, _uart0_put, _uart0_ready, _uart0_reset, _uart0_setbaud, _uart0_configure, _uart0_enable };
 
 int uart0_pull(void* destination, lf_size_t length);
 int uart0_push(void* source, lf_size_t length);
@@ -8,6 +8,7 @@ uint8_t uart0_get(void);
 void uart0_put(uint8_t byte);
 int uart0_ready(void);
 int uart0_reset(void);
+int uart0_setbaud(uint32_t baud);
 int uart0_configure(void);
 void uart0_enable(void);
 
@@ -18,6 +19,7 @@ void *uart0_interface[] = {
 	&uart0_put,
 	&uart0_ready,
 	&uart0_reset,
+	&uart0_setbaud,
 	&uart0_configure,
 	&uart0_enable
 };
@@ -46,6 +48,10 @@ LF_WEAK int uart0_ready(void) {
 
 LF_WEAK int uart0_reset(void) {
 	return lf_invoke(lf_get_current_device(), "uart0", _uart0_reset, lf_int32_t, NULL);
+}
+
+LF_WEAK int uart0_setbaud(uint32_t baud) {
+	return lf_invoke(lf_get_current_device(), "uart0", _uart0_setbaud, lf_int32_t, lf_args(lf_infer(baud)));
 }
 
 LF_WEAK int uart0_configure(void) {

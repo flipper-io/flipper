@@ -2,20 +2,30 @@
 
 uint8_t idx = 0;
 
+#define BAUDRATE(baud) (((F_CPU / (baud * 16.0)) + 0.5) - 1)
+
 LF_FUNC("uart0") int uart0_configure(void) {
 
 #warning No way to get into DFU baud here.
-	UBRR1L = DFU_BAUD;
-
+	UBRR1L = BAUDRATE(FMR_BAUD);
 	UCSR1A &= ~(1 << U2X1);
+
 	/* 8n1 */
 	UCSR1C |= (1 << UCSZ11) | (1 << UCSZ10);
+
 	/* Enable the receiver, transmitter, and receiver interrupt. */
 	UCSR1B |= (1 << RXEN1) | (1 << TXEN1);
 	UCSR1B |= (1 << RXCIE1);
 
 	/* Enable the FSI line as an input. */
 	FSI_DDR &= ~(1 << FSI_PIN);
+
+	return lf_success;
+}
+
+LF_FUNC("uart0") int uart0_setbaud(uint32_t baud) {
+	uint8_t b = BAUDRATE(baud);
+	UBRR1L = b;
 	return lf_success;
 }
 
@@ -81,9 +91,12 @@ failure:
 	return lf_error;
 }
 
+#include <flipper/atmegau2/megausb.h>
+
 ISR(USART1_RX_vect) {
 	while (!(UCSR1A & (1 << RXC1)));
 	if (idx == sizeof(uart0_buffer)) idx = 0;
-	uint8_t b = UDR1;
-	uart0_buffer[idx++] = b;
+	uint8_t c = UDR1;
+	uart0_buffer[idx++] = c;
+	usb_debug_putchar(c);
 }

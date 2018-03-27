@@ -55,10 +55,6 @@ int main(int argc, char *argv[]) {
 
 	unsigned char incoming[DEBUG_BUFFER_SIZE + 1]; // don't forget the null
 
-	int printtime = 1;
-
-	print_time();
-
 	while (alive) {
 		memset(incoming, '\0', sizeof(incoming));
 		_e = libusb_interrupt_transfer(handle, DEBUG_IN_ENDPOINT, incoming, DEBUG_BUFFER_SIZE, &len, DEBUG_TIMEOUT);
@@ -66,13 +62,9 @@ int main(int argc, char *argv[]) {
 			if (len > 0) {
 				printf("%s", incoming);
 				fflush(stdout);
-				printtime = 1;
 			}
 		} else if (_e == LIBUSB_ERROR_TIMEOUT) {
-			if (printtime) {
-				print_time();
-				printtime = 0;
-			}
+
 		} else {
 			fprintf(stderr, "Something went wrong with the transfer.\n");
 			goto exit;

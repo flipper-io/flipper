@@ -63,8 +63,8 @@
 #define IO_A8 PIO_PB0X1_AD4
 
 /* NOTE: Move these to platform. */
-#define DFU_BAUD 0x08
-#define FMR_BAUD 0x00
+#define DFU_BAUD 115200
+#define FMR_BAUD 1000000
 
 struct _carbon_context {
 	/* Device that handles interacting with the u2. (ATMEGA16U2) */
