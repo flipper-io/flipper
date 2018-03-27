@@ -8,15 +8,19 @@ struct _lf_libusb_context {
 	struct libusb_context *context;
 };
 
-int lf_libusb_configure(struct _lf_endpoint *endpoint, void *_ctx) {
+int lf_libusb_configure(struct _lf_device *device, void *_ctx) {
 	return lf_success;
 }
 
-bool lf_libusb_ready(struct _lf_endpoint *endpoint) {
+bool lf_libusb_ready(struct _lf_device *device) {
 	return false;
 }
 
-int lf_libusb_push(struct _lf_endpoint *endpoint, void *source, lf_size_t length) {
+int lf_libusb_push(struct _lf_device *device, void *source, lf_size_t length) {
+	lf_assert(device, failure, E_NULL, "No device provided to '%s'", __PRETTY_FUNCTION__);
+	lf_assert(device, failure, E_NULL, "No endpoint for to device '%s'.", device->name);
+	struct _lf_endpoint *endpoint = device->endpoint;
+
 	struct _lf_libusb_context *context = (struct _lf_libusb_context *)endpoint->_ctx;
 	int transferred;
 	int _e;
@@ -41,9 +45,16 @@ int lf_libusb_push(struct _lf_endpoint *endpoint, void *source, lf_size_t length
 		length -= transferred;
 	}
 	return lf_success;
+
+failure:
+	return lf_error;
 }
 
-int lf_libusb_pull(struct _lf_endpoint *endpoint, void *destination, lf_size_t length) {
+int lf_libusb_pull(struct _lf_device *device, void *destination, lf_size_t length) {
+	lf_assert(device, failure, E_NULL, "No device provided to '%s'", __PRETTY_FUNCTION__);
+	lf_assert(device, failure, E_NULL, "No endpoint for to device '%s'.", device->name);
+	struct _lf_endpoint *endpoint = device->endpoint;
+
 	struct _lf_libusb_context *context = (struct _lf_libusb_context *)endpoint->_ctx;
 	int transferred;
 	int _e;
@@ -68,6 +79,9 @@ int lf_libusb_pull(struct _lf_endpoint *endpoint, void *destination, lf_size_t l
 		length -= transferred;
 	}
 	return lf_success;
+
+failure:
+	return lf_error;
 }
 
 int lf_libusb_destroy(struct _lf_endpoint *endpoint) {

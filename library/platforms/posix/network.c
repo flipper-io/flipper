@@ -2,15 +2,18 @@
 #include <flipper/error.h>
 #include <flipper.h>
 
-int lf_network_configure(struct _lf_endpoint *endpoint, void *_ctx) {
-return lf_success;
+int lf_network_configure(struct _lf_device *device, void *_ctx) {
+	return lf_success;
 }
 
-bool lf_network_ready(struct _lf_endpoint *endpoint) {
+bool lf_network_ready(struct _lf_device *device) {
 	return false;
 }
 
-int lf_network_push(struct _lf_endpoint *endpoint, void *source, lf_size_t length) {
+int lf_network_push(struct _lf_device *device, void *source, lf_size_t length) {
+	lf_assert(device, failure, E_NULL, "No device provided to '%s'", __PRETTY_FUNCTION__);
+	lf_assert(device, failure, E_NULL, "No endpoint for to device '%s'.", device->name);
+	struct _lf_endpoint *endpoint = device->endpoint;
 	/* Obtain a pointer to and cast to the network context associated with the active endpoint. */
 	struct _lf_network_context *context = (struct _lf_network_context *)endpoint->_ctx;
 	ssize_t _e = sendto(context->fd, source, length, 0, (struct sockaddr *)&context->device, sizeof(struct sockaddr_in));
@@ -20,7 +23,10 @@ failure:
 	return lf_error;
 }
 
-int lf_network_pull(struct _lf_endpoint *endpoint, void *destination, lf_size_t length) {
+int lf_network_pull(struct _lf_device *device, void *destination, lf_size_t length) {
+	lf_assert(device, failure, E_NULL, "No device provided to '%s'", __PRETTY_FUNCTION__);
+	lf_assert(device, failure, E_NULL, "No endpoint for to device '%s'.", device->name);
+	struct _lf_endpoint *endpoint = device->endpoint;
 	/* Obtain a pointer to and cast to the network context associated with the active endpoint. */
 	struct _lf_network_context *context = (struct _lf_network_context *)endpoint->_ctx;
 	socklen_t _length = sizeof(context->device);

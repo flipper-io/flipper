@@ -2,10 +2,10 @@
 #include <flipper/message.h>
 
 /* Creates a new libflipper endpoint. */
-struct _lf_endpoint *lf_endpoint_create(int (* configure)(struct _lf_endpoint *endpoint, void *_ctx),
-										bool (* ready)(struct _lf_endpoint *endpoint),
-										int (* push)(struct _lf_endpoint *endpoint, void *source, lf_size_t length),
-										int (* pull)(struct _lf_endpoint *endpoint, void *destination, lf_size_t length),
+struct _lf_endpoint *lf_endpoint_create(int (* configure)(struct _lf_device *device, void *_ctx),
+										bool (* ready)(struct _lf_device *device),
+										int (* push)(struct _lf_device *device, void *source, lf_size_t length),
+										int (* pull)(struct _lf_device *device, void *destination, lf_size_t length),
 										int (* destroy)(struct _lf_endpoint *endpoint),
 										size_t ctx_size) {
 	lf_assert(configure && ready && push && pull, failure, E_NULL, "NULL function provided to '%s'.", __PRETTY_FUNCTION__);
