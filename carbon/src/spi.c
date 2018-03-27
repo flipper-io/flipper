@@ -35,7 +35,7 @@ LF_WEAK int spi_push(void* source, uint32_t length) {
 }
 
 LF_WEAK uint8_t spi_get(void) {
-	return lf_invoke(lf_get_current_device(), "spi", _spi_get, lf_void_t, NULL);
+	return lf_invoke(lf_get_current_device(), "spi", _spi_get, lf_int8_t, NULL);
 }
 
 LF_WEAK void spi_put(uint8_t byte) {
@@ -47,7 +47,7 @@ LF_WEAK void spi_end(void) {
 }
 
 LF_WEAK uint8_t spi_ready(void) {
-	return lf_invoke(lf_get_current_device(), "spi", _spi_ready, lf_void_t, NULL);
+	return lf_invoke(lf_get_current_device(), "spi", _spi_ready, lf_int8_t, NULL);
 }
 
 LF_WEAK void spi_disable(void) {

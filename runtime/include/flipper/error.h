@@ -52,8 +52,8 @@ enum {
 	E_TEST,
 
 	/* uart0 */
-	E_UART0_PUSH_TIMEOUT,
-	E_UART0_PULL_TIMEOUT,
+	E_UART0_WRITE_TIMEOUT,
+	E_UART0_READ_TIMEOUT,
 
     E_MAX
 };
@@ -90,8 +90,8 @@ enum {
 								 "packet subclass error", \
 								 "unimplemented error",	\
 								 "test failed", \
-								 "uart0 push timeout", \
-								 "uart0 pull timeout"
+								 "uart0 write timeout", \
+								 "uart0 read timeout"
 
 
 /* If this flag is set, error messages are nullified on platforms that do not need to store error strings. */

@@ -13,7 +13,7 @@ void *button_interface[] = {
 LF_MODULE(button, "button", button_interface);
 
 LF_WEAK uint8_t button_read(void) {
-	return lf_invoke(lf_get_current_device(), "button", _button_read, lf_void_t, NULL);
+	return lf_invoke(lf_get_current_device(), "button", _button_read, lf_int8_t, NULL);
 }
 
 LF_WEAK int button_configure(void) {

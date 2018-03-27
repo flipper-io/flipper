@@ -23,10 +23,53 @@
 #include <flipper.h>
 #include <flipper/posix/usb.h>
 #include <flipper/posix/network.h>
+#include <flipper/atmegau2/atmegau2.h>
 
-struct _lf_device *carbon_get_u2(struct _lf_device *device) {
+void sam_reset(void) {
+	/* reset low (active) */
+	gpio_write(0, (1 << SAM_RESET_PIN));
+	usleep(10000);
+	/* reset high (inactive) */
+	gpio_write((1 << SAM_RESET_PIN), 0);
+}
+
+int sam_enter_dfu(void) {
+	/* erase high, reset low (active) */
+	gpio_write((1 << SAM_ERASE_PIN), (1 << SAM_RESET_PIN));
+	/* Wait for chip to erase. */
+	usleep(8000000);
+	/* erase low, reset high (inactive) */
+	gpio_write((1 << SAM_RESET_PIN), (1 << SAM_ERASE_PIN));
+	return lf_success;
+}
+
+int sam_off(void) {
+	/* power off, reset low */
+	gpio_write(0, (1 << SAM_POWER_PIN) | (1 << SAM_RESET_PIN));
+	return lf_success;
+}
+
+int sam_on(void) {
+	/* power on, reset high */
+	gpio_write((1 << SAM_POWER_PIN) | (1 << SAM_RESET_PIN), 0);
+}
+
+struct _lf_device *carbon_select_4s(struct _lf_device *device) {
+	lf_assert(device, failure, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
 	struct _carbon_context *ctx = (struct _carbon_context *)device->_ctx;
+	lf_select(ctx->_4s);
+	return ctx->_4s;
+failure:
+	return NULL;
+}
+
+struct _lf_device *carbon_select_u2(struct _lf_device *device) {
+	lf_assert(device, failure, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
+	struct _carbon_context *ctx = (struct _carbon_context *)device->_ctx;
+	lf_select(ctx->_u2);
 	return ctx->_u2;
+failure:
+	return NULL;
 }
 
 struct _lf_device *carbon_attach_endpoint(struct _lf_endpoint *endpoint, struct _lf_device *_u2, struct _lf_device *_4s) {

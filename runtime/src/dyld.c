@@ -1,11 +1,15 @@
 #include <flipper.h>
 
 int dyld_register(struct _lf_device *device, struct _lf_module *module) {
+    lf_assert(device, failure, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
     lf_assert(module, failure, E_NULL, "No module provided to '%s'.", __PRETTY_FUNCTION__);
+
 #warning This is not a good way to increment the count.
     if (module->idx == -1) module->idx = lf_ll_count(device->modules);
+    //lf_debug("Registering module '%s' with index '%i'.", module->name, module->idx);
 #warning Need to handle reloading an existing moudle here.
     return lf_ll_append(&device->modules, module, lf_module_release);
+
 failure:
     return lf_error;
 }
@@ -41,10 +45,14 @@ failure:
 
 /* Unload a module from the device. */
 int dyld_unload(struct _lf_device *device, char *module) {
+    lf_assert(device, failure, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
+    lf_assert(module, failure, E_NULL, "No module provided to '%s'.", __PRETTY_FUNCTION__);
+
     struct _lf_module *m = dyld_module(device, module);
     lf_assert(module, failure, E_NULL, "No module '%s' loaded on device '%s'.", module, device->name);
     lf_ll_remove(&device->modules, m);
     return lf_success;
+
 failure:
     return lf_error;
 }

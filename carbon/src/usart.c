@@ -33,7 +33,7 @@ LF_WEAK int usart_push(void* source, lf_size_t length) {
 }
 
 LF_WEAK uint8_t usart_get(void) {
-	return lf_invoke(lf_get_current_device(), "usart", _usart_get, lf_void_t, NULL);
+	return lf_invoke(lf_get_current_device(), "usart", _usart_get, lf_int8_t, NULL);
 }
 
 LF_WEAK void usart_put(uint8_t byte) {

@@ -69,6 +69,13 @@ int main(void) {
 	dyld_register(_u2, &uart0);
 	dyld_register(_u2, &wdt);
 
+	button_configure();
+	gpio_configure();
+	led_configure();
+	spi_configure();
+	uart0_configure();
+	wdt_configure();
+
 	usb_configure();
 
 	/* Use USB debug as STDOUT. */

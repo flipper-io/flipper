@@ -1,8 +1,8 @@
 /* Flipper Platform Support Header for the Atmel ATSAM4S */
 
 /* Guard whether or not a target platform has already been defined. */
-#ifndef __atsam4s_h__
-#define __atsam4s_h__
+#ifndef __atsam4s__
+#define __atsam4s__
 
 #ifndef __SAM4S16B__
 #define __SAM4S16B__
