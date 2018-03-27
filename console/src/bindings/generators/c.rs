@@ -57,18 +57,18 @@ pub(crate) struct CModule {
     funcs: Vec<CFunction>,
 }
 
-impl From<Parameter> for CParameter {
-    fn from(param: Parameter) -> Self {
+impl<'a> From<&'a Parameter> for CParameter {
+    fn from(param: &'a Parameter) -> Self {
         CParameter {
-            name: param.name,
+            name: param.name.clone(),
             typ: param.typ.name(),
         }
     }
 }
 
-impl From<Function> for CFunction {
-    fn from(func: Function) -> Self {
-        let params: Vec<CParameter> = func.parameters.into_iter().map(|param| param.into()).collect();
+impl<'a> From<&'a Function> for CFunction {
+    fn from(func: &'a Function) -> Self {
+        let params: Vec<CParameter> = func.parameters.iter().map(|param| param.into()).collect();
 
         let ret = func.ret.name();
         let ret_size = func.ret.size();
@@ -83,7 +83,7 @@ impl From<Function> for CFunction {
         };
 
         CFunction {
-            name: func.name,
+            name: func.name.clone(),
             params,
             ret,
             ret_fmr: fmr_type,
@@ -91,12 +91,12 @@ impl From<Function> for CFunction {
     }
 }
 
-impl From<Module> for CModule {
-    fn from(module: Module) -> Self {
+impl<'a> From<&'a Module> for CModule {
+    fn from(module: &'a Module) -> Self {
         CModule {
-            name: module.name,
-            description: module.description,
-            funcs: module.functions.into_iter().map(|s| s.into()).collect(),
+            name: module.name.clone(),
+            description: module.description.clone(),
+            funcs: module.functions.iter().map(|s| s.into()).collect(),
         }
     }
 }
@@ -186,7 +186,7 @@ fn fmr_expansion_helper(h: &Helper, _: &Handlebars, rc: &mut RenderContext) -> R
 
 /// Configures handlebars, serializes the given `CModule`, and writes it
 /// to the given output.
-pub fn generate_module<W: Write>(module: Module, out: &mut W) -> Result<(), Error> {
+pub fn generate_module<W: Write>(module: &Module, out: &mut W) -> Result<(), Error> {
     let mut reg = Handlebars::new();
     reg.register_helper("param_expansion", Box::new(param_helper));
     reg.register_helper("struct_expansion", Box::new(struct_helper));

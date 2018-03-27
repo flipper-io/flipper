@@ -38,6 +38,7 @@ pub mod generators;
 
 use std::rc::Rc;
 use std::ops::Range;
+use std::collections::HashMap;
 use object::{
     self,
     Object,
@@ -48,8 +49,8 @@ use failure::Error;
 /// Represents errors that can occur when parsing ELF and/or DWARF files.
 #[derive(Debug, Fail)]
 pub enum BindingError {
-    #[fail(display = "failed to read binary section: {}", _0)]
-    SectionReadError(String),
+    #[fail(display = "failed to read the module binary sections")]
+    SectionReadError,
     #[fail(display = "failed to parse elf section: {}", _0)]
     ElfReadError(String),
     #[fail(display = "failed to parse macho section: {}", _0)]
@@ -68,7 +69,7 @@ pub enum BindingError {
 /// as `uint8_t`, pointers such as `char *`, or other types which are
 /// currently unsupported in a concrete sense but which can be referenced
 /// as generic data (such as structs).
-#[derive(Debug, PartialOrd, PartialEq, Ord, Eq)]
+#[derive(Debug, Clone, PartialOrd, PartialEq, Ord, Eq)]
 pub enum Type {
     /// Base types encapsulate all of the information necessary to represent
     /// a value in the program they were parsed from. This is used to
@@ -159,7 +160,7 @@ impl Type {
 ///
 /// The parameters would be named `letter` and `count`, and the types would refer
 /// to `Type`s named `char` and `uint8_t`.
-#[derive(Debug, PartialOrd, PartialEq, Ord, Eq)]
+#[derive(Debug, Clone, PartialOrd, PartialEq, Ord, Eq)]
 pub struct Parameter {
     /// The name of the formal parameter as defined in the original program,
     /// e.g. "greeting" in `void say_hello(char *greeting);`.
@@ -174,7 +175,7 @@ pub struct Parameter {
 /// The name and parameters are used for generating FFI bindings to this function.
 /// The address is captured so it's possible to tell if the function belongs to a
 /// certain binary section.
-#[derive(Debug, PartialOrd, PartialEq, Ord, Eq)]
+#[derive(Debug, Clone, PartialOrd, PartialEq, Ord, Eq)]
 pub struct Function {
     /// The name of the function as defined in the original program,
     /// e.g. "say_hello" in `void say_hello(char *greeting);`.
@@ -188,43 +189,64 @@ pub struct Function {
 }
 
 /// A fully formed Flipper module which can have bindings generated for it.
-#[derive(Debug, PartialOrd, PartialEq, Ord, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Module {
-    name: String,
+    pub name: String,
     description: String,
+    range: Range<u64>,
     functions: Vec<Function>,
 }
 
 impl Module {
     /// Parse Flipper module metadata from a debug-enabled binary.
-    pub fn parse(name: String, description: String, binary: &[u8]) -> Result<Self, Error> {
-        let functions = dwarf::parse(binary)?;
-        let range = read_section_address(binary, ".lf.funcs")?;
-        let functions: Vec<_> = functions.into_iter().filter(|f| range.start <= f.address && f.address < range.end).collect();
+    pub fn parse(binary: &[u8]) -> Result<Vec<Self>, Error> {
+        let sections = read_module_sections(binary)?;
+        let all_functions = dwarf::parse(binary)?;
+        let mut modules: HashMap<String, Module> = HashMap::new();
 
-        Ok(Module {
-            name,
-            description,
-            functions,
-        })
+        for f in all_functions.into_iter() {
+
+            // Check if there is a section this function belongs to.
+            if let Some(&(ref name, ref range)) = sections.iter().find(|&&(ref name, ref range)| {
+                range.start <= f.address && f.address < range.end
+            }) {
+                if !modules.contains_key(name) {
+                    // If a module for this section does not exist, create one.
+                    let module = Module {
+                        name: name.clone(),
+                        description: "Description".to_owned(),
+                        range: range.clone(),
+                        functions: vec![f],
+                    };
+                    modules.insert(name.clone(), module);
+                } else {
+                    // If a module for this section exists, add this function to it.
+                    modules.get_mut(name).unwrap().functions.push(f);
+                }
+            }
+        }
+
+        Ok(modules.into_iter().map(|(_, module)| module).collect())
     }
 }
 
-fn read_section_address(data: &[u8], section_name: &str) -> Result<Range<u64>, Error> {
+fn read_module_sections(data: &[u8]) -> Result<Vec<(String, Range<u64>)>, Error> {
     let bin = object::File::parse(data)
-        .map_err(|_| BindingError::SectionReadError(section_name.to_owned()))?;
+        .map_err(|_| BindingError::SectionReadError)?;
 
+    let mut sections = vec![];
     for section in bin.sections() {
         if let Some(name) = section.name() {
-            if name == section_name {
+            if name.starts_with(".lm.") {
                 let address = section.address();
                 let size = section.size();
-                return Ok(address..address + size);
+                let name = name.split(".lm.").collect::<Vec<_>>()[1];
+                sections.push((name.to_owned(), address..address + size));
             }
         }
     }
 
-    Err(BindingError::SectionReadError(section_name.to_owned()).into())
+    Ok(sections)
 }
 
 #[cfg(test)]

@@ -1,4 +1,6 @@
+use std::fs;
 use std::fs::File;
+use std::path::PathBuf;
 #[allow(unused_imports)] use std::io::Read;
 use std::io::Error as IoError;
 use clap::{App, AppSettings, Arg, ArgMatches};
@@ -31,20 +33,22 @@ pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
             .takes_value(true)
             .required(true)
             .help("The module file to generate language bindings for"))
-        .arg(Arg::with_name("name")
-            .index(2)
+        .arg(Arg::with_name("output")
+            .long("--output")
+            .short("-o")
             .takes_value(true)
-            .required(true)
-            .help("The name of the module"))
+            .help("The output directory for the bindings"))
 }
 
 pub fn execute(args: &ArgMatches) -> Result<(), Error> {
     // Guaranteed to be safe because these are required arguments.
     let filename = args.value_of("file").unwrap();
-    let module_name = args.value_of("name").unwrap();
 
     let mut file = File::open(filename)
         .map_err(|e| BindingError::FileError(filename.to_owned(), e))?;
+
+    let path = PathBuf::from(args.value_of("output").unwrap_or("./"));
+    fs::create_dir_all(&path);
 
     let module_binary = {
         let mut v = Vec::new();
@@ -52,9 +56,16 @@ pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         v
     };
 
-    let mut out = File::create("./binding.c")
-        .map_err(|e| BindingError::FileError("binding.c".to_owned(), e))?;
+    let modules = bindings::Module::parse(&module_binary)?;
+    for module in modules.iter() {
+        let mut module_name = module.name.clone();
+        module_name.push_str(".c");
+        let mut path = PathBuf::from(&path);
+        path.push(&module_name);
 
-    let module = bindings::Module::parse(String::from(module_name), "".to_owned(), &module_binary)?;
-    bindings::generators::c::generate_module(module, &mut out)
+        let mut out = File::create(&path)?;
+        bindings::generators::c::generate_module(module, &mut out)?;
+    }
+
+    Ok(())
 }
