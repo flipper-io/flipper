@@ -12,6 +12,7 @@
 #![deny(unused_import_braces)]
 #![deny(unused_qualifications)]
 
+#[macro_use] extern crate log;
 #[macro_use] extern crate serde_derive;
 #[macro_use] extern crate derive_fail;
 extern crate failure;

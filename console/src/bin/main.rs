@@ -21,8 +21,10 @@
 #![deny(unused_import_braces)]
 #![deny(unused_qualifications)]
 
+#[macro_use] extern crate log;
 #[macro_use] extern crate clap;
 #[macro_use] extern crate derive_fail;
+extern crate env_logger;
 extern crate failure;
 extern crate rustyline;
 extern crate byteorder;
@@ -41,6 +43,8 @@ use failure::Error;
 const ABOUT: &'static str = "flipper: Manage and control Flipper from the command line";
 
 fn main() {
+    env_logger::init();
+    info!("Initialized logger");
     let matches = &app().get_matches();
     match execute(&matches) {
         Ok(()) => return,

@@ -20,6 +20,8 @@ failure = { git = "https://github.com/withoutboats/failure.git" }
 derive-fail = { git = "https://github.com/withoutboats/derive-fail.git" }
 fallible-iterator = "*"
 flipper = { path = "../languages/rust" }
+log = "0.4.1"
+env_logger = "0.5.6"
 
 [lib]
 name = "flipper_console"

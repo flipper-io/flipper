@@ -393,6 +393,7 @@ struct DwarfParser {
     /// `Option.get_or_insert` to put back the new state.
     state: Option<State>,
     subprograms: Vec<UnresolvedSubprogram>,
+    errors: Vec<Error>,
 }
 
 impl DwarfParser {
@@ -400,6 +401,7 @@ impl DwarfParser {
         DwarfParser {
             state: Some(State::Search),
             subprograms: Vec::new(),
+            errors: vec![],
         }
     }
 
@@ -409,23 +411,38 @@ impl DwarfParser {
             // begin reading the subprogram, noting its depth so we know when
             // to quit.
             (State::Search, Event::NewSubprogram(dep)) => {
-                let func = parse_subprogram(entry, strings)?;
-                State::Read { func, dep }
+                match parse_subprogram(entry, strings) {
+                    Ok(func) => State::Read { func, dep },
+                    // If we failed to read subprogram metadata, search for the next subprogram
+                    Err(e) => {
+                        self.errors.push(e);
+                        State::Search
+                    }
+                }
             }
             // If we're reading a subprogram and find a new parameter, push
             // the parameter onto our parameter list and continue searching
             // for more parameters.
             (State::Read { mut func, dep, .. }, Event::NewParameter) => {
-                let param = parse_parameter(entry, strings)?;
-                func.parameters.push(param);
+                match parse_parameter(entry, strings) {
+                    Ok(param) => func.parameters.push(param),
+                    // If we had trouble parsing a parameter, log an error and continue.
+                    Err(e) => self.errors.push(e),
+                }
                 State::Read { func, dep }
             }
             // If we were reading one subprogram but stepped up to a new one,
             // save the previous function we built and begin a new one.
             (State::Read { func, .. }, Event::NewSubprogram(dep)) => {
                 self.subprograms.push(func);
-                let func = parse_subprogram(entry, strings)?;
-                State::Read { func, dep }
+                match parse_subprogram(entry, strings) {
+                    Ok(func) => State::Read { func, dep },
+                    Err(e) => {
+                        self.errors.push(e);
+                        // If we failed to read subprogram metadata, search for the next subprogram
+                        State::Search
+                    }
+                }
             }
             // If we step up in the DIE tree to a depth higher than the one we
             // began reading this subprogram in, save the function we were building
@@ -570,11 +587,16 @@ pub fn parse(buffer: &[u8]) -> Result<Vec<Function>, Error> {
         resolved_types.insert(offset, Rc::new(resolved_type));
     }
 
+    let DwarfParser { subprograms: unresolved_subprograms, errors, .. } = parser;
+
     // Resolve all subprograms
-    let unresolved_subprograms = parser.subprograms;
     let mut resolved_subprograms = Vec::<Function>::new();
     for subprogram in unresolved_subprograms.into_iter() {
         resolved_subprograms.push(subprogram.into_resolved(&resolved_types)?)
+    }
+
+    for error in errors.iter() {
+        warn!("Module parse problem: {}", error);
     }
 
     Ok(resolved_subprograms)
