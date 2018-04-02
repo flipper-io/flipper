@@ -42,11 +42,10 @@ int __attribute__((__destructor__)) lf_exit(void) {
 	return lf_success;
 }
 
-#ifdef __LF_DEBUG__
-
 /* Debugging functions for displaying the contents of various FMR related data structures. */
 
 void lf_debug_call(struct _fmr_invocation *call) {
+#ifdef __LF_DEBUG__
 	printf("call\n");
 	printf("\t└─ module:\t\t0x%x\n", call->index);
 	printf("\t└─ function:\t0x%x\n", call->function);
@@ -67,6 +66,7 @@ void lf_debug_call(struct _fmr_invocation *call) {
 		types >>= 4;
 	}
 	printf("\n");
+#endif
 }
 
 int lf_debug_level = LF_DEBUG_LEVEL_OFF;
@@ -76,6 +76,7 @@ void lf_set_debug_level(int level) {
 }
 
 void lf_debug_packet(struct _fmr_packet *packet, size_t length) {
+#ifdef __LF_DEBUG__
 	if (lf_debug_level != LF_DEBUG_LEVEL_ALL) return;
 
 	if (packet->header.magic == FMR_MAGIC_NUMBER) {
@@ -114,15 +115,16 @@ void lf_debug_packet(struct _fmr_packet *packet, size_t length) {
 		printf("Invalid magic number (0x%02x).\n", packet->header.magic);
 	}
 	printf("\n\n-----------\n\n");
+#endif
 }
 
 void lf_debug_result(struct _fmr_result *result) {
+#ifdef __LF_DEBUG__
 	if (lf_debug_level != LF_DEBUG_LEVEL_ALL) return;
 
 	printf("response:\n");
 	printf("\t└─ value:\t0x%x\n", result->value);
 	printf("\t└─ error:\t0x%hhx\n", result->error);
 	printf("\n-----------\n\n");
-}
-
 #endif
+}
