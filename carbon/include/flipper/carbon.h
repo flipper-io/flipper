@@ -8,10 +8,8 @@
 #include <flipper/atsam4s/atsam4s.h>
 #elif defined(ATMEGAU2)
 #include <flipper/atmegau2/atmegau2.h>
-#elif defined(POSIX)
-#include <flipper/posix/posix.h>
 #else
-#error "Invalid target platform."
+#include <flipper/posix/posix.h>
 #endif
 
 /* Descriptor information for USB. */
