@@ -36,8 +36,6 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr, "Failed to initialize libusb.\n");
 	}
 
-	libusb_set_debug(context, LIBUSB_LOG_LEVEL_ERROR);
-
 	struct libusb_device_handle *handle = libusb_open_device_with_vid_pid(context, VENDOR, PRODUCT);
 	if (!handle) {
 		fprintf(stderr, "Failed to open the device.\n");

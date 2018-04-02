@@ -12,7 +12,6 @@ struct _lf_device *lf_get_current_device(void) {
 	return lf_current_device;
 }
 
-/* Attempts to attach to all unattached devices. Returns how many devices were attached. */
 int lf_attach(struct _lf_device *device) {
 	lf_assert(device, failure, E_NULL, "Attempt to attach an invalid device.");
 	lf_ll_append(&lf_attached_devices, device, lf_device_release);
@@ -22,7 +21,6 @@ failure:
 	return lf_error;
 }
 
-/* Call's the device's selector function and selects the device. */
 int lf_select(struct _lf_device *device) {
 	lf_assert(device, failure, E_NULL, "NULL device pointer provided for selection.");
 	lf_set_current_device(device);
@@ -30,7 +28,6 @@ failure:
 	return lf_error;
 }
 
-/* Detaches a device from libflipper. */
 int lf_detach(struct _lf_device *device) {
 	lf_assert(device, failure, E_NULL, "Invalid device provided to detach.");
 	lf_ll_remove(&lf_attached_devices, device);
@@ -39,10 +36,7 @@ failure:
 	return lf_error;
 }
 
-/* Deactivates libflipper state and releases the event loop. */
 int __attribute__((__destructor__)) lf_exit(void) {
-	/* Release all of the libflipper events. */
-	lf_ll_release(&lf_registered_events);
 	/* Release all of the attached devices. */
 	lf_ll_release(&lf_attached_devices);
 	return lf_success;

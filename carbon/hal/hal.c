@@ -172,6 +172,7 @@ struct _lf_device *carbon_attach_hostname(char *hostname) {
 	struct _lf_endpoint *endpoint = lf_network_endpoint_for_hostname(hostname);
 	lf_assert(endpoint, failure, E_NO_DEVICE, "Failed to find Carbon device using hostname '%s'.", hostname);
 	struct _lf_device *carbon = lf_device_create("carbon", endpoint);
+	lf_attach(carbon);
 	return carbon;
 failure:
 	return NULL;

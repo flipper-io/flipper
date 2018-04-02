@@ -1,5 +1,4 @@
 #include <flipper.h>
-#include <flipper/message.h>
 
 /* Creates a new libflipper endpoint. */
 struct _lf_endpoint *lf_endpoint_create(int (* configure)(struct _lf_device *device, void *_ctx),
@@ -21,26 +20,6 @@ struct _lf_endpoint *lf_endpoint_create(int (* configure)(struct _lf_device *dev
 	return endpoint;
 failure:
 	return NULL;
-}
-
-/* Enqueues a message for sending over the endpoint. */
-int lf_endpoint_enqueue(struct _lf_endpoint *endpoint, struct _lf_msg *message) {
-	return lf_error;
-}
-
-bool lf_endpoint_has_data(struct _lf_endpoint *endpoint) {
-	return NULL;
-}
-
-/* Dequeues the next message to be sent. */
-struct _lf_msg *lf_endpoint_dequeue(struct _lf_endpoint *endpoint) {
-	return NULL;
-}
-
-/* Checks to see if any messages are available over the endpoint, and loads them into the incoming queue if there are. This function should never block! */
-void lf_endpoint_poll(struct _lf_endpoint *endpoint) {
-	/* Checks if there is any data available over this endpoint. If there is, it is loaded into the message processing queue. */
-
 }
 
 int lf_endpoint_release(struct _lf_endpoint *endpoint) {
