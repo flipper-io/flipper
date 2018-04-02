@@ -47,8 +47,6 @@ int __attribute__((__destructor__)) lf_exit(void) {
 	return lf_success;
 }
 
-#include <flipper.h>
-
 lf_return_t lf_invoke(struct _lf_device *device, char *module, lf_function function, lf_type ret, struct _lf_ll *parameters) {
 	lf_assert(device, failure, E_NULL, "No device was provided to '%s'.", __PRETTY_FUNCTION__);
 	lf_assert(module, failure, E_NULL, "No module was provided to '%s'.", __PRETTY_FUNCTION__);
@@ -162,7 +160,6 @@ failure:
 	return lf_error;
 }
 
-/* Asks the device's dynamic loader for a module index. */
 int lf_dyld(struct _lf_device *device, char *module) {
 	lf_assert(module, failure, E_NULL, "No module provided to '%s'.", __PRETTY_FUNCTION__);
 	lf_assert(strlen(module) < 16, failure, E_OVERFLOW, "Module name '%s' is invalid. Module names must be 16 characters or less.", module);
