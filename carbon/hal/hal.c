@@ -52,6 +52,7 @@ int sam_off(void) {
 int sam_on(void) {
 	/* power on, reset high */
 	gpio_write((1 << SAM_POWER_PIN) | (1 << SAM_RESET_PIN), 0);
+	return lf_success;
 }
 
 struct _lf_device *carbon_select_4s(struct _lf_device *device) {
