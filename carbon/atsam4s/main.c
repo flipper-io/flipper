@@ -5,6 +5,7 @@
 #define CLOCK_TIMEOUT 5000
 
 struct _fmr_packet packet;
+struct _lf_device *_4s;
 
 extern void uart0_put(uint8_t byte);
 
@@ -57,7 +58,7 @@ int main(void) {
 	/* Allow the reset pin to reset the device. */
 	RSTC->RSTC_MR = RSTC_MR_KEY_PASSWD | RSTC_MR_URSTEN;
 
-	struct _lf_device *_4s = lf_device_create("atmegau2", (void *)0xdeadbeef);
+	_4s = lf_device_create("atsam4s", (void *)0xdeadbeef);
 	lf_attach(_4s);
 
 	extern struct _lf_module adc;
@@ -136,10 +137,9 @@ void uart0_isr(void) {
 
 		UART0->UART_PTCR = UART_PTCR_RXTDIS | UART_PTCR_TXTDIS;
 
-		struct _fmr_result result;
 		lf_error_clear();
-		fmr_perform(&packet, &result);
-		uart0_push(&result, sizeof(struct _fmr_result));
+		fmr_perform(_4s, &packet);
+
 		uart0_pull(&packet, sizeof(struct _fmr_packet));
 
 		/* Wait a bit before raising the FMR pin. */
@@ -152,4 +152,20 @@ void uart0_isr(void) {
 
 	__enable_irq();
 
+}
+
+void uart0_pull_wait(void *destination, lf_size_t length) {
+	/* Disable the PDC receive complete interrupt. */
+	UART0->UART_IDR = UART_IDR_ENDRX;
+	/* Set the transmission length and destination pointer. */
+	UART0->UART_RCR = length;
+	UART0->UART_RPR = (uintptr_t)(destination);
+	/* Enable the receiver. */
+	UART0->UART_PTCR = UART_PTCR_RXTEN;
+	/* Wait until the transfer has finished. */
+	while (!(UART0->UART_SR & UART_SR_ENDRX));
+	/* Disable the PDC receiver. */
+	UART0->UART_PTCR = UART_PTCR_RXTDIS;
+	/* Enable the PDC receive complete interrupt. */
+	UART0->UART_IER = UART_IER_ENDRX;
 }
