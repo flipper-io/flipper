@@ -27,11 +27,11 @@ void *spi_interface[] = {
 LF_MODULE(spi, "spi", spi_interface);
 
 LF_WEAK int spi_pull(void* destination, uint32_t length) {
-	return lf_pull(lf_get_current_device(), "spi", _spi_pull, destination, length, lf_args(lf_infer(destination), lf_infer(length)));
+	return lf_pull(lf_get_current_device(), "spi", _spi_pull, destination, length);
 }
 
 LF_WEAK int spi_push(void* source, uint32_t length) {
-	return lf_push(lf_get_current_device(), "spi", _spi_push, source, length, lf_args(lf_infer(source), lf_infer(length)));
+	return lf_push(lf_get_current_device(), "spi", _spi_push, source, length);
 }
 
 LF_WEAK uint8_t spi_get(void) {

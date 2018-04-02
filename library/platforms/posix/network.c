@@ -13,12 +13,13 @@ bool lf_network_ready(struct _lf_device *device) {
 int lf_network_push(struct _lf_device *device, void *source, lf_size_t length) {
 	lf_assert(device, failure, E_NULL, "No device provided to '%s'", __PRETTY_FUNCTION__);
 	lf_assert(device, failure, E_NULL, "No endpoint for to device '%s'.", device->name);
+
 	struct _lf_endpoint *endpoint = device->endpoint;
-	/* Obtain a pointer to and cast to the network context associated with the active endpoint. */
 	struct _lf_network_context *context = (struct _lf_network_context *)endpoint->_ctx;
-	ssize_t _e = sendto(context->fd, source, length, 0, (struct sockaddr *)&context->device, sizeof(struct sockaddr_in));
-	lf_assert(_e > 0, failure, E_COMMUNICATION, "Failed to send data to networked device '%s' at '%s'.", context->host, inet_ntoa(context->device.sin_addr));
+	ssize_t e = sendto(context->fd, source, length, 0, (struct sockaddr *)&context->device, sizeof(struct sockaddr_in));
+	lf_assert(e > 0, failure, E_COMMUNICATION, "Failed to send data to networked device '%s' at '%s'.", context->host, inet_ntoa(context->device.sin_addr));
 	return lf_success;
+
 failure:
 	return lf_error;
 }
@@ -26,13 +27,14 @@ failure:
 int lf_network_pull(struct _lf_device *device, void *destination, lf_size_t length) {
 	lf_assert(device, failure, E_NULL, "No device provided to '%s'", __PRETTY_FUNCTION__);
 	lf_assert(device, failure, E_NULL, "No endpoint for to device '%s'.", device->name);
+
 	struct _lf_endpoint *endpoint = device->endpoint;
-	/* Obtain a pointer to and cast to the network context associated with the active endpoint. */
 	struct _lf_network_context *context = (struct _lf_network_context *)endpoint->_ctx;
 	socklen_t _length = sizeof(context->device);
-	ssize_t _e = recvfrom(context->fd, destination, length, 0, (struct sockaddr *)&context->device, &_length);
-	lf_assert(_e > 0, failure, E_COMMUNICATION, "Failed to receive data from networked device '%s' at '%s'.", context->host, inet_ntoa(context->device.sin_addr));
+	ssize_t e = recvfrom(context->fd, destination, length, 0, (struct sockaddr *)&context->device, &_length);
+	lf_assert(e > 0, failure, E_COMMUNICATION, "Failed to receive data from networked device '%s' at '%s'.", context->host, inet_ntoa(context->device.sin_addr));
 	return lf_success;
+
 failure:
 	return lf_error;
 }

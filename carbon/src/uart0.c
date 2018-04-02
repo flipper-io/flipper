@@ -27,11 +27,11 @@ void *uart0_interface[] = {
 LF_MODULE(uart0, "uart0", uart0_interface);
 
 LF_WEAK int uart0_pull(void* destination, lf_size_t length) {
-	return lf_pull(lf_get_current_device(), "uart0", _uart0_pull, destination, length, lf_args(lf_infer(destination), lf_infer(length)));
+	return lf_pull(lf_get_current_device(), "uart0", _uart0_pull, destination, length);
 }
 
 LF_WEAK int uart0_push(void* source, lf_size_t length) {
-	return lf_push(lf_get_current_device(), "uart0", _uart0_push, source, length, lf_args(lf_infer(source), lf_infer(length)));
+	return lf_push(lf_get_current_device(), "uart0", _uart0_push, source, length);
 }
 
 LF_WEAK uint8_t uart0_get(void) {

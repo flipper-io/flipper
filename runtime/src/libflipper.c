@@ -47,7 +47,7 @@ int __attribute__((__destructor__)) lf_exit(void) {
 	return lf_success;
 }
 
-lf_return_t lf_invoke(struct _lf_device *device, char *module, lf_function function, lf_type ret, struct _lf_ll *parameters) {
+lf_return_t lf_invoke(struct _lf_device *device, char *module, lf_function function, lf_type ret, struct _lf_ll *args) {
 	lf_assert(device, failure, E_NULL, "No device was provided to '%s'.", __PRETTY_FUNCTION__);
 	lf_assert(module, failure, E_NULL, "No module was provided to '%s'.", __PRETTY_FUNCTION__);
 
@@ -63,7 +63,7 @@ lf_return_t lf_invoke(struct _lf_device *device, char *module, lf_function funct
 	lf_assert(m, failure, E_MODULE, "No counterpart found for module '%s'.", module);
 
 	struct _fmr_invocation_packet *packet = (struct _fmr_invocation_packet *)(&_packet);
-	e = lf_create_call(m->idx, function, ret, parameters, &_packet.header, &packet->call);
+	e = lf_create_call(m->idx, function, ret, args, &_packet.header, &packet->call);
 	lf_assert(e == lf_success, failure, E_NULL, "Failed to generate a valid call to module '%s'.", module);
 	_packet.header.checksum = lf_crc(&_packet, _packet.header.length);
 	lf_debug_packet(&_packet, sizeof(struct _fmr_packet));
@@ -81,7 +81,7 @@ failure:
 	return lf_error;
 }
 
-lf_return_t lf_push(struct _lf_device *device, char *module, lf_function function, void *source, lf_size_t length, struct _lf_ll *parameters) {
+lf_return_t lf_push(struct _lf_device *device, char *module, lf_function function, void *source, lf_size_t length) {
 	lf_assert(device, failure, E_NULL, "No device was provided to '%s'.", __PRETTY_FUNCTION__);
 	lf_assert(module, failure, E_NULL, "No module was provided to '%s'.", __PRETTY_FUNCTION__);
 	if (!length) return lf_success;
@@ -101,7 +101,7 @@ lf_return_t lf_push(struct _lf_device *device, char *module, lf_function functio
 	struct _lf_module *m = dyld_module(device, module);
 	lf_assert(m, failure, E_MODULE, "No counterpart found for module '%s'.", module);
 
-	e = lf_create_call(m->idx, function, lf_int_t, lf_args(lf_ptr(source), lf_infer(length)), &_packet.header, &packet->call);
+	e = lf_create_call(m->idx, function, lf_int_t, NULL, &_packet.header, &packet->call);
 	lf_assert(e == lf_success, failure, E_NULL, "Failed to generate a valid push to module '%s'.", module);
 	_packet.header.checksum = lf_crc(&_packet, _packet.header.length);
 	lf_debug_packet(&_packet, sizeof(struct _fmr_packet));
@@ -121,7 +121,7 @@ failure:
 	return lf_error;
 }
 
-lf_return_t lf_pull(struct _lf_device *device, char *module, lf_function function, void *destination, lf_size_t length, struct _lf_ll *parameters) {
+lf_return_t lf_pull(struct _lf_device *device, char *module, lf_function function, void *destination, lf_size_t length) {
 	lf_assert(device, failure, E_NULL, "No device was provided to '%s'.", __PRETTY_FUNCTION__);
 	lf_assert(module, failure, E_NULL, "No module was provided to '%s'.", __PRETTY_FUNCTION__);
 	if (!length) return lf_success;
@@ -140,7 +140,7 @@ lf_return_t lf_pull(struct _lf_device *device, char *module, lf_function functio
 	struct _lf_module *m = dyld_module(device, module);
 	lf_assert(m, failure, E_MODULE, "No counterpart found for module '%s'.", module);
 
-	e = lf_create_call(m->idx, function, lf_int_t, lf_args(lf_ptr(destination), lf_infer(length)), &_packet.header, &packet->call);
+	e = lf_create_call(m->idx, function, lf_int_t, NULL, &_packet.header, &packet->call);
 	lf_assert(e == lf_success, failure, E_NULL, "Failed to generate a valid pull from module '%s'.", module);
 	_packet.header.checksum = lf_crc(&_packet, _packet.header.length);
 	lf_debug_packet(&_packet, sizeof(struct _fmr_packet));
