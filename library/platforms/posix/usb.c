@@ -98,7 +98,6 @@ struct _lf_ll *lf_libusb_endpoints_for_vid_pid(uint16_t vid, uint16_t pid) {
 	struct libusb_device **libusb_devices = NULL;
 	struct _lf_ll *endpoints = NULL;
 	int _e = libusb_init(&context);
-	libusb_set_debug(context, LIBUSB_LOG_LEVEL_INFO);
 	lf_assert(_e == 0, failure, E_LIBUSB, "Failed to initialize libusb. Reboot and try again.");
 	/* Walk the device list until all desired devices are attached. */
 	size_t device_count = libusb_get_device_list(context, &libusb_devices);

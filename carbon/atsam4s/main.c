@@ -122,7 +122,6 @@ int main(void) {
 
 	/* Launch the kernel task. */
 	os_scheduler_init();
-
 }
 
 void uart0_isr(void) {
