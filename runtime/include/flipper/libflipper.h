@@ -84,9 +84,6 @@ void lf_set_debug_level(int level);
 #include <flipper/ll.h>
 #include <flipper/dyld.h>
 
-typedef struct _lf_ll *lf_event_list;
-extern lf_event_list lf_registered_events;
-
 typedef struct _lf_ll *lf_device_list;
 extern lf_device_list lf_attached_devices;
 
