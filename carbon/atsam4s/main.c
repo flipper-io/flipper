@@ -58,7 +58,12 @@ int main(void) {
 	/* Allow the reset pin to reset the device. */
 	RSTC->RSTC_MR = RSTC_MR_KEY_PASSWD | RSTC_MR_URSTEN;
 
-	_4s = lf_device_create("atsam4s", (void *)0xdeadbeef);
+	struct _lf_endpoint *_4s_ep = lf_endpoint_create(uart0_configure,
+													 uart0_ready,
+													 uart0_push,
+													 uart0_pull,
+													 NULL, NULL);
+	_4s = lf_device_create("atsam4s", _4s_ep);
 	lf_attach(_4s);
 
 	extern struct _lf_module adc;

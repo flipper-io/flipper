@@ -88,7 +88,7 @@ int fmr_push(struct _lf_device *device, lf_module module, lf_function function, 
 	void *source = malloc(length);
 	lf_assert(source, failure, E_MALLOC, "Failed to allocate memory for '%s'.", __FUNCTION__);
 	int e = device->endpoint->pull(device, source, length);
-	lf_assert(e, failure, E_MALLOC, "Failed to pull data for '%s'.", __FUNCTION__);
+	lf_assert(e == lf_success, failure, E_FMR, "Failed to pull data for '%s'.", __FUNCTION__);
 
 	struct _lf_module *m = lf_ll_item(device->modules, module);
 	int (* push)(void *source, lf_size_t length) = m->interface[function];
@@ -112,7 +112,7 @@ int fmr_pull(struct _lf_device *device, lf_module module, lf_function function, 
 	*retval = pull(destination, length);
 
 	int e = device->endpoint->push(device, destination, length);
-	lf_assert(e, failure, E_MALLOC, "Failed to push data for '%s'.", __FUNCTION__);
+	lf_assert(e == lf_success, failure, E_FMR, "Failed to push data for '%s'.", __FUNCTION__);
 
 	free(destination);
 	return lf_success;
@@ -131,8 +131,6 @@ int fmr_dyld(struct _lf_device *device, char *module, lf_return_t *retval) {
 failure:
 	return lf_error;
 }
-
-/* ~ Message runtime subclass handlers. ~ */
 
 int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet) {
 	int e = E_UNIMPLEMENTED;
@@ -176,5 +174,6 @@ failure:
 	result.error = e;
 	result.value = retval;
 	e = device->endpoint->push(device, &result, sizeof(struct _fmr_result));
+	lf_debug_result(&result);
 	return e;
 }

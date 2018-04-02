@@ -11,7 +11,7 @@ struct _lf_device *fvm = NULL;
 
 int main(int argc, char *argv[]) {
 
-	//lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
+	lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
 
 	/* Create a UDP server. */
 	struct sockaddr_in addr;
@@ -102,11 +102,8 @@ int main(int argc, char *argv[]) {
 		struct _fmr_packet packet;
 		nep->pull(fvm, &packet, sizeof(struct _fmr_packet));
 		lf_debug_packet(&packet, sizeof(struct _fmr_packet));
-		struct _fmr_result result;
 		lf_error_clear();
 		fmr_perform(fvm, &packet);
-		lf_debug_result(&result);
-		nep->push(fvm, &result, sizeof(struct _fmr_result));
 	}
 
 	close(sd);

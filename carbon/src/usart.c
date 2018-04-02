@@ -25,11 +25,11 @@ void *usart_interface[] = {
 LF_MODULE(usart, "usart", usart_interface);
 
 LF_WEAK int usart_pull(void* destination, lf_size_t length) {
-	return lf_pull(lf_get_current_device(), "usart", _usart_pull, destination, length, lf_args(lf_infer(destination), lf_infer(length)));
+	return lf_pull(lf_get_current_device(), "usart", _usart_pull, destination, length);
 }
 
 LF_WEAK int usart_push(void* source, lf_size_t length) {
-	return lf_push(lf_get_current_device(), "usart", _usart_push, source, length, lf_args(lf_infer(source), lf_infer(length)));
+	return lf_push(lf_get_current_device(), "usart", _usart_push, source, length);
 }
 
 LF_WEAK uint8_t usart_get(void) {
