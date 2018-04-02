@@ -208,17 +208,14 @@ struct _lf_arg *lf_arg_create(lf_type type, lf_arg value);
 
 /* Builds an fmr_parameters from a set of variadic arguments provided by the fmr_parameters macro. */
 struct _lf_ll *fmr_build(int argc, ...);
-/* Executes a standard module. */
-lf_return_t fmr_execute(lf_module module, lf_function function, lf_type ret, lf_argc argc, lf_types argt, void *arguments);
-/* Executes an fmr_packet and stores the result of the operation in the result buffer provided. */
-int fmr_perform(struct _fmr_packet *packet, struct _fmr_result *result);
 
-/* Helper function for lf_push. */
-extern lf_return_t fmr_push(struct _fmr_push_pull_packet *packet);
-/* Helper function for lf_pull. */
-extern lf_return_t fmr_pull(struct _fmr_push_pull_packet *packet);
-/* Helper function for lf_dyld. */
-extern lf_return_t fmr_dyld(struct _fmr_dyld_packet *packet);
+/* Executes an fmr_packet and stores the result of the operation in the result buffer provided. */
+int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet);
+
+int fmr_execute(struct _lf_device *device, lf_module module, lf_function function, lf_type ret, lf_argc argc, lf_types argt, void *arguments, lf_return_t *retval);
+int fmr_push(struct _lf_device *device, lf_module module, lf_function function, lf_size_t length, lf_return_t *retval);
+int fmr_pull(struct _lf_device *device, lf_module module, lf_function function, lf_size_t length, lf_return_t *retval);
+int fmr_dyld(struct _lf_device *device, char *module, lf_return_t *retval);
 
 /* ~ Functions with platform specific implementation. ~ */
 
