@@ -19,7 +19,6 @@
 #include <flipper/rtc.h>
 #include <flipper/spi.h>
 #include <flipper/swd.h>
-#include <flipper/task.h>
 #include <flipper/temp.h>
 #include <flipper/timer.h>
 #include <flipper/uart0.h>
