@@ -41,7 +41,7 @@ LF_WEAK void usart_put(uint8_t byte) {
 }
 
 LF_WEAK int usart_ready(void) {
-	return lf_invoke(lf_get_current_device(), "usart", _usart_ready, lf_int32_t, NULL);
+	return lf_invoke(lf_get_current_device(), "usart", _usart_ready, lf_int_t, NULL);
 }
 
 LF_WEAK void usart_disable(void) {
@@ -53,6 +53,6 @@ LF_WEAK void usart_enable(void) {
 }
 
 LF_WEAK int usart_configure(void) {
-	return lf_invoke(lf_get_current_device(), "usart", _usart_configure, lf_int32_t, NULL);
+	return lf_invoke(lf_get_current_device(), "usart", _usart_configure, lf_int_t, NULL);
 }
 

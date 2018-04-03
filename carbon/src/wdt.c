@@ -17,6 +17,6 @@ LF_WEAK void wdt_fire(void) {
 }
 
 LF_WEAK int wdt_configure(void) {
-	return lf_invoke(lf_get_current_device(), "wdt", _wdt_configure, lf_int32_t, NULL);
+	return lf_invoke(lf_get_current_device(), "wdt", _wdt_configure, lf_int_t, NULL);
 }
 

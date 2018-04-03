@@ -13,10 +13,10 @@ void *timer_interface[] = {
 LF_MODULE(timer, "timer", timer_interface);
 
 LF_WEAK int timer_register(uint32_t ticks, void* callback) {
-	return lf_invoke(lf_get_current_device(), "timer", _timer_register, lf_int32_t, lf_args(lf_infer(ticks), lf_infer(callback)));
+	return lf_invoke(lf_get_current_device(), "timer", _timer_register, lf_int_t, lf_args(lf_infer(ticks), lf_infer(callback)));
 }
 
 LF_WEAK int timer_configure(void) {
-	return lf_invoke(lf_get_current_device(), "timer", _timer_configure, lf_int32_t, NULL);
+	return lf_invoke(lf_get_current_device(), "timer", _timer_configure, lf_int_t, NULL);
 }
 

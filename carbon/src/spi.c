@@ -59,6 +59,6 @@ LF_WEAK void spi_enable(void) {
 }
 
 LF_WEAK int spi_configure(void) {
-	return lf_invoke(lf_get_current_device(), "spi", _spi_configure, lf_int32_t, NULL);
+	return lf_invoke(lf_get_current_device(), "spi", _spi_configure, lf_int_t, NULL);
 }
 
