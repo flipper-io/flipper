@@ -146,23 +146,25 @@ int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet) {
 	lf_assert(_crc == crc, failure, E_CHECKSUM, "Checksums do not match.");
 
 	/* Cast the incoming packet to the different packet structures for subclass handling. */
-	struct _fmr_push_pull_packet *xfer = (struct _fmr_push_pull_packet *)packet;
-	struct _fmr_dyld_packet *dyld = (struct _fmr_dyld_packet *)packet;
-	struct _fmr_invocation *call = &((struct _fmr_invocation_packet *)packet)->call;
+	struct _fmr_invocation_packet *ipacket = (struct _fmr_invocation_packet *)packet;
+	struct _fmr_push_pull_packet *ppacket = (struct _fmr_push_pull_packet *)packet;
+	struct _fmr_dyld_packet *dpacket = (struct _fmr_dyld_packet *)packet;
+	struct _fmr_invocation *icall = &ipacket->call;
+	struct _fmr_invocation *pcall = &ppacket->call;
 
 	/* Switch through the packet subclasses and invoke the appropriate handler for each. */
 	switch (packet->header.type) {
 		case fmr_execute_class:
-			e = fmr_execute(device, call->index, call->function, call->ret, call->argc, call->types, call->parameters, &retval);
+			e = fmr_execute(device, icall->index, icall->function, icall->ret, icall->argc, icall->types, icall->parameters, &retval);
 		break;
 		case fmr_push_class:
-			e = fmr_push(device, call->index, call->function, xfer->length, &retval);
+			e = fmr_push(device, pcall->index, pcall->function, ppacket->length, &retval);
 		break;
 		case fmr_pull_class:
-			e = fmr_pull(device, call->index, call->function, xfer->length, &retval);
+			e = fmr_pull(device, pcall->index, pcall->function, ppacket->length, &retval);
 		break;
 		case fmr_dyld_class:
-			e = fmr_dyld(device, dyld->module, &retval);
+			e = fmr_dyld(device, dpacket->module, &retval);
 		break;
 		default:
 			e = E_UNIMPLEMENTED;
