@@ -11,7 +11,7 @@ LF_FUNC("usart") int usart_ready(void) {
 }
 
 LF_FUNC("usart") int usart_push(void *source, lf_size_t length) {
-	printf("Pushing to the usart bus.\n");
+	printf("Pushing '%s' to the usart bus.\n", source);
 	return lf_success;
 }
 
