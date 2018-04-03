@@ -43,19 +43,19 @@ LF_WEAK void uart0_put(uint8_t byte) {
 }
 
 LF_WEAK int uart0_ready(void) {
-	return lf_invoke(lf_get_current_device(), "uart0", _uart0_ready, lf_int32_t, NULL);
+	return lf_invoke(lf_get_current_device(), "uart0", _uart0_ready, lf_int_t, NULL);
 }
 
 LF_WEAK int uart0_reset(void) {
-	return lf_invoke(lf_get_current_device(), "uart0", _uart0_reset, lf_int32_t, NULL);
+	return lf_invoke(lf_get_current_device(), "uart0", _uart0_reset, lf_int_t, NULL);
 }
 
 LF_WEAK int uart0_setbaud(uint32_t baud) {
-	return lf_invoke(lf_get_current_device(), "uart0", _uart0_setbaud, lf_int32_t, lf_args(lf_infer(baud)));
+	return lf_invoke(lf_get_current_device(), "uart0", _uart0_setbaud, lf_int_t, lf_args(lf_infer(baud)));
 }
 
 LF_WEAK int uart0_configure(void) {
-	return lf_invoke(lf_get_current_device(), "uart0", _uart0_configure, lf_int32_t, NULL);
+	return lf_invoke(lf_get_current_device(), "uart0", _uart0_configure, lf_int_t, NULL);
 }
 
 LF_WEAK void uart0_enable(void) {

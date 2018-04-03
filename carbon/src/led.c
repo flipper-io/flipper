@@ -17,6 +17,6 @@ LF_WEAK void led_rgb(uint8_t r, uint8_t g, uint8_t b) {
 }
 
 LF_WEAK int led_configure(void) {
-	return lf_invoke(lf_get_current_device(), "led", _led_configure, lf_int32_t, NULL);
+	return lf_invoke(lf_get_current_device(), "led", _led_configure, lf_int_t, NULL);
 }
 

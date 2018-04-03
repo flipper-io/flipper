@@ -29,6 +29,6 @@ LF_WEAK void gpio_enable(uint32_t enable, uint32_t disable) {
 }
 
 LF_WEAK int gpio_configure(void) {
-	return lf_invoke(lf_get_current_device(), "gpio", _gpio_configure, lf_int32_t, NULL);
+	return lf_invoke(lf_get_current_device(), "gpio", _gpio_configure, lf_int_t, NULL);
 }
 

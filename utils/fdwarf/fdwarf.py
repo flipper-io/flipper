@@ -116,6 +116,11 @@ $FUNCTIONS$
 			for p in f.parameters:
 				args.append("lf_infer(%s)" % p.name)
 			retl = ["lf_void_t", "", "lf_int8_t", "lf_int16_t", "", "lf_int32_t"]
+			ftype = retl[f.ret + 1]
+			if f.type == "int":
+				ftype = "lf_int_t"
+			elif f.type == "void *":
+				ftype = "lf_ptr_t"
 			lf_args = "lf_args(%s)" % ", ".join(args)
 			if len(args) == 0:
 				lf_args = "NULL"
@@ -124,7 +129,7 @@ $FUNCTIONS$
 			elif f.name.endswith("pull"):
 				statement = "lf_pull(lf_get_current_device(), \"$MODULE$\", %s, %s, length);" % ("_" + f.name, "destination")
 			else:
-				statement = "lf_invoke(lf_get_current_device(), \"$MODULE$\", %s, %s, %s);" % ("_" + f.name, retl[f.ret + 1], lf_args)
+				statement = "lf_invoke(lf_get_current_device(), \"$MODULE$\", %s, %s, %s);" % ("_" + f.name, ftype, lf_args)
 			if f.type == "void":
 				body = statement
 			else:

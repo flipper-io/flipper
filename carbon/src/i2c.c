@@ -31,7 +31,7 @@ LF_WEAK uint8_t i2c_read(void) {
 }
 
 LF_WEAK int i2c_configure(void) {
-	return lf_invoke(lf_get_current_device(), "i2c", _i2c_configure, lf_int32_t, NULL);
+	return lf_invoke(lf_get_current_device(), "i2c", _i2c_configure, lf_int_t, NULL);
 }
 
 LF_WEAK void i2c_start_read(uint8_t address, uint8_t length) {
