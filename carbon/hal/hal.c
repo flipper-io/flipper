@@ -26,32 +26,40 @@
 #include <flipper/atmegau2/atmegau2.h>
 
 void sam_reset(void) {
+	carbon_select_u2(lf_get_current_device());
 	/* reset low (active) */
 	gpio_write(0, (1 << SAM_RESET_PIN));
 	usleep(10000);
 	/* reset high (inactive) */
 	gpio_write((1 << SAM_RESET_PIN), 0);
+	carbon_select_4s(lf_get_current_device());
 }
 
 int sam_enter_dfu(void) {
+	carbon_select_u2(lf_get_current_device());
 	/* erase high, reset low (active) */
 	gpio_write((1 << SAM_ERASE_PIN), (1 << SAM_RESET_PIN));
 	/* Wait for chip to erase. */
 	usleep(8000000);
 	/* erase low, reset high (inactive) */
 	gpio_write((1 << SAM_RESET_PIN), (1 << SAM_ERASE_PIN));
+	carbon_select_4s(lf_get_current_device());
 	return lf_success;
 }
 
 int sam_off(void) {
+	carbon_select_u2(lf_get_current_device());
 	/* power off, reset low */
 	gpio_write(0, (1 << SAM_POWER_PIN) | (1 << SAM_RESET_PIN));
+	carbon_select_4s(lf_get_current_device());
 	return lf_success;
 }
 
 int sam_on(void) {
+	carbon_select_u2(lf_get_current_device());
 	/* power on, reset high */
 	gpio_write((1 << SAM_POWER_PIN) | (1 << SAM_RESET_PIN), 0);
+	carbon_select_4s(lf_get_current_device());
 	return lf_success;
 }
 
