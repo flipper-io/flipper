@@ -124,14 +124,13 @@ failure:
 }
 
 int atsam4s_release(struct _lf_device *device) {
-
 	return lf_success;
 }
 
 int carbon_attach_u2s(const void *__u2, void *_unused) {
 	struct _lf_device *_4s = lf_device_create(atsam4s_read, atsam4s_write, atsam4s_release);
 	lf_assert(_4s, failure, E_NULL, "Failed to create 4s subdevice in '%s'.", __PRETTY_FUNCTION__);
-	return lf_attach(_4s);
+	return lf_attach(__u2);
 failure:
 	return lf_error;
 }
@@ -141,6 +140,7 @@ failure:
 /* Attaches to all of the Carbon devices available on the system. */
 int carbon_attach(void) {
 	struct _lf_ll *_u2s = lf_libusb_devices_for_vid_pid(CARBON_USB_VENDOR_ID, CARBON_USB_PRODUCT_ID);
+	if (!_u2s) return lf_error;
 	return lf_ll_apply_func(_u2s, carbon_attach_u2s, NULL);
 }
 

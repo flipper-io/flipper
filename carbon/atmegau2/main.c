@@ -2,6 +2,8 @@
 
 #include <flipper/atmegau2/megausb.h>
 
+struct _lf_device *_u2;
+
 int debug_putchar(char c, FILE *stream) {
 	usb_debug_putchar(c);
 	return 0;
@@ -11,7 +13,6 @@ void loop(void) {
 	while (1) {
 
 		struct _fmr_packet packet;
-		struct _fmr_result result;
 
 		int _e = megausb_bulk_receive(&packet, sizeof(struct _fmr_packet));
 
@@ -19,8 +20,7 @@ void loop(void) {
 
 		if (_e == lf_success) {
 			lf_error_clear();
-			fmr_perform(&packet, &result);
-			megausb_bulk_transmit(&result, sizeof(struct _fmr_result));
+			fmr_perform(_u2, &packet);
 		}
 
 		wdt_reset();
@@ -68,7 +68,7 @@ int main(void) {
 	/* Create a flipper device. */
 #warning Make this static.
 
-	struct _lf_device *_u2 = lf_device_create(atmegau2_write, atmegau2_read, atmegau2_release);
+	_u2 = lf_device_create(atmegau2_read, atmegau2_write, atmegau2_release);
 	lf_attach(_u2);
 
 	extern struct _lf_module button;
