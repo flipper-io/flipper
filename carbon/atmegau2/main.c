@@ -29,6 +29,20 @@ void loop(void) {
 	}
 }
 
+/* Use USB as the read/write endpoint. */
+
+int atmegau2_read(struct _lf_device *device, void *destination, lf_size_t length) {
+	megausb_bulk_receive(destination, length);
+}
+
+int atmegau2_write(struct _lf_device *device, void *source, lf_size_t length) {
+	megausb_bulk_transmit(source, length);
+}
+
+int atmegau2_release(struct _lf_device *device) {
+	return lf_error;
+}
+
 int main(void) {
 
 	/* Configure the AVR. */
@@ -52,7 +66,9 @@ int main(void) {
 	PCICR |= (1 << PCIE1);
 
 	/* Create a flipper device. */
-	struct _lf_device *_u2 = lf_device_create("atmegau2", (void *)0xdeadbeef);
+#warning Make this static.
+
+	struct _lf_device *_u2 = lf_device_create(atmegau2_write, atmegau2_read, atmegau2_release);
 	lf_attach(_u2);
 
 	extern struct _lf_module button;

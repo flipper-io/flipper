@@ -81,48 +81,7 @@ failure:
 	return NULL;
 }
 
-int uart0_bridge_configure(struct _lf_device *device, void *_configuration) {
-	lf_assert(device, failure, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
-	carbon_select_u2(device);
-	int _e = uart0_configure();
-	carbon_select_4s(device);
-	return _e;
-failure:
-	return lf_error;
-}
-
-bool uart0_bridge_ready(struct _lf_device *device) {
-	lf_assert(device, failure, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
-	carbon_select_u2(device);
-	int _e = uart0_ready();
-	carbon_select_4s(device);
-	return _e;
-failure:
-	return false;
-}
-
-int uart0_bridge_push(struct _lf_device *device, void *source, lf_size_t length) {
-	lf_assert(device, failure, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
-	carbon_select_u2(device);
-	lf_size_t size = 128;
-	lf_size_t packets = lf_ceiling(length, size);
-	for (lf_size_t i = 0; i < packets; i ++) {
-		lf_size_t len = (length > size) ? size : length;
-		int _e = uart0_push(source, len);
-		if (_e) {
-			carbon_select_4s(device);
-			return _e;
-		}
-		source += size;
-		length -= size;
-	}
-	carbon_select_4s(device);
-	return lf_success;
-failure:
-	return lf_error;
-}
-
-int uart0_bridge_pull(struct _lf_device *device, void *destination, lf_size_t length) {
+int atsam4s_read(struct _lf_device *device, void *destination, lf_size_t length) {
 	lf_assert(device, failure, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
 	carbon_select_u2(device);
 	lf_size_t size = 128;
@@ -143,45 +102,54 @@ failure:
 	return lf_error;
 }
 
-void carbon_attach_to_usb_endpoint_applier(const void *__u2_ep, void *_other) {
-	/* Obtain the u2's endpoint. */
-	struct _lf_endpoint *_u2_ep = (struct _lf_endpoint *)__u2_ep;
-	/* Create the u2 sub-device. */
-	struct _lf_device *_u2 = lf_device_create("u2", _u2_ep);
-	/* Create the 4s' endpoint using the u2's uart0 endpoint as a bridge. */
-	struct _lf_endpoint *_4s_ep = lf_endpoint_create(uart0_bridge_configure, uart0_bridge_ready, uart0_bridge_push, uart0_bridge_pull, NULL, 0);
-	/* Create the 4s sub-device. */
-	struct _lf_device *_4s = lf_device_create("4s", _4s_ep);
-	/* Set the 4s's context. */
-	struct _carbon_context *context = calloc(1, sizeof(struct _carbon_context));
-	lf_assert(context, failure, E_MALLOC, "Failed to allocate memory for carbon context.");
-	/* Set the carbon's u2 and 4s sub-devices. */
-	context->_u2 = _u2;
-	context->_4s = _4s;
-	/* Write back the contexts. */
-	_u2->_ctx = context;
-	_4s->_ctx = context;
-	/* Attach to the new carbon device. */
-	lf_attach(_4s);
+int atsam4s_write(struct _lf_device *device, void *source, lf_size_t length) {
+	lf_assert(device, failure, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
+	carbon_select_u2(device);
+	lf_size_t size = 128;
+	lf_size_t packets = lf_ceiling(length, size);
+	for (lf_size_t i = 0; i < packets; i ++) {
+		lf_size_t len = (length > size) ? size : length;
+		int _e = uart0_push(source, len);
+		if (_e) {
+			carbon_select_4s(device);
+			return _e;
+		}
+		source += size;
+		length -= size;
+	}
+	carbon_select_4s(device);
+	return lf_success;
 failure:
-	return;
+	return lf_error;
 }
 
-/* Attaches to all of the Carbon devices available on the system. */
-int carbon_attach(void) {
-	/* Obtains a list of endpoints for all Carbon devices attached to the system. */
-	struct _lf_ll *endpoints = lf_libusb_endpoints_for_vid_pid(CARBON_USB_VENDOR_ID, CARBON_USB_PRODUCT_ID);
-	if (!endpoints) return lf_error;
-	lf_ll_apply_func(endpoints, carbon_attach_to_usb_endpoint_applier, NULL);
+int atsam4s_release(struct _lf_device *device) {
+
 	return lf_success;
 }
 
+int carbon_attach_u2s(const void *__u2, void *_unused) {
+	struct _lf_device *_4s = lf_device_create(atsam4s_read, atsam4s_write, atsam4s_release);
+	lf_assert(_4s, failure, E_NULL, "Failed to create 4s subdevice in '%s'.", __PRETTY_FUNCTION__);
+	return lf_attach(_4s);
+failure:
+	return lf_error;
+}
+
+#warning Carbon is broken until carbon context is reinstated.
+
+/* Attaches to all of the Carbon devices available on the system. */
+int carbon_attach(void) {
+	struct _lf_ll *_u2s = lf_libusb_devices_for_vid_pid(CARBON_USB_VENDOR_ID, CARBON_USB_PRODUCT_ID);
+	return lf_ll_apply_func(_u2s, carbon_attach_u2s, NULL);
+}
+
 struct _lf_device *carbon_attach_hostname(char *hostname) {
-	struct _lf_endpoint *endpoint = lf_network_endpoint_for_hostname(hostname);
-	lf_assert(endpoint, failure, E_NO_DEVICE, "Failed to find Carbon device using hostname '%s'.", hostname);
-	struct _lf_device *carbon = lf_device_create("carbon", endpoint);
-	lf_attach(carbon);
-	return carbon;
+	struct _lf_device *device = lf_network_device_for_hostname(hostname);
+	lf_assert(device, failure, E_NO_DEVICE, "Failed to find Carbon device with hostname '%s'.", hostname);
+	lf_attach(device);
+	return device;
+
 failure:
 	return NULL;
 }

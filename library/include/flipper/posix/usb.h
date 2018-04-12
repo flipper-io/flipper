@@ -5,6 +5,6 @@
 #include <flipper/ll.h>
 
 /* Attaches to all devices with a given VID and PID. */
-struct _lf_ll *lf_libusb_endpoints_for_vid_pid(uint16_t vid, uint16_t pid);
+struct _lf_ll *lf_libusb_devices_for_vid_pid(uint16_t vid, uint16_t pid);
 
 #endif

@@ -87,7 +87,7 @@ failure:
 int fmr_push(struct _lf_device *device, lf_module module, lf_function function, lf_size_t length, lf_return_t *retval) {
 	void *source = malloc(length);
 	lf_assert(source, failure, E_MALLOC, "Failed to allocate memory for '%s'.", __FUNCTION__);
-	int e = device->endpoint->pull(device, source, length);
+	int e = device->read(device, source, length);
 	lf_assert(e == lf_success, failure, E_FMR, "Failed to pull data for '%s'.", __FUNCTION__);
 
 	struct _lf_module *m = lf_ll_item(device->modules, module);
@@ -111,7 +111,7 @@ int fmr_pull(struct _lf_device *device, lf_module module, lf_function function, 
 	lf_assert(pull, failure, E_NULL, "Bad function address in '%s'.", __FUNCTION__);
 	*retval = pull(destination, length);
 
-	int e = device->endpoint->push(device, destination, length);
+	int e = device->write(device, destination, length);
 	lf_assert(e == lf_success, failure, E_FMR, "Failed to push data for '%s'.", __FUNCTION__);
 
 	free(destination);
@@ -175,7 +175,7 @@ int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet) {
 failure:
 	result.error = e;
 	result.value = retval;
-	e = device->endpoint->push(device, &result, sizeof(struct _fmr_result));
+	e = device->write(device, &result, sizeof(struct _fmr_result));
 	lf_debug_result(&result);
 	return e;
 }

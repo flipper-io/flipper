@@ -25,6 +25,20 @@ void os_kernel_task(void) {
 	}
 }
 
+/* Use the uart0 bus as the read/write endpoint. */
+
+int atsam4s_read(struct _lf_device *device, void *destination, lf_size_t length) {
+	return uart0_pull(destination, length);
+}
+
+int atsam4s_write(struct _lf_device *device, void *source, lf_size_t length) {
+	return uart0_push(source, length);
+}
+
+int atsam4s_release(struct _lf_device *device) {
+	return lf_error;
+}
+
 int main(void) {
 
 	/* Disable the watchdog timer. */
@@ -58,12 +72,7 @@ int main(void) {
 	/* Allow the reset pin to reset the device. */
 	RSTC->RSTC_MR = RSTC_MR_KEY_PASSWD | RSTC_MR_URSTEN;
 
-	struct _lf_endpoint *_4s_ep = lf_endpoint_create(uart0_configure,
-													 uart0_ready,
-													 uart0_push,
-													 uart0_pull,
-													 NULL, NULL);
-	_4s = lf_device_create("atsam4s", _4s_ep);
+	_4s = lf_device_create(atsam4s_read, atsam4s_write, atsam4s_release);
 	lf_attach(_4s);
 
 	extern struct _lf_module adc;

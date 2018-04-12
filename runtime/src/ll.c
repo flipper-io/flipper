@@ -55,13 +55,16 @@ failure:
 	return;
 }
 
-void lf_ll_apply_func(struct _lf_ll *ll, lf_ll_applier_func func,  void *_ctx) {
+int lf_ll_apply_func(struct _lf_ll *ll, lf_ll_applier_func func,  void *_ctx) {
 	lf_assert(ll && func, failure, E_NULL, "Invalid parameter provided to '%s'.", __PRETTY_FUNCTION__);
+	int e = lf_success;
 	do {
-		func(ll->item, _ctx);
+		e = func(ll->item, _ctx);
+		if (e != lf_success) break;
 	} while ((ll = ll->next));
+	return e;
 failure:
-	return;
+	return lf_error;
 }
 
 /* Releases the entire linked list. */

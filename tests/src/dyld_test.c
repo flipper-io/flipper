@@ -4,7 +4,6 @@
 #include <tests.h>
 
 int test_func(void) {
-    printf("derp\n");
     return lf_success;
 }
 
@@ -23,27 +22,14 @@ int dyld_test(void) {
     lf_assert(!strcmp("test", module->name), failure, E_UNIMPLEMENTED, "Module name doesn't match.");
     lf_assert(module->idx == 1, failure, E_UNIMPLEMENTED, "Module name doesn't match.");
 
-    struct _lf_endpoint *endpoint = (void *)0xdeadbeef;
-    lf_try(endpoint = lf_endpoint_create(NULL, NULL, NULL, NULL, NULL, 0));
-    lf_expect_error();
-    lf_assert(endpoint == NULL, failure, E_UNIMPLEMENTED, "Endpoint was not NULL.");
-    lf_try(lf_endpoint_release(endpoint));
-    lf_expect_error();
-
-    lf_try(endpoint = lf_endpoint_create((void *)&test_func, (void *)&test_func, (void *)&test_func, (void *)&test_func, (void *)&test_func, 0));
-    lf_expect_success();
-    lf_assert(endpoint, failure, E_UNIMPLEMENTED, "Endpoint was NULL.");
-
     struct _lf_device *device = (void *)0xdeadbeef;
     lf_try(device = lf_device_create(NULL, NULL));
     lf_expect_error();
     lf_assert(device == NULL, failure, E_UNIMPLEMENTED, "Device was not NULL.");
 
-    lf_try(device = lf_device_create("test", endpoint));
+    lf_try(device = lf_device_create(NULL, NULL, NULL));
     lf_expect_success();
     lf_assert(device, failure, E_UNIMPLEMENTED, "Device was NULL.");
-    lf_assert(!strcmp("test", device->name), failure, E_UNIMPLEMENTED, "Device name doesn't match.");
-    lf_assert(device->endpoint == endpoint, failure, E_UNIMPLEMENTED, "Device endpoint pounter doesn't match.");
 
     lf_assert(device->modules == NULL, failure, E_UNIMPLEMENTED, "Device modules are not NULL.");
     lf_try(dyld_register(NULL, NULL));

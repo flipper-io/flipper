@@ -15,7 +15,7 @@ struct _lf_ll {
 };
 
 /* The type signature of a fast enumeration function. */
-typedef void (* lf_ll_applier_func)(const void *_item, void *_ctx);
+typedef int (* lf_ll_applier_func)(const void *_item, void *_ctx);
 
 /* Returns the number of items in the list. */
 size_t lf_ll_count(struct _lf_ll *ll);
@@ -26,7 +26,7 @@ void *lf_ll_item(struct _lf_ll *ll, uint32_t index);
 /* Removes matching items from the list. */
 void lf_ll_remove(struct _lf_ll **_ll, void *item);
 /* Applys a fast enumeration function to each item in the list. */
-void lf_ll_apply_func(struct _lf_ll *ll, lf_ll_applier_func func, void *_ctx);
+int lf_ll_apply_func(struct _lf_ll *ll, lf_ll_applier_func func, void *_ctx);
 /* Releases the list and all of its items. */
 int lf_ll_release(struct _lf_ll **_ll);
 
