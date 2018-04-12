@@ -17,15 +17,21 @@ struct _lf_device {
 	char *name;
 	/* The device's firmware version. */
 	lf_version_t version;
-	/* A pointer to the endpoint through which packets will be transferred. */
-	struct _lf_endpoint *endpoint;
 	/* The modules loaded on the device. */
 	struct _lf_ll *modules;
+	/* Receives arbitrary data from the device. */
+	int (* read)(struct _lf_device *device, void *destination, lf_size_t length);
+	/* Transmits arbitrary data to the device. */
+	int (* write)(struct _lf_device *device, void *source, lf_size_t length);
+	/* Releases device state. */
+	int (* release)(struct _lf_device *device);
 	/* The device's context. */
 	void *_ctx;
 };
 
-struct _lf_device *lf_device_create(char *name, struct _lf_endpoint *endpoint);
+struct _lf_device *lf_device_create(int (* read)(struct _lf_device *device, void *destination, lf_size_t length),
+									int (* write)(struct _lf_device *device, void *source, lf_size_t length),
+									int (* release)(struct _lf_device *device));
 int lf_device_release(struct _lf_device *device);
 
 #endif

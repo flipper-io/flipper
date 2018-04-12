@@ -77,7 +77,6 @@ void lf_set_debug_level(int level);
 #define little32(x) ((((uint32_t)(x)) << 16 ) | (((uint32_t)(x)) >> 16))
 
 #include <flipper/error.h>
-#include <flipper/endpoint.h>
 #include <flipper/device.h>
 #include <flipper/module.h>
 #include <flipper/fmr.h>

@@ -1,16 +1,15 @@
 #include <flipper.h>
 
 /* Creates a new libflipper device. */
-struct _lf_device *lf_device_create(char *name, struct _lf_endpoint *endpoint) {
+struct _lf_device *lf_device_create(int (* read)(struct _lf_device *device, void *destination, lf_size_t length),
+									int (* write)(struct _lf_device *device, void *source, lf_size_t length),
+									int (* release)(struct _lf_device *device)) {
 	struct _lf_device *device = NULL;
-	lf_assert(name, failure, E_NULL, "NULL name string provided to '%s'.", __PRETTY_FUNCTION__);
-	lf_assert(endpoint, failure, E_NULL, "NULL endpoint provided to '%s'.", __PRETTY_FUNCTION__);
 	device = (struct _lf_device *)calloc(1, sizeof(struct _lf_device));
 	lf_assert(device, failure, E_MALLOC, "Failed to allocate memory for new device.");
-	size_t len = strlen(name) + 1;
-	device->name = malloc(len);
-	strcpy(device->name, name);
-	device->endpoint = endpoint;
+	device->read = read;
+	device->write = write;
+	device->release = release;
 	return device;
 failure:
 	free(device);
@@ -19,7 +18,6 @@ failure:
 
 int lf_device_release(struct _lf_device *device) {
     lf_assert(device, failure, E_NULL, "NULL device provided to '%s'", __PRETTY_FUNCTION__);
-	lf_endpoint_release(device->endpoint);
 	free(device->name);
 	free(device);
 	return lf_success;

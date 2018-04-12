@@ -5,6 +5,7 @@
 
 #include <flipper.h>
 
+/* POSIX network includes. */
 #include <arpa/inet.h>
 #include <netdb.h>
 
@@ -17,14 +18,10 @@ struct _lf_network_context {
 	struct sockaddr_in device;
 };
 
-int lf_network_configure(struct _lf_device *device, void *_ctx);
-bool lf_network_ready(struct _lf_device *device);
-int lf_network_push(struct _lf_device *device, void *source, lf_size_t length);
-int lf_network_pull(struct _lf_device *device, void *destination, lf_size_t length);
-int lf_network_destroy(struct _lf_endpoint *endpoint);
-struct _lf_endpoint *lf_network_endpoint_for_hostname(char *hostname);
+int lf_network_read(struct _lf_device *device, void *destination, lf_size_t length);
+int lf_network_write(struct _lf_device *device, void *source, lf_size_t length);
+int lf_network_release(struct _lf_device *device);
 
-/* Returns the endpoint for a device on the network. */
-struct _lf_endpoint *lf_network_endpoint_for_hostname(char *hostname);
+struct _lf_device *lf_network_device_for_hostname(char *hostname);
 
 #endif

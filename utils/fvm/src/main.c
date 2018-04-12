@@ -31,18 +31,13 @@ int main(int argc, char *argv[]) {
 	}
 
 	/* The network endpoint for the virtual flipper device. */
-	struct _lf_network_context *context = NULL;
-	struct _lf_endpoint *nep = lf_endpoint_create(lf_network_configure,
-							 lf_network_ready,
-							 lf_network_push,
-							 lf_network_pull,
-							 lf_network_destroy,
-							 sizeof(struct _lf_network_context));
-	lf_assert(nep, failure, E_ENDPOINT, "Failed to create endpoint for networked device.");
-	context = (struct _lf_network_context *)nep->_ctx;
+	fvm = lf_device_create(lf_network_read, lf_network_write, lf_network_release);
+	lf_assert(fvm, failure, E_ENDPOINT, "Failed to create device for virtual machine.");
+	fvm->_ctx = calloc(1, sizeof(struct _lf_network_context));
+	struct _lf_network_context *context = (struct _lf_network_context *)fvm->_ctx;
+	lf_assert(context, failure, E_NULL, "Failed to allocate memory for context in '%s'.", __PRETTY_FUNCTION__);
+	/* Set server file descriptor. */
 	context->fd = sd;
-
-	fvm = lf_device_create("fvm", nep);
 	lf_attach(fvm);
 
 	printf("Flipper Virtual Machine (FVM) v0.1.0\nListening on 'localhost'.\n\n");
@@ -100,7 +95,7 @@ int main(int argc, char *argv[]) {
 
 	while (1) {
 		struct _fmr_packet packet;
-		nep->pull(fvm, &packet, sizeof(struct _fmr_packet));
+		fvm->read(fvm, &packet, sizeof(struct _fmr_packet));
 		lf_debug_packet(&packet, sizeof(struct _fmr_packet));
 		lf_error_clear();
 		fmr_perform(fvm, &packet);
