@@ -56,7 +56,8 @@ failure:
 }
 
 int lf_ll_apply_func(struct _lf_ll *ll, lf_ll_applier_func func,  void *_ctx) {
-	lf_assert(ll && func, failure, E_NULL, "Invalid parameter provided to '%s'.", __PRETTY_FUNCTION__);
+	lf_assert(ll, failure, E_NULL, "Invalid list provided to '%s'.", __PRETTY_FUNCTION__);
+	lf_assert(func, failure, E_NULL, "Invalid applier function provided to '%s'.", __PRETTY_FUNCTION__);
 	int e = lf_success;
 	do {
 		e = func(ll->item, _ctx);

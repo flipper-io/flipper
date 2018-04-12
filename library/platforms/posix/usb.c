@@ -83,7 +83,6 @@ int lf_libusb_release(struct _lf_device *device) {
 	lf_assert(context, failure, E_NULL, "No context specified for '%s'.", __PRETTY_FUNCTION__);
 	libusb_close(context->handle);
 	libusb_exit(context->context);
-
 	return lf_success;
 
 failure:
@@ -93,30 +92,33 @@ failure:
 struct _lf_ll *lf_libusb_devices_for_vid_pid(uint16_t vid, uint16_t pid) {
 	struct libusb_context *context = NULL;
 	struct libusb_device **libusb_devices = NULL;
+	struct libusb_device *libusb_device = NULL;
+	struct libusb_device_descriptor descriptor;
 	struct _lf_ll *devices = NULL;
+
 	int e = libusb_init(&context);
 	lf_assert(e == 0, failure, E_LIBUSB, "Failed to initialize libusb. Reboot and try again.");
-	/* Walk the device list until all desired devices are attached. */
+
 	size_t device_count = libusb_get_device_list(context, &libusb_devices);
 	for (size_t i = 0; i < device_count; i ++) {
-		struct libusb_device *libusb_device = libusb_devices[i];
-		/* Obtain the device's descriptor. */
-		struct libusb_device_descriptor descriptor;
+		libusb_device = libusb_devices[i];
+
 		e = libusb_get_device_descriptor(libusb_device, &descriptor);
 		lf_assert(e == 0, failure, E_LIBUSB, "Failed to obtain descriptor for device.");
-		/* Check if we have a match with the desired VID and PID. */
+
 		if (descriptor.idVendor == vid && descriptor.idProduct == pid) {
-			/* Create a device. */
 			struct _lf_device *device = lf_device_create(lf_libusb_read, lf_libusb_write, lf_libusb_release);
-			/* Retain a reference to the libusb context and give it to the context. */
+			lf_assert(device, failure, E_ENDPOINT, "Failed to create device in '%s'.", __PRETTY_FUNCTION__);
+			device->_ctx = calloc(1, sizeof(struct _lf_network_context));
 			struct _lf_libusb_context *context = (struct _lf_libusb_context *)device->_ctx;
-			/* Open the device and give it to the context. */
+			lf_assert(context, failure, E_NULL, "Failed to allocate memory for context in '%s'.", __PRETTY_FUNCTION__);
+
 			e = libusb_open(libusb_device, &(context->handle));
 			lf_assert(e == 0, failure, E_NO_DEVICE, "Could not find any devices connected via USB. Ensure that a device is connected.");
-			/* Claim the device's control interface. */
+
 			e = libusb_claim_interface(context->handle, FMR_INTERFACE);
 			lf_assert(e == 0, failure, E_LIBUSB, "Failed to claim interface on attached device. Please quit any other programs using your device.");
-			/* Add the device to the device list. */
+
 			e = lf_ll_append(&devices, device, lf_device_release);
 			lf_assert(e == 0, failure, E_NULL, "Failed to attach device.");
 		}
