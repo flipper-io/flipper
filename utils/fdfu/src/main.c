@@ -190,12 +190,11 @@ int enter_normal_mode(void) {
 		uart0_reset();
 		uart0_push("N#", 2);
 		usleep(1000);
-		uart0_pull(ack, sizeof(ack));
+		lf_try(uart0_pull(ack, sizeof(ack)));
 		if (!memcmp(ack, (const uint8_t []){ '\n', '\r' }, 2)) return lf_success;
 
 		/* If we failed the first time around, enter DFU. */
 		if (!tries) {
-			lf_debug("Entering DFU mode.");
 			sam_enter_dfu();
 		}
 
@@ -238,9 +237,9 @@ int main(int argc, char *argv[]) {
 	sam_reset();
 
 	/* Enter normal mode. (Values are sent as binary.)*/
-	lf_debug("Entering normal mode.");
+	lf_debug("Entering device firmware update mode.");
 	lf_assert(enter_normal_mode() == lf_success, failure, E_UNIMPLEMENTED, "Failed to enter normal mode.");
-	lf_debug(KGRN " Successfully entered normal mode." KNRM);
+	lf_debug(KGRN " Successfully entered DFU mode." KNRM);
 
 	/* Ensure the security bit is clear. */
 	lf_debug("Checking security bit.");

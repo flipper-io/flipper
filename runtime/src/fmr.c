@@ -173,7 +173,7 @@ int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet) {
 
 	struct _fmr_result result;
 failure:
-	result.error = e;
+	result.error = lf_error_get();
 	result.value = retval;
 	e = device->write(device, &result, sizeof(struct _fmr_result));
 	lf_debug_result(&result);

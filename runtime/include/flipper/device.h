@@ -26,7 +26,9 @@ struct _lf_device {
 	/* Releases device state. */
 	int (* release)(struct _lf_device *device);
 	/* The device's context. */
-	void *_ctx;
+	void *_dev_ctx;
+	/* The endpoint's context. */
+	void *_ep_ctx;
 };
 
 struct _lf_device *lf_device_create(int (* read)(struct _lf_device *device, void *destination, lf_size_t length),

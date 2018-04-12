@@ -33,8 +33,8 @@ int main(int argc, char *argv[]) {
 	/* The network endpoint for the virtual flipper device. */
 	fvm = lf_device_create(lf_network_read, lf_network_write, lf_network_release);
 	lf_assert(fvm, failure, E_ENDPOINT, "Failed to create device for virtual machine.");
-	fvm->_ctx = calloc(1, sizeof(struct _lf_network_context));
-	struct _lf_network_context *context = (struct _lf_network_context *)fvm->_ctx;
+	fvm->_ep_ctx = calloc(1, sizeof(struct _lf_network_context));
+	struct _lf_network_context *context = (struct _lf_network_context *)fvm->_ep_ctx;
 	lf_assert(context, failure, E_NULL, "Failed to allocate memory for context in '%s'.", __PRETTY_FUNCTION__);
 	/* Set server file descriptor. */
 	context->fd = sd;

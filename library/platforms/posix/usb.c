@@ -11,7 +11,7 @@ struct _lf_libusb_context {
 int lf_libusb_read(struct _lf_device *device, void *destination, lf_size_t length) {
 	lf_assert(device, failure, E_NULL, "No device provided to '%s'", __PRETTY_FUNCTION__);
 
-	struct _lf_libusb_context *context = (struct _lf_libusb_context *)device->_ctx;
+	struct _lf_libusb_context *context = (struct _lf_libusb_context *)device->_ep_ctx;
 	lf_assert(context, failure, E_NULL, "No context provided in '%s'.", __PRETTY_FUNCTION__);
 
 	int transferred;
@@ -45,7 +45,7 @@ failure:
 int lf_libusb_write(struct _lf_device *device, void *source, lf_size_t length) {
 	lf_assert(device, failure, E_NULL, "No device provided to '%s'", __PRETTY_FUNCTION__);
 
-	struct _lf_libusb_context *context = (struct _lf_libusb_context *)device->_ctx;
+	struct _lf_libusb_context *context = (struct _lf_libusb_context *)device->_ep_ctx;
 	lf_assert(context, failure, E_NULL, "No context provided in '%s'.", __PRETTY_FUNCTION__);
 
 	int transferred;
@@ -79,7 +79,7 @@ failure:
 int lf_libusb_release(struct _lf_device *device) {
 	lf_assert(device, failure, E_NULL, "No device specified for '%s'.", __PRETTY_FUNCTION__);
 
-	struct _lf_libusb_context *context = (struct _lf_libusb_context *)device->_ctx;
+	struct _lf_libusb_context *context = (struct _lf_libusb_context *)device->_ep_ctx;
 	lf_assert(context, failure, E_NULL, "No context specified for '%s'.", __PRETTY_FUNCTION__);
 	libusb_close(context->handle);
 	libusb_exit(context->context);
@@ -109,8 +109,8 @@ struct _lf_ll *lf_libusb_devices_for_vid_pid(uint16_t vid, uint16_t pid) {
 		if (descriptor.idVendor == vid && descriptor.idProduct == pid) {
 			struct _lf_device *device = lf_device_create(lf_libusb_read, lf_libusb_write, lf_libusb_release);
 			lf_assert(device, failure, E_ENDPOINT, "Failed to create device in '%s'.", __PRETTY_FUNCTION__);
-			device->_ctx = calloc(1, sizeof(struct _lf_network_context));
-			struct _lf_libusb_context *context = (struct _lf_libusb_context *)device->_ctx;
+			device->_ep_ctx = calloc(1, sizeof(struct _lf_network_context));
+			struct _lf_libusb_context *context = (struct _lf_libusb_context *)device->_ep_ctx;
 			lf_assert(context, failure, E_NULL, "Failed to allocate memory for context in '%s'.", __PRETTY_FUNCTION__);
 
 			e = libusb_open(libusb_device, &(context->handle));
