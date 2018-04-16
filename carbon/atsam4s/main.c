@@ -17,7 +17,7 @@ int debug_putchar(char c, FILE *stream) {
 void os_kernel_task(void) {
 	gpio_enable(IO_1, 0);
 	while (1) {
-		printf("Hello!\n");
+		//printf("Hello!\n");
 		gpio_write(IO_1, 0);
 		for (int i = 0x1FFFFFC; i > 0; i --) __asm__ __volatile__ ("nop");
 		gpio_write(0, IO_1);
@@ -147,7 +147,8 @@ void uart0_isr(void) {
 
 	/* If an entire packet has been received, process it. */
 	if (_sr & UART_SR_ENDRX) {
-		gpio_write(FMR_PIN, 0);
+		/* set fmr low (active) */
+		gpio_write(0, FMR_PIN);
 
 		UART0->UART_PTCR = UART_PTCR_RXTDIS | UART_PTCR_TXTDIS;
 
@@ -159,7 +160,8 @@ void uart0_isr(void) {
 		/* Wait a bit before raising the FMR pin. */
 		for (size_t i = 0; i < 0x3FF; i ++) __asm__ __volatile__("nop");
 
-		gpio_write(0, FMR_PIN);
+		/* set fmr high (inactive) */
+		gpio_write(FMR_PIN, 0);
 	} else {
 		UART0->UART_CR = UART_CR_RSTSTA;
 	}
