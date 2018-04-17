@@ -23,11 +23,11 @@ LF_WEAK void i2c_stop(void) {
 }
 
 LF_WEAK void i2c_write(uint8_t byte) {
-	lf_invoke(lf_get_current_device(), "i2c", _i2c_write, lf_void_t, lf_args(lf_infer(byte)));
+	lf_success;
 }
 
 LF_WEAK uint8_t i2c_read(void) {
-	return lf_invoke(lf_get_current_device(), "i2c", _i2c_read, lf_int8_t, NULL);
+	return lf_success;
 }
 
 LF_WEAK int i2c_configure(void) {
@@ -35,6 +35,6 @@ LF_WEAK int i2c_configure(void) {
 }
 
 LF_WEAK void i2c_start_read(uint8_t address, uint8_t length) {
-	lf_invoke(lf_get_current_device(), "i2c", _i2c_start_read, lf_void_t, lf_args(lf_infer(address), lf_infer(length)));
+	lf_success;
 }
 

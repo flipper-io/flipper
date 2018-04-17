@@ -98,9 +98,9 @@ int lf_select(struct _lf_device *device);
 /* Performs a remote procedure call to a module's function. */
 lf_return_t lf_invoke(struct _lf_device *device, char *module, lf_function function, lf_type ret, struct _lf_ll *args);
 /* Moves data from the address space of the host to that of the device. */
-lf_return_t lf_push(struct _lf_device *device, char *module, lf_function function, void *source, lf_size_t length);
+lf_return_t lf_push(struct _lf_device *device, void *dst, void *src, size_t len);
 /* Moves data from the address space of the device to that of the host. */
-lf_return_t lf_pull(struct _lf_device *device, char *module, lf_function function, void *destination, lf_size_t length);
+lf_return_t lf_pull(struct _lf_device *device, void *dst, void *src, size_t len);
 /* Gets the module index. */
 int lf_dyld(struct _lf_device *device, char *module);
 

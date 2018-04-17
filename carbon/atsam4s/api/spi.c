@@ -66,7 +66,7 @@ LF_FUNC("spi") uint8_t spi_get(void) {
 	return SPI->SPI_RDR;
 }
 
-LF_FUNC("spi") int spi_push(void *source, uint32_t length) {
+LF_FUNC("spi") int _spi_write(void *source, uint32_t length) {
 	/* Set the transmission length and destination pointer. */
 	SPI->SPI_TCR = length;
 	SPI->SPI_TPR = (uintptr_t)(source);
@@ -79,13 +79,13 @@ LF_FUNC("spi") int spi_push(void *source, uint32_t length) {
 	return lf_success;
 }
 
-LF_FUNC("spi") int spi_pull(void *destination, uint32_t length) {
+LF_FUNC("spi") int _spi_read(void *destination, uint32_t length) {
 	/* Set the transmission length and destination pointer. */
 	SPI->SPI_RCR = length;
 	SPI->SPI_RPR = (uintptr_t)(destination);
 	/* Enable the receiver. */
 	SPI->SPI_PTCR = SPI_PTCR_RXTEN;
-	/* If defined, usart_pull will not use interrupts. */
+	/* If defined, usart_read will not use interrupts. */
 	/* Wait until the transfer has finished. */
 	while (!(SPI->SPI_SR & SPI_SR_ENDRX)) {
 		SPI->SPI_TDR = 0x00;

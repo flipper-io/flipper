@@ -84,45 +84,23 @@ failure:
 	return lf_error;
 }
 
-int fmr_push(struct _lf_device *device, lf_module module, lf_function function, lf_size_t length, lf_return_t *retval) {
-	void *source = malloc(length);
-	lf_assert(source, failure, E_MALLOC, "Failed to allocate memory for '%s'.", __FUNCTION__);
-	int e = device->read(device, source, length);
+int fmr_push(struct _lf_device *device, void *dst, size_t len) {
+	int e = device->read(device, dst, len);
 	lf_assert(e == lf_success, failure, E_FMR, "Failed to pull data for '%s'.", __FUNCTION__);
-
-	struct _lf_module *m = lf_ll_item(device->modules, module);
-	int (* push)(void *source, lf_size_t length) = m->interface[function];
-	lf_assert(push, failure, E_NULL, "Bad function address in '%s'.", __FUNCTION__);
-	*retval = push(source, length);
-
-	free(source);
 	return lf_success;
-
 failure:
 	return lf_error;
 }
 
-int fmr_pull(struct _lf_device *device, lf_module module, lf_function function, lf_size_t length, lf_return_t *retval) {
-	void *destination = malloc(length);
-	lf_assert(destination, failure, E_MALLOC, "Failed to allocate memory for '%s'.", __FUNCTION__);
-
-	struct _lf_module *m = lf_ll_item(device->modules, module);
-	int (* pull)(void *destination, lf_size_t length) = m->interface[function];
-	lf_assert(pull, failure, E_NULL, "Bad function address in '%s'.", __FUNCTION__);
-	*retval = pull(destination, length);
-
-	int e = device->write(device, destination, length);
+int fmr_pull(struct _lf_device *device, void *src, size_t len) {
+	int e = device->write(device, src, len);
 	lf_assert(e == lf_success, failure, E_FMR, "Failed to push data for '%s'.", __FUNCTION__);
-
-	free(destination);
 	return lf_success;
-
 failure:
 	return lf_error;
 }
 
 int fmr_dyld(struct _lf_device *device, char *module, lf_return_t *retval) {
-	lf_debug("Trying to find module '%s'.", module);
 	struct _lf_module *m = dyld_module(device, module);
 	lf_assert(m, failure, E_MODULE, "No module '%s' has been registered.", m->name);
 	*retval = m->idx;
@@ -150,7 +128,6 @@ int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet) {
 	struct _fmr_push_pull_packet *ppacket = (struct _fmr_push_pull_packet *)packet;
 	struct _fmr_dyld_packet *dpacket = (struct _fmr_dyld_packet *)packet;
 	struct _fmr_invocation *icall = &ipacket->call;
-	struct _fmr_invocation *pcall = &ppacket->call;
 
 	/* Switch through the packet subclasses and invoke the appropriate handler for each. */
 	switch (packet->header.type) {
@@ -158,10 +135,10 @@ int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet) {
 			e = fmr_execute(device, icall->index, icall->function, icall->ret, icall->argc, icall->types, icall->parameters, &retval);
 		break;
 		case fmr_push_class:
-			e = fmr_push(device, pcall->index, pcall->function, ppacket->length, &retval);
+			e = fmr_push(device, ppacket->ptr, ppacket->len);
 		break;
 		case fmr_pull_class:
-			e = fmr_pull(device, pcall->index, pcall->function, ppacket->length, &retval);
+			e = fmr_pull(device, ppacket->ptr, ppacket->len);
 		break;
 		case fmr_dyld_class:
 			e = fmr_dyld(device, dpacket->module, &retval);

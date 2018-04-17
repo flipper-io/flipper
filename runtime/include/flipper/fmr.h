@@ -172,9 +172,9 @@ struct LF_PACKED _fmr_push_pull_packet {
 	/* The packet header programmed with 'fmr_push_class' or 'fmr_pull_class'. */
 	struct _fmr_header header;
 	/* The amount of data to be transferred. */
-	lf_size_t length;
-	/* The procedure call information of the invocation. */
-	struct _fmr_invocation call;
+	lf_size_t len;
+	/* The src/dst on the device. */
+	void *ptr;
 };
 
 /* Asks the dynamic loader for a module index. */
@@ -213,8 +213,8 @@ struct _lf_ll *fmr_build(int argc, ...);
 int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet);
 
 int fmr_execute(struct _lf_device *device, lf_module module, lf_function function, lf_type ret, lf_argc argc, lf_types argt, void *arguments, lf_return_t *retval);
-int fmr_push(struct _lf_device *device, lf_module module, lf_function function, lf_size_t length, lf_return_t *retval);
-int fmr_pull(struct _lf_device *device, lf_module module, lf_function function, lf_size_t length, lf_return_t *retval);
+int fmr_push(struct _lf_device *device, void *src, size_t len);
+int fmr_pull(struct _lf_device *device, void *dst, size_t len);
 int fmr_dyld(struct _lf_device *device, char *module, lf_return_t *retval);
 
 /* ~ Functions with platform specific implementation. ~ */

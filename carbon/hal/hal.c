@@ -93,7 +93,7 @@ int atsam4s_read(struct _lf_device *device, void *destination, lf_size_t length)
 	lf_size_t packets = lf_ceiling(length, size);
 	for (lf_size_t i = 0; i < packets; i ++) {
 		lf_size_t len = (length > size) ? size : length;
-		int _e = uart0_pull(destination, len);
+		int _e = uart0_read(destination, len);
 		if (_e) {
 			lf_select(prev);
 			return _e;
@@ -115,7 +115,7 @@ int atsam4s_write(struct _lf_device *device, void *source, lf_size_t length) {
 	lf_size_t packets = lf_ceiling(length, size);
 	for (lf_size_t i = 0; i < packets; i ++) {
 		lf_size_t len = (length > size) ? size : length;
-		int _e = uart0_push(source, len);
+		int _e = uart0_write(source, len);
 		if (_e) {
 			lf_select(prev);
 			return _e;

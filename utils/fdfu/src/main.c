@@ -68,21 +68,21 @@ uint8_t applet[] = {
 void sam_ba_jump(uint32_t address) {
 	char buffer[11];
 	sprintf(buffer, "G%08X#", address);
-	uart0_push(buffer, sizeof(buffer) - 1);
+	uart0_write(buffer, sizeof(buffer) - 1);
 }
 
 /* Instructs the SAM-BA to write a word to the address provided. */
 void sam_ba_write_word(uint32_t destination, uint32_t word) {
 	char buffer[20];
 	sprintf(buffer, "W%08X,%08X#", destination, word);
-	uart0_push(buffer, sizeof(buffer) - 1);
+	uart0_write(buffer, sizeof(buffer) - 1);
 }
 
 /* Instructs the SAM-BA to read a byte from the address provided. */
 uint8_t sam_ba_read_byte(uint32_t source) {
 	char buffer[12];
 	sprintf(buffer, "o%08X,#", source);
-	uart0_push(buffer, sizeof(buffer) - 1);
+	uart0_write(buffer, sizeof(buffer) - 1);
 	uint32_t retries = 0;
 	while(!uart0_ready() && retries ++ < 8);
 	return uart0_get();
@@ -92,18 +92,18 @@ uint8_t sam_ba_read_byte(uint32_t source) {
 void sam_ba_write_byte(uint32_t destination, uint8_t byte) {
 	char buffer[20];
 	sprintf(buffer, "O%08X,%02X#", destination, byte);
-	uart0_push(buffer, sizeof(buffer) - 1);
+	uart0_write(buffer, sizeof(buffer) - 1);
 }
 
 /* Instructs the SAM-BA to read a word from the address provided. */
 uint32_t sam_ba_read_word(uint32_t source) {
 	char buffer[12];
 	sprintf(buffer, "w%08X,#", source);
-	uart0_push(buffer, sizeof(buffer) - 1);
+	uart0_write(buffer, sizeof(buffer) - 1);
 	uint8_t retries = 0;
 	while(!uart0_ready() && retries ++ < 8);
 	uint32_t result = 0;
-	uart0_pull(&result, sizeof(uint32_t));
+	uart0_read(&result, sizeof(uint32_t));
 	return result;
 }
 
@@ -123,7 +123,7 @@ int sam_ba_copy(uint32_t destination, void *source, uint32_t length) {
 	char buffer[20];
 	uart0_reset();
 	sprintf(buffer, "S%08X,%08X#", destination, length);
-	uart0_push(buffer, sizeof(buffer) - 1);
+	uart0_write(buffer, sizeof(buffer) - 1);
 
 	/* Calculate the number of packets needed to perform the transfer. */
 	int packets = lf_ceiling(length, XLEN);
@@ -144,7 +144,7 @@ int sam_ba_copy(uint32_t destination, void *source, uint32_t length) {
 		/* Calculate the checksum of the data and write it to the packet in little endian format. */
 		_packet.checksum = little(lf_crc(_packet.data, sizeof(_packet.data)));
 		/* Transfer the packet to the SAM-BA. */
-		uart0_push(&_packet, sizeof(struct _xpacket));
+		uart0_write(&_packet, sizeof(struct _xpacket));
 
 		lf_assert(uart0_get() == ACK, failure, E_UNIMPLEMENTED, "Failed to get ACK.");
 
@@ -188,9 +188,9 @@ int enter_normal_mode(void) {
 
 	do {
 		uart0_reset();
-		uart0_push("N#", 2);
+		uart0_write("N#", 2);
 		usleep(1000);
-		lf_try(uart0_pull(ack, sizeof(ack)));
+		lf_try(uart0_read(ack, sizeof(ack)));
 		if (!memcmp(ack, (const uint8_t []){ '\n', '\r' }, 2)) return lf_success;
 
 		/* If we failed the first time around, enter DFU. */

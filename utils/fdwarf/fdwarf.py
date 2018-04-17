@@ -124,10 +124,10 @@ $FUNCTIONS$
 			lf_args = "lf_args(%s)" % ", ".join(args)
 			if len(args) == 0:
 				lf_args = "NULL"
-			if f.name.endswith("_push"):
-				statement = "lf_push(lf_get_current_device(), \"$MODULE$\", %s, %s, length);" % ("_" + f.name, "source")
-			elif f.name.endswith("pull"):
-				statement = "lf_pull(lf_get_current_device(), \"$MODULE$\", %s, %s, length);" % ("_" + f.name, "destination")
+			if f.name.endswith("_write"):
+				statement = "lf_success;" #"lf_push(lf_get_current_device(), \"$MODULE$\", %s, %s, length);" % ("_" + f.name, "source")
+			elif f.name.endswith("_read"):
+				statement = "lf_success;" # "lf_pull(lf_get_current_device(), \"$MODULE$\", %s, %s, length);" % ("_" + f.name, "destination")
 			else:
 				statement = "lf_invoke(lf_get_current_device(), \"$MODULE$\", %s, %s, %s);" % ("_" + f.name, ftype, lf_args)
 			if f.type == "void":
