@@ -62,10 +62,10 @@ LF_FUNC("usart") uint8_t usart_get(void) {
 	return USART0 -> US_RHR;
 }
 
-LF_FUNC("usart") int _usart_write(void *source, lf_size_t length) {
+LF_FUNC("usart") int _usart_write(void *src, size_t length) {
 	/* Set the transmission length and source pointer. */
 	USART0 -> US_TCR = length;
-	USART0 -> US_TPR = (uintptr_t)(source);
+	USART0 -> US_TPR = (uintptr_t)src;
 	/* Enable the PDC transmitter. */
 	USART0 -> US_PTCR = US_PTCR_TXTEN;
 	/* Wait until the transfer has finished. */
@@ -75,10 +75,10 @@ LF_FUNC("usart") int _usart_write(void *source, lf_size_t length) {
 	return lf_success;
 }
 
-LF_FUNC("usart") int _usart_read(void *destination, lf_size_t length) {
+LF_FUNC("usart") int _usart_read(void *dst, size_t length) {
 	/* Set the transmission length and destination pointer. */
 	USART0 -> US_RCR = length;
-	USART0 -> US_RPR = (uintptr_t)(destination);
+	USART0 -> US_RPR = (uintptr_t)dst;
 	/* Enable the receiver. */
 	USART0 -> US_PTCR = US_PTCR_RXTEN;
 	/* Wait until the transfer has finished. */

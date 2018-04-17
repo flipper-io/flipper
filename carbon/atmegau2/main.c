@@ -31,12 +31,12 @@ void loop(void) {
 
 /* Use USB as the read/write endpoint. */
 
-int atmegau2_read(struct _lf_device *device, void *destination, lf_size_t length) {
-	return megausb_bulk_receive(destination, length);
+int atmegau2_read(struct _lf_device *device, void *dst, size_t length) {
+	return megausb_bulk_receive(dst, length);
 }
 
-int atmegau2_write(struct _lf_device *device, void *source, lf_size_t length) {
-	return megausb_bulk_transmit(source, length);
+int atmegau2_write(struct _lf_device *device, void *src, size_t length) {
+	return megausb_bulk_transmit(src, length);
 }
 
 int atmegau2_release(struct _lf_device *device) {

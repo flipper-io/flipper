@@ -44,12 +44,12 @@ LF_FUNC("spi") uint8_t spi_get(void) {
 	return SPDR;
 }
 
-LF_FUNC("spi") int spi_write(void *source, lf_size_t length) {
-	while (length --) spi_put(*(uint8_t *)(source ++));
+LF_FUNC("spi") int spi_write(void *src, size_t length) {
+	while (length --) spi_put(*(uint8_t *)(src ++));
 	return lf_success;
 }
 
-LF_FUNC("spi") int spi_read(void *destination, lf_size_t length) {
-	while (length --) *(uint8_t *)(destination ++) = spi_get();
+LF_FUNC("spi") int spi_read(void *dst, size_t length) {
+	while (length --) *(uint8_t *)(dst ++) = spi_get();
 	return lf_success;
 }

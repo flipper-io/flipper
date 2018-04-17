@@ -27,12 +27,12 @@ LF_FUNC("spi") uint8_t spi_get(void) {
 	return lf_success;
 }
 
-LF_FUNC("spi") int spi_push(void *source, uint32_t length) {
+LF_FUNC("spi") int spi_push(void *src, uint32_t length) {
 	printf("Pushing to the spi bus.\n");
 	return lf_success;
 }
 
-LF_FUNC("spi") int spi_pull(void *destination, uint32_t length) {
+LF_FUNC("spi") int spi_pull(void *dst, uint32_t length) {
 	printf("Pulling from the spi bus.\n");
 	return lf_success;
 }

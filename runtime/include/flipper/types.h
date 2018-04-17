@@ -40,8 +40,6 @@
 
 /* Used to contain the result of checksumming operations. */
 typedef uint16_t lf_crc_t;
-/* Used to quantify block sizes sent accross different platforms. */
-typedef uint32_t lf_size_t;
 /* Used to quantify the version of modules in a standardized format. */
 typedef uint16_t lf_version_t;
 /* Used to specify return types. */

@@ -20,9 +20,9 @@ struct _lf_device {
 	/* The modules loaded on the device. */
 	struct _lf_ll *modules;
 	/* Receives arbitrary data from the device. */
-	int (* read)(struct _lf_device *device, void *destination, lf_size_t length);
+	int (* read)(struct _lf_device *device, void *dst, size_t length);
 	/* Transmits arbitrary data to the device. */
-	int (* write)(struct _lf_device *device, void *source, lf_size_t length);
+	int (* write)(struct _lf_device *device, void *src, size_t length);
 	/* Releases device state. */
 	int (* release)(struct _lf_device *device);
 	/* The device's context. */
@@ -31,8 +31,8 @@ struct _lf_device {
 	void *_ep_ctx;
 };
 
-struct _lf_device *lf_device_create(int (* read)(struct _lf_device *device, void *destination, lf_size_t length),
-									int (* write)(struct _lf_device *device, void *source, lf_size_t length),
+struct _lf_device *lf_device_create(int (* read)(struct _lf_device *device, void *dst, size_t length),
+									int (* write)(struct _lf_device *device, void *src, size_t length),
 									int (* release)(struct _lf_device *device));
 int lf_device_release(struct _lf_device *device);
 

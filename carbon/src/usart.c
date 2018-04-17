@@ -2,8 +2,8 @@
 
 enum { __usart_read, __usart_write, _usart_get, _usart_put, _usart_ready, _usart_disable, _usart_enable, _usart_configure };
 
-int _usart_read(void* destination, lf_size_t length);
-int _usart_write(void* source, lf_size_t length);
+int _usart_read(void* destination, size_t length);
+int _usart_write(void* source, size_t length);
 uint8_t usart_get(void);
 void usart_put(uint8_t byte);
 int usart_ready(void);
@@ -24,11 +24,11 @@ void *usart_interface[] = {
 
 LF_MODULE(usart, "usart", usart_interface);
 
-LF_WEAK int _usart_read(void* destination, lf_size_t length) {
+LF_WEAK int _usart_read(void* destination, size_t length) {
 	return lf_success;
 }
 
-LF_WEAK int _usart_write(void* source, lf_size_t length) {
+LF_WEAK int _usart_write(void* source, size_t length) {
 	return lf_success;
 }
 
