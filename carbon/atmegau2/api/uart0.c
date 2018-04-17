@@ -6,7 +6,6 @@ uint8_t idx = 0;
 
 LF_FUNC("uart0") int uart0_configure(void) {
 
-#warning No way to get into DFU baud here.
 	UBRR1L = BAUDRATE(FMR_BAUD);
 	UCSR1A &= ~(1 << U2X1);
 
@@ -56,18 +55,18 @@ failure:
 
 LF_FUNC("uart0") uint8_t uart0_get(void) {
 	uint8_t b;
-	uart0_pull(&b, 1);
+	uart0_read(&b, 1);
 	return b;
 }
 
-LF_FUNC("uart0") int uart0_push(void *source, lf_size_t length) {
+LF_FUNC("uart0") int uart0_write(void *source, lf_size_t length) {
 	while (length --) uart0_put(*(uint8_t *)source++);
 	return lf_success;
 }
 
 uint8_t uart0_buffer[64];
 
-LF_FUNC("uart0") int uart0_pull(void *destination, lf_size_t length) {
+LF_FUNC("uart0") int uart0_read(void *destination, lf_size_t length) {
 	if (idx) {
 		if (length >= idx) {
 			memcpy(destination, uart0_buffer, idx);

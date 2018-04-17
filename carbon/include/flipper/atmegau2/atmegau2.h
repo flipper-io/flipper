@@ -19,13 +19,6 @@
 #include <avr/wdt.h>
 #endif
 
-/* Define the modules that this platform uses. */
-#define __use_button__
-#define __use_gpio__
-#define __use_led__
-#define __use_uart0__
-#define __use_wdt__
-
 /* Pin definition macros for F4 hardware. */
 
 #define FLASH_CS_DDR DDRB

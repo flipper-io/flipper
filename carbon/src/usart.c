@@ -1,9 +1,9 @@
 #include <flipper.h>
 
-enum { _usart_pull, _usart_push, _usart_get, _usart_put, _usart_ready, _usart_disable, _usart_enable, _usart_configure };
+enum { __usart_read, __usart_write, _usart_get, _usart_put, _usart_ready, _usart_disable, _usart_enable, _usart_configure };
 
-int usart_pull(void* destination, lf_size_t length);
-int usart_push(void* source, lf_size_t length);
+int _usart_read(void* destination, lf_size_t length);
+int _usart_write(void* source, lf_size_t length);
 uint8_t usart_get(void);
 void usart_put(uint8_t byte);
 int usart_ready(void);
@@ -12,8 +12,8 @@ void usart_enable(void);
 int usart_configure(void);
 
 void *usart_interface[] = {
-	&usart_pull,
-	&usart_push,
+	&_usart_read,
+	&_usart_write,
 	&usart_get,
 	&usart_put,
 	&usart_ready,
@@ -24,12 +24,12 @@ void *usart_interface[] = {
 
 LF_MODULE(usart, "usart", usart_interface);
 
-LF_WEAK int usart_pull(void* destination, lf_size_t length) {
-	return lf_pull(lf_get_current_device(), "usart", _usart_pull, destination, length);
+LF_WEAK int _usart_read(void* destination, lf_size_t length) {
+	return lf_success;
 }
 
-LF_WEAK int usart_push(void* source, lf_size_t length) {
-	return lf_push(lf_get_current_device(), "usart", _usart_push, source, length);
+LF_WEAK int _usart_write(void* source, lf_size_t length) {
+	return lf_success;
 }
 
 LF_WEAK uint8_t usart_get(void) {

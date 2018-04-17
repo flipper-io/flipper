@@ -13,7 +13,7 @@ void uart0_put(uint8_t byte);
 uint8_t uart0_get(void);
 void uart0_enable(void);
 void uart0_disable(void);
-int uart0_push(void *source, lf_size_t length);
-int uart0_pull(void *destination, lf_size_t length);
+int uart0_write(void *source, lf_size_t length);
+int uart0_read(void *destination, lf_size_t length);
 
 #endif

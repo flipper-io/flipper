@@ -33,9 +33,9 @@
 #define LF_WEAK __attribute__((weak))
 
 #ifdef __clang__
-#define LF_FUNC(MODULE) __attribute__((section("__TEXT,.lm."MODULE)))
+#define LF_FUNC(MODULE) __attribute__((section("__TEXT,.lm."MODULE), used))
 #else
-#define LF_FUNC(MODULE) __attribute__((section(".lm."MODULE)))
+#define LF_FUNC(MODULE) __attribute__((section(".lm."MODULE), used))
 #endif
 
 /* Used to contain the result of checksumming operations. */
@@ -45,7 +45,7 @@ typedef uint32_t lf_size_t;
 /* Used to quantify the version of modules in a standardized format. */
 typedef uint16_t lf_version_t;
 /* Used to specify return types. */
-typedef uint32_t lf_return_t;
+typedef uint64_t lf_return_t;
 /* Describes a type used to contain libflipper error codes. */
 typedef uint8_t lf_error_t;
 

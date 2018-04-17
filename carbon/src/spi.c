@@ -1,9 +1,9 @@
 #include <flipper.h>
 
-enum { _spi_pull, _spi_push, _spi_get, _spi_put, _spi_end, _spi_ready, _spi_disable, _spi_enable, _spi_configure };
+enum { __spi_read, __spi_write, _spi_get, _spi_put, _spi_end, _spi_ready, _spi_disable, _spi_enable, _spi_configure };
 
-int spi_pull(void* destination, uint32_t length);
-int spi_push(void* source, uint32_t length);
+int _spi_read(void* destination, uint32_t length);
+int _spi_write(void* source, uint32_t length);
 uint8_t spi_get(void);
 void spi_put(uint8_t byte);
 void spi_end(void);
@@ -13,8 +13,8 @@ void spi_enable(void);
 int spi_configure(void);
 
 void *spi_interface[] = {
-	&spi_pull,
-	&spi_push,
+	&_spi_read,
+	&_spi_write,
 	&spi_get,
 	&spi_put,
 	&spi_end,
@@ -26,12 +26,12 @@ void *spi_interface[] = {
 
 LF_MODULE(spi, "spi", spi_interface);
 
-LF_WEAK int spi_pull(void* destination, uint32_t length) {
-	return lf_pull(lf_get_current_device(), "spi", _spi_pull, destination, length);
+LF_WEAK int _spi_read(void* destination, uint32_t length) {
+	return lf_success;
 }
 
-LF_WEAK int spi_push(void* source, uint32_t length) {
-	return lf_push(lf_get_current_device(), "spi", _spi_push, source, length);
+LF_WEAK int _spi_write(void* source, uint32_t length) {
+	return lf_success;
 }
 
 LF_WEAK uint8_t spi_get(void) {

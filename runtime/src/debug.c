@@ -9,13 +9,13 @@ void lf_set_debug_level(int level) {
 void lf_debug_call(struct _fmr_invocation *call) {
 #ifdef __LF_DEBUG__
 	printf("call\n");
-	printf("\t└─ module:\t\t0x%x\n", call->index);
-	printf("\t└─ function:\t0x%x\n", call->function);
+	printf("  └─module:    0x%x\n", call->index);
+	printf("  └─function:  0x%x\n", call->function);
 	char *typestrs[] = { "int8", "int16", "void", "int32", "int", "", "ptr", "int64" };
-	printf("\t└─ return:\t\t%s\n", typestrs[call->ret & 0x7]);
-	printf("\t└─ types:\t\t0x%x\n", call->types);
-	printf("\t└─ argc:\t\t0x%x (%d arguments)\n", call->argc, call->argc);
-	printf("arguments\n");
+	printf("  └─return:    %s\n", typestrs[call->ret & 0x7]);
+	printf("  └─types:     0x%x\n", call->types);
+	printf("  └─argc:      0x%x (%d arguments)\n", call->argc, call->argc);
+	printf("args\n");
 	/* Calculate the offset into the packet at which the arguments will be loaded. */
 	uint8_t *offset = call->parameters;
 	lf_types types = call->types;
@@ -23,7 +23,7 @@ void lf_debug_call(struct _fmr_invocation *call) {
 		lf_type type = types & lf_max_t;
 		lf_arg arg = 0;
 		memcpy(&arg, offset, lf_sizeof(type));
-		printf("\t└─ %c%s:\t\t0x%llx\n", ((type & (1 << 3)) ? '\0' : 'u'), typestrs[type & 0x7], arg);
+		printf("  └─ %c%s:   0x%llx\n", ((type & (1 << 3)) ? '\0' : 'u'), typestrs[type & 0x7], arg);
 		offset += lf_sizeof(type);
 		types >>= 4;
 	}
@@ -37,9 +37,9 @@ void lf_debug_packet(struct _fmr_packet *packet, size_t length) {
 
 	if (packet->header.magic == FMR_MAGIC_NUMBER) {
 		printf("header\n");
-		printf("\t└─ magic:\t\t0x%x\n", packet->header.magic);
-		printf("\t└─ checksum:\t0x%x\n", packet->header.checksum);
-		printf("\t└─ length:\t\t%d bytes (%.02f%%)\n", packet->header.length, (float) packet->header.length/sizeof(struct _fmr_packet)*100);
+		printf("  └─magic:     0x%x\n", packet->header.magic);
+		printf("  └─checksum:  0x%x\n", packet->header.checksum);
+		printf("  └─length:    %d bytes (%.02f%%)\n", packet->header.length, (float) packet->header.length/sizeof(struct _fmr_packet)*100);
 		char *classstrs[] = { "exec", "push", "pull", "dyld" };
 		printf("\t└─ class\t\t%s\n", classstrs[packet->header.type]);
 		struct _fmr_invocation_packet *invocation = (struct _fmr_invocation_packet *)(packet);
@@ -52,12 +52,12 @@ void lf_debug_packet(struct _fmr_packet *packet, size_t length) {
 			case fmr_push_class:
 			case fmr_pull_class:
 				printf("length:\n");
-				printf("\t└─ length:\t\t0x%x\n", pushpull->length);
-				lf_debug_call(&pushpull->call);
+				printf("   └─ ptr:     %p\n", pushpull->ptr);
+				printf("   └─ len:     0x%x\n\n", pushpull->len);
 			break;
 			case fmr_dyld_class:
 				printf("module:\n");
-				printf("\t└─ module:\t\t'%s'\n", dyld->module);
+				printf("   └─ module: '%s'\n", dyld->module);
 			break;
 			default:
 				printf("Invalid packet class.\n");
@@ -79,8 +79,8 @@ void lf_debug_result(struct _fmr_result *result) {
 	if (lf_debug_level != LF_DEBUG_LEVEL_ALL) return;
 
 	printf("response:\n");
-	printf("\t└─ value:\t0x%x\n", result->value);
-	printf("\t└─ error:\t0x%hhx\n", result->error);
+	printf("  └─ value:    0x%llx\n", result->value);
+	printf("  └─ error:    0x%hhx\n", result->error);
 	printf("\n-----------\n\n");
 #endif
 }
