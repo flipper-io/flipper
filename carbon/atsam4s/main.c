@@ -27,12 +27,12 @@ void os_kernel_task(void) {
 
 /* Use the uart0 bus as the read/write endpoint. */
 
-int atsam4s_read(struct _lf_device *device, void *destination, lf_size_t length) {
-	return uart0_read(destination, length);
+int atsam4s_read(struct _lf_device *device, void *dst, size_t length) {
+	return uart0_read(dst, length);
 }
 
-int atsam4s_write(struct _lf_device *device, void *source, lf_size_t length) {
-	return uart0_write(source, length);
+int atsam4s_write(struct _lf_device *device, void *src, size_t length) {
+	return uart0_write(src, length);
 }
 
 int atsam4s_release(struct _lf_device *device) {
@@ -172,12 +172,12 @@ void uart0_isr(void) {
 
 }
 
-void uart0_pull_wait(void *destination, lf_size_t length) {
+void uart0_pull_wait(void *dst, size_t length) {
 	/* Disable the PDC receive complete interrupt. */
 	UART0->UART_IDR = UART_IDR_ENDRX;
 	/* Set the transmission length and destination pointer. */
 	UART0->UART_RCR = length;
-	UART0->UART_RPR = (uintptr_t)(destination);
+	UART0->UART_RPR = (uintptr_t)dst;
 	/* Enable the receiver. */
 	UART0->UART_PTCR = UART_PTCR_RXTEN;
 	/* Wait until the transfer has finished. */

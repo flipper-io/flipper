@@ -85,20 +85,20 @@ failure:
 	return NULL;
 }
 
-int atsam4s_read(struct _lf_device *device, void *destination, lf_size_t length) {
+int atsam4s_read(struct _lf_device *device, void *dst, size_t length) {
 	struct _lf_device *prev = lf_get_current_device();
 	lf_assert(device, failure, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
 	carbon_select_u2(device);
-	lf_size_t size = 128;
-	lf_size_t packets = lf_ceiling(length, size);
-	for (lf_size_t i = 0; i < packets; i ++) {
-		lf_size_t len = (length > size) ? size : length;
-		int _e = uart0_read(destination, len);
+	size_t size = 128;
+	size_t packets = lf_ceiling(length, size);
+	for (size_t i = 0; i < packets; i ++) {
+		size_t len = (length > size) ? size : length;
+		int _e = uart0_read(dst, len);
 		if (_e) {
 			lf_select(prev);
 			return _e;
 		}
-		destination += size;
+		dst += size;
 		length -= size;
 	}
 	lf_select(prev);
@@ -107,20 +107,20 @@ failure:
 	return lf_error;
 }
 
-int atsam4s_write(struct _lf_device *device, void *source, lf_size_t length) {
+int atsam4s_write(struct _lf_device *device, void *src, size_t length) {
 	struct _lf_device *prev = lf_get_current_device();
 	lf_assert(device, failure, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
 	carbon_select_u2(device);
-	lf_size_t size = 128;
-	lf_size_t packets = lf_ceiling(length, size);
-	for (lf_size_t i = 0; i < packets; i ++) {
-		lf_size_t len = (length > size) ? size : length;
-		int _e = uart0_write(source, len);
+	size_t size = 128;
+	size_t packets = lf_ceiling(length, size);
+	for (size_t i = 0; i < packets; i ++) {
+		size_t len = (length > size) ? size : length;
+		int _e = uart0_write(src, len);
 		if (_e) {
 			lf_select(prev);
 			return _e;
 		}
-		source += size;
+		src += size;
 		length -= size;
 	}
 	lf_select(prev);

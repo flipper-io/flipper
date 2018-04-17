@@ -18,8 +18,8 @@ struct _lf_network_context {
 	struct sockaddr_in device;
 };
 
-int lf_network_read(struct _lf_device *device, void *destination, lf_size_t length);
-int lf_network_write(struct _lf_device *device, void *source, lf_size_t length);
+int lf_network_read(struct _lf_device *device, void *dst, size_t length);
+int lf_network_write(struct _lf_device *device, void *src, size_t length);
 int lf_network_release(struct _lf_device *device);
 
 struct _lf_device *lf_network_device_for_hostname(char *hostname);

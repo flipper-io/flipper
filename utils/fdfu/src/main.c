@@ -118,7 +118,7 @@ void sam_ba_write_efc_fcr(uint8_t command, uint32_t arg) {
 }
 
 /* Moves data from the host to the device's RAM using the SAM-BA and XMODEM protocol. */
-int sam_ba_copy(uint32_t destination, void *source, uint32_t length) {
+int sam_ba_copy(uint32_t destination, void *src, uint32_t length) {
 
 	char buffer[20];
 	uart0_reset();
@@ -140,7 +140,7 @@ int sam_ba_copy(uint32_t destination, void *source, uint32_t length) {
 		/* Construct the XMODEM packet. */
 		struct _xpacket _packet = { SOH, (packet + 1), ~(packet + 1), { 0 }, 0x00 };
 		/* Copy the chunk of data into the packet. */
-		memcpy(_packet.data, (void *)(source + (packet * XLEN)), _len);
+		memcpy(_packet.data, (void *)(src + (packet * XLEN)), _len);
 		/* Calculate the checksum of the data and write it to the packet in little endian format. */
 		_packet.checksum = little(lf_crc(_packet.data, sizeof(_packet.data)));
 		/* Transfer the packet to the SAM-BA. */
@@ -265,15 +265,15 @@ int main(int argc, char *argv[]) {
 	pagedata = load_page_data(firmware, firmware_size);
 
 	/* Calculate the number of pages to send. */
-	lf_size_t pages = lf_ceiling(firmware_size, IFLASH0_PAGE_SIZE);
+	size_t pages = lf_ceiling(firmware_size, IFLASH0_PAGE_SIZE);
 	/* Send the firmware, page by page. */
-	for (lf_size_t page = 0; page < pages; page ++) {
+	for (size_t page = 0; page < pages; page ++) {
 		/* Print the page count. */
-		printf("Uploading page %i / %u. (%.2f%%)", page + 1, pages, ((float)(page + 1))/pages*100);
+		printf("Uploading page %zu / %zu. (%.2f%%)", page + 1, pages, ((float)(page + 1))/pages*100);
 		fflush(stdout);
 		/* Copy the page. */
 		int _e = sam_ba_copy(_PAGEBUFFER, (void *)(pagedata + (page * IFLASH0_PAGE_SIZE)), IFLASH0_PAGE_SIZE);
-		lf_assert(_e == lf_success, failure, E_UNIMPLEMENTED, KRED "Failed to upload page %i of %i." KNRM, page + 1, pages);
+		lf_assert(_e == lf_success, failure, E_UNIMPLEMENTED, KRED "Failed to upload page %zu of %zu." KNRM, page + 1, pages);
 
 		/* Write the page number into the applet. */
 		sam_ba_write_word(_APPLET_PAGE, EEFC_FCR_FARG(page));
@@ -284,7 +284,7 @@ int main(int argc, char *argv[]) {
 		uint8_t retries = 0, fsr = 0;
 		while(!((fsr = sam_ba_read_byte(REGADDR(EFC0->EEFC_FSR))) & 1) && retries ++ < 4) {
 			if (fsr & 0xE) {
-				fprintf(stderr, KRED "Flash write error on page %u.\n" KNRM, page);
+				fprintf(stderr, KRED "Flash write error on page %zu.\n" KNRM, page);
 			}
 		}
 

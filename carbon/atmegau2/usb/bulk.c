@@ -4,7 +4,7 @@
 
 
 /* Receive a packet using the appropriate bulk endpoint. */
-int8_t megausb_bulk_receive(void *destination, lf_size_t length) {
+int8_t megausb_bulk_receive(void *dst, size_t length) {
 
 	/* If USB is not configured, return with error. */
 	if (!megausb_configuration) {
@@ -42,7 +42,7 @@ int8_t megausb_bulk_receive(void *destination, lf_size_t length) {
 		while (len --) {
 			if (length) {
 				/* If there is still valid data to send, load it from the receive buffer. */
-				*(uint8_t *)destination++ = UEDATX;
+				*(uint8_t *) dst++ = UEDATX;
 				/* Decrement the length. */
 				length --;
 			} else {
@@ -66,7 +66,7 @@ int8_t megausb_bulk_receive(void *destination, lf_size_t length) {
 }
 
 /* Receive a packet using the appropriate bulk endpoint. */
-int8_t megausb_bulk_transmit(void *source, lf_size_t length) {
+int8_t megausb_bulk_transmit(void *src, size_t length) {
 
 	/* If USB is not configured, return with error. */
 	if (!megausb_configuration) {
@@ -104,7 +104,7 @@ int8_t megausb_bulk_transmit(void *source, lf_size_t length) {
 		while (len --) {
 			if (length) {
 				/* If there is still valid data to send, load it into the transmit buffer. */
-				UEDATX = *(uint8_t *)source++;
+				UEDATX = *(uint8_t *) src++;
 				/* Decrement the length. */
 				length --;
 			} else {

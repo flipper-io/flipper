@@ -108,7 +108,7 @@ int lf_dyld(struct _lf_device *device, char *module);
 int lf_exit(void);
 
 /* Provides a checksum for a given block of data. */
-lf_crc_t lf_crc(const void *source, size_t length);
+lf_crc_t lf_crc(const void *src, size_t length);
 
 /* Obtains a result from a device. */
 int lf_get_result(struct _lf_device *device, struct _fmr_result *result);

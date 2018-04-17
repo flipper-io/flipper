@@ -2,14 +2,14 @@
 #include <flipper/error.h>
 #include <flipper.h>
 
-int lf_network_read(struct _lf_device *device, void *destination, lf_size_t length) {
+int lf_network_read(struct _lf_device *device, void *dst, size_t length) {
 	lf_assert(device, failure, E_NULL, "No device provided to '%s'", __PRETTY_FUNCTION__);
 	lf_assert(device, failure, E_NULL, "No endpoint for to device '%s'.", device->name);
 
 	struct _lf_network_context *context = (struct _lf_network_context *)device->_ep_ctx;
 	lf_assert(context, failure, E_NULL, "No context provided in '%s'.", __PRETTY_FUNCTION__);
 	socklen_t _length = sizeof(context->device);
-	ssize_t e = recvfrom(context->fd, destination, length, 0, (struct sockaddr *)&context->device, &_length);
+	ssize_t e = recvfrom(context->fd, dst, length, 0, (struct sockaddr *)&context->device, &_length);
 	lf_assert(e > 0, failure, E_COMMUNICATION, "Failed to receive data from networked device '%s' at '%s'.", context->host, inet_ntoa(context->device.sin_addr));
 	return lf_success;
 
@@ -17,13 +17,13 @@ failure:
 	return lf_error;
 }
 
-int lf_network_write(struct _lf_device *device, void *source, lf_size_t length) {
+int lf_network_write(struct _lf_device *device, void *src, size_t length) {
 	lf_assert(device, failure, E_NULL, "No device provided to '%s'", __PRETTY_FUNCTION__);
 	lf_assert(device, failure, E_NULL, "No endpoint for to device '%s'.", device->name);
 
 	struct _lf_network_context *context = (struct _lf_network_context *)device->_ep_ctx;
 	lf_assert(context, failure, E_NULL, "No context provided in '%s'.", __PRETTY_FUNCTION__);
-	ssize_t e = sendto(context->fd, source, length, 0, (struct sockaddr *)&context->device, sizeof(struct sockaddr_in));
+	ssize_t e = sendto(context->fd, src, length, 0, (struct sockaddr *)&context->device, sizeof(struct sockaddr_in));
 	lf_assert(e > 0, failure, E_COMMUNICATION, "Failed to send data to networked device '%s' at '%s'.", context->host, inet_ntoa(context->device.sin_addr));
 	return lf_success;
 

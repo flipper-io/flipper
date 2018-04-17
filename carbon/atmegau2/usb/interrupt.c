@@ -1,7 +1,7 @@
 #include <flipper/atmegau2/megausb.h>
 
 /* Receive a packet using the appropriate interrupt endpoint. */
-int8_t megausb_interrupt_receive(void *destination, lf_size_t length) {
+int8_t megausb_interrupt_receive(void *dst, size_t length) {
 
 	/* If USB is not configured, return with error. */
 	if (!megausb_configuration) {
@@ -32,7 +32,7 @@ int8_t megausb_interrupt_receive(void *destination, lf_size_t length) {
 		while (len --) {
 			if (length --) {
 				/* If there is still valid data to send, load it from the receive buffer. */
-				*(uint8_t *)destination++ = UEDATX;
+				*(uint8_t *) dst++ = UEDATX;
 			} else {
 				/* Otherwise, flush the buffer. */
 				break;
@@ -51,7 +51,7 @@ failure:
 }
 
 /* Send a packet using the appropriate interrupt endpoint. */
-int8_t megausb_interrupt_transmit(void *source, lf_size_t length) {
+int8_t megausb_interrupt_transmit(void *src, size_t length) {
 
 	/* If USB is not configured, return with error. */
 	if (!megausb_configuration) {
@@ -81,7 +81,7 @@ int8_t megausb_interrupt_transmit(void *source, lf_size_t length) {
 		uint8_t len = INTERRUPT_IN_SIZE;
 		while (len --) {
 			if (length --) {
-				UEDATX = *(uint8_t *)source++;
+				UEDATX = *(uint8_t *) src++;
 			} else {
 				/* Otherwise, flush the buffer. */
 				break;

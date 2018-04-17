@@ -11,7 +11,7 @@ void usart_enable(void);
 void usart_disable(void);
 void usart_put(uint8_t byte);
 uint8_t usart_get(void);
-int usart_write(void *source, size_t length);
-int usart_read(void *destination, size_t length);
+int usart_write(void *src, size_t length);
+int usart_read(void *dst, size_t length);
 
 #endif

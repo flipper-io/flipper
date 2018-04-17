@@ -66,10 +66,10 @@ LF_FUNC("spi") uint8_t spi_get(void) {
 	return SPI->SPI_RDR;
 }
 
-LF_FUNC("spi") int _spi_write(void *source, uint32_t length) {
+LF_FUNC("spi") int _spi_write(void *src, uint32_t length) {
 	/* Set the transmission length and destination pointer. */
 	SPI->SPI_TCR = length;
-	SPI->SPI_TPR = (uintptr_t)(source);
+	SPI->SPI_TPR = (uintptr_t)src;
 	/* Enable the PDC transmitter to start the transmission. */
 	SPI->SPI_PTCR = SPI_PTCR_TXTEN;
 	/* Wait until the transfer has finished. */
@@ -79,10 +79,10 @@ LF_FUNC("spi") int _spi_write(void *source, uint32_t length) {
 	return lf_success;
 }
 
-LF_FUNC("spi") int _spi_read(void *destination, uint32_t length) {
+LF_FUNC("spi") int _spi_read(void *dst, uint32_t length) {
 	/* Set the transmission length and destination pointer. */
 	SPI->SPI_RCR = length;
-	SPI->SPI_RPR = (uintptr_t)(destination);
+	SPI->SPI_RPR = (uintptr_t)dst;
 	/* Enable the receiver. */
 	SPI->SPI_PTCR = SPI_PTCR_RXTEN;
 	/* If defined, usart_read will not use interrupts. */

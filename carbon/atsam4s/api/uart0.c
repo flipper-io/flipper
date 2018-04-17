@@ -62,18 +62,18 @@ LF_FUNC("uart0") uint8_t uart0_get(void) {
 	return UART0->UART_RHR;
 }
 
-LF_FUNC("uart0") int uart0_write(void *source, lf_size_t length) {
+LF_FUNC("uart0") int uart0_write(void *src, size_t length) {
 	UART0->UART_TCR = length;
-	UART0->UART_TPR = (uintptr_t)(source);
+	UART0->UART_TPR = (uintptr_t)src;
 	UART0->UART_PTCR = UART_PTCR_TXTEN;
 	while (!(UART0->UART_SR & UART_SR_ENDTX) || !(UART0->UART_SR & UART_SR_TXEMPTY) || !(UART0->UART_SR & UART_SR_TXRDY));
 	UART0->UART_PTCR = UART_PTCR_TXTDIS;
 	return lf_success;
 }
 
-LF_FUNC("uart0") int uart0_read(void *destination, lf_size_t length) {
+LF_FUNC("uart0") int uart0_read(void *dst, size_t length) {
 	UART0->UART_RCR = length;
-	UART0->UART_RPR = (uintptr_t)(destination);
+	UART0->UART_RPR = (uintptr_t)dst;
 	UART0->UART_PTCR = UART_PTCR_RXTEN;
 #ifdef __uart0_read_sync__
 	/* Wait until the transfer has finished. */

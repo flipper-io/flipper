@@ -8,7 +8,7 @@ struct _lf_libusb_context {
 	struct libusb_context *context;
 };
 
-int lf_libusb_read(struct _lf_device *device, void *destination, lf_size_t length) {
+int lf_libusb_read(struct _lf_device *device, void *dst, size_t length) {
 	lf_assert(device, failure, E_NULL, "No device provided to '%s'", __PRETTY_FUNCTION__);
 
 	struct _lf_libusb_context *context = (struct _lf_libusb_context *)device->_ep_ctx;
@@ -29,11 +29,11 @@ int lf_libusb_read(struct _lf_device *device, void *destination, lf_size_t lengt
 			return lf_error;
 		}
 		if (length >= BULK_IN_SIZE) {
-			memcpy(destination, data, BULK_IN_SIZE);
+			memcpy(dst, data, BULK_IN_SIZE);
 		} else {
-			memcpy(destination, data, length);
+			memcpy(dst, data, length);
 		}
-		destination += transferred;
+		dst += transferred;
 		length -= transferred;
 	}
 	return lf_success;
@@ -42,7 +42,7 @@ failure:
 	return lf_error;
 }
 
-int lf_libusb_write(struct _lf_device *device, void *source, lf_size_t length) {
+int lf_libusb_write(struct _lf_device *device, void *src, size_t length) {
 	lf_assert(device, failure, E_NULL, "No device provided to '%s'", __PRETTY_FUNCTION__);
 
 	struct _lf_libusb_context *context = (struct _lf_libusb_context *)device->_ep_ctx;
@@ -54,9 +54,9 @@ int lf_libusb_write(struct _lf_device *device, void *source, lf_size_t length) {
 	for (int i = 0; i < total; i ++) {
 		uint8_t data[BULK_OUT_SIZE];
 		if (length >= BULK_OUT_SIZE) {
-			memcpy(data, source, BULK_OUT_SIZE);
+			memcpy(data, src, BULK_OUT_SIZE);
 		} else {
-			memcpy(data, source, length);
+			memcpy(data, src, length);
 		}
 		e = libusb_bulk_transfer(context->handle, BULK_OUT_ENDPOINT, data, BULK_OUT_SIZE, &transferred, LF_USB_TIMEOUT_MS);
 		if (e != 0) {
@@ -67,7 +67,7 @@ int lf_libusb_write(struct _lf_device *device, void *source, lf_size_t length) {
 			}
 			return lf_error;
 		}
-		source += transferred;
+		src += transferred;
 		length -= transferred;
 	}
 	return lf_success;

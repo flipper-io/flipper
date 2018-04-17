@@ -59,22 +59,22 @@ LF_FUNC("uart0") uint8_t uart0_get(void) {
 	return b;
 }
 
-LF_FUNC("uart0") int uart0_write(void *source, lf_size_t length) {
-	while (length --) uart0_put(*(uint8_t *)source++);
+LF_FUNC("uart0") int uart0_write(void *src, size_t length) {
+	while (length --) uart0_put(*(uint8_t *) src++);
 	return lf_success;
 }
 
 uint8_t uart0_buffer[64];
 
-LF_FUNC("uart0") int uart0_read(void *destination, lf_size_t length) {
+LF_FUNC("uart0") int uart0_read(void *dst, size_t length) {
 	if (idx) {
 		if (length >= idx) {
-			memcpy(destination, uart0_buffer, idx);
-			destination += idx;
+			memcpy(dst, uart0_buffer, idx);
+			dst += idx;
 			length -= idx;
 			idx = 0;
 		} else {
-			memcpy(destination, uart0_buffer, length);
+			memcpy(dst, uart0_buffer, length);
 			memmove(uart0_buffer, uart0_buffer + length, idx - length);
 			idx -= length;
 		}
@@ -82,7 +82,7 @@ LF_FUNC("uart0") int uart0_read(void *destination, lf_size_t length) {
 	while (length--) {
 		uint8_t timeout = UDFNUML + LF_UART_TIMEOUT_MS;
 		while (!(UCSR1A & (1 << RXC1))) lf_assert(UDFNUML != timeout, failure, E_UART0_READ_TIMEOUT, "Timeout occurred while pulling from uart0.");
-		*(uint8_t *)destination++ = UDR1;
+		*(uint8_t *) dst++ = UDR1;
 	}
 	return lf_success;
 
