@@ -85,7 +85,7 @@ failure:
 	return NULL;
 }
 
-int atsam4s_read(struct _lf_device *device, void *dst, size_t length) {
+int atsam4s_read(struct _lf_device *device, void *dst, uint32_t length) {
 	struct _lf_device *prev = lf_get_current_device();
 	lf_assert(device, failure, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
 	carbon_select_u2(device);
@@ -107,7 +107,7 @@ failure:
 	return lf_error;
 }
 
-int atsam4s_write(struct _lf_device *device, void *src, size_t length) {
+int atsam4s_write(struct _lf_device *device, void *src, uint32_t length) {
 	struct _lf_device *prev = lf_get_current_device();
 	lf_assert(device, failure, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
 	carbon_select_u2(device);

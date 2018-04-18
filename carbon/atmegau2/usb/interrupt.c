@@ -1,7 +1,7 @@
 #include <flipper/atmegau2/megausb.h>
 
 /* Receive a packet using the appropriate interrupt endpoint. */
-int8_t megausb_interrupt_receive(void *dst, size_t length) {
+int8_t megausb_interrupt_receive(void *dst, uint32_t length) {
 
 	/* If USB is not configured, return with error. */
 	if (!megausb_configuration) {
@@ -27,12 +27,12 @@ int8_t megausb_interrupt_receive(void *dst, size_t length) {
 #endif
 		}
 
-		/* Transfer the buffered data to the destination. */
+		/* Transfer the buffered data to the dst. */
 		uint8_t len = INTERRUPT_OUT_SIZE;
 		while (len --) {
 			if (length --) {
 				/* If there is still valid data to send, load it from the receive buffer. */
-				*(uint8_t *) dst++ = UEDATX;
+				*(uint8_t *)dst++ = UEDATX;
 			} else {
 				/* Otherwise, flush the buffer. */
 				break;
@@ -51,7 +51,7 @@ failure:
 }
 
 /* Send a packet using the appropriate interrupt endpoint. */
-int8_t megausb_interrupt_transmit(void *src, size_t length) {
+int8_t megausb_interrupt_transmit(void *src, uint32_t length) {
 
 	/* If USB is not configured, return with error. */
 	if (!megausb_configuration) {
@@ -77,11 +77,11 @@ int8_t megausb_interrupt_transmit(void *src, size_t length) {
 #endif
 		}
 
-		/* Transfer the buffered data to the destination. */
+		/* Transfer the buffered data to the dst. */
 		uint8_t len = INTERRUPT_IN_SIZE;
 		while (len --) {
 			if (length --) {
-				UEDATX = *(uint8_t *) src++;
+				UEDATX = *(uint8_t *)src++;
 			} else {
 				/* Otherwise, flush the buffer. */
 				break;

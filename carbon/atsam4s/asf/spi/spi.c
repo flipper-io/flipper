@@ -221,7 +221,7 @@ void spi_set_delay_between_chip_select(Spi *p_spi, uint32_t ul_delay)
  * \retval SPI_OK on Success.
  * \retval SPI_ERROR_TIMEOUT on Time-out.
  */
-spi_status_t spi_read(Spi *p_spi, uint16_t *us_data, uint8_t *p_pcs)
+spi_status_t asf_spi_read(Spi *p_spi, uint16_t *us_data, uint8_t *p_pcs)
 {
 	uint32_t timeout = SPI_TIMEOUT;
 	static uint32_t reg_value;
@@ -254,7 +254,7 @@ spi_status_t spi_read(Spi *p_spi, uint16_t *us_data, uint8_t *p_pcs)
  * \retval SPI_OK on Success.
  * \retval SPI_ERROR_TIMEOUT on Time-out.
  */
-spi_status_t spi_write(Spi *p_spi, uint16_t us_data,
+spi_status_t asf_spi_write(Spi *p_spi, uint16_t us_data,
 		uint8_t uc_pcs, uint8_t uc_last)
 {
 	uint32_t timeout = SPI_TIMEOUT;

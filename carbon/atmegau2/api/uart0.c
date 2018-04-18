@@ -31,6 +31,7 @@ LF_FUNC("uart0") int uart0_setbaud(uint32_t baud) {
 LF_FUNC("uart0") int uart0_reset(void) {
 	idx = 0;
 	while (UCSR1A & (1 << RXC1)) (void)UDR1;
+	return lf_success;
 }
 
 LF_FUNC("uart0") int uart0_ready(void) {
@@ -59,14 +60,14 @@ LF_FUNC("uart0") uint8_t uart0_get(void) {
 	return b;
 }
 
-LF_FUNC("uart0") int uart0_write(void *src, size_t length) {
-	while (length --) uart0_put(*(uint8_t *) src++);
+LF_FUNC("uart0") int uart0_write(void *src, uint32_t length) {
+	while (length --) uart0_put(*(uint8_t *)src++);
 	return lf_success;
 }
 
 uint8_t uart0_buffer[64];
 
-LF_FUNC("uart0") int uart0_read(void *dst, size_t length) {
+LF_FUNC("uart0") int uart0_read(void *dst, uint32_t length) {
 	if (idx) {
 		if (length >= idx) {
 			memcpy(dst, uart0_buffer, idx);

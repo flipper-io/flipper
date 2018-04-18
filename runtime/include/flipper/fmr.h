@@ -172,9 +172,9 @@ struct LF_PACKED _fmr_push_pull_packet {
 	/* The packet header programmed with 'fmr_push_class' or 'fmr_pull_class'. */
 	struct _fmr_header header;
 	/* The amount of data to be transferred. */
-	size_t len;
+	uint64_t len;
 	/* The src/dst on the device. */
-	void *ptr;
+	uint64_t ptr;
 };
 
 /* Asks the dynamic loader for a module index. */

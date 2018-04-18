@@ -44,13 +44,13 @@ get = c_spi_get
 
 push :: Buffer -> IO ()
 push (Buffer p o l) = withForeignPtr p $ \p' ->
-    c_spi_push (plusPtr p' o) (fromIntegral l)
+    c_spi_write (plusPtr p' o) (fromIntegral l)
 
 pull :: Int -> IO Buffer
 pull l
     | l <= 0    = error "pull: length must be greater than zero."
     | otherwise = do b@(Buffer p _ _) <- allocBufferSafe l
-                     withForeignPtr p (\p' -> c_spi_pull p' (fromIntegral l))
+                     withForeignPtr p (\p' -> c_spi_read p' (fromIntegral l))
                      return b
 
 foreign import ccall safe "flipper/spi/spi.h spi_configure"
@@ -68,8 +68,8 @@ foreign import ccall safe "flipper/spi.h spi_put"
 foreign import ccall safe "flipper/spi.h spi_get"
     c_spi_get :: IO Word8
 
-foreign import ccall safe "flipper/spi.h spi_push"
-    c_spi_push :: Ptr Word8 -> Word32 -> IO ()
+foreign import ccall safe "flipper/spi.h spi_write"
+    c_spi_write :: Ptr Word8 -> Word32 -> IO ()
 
-foreign import ccall safe "flipper/spi.h spi_pull"
-    c_spi_pull :: Ptr Word8 -> Word32 -> IO ()
+foreign import ccall safe "flipper/spi.h spi_read"
+    c_spi_read :: Ptr Word8 -> Word32 -> IO ()

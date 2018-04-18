@@ -62,7 +62,7 @@ LF_FUNC("uart0") uint8_t uart0_get(void) {
 	return UART0->UART_RHR;
 }
 
-LF_FUNC("uart0") int uart0_write(void *src, size_t length) {
+LF_FUNC("uart0") int uart0_write(void *src, uint32_t length) {
 	UART0->UART_TCR = length;
 	UART0->UART_TPR = (uintptr_t)src;
 	UART0->UART_PTCR = UART_PTCR_TXTEN;
@@ -71,7 +71,7 @@ LF_FUNC("uart0") int uart0_write(void *src, size_t length) {
 	return lf_success;
 }
 
-LF_FUNC("uart0") int uart0_read(void *dst, size_t length) {
+LF_FUNC("uart0") int uart0_read(void *dst, uint32_t length) {
 	UART0->UART_RCR = length;
 	UART0->UART_RPR = (uintptr_t)dst;
 	UART0->UART_PTCR = UART_PTCR_RXTEN;

@@ -108,7 +108,7 @@ int lf_dyld(struct _lf_device *device, char *module);
 int lf_exit(void);
 
 /* Provides a checksum for a given block of data. */
-lf_crc_t lf_crc(const void *src, size_t length);
+lf_crc_t lf_crc(const void *src, uint32_t length);
 
 /* Obtains a result from a device. */
 int lf_get_result(struct _lf_device *device, struct _fmr_result *result);
@@ -118,7 +118,7 @@ int lf_transfer(struct _lf_device *device, struct _fmr_packet *packet);
 int lf_retrieve(struct _lf_device *device, struct _fmr_result *response);
 
 /* Prints verbose information about the packet disassembly. */
-void lf_debug_packet(struct _fmr_packet *packet, size_t length);
+void lf_debug_packet(struct _fmr_packet *packet, uint32_t length);
 void lf_debug_result(struct _fmr_result *result);
 
 #endif

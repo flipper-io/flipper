@@ -31,11 +31,11 @@ void loop(void) {
 
 /* Use USB as the read/write endpoint. */
 
-int atmegau2_read(struct _lf_device *device, void *dst, size_t length) {
+int atmegau2_read(struct _lf_device *device, void *dst, uint32_t length) {
 	return megausb_bulk_receive(dst, length);
 }
 
-int atmegau2_write(struct _lf_device *device, void *src, size_t length) {
+int atmegau2_write(struct _lf_device *device, void *src, uint32_t length) {
 	return megausb_bulk_transmit(src, length);
 }
 
@@ -74,6 +74,7 @@ int main(void) {
 	extern struct _lf_module button;
 	extern struct _lf_module gpio;
 	extern struct _lf_module led;
+	extern struct _lf_module libc;
 	extern struct _lf_module spi;
 	extern struct _lf_module uart0;
 	extern struct _lf_module wdt;
@@ -82,6 +83,7 @@ int main(void) {
 	dyld_register(_u2, &button);
 	dyld_register(_u2, &gpio);
 	dyld_register(_u2, &led);
+	dyld_register(_u2, &libc);
 	dyld_register(_u2, &spi);
 	dyld_register(_u2, &uart0);
 	dyld_register(_u2, &wdt);

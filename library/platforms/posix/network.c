@@ -2,7 +2,7 @@
 #include <flipper/error.h>
 #include <flipper.h>
 
-int lf_network_read(struct _lf_device *device, void *dst, size_t length) {
+int lf_network_read(struct _lf_device *device, void *dst, uint32_t length) {
 	lf_assert(device, failure, E_NULL, "No device provided to '%s'", __PRETTY_FUNCTION__);
 	lf_assert(device, failure, E_NULL, "No endpoint for to device '%s'.", device->name);
 
@@ -17,7 +17,7 @@ failure:
 	return lf_error;
 }
 
-int lf_network_write(struct _lf_device *device, void *src, size_t length) {
+int lf_network_write(struct _lf_device *device, void *src, uint32_t length) {
 	lf_assert(device, failure, E_NULL, "No device provided to '%s'", __PRETTY_FUNCTION__);
 	lf_assert(device, failure, E_NULL, "No endpoint for to device '%s'.", device->name);
 
