@@ -135,10 +135,10 @@ int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet) {
 			e = fmr_execute(device, icall->index, icall->function, icall->ret, icall->argc, icall->types, icall->parameters, &retval);
 		break;
 		case fmr_push_class:
-			e = fmr_push(device, ppacket->ptr, ppacket->len);
+			e = fmr_push(device, (void *)(uintptr_t)ppacket->ptr, ppacket->len);
 		break;
 		case fmr_pull_class:
-			e = fmr_pull(device, ppacket->ptr, ppacket->len);
+			e = fmr_pull(device, (void *)(uintptr_t)ppacket->ptr, ppacket->len);
 		break;
 		case fmr_dyld_class:
 			e = fmr_dyld(device, dpacket->module, &retval);

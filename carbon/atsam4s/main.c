@@ -27,11 +27,11 @@ void os_kernel_task(void) {
 
 /* Use the uart0 bus as the read/write endpoint. */
 
-int atsam4s_read(struct _lf_device *device, void *dst, size_t length) {
+int atsam4s_read(struct _lf_device *device, void *dst, uint32_t length) {
 	return uart0_read(dst, length);
 }
 
-int atsam4s_write(struct _lf_device *device, void *src, size_t length) {
+int atsam4s_write(struct _lf_device *device, void *src, uint32_t length) {
 	return uart0_write(src, length);
 }
 
@@ -75,41 +75,41 @@ int main(void) {
 	_4s = lf_device_create(atsam4s_read, atsam4s_write, atsam4s_release);
 	lf_attach(_4s);
 
-	// extern struct _lf_module adc;
-	// extern struct _lf_module button;
-	// extern struct _lf_module dac;
-	// extern struct _lf_module gpio;
-	// extern struct _lf_module i2c;
-	// extern struct _lf_module led;
-	// extern struct _lf_module libc;
-	// extern struct _lf_module pwm;
-	// extern struct _lf_module rtc;
-	// extern struct _lf_module spi;
-	// extern struct _lf_module swd;
-	// extern struct _lf_module temp;
-	// extern struct _lf_module timer;
-	// extern struct _lf_module uart0;
-	// extern struct _lf_module usart;
-	// extern struct _lf_module usb;
-	// extern struct _lf_module wdt;
-	//
-	// dyld_register(_4s, &adc);
-	// dyld_register(_4s, &button);
-	// dyld_register(_4s, &dac);
-	// dyld_register(_4s, &gpio);
-	// dyld_register(_4s, &i2c);
-	// dyld_register(_4s, &led);
-	// dyld_register(_4s, &libc);
-	// dyld_register(_4s, &pwm);
-	// dyld_register(_4s, &rtc);
-	// dyld_register(_4s, &spi);
-	// dyld_register(_4s, &swd);
-	// dyld_register(_4s, &temp);
-	// dyld_register(_4s, &timer);
-	// dyld_register(_4s, &uart0);
-	// dyld_register(_4s, &usart);
-	// dyld_register(_4s, &usb);
-	// dyld_register(_4s, &wdt);
+	extern struct _lf_module adc;
+	extern struct _lf_module button;
+	extern struct _lf_module dac;
+	extern struct _lf_module gpio;
+	extern struct _lf_module i2c;
+	extern struct _lf_module led;
+	extern struct _lf_module libc;
+	extern struct _lf_module pwm;
+	extern struct _lf_module rtc;
+	extern struct _lf_module spi;
+	extern struct _lf_module swd;
+	extern struct _lf_module temp;
+	extern struct _lf_module timer;
+	extern struct _lf_module uart0;
+	extern struct _lf_module usart;
+	extern struct _lf_module usb;
+	extern struct _lf_module wdt;
+
+	dyld_register(_4s, &adc);
+	dyld_register(_4s, &button);
+	dyld_register(_4s, &dac);
+	dyld_register(_4s, &gpio);
+	dyld_register(_4s, &i2c);
+	dyld_register(_4s, &led);
+	dyld_register(_4s, &libc);
+	dyld_register(_4s, &pwm);
+	dyld_register(_4s, &rtc);
+	dyld_register(_4s, &spi);
+	dyld_register(_4s, &swd);
+	dyld_register(_4s, &temp);
+	dyld_register(_4s, &timer);
+	dyld_register(_4s, &uart0);
+	dyld_register(_4s, &usart);
+	dyld_register(_4s, &usb);
+	dyld_register(_4s, &wdt);
 
 	adc_configure();
 	button_configure();
@@ -172,7 +172,7 @@ void uart0_isr(void) {
 
 }
 
-void uart0_pull_wait(void *dst, size_t length) {
+void uart0_pull_wait(void *dst, uint32_t length) {
 	/* Disable the PDC receive complete interrupt. */
 	UART0->UART_IDR = UART_IDR_ENDRX;
 	/* Set the transmission length and destination pointer. */

@@ -66,7 +66,7 @@ LF_FUNC("spi") uint8_t spi_get(void) {
 	return SPI->SPI_RDR;
 }
 
-LF_FUNC("spi") int _spi_write(void *src, uint32_t length) {
+LF_FUNC("spi") int spi_write(void *src, uint32_t length) {
 	/* Set the transmission length and destination pointer. */
 	SPI->SPI_TCR = length;
 	SPI->SPI_TPR = (uintptr_t)src;
@@ -79,7 +79,7 @@ LF_FUNC("spi") int _spi_write(void *src, uint32_t length) {
 	return lf_success;
 }
 
-LF_FUNC("spi") int _spi_read(void *dst, uint32_t length) {
+LF_FUNC("spi") int spi_read(void *dst, uint32_t length) {
 	/* Set the transmission length and destination pointer. */
 	SPI->SPI_RCR = length;
 	SPI->SPI_RPR = (uintptr_t)dst;

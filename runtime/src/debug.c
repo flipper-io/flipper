@@ -31,7 +31,7 @@ void lf_debug_call(struct _fmr_invocation *call) {
 #endif
 }
 
-void lf_debug_packet(struct _fmr_packet *packet, size_t length) {
+void lf_debug_packet(struct _fmr_packet *packet, uint32_t length) {
 #ifdef __LF_DEBUG__
 	if (lf_debug_level != LF_DEBUG_LEVEL_ALL) return;
 
@@ -52,8 +52,8 @@ void lf_debug_packet(struct _fmr_packet *packet, size_t length) {
 			case fmr_push_class:
 			case fmr_pull_class:
 				printf("length:\n");
-				printf("   └─ ptr:     %p\n", pushpull->ptr);
-				printf("   └─ len:     0x%x\n\n", pushpull->len);
+				printf("   └─ ptr:     0x%llx\n", pushpull->ptr);
+				printf("   └─ len:     0x%llx\n\n", pushpull->len);
 			break;
 			case fmr_dyld_class:
 				printf("module:\n");

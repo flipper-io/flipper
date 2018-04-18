@@ -98,7 +98,7 @@ lf_return_t lf_push(struct _lf_device *device, void *dst, void *src, size_t len)
 
 	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
 	packet->len = len;
-	packet->ptr = dst;
+	packet->ptr = (uintptr_t)dst;
 	_packet.header.checksum = lf_crc(&_packet, _packet.header.length);
 	lf_debug_packet(&_packet, sizeof(struct _fmr_packet));
 
@@ -133,7 +133,7 @@ lf_return_t lf_pull(struct _lf_device *device, void *dst, void *src, size_t len)
 	_packet.header.type = fmr_pull_class;
 	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
 	packet->len = len;
-	packet->ptr = src;
+	packet->ptr = (uintptr_t)src;
 	_packet.header.checksum = lf_crc(&_packet, _packet.header.length);
 	lf_debug_packet(&_packet, sizeof(struct _fmr_packet));
 

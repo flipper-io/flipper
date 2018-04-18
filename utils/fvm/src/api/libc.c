@@ -2,7 +2,7 @@
 
 #include <flipper.h>
 
-LF_FUNC("libc") void *libc_malloc(size_t length) {
+LF_FUNC("libc") void *libc_malloc(uint32_t length) {
     return malloc(length);
 }
 

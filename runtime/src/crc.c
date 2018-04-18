@@ -23,6 +23,6 @@ uint16_t calcrc(const char *ptr, uint32_t count) {
 }
 
 /* This function uses the CCITT crc16 algorithm. */
-lf_crc_t lf_crc(const void *src, size_t length) {
+lf_crc_t lf_crc(const void *src, uint32_t length) {
 	return calcrc(src, (uint32_t)length);
 }

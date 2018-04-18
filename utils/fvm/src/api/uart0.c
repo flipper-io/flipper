@@ -27,12 +27,12 @@ LF_FUNC("uart0") uint8_t uart0_get(void) {
 	return '\0';
 }
 
-LF_FUNC("uart0") int uart0_write(void *src, size_t length) {
+LF_FUNC("uart0") int uart0_write(void *src, uint32_t length) {
 	printf("Writing to the uart0 bus: %s\n", src);
 	return lf_success;
 }
 
-LF_FUNC("uart0") int uart0_read(void *dst, size_t length) {
+LF_FUNC("uart0") int uart0_read(void *dst, uint32_t length) {
 	printf("Reading from the uart0 bus.\n");
 	return lf_success;
 }

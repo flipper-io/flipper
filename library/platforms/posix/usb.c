@@ -8,7 +8,7 @@ struct _lf_libusb_context {
 	struct libusb_context *context;
 };
 
-int lf_libusb_read(struct _lf_device *device, void *dst, size_t length) {
+int lf_libusb_read(struct _lf_device *device, void *dst, uint32_t length) {
 	lf_assert(device, failure, E_NULL, "No device provided to '%s'", __PRETTY_FUNCTION__);
 
 	struct _lf_libusb_context *context = (struct _lf_libusb_context *)device->_ep_ctx;
@@ -42,7 +42,7 @@ failure:
 	return lf_error;
 }
 
-int lf_libusb_write(struct _lf_device *device, void *src, size_t length) {
+int lf_libusb_write(struct _lf_device *device, void *src, uint32_t length) {
 	lf_assert(device, failure, E_NULL, "No device provided to '%s'", __PRETTY_FUNCTION__);
 
 	struct _lf_libusb_context *context = (struct _lf_libusb_context *)device->_ep_ctx;
