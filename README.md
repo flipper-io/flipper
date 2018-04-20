@@ -1,29 +1,21 @@
 # Flipper
 
-[![Build Status](https://travis-ci.org/flipper-io/flipper.svg?branch=master)](https://travis-ci.org/flipper-io/flipper)
+[![Build Status](https://travis-ci.org/flipper-io/flipper.svg?branch=master)](https://travis-ci.org/flipper-io/flipper) [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://github.com/flipper-io/flipper/blob/master/README.md#license) [![flipper.io](https://img.shields.io/badge/store-flipper.io-green.svg)](https://flipper.io) [![Chat on discord](https://img.shields.io/badge/chat-on%20discord-7289DA.svg)](https://discord.gg/R5zdK4m) [![Email us](https://img.shields.io/badge/email-opensource%40flipper.io-lightgray.svg)](mailto:opensource@flipper.io)
 
 ## About
 
-Flipper is a development platform that offers a new take on the traditional
-embedded software development cycle.
+Flipper is a new kind of embedded development platform that lets developers use familiar tools to use to create amazing applications that interact with embedded hardware. Flipper can be controlled from [these](./languages) programming langauges running on desktop, mobile, and web applications.
 
-Using Flipper, a developer creates and debugs program logic on a development
-machine instead of deploying code onto an embedded device and debugging it
-there. Our library performs remote procedure calls to a connected device
-instead of emulating the hardware. This makes it possible to use real hardware
-to test program behavior in real time. When development is complete, the
-project can be cross compiled and loaded onto a Flipper device for native
-performance.
-
-This new embedded development workflow makes it simple to use widely adopted
-and industry standard tools, like Xcode and Visual Studio, to develop and debug
-applications that interact with embedded hardware peripherals. The capabilities
-of the platform extend beyond the scope of embedded software development;
-Flipper makes it easy to write applications in any programming language, on any
-platform, that control real hardware.
-
-To purchase a Flipper device, please visit our store
-[here](https://flipper.io/products/flipper-carbon-developer-unit).
+1. **Purchase a board from our web store
+   [here](https://flipper.io/products/flipper-carbon-developer-unit).**
+    - You can't get started without a board. Pick one up today!
+2. **Visit [this](https://github.com/flipper-io/flipper/wiki/Getting-Started)
+Wiki page to set up your environment.**
+    - Our Wiki is easy to navigate. Start at the top and work your way through it.
+3. **Try out the examples [here](./examples).**
+    - The best way to learn is by example. Dive head first into our intuitive examples.
+4. **Ask questions!**
+    - We are build a community around the platform, and we want you to be a part of it. Join our [Discord](https://discord.gg/R5zdK4m) server and ask questions, [email us](mailto:opensource@flipper.io), or open issues here on GitHub.
 
 ## Quickstart
 
@@ -93,7 +85,8 @@ Attach only one Flipper device to your computer via USB, and then run the
 following command.
 
 ```
-make update
+make install-atmegau2
+make install-atsam4s
 ```
 
 ## Example
