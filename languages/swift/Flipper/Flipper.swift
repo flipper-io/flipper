@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import CFlipper
+import Clibflipper
 
 public struct Flipper {
   let device: UnsafeMutablePointer<_lf_device>

@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import CFlipper
+import Clibflipper
 
 public struct StandardModuleFFI {
   let moduleMetadata: _lf_module

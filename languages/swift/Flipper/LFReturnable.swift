@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import CFlipper
+import Clibflipper
 
 public protocol LFReturnable {
   static var lfType: LFType { get }

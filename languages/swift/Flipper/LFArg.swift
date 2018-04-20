@@ -1,4 +1,4 @@
-import CFlipper
+import Clibflipper
 
 public protocol LFArg {
   var asLFArg: _lf_arg { get }
