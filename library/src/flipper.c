@@ -1,7 +1,7 @@
 #include <flipper.h>
 
 /* Expose the virtual interface for this driver. */
-const struct _flipper flipper = {
+const struct _flipper_interface flipper = {
 	flipper_attach,
 	flipper_select,
 	flipper_detach,

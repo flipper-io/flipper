@@ -1,4 +1,3 @@
-#define __private_include__
 #include <flipper/pwm.h>
 
 #ifdef __use_pwm__
@@ -6,7 +5,7 @@
 LF_MODULE(_pwm, "pwm", "Interfaces with the device's pulse width modulation controller.", NULL, NULL);
 
 /* Define the virtual interface for this module. */
-const struct _pwm pwm = {
+const struct _pwm_interface pwm = {
 	pwm_configure
 };
 

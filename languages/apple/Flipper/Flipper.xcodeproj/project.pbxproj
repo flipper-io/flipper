@@ -584,7 +584,6 @@
 					__fs_transfer_symbols__,
 					__fld_upload_symbols__,
 					"PLATFORM_HEADER=<flipper/platforms/posix.h>",
-					__private_include__,
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -648,7 +647,6 @@
 					__fs_transfer_symbols__,
 					__fld_upload_symbols__,
 					"PLATFORM_HEADER=<flipper/platforms/posix.h>",
-					__private_include__,
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;

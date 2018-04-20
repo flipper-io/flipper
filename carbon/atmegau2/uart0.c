@@ -1,6 +1,5 @@
-#define __private_include__
 #include <flipper/uart0.h>
-#include <flipper/atmegau2/atmegau2.h>
+
 #include <flipper/atmegau2/megausb.h>
 
 uint8_t uart0_buffer[256];

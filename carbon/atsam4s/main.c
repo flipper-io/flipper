@@ -1,7 +1,8 @@
-#define __private_include__
 #include <flipper.h>
-#include <flipper/atsam4s/atsam4s.h>
 #include <os/scheduler.h>
+
+/* How many clock cycles to wait before giving up initialization. */
+#define CLOCK_TIMEOUT 5000
 
 struct _fmr_packet packet;
 
@@ -29,12 +30,12 @@ int main(void) {
 
 	/* Configure the primary clock source. */
 	if (!(PMC->CKGR_MOR & CKGR_MOR_MOSCSEL)) {
-		PMC->CKGR_MOR = CKGR_MOR_KEY(0x37) | BOARD_OSCOUNT | CKGR_MOR_MOSCRCEN | CKGR_MOR_MOSCXTEN;
+		PMC->CKGR_MOR = CKGR_MOR_KEY_PASSWD | BOARD_OSCOUNT | CKGR_MOR_MOSCRCEN | CKGR_MOR_MOSCXTEN;
 		for (uint32_t timeout = 0; !(PMC->PMC_SR & PMC_SR_MOSCXTS) && (timeout ++ < CLOCK_TIMEOUT););
 	}
 
 	/* Select external 20MHz oscillator. */
-	PMC->CKGR_MOR = CKGR_MOR_KEY(0x37) | BOARD_OSCOUNT | CKGR_MOR_MOSCRCEN | CKGR_MOR_MOSCXTEN | CKGR_MOR_MOSCSEL;
+	PMC->CKGR_MOR = CKGR_MOR_KEY_PASSWD | BOARD_OSCOUNT | CKGR_MOR_MOSCRCEN | CKGR_MOR_MOSCXTEN | CKGR_MOR_MOSCSEL;
 	for (uint32_t timeout = 0; !(PMC->PMC_SR & PMC_SR_MOSCSELS) && (timeout ++ < CLOCK_TIMEOUT););
 	PMC->PMC_MCKR = (PMC->PMC_MCKR & ~(uint32_t)PMC_MCKR_CSS_Msk) | PMC_MCKR_CSS_MAIN_CLK;
 	for (uint32_t timeout = 0; !(PMC->PMC_SR & PMC_SR_MCKRDY) && (timeout++ < CLOCK_TIMEOUT););
@@ -50,7 +51,7 @@ int main(void) {
 	for (uint32_t timeout = 0; !(PMC->PMC_SR & PMC_SR_MCKRDY) && (timeout++ < CLOCK_TIMEOUT););
 
 	/* Allow the reset pin to reset the device. */
-	RSTC->RSTC_MR = RSTC_MR_KEY(0xA5) | RSTC_MR_URSTEN;
+	RSTC->RSTC_MR = RSTC_MR_KEY_PASSWD | RSTC_MR_URSTEN;
 
 	/* Configure the USART peripheral. */
 	usart_configure();

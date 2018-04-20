@@ -1,7 +1,6 @@
-#include <flipper/libflipper.h>
+#include <flipper.h>
 
 #ifdef __use_led__
-#define __private_include__
 #include <flipper/led.h>
 
 int led_configure(void) {

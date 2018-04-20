@@ -1,7 +1,6 @@
-#define __private_include__
 #include <flipper/posix/network.h>
 #include <flipper/error.h>
-#include <flipper/libflipper.h>
+#include <flipper.h>
 
 int lf_network_configure(struct _lf_endpoint *endpoint, void *_ctx) {
 return lf_success;

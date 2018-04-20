@@ -1,7 +1,6 @@
-#include <flipper/libflipper.h>
+#include <flipper.h>
 
 #ifdef __use_fs__
-#define __private_include__
 #include <flipper/fs.h>
 
 int fs_configure(void) {

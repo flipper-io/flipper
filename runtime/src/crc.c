@@ -1,5 +1,4 @@
-#define __private_include__
-#include <flipper/libflipper.h>
+#include <flipper.h>
 
 /*                                      16   12   5
    This is the CCITT CRC 16 polynomial X  + X  + X  + 1. */

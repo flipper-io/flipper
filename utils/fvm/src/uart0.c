@@ -1,7 +1,6 @@
-#include <flipper/libflipper.h>
+#include <flipper.h>
 
 #ifdef __use_uart0__
-#define __private_include__
 #include <flipper/uart0.h>
 
 int uart0_configure(uint8_t baud, uint8_t interrupts) {

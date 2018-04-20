@@ -2,7 +2,7 @@
 #define __is25lp_h__
 
 /* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
-#include <flipper/libflipper.h>
+#include <flipper.h>
 
 #define IS25LP_PAGE_SIZE 256
 #define IS25LP_SECTOR_SIZE 16
@@ -62,9 +62,6 @@ enum IS25LP_SR {
 	IS25LP_SRWD
 };
 
-#ifdef __private_include__
-
 int is25lp_configure(void);
 
-#endif
 #endif

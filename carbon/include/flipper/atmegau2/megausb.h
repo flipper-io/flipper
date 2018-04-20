@@ -2,11 +2,7 @@
 #define __megausb_h__
 
 /* Include all types and macros exposed by the Flipper Toolbox. */
-#include <flipper/libflipper.h>
-#include <flipper/atmegau2/atmegau2.h>
-#include <flipper/atmegau2/megausb.h>
-
-#ifdef __private_include__
+#include <flipper.h>
 
 extern volatile uint8_t megausb_configuration;
 
@@ -74,4 +70,4 @@ int8_t megausb_bulk_transmit(void *source, lf_size_t length);
 int usb_debug_putchar(uint8_t c);
 
 #endif
-#endif
+

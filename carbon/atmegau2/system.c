@@ -1,5 +1,4 @@
-#define __private_include__
-#include <flipper/carbon.h>
+#include <flipper.h>
 #include <flipper/atmegau2/megausb.h>
 
 lf_return_t fmr_push(struct _fmr_push_pull_packet *packet) {

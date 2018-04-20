@@ -1,6 +1,4 @@
-#define __private_include__
 #include <flipper/is25lp.h>
-#include <flipper/atsam4s/atsam4s.h>
 #include <flipper/spi.h>
 
 int is25lp_configure(void) {

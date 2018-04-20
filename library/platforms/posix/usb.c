@@ -1,7 +1,6 @@
 /* libusb.c - USB endpoint wrapper using libusb. */
 
-#define __private_include__
-#include <flipper/libflipper.h>
+#include <flipper.h>
 #include <libusb.h>
 
 struct _lf_libusb_context {

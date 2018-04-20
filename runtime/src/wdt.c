@@ -1,4 +1,3 @@
-#define __private_include__
 #include <flipper/wdt.h>
 
 #ifdef __use_wdt__
@@ -6,7 +5,7 @@
 LF_MODULE(_wdt, "wdt", "Handles interaction with the internal watchdog timer.", NULL, NULL);
 
 /* Define the virtual interface for this module. */
-const struct _wdt wdt = {
+const struct _wdt_interface wdt = {
 	wdt_configure,
 	wdt_fire
 };

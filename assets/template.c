@@ -10,7 +10,7 @@ FUNCTIONPROTOS
 
 VARIABLES
 
-#ifdef __ATSAM4S__
+#ifdef ATSAM4S
 
 const char _fmr_app_name[] __attribute__((section (".name"))) = "PACKAGE";
 

@@ -1,13 +1,12 @@
-#include <flipper/libflipper.h>
+#include <flipper.h>
 
-#define __private_include__
 #include <flipper/error.h>
 
 /* Expose the error message strings. */
 char *lf_error_messages[] = { LF_ERROR_MESSAGE_STRINGS };
 char last_error[256];
 lf_error_t error_code = E_OK;
-#ifdef __disable_error_side_effects__
+#ifdef __no_err_str__
 uint8_t errors_cause_side_effects = 0;
 #else
 uint8_t errors_cause_side_effects = 1;
@@ -20,7 +19,7 @@ int lf_error_configure(void) {
 void lf_error_raise(lf_error_t error, const char *format, ...) {
 	/* Record the observed error. */
 	error_code = error;
-#ifndef __disable_error_side_effects__
+#ifndef __no_err_str__
 	lf_error_t _error = error;
 	if (error && errors_cause_side_effects) {
 		/* Construct a va_list to acmmcess variadic arguments. */

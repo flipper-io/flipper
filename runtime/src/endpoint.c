@@ -1,4 +1,4 @@
-#include <flipper/libflipper.h>
+#include <flipper.h>
 #include <flipper/message.h>
 
 /* Creates a new libflipper endpoint. */

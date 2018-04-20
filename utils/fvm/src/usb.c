@@ -1,7 +1,6 @@
-#include <flipper/libflipper.h>
+#include <flipper.h>
 
 #ifdef __use_usb__
-#define __private_include__
 #include <flipper/usb.h>
 
 int usb_configure(void) {

@@ -1,6 +1,5 @@
-#define __private_include__
 #include <flipper/gpio.h>
-#include <flipper/atmegau2/atmegau2.h>
+
 
 int gpio_configure(void) {
 	return lf_success;

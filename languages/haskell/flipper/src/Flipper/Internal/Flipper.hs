@@ -62,14 +62,14 @@ attach FVM             = pause >> return False
 detach :: String -> IO Bool
 detach n = withCString n ((retSuc <$>) . c_flipper_detach)
 
-foreign import ccall safe "flipper/libflipper.h flipper_select"
+foreign import ccall safe "flipper.h flipper_select"
     c_flipper_select :: CString -> IO CInt
 
-foreign import ccall safe "flipper/libflipper.h flipper_detach"
+foreign import ccall safe "flipper.h flipper_detach"
     c_flipper_detach :: CString -> IO CInt
 
-foreign import ccall safe "flipper/libflipper.h flipper_attach_usb"
+foreign import ccall safe "flipper.h flipper_attach_usb"
     c_flipper_attach_usb :: CString -> IO CInt
 
-foreign import ccall safe "flipper/libflipper.h flipper_attach_network"
+foreign import ccall safe "flipper.h flipper_attach_network"
     c_flipper_attach_network :: CString -> CString -> IO CInt

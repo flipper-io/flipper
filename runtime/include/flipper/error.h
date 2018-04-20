@@ -56,7 +56,7 @@ enum {
 	/* uart0 */
 	E_UART0_PUSH_TIMEOUT,
 	E_UART0_PULL_TIMEOUT,
-    
+
     E_MAX
 };
 
@@ -96,7 +96,7 @@ enum {
 
 
 /* If this flag is set, error messages are nullified on platforms that do not need to store error strings. */
-#ifndef __disable_error_side_effects__
+#ifndef __no_err_str__
 /* Allow the 'error_message' macro to serve as a passthrough for any variadic arguments supplied to it. */
 #define error_message(...) __VA_ARGS__
 #else

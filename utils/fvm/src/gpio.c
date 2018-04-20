@@ -1,7 +1,6 @@
-#include <flipper/libflipper.h>
+#include <flipper.h>
 
 #ifdef __use_gpio__
-#define __private_include__
 #include <flipper/gpio.h>
 
 int gpio_configure(void) {

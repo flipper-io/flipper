@@ -1,10 +1,8 @@
-#define __private_include__
 #include <unistd.h>
 #include <flipper.h>
-#include <flipper/posix/posix.h>
-#include <flipper/atmegau2/atmegau2.h>
+
+#define __SAM4S16B__
 #include <flipper/atsam4s/atsam4s.h>
-#include <stdio.h>
 
 /* Defines the XMODEM flow control bytes. */
 #define SOH 0x01
@@ -88,11 +86,15 @@ void sam_pull(void *destination, size_t len) {
 	uart0_pull(destination, len);
 }
 
+#define SAM_RESET_PIN 0x04
+
 void sam_reset() {
 	gpio.write(0, (1 << SAM_RESET_PIN));
 	usleep(10000);
 	gpio.write((1 << SAM_RESET_PIN), 0);
 }
+
+#define SAM_ERASE_PIN 0x06
 
 int sam_enter_dfu(void) {
 	gpio.write((1 << SAM_ERASE_PIN), 0);
@@ -147,7 +149,7 @@ uint32_t sam_ba_read_word(uint32_t source) {
 
 /* Writes the given command and argument into the EFC0->EEFC_FCR register. */
 void sam_ba_write_efc_fcr(uint8_t command, uint32_t arg) {
-	sam_ba_write_word(REGADDR(EFC0->EEFC_FCR), (EEFC_FCR_FKEY(0x5A) | EEFC_FCR_FARG(arg) | EEFC_FCR_FCMD(command)));
+	sam_ba_write_word(REGADDR(EFC0->EEFC_FCR), (EEFC_FCR_FKEY_PASSWD | EEFC_FCR_FARG(arg) | command));
 }
 
 /* Moves data from the host to the device's RAM using the SAM-BA and XMODEM protocol. */
@@ -311,7 +313,7 @@ begin: ;
 	}
 
 	printf("Checking security bit.\n");
-	sam_ba_write_efc_fcr(EFC_GGPB, 0);
+	sam_ba_write_efc_fcr(EEFC_FCR_FCMD_GGPB, 0);
 	if (sam_ba_read_word(REGADDR(EFC0->EEFC_FRR)) & 0x01) {
 		fprintf(stderr, KRED "The device's security bit is set. Please erase again.\n");
 		return EXIT_FAILURE;
@@ -372,10 +374,10 @@ begin: ;
 	printf(KGRN "\n Successfully uploaded all pages. %zu bytes used. (%.2f%% of flash)\n" KNRM, firmware_size, (float)firmware_size/IFLASH0_SIZE*100);
 
 	/* Set GPNVM1 to boot from flash memory. */
-	sam_ba_write_efc_fcr(EFC_SGPB, 0x01);
+	sam_ba_write_efc_fcr(EEFC_FCR_FCMD_SGPB, 0x01);
 
 	printf("Checking GPNVM1 bit.\n");
-	sam_ba_write_efc_fcr(EFC_GGPB, 0);
+	sam_ba_write_efc_fcr(EEFC_FCR_FCMD_GGPB, 0);
 	uint8_t retries = 0;
 	if (!(sam_ba_read_byte(REGADDR(EFC0->EEFC_FRR)) & (1 << 1)) && retries ++ < RETRIES) {
 		if (retries > RETRIES) {
@@ -383,9 +385,9 @@ begin: ;
 			return EXIT_FAILURE;
 		}
 		/* Set GPNVM1 to boot from flash memory. */
-		sam_ba_write_efc_fcr(EFC_SGPB, 0x01);
+		sam_ba_write_efc_fcr(EEFC_FCR_FCMD_SGPB, 0x01);
 		/* Read the state of the GPNVM bits. */
-		sam_ba_write_efc_fcr(EFC_GGPB, 0);
+		sam_ba_write_efc_fcr(EEFC_FCR_FCMD_GGPB, 0);
 	}
 	printf(KGRN "The device's GPNVM1 bit is set.\n" KNRM);
 

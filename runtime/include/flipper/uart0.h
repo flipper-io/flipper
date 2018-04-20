@@ -2,13 +2,11 @@
 #define __uart0_h__
 
 /* Include all types and macros exposed by the Flipper Toolbox. */
-#include <flipper/libflipper.h>
+#include <flipper.h>
 #include <flipper/usart.h>
 
-#ifdef __private_include__
-
 /* Declare the virtual interface for this modules. */
-extern const struct _uart0 {
+extern const struct _uart0_interface {
 	int (* configure)(uint8_t baud, uint8_t interrupts);
 	int (* ready)(void);
 	int (* push)(void *source, lf_size_t length);
@@ -27,5 +25,4 @@ int uart0_ready(void);
 int uart0_push(void *source, lf_size_t length);
 int uart0_pull(void *destination, lf_size_t length);
 
-#endif
 #endif

@@ -1,5 +1,4 @@
-#define __private_include__
-#include <flipper/carbon.h>
+#include <flipper.h>
 #include <flipper/atsam4s/modules.h>
 
 /* Define the standard modules based on platform specific usage declarations. */

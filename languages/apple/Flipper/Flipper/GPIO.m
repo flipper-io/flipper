@@ -7,7 +7,6 @@
 //
 
 #import "GPIO.h"
-#define __private_include__
 #include <flipper/gpio.h>
 
 @implementation GPIO

@@ -2,17 +2,15 @@
 #define __usart_h__
 
 /* Include all types and macros exposed by the Flipper Toolbox. */
-#include <flipper/libflipper.h>
+#include <flipper.h>
 
 /* Declare the virtual interface for this modules. */
-extern const struct _usart {
+extern const struct _usart_interface {
 	int (* configure)(void);
 	int (* ready)(void);
 	int (* push)(void *source, lf_size_t length);
 	int (* pull)(void *destination, lf_size_t length);
 } usart;
-
-#ifdef __private_include__
 
 /* Declare the _lf_module structure for this module. */
 extern struct _lf_module _usart;
@@ -26,5 +24,4 @@ int usart_ready(void);
 int usart_push(void *source, lf_size_t length);
 int usart_pull(void *destination, lf_size_t length);
 
-#endif
 #endif

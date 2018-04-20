@@ -1,7 +1,6 @@
-#include <flipper/libflipper.h>
+#include <flipper.h>
 
 #ifdef __use_usart__
-#define __private_include__
 #include <flipper/usart.h>
 
 int usart_configure(void) {

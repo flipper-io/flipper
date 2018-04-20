@@ -1,4 +1,4 @@
-#include <flipper/atsam4s/atsam4s.h>
+#include <flipper.h>
 
 void null_isr(void) {
 	while (1);

@@ -1,6 +1,5 @@
-#define __private_include__
 #include <flipper/led.h>
-#include <flipper/atmegau2/atmegau2.h>
+
 
 int led_configure(void) {
 	/* Configure the DI (data in) pin of the LED as an output. */

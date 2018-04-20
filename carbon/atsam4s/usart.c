@@ -1,6 +1,4 @@
-#define __private_include__
 #include <flipper/usart.h>
-#include <flipper/atsam4s/atsam4s.h>
 
 #define USART0_BAUDRATE 230400
 
