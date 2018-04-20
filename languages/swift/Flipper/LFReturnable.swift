@@ -1,10 +1,3 @@
-//
-//  LFReturnable.swift
-//  Flipper
-//
-//  Created by Harlan Haskins on 1/31/18.
-//
-
 import Foundation
 import Clibflipper
 

@@ -1,10 +1,3 @@
-//
-//  Module.swift
-//  Flipper
-//
-//  Created by Harlan Haskins on 2/9/18.
-//
-
 import Foundation
 import Clibflipper
 
