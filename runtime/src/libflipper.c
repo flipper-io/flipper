@@ -81,7 +81,7 @@ failure:
 	return lf_error;
 }
 
-lf_return_t lf_push(struct _lf_device *device, void *dst, void *src, size_t len) {
+int lf_push(struct _lf_device *device, void *dst, void *src, size_t len) {
 	lf_assert(device, failure, E_NULL, "NULL device was provided to '%s'.", __FUNCTION__);
 	lf_assert(dst, failure, E_NULL, "NULL dst was provided to '%s'.", __FUNCTION__);
 	lf_assert(src, failure, E_NULL, "NULL src was provided to '%s'.", __FUNCTION__);
@@ -117,7 +117,7 @@ failure:
 	return lf_error;
 }
 
-lf_return_t lf_pull(struct _lf_device *device, void *dst, void *src, size_t len) {
+int lf_pull(struct _lf_device *device, void *dst, void *src, size_t len) {
 	lf_assert(device, failure, E_NULL, "NULL device was provided to '%s'.", __FUNCTION__);
 	lf_assert(dst, failure, E_NULL, "NULL dst was provided to '%s'.", __FUNCTION__);
 	lf_assert(src, failure, E_NULL, "NULL src was provided to '%s'.", __FUNCTION__);
