@@ -13,4 +13,5 @@ __pycache__
 *.pyc
 .idea/
 Flipper.xcodeproj
+Package.resolved
 cmake-build-debug/
