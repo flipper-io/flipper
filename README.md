@@ -15,7 +15,7 @@ Wiki page to set up your environment.**
 3. **Try out the examples [here](./examples).**
     - The best way to learn is by example. Dive head first into our intuitive examples.
 4. **Ask questions!**
-    - We are build a community around the platform, and we want you to be a part of it. Join our [Discord](https://discord.gg/R5zdK4m) server and ask questions, [email us](mailto:opensource@flipper.io), or open issues here on GitHub.
+    - We are building a community around the platform, and we want you to be a part of it. Join our [Discord](https://discord.gg/R5zdK4m) server and ask questions, [email us](mailto:opensource@flipper.io), or open issues here on GitHub.
 
 ## Quickstart
 
