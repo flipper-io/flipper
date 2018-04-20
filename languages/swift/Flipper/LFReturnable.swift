@@ -60,7 +60,7 @@ extension Int32: LFReturnable {
   }
 
   public init(lfReturn: lf_return_t) {
-    self = Int32(bitPattern: lfReturn)
+    self = Int32(bitPattern: UInt32(truncatingIfNeeded: lfReturn))
   }
 }
 
@@ -70,7 +70,7 @@ extension Int64: LFReturnable {
   }
 
   public init(lfReturn: lf_return_t) {
-    self = Int64(bitPattern: UInt64(lfReturn))
+    self = Int64(bitPattern: lfReturn)
   }
 }
 
@@ -110,7 +110,7 @@ extension UInt32: LFReturnable {
     return .u32
   }
   public init(lfReturn: lf_return_t) {
-    self = UInt32(lfReturn)
+    self = UInt32(truncatingIfNeeded: lfReturn)
   }
 }
 
@@ -119,7 +119,7 @@ extension UInt64: LFReturnable {
     return .u64
   }
   public init(lfReturn: lf_return_t) {
-    self = UInt64(lfReturn)
+    self = lfReturn
   }
 }
 
