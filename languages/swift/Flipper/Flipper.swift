@@ -34,11 +34,11 @@ public struct LED: StandardModule {
     self.ffi = ffi
   }
 
-  func configure() {
+  public func configure() {
     ffi.invoke(index: 0, args: [])
   }
 
-  func rgb(_ r: UInt8, _ g: UInt8, _ b: UInt8) {
+  public func rgb(_ r: UInt8, _ g: UInt8, _ b: UInt8) {
     ffi.invoke(index: 1, args: [r, g, b])
   }
 }
