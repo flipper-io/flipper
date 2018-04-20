@@ -47,7 +47,7 @@ int __attribute__((__destructor__)) lf_exit(void) {
 	return lf_success;
 }
 
-lf_return_t lf_invoke(struct _lf_device *device, char *module, lf_function function, lf_type ret, struct _lf_ll *args) {
+lf_return_t lf_invoke(struct _lf_device *device, const char *module, lf_function function, lf_type ret, struct _lf_ll *args) {
 	lf_assert(device, failure, E_NULL, "NULL device was provided to '%s'.", __FUNCTION__);
 	lf_assert(module, failure, E_NULL, "NULL module was provided to '%s'.", __FUNCTION__);
 
