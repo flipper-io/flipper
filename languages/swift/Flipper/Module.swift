@@ -67,7 +67,7 @@ public struct Module {
     }
   }
 
-  public func pull(byteCount: Int, source: DevicePointer) throws -> Data {
+  public func pull(from source: DevicePointer, byteCount: Int) throws -> Data {
     var resultData = Data(repeating: 0, count: byteCount)
     let ptr = UnsafeMutableRawPointer(bitPattern: UInt(source.bitPattern))
     resultData.withUnsafeMutableBytes {
