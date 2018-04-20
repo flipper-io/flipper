@@ -106,6 +106,9 @@ AVR_CFLAGS      := -std=c99           \
 AVR_LDFLAGS  := -mmcu=atmega32u2 \
                 -Wl,--gc-sections
 
+PKGCONFIG_DIR := $(PREFIX)/lib/pkgconfig
+PKGCONFIG_PATH := $(PKGCONFIG_DIR)/libflipper.pc
+
 $(AVR_TARGET): $(AVR_TARGET).hex
 
 .PHONY: install-atmegau2
@@ -168,6 +171,24 @@ uninstall-libflipper:
 	$(_v)rm -r $(PREFIX)/include/flipper
 	$(_v)rm $(PREFIX)/lib/$(X86_TARGET).so
 	$(_v)rm -rf $(PREFIX)/share/flipper
+
+define PKGCONFIG_BODY
+Name: libflipper
+Description: The libflipper C library
+Version: 0.0.1
+Libs: -L$(PREFIX)/lib -lflipper
+Requires.private:
+Cflags: -I$(PREFIX)/include -DPOSIX
+endef
+
+export PKGCONFIG_BODY
+
+install-pkgconfig:
+	$(_v)mkdir -p $(PKGCONFIG_DIR)
+	$(_v)rm -f $(PKGCONFIG_PATH)
+	$(_v)echo "$$PKGCONFIG_BODY" > $(PKGCONFIG_PATH)
+
+install:: install-pkgconfig
 
 # --- CONSOLE --- #
 
