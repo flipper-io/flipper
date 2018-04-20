@@ -4,23 +4,23 @@
 #include <flipper/atsam4s/modules.h>
 
 int carbon_select_atsam4s(struct _lf_device *device) {
-	LF_MODULE_SET_DEVICE_AND_ID(_adc, device, _adc_id);
-	LF_MODULE_SET_DEVICE_AND_ID(_button, device, _button_id);
-	LF_MODULE_SET_DEVICE_AND_ID(_dac, device, _dac_id);
-	LF_MODULE_SET_DEVICE_AND_ID(_fld, device, _fld_id);
-	LF_MODULE_SET_DEVICE_AND_ID(_gpio, device, _gpio_id);
-	LF_MODULE_SET_DEVICE_AND_ID(_i2c, device, _i2c_id);
-	LF_MODULE_SET_DEVICE_AND_ID(_led, device, _led_id);
-	LF_MODULE_SET_DEVICE_AND_ID(_pwm, device, _pwm_id);
-	LF_MODULE_SET_DEVICE_AND_ID(_rtc, device, _rtc_id);
-	LF_MODULE_SET_DEVICE_AND_ID(_spi, device, _spi_id);
-	LF_MODULE_SET_DEVICE_AND_ID(_swd, device, _swd_id);
-	LF_MODULE_SET_DEVICE_AND_ID(_task, device, _task_id);
-	LF_MODULE_SET_DEVICE_AND_ID(_temp, device, _temp_id);
-	LF_MODULE_SET_DEVICE_AND_ID(_timer, device, _timer_id);
-	LF_MODULE_SET_DEVICE_AND_ID(_uart0, device, _uart0_id);
-	LF_MODULE_SET_DEVICE_AND_ID(_usart, device, _usart_id);
-	LF_MODULE_SET_DEVICE_AND_ID(_usb, device, _usb_id);
-	LF_MODULE_SET_DEVICE_AND_ID(_wdt, device, _wdt_id);
+	_adc.index = _adc_id;
+	_button.index = _button_id;
+	_dac.index = _dac_id;
+	_fld.index = _fld_id;
+	_gpio.index = _gpio_id;
+	_i2c.index = _i2c_id;
+	_led.index = _led_id;
+	_pwm.index = _pwm_id;
+	_rtc.index = _rtc_id;
+	_spi.index = _spi_id;
+	_swd.index = _swd_id;
+	_task.index = _task_id;
+	_temp.index = _temp_id;
+	_timer.index = _timer_id;
+	_uart0.index = _uart0_id;
+	_usart.index = _usart_id;
+	_usb.index = _usb_id;
+	_wdt.index = _wdt_id;
 	return lf_success;
 }

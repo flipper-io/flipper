@@ -10,7 +10,7 @@ const struct _swd_interface swd = {
 };
 
 LF_WEAK int swd_configure(void) {
-	return lf_invoke(&_swd, _swd_configure, lf_int_t, NULL);
+	return lf_invoke(lf_get_current_device(), &_swd, _swd_configure, lf_int_t, NULL);
 }
 
 #endif
