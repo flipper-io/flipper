@@ -8,28 +8,77 @@
 import Foundation
 import Clibflipper
 
-public struct StandardModuleFFI {
-  let moduleMetadata: _lf_module
+public struct FlipperError: Error, CustomStringConvertible {
+  public let message: String
+
+  static var current: FlipperError? {
+    if lf_error_get() == E_OK {
+      return nil
+    }
+    return FlipperError(message: String(cString: lf_error_string()))
+  }
+
+  public var description: String {
+    return message
+  }
 }
 
-public struct UserModuleFFI {
-  var moduleMetadata: _lf_module
+public struct Module {
+  let device: UnsafeMutablePointer<_lf_device>?
   let name: String
 
-  public static func uninitialized(name: String) -> UserModuleFFI {
-    return UserModuleFFI(name: name, version: 0, crc: 0, index: 0)
-  } 
-
-  init(name: String, version: lf_version_t, crc: lf_crc_t, index: Int32) {
+  init(name: String, device: Flipper) {
     self.name = name
-    self.moduleMetadata = _lf_module(name: name,
-                                     description: nil,
-                                     version: version,
-                                     identifier: crc,
-                                     index: index,
-                                     device: nil,
-                                     data: nil,
-                                     psize: nil)
+    self.device = device.device
+  }
+
+  public func invoke(index: UInt8, args: [LFArg]) throws {
+    _ = try invoke(index: index, args: args) as LFVoid
+  }
+
+  public func invoke<Ret: LFReturnable>(
+    index: UInt8,
+    args: [LFArg]
+  ) throws -> Ret {
+    let ret = name.withCString { bytes -> lf_return_t in
+      let mutPtr = UnsafeMutablePointer(mutating: bytes)
+      return lf_invoke(device, mutPtr, index,
+                       Ret.lfType.rawValue, buildLinkedList(args))
+    }
+    if let err = FlipperError.current {
+      throw err
+    }
+    return Ret.init(lfReturn: ret)
+  }
+
+  public func push(
+    index: UInt8,
+    data: Data,
+    destination: DevicePointer
+  ) throws {
+    let ptr = UnsafeMutableRawPointer(bitPattern: UInt(destination.bitPattern))
+    data.withUnsafeBytes { (bytes: UnsafePointer<UInt8>) -> Void in
+      let rawPtr = UnsafeMutableRawPointer(mutating: bytes)
+      lf_push(device, ptr, rawPtr, data.count)
+      return
+    }
+    if let err = FlipperError.current {
+      throw err
+    }
+  }
+
+  public func pull(byteCount: Int, source: DevicePointer) throws -> Data {
+    var resultData = Data(repeating: 0, count: byteCount)
+    let ptr = UnsafeMutableRawPointer(bitPattern: UInt(source.bitPattern))
+    resultData.withUnsafeMutableBytes {
+      (bytes: UnsafeMutablePointer<UInt8>) -> Void in
+      lf_pull(device, bytes, ptr, byteCount)
+      return
+    }
+    if let err = FlipperError.current {
+      throw err
+    }
+    return resultData
   }
 }
 
@@ -41,92 +90,4 @@ func buildLinkedList(_ args: [LFArg]) -> UnsafeMutablePointer<_lf_ll>? {
                   UInt(truncatingIfNeeded: arg.asLFArg.value)), nil)
   }
   return argList
-}
-
-public enum ModuleFFI {
-  case standard(StandardModuleFFI)
-  case user(UserModuleFFI)
-
-  var modulePtr: _lf_module {
-    switch self {
-    case .standard(let mod): return mod.moduleMetadata
-    case .user(let mod): return mod.moduleMetadata
-    }
-  }
-
-  public func invoke(index: UInt8, args: [LFArg]) {
-    _ = invoke(index: index, args: args) as LFVoid
-  }
-
-  public func push(index: UInt8, data: Data, args: [LFArg]) {
-    _ = push(index: index, data: data, args: args) as LFVoid
-  }
-
-  public func pull(index: UInt8, data: inout Data, args: [LFArg]) {
-    _ = pull(index: index, data: &data, args: args) as LFVoid
-  }
-
-  public func invoke<Ret: LFReturnable>(index: UInt8, args: [LFArg]) -> Ret {
-    var mod = modulePtr
-    let ret = lf_invoke(&mod, index, Ret.lfType.rawValue, buildLinkedList(args))
-    return Ret.init(lfReturn: ret)
-  }
-
-  public func push<Ret: LFReturnable>(index: UInt8, data: Data, args: [LFArg]) -> Ret {
-    var mod = modulePtr
-    let ret = 
-      data.withUnsafeBytes { (ptr: UnsafePointer<UInt32>) -> lf_return_t in
-        return lf_push(&mod, index, UnsafeMutableRawPointer(mutating: ptr),
-                       UInt32(data.count), buildLinkedList(args))
-      }
-    return Ret.init(lfReturn: ret)
-  }
-
-  public func pull<Ret: LFReturnable>(index: UInt8, data: inout Data,
-                                      args: [LFArg]) -> Ret {
-    var mod = modulePtr
-    let count = UInt32(data.count)
-    let ret = data.withUnsafeMutableBytes {
-      lf_pull(&mod, index, $0, count, buildLinkedList(args))
-    }
-    return Ret.init(lfReturn: ret)
-  }
-}
-
-public protocol UserModule {
-  static var name: String { get }
-  init(flipper: Flipper)
-  init(ffi: ModuleFFI)
-  init()
-}
-
-public extension UserModule {
-  init() {
-    self.init(ffi: .user(.uninitialized(name: Self.name)))
-  }
-
-  init(flipper: Flipper) {
-    var ffi = UserModuleFFI(name: Self.name, version: 0, crc: 0, index: 0)
-    lf_bind(&ffi.moduleMetadata, flipper.device)
-    self.init(ffi: .user(ffi))
-  }
-}
-
-public protocol StandardModule {
-  static var underlyingModule: _lf_module { get }
-  init(flipper: Flipper)
-  init(ffi: ModuleFFI)
-  init()
-}
-
-public extension StandardModule {
-  init() {
-    self.init(ffi: .standard(StandardModuleFFI(moduleMetadata: Self.underlyingModule)))
-  }
-
-  init(flipper: Flipper) {
-    var mod = Self.underlyingModule
-    lf_bind(&mod, flipper.device)
-    self.init(ffi: .standard(StandardModuleFFI(moduleMetadata: mod)))
-  }
 }

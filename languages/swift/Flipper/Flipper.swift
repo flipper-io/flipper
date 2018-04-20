@@ -25,20 +25,18 @@ public struct Flipper {
   }
 }
 
-public struct LED: StandardModule {
-  public static let underlyingModule = _led
+public struct LED {
+  let module: Module
 
-  let ffi: ModuleFFI
-
-  public init(ffi: ModuleFFI) {
-    self.ffi = ffi
+  public init(flipper: Flipper) {
+    self.module = Module(name: "led", device: flipper)
   }
 
-  public func configure() {
-    ffi.invoke(index: 0, args: [])
+  public func configure() throws {
+    try module.invoke(index: 0, args: [])
   }
 
-  public func rgb(_ r: UInt8, _ g: UInt8, _ b: UInt8) {
-    ffi.invoke(index: 1, args: [r, g, b])
+  public func rgb(_ r: UInt8, _ g: UInt8, _ b: UInt8) throws {
+    try module.invoke(index: 1, args: [r, g, b])
   }
 }
