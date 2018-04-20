@@ -7,6 +7,17 @@ PREFIX ?= /usr/local
 # List of all target types
 TARGETS := ARM AVR X86
 
+# Platform. "Darwin" for macOS, "Linux" for linux.
+UNAME := $(shell uname -s)
+
+# For linux, use "dfu-programmer [BOARD] start"
+# For all else, use "dfu-programmer [BOARD] launch --no-reset"
+DFU_LAUNCH := launch --no-reset
+
+ifeq ($(UNAME), Linux)
+DFU_LAUNCH := start
+endif
+
 .PHONY: all install
 
 all::
@@ -102,7 +113,7 @@ $(AVR_TARGET): $(AVR_TARGET).hex
 install-atmegau2: atmegau2
 	$(_v)dfu-programmer atmega32u2 erase
 	$(_v)dfu-programmer atmega32u2 flash $(BUILD)/$(AVR_TARGET)/$(AVR_TARGET).hex
-	$(_v)dfu-programmer atmega32u2 launch --no-reset
+	$(_v)dfu-programmer atmega32u2 $(DFU_LAUNCH)
 
 # install:: install-atmegau2
 
