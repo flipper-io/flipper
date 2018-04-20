@@ -4,7 +4,7 @@
 
 ## About
 
-Flipper is a new kind of embedded development platform that lets developers use familiar tools to use to create amazing applications that interact with embedded hardware. Flipper can be controlled from [these](./languages) programming langauges running on desktop, mobile, and web applications.
+Flipper is a new kind of embedded development platform that lets developers use familiar tools to create amazing applications that interact with embedded hardware. Flipper can be controlled from [these](./languages) programming langauges running on desktop, mobile, and web applications.
 
 1. **Purchase a board from our web store
    [here](https://flipper.io/products/flipper-carbon-developer-unit).**
