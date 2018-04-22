@@ -105,6 +105,46 @@ make install
 
 See the README for each example for details.
 
+# How it works
+
+Let's go through a brief tour of Flipper's major components and explain how
+they all work together. Hopefully this will help to paint a clearer picture
+of what Flipper is capable of.
+
+```
+---------------------                        -------------
+| Language bindings |                        |  Packages |
+---------------------                        -------------
+---------------------                        -------------
+|    Libflipper     |                        |  Osmium   |
+---------------------                        -------------
+---------------------                        -------------
+|                   |                        |           |
+|                   |                        |           |
+|       Host        |  USB, Wifi, Bluetooth  |  Flipper  |
+|                   |  <~~~~~~~~~~~~~~~~~~>  |           |
+|                   |                        |           |
+---------------------                        -------------
+```
+
+Libflipper is the name of the library which captures function calls on the
+host machine and sends them to Flipper. A host machine can be a desktop
+computer, smartphone, or even a server. Hosts can communicate with Flipper
+using any form of communication, with usb, wifi, and bluetooth being the main
+three. In order to use high level programming languages, we have
+"language bindings" which make use of libflipper in order to control Flipper.
+
+Osmium is our affectionate name for Flipper's operating system. It's in charge
+of communicating with libflipper and receiving instructions, then executing
+code in the correct package and returning the result. Flipper comes with
+several "standard" packages, which provide the core functionality of the board.
+These correspond pretty closely to the peripherals in the hardware, giving
+access to GPIO, USART, SPI, I2C, and more. However, Flipper allows you to
+write your own packages. Packages always run directly on the device, meaning
+that you get native performance, but every package can have language bindings
+generated for it, allowing you to execute functions in that package remotely
+from your language of choice.
+
 ## Contribution
 
 Contribution is welcome! Feel free to submit pull requests to this repository
