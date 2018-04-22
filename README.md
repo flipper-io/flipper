@@ -44,7 +44,7 @@ apt-get install libnewlib-arm-none-eabi binutils-arm-none-eabi gcc-arm-none-eabi
 
 ### Clone and build the repository
 ```
-git clone https://github.com/georgemorgan/flipper.git
+git clone https://github.com/flipper-io/flipper.git
 cd flipper
 make
 ```
