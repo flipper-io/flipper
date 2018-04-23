@@ -40,11 +40,14 @@ void lf_debug_packet(struct _fmr_packet *packet, uint32_t length) {
 		printf("  └─magic:     0x%x\n", packet->header.magic);
 		printf("  └─checksum:  0x%x\n", packet->header.checksum);
 		printf("  └─length:    %d bytes (%.02f%%)\n", packet->header.length, (float) packet->header.length/sizeof(struct _fmr_packet)*100);
-		char *classstrs[] = { "exec", "push", "pull", "dyld" };
-		printf("\t└─ class\t\t%s\n", classstrs[packet->header.type]);
+		char *classstrs[] = { "exec", "push", "pull", "dyld", "malloc", "free" };
+		printf("  └─class:     %s\n", classstrs[packet->header.type]);
+
 		struct _fmr_invocation_packet *invocation = (struct _fmr_invocation_packet *)(packet);
 		struct _fmr_push_pull_packet *pushpull = (struct _fmr_push_pull_packet *)(packet);
 		struct _fmr_dyld_packet *dyld = (struct _fmr_dyld_packet *)(packet);
+		struct _fmr_memory_packet *mem = (struct _fmr_memory_packet *)(packet);
+
 		switch (packet->header.type) {
 			case fmr_execute_class:
 				lf_debug_call(&invocation->call);
@@ -58,6 +61,14 @@ void lf_debug_packet(struct _fmr_packet *packet, uint32_t length) {
 			case fmr_dyld_class:
 				printf("module:\n");
 				printf("   └─ module: '%s'\n", dyld->module);
+			break;
+			case fmr_malloc_class:
+				printf("malloc:\n");
+				printf("   └─ size: '0x%llx'\n", mem->size);
+			break;
+			case fmr_free_class:
+				printf("free:\n");
+				printf("   └─ ptr: '0x%llx'\n", mem->ptr);
 			break;
 			default:
 				printf("Invalid packet class.\n");

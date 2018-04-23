@@ -102,9 +102,9 @@ int lf_push(struct _lf_device *device, void *dst, void *src, size_t len);
 /* Moves data from the address space of the device to that of the host. */
 int lf_pull(struct _lf_device *device, void *dst, void *src, size_t len);
 /* Gets the module index. */
-int lf_dyld(struct _lf_device *device, char *module);
+int lf_dyld(struct _lf_device *device, char *module, int *idx);
 /* Allocates memory on the device. */
-int lf_malloc(struct _lf_device *device, size_t length, void **ptr);
+int lf_malloc(struct _lf_device *device, size_t size, void **ptr);
 /* Frees memory on the device. */
 int lf_free(struct _lf_device *device, void *ptr);
 
