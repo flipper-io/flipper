@@ -84,17 +84,15 @@ failure:
 	return lf_error;
 }
 
-int fmr_push(struct _lf_device *device, void *dst, size_t len) {
-	int e = device->read(device, dst, len);
-	lf_assert(e == lf_success, failure, E_FMR, "Failed to pull data for '%s'.", __FUNCTION__);
+int fmr_push(struct _lf_device *device, void *dst, uint32_t len) {
+	lf_assert(device->read(device, dst, len) == lf_success, failure, E_FMR, "Failed to pull data for '%s'.", __FUNCTION__);
 	return lf_success;
 failure:
 	return lf_error;
 }
 
-int fmr_pull(struct _lf_device *device, void *src, size_t len) {
-	int e = device->write(device, src, len);
-	lf_assert(e == lf_success, failure, E_FMR, "Failed to push data for '%s'.", __FUNCTION__);
+int fmr_pull(struct _lf_device *device, void *src, uint32_t len) {
+	lf_assert(device->write(device, src, len) == lf_success, failure, E_FMR, "Failed to push data for '%s'.", __FUNCTION__);
 	return lf_success;
 failure:
 	return lf_error;

@@ -56,7 +56,7 @@ void lf_debug_packet(struct _fmr_packet *packet, uint32_t length) {
 			case fmr_pull_class:
 				printf("length:\n");
 				printf("   └─ ptr:     0x%llx\n", pushpull->ptr);
-				printf("   └─ len:     0x%llx\n\n", pushpull->len);
+				printf("   └─ len:     0x%x\n\n", pushpull->len);
 			break;
 			case fmr_dyld_class:
 				printf("module:\n");

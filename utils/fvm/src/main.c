@@ -11,7 +11,7 @@ struct _lf_device *fvm = NULL;
 
 int main(int argc, char *argv[]) {
 
-	lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
+	//lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
 
 	/* Create a UDP server. */
 	struct sockaddr_in addr;
