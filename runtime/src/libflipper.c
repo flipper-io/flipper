@@ -75,8 +75,9 @@ int lf_invoke(struct _lf_device *device, const char *module, lf_function functio
 	lf_assert(e == lf_success, failure, E_ENDPOINT, "Failed to receive message from the device '%s'.", device->name);
 	lf_debug_result(&result);
 	lf_assert(result.error == E_OK, failure, result.error, "An error occured on the device '%s':", device->name);
-	return result.value;
+	*retval = result.value;
 
+	return lf_success;
 failure:
 	return lf_error;
 }
