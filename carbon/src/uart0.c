@@ -26,13 +26,14 @@ void *uart0_interface[] = {
 
 LF_MODULE(uart0, "uart0", uart0_interface);
 
+#warning Memory not freed if invoke or pull fail.
 LF_WEAK int uart0_read(void* destination, uint32_t length) {
 	void *buffer = NULL;
 	lf_return_t retval;
 	struct _lf_device *device = lf_get_current_device();
 	lf_assert(device, failure, E_UNIMPLEMENTED, "NULL device for uart0_read.");
 	lf_assert(lf_malloc(device, length, &buffer) == lf_success, failure, E_NULL, "Failed to allocate remote memory for uart0_read.");
-	lf_assert(lf_invoke(device, "uart0", _uart0_read, lf_int_t, &retval, lf_args(lf_ptr(buffer), lf_infer(length))) == lf_success, failure, E_UNIMPLEMENTED, "Failed to invoke uart0 read.");
+	lf_assert(lf_invoke(device, "uart0", _uart0_read, lf_int_t, &retval, lf_args(lf_ptr(buffer), lf_infer(length))) == lf_success, failure, E_UNIMPLEMENTED, "Failed to invoke uart0_read.");
 	lf_assert(lf_pull(device, destination, buffer, length) == lf_success, failure, E_UNIMPLEMENTED, "Failed to pull uart0.");
 	lf_assert(lf_free(device, buffer) == lf_success, failure, E_UNIMPLEMENTED, "Failed to free uart0_read memory.");
 	return (int)retval;
@@ -40,14 +41,15 @@ failure:
 	return lf_error;
 }
 
+#warning Memory not freed if push or invoke fail.
 LF_WEAK int uart0_write(void* source, uint32_t length) {
 	void *buffer = NULL;
 	lf_return_t retval;
 	struct _lf_device *device = lf_get_current_device();
-	lf_assert(device, failure, E_UNIMPLEMENTED, "NULL device for uart0_read.");
+	lf_assert(device, failure, E_UNIMPLEMENTED, "NULL device for uart0_write.");
 	lf_assert(lf_malloc(device, length, &buffer) == lf_success, failure, E_NULL, "Failed to allocate remote memory for uart0_write.");
 	lf_assert(lf_push(device, buffer, source, length) == lf_success, failure, E_UNIMPLEMENTED, "Failed to push uart0.");
-	lf_assert(lf_invoke(device, "uart0", _uart0_write, lf_int_t, &retval, lf_args(lf_ptr(buffer), lf_infer(length))) == lf_success, failure, E_UNIMPLEMENTED, "Failed to invoke uart0 write.");
+	lf_assert(lf_invoke(device, "uart0", _uart0_write, lf_int_t, &retval, lf_args(lf_ptr(buffer), lf_infer(length))) == lf_success, failure, E_UNIMPLEMENTED, "Failed to invoke uart0_write.");
 	lf_assert(lf_free(device, buffer) == lf_success, failure, E_UNIMPLEMENTED, "Failed to free uart0_write memory.");
 	return (int)retval;
 failure:
