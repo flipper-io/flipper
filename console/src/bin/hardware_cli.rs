@@ -2,8 +2,12 @@
 //! hardware which isn't remote module execution. This includes booting the
 //! board and installing and deploying modules.
 
+use std::fs::File;
+#[allow(unused_imports)]
+use std::io::Read;
 use console::CliError;
 use clap::{App, Arg, ArgMatches};
+use indicatif::{ProgressBar, ProgressStyle};
 use failure::Error;
 
 #[derive(Debug, Fail)]
@@ -53,11 +57,17 @@ pub mod boot {
 
 pub mod flash {
     use super::*;
-    use console::hardware::fdfu;
+    use console::hardware::fdfu::{
+        self,
+        Progress,
+    };
 
     pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
         App::new("flash")
             .about("Flash a new firmware image onto Flipper")
+            .arg(Arg::with_name("verify")
+                .long("verify")
+                .help("After uploading, verify the firmware was written correctly"))
             .arg(Arg::with_name("image")
                 .required(true)
                 .takes_value(true))
@@ -66,7 +76,61 @@ pub mod flash {
     pub fn execute(args: &ArgMatches) -> Result<(), Error> {
         // This is safe because "image" is a required argument.
         let image = args.value_of("image").unwrap();
-        println!("Flipper flash got image: {}", image);
-        fdfu::flash(image)
+        info!("Flipper flash got image: {}", image);
+
+        let firmware: Vec<_> = File::open(image)
+            .and_then(|mut f| {
+                let mut v = Vec::new();
+                f.read_to_end(&mut v)?;
+                Ok(v)
+            })?;
+
+        let flash_total = firmware.len() / 512;
+        let verify_total = firmware.len() / 4;
+
+        let verify = args.is_present("verify");
+        let receiver = fdfu::flash(firmware.into(), verify);
+
+        let flash_bar = ProgressBar::new(flash_total as u64);
+        flash_bar.set_style(ProgressStyle::default_bar()
+            .template("{spinner:.green} {msg:20} [{elapsed_precise}] [{bar:40.cyan/blue}] {percent:>3}% ({eta})")
+            .progress_chars("##-"));
+
+        let verify_bar = if !verify { None } else {
+            let bar = ProgressBar::new(verify_total as u64);
+            bar.set_style(ProgressStyle::default_bar()
+                .template("{spinner:.green} {msg:20} [{elapsed_precise}] [{bar:40.cyan/blue}] {percent:>3}% ({eta})")
+                .progress_chars("##-"));
+            Some(bar)
+        };
+
+        loop {
+            let progress = receiver.recv().unwrap();
+            match progress {
+                Progress::UpdateMode => flash_bar.set_message("Entered update mode"),
+                Progress::NormalMode => flash_bar.set_message("Entered normal mode"),
+                Progress::Applet => flash_bar.set_message("Uploaded copy applet"),
+                Progress::Flashing(done) => {
+                    flash_bar.set_message("Flashing firmware");
+                    flash_bar.set_position(done as u64);
+                },
+                Progress::FlashComplete => flash_bar.finish_with_message("Firmware flashed"),
+                Progress::Verifying(done) => {
+                    verify_bar.as_ref().unwrap().set_message("Verifying firmware");
+                    verify_bar.as_ref().unwrap().set_position(done as u64);
+                },
+                Progress::VerifyComplete(errors) => {
+                    if errors > 0 {
+                        verify_bar.as_ref().unwrap().set_message("Verification failed");
+                    } else {
+                        verify_bar.as_ref().unwrap().finish();
+                    }
+                }
+                Progress::Failed(e) => Err(e)?,
+                Progress::Complete => break,
+            }
+        }
+
+        Ok(())
     }
 }

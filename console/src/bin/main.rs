@@ -11,6 +11,7 @@
 //! itself typically only need to interpret each command enough to
 //! decide which child module to pass the execution onto.
 
+#![deny(warnings)]
 #![deny(missing_docs)]
 #![deny(missing_debug_implementations)]
 #![deny(missing_copy_implementations)]
@@ -21,11 +22,17 @@
 #![deny(unused_import_braces)]
 #![deny(unused_qualifications)]
 
-#[macro_use] extern crate clap;
-#[macro_use] extern crate failure;
+#[macro_use]
+extern crate log;
+extern crate env_logger;
+#[macro_use]
+extern crate clap;
+#[macro_use]
+extern crate failure;
 extern crate rustyline;
 extern crate byteorder;
 extern crate libc;
+extern crate indicatif;
 extern crate flipper;
 extern crate flipper_console as console;
 
@@ -33,13 +40,20 @@ mod modules_cli;
 mod hardware_cli;
 mod bindings_cli;
 
-use console::CliError;
-use clap::{App, AppSettings, Arg, ArgMatches};
 use failure::Error;
+use console::CliError;
+
+use clap::{
+    App,
+    AppSettings,
+    Arg,
+    ArgMatches,
+};
 
 const ABOUT: &'static str = "flipper: Manage and control Flipper from the command line";
 
 fn main() {
+    env_logger::init();
     let matches = &app().get_matches();
     match execute(&matches) {
         Ok(()) => return,

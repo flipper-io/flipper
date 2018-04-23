@@ -18,6 +18,7 @@
 
 use flipper;
 use console::CliError;
+#[allow(unused_imports)]
 use flipper::StandardModule;
 use clap::{App, AppSettings, Arg, ArgMatches};
 use failure::Error;
