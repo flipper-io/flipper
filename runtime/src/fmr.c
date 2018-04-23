@@ -73,7 +73,7 @@ failure:
 	return lf_error;
 }
 
-int fmr_execute(struct _lf_device *device, lf_module module, lf_function function, lf_type ret, lf_argc argc, lf_types argt, void *arguments, lf_return_t *retval) {
+int fmr_invoke(struct _lf_device *device, lf_module module, lf_function function, lf_type ret, lf_argc argc, lf_types argt, void *arguments, lf_return_t *retval) {
 	struct _lf_module *m = lf_ll_item(device->modules, module);
 	void *f = m->interface[function];
 	lf_assert(f, failure, E_NULL, "Bad function address in '%s'.", __FUNCTION__);
@@ -146,7 +146,7 @@ int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet) {
 	/* Switch through the packet subclasses and invoke the appropriate handler for each. */
 	switch (packet->header.type) {
 		case fmr_execute_class:
-			e = fmr_execute(device, icall->index, icall->function, icall->ret, icall->argc, icall->types, icall->parameters, &retval);
+			e = fmr_invoke(device, icall->index, icall->function, icall->ret, icall->argc, icall->types, icall->parameters, &retval);
 		break;
 		case fmr_push_class:
 			e = fmr_push(device, (void *)(uintptr_t)ppacket->ptr, ppacket->len);
