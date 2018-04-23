@@ -17,17 +17,26 @@ void *gpio_interface[] = {
 LF_MODULE(gpio, "gpio", gpio_interface);
 
 LF_WEAK uint32_t gpio_read(uint32_t mask) {
-	return 	lf_invoke(lf_get_current_device(), "gpio", _gpio_read, lf_void_t, lf_args(lf_infer(mask)));
+	lf_return_t retval;
+	lf_invoke(lf_get_current_device(), "gpio", _gpio_read, lf_int32_t, &retval, lf_args(lf_infer(mask)));
+	return (uint32_t)retval;
 }
 
 LF_WEAK void gpio_write(uint32_t set, uint32_t clear) {
-	lf_invoke(lf_get_current_device(), "gpio", _gpio_write, lf_void_t, lf_args(lf_infer(set), lf_infer(clear)));
+	lf_return_t retval;
+	lf_invoke(lf_get_current_device(), "gpio", _gpio_write, lf_void_t, &retval, lf_args(lf_infer(set), lf_infer(clear)));
+	
 }
 
 LF_WEAK void gpio_enable(uint32_t enable, uint32_t disable) {
-	lf_invoke(lf_get_current_device(), "gpio", _gpio_enable, lf_void_t, lf_args(lf_infer(enable), lf_infer(disable)));
+	lf_return_t retval;
+	lf_invoke(lf_get_current_device(), "gpio", _gpio_enable, lf_void_t, &retval, lf_args(lf_infer(enable), lf_infer(disable)));
+	
 }
 
 LF_WEAK int gpio_configure(void) {
-	return lf_invoke(lf_get_current_device(), "gpio", _gpio_configure, lf_int_t, NULL);
+	lf_return_t retval;
+	lf_invoke(lf_get_current_device(), "gpio", _gpio_configure, lf_int_t, &retval, NULL);
+	return (int)retval;
 }
+

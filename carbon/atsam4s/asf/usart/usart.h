@@ -310,10 +310,10 @@ void usart_spi_release_chip_select(Usart *p_usart);
 uint32_t usart_is_tx_ready(Usart *p_usart);
 uint32_t usart_is_tx_empty(Usart *p_usart);
 uint32_t usart_is_rx_ready(Usart *p_usart);
-uint32_t usart_write(Usart *p_usart, uint32_t c);
+uint32_t asf_usart_write(Usart *p_usart, uint32_t c);
 uint32_t usart_putchar(Usart *p_usart, uint32_t c);
 void usart_write_line(Usart *p_usart, const char *string);
-uint32_t usart_read(Usart *p_usart, uint32_t *c);
+uint32_t asf_usart_read(Usart *p_usart, uint32_t *c);
 uint32_t usart_getchar(Usart *p_usart, uint32_t *c);
 #if (SAM3XA || SAM3U)
 uint32_t *usart_get_tx_access(Usart *p_usart);

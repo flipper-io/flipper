@@ -11,6 +11,8 @@ void *rtc_interface[] = {
 LF_MODULE(rtc, "rtc", rtc_interface);
 
 LF_WEAK int rtc_configure(void) {
-	return lf_invoke(lf_get_current_device(), "rtc", _rtc_configure, lf_int_t, NULL);
+	lf_return_t retval;
+	lf_invoke(lf_get_current_device(), "rtc", _rtc_configure, lf_int_t, &retval, NULL);
+	return (int)retval;
 }
 

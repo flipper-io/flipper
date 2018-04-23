@@ -124,16 +124,11 @@ $FUNCTIONS$
 			lf_args = "lf_args(%s)" % ", ".join(args)
 			if len(args) == 0:
 				lf_args = "NULL"
-			if f.name.endswith("_write"):
-				statement = "lf_success;" #"lf_push(lf_get_current_device(), \"$MODULE$\", %s, %s, length);" % ("_" + f.name, "source")
-			elif f.name.endswith("_read"):
-				statement = "lf_success;" # "lf_pull(lf_get_current_device(), \"$MODULE$\", %s, %s, length);" % ("_" + f.name, "destination")
+			if f.type != "void":
+				retstatement = "return (%s)retval;" % (f.type)
 			else:
-				statement = "lf_invoke(lf_get_current_device(), \"$MODULE$\", %s, %s, %s);" % ("_" + f.name, ftype, lf_args)
-			if f.type == "void":
-				body = statement
-			else:
-				body = "return " + statement
+				retstatement = ""
+			body = "lf_return_t retval;\n\t" + "lf_invoke(lf_get_current_device(), \"$MODULE$\", %s, %s, &retval, %s);\n\t%s" % ("_" + f.name, ftype, lf_args, retstatement)
 			functs.append("LF_WEAK " + str(f) + " {\n\t%s\n}\n" % body)
 		ctemplate = ctemplate.replace("$VARIABLES$\n\n", "")
 		ctemplate = ctemplate.replace("$STRUCTBODY$", "\t" + ",\n\t".join(struct))

@@ -1565,7 +1565,7 @@ uint32_t usart_send_address(Usart *p_usart, uint32_t ul_addr)
 
 	p_usart->US_CR = US_CR_SENDA;
 
-	if (usart_write(p_usart, ul_addr)) {
+	if (asf_usart_write(p_usart, ul_addr)) {
 		return 1;
 	} else {
 		return 0;
@@ -1701,7 +1701,7 @@ uint32_t usart_is_rx_ready(Usart *p_usart)
  * \retval 0 on success.
  * \retval 1 on failure.
  */
-uint32_t usart_write(Usart *p_usart, uint32_t c)
+uint32_t asf_usart_write(Usart *p_usart, uint32_t c)
 {
 	if (!(p_usart->US_CSR & US_CSR_TXRDY)) {
 		return 1;
@@ -1738,7 +1738,7 @@ uint32_t usart_putchar(Usart *p_usart, uint32_t c)
  * \param p_usart Pointer to a USART instance.
  * \param string Pointer to one-line string to be sent.
  */
-void usart_write_line(Usart *p_usart, const char *string)
+void asf_usart_write_line(Usart *p_usart, const char *string)
 {
 	while (*string != '\0') {
 		usart_putchar(p_usart, *string++);
@@ -1756,7 +1756,7 @@ void usart_write_line(Usart *p_usart, const char *string)
  * \retval 0 on success.
  * \retval 1 if no data is available or errors.
  */
-uint32_t usart_read(Usart *p_usart, uint32_t *c)
+uint32_t asf_usart_read(Usart *p_usart, uint32_t *c)
 {
 	if (!(p_usart->US_CSR & US_CSR_RXRDY)) {
 		return 1;
