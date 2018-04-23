@@ -48,7 +48,6 @@ int main(int argc, char *argv[]) {
 	extern struct _lf_module gpio;
 	extern struct _lf_module i2c;
 	extern struct _lf_module led;
-	extern struct _lf_module libc;
 	extern struct _lf_module pwm;
 	extern struct _lf_module rtc;
 	extern struct _lf_module spi;
@@ -66,7 +65,6 @@ int main(int argc, char *argv[]) {
 	dyld_register(fvm, &gpio);
 	dyld_register(fvm, &i2c);
 	dyld_register(fvm, &led);
-	dyld_register(fvm, &libc);
 	dyld_register(fvm, &pwm);
 	dyld_register(fvm, &rtc);
 	dyld_register(fvm, &spi);

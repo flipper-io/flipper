@@ -81,7 +81,6 @@ int main(void) {
 	extern struct _lf_module gpio;
 	extern struct _lf_module i2c;
 	extern struct _lf_module led;
-	extern struct _lf_module libc;
 	extern struct _lf_module pwm;
 	extern struct _lf_module rtc;
 	extern struct _lf_module spi;
@@ -99,7 +98,6 @@ int main(void) {
 	dyld_register(_4s, &gpio);
 	dyld_register(_4s, &i2c);
 	dyld_register(_4s, &led);
-	dyld_register(_4s, &libc);
 	dyld_register(_4s, &pwm);
 	dyld_register(_4s, &rtc);
 	dyld_register(_4s, &spi);

@@ -182,3 +182,13 @@ int lf_dyld(struct _lf_device *device, char *module) {
 failure:
 	return lf_error;
 }
+
+int lf_malloc(struct _lf_device *device, size_t length, void **ptr) {
+
+	return lf_success;
+}
+
+int lf_free(struct _lf_device *device, void *ptr) {
+
+	return lf_success;
+}

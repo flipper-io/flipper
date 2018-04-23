@@ -12,8 +12,8 @@ void usart_enable(void);
 int usart_configure(void);
 
 void *usart_interface[] = {
-	&_usart_read,
-	&_usart_write,
+	&usart_read,
+	&usart_write,
 	&usart_get,
 	&usart_put,
 	&usart_ready,
@@ -24,11 +24,11 @@ void *usart_interface[] = {
 
 LF_MODULE(usart, "usart", usart_interface);
 
-LF_WEAK int _usart_read(void* destination, uint32_t length) {
+LF_WEAK int usart_read(void* destination, uint32_t length) {
 	return lf_success;
 }
 
-LF_WEAK int _usart_write(void* source, uint32_t length) {
+LF_WEAK int usart_write(void* source, uint32_t length) {
 	return lf_success;
 }
 
@@ -55,4 +55,3 @@ LF_WEAK void usart_enable(void) {
 LF_WEAK int usart_configure(void) {
 	return lf_invoke(lf_get_current_device(), "usart", _usart_configure, lf_int_t, NULL);
 }
-
