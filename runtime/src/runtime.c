@@ -51,10 +51,10 @@ lf_return_t lf_invoke(struct _lf_module *module, lf_function function, lf_type r
 	#warning Remove this.
 	/* If the user module bit is set, make the invocation a user invocation. */
 	if (module->index & FMR_USER_INVOCATION_BIT) {
-		_packet.header.class = fmr_user_invocation_class;
+		_packet.header.type = fmr_user_invocation_class;
 	} else {
 		/* Otherwise, make it a standard invocation. */
-		_packet.header.class = fmr_standard_invocation_class;
+		_packet.header.type = fmr_standard_invocation_class;
 	}
 
 	/* Generate the function call in the outgoing packet. */
@@ -84,7 +84,7 @@ lf_return_t lf_push(struct _lf_module *module, lf_function function, void *sourc
 	memset(&_packet, 0, sizeof(struct _fmr_packet));
 	_packet.header.magic = FMR_MAGIC_NUMBER;
 	_packet.header.length = sizeof(struct _fmr_push_pull_packet);
-	_packet.header.class = fmr_push_class;
+	_packet.header.type = fmr_push_class;
 	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
 	packet->length = length;
 
@@ -118,7 +118,7 @@ lf_return_t lf_pull(struct _lf_module *module, lf_function function, void *desti
 	memset(&_packet, 0, sizeof(struct _fmr_packet));
 	_packet.header.magic = FMR_MAGIC_NUMBER;
 	_packet.header.length = sizeof(struct _fmr_push_pull_packet);
-	_packet.header.class = fmr_pull_class;
+	_packet.header.type = fmr_pull_class;
 	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
 	packet->length = length;
 
@@ -152,7 +152,7 @@ int lf_load(void *source, lf_size_t length, struct _lf_device *device) {
 	memset(&_packet, 0, sizeof(struct _fmr_packet));
 	_packet.header.magic = FMR_MAGIC_NUMBER;
 	_packet.header.length = sizeof(struct _fmr_push_pull_packet);
-	_packet.header.class = fmr_ram_load_class;
+	_packet.header.type = fmr_ram_load_class;
 	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
 	packet->length = length;
 	_packet.header.checksum = lf_crc(packet, _packet.header.length);

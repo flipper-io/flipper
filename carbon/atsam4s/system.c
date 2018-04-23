@@ -29,10 +29,10 @@ lf_return_t fmr_push(struct _fmr_push_pull_packet *packet) {
 		return lf_error;
 	}
 	uart0_pull_wait(push_buffer, packet->length);
-	if (packet->header.class == fmr_send_class) {
+	if (packet->header.type == fmr_send_class) {
 		/* If we are copying data, simply return a pointer to the copied data. */
 		_e = (uintptr_t)push_buffer;
-	} else if (packet->header.class == fmr_ram_load_class) {
+	} else if (packet->header.type == fmr_ram_load_class) {
 		_e = os_load_image(push_buffer);
 		return lf_success;
 	} else {
@@ -45,7 +45,7 @@ lf_return_t fmr_push(struct _fmr_push_pull_packet *packet) {
 
 lf_return_t fmr_pull(struct _fmr_push_pull_packet *packet) {
 	lf_return_t _e = lf_success;
-	if (packet->header.class == fmr_receive_class) {
+	if (packet->header.type == fmr_receive_class) {
 		/* If we are receiving data, simply push the memory. */
 		_e = uart0_push((void *)*(uint64_t *)(packet->call.parameters), packet->length);
 	} else {

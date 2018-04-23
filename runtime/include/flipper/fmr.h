@@ -131,8 +131,8 @@ struct LF_PACKED _fmr_header {
 	lf_crc_t checksum;
 	/* The length of the packet expressed in bytes. */
 	uint16_t length;
-	/* The packet's class. */
-	fmr_class class;
+	/* The packet's type. */
+	fmr_class type;
 };
 
 /* Standardizes the notion of an argument. */
