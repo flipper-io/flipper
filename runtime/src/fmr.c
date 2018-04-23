@@ -158,10 +158,10 @@ int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet) {
 			e = fmr_dyld(device, dpacket->module, &retval);
 		break;
 		case fmr_malloc_class:
-			e = fmr_malloc(mpacket->size, &retval);
+			e = fmr_malloc(mpacket->size, (void *)&retval);
 		break;
 		case fmr_free_class:
-			e = fmr_free((void *)mpacket->ptr);
+			e = fmr_free((void *)(uintptr_t)mpacket->ptr);
 		break;
 		default:
 			e = E_UNIMPLEMENTED;
