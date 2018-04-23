@@ -96,7 +96,7 @@ int lf_detach(struct _lf_device *device);
 int lf_select(struct _lf_device *device);
 
 /* Performs a remote procedure call to a module's function. */
-lf_return_t lf_invoke(struct _lf_device *device, const char *module, lf_function function, lf_type ret, struct _lf_ll *args);
+int lf_invoke(struct _lf_device *device, const char *module, lf_function function, lf_type ret, lf_return_t *retval, struct _lf_ll *args);
 /* Moves data from the address space of the host to that of the device. */
 int lf_push(struct _lf_device *device, void *dst, void *src, size_t len);
 /* Moves data from the address space of the device to that of the host. */

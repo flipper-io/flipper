@@ -13,10 +13,14 @@ void *wdt_interface[] = {
 LF_MODULE(wdt, "wdt", wdt_interface);
 
 LF_WEAK void wdt_fire(void) {
-	lf_invoke(lf_get_current_device(), "wdt", _wdt_fire, lf_void_t, NULL);
+	lf_return_t retval;
+	lf_invoke(lf_get_current_device(), "wdt", _wdt_fire, lf_void_t, &retval, NULL);
+	
 }
 
 LF_WEAK int wdt_configure(void) {
-	return lf_invoke(lf_get_current_device(), "wdt", _wdt_configure, lf_int_t, NULL);
+	lf_return_t retval;
+	lf_invoke(lf_get_current_device(), "wdt", _wdt_configure, lf_int_t, &retval, NULL);
+	return (int)retval;
 }
 

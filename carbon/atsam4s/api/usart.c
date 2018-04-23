@@ -62,7 +62,7 @@ LF_FUNC("usart") uint8_t usart_get(void) {
 	return USART0 -> US_RHR;
 }
 
-LF_FUNC("usart") int _usart_write(void *src, uint32_t length) {
+LF_FUNC("usart") int usart_write(void *src, uint32_t length) {
 	/* Set the transmission length and source pointer. */
 	USART0 -> US_TCR = length;
 	USART0 -> US_TPR = (uintptr_t)src;
@@ -75,7 +75,7 @@ LF_FUNC("usart") int _usart_write(void *src, uint32_t length) {
 	return lf_success;
 }
 
-LF_FUNC("usart") int _usart_read(void *dst, uint32_t length) {
+LF_FUNC("usart") int usart_read(void *dst, uint32_t length) {
 	/* Set the transmission length and destination pointer. */
 	USART0 -> US_RCR = length;
 	USART0 -> US_RPR = (uintptr_t)dst;

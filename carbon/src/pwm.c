@@ -11,6 +11,8 @@ void *pwm_interface[] = {
 LF_MODULE(pwm, "pwm", pwm_interface);
 
 LF_WEAK int pwm_configure(void) {
-	return lf_invoke(lf_get_current_device(), "pwm", _pwm_configure, lf_int_t, NULL);
+	lf_return_t retval;
+	lf_invoke(lf_get_current_device(), "pwm", _pwm_configure, lf_int_t, &retval, NULL);
+	return (int)retval;
 }
 
