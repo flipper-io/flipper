@@ -23,7 +23,7 @@ struct _lf_module {
 		interface                       \
 	};
 
-struct _lf_module *lf_module_create(char *name, int idx);
+struct _lf_module *lf_module_create(const char *name, int idx);
 int lf_module_release(struct _lf_module *module);
 
 #endif

@@ -17,12 +17,10 @@ failure:
 /* Load a module onto the device. */
 int dyld_load(struct _lf_device *device, void *src, size_t len) {
     return lf_success;
-failure:
-    return lf_error;
 }
 
 /* Get the module index on the device. */
-struct _lf_module *dyld_module(struct _lf_device *device, char *module) {
+struct _lf_module *dyld_module(struct _lf_device *device, const char *module) {
     lf_assert(device, failure, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
     lf_assert(module, failure, E_NULL, "No module provided to '%s'.", __PRETTY_FUNCTION__);
 
