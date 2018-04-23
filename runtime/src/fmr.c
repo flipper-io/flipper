@@ -110,6 +110,19 @@ failure:
 	return lf_error;
 }
 
+int fmr_malloc(size_t size, void **ptr) {
+	*ptr = malloc(size);
+	lf_assert(*ptr, failure, E_MALLOC, "Failed to allocate memory.");
+	return lf_success;
+failure:
+	return lf_error;
+}
+
+int fmr_free(void *ptr) {
+	free(ptr);
+	return lf_success;
+}
+
 int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet) {
 	int e = E_UNIMPLEMENTED;
 	lf_return_t retval = -1;
@@ -128,6 +141,7 @@ int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet) {
 	struct _fmr_push_pull_packet *ppacket = (struct _fmr_push_pull_packet *)packet;
 	struct _fmr_dyld_packet *dpacket = (struct _fmr_dyld_packet *)packet;
 	struct _fmr_invocation *icall = &ipacket->call;
+	struct _fmr_memory_packet *mpacket = (struct _fmr_memory_packet *)packet;
 
 	/* Switch through the packet subclasses and invoke the appropriate handler for each. */
 	switch (packet->header.type) {
@@ -142,6 +156,12 @@ int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet) {
 		break;
 		case fmr_dyld_class:
 			e = fmr_dyld(device, dpacket->module, &retval);
+		break;
+		case fmr_malloc_class:
+			e = fmr_malloc(mpacket->size, &retval);
+		break;
+		case fmr_free_class:
+			e = fmr_free((void *)mpacket->ptr);
 		break;
 		default:
 			e = E_UNIMPLEMENTED;

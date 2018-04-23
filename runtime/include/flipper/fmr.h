@@ -109,7 +109,9 @@ enum {
 	/* Causes a pull operation to begin. */
 	fmr_pull_class,
 	/* Communicates with the device's dynamic loader. */
-	fmr_dyld_class
+	fmr_dyld_class,
+	fmr_malloc_class,
+	fmr_free_class,
 };
 
 /* A type used to reference the values in the enum above. */
@@ -183,6 +185,16 @@ struct LF_PACKED _fmr_dyld_packet {
 	struct _fmr_header header;
 	/* The module name. */
 	char module[16];
+};
+
+/* Allocates memory on the device. */
+struct LF_PACKED _fmr_memory_packet {
+	/* The packet header programmed with 'fmr_dyld_class'. */
+	struct _fmr_header header;
+	/* The size. */
+	lf_return_t size;
+	/* The pointer. */
+	lf_return_t ptr;
 };
 
 /* A generic datastructure that is sent back following any message runtime trancsaction. */
