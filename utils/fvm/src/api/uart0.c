@@ -33,6 +33,8 @@ LF_FUNC("uart0") int uart0_write(void *src, uint32_t length) {
 }
 
 LF_FUNC("uart0") int uart0_read(void *dst, uint32_t length) {
-	printf("Reading from the uart0 bus.\n");
+	printf("Reading from the uart0 bus: ");
+	fgets(dst, length, stdin);
+	fseek(stdin, 0, SEEK_END);
 	return lf_success;
 }
