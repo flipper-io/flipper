@@ -74,7 +74,6 @@ int main(void) {
 	extern struct _lf_module button;
 	extern struct _lf_module gpio;
 	extern struct _lf_module led;
-	extern struct _lf_module libc;
 	extern struct _lf_module spi;
 	extern struct _lf_module uart0;
 	extern struct _lf_module wdt;
@@ -83,7 +82,6 @@ int main(void) {
 	dyld_register(_u2, &button);
 	dyld_register(_u2, &gpio);
 	dyld_register(_u2, &led);
-	dyld_register(_u2, &libc);
 	dyld_register(_u2, &spi);
 	dyld_register(_u2, &uart0);
 	dyld_register(_u2, &wdt);

@@ -103,6 +103,10 @@ int lf_push(struct _lf_device *device, void *dst, void *src, size_t len);
 int lf_pull(struct _lf_device *device, void *dst, void *src, size_t len);
 /* Gets the module index. */
 int lf_dyld(struct _lf_device *device, char *module);
+/* Allocates memory on the device. */
+int lf_malloc(struct _lf_device *device, size_t length, void **ptr);
+/* Frees memory on the device. */
+int lf_free(struct _lf_device *device, void *ptr);
 
 /* Closes the library. */
 int lf_exit(void);

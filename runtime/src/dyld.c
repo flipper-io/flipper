@@ -16,8 +16,6 @@ failure:
 
 /* Load a module onto the device. */
 int dyld_load(struct _lf_device *device, void *src, size_t len) {
-    void *region = libc_malloc(len);
-    lf_assert(region, failure, E_NULL, "Failed to allocate remote memory.");
     return lf_success;
 failure:
     return lf_error;
