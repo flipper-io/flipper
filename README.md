@@ -42,6 +42,12 @@ apt-get install dfu-programmer avr-libc binutils-avr gcc-avr
 apt-get install libnewlib-arm-none-eabi binutils-arm-none-eabi gcc-arm-none-eabi
 ```
 
+#### Rust
+
+In addition to the dependencies installed via apt or brew, you will need to install the
+Rust toolchain in order to compile the console. Cross-platform instructions on installing
+Rust can be found at [rustup.rs](https://rustup.rs/).
+
 ### Clone and build the repository
 ```
 git clone https://github.com/georgemorgan/flipper.git
