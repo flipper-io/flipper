@@ -371,7 +371,13 @@ pub fn flash(firmware: Arc<[u8]>, verify: bool) -> mpsc::Receiver<Progress> {
     let (mut sender, receiver) = mpsc::channel();
 
     thread::spawn(move || {
-        let flipper = Flipper::attach();
+        let flipper = match Flipper::attach() {
+            Ok(flipper) => flipper,
+            Err(e) => {
+                let _ = sender.send(Progress::Failed(e.into()));
+                return;
+            }
+        };
         flipper.select_u2_gpio();
 
         let mut bus = Uart0::new();

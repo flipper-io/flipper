@@ -16,7 +16,11 @@
 //! $
 //! ```
 
-use flipper;
+use Result;
+use flipper::{
+    Flipper,
+    fsm::led::Led,
+};
 use console::CliError;
 #[allow(unused_imports)]
 use flipper::StandardModule;
@@ -50,7 +54,7 @@ pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
         ])
 }
 
-pub fn execute(args: &ArgMatches) -> Result<(), Error> {
+pub fn execute(args: &ArgMatches) -> Result<()> {
     if args.is_present("repl") {
         repl();
         ::std::process::exit(0);
@@ -112,13 +116,13 @@ pub mod led {
             )
     }
 
-    pub fn execute(args: &ArgMatches) -> Result<(), Error> {
+    pub fn execute(args: &ArgMatches) -> Result<()> {
         let red = args.value_of("red").unwrap().parse::<u8>().unwrap();
         let green = args.value_of("green").unwrap().parse::<u8>().unwrap();
         let blue = args.value_of("blue").unwrap().parse::<u8>().unwrap();
 
-        let flipper = flipper::Flipper::attach();
-        let led = flipper::fsm::led::Led::bind(&flipper);
+        let flipper = Flipper::attach().map_err(Error::from)?;
+        let led = Led::bind(&flipper);
         led.rgb(red, green, blue);
         Ok(())
     }

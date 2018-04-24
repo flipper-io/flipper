@@ -50,6 +50,8 @@ use clap::{
     ArgMatches,
 };
 
+type Result<T> = std::result::Result<T, Error>;
+
 const ABOUT: &'static str = "flipper: Manage and control Flipper from the command line";
 
 fn main() {
@@ -87,7 +89,7 @@ pub fn app() -> App<'static, 'static> {
 /// are implemented by a child module rather than by the `flipper` module
 /// itself. Because of this, we have to explicitly pass the name of the matched
 /// command to the child module (e.g. the "c" in `(c @ "boot")`).
-pub fn execute(args: &ArgMatches) -> Result<(), Error> {
+pub fn execute(args: &ArgMatches) -> Result<()> {
     match args.subcommand() {
         ("module", Some(m)) => modules_cli::execute(m),
         ("generate", Some(m)) => bindings_cli::execute(m),
