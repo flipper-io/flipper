@@ -35,7 +35,7 @@ impl GpioToggle {
 }
 
 fn main() {
-    let flipper = Flipper::attach();
+    let flipper = Flipper::attach().expect("should attach to Flipper");
     let gpio: GpioToggle = GpioToggle::bind(&flipper);
     gpio.toggle();
 }
