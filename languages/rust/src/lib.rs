@@ -8,6 +8,8 @@
 #[allow(unused_imports)]
 #[macro_use]
 extern crate log;
+#[macro_use]
+extern crate failure;
 extern crate libc;
 
 pub mod fsm;
@@ -22,6 +24,14 @@ type _lf_function_index = u8;
 type _fmr_return = u32;
 
 pub const LF_VERSION: u16 = 0x0001;
+
+#[derive(Debug, Fail)]
+pub enum FlipperError {
+    #[fail(display = "failed to attach to a Flipper device")]
+    Attach,
+}
+
+type Result<T> = std::result::Result<T, FlipperError>;
 
 /// The libflipper native representation of a module. An `_lf_module` struct
 /// is the most important piece of information in FMR because it's name is a
@@ -141,7 +151,7 @@ pub trait UserModule<'a>: From<UserModuleFFI> {
 
     /// Binds an instance of a User Module to the given Flipper.
     ///
-    /// ```
+    /// ```rust,no_run
     /// use flipper::{Flipper, UserModule, ModuleFFI, UserModuleFFI};
     ///
     /// struct MyModule {
@@ -166,18 +176,18 @@ pub trait UserModule<'a>: From<UserModuleFFI> {
     /// }
     ///
     /// impl MyModule {
-    ///     fn myFunc(&self) {
+    ///     fn my_func(&self) {
     ///         // Do FMR invocation
     ///     }
     /// }
     ///
-    /// let flipper = Flipper::attach();
+    /// let flipper = Flipper::attach().expect("should attach to Flipper");
     ///
     /// // Any of the following will bind "MyModule"
-    /// let myModule = MyModule::new();          // Attaches to default ("active") flipper
-    /// let myModule = MyModule::bind(&flipper); // Attaches to specified flipper
+    /// let my_module = MyModule::new();          // Attaches to default ("active") flipper
+    /// let my_module = MyModule::bind(&flipper); // Attaches to specified flipper
     ///
-    /// myModule.myFunc();
+    /// my_module.my_func();
     /// ```
     fn bind(flipper: &Flipper) -> Self {
         let mut module = UserModuleFFI::uninitialized(Self::NAME);
@@ -191,7 +201,7 @@ extern {
     fn flipper_attach() -> _lf_device;
     fn carbon_attach_hostname(hostname: *const c_char) -> _lf_device;
     fn carbon_select_u2_gpio(device: _lf_device); // TODO remove after loader improvements
-    fn lf_bind(module: *mut _lf_module, device: *const c_void) -> c_int;
+fn lf_bind(module: *mut _lf_module, device: *const c_void) -> c_int;
 }
 
 pub struct Flipper {
@@ -202,19 +212,20 @@ pub struct Flipper {
 }
 
 impl Flipper {
-    pub fn attach() -> Self {
+    pub fn attach() -> Result<Flipper> {
         unsafe {
-            Flipper {
-                device: flipper_attach()
-            }
+            let device = flipper_attach();
+            if device == ptr::null() { return Err(FlipperError::Attach); }
+            Ok(Flipper { device })
         }
     }
 
-    pub fn attach_hostname(hostname: &str) -> Self {
+    pub fn attach_hostname(hostname: &str) -> Result<Flipper> {
         unsafe {
-            Flipper {
-                device: carbon_attach_hostname(CString::new(hostname).unwrap().as_ptr())
-            }
+            let hostname_CString = CString::new(hostname).unwrap();
+            let device = carbon_attach_hostname(hostname_CString.as_ptr());
+            if device == ptr::null() { return Err(FlipperError::Attach); }
+            Ok(Flipper { device })
         }
     }
 
