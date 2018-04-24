@@ -55,6 +55,9 @@ ARM_CFLAGS   := -std=c99              \
                 -Wno-expansion-to-defined \
                 -Os                   \
                 -mcpu=cortex-m4       \
+				-mthumb               \
+                -march=armv7e-m       \
+                -mtune=cortex-m4      \
                 -mfloat-abi=soft      \
                 -D__no_err_str__      \
                 -DATSAM4S             \
