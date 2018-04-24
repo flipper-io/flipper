@@ -21,8 +21,13 @@ extern caddr_t _sbrk(int increment) {
 	return (caddr_t)(previous);
 }
 
-extern int link(char *old, char *new) {
-	return -1 ;
+extern void uart0_put(char c);
+
+extern int _write(int file, char *ptr, int len) {
+	for (int i = 0; i < len; i ++, ptr ++) {
+		uart0_put(*ptr);
+	}
+	return 0;
 }
 
 extern int _close(int file) {
@@ -43,29 +48,4 @@ extern int _lseek(int file, int ptr, int dir) {
 
 extern int _read(int file, char *ptr, int len) {
 	return 0 ;
-}
-
-extern void uart0_put(char c);
-
-extern int _write(int file, char *ptr, int len) {
-	for (int i = 0; i < len; i ++, ptr ++) {
-		uart0_put(*ptr);
-	}
-	return 0;
-}
-
-extern void _exit(int status) {
-	while (1);
-}
-
-extern void _kill(int pid, int sig) {
-	return;
-}
-
-extern int _getpid(void) {
-	return -1;
-}
-
-extern void end(void) {
-	return;
 }

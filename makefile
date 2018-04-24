@@ -54,9 +54,7 @@ ARM_CFLAGS   := -std=c99              \
                 -Wno-unused-parameter \
                 -Wno-expansion-to-defined \
                 -Os                   \
-                -mthumb               \
-                -march=armv7e-m       \
-                -mtune=cortex-m4      \
+                -mcpu=cortex-m4       \
                 -mfloat-abi=soft      \
                 -D__no_err_str__      \
                 -DATSAM4S             \
@@ -64,6 +62,7 @@ ARM_CFLAGS   := -std=c99              \
                 $(foreach inc,$(ARM_INC_DIRS),-I$(inc))
 
 ARM_LDFLAGS  := -nostartfiles                    \
+                -mcpu=cortex-m4                  \
                 -Wl,-T carbon/atsam4s/sam4s16.ld \
                 -Wl,--gc-sections
 
