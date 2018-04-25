@@ -159,6 +159,7 @@ libflipper: $(X86_TARGET).so | $(BUILD)/include/flipper/.dir
 
 install-libflipper: libflipper
 	$(_v)cp $(BUILD)/$(X86_TARGET)/$(X86_TARGET).so $(PREFIX)/lib/
+	$(_v)ln -sf $(PREFIX)/lib/$(X86_TARGET).so /usr/lib/$(X86_TARGET).so
 	$(_v)cp -r $(BUILD)/include/* $(PREFIX)/include/
 	$(_v)cp assets/flipper.mk $(PREFIX)/include/
 	$(_v)mkdir -p $(PREFIX)/share/flipper
@@ -244,7 +245,7 @@ uninstall-utils:
 PY_DIR = $(shell python -m site --user-site)
 
 install-python:
-	$(_v)pip2 install languages/python --upgrade -q
+	$(_v)pip3 install languages/python --upgrade -q
 
 install:: install-python
 
