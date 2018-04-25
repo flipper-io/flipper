@@ -1,4 +1,4 @@
-import lf
+from . import lf
 
 # ! KEEP IN SYNC WITH THE FILES BELOW
 # carbon/include/flipper/led.h

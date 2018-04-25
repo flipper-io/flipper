@@ -1,5 +1,5 @@
-from lf import *
+from .lf import *
 
 # Enumerate the standard modules
-import led
-import gpio
+from . import led
+from . import gpio
