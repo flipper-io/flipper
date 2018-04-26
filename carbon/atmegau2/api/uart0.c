@@ -68,6 +68,7 @@ LF_FUNC("uart0") int uart0_write(void *src, uint32_t length) {
 uint8_t uart0_buffer[64];
 
 LF_FUNC("uart0") int uart0_read(void *dst, uint32_t length) {
+	printf("i: %i l: %u\n", idx, length);
 	if (idx) {
 		if (length >= idx) {
 			memcpy(dst, uart0_buffer, idx);
@@ -78,6 +79,7 @@ LF_FUNC("uart0") int uart0_read(void *dst, uint32_t length) {
 			memcpy(dst, uart0_buffer, length);
 			memmove(uart0_buffer, uart0_buffer + length, idx - length);
 			idx -= length;
+			return lf_success;
 		}
 	}
 	while (length--) {
