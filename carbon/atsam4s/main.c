@@ -17,7 +17,7 @@ int debug_putchar(char c, FILE *stream) {
 void os_kernel_task(void) {
 	gpio_enable(IO_1, 0);
 	while (1) {
-		//printf("Hello!\n");
+		printf("Hello!\n");
 		gpio_write(IO_1, 0);
 		for (int i = 0x1FFFFFC; i > 0; i --) __asm__ __volatile__ ("nop");
 		gpio_write(0, IO_1);
@@ -155,7 +155,8 @@ void uart0_isr(void) {
 		lf_error_clear();
 		fmr_perform(_4s, &packet);
 
-		uart0_write(&packet, sizeof(struct _fmr_packet));
+		/* Pull an FMR packet asynchronously to launch FMR. */
+		uart0_read(&packet, sizeof(struct _fmr_packet));
 
 		/* Wait a bit before raising the FMR pin. */
 		for (size_t i = 0; i < 0x3FF; i ++) __asm__ __volatile__("nop");

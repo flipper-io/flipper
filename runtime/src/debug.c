@@ -64,7 +64,7 @@ void lf_debug_packet(struct _fmr_packet *packet, uint32_t length) {
 			break;
 			case fmr_malloc_class:
 				printf("malloc:\n");
-				printf("   └─ size: '0x%llx'\n", mem->size);
+				printf("   └─ size: '0x%x'\n", mem->size);
 			break;
 			case fmr_free_class:
 				printf("free:\n");
