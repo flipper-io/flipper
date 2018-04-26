@@ -119,6 +119,7 @@ int sam_ba_copy(uint32_t destination, void *src, uint32_t length) {
 	uart0_reset();
 	sprintf(buffer, "S%08X,%08X#", destination, length);
 	uart0_write(buffer, sizeof(buffer) - 1);
+	lf_assert(uart0_get() == 'C', failure, E_UNIMPLEMENTED, "Failed to get CTS ACK.");
 
 	/* Calculate the number of packets needed to perform the transfer. */
 	int packets = lf_ceiling(length, XLEN);

@@ -125,71 +125,124 @@ _call:
 	; Call the target function.
 	icall
 
-_ret:
-
 	mov r16, retv
 	andi r16, 0x7
 
-	; lf_int8_t
-	cpi r16, 0
-		breq _ret_8
-	; lf_int16_t
-	cpi r16, 1
-		breq _ret_16
-	; lf_void_t
-	cpi r16, 2
-		breq _ret_void
-	; lf_int32_t
-	cpi r16, 3
-		breq _ret_32
-	; lf_int_t
-	cpi r16, 4
-		breq _ret_int
-	; lf_ptr_t
-	cpi r16, 6
-		breq _ret_16
-	; lf_int64_t
-	cpi r16, 7
-		breq _ret_64
-
-	rjmp _failure
+/*         lo         |          hi        */
+/* r18, r19, r20, r21 | r22, r23, r24, r25 */
 
 _ret_8:
+	cpi r16, 0
+	brne _ret_16
+
 	clr r25
-	mov r22, r24
+	mov r18, r24
 	clr r24
 	clr r23
+	clr r22
+
+	clr r21
+	clr r20
+	clr r19
+
 	sbrs r16, 4
 	rjmp _done
-	sbrs r22, 7
+
+	sbrs r18, 7
 	rjmp _done
+
 	com r25
 	com r24
 	com r23
+	com r22
+
+	com r21
+	com r20
+	com r19
+
 	rjmp _done
-_ret_int:
-	sbr r16, 4
 _ret_16:
-	mov r23, r25
+	cpi r16, 1
+	brne _ret_void
+_ret_16_begin:
+	mov r19, r25
 	clr r25
-	mov r22, r24
+	mov r18, r24
 	clr r24
+	clr r23
+	clr r22
+
+	clr r21
+	clr r20
+
 	sbrs r16, 4
 	rjmp _done
-	sbrs r23, 7
+
+	sbrs r19, 7
 	rjmp _done
+
 	com r25
 	com r24
+	com r23
+	com r22
+
+	com r21
+	com r20
+
 	rjmp _done
-_ret_32:
-	rjmp _done
-_ret_64:
-	rjmp _failure
 _ret_void:
+	cpi r16, 2
+	brne _ret_32
+
 	clr r25
 	clr r24
 	clr r23
 	clr r22
+
+	clr r21
+	clr r20
+	clr r19
+	clr r18
+	rjmp _done
+_ret_32:
+	cpi r16, 3
+	brne _ret_int
+
+	mov r21, r25
+	clr r25
+	mov r20, r24
+	clr r24
+	mov r19, r23
+	clr r23
+	mov r18, r22
+
+	sbrs r16, 4
+	rjmp _done
+
+	sbrs r21, 7
+	rjmp _done
+
+	com r25
+	com r24
+	com r23
+	com r22
+
+	rjmp _done
+_ret_int:
+	cpi r16, 4
+	brne _ret_ptr
+
+	sbr r16, 4
+	rjmp _ret_16_begin
+_ret_ptr:
+	cpi r16, 6
+	brne _ret_64
+
+	rjmp _ret_16_begin
+_ret_64:
+	cpi r16, 7
+	brne _failure
+
 	rjmp _done
 
 _failure:
@@ -197,6 +250,10 @@ _failure:
 	ser r24
 	ser r23
 	ser r22
+	ser r21
+	ser r20
+	ser r19
+	ser r18
 _done:
 	; Restore the callee saved registers.
 	pop argt_h
