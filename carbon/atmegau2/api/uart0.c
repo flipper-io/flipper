@@ -17,7 +17,7 @@ LF_FUNC("uart0") int uart0_configure(void) {
 	UCSR1B |= (1 << RXCIE1);
 
 	/* Enable the FSI line as an input. */
-	FSI_DDR &= ~(1 << FSI_PIN);
+	FMR_DDR &= ~(1 << FMR_PIN);
 
 	return lf_success;
 }
@@ -68,7 +68,6 @@ LF_FUNC("uart0") int uart0_write(void *src, uint32_t length) {
 uint8_t uart0_buffer[64];
 
 LF_FUNC("uart0") int uart0_read(void *dst, uint32_t length) {
-	printf("i: %i l: %u\n", idx, length);
 	if (idx) {
 		if (length >= idx) {
 			memcpy(dst, uart0_buffer, idx);
@@ -99,6 +98,9 @@ ISR(USART1_RX_vect) {
 	while (!(UCSR1A & (1 << RXC1)));
 	if (idx == sizeof(uart0_buffer)) idx = 0;
 	uint8_t c = UDR1;
-	uart0_buffer[idx++] = c;
-	usb_debug_putchar(c);
+	if (FMR_IN & (1 << FMR_PIN)) {
+		usb_debug_putchar(c);
+	} else {
+		uart0_buffer[idx++] = c;
+	}
 }

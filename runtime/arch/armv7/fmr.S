@@ -145,6 +145,7 @@ _ret:
 
 _ret_void:
 	mov r0, #0
+	mov r1, #0
 	b _call_done
 _ret_8:
 	b _call_done
@@ -159,6 +160,7 @@ _ret_64:
 
 _failure:
 	mov r0, #-1
+	mov r1, #-1
 _call_done:
 	pop { _function-temp, pc }
 

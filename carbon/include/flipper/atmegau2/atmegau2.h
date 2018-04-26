@@ -63,8 +63,8 @@
 #define SAM_ERASE_PORT PORTD
 #define SAM_ERASE_PIN 0x06
 
-#define FSI_DDR DDRC
-#define FSI_IN PINC
-#define FSI_PIN 0x07
+#define FMR_DDR DDRC
+#define FMR_IN PINC
+#define FMR_PIN 0x07
 
 #endif
