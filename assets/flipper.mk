@@ -74,7 +74,7 @@ HOST_INC_DIRS := include
 
 -include $(BUILD)/gen.mk
 
-HOST_SRC_DIRS := host $(GEN_DIRS)
+HOST_SRC_DIRS := src host $(GEN_DIRS)
 
 $(BUILD)/gen.mk: $(DEVICE_TARGET).elf | $(BUILD)/gen/.dir
 	$(_v)fdwarf $(BUILD)/$(DEVICE_TARGET)/$(DEVICE_TARGET).elf c $(BUILD)/gen
@@ -88,6 +88,8 @@ HOST_CFLAGS   := -std=gnu99             \
                  -DPOSIX                \
 
 HOST_LDFLAGS  := -lflipper
+
+fvm: $(HOST_TARGET).so
 
 # Check if this is a module
 ifneq ("$(wildcard host)","")
