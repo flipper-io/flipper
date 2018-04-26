@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
 			struct _lf_module *m = dlsym(dlm, module);
 			lf_assert(m, failure, E_NULL, "Failed to read module '%s' from '%s'.", module, lib);
 			lf_debug("Successfully loaded module '%s'.", module);
-			int _e = dyld_register(lf_get_current_device(), m);
+			int _e = dyld_register(fvm, m);
 			lf_assert(_e == lf_success, failure, E_NULL, "Failed to register module '%s'.", m->name);
 			lf_debug("Successfully registered module '%s'.", module);
 		}
