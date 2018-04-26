@@ -107,11 +107,6 @@ uint32_t sam_ba_read_word(uint32_t source) {
 	return result;
 }
 
-/* Drains the data in the uart0 buffer. */
-void uart0_drain(void) {
-	while (!uart0_ready()) (void)uart0_get();
-}
-
 /* Writes the given command and argument into the EFC0->EEFC_FCR register. */
 void sam_ba_write_efc_fcr(uint8_t command, uint32_t arg) {
 	sam_ba_write_word(REGADDR(EFC0->EEFC_FCR), (EEFC_FCR_FKEY_PASSWD | EEFC_FCR_FARG(arg) | command));
