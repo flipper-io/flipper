@@ -108,9 +108,10 @@ failure:
 	return lf_error;
 }
 
-int fmr_malloc(size_t size, void **ptr) {
-	*ptr = malloc(size);
-	lf_assert(*ptr, failure, E_MALLOC, "Failed to allocate memory.");
+int fmr_malloc(uint32_t size, lf_return_t *retval) {
+	void *ptr = malloc(size);
+	lf_assert(ptr, failure, E_MALLOC, "Failed to allocate memory.");
+	*retval = (lf_return_t)(uintptr_t)ptr;
 	return lf_success;
 failure:
 	return lf_error;
@@ -156,7 +157,7 @@ int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet) {
 			e = fmr_dyld(device, dpacket->module, &retval);
 		break;
 		case fmr_malloc_class:
-			e = fmr_malloc(mpacket->size, (void *)&retval);
+			e = fmr_malloc(mpacket->size, &retval);
 		break;
 		case fmr_free_class:
 			e = fmr_free((void *)(uintptr_t)mpacket->ptr);
