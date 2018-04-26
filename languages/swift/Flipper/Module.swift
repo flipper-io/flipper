@@ -35,8 +35,10 @@ public struct Module {
   ) throws -> Ret {
     let ret = name.withCString { bytes -> lf_return_t in
       let mutPtr = UnsafeMutablePointer(mutating: bytes)
-      return lf_invoke(device, mutPtr, index,
-                       Ret.lfType.rawValue, buildLinkedList(args))
+      var ret = lf_return_t()
+      lf_invoke(device, mutPtr, index, Ret.lfType.rawValue,
+                &ret, buildLinkedList(args))
+      return ret
     }
     if let err = FlipperError.current {
       throw err
