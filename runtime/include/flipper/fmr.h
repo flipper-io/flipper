@@ -192,9 +192,9 @@ struct LF_PACKED _fmr_memory_packet {
 	/* The packet header programmed with 'fmr_dyld_class'. */
 	struct _fmr_header header;
 	/* The size. */
-	lf_return_t size;
+	uint32_t size;
 	/* The pointer. */
-	lf_return_t ptr;
+	uint64_t ptr;
 };
 
 /* A generic datastructure that is sent back following any message runtime trancsaction. */
