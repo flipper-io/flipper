@@ -19,7 +19,7 @@ failure:
 
 int flipper_select(struct _lf_device *device) {
 	lf_assert(device, failure, E_NULL, "NULL device pointer provided for selection.");
-	lf_set_current_device(device);
+	lf_select(device);
 	return lf_success;
 failure:
 	return lf_error;
