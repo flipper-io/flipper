@@ -68,8 +68,8 @@ def bind(module, device):
 	libflipper.lf_bind(c_void_p(device.ref), c_void_p(module.ref))
 
 def current_device():
-	libflipper.lf_get_current_device.restype = c_void_p
-	return libflipper.lf_get_current_device()
+	libflipper.lf_get_selected.restype = c_void_p
+	return libflipper.lf_get_selected()
 
 def lf_ll_from_list(l):
 	ll = c_void_p(0)

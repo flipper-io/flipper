@@ -12,7 +12,7 @@ const struct _flipper_interface flipper = {
 struct _lf_device *flipper_attach(void) {
 	int _e = carbon_attach();
 	lf_assert(_e == lf_success, failure, E_NO_DEVICE, "Failed to find any Flipper devices attached to this computer. Please check your connection and try again.");
-	return lf_get_current_device();
+	return lf_get_selected();
 failure:
 	return NULL;
 }

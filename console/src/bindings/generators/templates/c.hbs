@@ -7,6 +7,6 @@ const struct _{{name}}_interface {{name}} {
 };
 {{#each funcs}}
 LF_WEAK {{ret}} {{../name}}_{{name}}({{param_expansion params}}) {
-    {{ret}} result = lf_invoke(lf_get_current_device(), &_{{../name}}, _{{../name}}_{{name}}, {{ret_fmr}}, lf_args({{fmr_expansion params}}));
+    {{ret}} result = lf_invoke(lf_get_selected(), &_{{../name}}, _{{../name}}_{{name}}, {{ret_fmr}}, lf_args({{fmr_expansion params}}));
 }
 {{/each}}

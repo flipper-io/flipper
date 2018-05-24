@@ -87,6 +87,8 @@ void lf_set_debug_level(int level);
 int lf_attach(struct _lf_device *device);
 /* Selects an attached device. */
 int lf_select(struct _lf_device *device);
+/* Returns the currently selected device. */
+struct _lf_device *lf_get_selected(void);
 /* Detaches from an attached device. */
 int lf_detach(struct _lf_device *device);
 /* Releases all library state. */

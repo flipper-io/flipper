@@ -109,7 +109,7 @@ int os_load_image(struct _lf_abi_header *header) {
 	} else {
 		/* Load a module. */
 		struct _lf_module *_module = (struct _lf_module *)header + header->module_offset;
-		dyld_register(lf_get_current_device(), _module);
+		dyld_register(lf_get_selected(), _module);
 	}
 
 	return lf_success;
