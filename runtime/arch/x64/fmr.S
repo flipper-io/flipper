@@ -61,7 +61,7 @@ _load:
 	cmp $7, temp
 		je _load_64
 
-	jmp _failure
+	jmp _fail
 
 _load_8:
 	movb (argv), %al
@@ -116,7 +116,7 @@ _write_r9:
 	movq %rax, %r9
 	jmp _write_done
 _write_stack:
-	jmp _failure
+	jmp _fail
 
 _write_done:
 	shr $4, argt
@@ -154,7 +154,7 @@ _ret:
 	cmp $7, temp
 		je _ret_64
 
-	jmp _failure
+	jmp _fail
 
 _ret_8:
 	jmp _done
@@ -171,7 +171,7 @@ _ret_ptr:
 _ret_64:
 	jmp _done
 
-_failure:
+_fail:
 	mov $-1, %rax
 _done:
 	addq $8, %rsp

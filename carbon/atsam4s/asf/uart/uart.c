@@ -337,7 +337,7 @@ void uart_set_clock_divisor(Uart *p_uart, uint16_t us_divisor)
  * \param data Data to be sent.
  *
  * \retval 0 Success.
- * \retval 1 I/O Failure, UART is not ready.
+ * \retval 1 I/O fail, UART is not ready.
  */
 uint32_t uart_write(Uart *p_uart, const uint8_t uc_data)
 {
@@ -357,7 +357,7 @@ uint32_t uart_write(Uart *p_uart, const uint8_t uc_data)
  * \param p_uart Pointer to a UART instance.
  *
  * \retval 0 Success.
- * \retval 1 I/O Failure, UART is not ready.
+ * \retval 1 I/O fail, UART is not ready.
  */
 uint32_t uart_read(Uart *p_uart, uint8_t *puc_data)
 {

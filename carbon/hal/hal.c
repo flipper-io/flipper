@@ -68,26 +68,26 @@ int sam_on(void) {
 }
 
 struct _lf_device *carbon_select_4s(struct _lf_device *device) {
-	lf_assert(device, failure, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
+	lf_assert(device, fail, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
 	struct _carbon_context *ctx = (struct _carbon_context *)device->_dev_ctx;
 	lf_select(ctx->_4s);
 	return ctx->_4s;
-failure:
+fail:
 	return NULL;
 }
 
 struct _lf_device *carbon_select_u2(struct _lf_device *device) {
-	lf_assert(device, failure, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
+	lf_assert(device, fail, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
 	struct _carbon_context *ctx = (struct _carbon_context *)device->_dev_ctx;
 	lf_select(ctx->_u2);
 	return ctx->_u2;
-failure:
+fail:
 	return NULL;
 }
 
 int atsam4s_read(struct _lf_device *device, void *dst, uint32_t length) {
 	struct _lf_device *prev = lf_get_selected();
-	lf_assert(device, failure, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
+	lf_assert(device, fail, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
 	carbon_select_u2(device);
 	size_t size = 128;
 	size_t packets = lf_ceiling(length, size);
@@ -103,13 +103,13 @@ int atsam4s_read(struct _lf_device *device, void *dst, uint32_t length) {
 	}
 	lf_select(prev);
 	return lf_success;
-failure:
+fail:
 	return lf_error;
 }
 
 int atsam4s_write(struct _lf_device *device, void *src, uint32_t length) {
 	struct _lf_device *prev = lf_get_selected();
-	lf_assert(device, failure, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
+	lf_assert(device, fail, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
 	carbon_select_u2(device);
 	size_t size = 128;
 	size_t packets = lf_ceiling(length, size);
@@ -125,7 +125,7 @@ int atsam4s_write(struct _lf_device *device, void *src, uint32_t length) {
 	}
 	lf_select(prev);
 	return lf_success;
-failure:
+fail:
 	return lf_error;
 }
 
@@ -137,20 +137,20 @@ int carbon_attach_u2s(const void *__u2, void *_unused) {
 	struct _lf_device *_u2 = (struct _lf_device *)__u2;
 	_u2->_dev_ctx = calloc(1, sizeof(struct _carbon_context));
 	struct _carbon_context *_u2_context = (struct _carbon_context *)_u2->_dev_ctx;
-	lf_assert(_u2_context, failure, E_NULL, "Failed to allocate memory for context in '%s'.", __PRETTY_FUNCTION__);
+	lf_assert(_u2_context, fail, E_NULL, "Failed to allocate memory for context in '%s'.", __PRETTY_FUNCTION__);
 
 	struct _lf_device *_4s = lf_device_create(atsam4s_read, atsam4s_write, atsam4s_release);
-	lf_assert(_4s, failure, E_NULL, "Failed to create 4s subdevice in '%s'.", __PRETTY_FUNCTION__);
+	lf_assert(_4s, fail, E_NULL, "Failed to create 4s subdevice in '%s'.", __PRETTY_FUNCTION__);
 
 	_4s->_dev_ctx = calloc(1, sizeof(struct _carbon_context));
 	struct _carbon_context *_4s_context = (struct _carbon_context *)_4s->_dev_ctx;
-	lf_assert(_4s_context, failure, E_NULL, "Failed to allocate memory for context in '%s'.", __PRETTY_FUNCTION__);
+	lf_assert(_4s_context, fail, E_NULL, "Failed to allocate memory for context in '%s'.", __PRETTY_FUNCTION__);
 
 	_u2_context->_u2 = _4s_context->_u2 = _u2;
 	_u2_context->_4s = _4s_context->_4s = _4s;
 
 	return lf_attach(_4s);
-failure:
+fail:
 	return lf_error;
 }
 
@@ -165,10 +165,10 @@ int carbon_attach(void) {
 
 struct _lf_device *carbon_attach_hostname(char *hostname) {
 	struct _lf_device *device = lf_network_device_for_hostname(hostname);
-	lf_assert(device, failure, E_NO_DEVICE, "Failed to find Carbon device with hostname '%s'.", hostname);
+	lf_assert(device, fail, E_NO_DEVICE, "Failed to find Carbon device with hostname '%s'.", hostname);
 	lf_attach(device);
 	return device;
 
-failure:
+fail:
 	return NULL;
 }

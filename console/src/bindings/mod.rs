@@ -43,7 +43,7 @@ use object::{
     Object,
     ObjectSection,
 };
-use failure::Error;
+use fail::Error;
 
 /// Represents errors that can occur when parsing ELF and/or DWARF files.
 #[derive(Debug, Fail)]

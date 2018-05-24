@@ -1075,7 +1075,7 @@ void pio_capture_disable(Pio *p_pio)
  * \param pul_data Pointer to store the data.
  *
  * \retval 0 Success.
- * \retval 1 I/O Failure, Capture data is not ready.
+ * \retval 1 I/O fail, Capture data is not ready.
  */
 uint32_t pio_capture_read(const Pio *p_pio, uint32_t *pul_data)
 {

@@ -22,7 +22,7 @@ int8_t megausb_interrupt_receive(void *dst, uint32_t length) {
 				/* Reset the endpoint hardware. */
 				UERST = 0x1E;
 				UERST = 0;
-				goto failure;
+				goto fail;
 			}
 #endif
 		}
@@ -45,7 +45,7 @@ int8_t megausb_interrupt_receive(void *dst, uint32_t length) {
 
 	return lf_success;
 
-failure:
+fail:
 
 	return lf_error;
 }
@@ -72,7 +72,7 @@ int8_t megausb_interrupt_transmit(void *src, uint32_t length) {
 				/* Reset the endpoint hardware. */
 				UERST = 0x1E;
 				UERST = 0;
-				goto failure;
+				goto fail;
 			}
 #endif
 		}
@@ -94,7 +94,7 @@ int8_t megausb_interrupt_transmit(void *src, uint32_t length) {
 
 	return lf_success;
 
-failure:
+fail:
 
 	return lf_error;
 }

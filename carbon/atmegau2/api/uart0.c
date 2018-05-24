@@ -48,9 +48,9 @@ LF_FUNC("uart0") void uart0_disable(void) {
 
 LF_FUNC("uart0") void uart0_put(uint8_t byte) {
 	uint8_t timeout = UDFNUML + LF_UART_TIMEOUT_MS;
-	while (!(UCSR1A & (1 << UDRE1))) lf_assert(UDFNUML != timeout, failure, E_UART0_WRITE_TIMEOUT, "Error occurred while putting to uart0.");
+	while (!(UCSR1A & (1 << UDRE1))) lf_assert(UDFNUML != timeout, fail, E_UART0_WRITE_TIMEOUT, "Error occurred while putting to uart0.");
 	UDR1 = byte;
-failure:
+fail:
 	return;
 }
 
@@ -83,12 +83,12 @@ LF_FUNC("uart0") int uart0_read(void *dst, uint32_t length) {
 	}
 	while (length--) {
 		uint8_t timeout = UDFNUML + LF_UART_TIMEOUT_MS;
-		while (!(UCSR1A & (1 << RXC1))) lf_assert(UDFNUML != timeout, failure, E_UART0_READ_TIMEOUT, "Timeout occurred while pulling from uart0.");
+		while (!(UCSR1A & (1 << RXC1))) lf_assert(UDFNUML != timeout, fail, E_UART0_READ_TIMEOUT, "Timeout occurred while pulling from uart0.");
 		*(uint8_t *) dst++ = UDR1;
 	}
 	return lf_success;
 
-failure:
+fail:
 	return lf_error;
 }
 
