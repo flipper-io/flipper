@@ -8,7 +8,7 @@ use std::io::Read;
 use console::CliError;
 use clap::{App, Arg, ArgMatches};
 use indicatif::{ProgressBar, ProgressStyle};
-use failure::Error;
+use fail::Error;
 
 #[derive(Debug, Fail)]
 #[fail(display = "A hardware error occurred")]

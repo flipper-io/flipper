@@ -78,9 +78,9 @@ int os_task_add(struct _os_task *task) {
 struct _os_task *os_task_create(void *_entry, void (* _exit)(struct _lf_abi_header *header), struct _lf_abi_header *header, uint32_t stack_size) {
 	/* Allocate the next available task slot. */
 	struct _os_task *task = malloc(sizeof(struct _os_task));
-	lf_assert(task, failure, E_NULL, "Failed to allocate memory to create task");
+	lf_assert(task, fail, E_NULL, "Failed to allocate memory to create task");
 	os_stack_t *stack = malloc(stack_size);
-	lf_assert(stack, failure, E_NULL, "Failed to allocate memory to create stack.");
+	lf_assert(stack, fail, E_NULL, "Failed to allocate memory to create stack.");
 
 	/* Set the task's stack pointer to the top of the task's stack. */
 	task->sp = (uintptr_t)stack + stack_size;
@@ -124,13 +124,13 @@ struct _os_task *os_task_create(void *_entry, void (* _exit)(struct _lf_abi_head
 	_tsk->r11 = 11;
 
 	return task;
-failure:
+fail:
 	return NULL;
 }
 
 int os_task_release(struct _os_task *task) {
-	lf_assert(task, failure, E_NULL, "Invalid task pointer provided to '%s'.", __PRETTY_FUNCTION__);
-	lf_assert(task != schedule.head, failure, E_INVALID_TASK, "Tried to release task head.");
+	lf_assert(task, fail, E_NULL, "Invalid task pointer provided to '%s'.", __PRETTY_FUNCTION__);
+	lf_assert(task != schedule.head, fail, E_INVALID_TASK, "Tried to release task head.");
 	/* Disallow interrupts while freeing memory. */
 	__disable_irq();
 	/* Call the task's exit function. */
@@ -158,7 +158,7 @@ int os_task_release(struct _os_task *task) {
 	/* Decrement the number of active tasks. */
 	schedule.count --;
 	return lf_success;
-failure:
+fail:
 	return lf_error;
 }
 

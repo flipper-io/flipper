@@ -7,10 +7,10 @@ extern int ll_test(void);
 
 int main(int argc, char *argv[]) {
 
-    lf_assert(dyld_test() == lf_success, failure, E_TEST, "Failed dyld_test.");
-    lf_assert(ll_test() == lf_success, failure, E_TEST, "Failed ll_test.");
+    lf_assert(dyld_test() == lf_success, fail, E_TEST, "Failed dyld_test.");
+    lf_assert(ll_test() == lf_success, fail, E_TEST, "Failed ll_test.");
 
     return EXIT_SUCCESS;
-failure:
+fail:
     return EXIT_FAILURE;
 }

@@ -20,7 +20,7 @@ use std::ops::{
     DerefMut,
 };
 
-use failure::Error;
+use fail::Error;
 use fallible_iterator::FallibleIterator;
 use object;
 use object::Object;

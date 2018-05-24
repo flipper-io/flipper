@@ -11,17 +11,17 @@ const struct _flipper_interface flipper = {
 /* Shim to attach all possible flipper devices that could be attached to the system. */
 struct _lf_device *flipper_attach(void) {
 	int _e = carbon_attach();
-	lf_assert(_e == lf_success, failure, E_NO_DEVICE, "Failed to find any Flipper devices attached to this computer. Please check your connection and try again.");
+	lf_assert(_e == lf_success, fail, E_NO_DEVICE, "Failed to find any Flipper devices attached to this computer. Please check your connection and try again.");
 	return lf_get_selected();
-failure:
+fail:
 	return NULL;
 }
 
 int flipper_select(struct _lf_device *device) {
-	lf_assert(device, failure, E_NULL, "NULL device pointer provided for selection.");
+	lf_assert(device, fail, E_NULL, "NULL device pointer provided for selection.");
 	lf_select(device);
 	return lf_success;
-failure:
+fail:
 	return lf_error;
 }
 

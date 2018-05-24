@@ -13,7 +13,7 @@ use std::{thread, time};
 use byteorder::{BigEndian, ReadBytesExt};
 use xmodem;
 use xmodem::Xmodem;
-use failure::Error;
+use fail::Error;
 
 use flipper::{
     Flipper,

@@ -65,7 +65,7 @@ _load:
 	cpi r16, 7
 		breq _load_64
 
-	rjmp _failure
+	rjmp _fail
 
 _load_8:
 	ld r0, Z+
@@ -93,7 +93,7 @@ _load_32:
 	subi XL, 0x04
 	rjmp _load_done
 _load_64:
-	rjmp _failure
+	rjmp _fail
 
 _load_int:
 _load_ptr:
@@ -241,11 +241,11 @@ _ret_ptr:
 	rjmp _ret_16_begin
 _ret_64:
 	cpi r16, 7
-	brne _failure
+	brne _fail
 
 	rjmp _done
 
-_failure:
+_fail:
 	ser r25
 	ser r24
 	ser r23

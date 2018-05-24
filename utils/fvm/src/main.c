@@ -32,10 +32,10 @@ int main(int argc, char *argv[]) {
 
 	/* The network endpoint for the virtual flipper device. */
 	fvm = lf_device_create(lf_network_read, lf_network_write, lf_network_release);
-	lf_assert(fvm, failure, E_ENDPOINT, "Failed to create device for virtual machine.");
+	lf_assert(fvm, fail, E_ENDPOINT, "Failed to create device for virtual machine.");
 	fvm->_ep_ctx = calloc(1, sizeof(struct _lf_network_context));
 	struct _lf_network_context *context = (struct _lf_network_context *)fvm->_ep_ctx;
-	lf_assert(context, failure, E_NULL, "Failed to allocate memory for context in '%s'.", __PRETTY_FUNCTION__);
+	lf_assert(context, fail, E_NULL, "Failed to allocate memory for context in '%s'.", __PRETTY_FUNCTION__);
 	/* Set server file descriptor. */
 	context->fd = sd;
 	lf_attach(fvm);
@@ -82,12 +82,12 @@ int main(int argc, char *argv[]) {
 		while ((module = *modules++)) {
 			lf_debug("Loading module '%s' from '%s'.", module, lib);
 			void *dlm = dlopen(lib, RTLD_LAZY);
-			lf_assert(dlm, failure, E_NULL, "Failed to open module '%s'.", lib);
+			lf_assert(dlm, fail, E_NULL, "Failed to open module '%s'.", lib);
 			struct _lf_module *m = dlsym(dlm, module);
-			lf_assert(m, failure, E_NULL, "Failed to read module '%s' from '%s'.", module, lib);
+			lf_assert(m, fail, E_NULL, "Failed to read module '%s' from '%s'.", module, lib);
 			lf_debug("Successfully loaded module '%s'.", module);
 			int _e = dyld_register(fvm, m);
-			lf_assert(_e == lf_success, failure, E_NULL, "Failed to register module '%s'.", m->name);
+			lf_assert(_e == lf_success, fail, E_NULL, "Failed to register module '%s'.", m->name);
 			lf_debug("Successfully registered module '%s'.", module);
 		}
 		printf("\n");
@@ -103,6 +103,6 @@ int main(int argc, char *argv[]) {
 
 	close(sd);
 
-failure:
+fail:
 	return EXIT_FAILURE;
 }

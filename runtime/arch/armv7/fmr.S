@@ -53,7 +53,7 @@ _load:
 	cmp temp, #7
 		beq _load_64
 
-	b _failure
+	b _fail
 
 _load_8:
 	/* Load a byte from the argument list. */
@@ -74,7 +74,7 @@ _load_32:
 	add _argv, #4
 	b _load_done
 _load_64:
-	b _failure
+	b _fail
 
 _load_int:
 _load_ptr:
@@ -106,7 +106,7 @@ _write_r3:
 	mov r3, temp
 	b _write_done
 _write_stack:
-	b _failure
+	b _fail
 
 _write_done:
 	lsrs argt, #4
@@ -141,7 +141,7 @@ _ret:
 	cmp retv, #7
 		beq _ret_64
 
-	b _failure
+	b _fail
 
 _ret_void:
 	mov r0, #0
@@ -158,7 +158,7 @@ _ret_32:
 _ret_64:
 	b _call_done
 
-_failure:
+_fail:
 	mov r0, #-1
 	mov r1, #-1
 _call_done:
