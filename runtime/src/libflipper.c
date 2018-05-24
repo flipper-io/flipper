@@ -34,6 +34,10 @@ failure:
 	return lf_error;
 }
 
+struct _lf_device *lf_get_selected(void) {
+	return lf_get_current_device();
+}
+
 int lf_detach(struct _lf_device *device) {
 	lf_assert(device, failure, E_NULL, "Invalid device provided to detach.");
 

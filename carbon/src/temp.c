@@ -12,7 +12,7 @@ LF_MODULE(temp, "temp", temp_interface);
 
 LF_WEAK int temp_configure(void) {
 	lf_return_t retval;
-	lf_invoke(lf_get_current_device(), "temp", _temp_configure, lf_int_t, &retval, NULL);
+	lf_invoke(lf_get_selected(), "temp", _temp_configure, lf_int_t, &retval, NULL);
 	return (int)retval;
 }
 

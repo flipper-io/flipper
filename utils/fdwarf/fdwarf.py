@@ -128,7 +128,7 @@ $FUNCTIONS$
 				retstatement = "return (%s)retval;" % (f.type)
 			else:
 				retstatement = ""
-			body = "lf_return_t retval;\n\t" + "lf_invoke(lf_get_current_device(), \"$MODULE$\", %s, %s, &retval, %s);\n\t%s" % ("_" + f.name, ftype, lf_args, retstatement)
+			body = "lf_return_t retval;\n\t" + "lf_invoke(lf_get_selected(), \"$MODULE$\", %s, %s, &retval, %s);\n\t%s" % ("_" + f.name, ftype, lf_args, retstatement)
 			functs.append("LF_WEAK " + str(f) + " {\n\t%s\n}\n" % body)
 		ctemplate = ctemplate.replace("$VARIABLES$\n\n", "")
 		ctemplate = ctemplate.replace("$STRUCTBODY$", "\t" + ",\n\t".join(struct))

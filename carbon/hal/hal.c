@@ -26,7 +26,7 @@
 #include <flipper/atmegau2/atmegau2.h>
 
 void sam_reset(void) {
-	struct _lf_device *device = lf_get_current_device();
+	struct _lf_device *device = lf_get_selected();
 	carbon_select_u2(device);
 	/* reset low (active) */
 	gpio_write(0, (1 << SAM_RESET_PIN));
@@ -37,7 +37,7 @@ void sam_reset(void) {
 }
 
 int sam_enter_dfu(void) {
-	struct _lf_device *device = lf_get_current_device();
+	struct _lf_device *device = lf_get_selected();
 	carbon_select_u2(device);
 	/* erase high, reset low (active) */
 	gpio_write((1 << SAM_ERASE_PIN), (1 << SAM_RESET_PIN));
@@ -50,7 +50,7 @@ int sam_enter_dfu(void) {
 }
 
 int sam_off(void) {
-	struct _lf_device *device = lf_get_current_device();
+	struct _lf_device *device = lf_get_selected();
 	carbon_select_u2(device);
 	/* power off, reset low */
 	gpio_write(0, (1 << SAM_POWER_PIN) | (1 << SAM_RESET_PIN));
@@ -59,7 +59,7 @@ int sam_off(void) {
 }
 
 int sam_on(void) {
-	struct _lf_device *device = lf_get_current_device();
+	struct _lf_device *device = lf_get_selected();
 	carbon_select_u2(device);
 	/* power on, reset high */
 	gpio_write((1 << SAM_POWER_PIN) | (1 << SAM_RESET_PIN), 0);
@@ -86,7 +86,7 @@ failure:
 }
 
 int atsam4s_read(struct _lf_device *device, void *dst, uint32_t length) {
-	struct _lf_device *prev = lf_get_current_device();
+	struct _lf_device *prev = lf_get_selected();
 	lf_assert(device, failure, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
 	carbon_select_u2(device);
 	size_t size = 128;
@@ -108,7 +108,7 @@ failure:
 }
 
 int atsam4s_write(struct _lf_device *device, void *src, uint32_t length) {
-	struct _lf_device *prev = lf_get_current_device();
+	struct _lf_device *prev = lf_get_selected();
 	lf_assert(device, failure, E_NULL, "No device provided to '%s'.", __PRETTY_FUNCTION__);
 	carbon_select_u2(device);
 	size_t size = 128;

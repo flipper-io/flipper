@@ -30,7 +30,7 @@ LF_MODULE(uart0, "uart0", uart0_interface);
 LF_WEAK int uart0_read(void* destination, uint32_t length) {
 	void *buffer = NULL;
 	lf_return_t retval;
-	struct _lf_device *device = lf_get_current_device();
+	struct _lf_device *device = lf_get_selected();
 	lf_assert(device, failure, E_UNIMPLEMENTED, "NULL device for uart0_read.");
 	lf_assert(lf_malloc(device, length, &buffer) == lf_success, failure, E_NULL, "Failed to allocate remote memory for uart0_read.");
 	lf_assert(lf_invoke(device, "uart0", _uart0_read, lf_int_t, &retval, lf_args(lf_ptr(buffer), lf_infer(length))) == lf_success, failure, E_UNIMPLEMENTED, "Failed to invoke uart0_read.");
@@ -45,7 +45,7 @@ failure:
 LF_WEAK int uart0_write(void* source, uint32_t length) {
 	void *buffer = NULL;
 	lf_return_t retval;
-	struct _lf_device *device = lf_get_current_device();
+	struct _lf_device *device = lf_get_selected();
 	lf_assert(device, failure, E_UNIMPLEMENTED, "NULL device for uart0_write.");
 	lf_assert(lf_malloc(device, length, &buffer) == lf_success, failure, E_NULL, "Failed to allocate remote memory for uart0_write.");
 	lf_assert(lf_push(device, buffer, source, length) == lf_success, failure, E_UNIMPLEMENTED, "Failed to push uart0.");
@@ -58,42 +58,42 @@ failure:
 
 LF_WEAK uint8_t uart0_get(void) {
 	lf_return_t retval;
-	lf_invoke(lf_get_current_device(), "uart0", _uart0_get, lf_int8_t, &retval, NULL);
+	lf_invoke(lf_get_selected(), "uart0", _uart0_get, lf_int8_t, &retval, NULL);
 	return (uint8_t)retval;
 }
 
 LF_WEAK void uart0_put(uint8_t byte) {
 	lf_return_t retval;
-	lf_invoke(lf_get_current_device(), "uart0", _uart0_put, lf_void_t, &retval, lf_args(lf_infer(byte)));
+	lf_invoke(lf_get_selected(), "uart0", _uart0_put, lf_void_t, &retval, lf_args(lf_infer(byte)));
 
 }
 
 LF_WEAK int uart0_ready(void) {
 	lf_return_t retval;
-	lf_invoke(lf_get_current_device(), "uart0", _uart0_ready, lf_int_t, &retval, NULL);
+	lf_invoke(lf_get_selected(), "uart0", _uart0_ready, lf_int_t, &retval, NULL);
 	return (int)retval;
 }
 
 LF_WEAK int uart0_reset(void) {
 	lf_return_t retval;
-	lf_invoke(lf_get_current_device(), "uart0", _uart0_reset, lf_int_t, &retval, NULL);
+	lf_invoke(lf_get_selected(), "uart0", _uart0_reset, lf_int_t, &retval, NULL);
 	return (int)retval;
 }
 
 LF_WEAK int uart0_setbaud(uint32_t baud) {
 	lf_return_t retval;
-	lf_invoke(lf_get_current_device(), "uart0", _uart0_setbaud, lf_int_t, &retval, lf_args(lf_infer(baud)));
+	lf_invoke(lf_get_selected(), "uart0", _uart0_setbaud, lf_int_t, &retval, lf_args(lf_infer(baud)));
 	return (int)retval;
 }
 
 LF_WEAK int uart0_configure(void) {
 	lf_return_t retval;
-	lf_invoke(lf_get_current_device(), "uart0", _uart0_configure, lf_int_t, &retval, NULL);
+	lf_invoke(lf_get_selected(), "uart0", _uart0_configure, lf_int_t, &retval, NULL);
 	return (int)retval;
 }
 
 LF_WEAK void uart0_enable(void) {
 	lf_return_t retval;
-	lf_invoke(lf_get_current_device(), "uart0", _uart0_enable, lf_void_t, &retval, NULL);
+	lf_invoke(lf_get_selected(), "uart0", _uart0_enable, lf_void_t, &retval, NULL);
 
 }

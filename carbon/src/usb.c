@@ -12,7 +12,7 @@ LF_MODULE(usb, "usb", usb_interface);
 
 LF_WEAK int usb_configure(void) {
 	lf_return_t retval;
-	lf_invoke(lf_get_current_device(), "usb", _usb_configure, lf_int_t, &retval, NULL);
+	lf_invoke(lf_get_selected(), "usb", _usb_configure, lf_int_t, &retval, NULL);
 	return (int)retval;
 }
 
