@@ -26,7 +26,7 @@
 #include <flipper/usb.h>
 #include <flipper/wdt.h>
 
-/* ~ Declare the virtual interface for this driver. ~ */
+/* Declare the virtual interface for this driver. */
 extern const struct _flipper_interface {
 	/* Attaches the current instance of libflipper to the first available device over the default endpoint. */
 	struct _lf_device *(* const attach)(void);

@@ -1,7 +1,7 @@
 #ifndef __is25lp_h__
 #define __is25lp_h__
 
-/* ~ Include all types and macros exposed by the Flipper Toolbox. ~ */
+/* Include all types and macros exposed by the Flipper Toolbox. */
 #include <flipper.h>
 
 #define IS25LP_PAGE_SIZE 256

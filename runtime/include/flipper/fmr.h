@@ -12,7 +12,7 @@
 /* The magic number that indicates the start of a packet. */
 #define FMR_MAGIC_NUMBER 0xFE
 
-/* ~ Define types exposed by the FMR API. ~ */
+/* Define types exposed by the FMR API. */
 
 /* The variadic argument type. Used to hold argument metadata and value during parsing. */
 typedef uint64_t lf_va;
@@ -65,7 +65,7 @@ enum {
 /* A type used to reference the values in the enum above. */
 typedef uint8_t lf_type;
 
-/* ~ Parameter list building macros. */
+/* Parameter list building macros. */
 
 /* Counts the number of arguments within a variadic argument macro. */
 #define __fmr_count_implicit(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _a, _b, _c, _d, _e, _f, _10, n, ...) n
@@ -74,7 +74,7 @@ typedef uint8_t lf_type;
 /* Generates and returns a pointer to an 'fmr_parameters' given a list of variadic arguments. */
 #define lf_args(...) fmr_build((__fmr_count(__VA_ARGS__)/2), ##__VA_ARGS__)
 
-/* ~ Parser macros for variables. */
+/* Parser macros for variables. */
 
 /* Creates an 'lf_va' from an 'lf_type' and an immediate value. */
 #define lf_intx(type, arg) (lf_type)type, (lf_arg)(uintptr_t)arg
@@ -209,7 +209,7 @@ struct LF_PACKED _fmr_result {
 /* A reference to the lf_modules array. */
 extern const void *const lf_modules[];
 
-/* ~ Declare the prototypes for all functions exposed by this driver. ~ */
+/* Declare the prototypes for all functions exposed by this driver. */
 
 /* Appends an argument to an fmr_parameters. */
 int lf_append(struct _lf_ll *list, lf_type type, lf_arg value);
@@ -229,7 +229,7 @@ int fmr_push(struct _lf_device *device, void *src, uint32_t len);
 int fmr_pull(struct _lf_device *device, void *dst, uint32_t len);
 int fmr_dyld(struct _lf_device *device, char *module, lf_return_t *retval);
 
-/* ~ Functions with platform specific implementation. ~ */
+/* Functions with platform specific implementation. */
 
 /* Unpacks the argument buffer into the CPU following the native architecture's calling convention and jumps to the given function pointer. */
 extern lf_return_t fmr_call(lf_return_t (* function)(void), lf_type ret, uint8_t argc, uint16_t argt, void *argv);
