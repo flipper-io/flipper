@@ -72,7 +72,8 @@ ARM_SRC_DIRS := carbon/atsam4s        \
 ARM_CFLAGS   := -std=c99              \
                 -Wall                 \
                 -Wextra               \
-                -Wno-unused-parameter \
+                -Wpedantic            \
+		-Wno-unused-parameter \
                 -Wno-expansion-to-defined \
                 -Os                   \
                 -mcpu=cortex-m4       \

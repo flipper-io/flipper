@@ -1,13 +1,15 @@
 #include <flipper.h>
 
-lf_device_list lf_attached_devices;
-struct _lf_device *lf_current_device;
+static struct _lf_ll *lf_attached_devices;
+static struct _lf_device *lf_current_device;
 
-void lf_set_current_device(struct _lf_device *device) {
+/* Setter for the lf_current_device global. */
+static void lf_set_current_device(struct _lf_device *device) {
 	lf_current_device = device;
 }
 
-struct _lf_device *lf_get_current_device(void) {
+/* Getter for the lf_current_device global. */
+static struct _lf_device *lf_get_current_device(void) {
 	return lf_current_device;
 }
 

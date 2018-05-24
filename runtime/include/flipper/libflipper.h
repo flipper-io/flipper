@@ -83,46 +83,39 @@ void lf_set_debug_level(int level);
 #include <flipper/ll.h>
 #include <flipper/dyld.h>
 
-typedef struct _lf_ll *lf_device_list;
-extern lf_device_list lf_attached_devices;
-
-extern struct _lf_device *lf_current_device;
-void lf_set_current_device(struct _lf_device *device);
-struct _lf_device *lf_get_current_device(void);
-
 /* Attaches to a device. */
 int lf_attach(struct _lf_device *device);
-int lf_detach(struct _lf_device *device);
+/* Selects an attached device. */
 int lf_select(struct _lf_device *device);
+/* Detaches from an attached device. */
+int lf_detach(struct _lf_device *device);
+/* Releases all library state. */
+int lf_exit(void);
 
 /* Performs a remote procedure call to a module's function. */
 int lf_invoke(struct _lf_device *device, const char *module, lf_function function, lf_type ret, lf_return_t *retval, struct _lf_ll *args);
+
 /* Moves data from the address space of the host to that of the device. */
 int lf_push(struct _lf_device *device, void *dst, void *src, size_t len);
+
 /* Moves data from the address space of the device to that of the host. */
 int lf_pull(struct _lf_device *device, void *dst, void *src, size_t len);
+
 /* Gets the module index. */
 int lf_dyld(struct _lf_device *device, const char *module, int *idx);
+
 /* Allocates memory on the device. */
 int lf_malloc(struct _lf_device *device, size_t size, void **ptr);
+
 /* Frees memory on the device. */
 int lf_free(struct _lf_device *device, void *ptr);
-
-/* Closes the library. */
-int lf_exit(void);
 
 /* Provides a checksum for a given block of data. */
 lf_crc_t lf_crc(const void *src, uint32_t length);
 
-/* Obtains a result from a device. */
-int lf_get_result(struct _lf_device *device, struct _fmr_result *result);
-/* Sends a packet to the specified device. */
-int lf_transfer(struct _lf_device *device, struct _fmr_packet *packet);
-/* Retrieves a packet from the specified device. */
-int lf_retrieve(struct _lf_device *device, struct _fmr_result *response);
-
 /* Prints verbose information about the packet disassembly. */
 void lf_debug_packet(struct _fmr_packet *packet, uint32_t length);
+/* Prints verbose information about a function call. */
 void lf_debug_result(struct _fmr_result *result);
 
 #endif
