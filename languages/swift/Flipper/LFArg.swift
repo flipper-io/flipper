@@ -29,73 +29,69 @@ extension SignedInteger {
   }
 }
 
+extension Bool: LFArg {
+  public var asLFArg: _lf_arg {
+    return _lf_arg(type: LFType.u8.rawValue, value: (self ? 1 : 0).toLFArg)
+  }
+}
+
 extension Int: LFArg {
   public var asLFArg: _lf_arg {
-    return _lf_arg(type: LFType.int.rawValue,
-                   value: toLFArg)
+    return _lf_arg(type: LFType.int.rawValue, value: toLFArg)
   }
 }
 
 extension Int8: LFArg {
   public var asLFArg: _lf_arg {
-    return _lf_arg(type: LFType.i8.rawValue,
-                   value: toLFArg)
+    return _lf_arg(type: LFType.i8.rawValue, value: toLFArg)
   }
 }
 
 extension Int16: LFArg {
   public var asLFArg: _lf_arg {
-    return _lf_arg(type: LFType.i16.rawValue,
-                   value: toLFArg)
+    return _lf_arg(type: LFType.i16.rawValue, value: toLFArg)
   }
 }
 
 extension Int32: LFArg {
   public var asLFArg: _lf_arg {
-    return _lf_arg(type: LFType.i32.rawValue,
-                   value: toLFArg)
+    return _lf_arg(type: LFType.i32.rawValue, value: toLFArg)
   }
 }
 
 extension Int64: LFArg {
   public var asLFArg: _lf_arg {
-    return _lf_arg(type: LFType.i64.rawValue,
-                   value: toLFArg)
+    return _lf_arg(type: LFType.i64.rawValue, value: toLFArg)
   }
 }
 
 extension UInt: LFArg {
   public var asLFArg: _lf_arg {
-    return _lf_arg(type: LFType.u64.rawValue,
-                   value: UInt64(self))
+    return _lf_arg(type: LFType.u64.rawValue, value: UInt64(self))
   }
 }
 
 extension UInt8: LFArg {
   public var asLFArg: _lf_arg {
-    return _lf_arg(type: LFType.u8.rawValue,
-                   value: UInt64(self))
+    return _lf_arg(type: LFType.u8.rawValue, value: UInt64(self))
   }
 }
 
 extension UInt16: LFArg {
   public var asLFArg: _lf_arg {
-    return _lf_arg(type: LFType.u16.rawValue,
-                   value: UInt64(self))
+    return _lf_arg(type: LFType.u16.rawValue, value: UInt64(self))
   }
 }
 
 extension UInt32: LFArg {
   public var asLFArg: _lf_arg {
-    return _lf_arg(type: LFType.u32.rawValue,
-                   value: UInt64(self))
+    return _lf_arg(type: LFType.u32.rawValue, value: UInt64(self))
   }
 }
 
 extension UInt64: LFArg {
   public var asLFArg: _lf_arg {
-    return _lf_arg(type: LFType.u64.rawValue,
-                   value: self)
+    return _lf_arg(type: LFType.u64.rawValue, value: self)
   }
 }
 
