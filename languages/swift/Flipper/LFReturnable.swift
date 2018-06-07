@@ -17,6 +17,16 @@ public struct DevicePointer {
   let bitPattern: UInt64
 }
 
+extension Bool: LFReturnable {
+  public static var lfType: LFType {
+    return .u8
+  }
+
+  public init(lfReturn: lf_return_t) {
+    self = lfReturn != 0
+  }
+}
+
 extension Int: LFReturnable {
   public static var lfType: LFType {
     return .int
