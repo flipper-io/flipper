@@ -80,9 +80,9 @@ public struct Module {
 func buildLinkedList(_ args: [LFArg]) -> UnsafeMutablePointer<_lf_ll>? {
   var argList: UnsafeMutablePointer<_lf_ll>? = nil
   for arg in args {
-    lf_ll_append(&argList,
-                 UnsafeMutableRawPointer(bitPattern:
-                  UInt(truncatingIfNeeded: arg.asLFArg.value)), nil)
+    let lfValue = arg.asLFArg
+    let lfArg = lf_arg_create(lfValue.type, lfValue.value)
+    lf_ll_append(&argList, lfArg, nil)
   }
   return argList
 }
