@@ -96,7 +96,8 @@ struct _lf_ll *lf_libusb_devices_for_vid_pid(uint16_t vid, uint16_t pid) {
 		if (descriptor.idVendor == vid && descriptor.idProduct == pid) {
 			device = lf_device_create(lf_libusb_read, lf_libusb_write, lf_libusb_release);
 			lf_assert(device, E_ENDPOINT, "failed to create device");
-			device->_ep_ctx = calloc(1, sizeof(struct _lf_network_context));
+
+			device->_ep_ctx = calloc(1, sizeof(struct _lf_libusb_context));
 
 			struct _lf_libusb_context *context = (struct _lf_libusb_context *)device->_ep_ctx;
 			lf_assert(context, E_NULL, "failed to allocate memory for context");
