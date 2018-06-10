@@ -1,43 +1,40 @@
 #include <flipper.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-#define _GNU_SOURCE
 #include <dlfcn.h>
 #include <flipper/posix/network.h>
 
 /* fvm - Creates a local server that acts as a virtual flipper device. */
 
-struct _lf_device *fvm = NULL;
-
 int main(int argc, char *argv[]) {
 
-	//lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
-
-	/* Create a UDP server. */
 	struct sockaddr_in addr;
-	int sd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	if (sd < 0) {
-		printf("Failed to get socket.\n");
-		return 0;
-	}
+	int sd;
+	int e;
+	struct _lf_network_context *context;
+	struct _lf_device *fvm = NULL;
+
+	sd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	lf_assert(sd > 0, E_ENDPOINT, "Failed to obtain socket.");
+
 	bzero(&addr, sizeof(addr));
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(LF_UDP_PORT);
 	addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	int e = bind(sd, (struct sockaddr*)&addr, sizeof(addr));
-	if (e < 0) {
-		printf("Failed to create server.\n");
-		return 0;
-	}
+
+	e = bind(sd, (struct sockaddr*)&addr, sizeof(addr));
+	lf_assert(e == 0, E_ENDPOINT, "Failed to create server.");
 
 	/* The network endpoint for the virtual flipper device. */
 	fvm = lf_device_create(lf_network_read, lf_network_write, lf_network_release);
 	lf_assert(fvm, E_ENDPOINT, "Failed to create device for virtual machine.");
+
 	fvm->_ep_ctx = calloc(1, sizeof(struct _lf_network_context));
-	struct _lf_network_context *context = (struct _lf_network_context *)fvm->_ep_ctx;
+	context = (struct _lf_network_context *)fvm->_ep_ctx;
 	lf_assert(context, E_NULL, "Failed to allocate memory for context");
-	/* Set server file descriptor. */
+
 	context->fd = sd;
+
 	lf_attach(fvm);
 
 	printf("Flipper Virtual Machine (FVM) v0.1.0\nListening on 'localhost'.\n\n");
@@ -79,25 +76,29 @@ int main(int argc, char *argv[]) {
 	if (argc > 1) {
 		char *lib = argv[1];
 		char *module, **modules = &argv[2];
+
 		while ((module = *modules++)) {
 			printf("Loading module '%s' from '%s'.", module, lib);
 			void *dlm = dlopen(lib, RTLD_LAZY);
 			lf_assert(dlm, E_NULL, "Failed to open module '%s'.", lib);
+
 			struct _lf_module *m = dlsym(dlm, module);
 			lf_assert(m, E_NULL, "Failed to read module '%s' from '%s'.", module, lib);
 			printf("Successfully loaded module '%s'.", module);
-			int e = dyld_register(fvm, m);
+
+			e = dyld_register(fvm, m);
 			lf_assert(e , E_NULL, "Failed to register module '%s'.", m->name);
 			printf("Successfully registered module '%s'.", module);
 		}
+
 		printf("\n");
 	}
 
+	struct _fmr_packet packet;
+
 	while (1) {
-		struct _fmr_packet packet;
 		fvm->read(fvm, &packet, sizeof(struct _fmr_packet));
 		lf_debug_packet(&packet, sizeof(struct _fmr_packet));
-		lf_error_set(E_OK);
 		fmr_perform(fvm, &packet);
 	}
 

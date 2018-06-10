@@ -152,7 +152,6 @@ void uart0_isr(void) {
 
 		UART0->UART_PTCR = UART_PTCR_RXTDIS | UART_PTCR_TXTDIS;
 
-        lf_error_set(E_OK);
 		fmr_perform(_4s, &packet);
 
 		/* Pull an FMR packet asynchronously to launch FMR. */
