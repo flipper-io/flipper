@@ -32,7 +32,11 @@
 #define KYEL "\x1B[33m"
 #endif
 
+#ifdef __AVR__
+#define lf_debug(fmt, ...) printf_P(PSTR(fmt"\n"), ##__VA_ARGS__)
+#else
 #define lf_debug(fmt, ...) printf(fmt"\n", ##__VA_ARGS__)
+#endif
 
 /* Packed attribute. */
 #define LF_PACKED __attribute__((__packed__))

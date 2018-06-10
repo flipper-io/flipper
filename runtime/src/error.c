@@ -9,7 +9,7 @@
 #define STRL(name, str) const char name[] PROGMEM = str;
 #else
 #define STROP "%s"
-#define STRL(name, str) const char *name = str;
+#define STRL(name, str) const char name[] = str;
 #endif
 
 #define MSG KRED "flippper runtime error" KNRM ": " KBLU STROP KNRM " (0x%02x)\n" KGRN "  " "%s" ": " KYEL

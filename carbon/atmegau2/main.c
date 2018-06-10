@@ -25,10 +25,13 @@ void loop(void) {
 		/* ensure the packet is valid */
 		lf_assert(e, E_USB, "failed to obtain usb packet");
 
+		lf_debug("performing");
+
 		/* execute the packet */
 		fmr_perform(_u2, &packet);
 
 fail:
+		led_rgb(10, 0, 0);
 		continue;
 	}
 }
@@ -50,7 +53,7 @@ int atmegau2_release(struct _lf_device *device) {
 int main(void) {
 
 	/* Configure the AVR. */
-	wdt_enable(WDTO_500MS);
+	//wdt_enable(WDTO_500MS);
 	CLKPR = (1 << CLKPCE);
 	CLKPR = 0;
 	sei();
