@@ -3,10 +3,6 @@
 #ifndef __lf_fmr_h__
 #define __lf_fmr_h__
 
-#include <flipper/types.h>
-#include <flipper/error.h>
-#include <flipper/ll.h>
-
 /* The size of a single FMR packet expressed in bytes. */
 #define FMR_PACKET_SIZE 64
 /* The magic number that indicates the start of a packet. */

@@ -1,9 +1,6 @@
 #ifndef __lf_module_h__
 #define __lf_module_h__
 
-#include <flipper/types.h>
-#include <flipper/fmr.h>
-
 struct _lf_module {
 	/* A string containing the module's name. */
 	char *name;

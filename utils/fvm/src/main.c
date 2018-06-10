@@ -80,15 +80,15 @@ int main(int argc, char *argv[]) {
 		char *lib = argv[1];
 		char *module, **modules = &argv[2];
 		while ((module = *modules++)) {
-			lf_debug("Loading module '%s' from '%s'.", module, lib);
+			printf("Loading module '%s' from '%s'.", module, lib);
 			void *dlm = dlopen(lib, RTLD_LAZY);
 			lf_assert(dlm, E_NULL, "Failed to open module '%s'.", lib);
 			struct _lf_module *m = dlsym(dlm, module);
 			lf_assert(m, E_NULL, "Failed to read module '%s' from '%s'.", module, lib);
-			lf_debug("Successfully loaded module '%s'.", module);
+			printf("Successfully loaded module '%s'.", module);
 			int e = dyld_register(fvm, m);
 			lf_assert(e , E_NULL, "Failed to register module '%s'.", m->name);
-			lf_debug("Successfully registered module '%s'.", module);
+			printf("Successfully registered module '%s'.", module);
 		}
 		printf("\n");
 	}

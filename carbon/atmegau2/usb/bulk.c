@@ -1,5 +1,7 @@
 #include <flipper/atmegau2/megausb.h>
 
+#define LF_USB_TIMEOUT_MS 200
+
 int megausb_bulk_receive(void *dst, uint32_t length) {
 
 	uint8_t _sreg = SREG;
@@ -16,7 +18,7 @@ int megausb_bulk_receive(void *dst, uint32_t length) {
 
 		/* Wait until the USB controller is ready. */
 		uint8_t timeout = UDFNUML + LF_USB_TIMEOUT_MS;
-		
+
 		while (1) {
 
 			/* data is available */

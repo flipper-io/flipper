@@ -3,9 +3,6 @@
 #ifndef __lf_error_h__
 #define __lf_error_h__
 
-/* Include all types exposed by libflipper. */
-#include <flipper/types.h>
-
 /* Success code macros. */
 #define lf_success 1
 #define lf_error 0

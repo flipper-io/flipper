@@ -22,7 +22,7 @@ int lf_libusb_read(struct _lf_device *device, void *dst, uint32_t length) {
 	while (length) {
         len = (length > BULK_IN_SIZE) ? BULK_IN_SIZE : length;
 
-        e = libusb_bulk_transfer(context->handle, BULK_IN_ENDPOINT, dst, len, &actual, LF_USB_TIMEOUT_MS);
+        e = libusb_bulk_transfer(context->handle, BULK_IN_ENDPOINT, dst, len, &actual, 0);
 		lf_assert(e == 0, E_LIBUSB, "read transfer failed (%s)", libusb_error_name(e));
 
 		dst += actual;
@@ -47,7 +47,7 @@ int lf_libusb_write(struct _lf_device *device, void *src, uint32_t length) {
 	while (length) {
         len = (length > BULK_OUT_SIZE) ? BULK_OUT_SIZE : length;
 
-        e = libusb_bulk_transfer(context->handle, BULK_OUT_ENDPOINT, src, len, &actual, LF_USB_TIMEOUT_MS);
+        e = libusb_bulk_transfer(context->handle, BULK_OUT_ENDPOINT, src, len, &actual, 0);
 		lf_assert(e == 0, E_LIBUSB, "write transfer failed (%s)", libusb_error_name(e));
 
 		src += actual;

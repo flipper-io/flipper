@@ -1,9 +1,6 @@
 #ifndef __lf_ll_h__
 #define __lf_ll_h__
 
-/* Include all types exposed by libflipper. */
-#include <flipper/types.h>
-
 /* Generic linked list data structure used throughout libflipper */
 struct _lf_ll {
 	/* The item stored at this node in the list. */

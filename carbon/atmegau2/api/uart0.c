@@ -2,6 +2,7 @@
 
 uint8_t idx = 0;
 
+#define LF_UART_TIMEOUT_MS 100
 #define BAUDRATE(baud) (((F_CPU / (baud * 16.0)) + 0.5) - 1)
 
 LF_FUNC("uart0") int uart0_configure(void) {

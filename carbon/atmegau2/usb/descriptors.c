@@ -1,5 +1,8 @@
 #include <flipper/atmegau2/megausb.h>
 
+#define lo(x) ((uint8_t)(x))
+#define hi(x) ((uint8_t)(x >> 8))
+
 const uint8_t PROGMEM endpoint[] = {
 	1, ENDPOINT_TYPE_BULK_IN, ENDPOINT_SIZE(BULK_IN_SIZE) | BULK_TRANSMIT_BUFFER,
 	1, ENDPOINT_TYPE_BULK_OUT, ENDPOINT_SIZE(BULK_OUT_SIZE) | BULK_RECEIVE_BUFFER,

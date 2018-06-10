@@ -1,9 +1,6 @@
 #ifndef __lf_device_h__
 #define __lf_device_h__
 
-#include <flipper/types.h>
-#include <flipper/error.h>
-
 /* Macros that quantify device attributes. */
 #define lf_device_8bit (1 << 1)
 #define lf_device_16bit (1 << 2)

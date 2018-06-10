@@ -18,6 +18,24 @@
 #define CARBON_USB_VENDOR_ID       0x16C0
 #define CARBON_USB_PRODUCT_ID      0x0480
 
+/* NOTE: Summing the size parameters of each endpoints below should be less than or equal to 160. */
+#define USB_IN_MASK            0x80
+
+#define INTERRUPT_IN_ENDPOINT	(0x01 | USB_IN_MASK)
+#define INTERRUPT_IN_SIZE		16
+#define INTERRUPT_OUT_ENDPOINT	0x02
+#define INTERRUPT_OUT_SIZE		16
+
+#define FMR_INTERFACE			0
+#define BULK_IN_ENDPOINT		(0x01 | USB_IN_MASK)
+#define BULK_IN_SIZE			64
+#define BULK_OUT_ENDPOINT		0x02
+#define BULK_OUT_SIZE			64
+
+#define DEBUG_INTERFACE			1
+#define DEBUG_IN_ENDPOINT		(0x03 | USB_IN_MASK)
+#define DEBUG_IN_SIZE			32
+
 /* Define the IO pins for this board. */
 
 /* GPIO signals */
