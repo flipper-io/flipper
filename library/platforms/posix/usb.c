@@ -84,22 +84,22 @@ struct _lf_ll *lf_libusb_devices_for_vid_pid(uint16_t vid, uint16_t pid) {
     int e;
 
     e = libusb_init(&context);
-	lf_assert(e == 0, E_LIBUSB, "Failed to initialize libusb. Reboot and try again.");
+	lf_assert(e == 0, E_LIBUSB, "failed to initialize libusb");
 
 	size_t device_count = libusb_get_device_list(context, &libusb_devices);
 	for (size_t i = 0; i < device_count; i ++) {
 		libusb_device = libusb_devices[i];
 
 		e = libusb_get_device_descriptor(libusb_device, &descriptor);
-		lf_assert(e == 0, E_LIBUSB, "Failed to obtain descriptor for device.");
+		lf_assert(e == 0, E_LIBUSB, "failed to obtain descriptor for device");
 
 		if (descriptor.idVendor == vid && descriptor.idProduct == pid) {
 			device = lf_device_create(lf_libusb_read, lf_libusb_write, lf_libusb_release);
-			lf_assert(device, E_ENDPOINT, "Failed to create device");
+			lf_assert(device, E_ENDPOINT, "failed to create device");
 			device->_ep_ctx = calloc(1, sizeof(struct _lf_network_context));
 
 			struct _lf_libusb_context *context = (struct _lf_libusb_context *)device->_ep_ctx;
-			lf_assert(context, E_NULL, "Failed to allocate memory for context");
+			lf_assert(context, E_NULL, "failed to allocate memory for context");
 
             e = libusb_open(libusb_device, &(context->handle));
 			lf_assert(e == 0, E_NO_DEVICE, "Could not find any devices connected via USB. Ensure that a device is connected.");
@@ -107,7 +107,7 @@ struct _lf_ll *lf_libusb_devices_for_vid_pid(uint16_t vid, uint16_t pid) {
             e = libusb_claim_interface(context->handle, FMR_INTERFACE);
 			lf_assert(e == 0, E_LIBUSB, "Failed to claim interface on attached device. Please quit any other programs using your device.");
 
-			lf_assert(lf_ll_append(&devices, device, lf_device_release), E_NULL, "Failed to append to device list.");
+			lf_assert(lf_ll_append(&devices, device, lf_device_release), E_NULL, "failed to append to device list");
 		}
 	}
 
