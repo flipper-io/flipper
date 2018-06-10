@@ -28,52 +28,38 @@ void print_time(void) {
 
 int main(int argc, char *argv[]) {
 
+	/* capture interrupt signal */
 	signal(SIGINT, sigint);
 
-	struct libusb_context *context;
+	struct libusb_context *context = NULL;
+	struct libusb_device_handle *handle = NULL;
+	int e;
+	int len;
+	uint8_t buf[DEBUG_IN_SIZE];
 
-	int e = libusb_init(&context);
-	if (e) {
-		fprintf(stderr, "Failed to initialize libusb.\n");
-	}
+	e = libusb_init(&context);
+	lf_assert(e == 0, E_LIBUSB, "Failed to initialize libusb.");
 
-	struct libusb_device_handle *handle = libusb_open_device_with_vid_pid(context, VENDOR, PRODUCT);
-	if (!handle) {
-		fprintf(stderr, "Failed to open the device.\n");
-		goto exit;
-	}
+	handle = libusb_open_device_with_vid_pid(context, VENDOR, PRODUCT);
+	lf_assert(handle, E_LIBUSB, "Failed to open the device.");
 
 	/* Configure USB device. */
 	e = libusb_claim_interface(handle, DEBUG_INTERFACE);
-	if (e) {
-		fprintf(stderr, "Failed to claim the debug interface.\n");
-		goto exit;
-	}
-
-	int len;
-
-	uint8_t buf[DEBUG_IN_SIZE];
+	lf_assert(e == 0, E_LIBUSB, "Failed to claim the debug interface.");
 
 	while (alive) {
-		e = libusb_interrupt_transfer(handle, DEBUG_IN_ENDPOINT, buf, DEBUG_IN_SIZE, &len, 0);
-		if (e == 0) {
-			if (len > 0) {
-				uint8_t *_buf = buf;
-				while (len --) printf("%c", *(uint8_t *)(_buf ++));
-				fflush(stdout);
-			}
-		} else if (e == LIBUSB_ERROR_TIMEOUT) {
 
-		} else {
-			fprintf(stderr, "Something went wrong with the transfer.\n");
-			goto exit;
-		}
+		uint8_t *_buf = buf;
+
+		e = libusb_interrupt_transfer(handle, DEBUG_IN_ENDPOINT, buf, DEBUG_IN_SIZE, &len, 0);
+		lf_assert(e == 0, E_LIBUSB, "Failed to complete transfer.");
+
+		while (len --) printf("%c", *(uint8_t *)_buf ++);
 	}
 
-exit:
-
-	if (handle) libusb_close(handle);
-	if (context) libusb_exit(context);
+fail:
+	libusb_close(handle);
+	libusb_exit(context);
 
 	return 0;
 

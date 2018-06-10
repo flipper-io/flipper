@@ -159,7 +159,6 @@ X86_SRC_DIRS := carbon/hal              \
 X86_CFLAGS   := -fpic                   \
                 -DPOSIX                 \
 				-D__LF_DEBUG__          \
-				-DLF_CONFIG_NO_COLOR    \
 				$(shell pkg-config --cflags-only-I libusb-1.0)
 
 X86_LDFLAGS  := $(shell pkg-config --libs libusb-1.0)
@@ -239,7 +238,7 @@ languages:: language-rust
 
 utils: libflipper | $(BUILD)/utils/.dir
 	$(_v)$(X86_CC) $(GLOBAL_CFLAGS) $(X86_CFLAGS) -o $(BUILD)/utils/fdfu utils/fdfu/src/*.c -L$(BUILD)/$(X86_TARGET) -lflipper
-	$(_v)$(X86_CC) $(GLOBAL_CFLAGS) $(X86_CFLAGS) -o $(BUILD)/utils/fdebug utils/fdebug/src/*.c $(shell pkg-config --libs libusb-1.0)
+	$(_v)$(X86_CC) $(GLOBAL_CFLAGS) $(X86_CFLAGS) -o $(BUILD)/utils/fdebug utils/fdebug/src/*.c $(shell pkg-config --libs libusb-1.0) -lflipper
 	$(_v)$(X86_CC) $(GLOBAL_CFLAGS) $(X86_CFLAGS) -o $(BUILD)/utils/fload utils/fload/src/*.c -L$(BUILD)/$(X86_TARGET) -lflipper
 	$(_v)$(X86_CC) $(GLOBAL_CFLAGS) $(X86_CFLAGS) -o $(BUILD)/utils/fvm $(call find_srcs, utils/fvm/src) -L$(BUILD)/$(X86_TARGET) -lflipper -ldl
 	$(_v)cp utils/fdwarf/fdwarf.py $(BUILD)/utils/fdwarf

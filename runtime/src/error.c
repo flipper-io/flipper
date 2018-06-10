@@ -9,7 +9,7 @@
 #define STRL(name, str) const char name[] = str;
 #endif
 
-#define MSG KRED "flippper runtime error" KNRM ": " KBLU STROP KNRM " (0x%02x)\n" KGRN "  " "%s" ": " KYEL
+#define MSG KRED "flipper runtime error" KNRM ": " KBLU STROP KNRM " (0x%02x)\n" KGRN "  " "%s" ":%i: " KYEL
 
 STRL(E_OK_STR, "no error");
 STRL(E_MALLOC_STR, "malloc failure");
@@ -85,7 +85,7 @@ static const char *const err_strs[] = { LF_ERROR_MESSAGE_STRINGS };
 
 static lf_err_t _lf_err;
 
-void _lf_assert(lf_err_t err, const char *func, const char *fmt, ...) {
+void _lf_assert(lf_err_t err, const char *func, int line, const char *fmt, ...) {
     lf_assert(err < LF_MAX_ERR, E_BOUNDARY, "err out of bounds");
     _lf_err = err;
 
@@ -93,11 +93,11 @@ void _lf_assert(lf_err_t err, const char *func, const char *fmt, ...) {
     va_start(args, fmt);
 
 #ifdef __AVR__
-    printf_P(PSTR(MSG), err_strs[err], err, func);
+    printf_P(PSTR(MSG), err_strs[err], err, func, line);
     vfprintf_P(stdout, fmt, args);
     printf_P(PSTR(KNRM "\n\n"));
 #else
-    printf(MSG, err_strs[err], err, func);
+    printf(MSG, err_strs[err], err, func, line);
     vprintf(fmt, args);
     printf(KNRM "\n\n");
 #endif

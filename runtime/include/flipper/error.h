@@ -12,9 +12,9 @@
 #ifdef LF_CONFIG_OMIT_ERRORS
 #define lf_assert(cond, err, fmt, ...) if (!(cond)) { goto fail; }
 #elif __AVR__
-#define lf_assert(cond, err, fmt, ...) if (!(cond)) { _lf_assert(err, __func__, PSTR(fmt), ##__VA_ARGS__); goto fail; }
+#define lf_assert(cond, err, fmt, ...) if (!(cond)) { _lf_assert(err, __func__, __LINE__, PSTR(fmt), ##__VA_ARGS__); goto fail; }
 #else
-#define lf_assert(cond, err, fmt, ...) if (!(cond)) { _lf_assert(err, __func__, fmt, ##__VA_ARGS__); goto fail; }
+#define lf_assert(cond, err, fmt, ...) if (!(cond)) { _lf_assert(err, __func__, __LINE__, fmt, ##__VA_ARGS__); goto fail; }
 #endif
 
 /* Enumerate all of the error codes. */
@@ -61,7 +61,7 @@ typedef enum {
 } lf_err_t;
 
 /* Raises an error internally to the current context of libflipper. */
-extern void _lf_assert(lf_err_t err, const char *func, const char *format, ...) __attribute__ ((format (printf, 3, 4)));
+extern void _lf_assert(lf_err_t err, const char *func, int line, const char *format, ...) __attribute__ ((format (printf, 4, 5)));
 
 void lf_error_set(lf_err_t err);
 lf_err_t lf_error_get(void);
