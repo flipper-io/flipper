@@ -14,7 +14,7 @@ void _lf_assert(lf_err_t err, const char *func, const char *fmt, ...) {
     va_start(args, fmt);
     printf(KRED "flippper runtime error" KNRM ": " KBLU "%s" KNRM " (0x%02x)\n" KGRN "  %s: " KYEL, err_strs[err], err, func);
     vprintf(fmt, args);
-    printf(KNRM "\n");
+    printf(KNRM "\n\n");
     va_end(args);
 
 fail:
