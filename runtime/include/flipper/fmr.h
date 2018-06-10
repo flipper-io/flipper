@@ -93,20 +93,19 @@ typedef uint8_t lf_type;
 /* Creates an 'lf_va' from a C variable. */
 #define lf_infer(variable) lf_intx(lf_utype(variable), variable)
 
-/* If this bit is set in the module's index, then it is a user module. */
-#define FMR_USER_INVOCATION_BIT (1 << 8)
-
 /* Exposes all message runtime packet classes. */
 enum {
-	/* Invokes a function in a standard module. */
+	/* executes a function on the device */
 	fmr_execute_class,
-	/* Causes a push operation to begin. */
+	/* moves data from the host's memory to the device's memory */
 	fmr_push_class,
-	/* Causes a pull operation to begin. */
+	/* moves data from the device's memory to the host's memory */
 	fmr_pull_class,
-	/* Communicates with the device's dynamic loader. */
+	/* interfaces with the dynamic loader */
 	fmr_dyld_class,
+	/* allocates memory on the device */
 	fmr_malloc_class,
+	/* frees memory on the device */
 	fmr_free_class,
 };
 
@@ -202,15 +201,12 @@ struct LF_PACKED _fmr_result {
 	/* NOTE: Add bitfield indicating the need to poll for updates. */
 };
 
-/* A reference to the lf_modules array. */
-extern const void *const lf_modules[];
-
-/* Declare the prototypes for all functions exposed by this driver. */
-
 /* Appends an argument to an fmr_parameters. */
 int lf_append(struct _lf_ll *list, lf_type type, lf_arg value);
+
 /* Generates the appropriate data structure needed for the remote procedure call of 'funtion' in 'module'. */
 int lf_create_call(lf_module module, lf_function function, lf_type ret, struct _lf_ll *args, struct _fmr_header *header, struct _fmr_invocation *call);
+
 /* Creates a struct _lf_arg * type. */
 struct _lf_arg *lf_arg_create(lf_type type, lf_arg value);
 
@@ -220,14 +216,7 @@ struct _lf_ll *fmr_build(int argc, ...);
 /* Executes an fmr_packet and stores the result of the operation in the result buffer provided. */
 int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet);
 
-int fmr_execute(struct _lf_device *device, lf_module module, lf_function function, lf_type ret, lf_argc argc, lf_types argt, void *arguments, lf_return_t *retval);
-int fmr_push(struct _lf_device *device, void *src, uint32_t len);
-int fmr_pull(struct _lf_device *device, void *dst, uint32_t len);
-int fmr_dyld(struct _lf_device *device, char *module, lf_return_t *retval);
-
-/* Functions with platform specific implementation. */
-
-/* Unpacks the argument buffer into the CPU following the native architecture's calling convention and jumps to the given function pointer. */
+/* platform specific internal functions implemented in assembly */
 extern lf_return_t fmr_call(lf_return_t (* function)(void), lf_type ret, uint8_t argc, uint16_t argt, void *argv);
 
 #endif
