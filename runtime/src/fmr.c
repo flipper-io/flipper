@@ -93,7 +93,7 @@ fail:
 int fmr_invoke(struct _lf_device *device, lf_module module, lf_function function, lf_type ret, lf_argc argc, lf_types argt, void *arguments, lf_return_t *retval) {
 	struct _lf_module *m = lf_ll_item(device->modules, module);
 	lf_return_t (* f)(void) = m->interface[function];
-	lf_assert(f, E_NULL, "Bad function address");
+	lf_assert(f, E_NULL, "bad rpc function address");
 
 	*retval = fmr_call(f, ret, argc, argt, arguments);
 
@@ -194,9 +194,13 @@ int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet) {
 	}
 
 fail:
+
 	result.error = lf_error_get();
 	result.value = retval;
+
 	e = device->write(device, &result, sizeof(struct _fmr_result));
+	
 	lf_debug_result(&result);
+
 	return e;
 }

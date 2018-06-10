@@ -41,6 +41,7 @@ GLOBAL_CFLAGS = -std=c99              \
                 -Wall                 \
                 -Wextra               \
                 -Wno-unused-parameter \
+				-Wno-expansion-to-defined \
                 -Os                   \
                 -g                    \
 #				-Wpedantic            \

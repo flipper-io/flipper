@@ -43,21 +43,6 @@ LF_FUNC("timer") int timer_configure(void) {
 
 /* Registers a callback with the next available timer. */
 LF_FUNC("timer") int timer_register(uint32_t ticks, void *callback) {
-	/* Loop through the timers until a free timer is found. */
-	for (size_t i = 0; i < sizeof(timers); i ++) {
-		if (timers[i].available) {
-			/* Hold the timer. */
-			timers[i].available = false;
-			/* Set the callback address. */
-			timers[i].callback = callback;
-			/* Set the compare value into C. */
-			timers[i].CH->TC_RC = ticks;
-			/* Enable the clock and start the timer. */
-			timers[i].CH->TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;
-			return lf_success;
-		}
-	}
-	lf_error_raise(E_TIMER, error_message("No timer is available to register a callback."));
 	return lf_error;
 }
 
