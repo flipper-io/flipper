@@ -151,6 +151,8 @@ int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet) {
 	struct _fmr_invocation *icall = &ipacket->call;
 	struct _fmr_memory_packet *mpacket = (struct _fmr_memory_packet *)packet;
 
+	lf_error_set(E_OK);
+
 	/* Switch through the packet subclasses and invoke the appropriate handler for each. */
 	switch (packet->header.type) {
 		case fmr_execute_class:

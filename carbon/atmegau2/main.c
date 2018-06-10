@@ -11,18 +11,25 @@ int debug_putchar(char c, FILE *stream) {
 }
 
 void loop(void) {
+
+	int e;
+
 	while (1) {
 
-		int e = megausb_bulk_receive(&packet, sizeof(struct _fmr_packet));
-
+		/* pet the watchdog */
 		wdt_reset();
 
-		if (e) {
-			lf_error_set(E_OK);
-			fmr_perform(_u2, &packet);
-		}
+		/* obtain a message runtime packet */
+		e = megausb_bulk_receive(&packet, sizeof(struct _fmr_packet));
 
-		wdt_reset();
+		/* ensure the packet is valid */
+		lf_assert(e, E_USB, "failed to obtain usb packet");
+
+		/* execute the packet */
+		fmr_perform(_u2, &packet);
+
+fail:
+		continue;
 	}
 }
 
