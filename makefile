@@ -7,17 +7,6 @@ PREFIX ?= /usr/local
 # List of all target types
 TARGETS := ARM AVR X86
 
-# Platform. "Darwin" for macOS, "Linux" for linux.
-UNAME := $(shell uname -s)
-
-# For linux, use "dfu-programmer [BOARD] start"
-# For all else, use "dfu-programmer [BOARD] launch --no-reset"
-DFU_LAUNCH := launch --no-reset
-
-ifeq ($(UNAME), Linux)
-DFU_LAUNCH := start
-endif
-
 .PHONY: all install uninstall help
 
 all::
@@ -124,7 +113,8 @@ AVR_CFLAGS   := -mmcu=atmega32u2      \
                 -DARCH=ARCH_AVR8      \
                 -D__AVR_ATmega32U2__  \
                 -DF_CPU=16000000UL    \
-                -DATMEGAU2
+                -DATMEGAU2            \
+				-D LF_CONFIG_OMIT_ERRORS
 
 AVR_LDFLAGS  := -mmcu=atmega32u2 \
 				-Wl,--gc-sections
@@ -136,10 +126,15 @@ $(AVR_TARGET): $(AVR_TARGET).hex
 
 .PHONY: install-atmegau2
 
+# flashes an image to a flipper in DFU mode
 install-atmegau2: atmegau2
 	$(_v)dfu-programmer atmega32u2 erase --force
 	$(_v)dfu-programmer atmega32u2 flash $(BUILD)/$(AVR_TARGET)/$(AVR_TARGET).hex
-	$(_v)dfu-programmer atmega32u2 $(DFU_LAUNCH)
+	$(_v)dfu-programmer atmega32u2 start
+
+# boots a flipper in DFU mode
+boot:
+	$(_v)dfu-programmer atmega32u2 start
 
 # install:: install-atmegau2
 
@@ -163,6 +158,7 @@ X86_SRC_DIRS := carbon/hal              \
 X86_CFLAGS   := -fpic                   \
                 -DPOSIX                 \
 				-D__LF_DEBUG__          \
+				-DLF_CONFIG_NO_COLOR    \
 				$(shell pkg-config --cflags-only-I libusb-1.0)
 
 X86_LDFLAGS  := $(shell pkg-config --libs libusb-1.0)
