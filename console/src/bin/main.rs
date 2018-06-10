@@ -40,7 +40,7 @@ mod modules_cli;
 mod hardware_cli;
 mod bindings_cli;
 
-use fail::Error;
+use failure::Error;
 use console::CliError;
 
 use clap::{

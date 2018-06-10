@@ -23,7 +23,7 @@ use flipper::{
 };
 use console::CliError;
 use clap::{App, AppSettings, Arg, ArgMatches};
-use fail::Error;
+use failure::Error;
 
 pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
     App::new("module")

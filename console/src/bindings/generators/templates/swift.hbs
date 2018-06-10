@@ -1,0 +1,16 @@
+import Flipper
+
+public class {{name}} {
+    public let description = "{{description}}"
+    let module: Module
+
+    public init(flipper: Flipper) {
+        self.module = Module(name: "{{name}}", device: flipper)
+    }
+
+{{#each funcs}}
+    public func {{name}}({{param_expansion params}}) throws -> {{ret}} {
+        return try module.invoke(index: {{index}}, args: [{{args_expansion params}}])
+    }
+{{/each}}
+}
