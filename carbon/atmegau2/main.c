@@ -2,7 +2,8 @@
 
 #include <flipper/atmegau2/megausb.h>
 
-struct _lf_device *_u2;
+static struct _fmr_packet packet;
+static struct _lf_device *_u2;
 
 int debug_putchar(char c, FILE *stream) {
 	usb_debug_putchar(c);
@@ -12,20 +13,16 @@ int debug_putchar(char c, FILE *stream) {
 void loop(void) {
 	while (1) {
 
-		struct _fmr_packet packet;
-
 		int e = megausb_bulk_receive(&packet, sizeof(struct _fmr_packet));
 
 		wdt_reset();
 
-		if (e ) {
+		if (e) {
 			lf_error_set(E_OK);
 			fmr_perform(_u2, &packet);
 		}
 
 		wdt_reset();
-
-		__asm__ __volatile__("nop");
 	}
 }
 
@@ -101,11 +98,6 @@ int main(void) {
 	FILE debug_f = FDEV_SETUP_STREAM(debug_putchar, NULL, _FDEV_SETUP_RW);
 	stdout = &debug_f;
 
-	// TCCR1B |= (1 << WGM12);
-	// OCR1A = 15625; // 1s
-	// TIMSK1 |= (1 << OCIE1A);
-	// TCCR1B |= (1 << CS12) | (0 << CS11) | (1 << CS10);
-
 	/* Bring the 4S out of reset. */
 	SAM_POWER_PORT |= (1 << SAM_RESET_PIN);
 
@@ -122,14 +114,4 @@ ISR (PCINT1_vect) {
 	SAM_POWER_PORT &= ~(1 << SAM_POWER_PIN);
 	wdt_enable(WDTO_15MS);
 	while (1) __asm__ __volatile__("nop");
-}
-
-ISR(TIMER1_COMPA_vect) {
-	// static int b = 0;
-	// led_rgb(0, 0, (b^=1)*10);
-	// static int heartbeat = 0;
-	// uint8_t _sreg = SREG;
-	// cli();
-	// printf("%i\n", heartbeat++);
-	// SREG = _sreg;
 }

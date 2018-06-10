@@ -5,7 +5,7 @@
 #define CLOCK_TIMEOUT 5000
 
 struct _fmr_packet packet;
-struct _lf_device *_4s;
+static struct _lf_device *_4s;
 
 extern void uart0_put(uint8_t byte);
 
