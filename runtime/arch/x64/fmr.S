@@ -128,7 +128,6 @@ _do_call:
 	callq *-8(%rbp)
 
 _ret:
-
 	movq retv, temp
 	and $0x7, temp
 
@@ -173,6 +172,7 @@ _ret_64:
 
 _fail:
 	mov $-1, %rax
+
 _done:
 	addq $8, %rsp
 	pop %r12
