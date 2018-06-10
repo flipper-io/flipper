@@ -61,6 +61,8 @@ int lf_invoke(struct _lf_device *device, const char *module, lf_function functio
 	struct _fmr_result result;
 	int e;
 
+	lf_debug("Invoking function on device '%s'.", device->name);
+
 	memset(&_packet, 0, sizeof(struct _fmr_packet));
 	_packet.header.magic = FMR_MAGIC_NUMBER;
 	_packet.header.length = sizeof(struct _fmr_invocation_packet);
@@ -102,6 +104,8 @@ int lf_push(struct _lf_device *device, void *dst, void *src, size_t len) {
 	struct _fmr_result result;
 	int e;
 
+	lf_debug("Pushing to memory on device '%s'.", device->name);
+
 	memset(&_packet, 0, sizeof(struct _fmr_packet));
 	_packet.header.magic = FMR_MAGIC_NUMBER;
 	_packet.header.length = sizeof(struct _fmr_push_pull_packet);
@@ -139,6 +143,8 @@ int lf_pull(struct _lf_device *device, void *dst, void *src, size_t len) {
 	struct _fmr_packet _packet;
 	struct _fmr_result result;
 	int e;
+
+	lf_debug("Pulling from memory on device '%s'.", device->name);
 
 	memset(&_packet, 0, sizeof(struct _fmr_packet));
 	_packet.header.magic = FMR_MAGIC_NUMBER;
@@ -178,6 +184,8 @@ int lf_dyld(struct _lf_device *device, const char *module, int *idx) {
 	struct _fmr_result result;
 	int e;
 
+	lf_debug("Syncing with loader on device '%s'.", device->name);
+
 	memset(&_packet, 0, sizeof(struct _fmr_packet));
 	_packet.header.magic = FMR_MAGIC_NUMBER;
 	_packet.header.length = sizeof(struct _fmr_dyld_packet);
@@ -212,6 +220,8 @@ int lf_malloc(struct _lf_device *device, size_t size, void **ptr) {
 	struct _fmr_result result;
 	int e;
 
+	lf_debug("Allocating memory on device '%s'.", device->name);
+
 	memset(&_packet, 0, sizeof(struct _fmr_packet));
 	_packet.header.magic = FMR_MAGIC_NUMBER;
 	_packet.header.length = sizeof(struct _fmr_dyld_packet);
@@ -244,6 +254,8 @@ int lf_free(struct _lf_device *device, void *ptr) {
 	struct _fmr_packet _packet;
 	struct _fmr_result result;
 	int e;
+
+	lf_debug("Freeing memory on device '%s'.", device->name);
 
 	memset(&_packet, 0, sizeof(struct _fmr_packet));
 	_packet.header.magic = FMR_MAGIC_NUMBER;

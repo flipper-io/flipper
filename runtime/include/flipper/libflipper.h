@@ -32,6 +32,8 @@
 #define KYEL "\x1B[33m"
 #endif
 
+#define lf_debug(fmt, ...) printf(fmt"\n", ##__VA_ARGS__)
+
 /* Packed attribute. */
 #define LF_PACKED __attribute__((__packed__))
 /* Weak attribute. */

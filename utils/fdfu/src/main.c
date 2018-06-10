@@ -1,8 +1,6 @@
 #include <unistd.h>
 #include <flipper.h>
 
-#define lf_debug(fmt, ...) printf(fmt"\n", ##__VA_ARGS__)
-
 /* Define bit manipulation macros. */
 #define lo(x) ((uint8_t)(x))
 #define hi(x) ((uint8_t)(x >> 8))

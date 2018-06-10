@@ -3,6 +3,8 @@
 #include <flipper.h>
 #include <libusb.h>
 
+#define LF_USB_TIMEOUT_MS 200
+
 struct _lf_libusb_context {
 	struct libusb_device_handle *handle;
 	struct libusb_context *context;
@@ -22,11 +24,12 @@ int lf_libusb_read(struct _lf_device *device, void *dst, uint32_t length) {
 	while (length) {
         len = (length > BULK_IN_SIZE) ? BULK_IN_SIZE : length;
 
-        e = libusb_bulk_transfer(ctx->handle, BULK_IN_ENDPOINT, dst, len, &actual, 0);
+		lf_debug("Reading %i from libusb.", length);
+        e = libusb_bulk_transfer(ctx->handle, BULK_IN_ENDPOINT, dst, len, &actual, LF_USB_TIMEOUT_MS);
 		lf_assert(e == 0, E_LIBUSB, "read transfer failed (%s)", libusb_error_name(e));
 
-		dst += actual;
-		length -= actual;
+		dst += len;
+		length -= len;
 	}
 
 	return lf_success;
@@ -44,14 +47,16 @@ int lf_libusb_write(struct _lf_device *device, void *src, uint32_t length) {
 
 	struct _lf_libusb_context *ctx = (struct _lf_libusb_context *)device->_ep_ctx;
 	lf_assert(ctx, E_NULL, "invalid context");
+
 	while (length) {
         len = (length > BULK_OUT_SIZE) ? BULK_OUT_SIZE : length;
 
-        e = libusb_bulk_transfer(ctx->handle, BULK_OUT_ENDPOINT, src, len, &actual, 0);
+		lf_debug("Sending %i through libusb.", length);
+        e = libusb_bulk_transfer(ctx->handle, BULK_OUT_ENDPOINT, src, len, &actual, LF_USB_TIMEOUT_MS);
 		lf_assert(e == 0, E_LIBUSB, "write transfer failed (%s)", libusb_error_name(e));
 
-		src += actual;
-		length -= actual;
+		src += len;
+		length -= len;
 	}
 
 	return lf_success;
