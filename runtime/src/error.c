@@ -1,9 +1,6 @@
 #include <flipper.h>
 #include <stdarg.h>
 
-#include <flipper/error.h>
-
-
 #ifdef __AVR__
 #define STROP "%S"
 #define STRL(name, str) const char name[] PROGMEM = str;
