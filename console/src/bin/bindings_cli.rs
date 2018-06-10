@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io::Read;
 use std::io::Error as IoError;
 use clap::{App, AppSettings, Arg, ArgMatches};
-use fail::Error;
+use failure::Error;
 use console::bindings;
 
 #[derive(Debug, Fail)]

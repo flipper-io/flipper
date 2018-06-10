@@ -9,7 +9,7 @@
 
 use std::io::Write;
 use std::io::Cursor;
-use fail::Error;
+use failure::Error;
 
 use handlebars::{
     Handlebars,
