@@ -58,8 +58,8 @@ int lf_invoke(struct _lf_device *device, const char *module, lf_function functio
 	lf_assert(module, E_NULL, "invalid module");
 
 	struct _fmr_packet _packet;
-	int e;
 	struct _fmr_result result;
+	int e;
 
 	memset(&_packet, 0, sizeof(struct _fmr_packet));
 	_packet.header.magic = FMR_MAGIC_NUMBER;
@@ -84,6 +84,7 @@ int lf_invoke(struct _lf_device *device, const char *module, lf_function functio
 
 	lf_debug_result(&result);
 	lf_assert(result.error == E_OK, result.error, "An error occured on the device '%s':", device->name);
+
 	*retval = result.value;
 
 	return lf_success;
@@ -98,8 +99,8 @@ int lf_push(struct _lf_device *device, void *dst, void *src, size_t len) {
 	lf_assert(len, E_NULL, "Zero length");
 
 	struct _fmr_packet _packet;
-	int e;
 	struct _fmr_result result;
+	int e;
 
 	memset(&_packet, 0, sizeof(struct _fmr_packet));
 	_packet.header.magic = FMR_MAGIC_NUMBER;
@@ -110,6 +111,7 @@ int lf_push(struct _lf_device *device, void *dst, void *src, size_t len) {
 	packet->len = len;
 	packet->ptr = (uintptr_t)dst;
 	_packet.header.checksum = lf_crc(&_packet, _packet.header.length);
+
 	lf_debug_packet(&_packet, sizeof(struct _fmr_packet));
 
 	e = device->write(device, &_packet, sizeof(struct _fmr_packet));
@@ -119,6 +121,7 @@ int lf_push(struct _lf_device *device, void *dst, void *src, size_t len) {
 
 	e = device->read(device, &result, sizeof(struct _fmr_result));
 	lf_assert(e , E_ENDPOINT, "Failed to receive message from the device '%s'.", device->name);
+
 	lf_debug_result(&result);
 	lf_assert(result.error == E_OK, result.error, "An error occured on the device '%s':", device->name);
 
@@ -134,26 +137,30 @@ int lf_pull(struct _lf_device *device, void *dst, void *src, size_t len) {
 	lf_assert(len, E_NULL, "Zero length");
 
 	struct _fmr_packet _packet;
-	int e;
 	struct _fmr_result result;
+	int e;
 
 	memset(&_packet, 0, sizeof(struct _fmr_packet));
 	_packet.header.magic = FMR_MAGIC_NUMBER;
 	_packet.header.length = sizeof(struct _fmr_push_pull_packet);
 	_packet.header.type = fmr_pull_class;
+
 	struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)(&_packet);
 	packet->len = len;
 	packet->ptr = (uintptr_t)src;
 	_packet.header.checksum = lf_crc(&_packet, _packet.header.length);
+
 	lf_debug_packet(&_packet, sizeof(struct _fmr_packet));
 
 	e = device->write(device, &_packet, sizeof(struct _fmr_packet));
 	lf_assert(e , E_ENDPOINT, "Failed to send message to device '%s'.", device->name);
+
 	e = device->read(device, dst, len);
 	lf_assert(e , E_FMR, "Failed to pull data from device '%s'.", device->name);
 
 	e = device->read(device, &result, sizeof(struct _fmr_result));
 	lf_assert(e , E_ENDPOINT, "Failed to receive message from the device '%s'.", device->name);
+
 	lf_debug_result(&result);
 	lf_assert(result.error == E_OK, result.error, "An error occured on the device '%s':", device->name);
 
@@ -168,8 +175,8 @@ int lf_dyld(struct _lf_device *device, const char *module, int *idx) {
 	lf_assert(strlen(module) < 16, E_OVERFLOW, "Module name '%s' is invalid. Module names must be 16 characters or less.", module);
 
 	struct _fmr_packet _packet;
-	int e;
 	struct _fmr_result result;
+	int e;
 
 	memset(&_packet, 0, sizeof(struct _fmr_packet));
 	_packet.header.magic = FMR_MAGIC_NUMBER;
@@ -179,6 +186,7 @@ int lf_dyld(struct _lf_device *device, const char *module, int *idx) {
 	struct _fmr_dyld_packet *packet = (struct _fmr_dyld_packet *)(&_packet);
 	strcpy(packet->module, module);
 	_packet.header.checksum = lf_crc(&_packet, _packet.header.length);
+
 	lf_debug_packet(&_packet, sizeof(struct _fmr_packet));
 
 	e = device->write(device, &_packet, sizeof(struct _fmr_packet));
@@ -186,8 +194,10 @@ int lf_dyld(struct _lf_device *device, const char *module, int *idx) {
 
 	e = device->read(device, &result, sizeof(struct _fmr_result));
 	lf_assert(e , E_ENDPOINT, "Failed to receive message from the device '%s'.", device->name);
+
 	lf_debug_result(&result);
 	lf_assert(result.error == E_OK, result.error, "An error occured on the device '%s':", device->name);
+
 	*idx = result.value;
 
 	return lf_success;
@@ -199,8 +209,8 @@ int lf_malloc(struct _lf_device *device, size_t size, void **ptr) {
 	lf_assert(device, E_NULL, "invalid device");
 
 	struct _fmr_packet _packet;
-	int e;
 	struct _fmr_result result;
+	int e;
 
 	memset(&_packet, 0, sizeof(struct _fmr_packet));
 	_packet.header.magic = FMR_MAGIC_NUMBER;
@@ -217,8 +227,10 @@ int lf_malloc(struct _lf_device *device, size_t size, void **ptr) {
 
 	e = device->read(device, &result, sizeof(struct _fmr_result));
 	lf_assert(e , E_ENDPOINT, "Failed to receive message from the device '%s'.", device->name);
+
 	lf_debug_result(&result);
 	lf_assert(result.error == E_OK, result.error, "An error occured on the device '%s':", device->name);
+
 	*ptr = (void *)(uintptr_t)result.value;
 
 	return lf_success;
@@ -230,8 +242,8 @@ int lf_free(struct _lf_device *device, void *ptr) {
 	lf_assert(device, E_NULL, "invalid device");
 
 	struct _fmr_packet _packet;
-	int e;
 	struct _fmr_result result;
+	int e;
 
 	memset(&_packet, 0, sizeof(struct _fmr_packet));
 	_packet.header.magic = FMR_MAGIC_NUMBER;
@@ -241,6 +253,7 @@ int lf_free(struct _lf_device *device, void *ptr) {
 	struct _fmr_memory_packet *packet = (struct _fmr_memory_packet *)(&_packet);
 	packet->ptr = (uintptr_t)ptr;
 	_packet.header.checksum = lf_crc(&_packet, _packet.header.length);
+
 	lf_debug_packet(&_packet, sizeof(struct _fmr_packet));
 
 	e = device->write(device, &_packet, sizeof(struct _fmr_packet));
@@ -248,6 +261,7 @@ int lf_free(struct _lf_device *device, void *ptr) {
 
 	e = device->read(device, &result, sizeof(struct _fmr_result));
 	lf_assert(e , E_ENDPOINT, "Failed to receive message from the device '%s'.", device->name);
+
 	lf_debug_result(&result);
 	lf_assert(result.error == E_OK, result.error, "An error occured on the device '%s':", device->name);
 
