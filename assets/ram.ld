@@ -6,7 +6,7 @@ _ENTRY = DEFINED(main) ? ABSOLUTE(main) + 1: 0;
 ENTRY(_ENTRY);
 
 /* Ensure the module struct is linked in. */
-/* ASSERT (!DEFINED(module), "Error: No module structure defined."); */
+/* ASSERT (!DEFINED(module), "Error: invalid module structure defined."); */
 
 /* The only memory section we need to worry about is RAM. */
 MEMORY {

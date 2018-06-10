@@ -31,8 +31,8 @@ int main(int argc, char *argv[]) {
 
 	struct libusb_context *context;
 
-	int _e = libusb_init(&context);
-	if (_e) {
+	int e = libusb_init(&context);
+	if (e) {
 		fprintf(stderr, "Failed to initialize libusb.\n");
 	}
 
@@ -43,8 +43,8 @@ int main(int argc, char *argv[]) {
 	}
 
 	/* Configure USB device. */
-	_e = libusb_claim_interface(handle, DEBUG_INTERFACE);
-	if (_e) {
+	e = libusb_claim_interface(handle, DEBUG_INTERFACE);
+	if (e) {
 		fprintf(stderr, "Failed to claim the debug interface.\n");
 		goto exit;
 	}
@@ -55,13 +55,13 @@ int main(int argc, char *argv[]) {
 
 	while (alive) {
 		memset(incoming, '\0', sizeof(incoming));
-		_e = libusb_interrupt_transfer(handle, DEBUG_IN_ENDPOINT, incoming, DEBUG_BUFFER_SIZE, &len, DEBUG_TIMEOUT);
-		if (_e == 0) {
+		e = libusb_interrupt_transfer(handle, DEBUG_IN_ENDPOINT, incoming, DEBUG_BUFFER_SIZE, &len, DEBUG_TIMEOUT);
+		if (e == 0) {
 			if (len > 0) {
 				printf("%s", incoming);
 				fflush(stdout);
 			}
-		} else if (_e == LIBUSB_ERROR_TIMEOUT) {
+		} else if (e == LIBUSB_ERROR_TIMEOUT) {
 
 		} else {
 			fprintf(stderr, "Something went wrong with the transfer.\n");

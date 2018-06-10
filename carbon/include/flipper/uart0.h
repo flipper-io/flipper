@@ -9,7 +9,7 @@ int uart0_configure(void);
 int uart0_setbaud(uint32_t baud);
 int uart0_reset(void);
 int uart0_ready(void);
-void uart0_put(uint8_t byte);
+void uart0_put(const uint8_t byte);
 uint8_t uart0_get(void);
 void uart0_enable(void);
 void uart0_disable(void);

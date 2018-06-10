@@ -67,7 +67,3 @@ extern void _kill(int pid, int sig) {
 extern int _getpid(void) {
 	return -1;
 }
-
-extern void end(void) {
-	return;
-}

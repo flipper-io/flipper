@@ -15,60 +15,63 @@ volatile bool g_interrupt_enabled;
 
 __attribute__((section(".vectors"))) isr_t vector_table[] = {
 
+    /* cortex stack and reset addresses */
 	(isr_t)(&_estack),
 	reset_exception,
 
+    /* cortex-m4 exceptions */
 	nmi_exception,
 	hardfault_exception,
 	memmanage_exception,
 	busfault_exception,
 	usagefault_exception,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	null_isr,
+	null_isr,
+	null_isr,
+	null_isr,
 	svc_exception,
 	debugmon_exception,
-	NULL,
+	null_isr,
 	pendsv_exception,
 	systick_exception,
 
-	supc_isr,    /* 0  supply controller */
-	rstc_isr,    /* 1  reset controller */
-	rtc_isr,     /* 2  real time clock */
-	rtt_isr,     /* 3  real time timer */
-	wdt_isr,     /* 4  watchdog timer */
-	pmc_isr,     /* 5  pmc */
-	eefc_isr,    /* 6  eefc */
-	null_isr,    /* 7  reserved */
-	uart0_isr,   /* 8  uart0 */
-	uart1_isr,   /* 9  uart1 */
-	smc_isr,     /* 10 smc */
-	pioa_isr,    /* 11 parallel io controller a */
-	piob_isr,    /* 12 parallel io controller b */
-	pioc_isr,    /* 13 parallel io controller c */
-	usart0_isr,  /* 14 usart 0 */
-	usart1_isr,  /* 15 usart 1 */
-	usart2_isr,  /* 16 usart 2 */
-	null_isr,    /* 17 reserved */
-	mci_isr,     /* 18 mci */
-	twi0_isr,    /* 19 twi 0 */
-	twi1_isr,    /* 20 twi 1 */
-	spi_isr,     /* 21 spi */
-	ssc_isr,     /* 22 ssc */
-	tc0_isr,     /* 23 timer counter 0 */
-	tc1_isr,     /* 24 timer counter 1 */
-	tc2_isr,     /* 25 timer counter 2 */
-	tc3_isr,     /* 26 timer counter 3 */
-	tc4_isr,     /* 27 timer counter 4 */
-	tc5_isr,     /* 28 timer counter 5 */
-	adc_isr,     /* 29 adc controller */
-	dac_isr,     /* 30 dac controller */
-	pwm_isr,     /* 31 pwm */
-	crccu_isr,   /* 32 crc calculation unit */
-	acc_isr,     /* 33 analog comparator */
-	usbd_isr,    /* 34 usb device port */
-	null_isr     /* 35 not used */
+    /* sam4s specific isrs */
+	supc_isr,
+	rstc_isr,
+	rtc_isr,
+	rtt_isr,
+	wdt_isr,
+	pmc_isr,
+	eefc_isr,
+	null_isr,
+	uart0_isr,
+	uart1_isr,
+	smc_isr,
+	pioa_isr,
+	piob_isr,
+	pioc_isr,
+	usart0_isr,
+	usart1_isr,
+	usart2_isr,
+	null_isr,
+	mci_isr,
+	twi0_isr,
+	twi1_isr,
+	spi_isr,
+	ssc_isr,
+	tc0_isr,
+	tc1_isr,
+	tc2_isr,
+	tc3_isr,
+	tc4_isr,
+	tc5_isr,
+	adc_isr,
+	dac_isr,
+	pwm_isr,
+	crccu_isr,
+	acc_isr,
+	usbd_isr,
+	null_isr
 };
 
 extern void system_init(void);

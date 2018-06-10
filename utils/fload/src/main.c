@@ -39,9 +39,9 @@ int main(int argc, char *argv[]) {
 	fclose(fp);
 
 	/* Load the application into RAM. */
-	int _e = dyld_load(device, fbuf, fsize);
+	int e = dyld_load(device, fbuf, fsize);
 
-	lf_assert(_e == lf_success, fail, E_MODULE, "Failed to load module.");
+	lf_assert(e , E_MODULE, "Failed to load module.");
 
 fail:
 

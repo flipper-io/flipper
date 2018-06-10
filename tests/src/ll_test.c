@@ -11,34 +11,34 @@ int ll_test(void) {
     struct _lf_ll *ll = NULL;
     lf_try(lf_ll_append(&ll, ITEM, NULL));
     lf_expect_success();
-    lf_assert(ll, fail, E_NULL, "Linked list was not created.");
+    lf_assert(ll, E_NULL, "Linked list was not created.");
 
     /* Expect 1 item. */
     int count = 0;
     lf_try(count = lf_ll_count(ll));
     lf_expect_success();
-    lf_assert(count == 1, fail, E_UNIMPLEMENTED, "Expected 1 item in list.");
+    lf_assert(count == 1, E_UNIMPLEMENTED, "Expected 1 item in list.");
 
     /* Try to access a valid item. */
     void *item = NULL;
     lf_try(item = lf_ll_item(ll, 0));
     lf_expect_success();
-    lf_assert(item == ITEM, fail, E_UNIMPLEMENTED, "Item did not match.");
+    lf_assert(item == ITEM, E_UNIMPLEMENTED, "Item did not match.");
 
     /* Try to access an invalid item. */
     lf_try(item = lf_ll_item(ll, 1));
     lf_expect_error();
-    lf_assert(item == NULL, fail, E_UNIMPLEMENTED, "Invalid item was not NULL.");
+    lf_assert(item == NULL, E_UNIMPLEMENTED, "invalid item was not NULL.");
 
     /* Free that item. */
     lf_try(lf_ll_remove(&ll, ITEM));
     lf_expect_success();
-    lf_assert(ll == NULL, fail, E_UNIMPLEMENTED, "Expected ll to be NULL.");
+    lf_assert(ll == NULL, E_UNIMPLEMENTED, "Expected ll to be NULL.");
 
     /* Count should be 0. */
     lf_try(count = lf_ll_count(ll));
     lf_expect_success();
-    lf_assert(count == 0, fail, E_UNIMPLEMENTED, "Expected 0 items in list.");
+    lf_assert(count == 0, E_UNIMPLEMENTED, "Expected 0 items in list.");
 
     return lf_success;
 fail:

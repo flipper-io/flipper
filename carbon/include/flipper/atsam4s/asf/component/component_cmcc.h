@@ -99,13 +99,13 @@ typedef struct {
 /* -------- CMCC_SR : (CMCC Offset: 0x0C) Cache Status Register -------- */
 #define CMCC_SR_CSTS (0x1u << 0) /**< \brief (CMCC_SR) Cache Controller Status */
 /* -------- CMCC_MAINT0 : (CMCC Offset: 0x20) Cache Maintenance Register 0 -------- */
-#define CMCC_MAINT0_INVALL (0x1u << 0) /**< \brief (CMCC_MAINT0) Cache Controller Invalidate All */
+#define CMCC_MAINT0_INVALL (0x1u << 0) /**< \brief (CMCC_MAINT0) Cache Controller invalidate All */
 /* -------- CMCC_MAINT1 : (CMCC Offset: 0x24) Cache Maintenance Register 1 -------- */
 #define CMCC_MAINT1_INDEX_Pos 4
-#define CMCC_MAINT1_INDEX_Msk (0x1fu << CMCC_MAINT1_INDEX_Pos) /**< \brief (CMCC_MAINT1) Invalidate Index */
+#define CMCC_MAINT1_INDEX_Msk (0x1fu << CMCC_MAINT1_INDEX_Pos) /**< \brief (CMCC_MAINT1) invalidate Index */
 #define CMCC_MAINT1_INDEX(value) ((CMCC_MAINT1_INDEX_Msk & ((value) << CMCC_MAINT1_INDEX_Pos)))
 #define CMCC_MAINT1_WAY_Pos 30
-#define CMCC_MAINT1_WAY_Msk (0x3u << CMCC_MAINT1_WAY_Pos) /**< \brief (CMCC_MAINT1) Invalidate Way */
+#define CMCC_MAINT1_WAY_Msk (0x3u << CMCC_MAINT1_WAY_Pos) /**< \brief (CMCC_MAINT1) invalidate Way */
 #define   CMCC_MAINT1_WAY_WAY0 (0x0u << 30) /**< \brief (CMCC_MAINT1) Way 0 is selection for index invalidation */
 #define   CMCC_MAINT1_WAY_WAY1 (0x1u << 30) /**< \brief (CMCC_MAINT1) Way 1 is selection for index invalidation */
 #define   CMCC_MAINT1_WAY_WAY2 (0x2u << 30) /**< \brief (CMCC_MAINT1) Way 2 is selection for index invalidation */

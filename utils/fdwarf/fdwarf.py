@@ -198,7 +198,7 @@ def process_file(filename, language, outdir):
 		elif language.lower() == "python":
 			generate_py(modules, outdir)
 		else:
-			print("Invalid language: " + language)
+			print("invalid language: " + language)
 			sys.exit(1)
 
 if __name__ == "__main__":

@@ -119,11 +119,12 @@ int sam_ba_copy(uint32_t destination, void *src, uint32_t length) {
 	uart0_reset();
 	sprintf(buffer, "S%08X,%08X#", destination, length);
 	uart0_write(buffer, sizeof(buffer) - 1);
-	lf_assert(uart0_get() == 'C', fail, E_UNIMPLEMENTED, "Failed to get CTS ACK.");
+	lf_assert(uart0_get() == 'C', E_UNIMPLEMENTED, "Failed to get CTS ACK.");
 
 	/* Calculate the number of packets needed to perform the transfer. */
-	int packets = lf_ceiling(length, XLEN);
-	for (int packet = 0; packet < packets; packet ++) {
+	int packet = 0;
+
+	while (length) {
 
 
 		uart0_reset();
@@ -142,22 +143,26 @@ int sam_ba_copy(uint32_t destination, void *src, uint32_t length) {
 		/* Transfer the packet to the SAM-BA. */
 		uart0_write(&_packet, sizeof(struct _xpacket));
 
-		lf_assert(uart0_get() == ACK, fail, E_UNIMPLEMENTED, "Failed to get ACK.");
+		lf_assert(uart0_get() == ACK, E_UNIMPLEMENTED, "Failed to get ACK.");
 
 		/* Decrement the length appropriately. */
 		length -= _len;
+        packet ++;
 	}
 
 	/* Send end of transmission. */
 	uart0_put(EOT);
 
-	lf_assert(uart0_get() == ACK, fail, E_UNIMPLEMENTED, "Failed to get EOT ACK.");
+	lf_assert(uart0_get() == ACK, E_UNIMPLEMENTED, "Failed to get EOT ACK.");
 
 	return lf_success;
 
 fail:
 	return lf_error;
 }
+
+/* Computes the greatest integer from the result of the division of x by y. */
+#define lf_ceiling(x, y) ((x + y - 1) / y)
 
 void *load_page_data(FILE *firmware, size_t size) {
 	size_t pages = lf_ceiling(size, IFLASH0_PAGE_SIZE);
@@ -186,7 +191,7 @@ int enter_normal_mode(void) {
 		uart0_reset();
 		uart0_write("N#", 2);
 		usleep(1000);
-		lf_try(uart0_read(ack, sizeof(ack)));
+		uart0_read(ack, sizeof(ack));
 		if (!memcmp(ack, (const uint8_t []){ '\n', '\r' }, 2)) return lf_success;
 
 		/* If we failed the first time around, enter DFU. */
@@ -219,7 +224,7 @@ int main(int argc, char *argv[]) {
 
 	/* Open the firmware image. */
 	firmware = fopen(argv[1], "rb");
-	lf_assert(firmware, fail, E_UNIMPLEMENTED, "The file being opened, '%s', does not exist.\n", argv[1]);
+	lf_assert(firmware, E_UNIMPLEMENTED, "The file being opened, '%s', does not exist.\n", argv[1]);
 
 	/* Determine the size of the file. */
 	fseek(firmware, 0L, SEEK_END);
@@ -234,18 +239,18 @@ int main(int argc, char *argv[]) {
 
 	/* Enter normal mode. (Values are sent as binary.)*/
 	lf_debug("Entering device firmware update mode.");
-	lf_assert(enter_normal_mode() == lf_success, fail, E_UNIMPLEMENTED, "Failed to enter normal mode.");
+	lf_assert(enter_normal_mode() , E_UNIMPLEMENTED, "Failed to enter normal mode.");
 	lf_debug(KGRN " Successfully entered DFU mode." KNRM);
 
 	/* Ensure the security bit is clear. */
 	lf_debug("Checking security bit.");
 	sam_ba_write_efc_fcr(EEFC_FCR_FCMD_GGPB, 0);
-	lf_assert((sam_ba_read_word(REGADDR(EFC0->EEFC_FRR)) & 0x01) == 0, fail, E_UNIMPLEMENTED, KRED "The device's security bit is set." KNRM);
+	lf_assert((sam_ba_read_word(REGADDR(EFC0->EEFC_FRR)) & 0x01) == 0, E_UNIMPLEMENTED, KRED "The device's security bit is set." KNRM);
 	lf_debug(KGRN " Security bit is clear." KNRM);
 
 	/* Move the copy applet into RAM. */
 	lf_debug("Uploading copy applet.");
-	lf_assert(sam_ba_copy(_APPLET, applet, sizeof(applet)) == lf_success, fail, E_UNIMPLEMENTED, KRED "Failed to upload copy applet." KNRM);
+	lf_assert(sam_ba_copy(_APPLET, applet, sizeof(applet)) , E_UNIMPLEMENTED, KRED "Failed to upload copy applet." KNRM);
 	lf_debug(KGRN " Successfully uploaded copy applet." KNRM);
 
 	/* Write the stack address into the applet. */
@@ -268,8 +273,8 @@ int main(int argc, char *argv[]) {
 		printf("Uploading page %zu / %zu. (%.2f%%)", page + 1, pages, ((float)(page + 1))/pages*100);
 		fflush(stdout);
 		/* Copy the page. */
-		int _e = sam_ba_copy(_PAGEBUFFER, (void *)(pagedata + (page * IFLASH0_PAGE_SIZE)), IFLASH0_PAGE_SIZE);
-		lf_assert(_e == lf_success, fail, E_UNIMPLEMENTED, KRED "Failed to upload page %zu of %zu." KNRM, page + 1, pages);
+		int e = sam_ba_copy(_PAGEBUFFER, (void *)(pagedata + (page * IFLASH0_PAGE_SIZE)), IFLASH0_PAGE_SIZE);
+		lf_assert(e , E_UNIMPLEMENTED, KRED "Failed to upload page %zu of %zu." KNRM, page + 1, pages);
 
 		/* Write the page number into the applet. */
 		sam_ba_write_word(_APPLET_PAGE, EEFC_FCR_FARG(page));

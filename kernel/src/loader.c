@@ -64,7 +64,7 @@ int os_load_application(struct _lf_abi_header *header) {
 
 	void *_main = header + header->entry;
 	task = os_task_create(_main, os_app_exit, header, APPLICATION_STACK_SIZE_WORDS * sizeof(uint32_t));
-	lf_assert(task, fail, E_NULL, "Failed to allocate memory for task");
+	lf_assert(task, E_NULL, "Failed to allocate memory for task");
 
 	/* Add the task. */
 	os_task_add(task);
@@ -79,7 +79,7 @@ fail:
 
 /* Loads an image into RAM. */
 int os_load_image(struct _lf_abi_header *header) {
-	lf_assert(header, fail, E_NULL, "NULL module header provided for module load.");
+	lf_assert(header, E_NULL, "invalid module header provided for module load.");
 
 #warning Make sure the module is valid here.
 

@@ -26,7 +26,7 @@ enum _Error {
     Timer,
     Timeout,
     NoPID,
-    InvalidTask,
+    invalidTask,
     Subclass,
     Unimplemented,
 }

@@ -202,7 +202,7 @@ struct LF_PACKED _fmr_result {
 	/* The return value of the function called (if any). */
 	lf_return_t value;
 	/* The error code generated on the device. */
-	lf_error_t error;
+	lf_err_t error;
 	/* NOTE: Add bitfield indicating the need to poll for updates. */
 };
 

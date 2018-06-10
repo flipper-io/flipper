@@ -14,12 +14,12 @@ void loop(void) {
 
 		struct _fmr_packet packet;
 
-		int _e = megausb_bulk_receive(&packet, sizeof(struct _fmr_packet));
+		int e = megausb_bulk_receive(&packet, sizeof(struct _fmr_packet));
 
 		wdt_reset();
 
-		if (_e == lf_success) {
-			lf_error_clear();
+		if (e ) {
+			lf_error_set(E_OK);
 			fmr_perform(_u2, &packet);
 		}
 

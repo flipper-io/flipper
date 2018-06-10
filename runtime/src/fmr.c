@@ -2,7 +2,7 @@
 
 struct _lf_arg *lf_arg_create(lf_type type, lf_arg value) {
 	struct _lf_arg *arg = malloc(sizeof(struct _lf_arg));
-	lf_assert(arg, fail, E_MALLOC, "Failed to allocate new lf_arg.");
+	lf_assert(arg, E_MALLOC, "Failed to allocate new lf_arg.");
 	arg->type = type;
 	arg->value = value;
 	return arg;
@@ -15,8 +15,9 @@ void lf_arg_release(struct _lf_arg *arg) {
 }
 
 struct _lf_ll *fmr_build(int argc, ...) {
-	lf_assert(argc < FMR_MAX_ARGC, fail, E_OVERFLOW, "Too many arguments were provided when building (%i) call.", argc);
-	struct _lf_ll *list = NULL;
+	lf_assert(argc < FMR_MAX_ARGC, E_OVERFLOW, "Too many arguments were provided when building (%i) call.", argc);
+
+    struct _lf_ll *list = NULL;
 	/* Construct a va_list to access variadic arguments. */
 	va_list argv;
 	/* Initialize the va_list that we created above. */
@@ -26,12 +27,14 @@ struct _lf_ll *fmr_build(int argc, ...) {
 		/* Unstage the value of the argument from the variadic argument list. */
 		int type = va_arg(argv, int);
 		lf_arg value = va_arg(argv, lf_arg);
-		lf_assert(type <= lf_max_t, fail, E_TYPE, "An invalid type was provided while appending the parameter '%llx' with type '%x' to the argument list.", value, type);
+		lf_assert(type <= lf_max_t, E_TYPE, "An invalid type was provided while appending the parameter '%llx' with type '%x' to the argument list.", value, type);
 		struct _lf_arg *arg = lf_arg_create(type, value);
-		lf_assert(arg, fail, E_MALLOC, "Failed to append new lf_arg.");
+		lf_assert(arg, E_MALLOC, "Failed to append new lf_arg.");
 		lf_ll_append(&list, arg, lf_arg_release);
 	}
+
 	va_end(argv);
+
 	return list;
 fail:
 	lf_ll_release(&list);
@@ -40,8 +43,9 @@ fail:
 }
 
 int lf_create_call(lf_module module, lf_function function, lf_type ret, struct _lf_ll *args, struct _fmr_header *header, struct _fmr_invocation *call) {
-	lf_assert(header, fail, E_NULL, "NULL header passed to '%s'.", __PRETTY_FUNCTION__);
-	lf_assert(call, fail, E_NULL, "NULL call passed to '%s'.", __PRETTY_FUNCTION__);
+	lf_assert(header, E_NULL, "NULL header passed");
+	lf_assert(call, E_NULL, "NULL call passed");
+
 	/* Store the target module, function, and argument count in the packet. */
 	size_t argc = lf_ll_count(args);
 	call->index = module;
@@ -54,7 +58,7 @@ int lf_create_call(lf_module module, lf_function function, lf_type ret, struct _
 	for (size_t i = 0; i < argc; i ++) {
 		/* Pop the argument from the argument list. */
 		struct _lf_arg *arg = lf_ll_item(args, i);
-		lf_assert(arg, fail, E_NULL, "Invalid argument supplied to '%s'.", __PRETTY_FUNCTION__);
+		lf_assert(arg, E_NULL, "invalid argument supplied");
 		/* Encode the argument's type. */
 		call->types |= (arg->type & lf_max_t) << (i * 4);
 		/* Calculate the size of the argument. */
@@ -66,7 +70,9 @@ int lf_create_call(lf_module module, lf_function function, lf_type ret, struct _
 		/* Increment the size of the packet. */
 		header->length += size;
 	}
+
 	lf_ll_release(&args);
+
 	return lf_success;
 fail:
 	lf_ll_release(&args);
@@ -75,24 +81,26 @@ fail:
 
 int fmr_invoke(struct _lf_device *device, lf_module module, lf_function function, lf_type ret, lf_argc argc, lf_types argt, void *arguments, lf_return_t *retval) {
 	struct _lf_module *m = lf_ll_item(device->modules, module);
-	void *f = m->interface[function];
-	lf_assert(f, fail, E_NULL, "Bad function address in '%s'.", __FUNCTION__);
+	lf_return_t (* f)(void) = m->interface[function];
+	lf_assert(f, E_NULL, "Bad function address");
 	*retval = fmr_call(f, ret, argc, argt, arguments);
-	return lf_success;
 
+	return lf_success;
 fail:
 	return lf_error;
 }
 
 int fmr_push(struct _lf_device *device, void *dst, uint32_t len) {
-	lf_assert(device->read(device, dst, len) == lf_success, fail, E_FMR, "Failed to pull data for '%s'.", __FUNCTION__);
+	lf_assert(device->read(device, dst, len) , E_FMR, "Failed to pull data");
+
 	return lf_success;
 fail:
 	return lf_error;
 }
 
 int fmr_pull(struct _lf_device *device, void *src, uint32_t len) {
-	lf_assert(device->write(device, src, len) == lf_success, fail, E_FMR, "Failed to push data for '%s'.", __FUNCTION__);
+	lf_assert(device->write(device, src, len) , E_FMR, "Failed to push data");
+
 	return lf_success;
 fail:
 	return lf_error;
@@ -100,18 +108,19 @@ fail:
 
 int fmr_dyld(struct _lf_device *device, char *module, lf_return_t *retval) {
 	struct _lf_module *m = dyld_module(device, module);
-	lf_assert(m, fail, E_MODULE, "No module '%s' has been registered.", m->name);
+	lf_assert(m, E_MODULE, "no module '%s' has been registered.", m->name);
 	*retval = m->idx;
-	return lf_success;
 
+	return lf_success;
 fail:
 	return lf_error;
 }
 
 int fmr_malloc(uint32_t size, lf_return_t *retval) {
 	void *ptr = malloc(size);
-	lf_assert(ptr, fail, E_MALLOC, "Failed to allocate memory.");
+	lf_assert(ptr, E_MALLOC, "Failed to allocate memory.");
 	*retval = (lf_return_t)(uintptr_t)ptr;
+
 	return lf_success;
 fail:
 	return lf_error;
@@ -127,13 +136,13 @@ int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet) {
 	lf_return_t retval = -1;
 
 	/* Check that the magic number matches. */
-	lf_assert(packet->header.magic == FMR_MAGIC_NUMBER, fail, E_CHECKSUM, "Invalid magic number.");
+	lf_assert(packet->header.magic == FMR_MAGIC_NUMBER, E_CHECKSUM, "invalid magic number.");
 
 	/* Ensure the packet's checksums match. */
 	lf_crc_t _crc = packet->header.checksum;
 	packet->header.checksum = 0x00;
 	uint16_t crc = lf_crc(packet, packet->header.length);
-	lf_assert(_crc == crc, fail, E_CHECKSUM, "Checksums do not match.");
+	lf_assert(_crc == crc, E_CHECKSUM, "Checksums do not match.");
 
 	/* Cast the incoming packet to the different packet structures for subclass handling. */
 	struct _fmr_invocation_packet *ipacket = (struct _fmr_invocation_packet *)packet;

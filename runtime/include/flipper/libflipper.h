@@ -10,9 +10,6 @@
 
 #include <flipper/types.h>
 
-/* The current version of libflipper. */
-#define LF_VERSION 0x0001
-
 /* If defined, imposes a timeout on USB transactions. */
 #define __lf_usb_timeout__
 #ifdef __lf_usb_timeout__
@@ -57,16 +54,13 @@ enum {
 
 //#define __LF_DEBUG__
 #ifdef __LF_DEBUG__
-#define lf_debug(format, ...) printf(format"\n", ##__VA_ARGS__)
+#define lf_debug(fmt, ...) printf(fmt"\n", ##__VA_ARGS__)
 #else
-#define lf_debug(format, ...)
+#define lf_debug(fmt, ...)
 #endif
 
 /* Sets library debug verbosity. */
 void lf_set_debug_level(int level);
-
-/* Computes the greatest integer from the result of the division of x by y. */
-#define lf_ceiling(x, y) ((x + y - 1) / y)
 
 /* Define bit manipulation macros. */
 #define lo(x) ((uint8_t)(x))

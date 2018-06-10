@@ -78,9 +78,9 @@ int os_task_add(struct _os_task *task) {
 struct _os_task *os_task_create(void *_entry, void (* _exit)(struct _lf_abi_header *header), struct _lf_abi_header *header, uint32_t stack_size) {
 	/* Allocate the next available task slot. */
 	struct _os_task *task = malloc(sizeof(struct _os_task));
-	lf_assert(task, fail, E_NULL, "Failed to allocate memory to create task");
+	lf_assert(task, E_NULL, "Failed to allocate memory to create task");
 	os_stack_t *stack = malloc(stack_size);
-	lf_assert(stack, fail, E_NULL, "Failed to allocate memory to create stack.");
+	lf_assert(stack, E_NULL, "Failed to allocate memory to create stack.");
 
 	/* Set the task's stack pointer to the top of the task's stack. */
 	task->sp = (uintptr_t)stack + stack_size;
@@ -129,8 +129,8 @@ fail:
 }
 
 int os_task_release(struct _os_task *task) {
-	lf_assert(task, fail, E_NULL, "Invalid task pointer provided to '%s'.", __PRETTY_FUNCTION__);
-	lf_assert(task != schedule.head, fail, E_INVALID_TASK, "Tried to release task head.");
+	lf_assert(task, E_NULL, "invalid task pointer");
+	lf_assert(task != schedule.head, E_INVALID_TASK, "Tried to release task head.");
 	/* Disallow interrupts while freeing memory. */
 	__disable_irq();
 	/* Call the task's exit function. */
@@ -203,59 +203,57 @@ struct _os_task *os_task_from_pid(int pid) {
 
 /* Pauses the execution of the current task. */
 int os_task_pause(int pid) {
-	/* Circumvent users from interacting with the system task. */
-	if (!pid) {
-		lf_error_raise(E_INVALID_TASK, NULL);
-		return lf_error;
-	}
+    lf_assert(pid, E_INVALID_TASK, "can't pause the system task");
+
 	/* Find the task for the given PID. */
 	struct _os_task *task = os_task_from_pid(pid);
-	if (!task) {
-		lf_error_raise(E_NO_PID, NULL);
-		return lf_error;
-	}
+    lf_assert(task, E_NULL, "invalid task");
+
 	/* If the task is the currently executing task, queue the move to the next task. */
 	if (os_current_task == task) {
 		os_task_next();
 	}
+
 	/* Mark the task as paused. */
 	task->status = os_task_status_paused;
+
 	return lf_success;
+fail:
+    return lf_error;
 }
 
 /* Resumes execution of a given task. */
 int os_task_resume(int pid) {
-	/* Circumvent users from interacting with the system task. */
-	if (!pid) {
-		return lf_success;
-	}
+    lf_assert(pid, E_INVALID_TASK, "can't resume the system task");
+
 	/* Find the task for the given PID. */
 	struct _os_task *task = os_task_from_pid(pid);
-	if (!task) {
-		lf_error_raise(E_NO_PID, NULL);
-		return lf_error;
-	}
+    lf_assert(task, E_NULL, "invalid task");
+
 	/* Mark the task as idle so it is executed during the next scheduling event. */
 	task->status = os_task_status_idle;
+
 	/* Execute the resumed task next. */
 	os_current_task->status = os_task_status_idle;
 	os_current_task = NULL;
 	os_next_task = task;
 	os_task_next();
+
 	return lf_success;
+fail:
+    return lf_error;
 }
 
 /* Stop the execution of the active task and releases task memory. */
 int os_task_stop(int pid) {
-	/* Circumvent users from interacting with the system task. */
-	if (!pid) {
-		lf_error_raise(E_INVALID_TASK, NULL);
-		return lf_error;
-	}
+    lf_assert(pid, E_INVALID_TASK, "can't stop the system task");
+
 	/* Find the task for the given PID. */
 	struct _os_task *task = os_task_from_pid(pid);
 	/* Release the task with the given PID. */
 	return os_task_release(task);
+fail:
+    return lf_error;
 }
 
 /* This function is called once per millisecond and triggers a context switch. */

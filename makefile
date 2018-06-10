@@ -47,6 +47,15 @@ help:
 	"  update              - Flash the built firmware images to the attached device\n" \
 	"  clean               - Remove the entire build directory, containing all built products\n"
 
+# Global CFLAGS
+GLOBAL_CFLAGS = -std=c99              \
+                -Wall                 \
+                -Wextra               \
+                -Wno-unused-parameter \
+                -Os                   \
+                -g                    \
+#				-Wpedantic            \
+
 # ARM target variables
 ARM_TARGET   := atsam4s
 
@@ -69,20 +78,11 @@ ARM_SRC_DIRS := carbon/atsam4s        \
                 runtime/arch/armv7    \
                 runtime/src           \
 
-ARM_CFLAGS   := -std=c99              \
-                -Wall                 \
-                -Wextra               \
-                -Wpedantic            \
-		-Wno-unused-parameter \
-                -Wno-expansion-to-defined \
-                -Os                   \
-                -mcpu=cortex-m4       \
-                -g                    \
+ARM_CFLAGS   := -mcpu=cortex-m4       \
                 -mthumb               \
                 -march=armv7e-m       \
                 -mtune=cortex-m4      \
                 -mfloat-abi=soft      \
-                -D__no_err_str__      \
                 -DATSAM4S             \
                 -D__SAM4S16B__
 
@@ -120,17 +120,10 @@ AVR_SRC_DIRS := carbon/atmegau2       \
                 runtime/arch/avr8     \
                 runtime/src
 
-AVR_CFLAGS   := -std=c99              \
-                -Wall                 \
-                -Wextra               \
-                -Wno-unused-parameter \
-                -Os                   \
-                -g                    \
-                -mmcu=atmega32u2      \
+AVR_CFLAGS   := -mmcu=atmega32u2      \
                 -DARCH=ARCH_AVR8      \
                 -D__AVR_ATmega32U2__  \
                 -DF_CPU=16000000UL    \
-                -D__no_err_str__      \
                 -DATMEGAU2
 
 AVR_LDFLAGS  := -mmcu=atmega32u2 \
@@ -167,12 +160,7 @@ X86_SRC_DIRS := carbon/hal              \
                 library/platforms/posix \
                 runtime/src
 
-X86_CFLAGS   := -std=gnu99              \
-                -g                      \
-                -Wall                   \
-                -Wextra                 \
-                -Wno-unused-parameter   \
-                -fpic                   \
+X86_CFLAGS   := -fpic                   \
                 -DPOSIX                 \
 				-D__LF_DEBUG__          \
 				$(shell pkg-config --cflags-only-I libusb-1.0)
@@ -253,10 +241,10 @@ languages:: language-rust
 .PHONY: utils install-utils uninstall-utils
 
 utils: libflipper | $(BUILD)/utils/.dir
-	$(_v)$(X86_CC) $(X86_CFLAGS) -o $(BUILD)/utils/fdfu utils/fdfu/src/*.c -L$(BUILD)/$(X86_TARGET) -lflipper
-	$(_v)$(X86_CC) $(X86_CFLAGS) -o $(BUILD)/utils/fdebug utils/fdebug/src/*.c $(shell pkg-config --libs libusb-1.0)
-	$(_v)$(X86_CC) $(X86_CFLAGS) -o $(BUILD)/utils/fload utils/fload/src/*.c -L$(BUILD)/$(X86_TARGET) -lflipper
-	$(_v)$(X86_CC) $(X86_CFLAGS) -o $(BUILD)/utils/fvm $(call find_srcs, utils/fvm/src) -L$(BUILD)/$(X86_TARGET) -lflipper -ldl
+	$(_v)$(X86_CC) $(GLOBAL_CFLAGS) $(X86_CFLAGS) -o $(BUILD)/utils/fdfu utils/fdfu/src/*.c -L$(BUILD)/$(X86_TARGET) -lflipper
+	$(_v)$(X86_CC) $(GLOBAL_CFLAGS) $(X86_CFLAGS) -o $(BUILD)/utils/fdebug utils/fdebug/src/*.c $(shell pkg-config --libs libusb-1.0)
+	$(_v)$(X86_CC) $(GLOBAL_CFLAGS) $(X86_CFLAGS) -o $(BUILD)/utils/fload utils/fload/src/*.c -L$(BUILD)/$(X86_TARGET) -lflipper
+	$(_v)$(X86_CC) $(GLOBAL_CFLAGS) $(X86_CFLAGS) -o $(BUILD)/utils/fvm $(call find_srcs, utils/fvm/src) -L$(BUILD)/$(X86_TARGET) -lflipper -ldl
 	$(_v)cp utils/fdwarf/fdwarf.py $(BUILD)/utils/fdwarf
 	$(_v)chmod +x $(BUILD)/utils/fdwarf
 
@@ -277,7 +265,7 @@ uninstall-utils:
 .PHONY: test
 
 test: libflipper
-	$(_v)$(X86_CC) $(X86_CFLAGS) -Itests/include -o $(BUILD)/test $(call find_srcs, tests/src) -L$(BUILD)/$(X86_TARGET) -lflipper
+	$(_v)$(X86_CC) $(GLOBAL_CFLAGS) $(X86_CFLAGS) -Itests/include -o $(BUILD)/test $(call find_srcs, tests/src) -L$(BUILD)/$(X86_TARGET) -lflipper
 	$(_v)./$(BUILD)/test
 
 # --- LANGUAGES --- #
@@ -363,11 +351,11 @@ $$($1_SO): $$($1_OBJS)
 
 # Compiling rule for C sources
 $$($1_BUILD)/%.c.o: %.c | $$($1_BUILD_DIR_FILES)
-	$(_v)$$($1_CC) $$($1_CFLAGS) -I$$(<D) -MD -MP -MF $$($1_BUILD)/$$*.c.d -c -o $$@ $$<
+	$(_v)$$($1_CC) $(GLOBAL_CFLAGS) $$($1_CFLAGS) -I$$(<D) -MD -MP -MF $$($1_BUILD)/$$*.c.d -c -o $$@ $$<
 
 # Compiling rule for S sources
 $$($1_BUILD)/%.S.o: %.S | $$($1_BUILD_DIR_FILES)
-	$(_v)$$($1_AS) $$($1_ASFLAGS) $$($1_CFLAGS) -I$$(<D) -MD -MP -MF $$($1_BUILD)/$$*.S.d -c -o $$@ $$<
+	$(_v)$$($1_AS) $$($1_ASFLAGS) $(GLOBAL_CFLAGS) $$($1_CFLAGS) -I$$(<D) -MD -MP -MF $$($1_BUILD)/$$*.S.d -c -o $$@ $$<
 
 # Build dependency rules
 -include $$($1_DEPS)

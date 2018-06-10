@@ -1,129 +1,107 @@
 #include <flipper/atmegau2/megausb.h>
 
-/* Has bulk already timed out? */
+int megausb_bulk_receive(void *dst, uint32_t length) {
 
-
-/* Receive a packet using the appropriate bulk endpoint. */
-int8_t megausb_bulk_receive(void *dst, uint32_t length) {
-
-	/* If USB is not configured, return with error. */
-	if (!megausb_configuration) {
-		return lf_error;
-	}
-
-	uint8_t _sreg = SREG;
+    uint8_t _sreg = SREG;
 	cli();
+
+    lf_assert(megausb_configuration, E_USB, "usb is not configured");
 
 	/* Select the endpoint that has been configured to receive bulk data. */
 	UENUM = BULK_OUT_ENDPOINT;
 
-	int total = lf_ceiling(length, BULK_OUT_SIZE);
-	for (int i = 0; i < total; i ++) {
+	while (length) {
 
-		/* Wait until the USB controller is ready. */
+        /* TODO: use interrupts for USB timeout */
+
+        /* Wait until the USB controller is ready. */
 		uint8_t timeout = UDFNUML + LF_USB_TIMEOUT_MS;
 		while (1) {
 
-			if ((UEINTX & (1 << RWAL))) break;
+            /* data is available */
+			if (UEINTX & (1 << RWAL)) break;
+
+            /* TODO: do these need to be wrapped in SREG sets? */
+
 			SREG = _sreg;
-
-			if (UDFNUML == timeout) return lf_error;
-
-			if (!megausb_configuration) return lf_error;
-
+            lf_assert(UDFNUML != timeout, E_TIMEOUT, "usb transfer timed out");
+            lf_assert(megausb_configuration, E_USB, "usb is not configured");
 			_sreg = SREG;
-			cli();
 
+			cli();
 			UENUM = BULK_OUT_ENDPOINT;
 		}
 
-		/* Transfer the buffered data to the dst. */
-		uint8_t len = BULK_OUT_SIZE;
-		while (len --) {
-			if (length) {
-				/* If there is still valid data to send, load it from the receive buffer. */
-				*(uint8_t *)dst++ = UEDATX;
-				/* Decrement the length. */
-				length --;
-			} else {
-				/* Otherwise, flush the buffer. */
-				while ((UEINTX & (1 << RWAL))) (void)UEDATX;
-				break;
-			}
-		}
+        /* calculate send length */
+        size_t len = (length > BULK_OUT_SIZE) ? BULK_OUT_SIZE : length;
+        /* fill the fifo with the available data */
+        while (len --) *(uint8_t *)dst++ = UEDATX;
+        /* fill the fifo */
+        while ((UEINTX & (1 << RWAL))) (void)UEDATX;
+        /* shift the fifo out */
+        UEINTX = (1 << NAKINI) | (1 << RWAL) | (1 << RXSTPI) | (1 << STALLEDI) | (1 << TXINI);
 
-		/* Flush the receive buffer and reset the interrupt state machine. */
-		UEINTX = (1 << NAKINI) | (1 << RWAL) | (1 << RXSTPI) | (1 << STALLEDI) | (1 << TXINI);
+        length -= len;
 	}
 
 	SREG = _sreg;
-	return lf_success;
 
-	// while (UEINTX & (1 << RWAL)) {
-	// 	/* Flush the receive buffer and reset the interrupt state machine. */
-	// 	UEINTX = (1 << NAKINI) | (1 << RWAL) | (1 << RXSTPI) | (1 << STALLEDI) | (1 << TXINI);
-	// }
+    /* TODO: figure out better way to handle SREG */
+
+    SREG = _sreg;
+    return lf_success;
+fail:
+    SREG = _sreg;
+	return lf_error;
 }
 
-/* Receive a packet using the appropriate bulk endpoint. */
-int8_t megausb_bulk_transmit(void *src, uint32_t length) {
+int megausb_bulk_transmit(void *src, uint32_t length) {
 
-	/* If USB is not configured, return with error. */
-	if (!megausb_configuration) {
-		return lf_error;
-	}
+    uint8_t _sreg = SREG;
+    cli();
 
-	uint8_t _sreg = SREG;
-	cli();
+    lf_assert(megausb_configuration, E_USB, "usb is not configured");
 
 	/* Select the endpoint that has been configured to receive bulk data. */
 	UENUM = BULK_IN_ENDPOINT & ~USB_IN_MASK;
 
-	int total = lf_ceiling(length, BULK_OUT_SIZE);
-	for (int i = 0; i < total; i ++) {
+	while (length) {
 
 		/* Wait until the USB controller is ready. */
 		uint8_t timeout = UDFNUML + LF_USB_TIMEOUT_MS;
 		while (1) {
 
-			if ((UEINTX & (1 << RWAL))) break;
+            /* data is available */
+			if (UEINTX & (1 << RWAL)) break;
+
+            /* TODO: do these need to be wrapped in SREG sets? */
+
 			SREG = _sreg;
-
-			if (UDFNUML == timeout) return lf_error;
-
-			if (!megausb_configuration) return lf_error;
-
+            lf_assert(UDFNUML != timeout, E_TIMEOUT, "usb transfer timed out");
+            lf_assert(megausb_configuration, E_USB, "usb is not configured");
 			_sreg = SREG;
-			cli();
 
+			cli();
 			UENUM = BULK_IN_ENDPOINT & ~USB_IN_MASK;
 		}
 
-		/* Transfer the buffered data to the dst. */
-		uint8_t len = BULK_IN_SIZE;
-		while (len --) {
-			if (length) {
-				/* If there is still valid data to send, load it into the transmit buffer. */
-				UEDATX = *(uint8_t *)src++;
-				/* Decrement the length. */
-				length --;
-			} else {
-				/* Otherwise, flush the buffer. */
-				while ((UEINTX & (1 << RWAL))) UEDATX = 0;
-				break;
-			}
-		}
-
-		/* Flush the transmit buffer and reset the interrupt state machine. */
+        /* calculate send length */
+        size_t len = (length > BULK_IN_SIZE) ? BULK_IN_SIZE : length;
+        /* fill the fifo with the available data */
+        while (len --) UEDATX = *(uint8_t *)src++;
+        /* fill the fifo */
+        while ((UEINTX & (1 << RWAL))) UEDATX = 0;
+		/* shift the fifo out */
 		UEINTX = (1 << RWAL) | (1 << NAKOUTI) | (1 << RXSTPI) | (1 << STALLEDI);
+
+        length -= len;
 	}
 
-	SREG = _sreg;
-	return lf_success;
+    /* TODO: figure out better way to handle SREG */
 
-	// while (UEINTX & (1 << RWAL)) {
-	// 	/* Flush the transmit buffer and reset the interrupt state machine. */
-	// 	UEINTX = (1 << RWAL) | (1 << NAKOUTI) | (1 << RXSTPI) | (1 << STALLEDI);
-	// }
-
+    SREG = _sreg;
+    return lf_success;
+fail:
+    SREG = _sreg;
+	return lf_error;
 }

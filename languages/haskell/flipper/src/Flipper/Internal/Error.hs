@@ -43,7 +43,7 @@ data FlipperError = OK                -- ^ All clear.
                   | MemAllocFailed    -- ^ Memory allocation failed.
                   | Null              -- ^ Null pointer error.
                   | Overflow          -- ^ Overflow.
-                  | NoDevice          -- ^ No device available.
+                  | NoDevice          -- ^ invalid device available.
                   | NotAttached       -- ^ Device not attached.
                   | AlreadyAttached   -- ^ Device already attached.
                   | FileAlreadyExists -- ^ File already exists.

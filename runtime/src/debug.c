@@ -71,7 +71,7 @@ void lf_debug_packet(struct _fmr_packet *packet, uint32_t length) {
 				printf("   └─ ptr: '0x%llx'\n", mem->ptr);
 			break;
 			default:
-				printf("Invalid packet class.\n");
+				printf("invalid packet class.\n");
 			break;
 		}
 		for (size_t i = 1; i <= length; i ++) {
@@ -79,7 +79,7 @@ void lf_debug_packet(struct _fmr_packet *packet, uint32_t length) {
 			if (i % 8 == 0 && i < length - 1) printf("\n");
 		}
 	} else {
-		printf("Invalid magic number (0x%02x).\n", packet->header.magic);
+		printf("invalid magic number (0x%02x).\n", packet->header.magic);
 	}
 	printf("\n\n-----------\n\n");
 #endif
@@ -91,7 +91,7 @@ void lf_debug_result(struct _fmr_result *result) {
 
 	printf("response:\n");
 	printf("  └─ value:    0x%llx\n", result->value);
-	printf("  └─ error:    0x%hhx\n", result->error);
+	printf("  └─ error:    0x%x\n", result->error);
 	printf("\n-----------\n\n");
 #endif
 }
