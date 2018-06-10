@@ -32,21 +32,21 @@ ASF_SRCS     := $(shell find carbon/atsam4s/drivers -type d)
 
 ASF_INC      := carbon/include/flipper/atsam4s/asf \
                 carbon/include/flipper/atsam4s/asf/cmsis \
-				$(shell find carbon/atsam4s/drivers -type d)
+                $(shell find carbon/atsam4s/drivers -type d)
 
 # Directories that need to be included for this target.
 ARM_INC_DIRS := carbon/include        \
                 kernel/include        \
                 library/include       \
-                runtime/include		  \
-				$(ASF_INC)
+                runtime/include       \
+                $(ASF_INC)
 
 ARM_SRC_DIRS := carbon/atsam4s        \
                 kernel/src            \
                 kernel/arch/armv7     \
                 runtime/arch/armv7    \
                 runtime/src           \
-				$(ASF_SRCS)
+                $(ASF_SRCS)
 
 ARM_CFLAGS   := -std=c99              \
                 -Wall                 \
@@ -55,7 +55,7 @@ ARM_CFLAGS   := -std=c99              \
                 -Wno-expansion-to-defined \
                 -Os                   \
                 -mcpu=cortex-m4       \
-				-mthumb               \
+                -mthumb               \
                 -march=armv7e-m       \
                 -mtune=cortex-m4      \
                 -mfloat-abi=soft      \
@@ -65,7 +65,11 @@ ARM_CFLAGS   := -std=c99              \
                 $(foreach inc,$(ARM_INC_DIRS),-I$(inc))
 
 ARM_LDFLAGS  := -nostartfiles                    \
-                -mcpu=cortex-m4                  \
+                -mcpu=cortex-m4       \
+                -mthumb               \
+                -march=armv7e-m       \
+                -mtune=cortex-m4      \
+                -mfloat-abi=soft      \
                 -Wl,-T carbon/atsam4s/sam4s16.ld \
                 -Wl,--gc-sections
 
