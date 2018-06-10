@@ -10,9 +10,11 @@
 /* Short hand for raising errors based on the truth of a condition. */
 
 #ifdef LF_CONFIG_OMIT_ERRORS
-#define lf_assert(cond, err, ...) if (!(cond)) { goto fail; }
+#define lf_assert(cond, err, fmt, ...) if (!(cond)) { goto fail; }
+#elif __AVR__
+#define lf_assert(cond, err, fmt, ...) if (!(cond)) { _lf_assert(err, __func__, PSTR(fmt), ##__VA_ARGS__); goto fail; }
 #else
-#define lf_assert(cond, err, ...) if (!(cond)) { _lf_assert(err, __func__, __VA_ARGS__); goto fail; }
+#define lf_assert(cond, err, fmt, ...) if (!(cond)) { _lf_assert(err, __func__, fmt, ##__VA_ARGS__); goto fail; }
 #endif
 
 /* Enumerate all of the error codes. */
@@ -57,42 +59,6 @@ typedef enum {
     /* must be kept at the bottom of this enum */
     LF_MAX_ERR
 } lf_err_t;
-
-/* These are the error strings that correspond to the values in the error code enumeration. */
-#define LF_ERROR_MESSAGE_STRINGS "no error", \
-								 "malloc failure", \
-								 "null pointer", \
-								 "overflow", \
-								 "invalid device", \
-								 "device not yet attached", \
-								 "device already attached", \
-								 "file already exists", \
-								 "file does not exist", \
-								 "message runtime packet overflow", \
-								 "message runtime error", \
-								 "endpoint error", \
-								 "libusb error", \
-								 "communication error", \
-								 "socket error", \
-								 "invalid module found", \
-								 "address resoultion failure", \
-								 "invalid error string", \
-								 "checksums do not match", \
-								 "invalid name", \
-								 "configuration error", \
-								 "acknowledgement error", \
-								 "type error", \
-								 "boundary error", \
-								 "timer error", \
-								 "timeout error", \
-								 "no task for pid", \
-								 "invalid task specified", \
-								 "packet subclass error", \
-								 "unimplemented error",	\
-								 "test failed", \
-								 "uart0 write timeout", \
-								 "uart0 read timeout", \
-                                 "usb error"
 
 /* Raises an error internally to the current context of libflipper. */
 extern void _lf_assert(lf_err_t err, const char *func, const char *format, ...) __attribute__ ((format (printf, 3, 4)));

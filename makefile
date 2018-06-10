@@ -115,7 +115,7 @@ AVR_CFLAGS   := -mmcu=atmega32u2      \
                 -D__AVR_ATmega32U2__  \
                 -DF_CPU=16000000UL    \
                 -DATMEGAU2            \
-				-D LF_CONFIG_OMIT_ERRORS
+#				-D LF_CONFIG_OMIT_ERRORS
 
 AVR_LDFLAGS  := -mmcu=atmega32u2 \
 				-Wl,--gc-sections

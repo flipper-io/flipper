@@ -1,3 +1,4 @@
+#include <flipper.h>
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
@@ -51,14 +52,14 @@ int main(int argc, char *argv[]) {
 
 	int len;
 
-	unsigned char incoming[DEBUG_BUFFER_SIZE + 1]; // don't forget the null
+	uint8_t buf[DEBUG_IN_SIZE];
 
 	while (alive) {
-		memset(incoming, '\0', sizeof(incoming));
-		e = libusb_interrupt_transfer(handle, DEBUG_IN_ENDPOINT, incoming, DEBUG_BUFFER_SIZE, &len, DEBUG_TIMEOUT);
+		e = libusb_interrupt_transfer(handle, DEBUG_IN_ENDPOINT, buf, DEBUG_IN_SIZE, &len, 0);
 		if (e == 0) {
 			if (len > 0) {
-				printf("%s", incoming);
+				uint8_t *_buf = buf;
+				while (len --) printf("%c", *(uint8_t *)(_buf ++));
 				fflush(stdout);
 			}
 		} else if (e == LIBUSB_ERROR_TIMEOUT) {
