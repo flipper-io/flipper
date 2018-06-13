@@ -25,8 +25,6 @@ void loop(void) {
 		/* ensure the packet is valid */
 		lf_assert(e, E_USB, "failed to obtain usb packet");
 
-		lf_debug("performing");
-
 		/* execute the packet */
 		fmr_perform(_u2, &packet);
 

@@ -199,7 +199,7 @@ fail:
 	result.value = retval;
 
 	e = device->write(device, &result, sizeof(struct _fmr_result));
-	
+
 	lf_debug_result(&result);
 
 	return e;

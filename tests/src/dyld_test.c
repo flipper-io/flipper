@@ -23,7 +23,7 @@ int dyld_test(void) {
     lf_assert(module->idx == 1, E_UNIMPLEMENTED, "Module name doesn't match.");
 
     struct _lf_device *device = (void *)0xdeadbeef;
-    lf_try(device = lf_device_create(NULL, NULL));
+    lf_try(device = lf_device_create(NULL, NULL, NULL));
     lf_expect_error();
     lf_assert(device == NULL, E_UNIMPLEMENTED, "Device was not NULL.");
 
