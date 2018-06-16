@@ -1,4 +1,6 @@
-#include <flipper/atmegau2/megausb.h>
+#include "carbon.h"
+#include "atmegau2.h"
+#include "megausb.h"
 
 #define lo(x) ((uint8_t)(x))
 #define hi(x) ((uint8_t)(x >> 8))

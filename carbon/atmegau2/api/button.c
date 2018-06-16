@@ -1,4 +1,5 @@
-#include <flipper/button.h>
+#include <api/button.h>
+#include "atmegau2.h"
 
 LF_FUNC("button") int button_configure(void) {
 	BUTTON_DDR &= ~(1 << BUTTON_PIN);

@@ -2,29 +2,28 @@
 #define __flipper_h__
 
 /* Include the top-level libflipper header. */
-#include <flipper/libflipper.h>
+#include "libflipper.h"
 
 /* Include the 'Flipper: Carbon Edition' device support header. */
-#include <flipper/carbon.h>
+#include "carbon.h"
 
 /* Include the header files for all of the standard modules exposed by the toolbox. */
-#include <flipper/adc.h>
-#include <flipper/button.h>
-#include <flipper/dac.h>
-#include <flipper/gpio.h>
-#include <flipper/i2c.h>
-#include <flipper/is25lp.h>
-#include <flipper/led.h>
-#include <flipper/pwm.h>
-#include <flipper/rtc.h>
-#include <flipper/spi.h>
-#include <flipper/swd.h>
-#include <flipper/temp.h>
-#include <flipper/timer.h>
-#include <flipper/uart0.h>
-#include <flipper/usart.h>
-#include <flipper/usb.h>
-#include <flipper/wdt.h>
+#include "api/adc.h"
+#include "api/button.h"
+#include "api/dac.h"
+#include "api/gpio.h"
+#include "api/i2c.h"
+#include "api/led.h"
+#include "api/pwm.h"
+#include "api/rtc.h"
+#include "api/spi.h"
+#include "api/swd.h"
+#include "api/temp.h"
+#include "api/timer.h"
+#include "api/uart0.h"
+#include "api/usart.h"
+#include "api/usb.h"
+#include "api/wdt.h"
 
 /* Declare the virtual interface for this driver. */
 extern const struct _flipper_interface {

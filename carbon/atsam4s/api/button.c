@@ -1,4 +1,4 @@
-#include <flipper/button.h>
+#include <api/button.h>
 
 LF_FUNC("button") int button_configure(void) {
 	return lf_success;

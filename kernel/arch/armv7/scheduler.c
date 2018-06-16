@@ -1,7 +1,8 @@
 /* Osmium scheduler implementation. */
 
 #include <flipper.h>
-#include <os/scheduler.h>
+#include "os/scheduler.h"
+#include "atsam4s.h"
 
 /* Pointers to the current and next tasks. */
 struct _os_task *os_current_task;

@@ -1,4 +1,5 @@
-#include <flipper/rtc.h>
+#include <api/rtc.h>
+#include "rtc.h"
 
 LF_FUNC("rtc") int rtc_configure(void) {
 	return lf_success;

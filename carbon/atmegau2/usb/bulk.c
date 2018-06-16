@@ -1,9 +1,11 @@
-#include <flipper/atmegau2/megausb.h>
+#include "flipper.h"
+#include "atmegau2.h"
+#include "megausb.h"
 
 #define LF_USB_TIMEOUT_S 2
 
 int megausb_bulk_receive(void *dst, uint32_t length) {
-	
+
 	lf_assert(megausb_configuration, E_USB, "usb is not configured");
 
 	/* Select the endpoint that has been configured to receive bulk data. */

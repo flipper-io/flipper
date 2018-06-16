@@ -1,4 +1,5 @@
-#include <flipper/led.h>
+#include <api/led.h>
+#include "atmegau2.h"
 
 LF_FUNC("led") int led_configure(void) {
 	/* Configure the DI (data in) pin of the LED as an output. */

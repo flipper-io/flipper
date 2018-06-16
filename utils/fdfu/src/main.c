@@ -10,7 +10,7 @@
 #define little32(x) ((((uint32_t)(x)) << 16 ) | (((uint32_t)(x)) >> 16))
 
 #define __SAM4S16B__
-#include <flipper/atsam4s/atsam4s.h>
+#include "atsam4s.h"
 
 /* Defines the XMODEM flow control bytes. */
 #define SOH 0x01
@@ -27,7 +27,7 @@ struct __attribute__((__packed__)) _xpacket {
 	uint8_t number;
 	uint8_t _number;
 	uint8_t data[XLEN];
-	uint16_t checksum;
+	uint16_t crc;
 };
 
 /* See utils/copy_x.s for the source of this applet. These are the raw thumb instructions that result from the compilation of the applet. */
@@ -130,32 +130,28 @@ int sam_ba_copy(uint32_t destination, void *src, uint32_t length) {
 	lf_assert(uart0_get() == 'C', E_UNIMPLEMENTED, "Failed to get CTS ACK.");
 
 	/* Calculate the number of packets needed to perform the transfer. */
-	int packet = 0;
+	int i = 0;
 
 	while (length) {
 
-
 		uart0_reset();
 
-		uint32_t _len = XLEN;
-		if (length < _len) {
-			_len = length;
-		}
+		uint32_t len = (length > XLEN) ? XLEN : length;
 
 		/* Construct the XMODEM packet. */
-		struct _xpacket _packet = { SOH, (packet + 1), ~(packet + 1), { 0 }, 0x00 };
+		struct _xpacket packet = { SOH, i, ~i, { 0 }, 0x0000 };
 		/* Copy the chunk of data into the packet. */
-		memcpy(_packet.data, (void *)(src + (packet * XLEN)), _len);
+		memcpy(packet.data, (void *)(src + (i * XLEN)), len);
 		/* Calculate the checksum of the data and write it to the packet in little endian format. */
-		_packet.checksum = little(lf_crc(_packet.data, sizeof(_packet.data)));
+        lf_crc(packet.data, sizeof(packet.data), &packet.crc);
 		/* Transfer the packet to the SAM-BA. */
-		uart0_write(&_packet, sizeof(struct _xpacket));
+		uart0_write(&packet, sizeof(packet));
 
 		lf_assert(uart0_get() == ACK, E_UNIMPLEMENTED, "Failed to get ACK.");
 
 		/* Decrement the length appropriately. */
-		length -= _len;
-        packet ++;
+		length -= len;
+        i ++;
 	}
 
 	/* Send end of transmission. */
@@ -228,7 +224,7 @@ int main(int argc, char *argv[]) {
 
 	/* Attach to a Flipper device. */
 	struct _lf_device *device = flipper.attach();
-	carbon_select_u2(device);
+//	carbon_select_u2(device);
 
 	/* Open the firmware image. */
 	firmware = fopen(argv[1], "rb");

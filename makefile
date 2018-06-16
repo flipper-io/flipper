@@ -51,19 +51,19 @@ ARM_TARGET   := atsam4s
 
 ARM_PREFIX   := arm-none-eabi-
 
-ASF_INC      := carbon/include/flipper/atsam4s/asf \
-                carbon/include/flipper/atsam4s/asf/cmsis \
+ASF_INC      := carbon/atsam4s/include/asf \
+                carbon/atsam4s/include/asf/cmsis \
 				$(shell find carbon/atsam4s/asf -type d)
 
 # Directories that need to be included for this target.
 ARM_INC_DIRS := carbon/include        \
+                carbon/atsam4s/include\
                 kernel/include        \
                 library/include       \
                 runtime/include       \
                 $(ASF_INC)
 
 ARM_SRC_DIRS := carbon/atsam4s        \
-				carbon/src            \
                 kernel/arch/armv7     \
                 runtime/arch/armv7    \
                 runtime/src           \
@@ -76,7 +76,7 @@ ARM_CFLAGS   := -mcpu=cortex-m4       \
                 -DATSAM4S             \
                 -D__SAM4S16B__
 
-ARM_LDFLAGS  := -nostartfiles                    \
+ARM_LDFLAGS  := -nostartfiles         \
                 -mcpu=cortex-m4       \
                 -mthumb               \
                 -march=armv7e-m       \
@@ -101,12 +101,12 @@ AVR_PREFIX   := avr-
 
 # Directories that need to be included for this target.
 AVR_INC_DIRS := carbon/include        \
+				carbon/atmegau2/include\
                 kernel/include        \
                 library/include       \
                 runtime/include
 
 AVR_SRC_DIRS := carbon/atmegau2       \
-                carbon/src            \
                 runtime/arch/avr8     \
                 runtime/src
 
@@ -146,15 +146,18 @@ X86_PREFIX   :=
 
 # Directories that need to be included for this target.
 X86_INC_DIRS := carbon/include          \
+				carbon/atsam4s/include  \
+				carbon/atmegau2/include \
                 library/include         \
-                runtime/include
+                runtime/include         \
+				$(dir $(wildcard api/*))
 
 X86_SRC_DIRS := carbon/hal              \
-                carbon/src              \
                 library/src             \
                 runtime/arch/x64        \
                 library/platforms/posix \
-                runtime/src
+                runtime/src             \
+				$(dir $(wildcard api/*))
 
 X86_CFLAGS   := -fpic                   \
                 -DPOSIX                 \
@@ -166,10 +169,9 @@ X86_LDFLAGS  := $(shell pkg-config --libs libusb-1.0)
 # --- LIBFLIPPER --- #
 
 libflipper: $(X86_TARGET).so | $(BUILD)/include/flipper/.dir
-	$(_v)cp -r carbon/include/flipper/* $(BUILD)/include/flipper
-	$(_v)cp -r library/include/flipper/* $(BUILD)/include/flipper
-	$(_v)cp -r runtime/include/flipper/* $(BUILD)/include/flipper
-	$(_v)cp library/include/flipper.h $(BUILD)/include
+	$(_v)cp -r carbon/include/* $(BUILD)/include/flipper
+	$(_v)cp -r library/include/* $(BUILD)/include/flipper
+	$(_v)cp -r runtime/include/* $(BUILD)/include/flipper
 
 .PHONY: install-libflipper uninstall-libflipper
 
@@ -238,7 +240,7 @@ languages:: language-rust
 
 utils: libflipper | $(BUILD)/utils/.dir
 	$(_v)$(X86_CC) $(GLOBAL_CFLAGS) $(X86_CFLAGS) -o $(BUILD)/utils/fdfu utils/fdfu/src/*.c -L$(BUILD)/$(X86_TARGET) -lflipper
-	$(_v)$(X86_CC) $(GLOBAL_CFLAGS) $(X86_CFLAGS) -o $(BUILD)/utils/fdebug utils/fdebug/src/*.c $(shell pkg-config --libs libusb-1.0) -lflipper
+	$(_v)$(X86_CC) $(GLOBAL_CFLAGS) $(X86_CFLAGS) -o $(BUILD)/utils/fdebug utils/fdebug/src/*.c $(shell pkg-config --libs libusb-1.0) -L$(BUILD)/$(X86_TARGET) -lflipper
 	$(_v)$(X86_CC) $(GLOBAL_CFLAGS) $(X86_CFLAGS) -o $(BUILD)/utils/fload utils/fload/src/*.c -L$(BUILD)/$(X86_TARGET) -lflipper
 	$(_v)$(X86_CC) $(GLOBAL_CFLAGS) $(X86_CFLAGS) -o $(BUILD)/utils/fvm $(call find_srcs, utils/fvm/src) -L$(BUILD)/$(X86_TARGET) -lflipper -ldl
 	$(_v)cp utils/fdwarf/fdwarf.py $(BUILD)/utils/fdwarf

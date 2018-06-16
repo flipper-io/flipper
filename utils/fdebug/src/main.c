@@ -12,14 +12,14 @@ void sigint(int signal) {
 
 int main(int argc, char *argv[]) {
 
-	/* capture interrupt signal */
-	signal(SIGKILL, sigint);
-
-	struct libusb_context *context = NULL;
+    struct libusb_context *context = NULL;
 	struct libusb_device_handle *handle = NULL;
 	int e;
 	int len;
 	uint8_t buf[DEBUG_IN_SIZE];
+
+	/* capture interrupt signal */
+	signal(SIGKILL, sigint);
 
 	e = libusb_init(&context);
 	lf_assert(e == 0, E_LIBUSB, "Failed to initialize libusb.");

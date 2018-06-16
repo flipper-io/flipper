@@ -1,4 +1,5 @@
-#include <flipper/wdt.h>
+#include <api/wdt.h>
+#include "atmegau2.h"
 
 LF_FUNC("wdt") int wdt_configure(void) {
 	return lf_success;

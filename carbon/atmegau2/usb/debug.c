@@ -1,4 +1,6 @@
-#include <flipper/atmegau2/megausb.h>
+#include "carbon.h"
+#include "atmegau2.h"
+#include "megausb.h"
 
 volatile uint8_t debug_flush_timer=0;
 

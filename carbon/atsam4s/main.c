@@ -1,5 +1,6 @@
 #include <flipper.h>
-#include <os/scheduler.h>
+#include "atsam4s.h"
+#include "os/scheduler.h"
 
 /* How many clock cycles to wait before giving up initialization. */
 #define CLOCK_TIMEOUT 5000
@@ -75,56 +76,75 @@ int main(void) {
 	_4s = lf_device_create(atsam4s_read, atsam4s_write, atsam4s_release);
 	lf_attach(_4s);
 
-	extern struct _lf_module adc;
-	extern struct _lf_module button;
-	extern struct _lf_module dac;
-	extern struct _lf_module gpio;
-	extern struct _lf_module i2c;
-	extern struct _lf_module led;
-	extern struct _lf_module pwm;
-	extern struct _lf_module rtc;
-	extern struct _lf_module spi;
-	extern struct _lf_module swd;
-	extern struct _lf_module temp;
-	extern struct _lf_module timer;
-	extern struct _lf_module uart0;
-	extern struct _lf_module usart;
-	extern struct _lf_module usb;
-	extern struct _lf_module wdt;
+#if 0
 
+    /* peripheral configuration */
+
+    extern struct _lf_module adc;
 	dyld_register(_4s, &adc);
-	dyld_register(_4s, &button);
-	dyld_register(_4s, &dac);
-	dyld_register(_4s, &gpio);
-	dyld_register(_4s, &i2c);
-	dyld_register(_4s, &led);
-	dyld_register(_4s, &pwm);
-	dyld_register(_4s, &rtc);
-	dyld_register(_4s, &spi);
-	dyld_register(_4s, &swd);
-	dyld_register(_4s, &temp);
-	dyld_register(_4s, &timer);
-	dyld_register(_4s, &uart0);
-	dyld_register(_4s, &usart);
-	dyld_register(_4s, &usb);
-	dyld_register(_4s, &wdt);
+    adc_configure();
 
-	adc_configure();
-	button_configure();
-	dac_configure();
-	gpio_configure();
-	i2c_configure();
-	led_configure();
-	pwm_configure();
-	rtc_configure();
-	spi_configure();
-	swd_configure();
-	temp_configure();
-	timer_configure();
-	uart0_configure();
-	usart_configure();
-	usb_configure();
+    extern struct _lf_module button;
+	dyld_register(_4s, &button);
+    button_configure();
+
+    extern struct _lf_module dac;
+	dyld_register(_4s, &dac);
+    dac_configure();
+
+    extern struct _lf_module gpio;
+	dyld_register(_4s, &gpio);
+    gpio_configure();
+
+    extern struct _lf_module i2c;
+	dyld_register(_4s, &i2c);
+    i2c_configure();
+
+    extern struct _lf_module led;
+	dyld_register(_4s, &led);
+    led_configure();
+
+    extern struct _lf_module pwm;
+	dyld_register(_4s, &pwm);
+    pwm_configure();
+
+    extern struct _lf_module rtc;
+	dyld_register(_4s, &rtc);
+    rtc_configure();
+
+    extern struct _lf_module spi;
+	dyld_register(_4s, &spi);
+    spi_configure();
+
+    extern struct _lf_module swd;
+	dyld_register(_4s, &swd);
+    swd_configure();
+
+    extern struct _lf_module temp;
+	dyld_register(_4s, &temp);
+    temp_configure();
+
+    extern struct _lf_module timer;
+	dyld_register(_4s, &timer);
+    timer_configure();
+
+    extern struct _lf_module uart0;
+	dyld_register(_4s, &uart0);
+    uart0_configure();
+
+    extern struct _lf_module usart;
+	dyld_register(_4s, &usart);
+    usart_configure();
+
+    extern struct _lf_module usb;
+	dyld_register(_4s, &usb);
+    usb_configure();
+
+    extern struct _lf_module wdt;
+	dyld_register(_4s, &wdt);
 	wdt_configure();
+
+#endif
 
 	/* Enable the FSI pin. */
 	gpio_enable(FMR_PIN, 0);
@@ -152,6 +172,7 @@ void uart0_isr(void) {
 
 		UART0->UART_PTCR = UART_PTCR_RXTDIS | UART_PTCR_TXTDIS;
 
+        lf_error_set(E_OK);
 		fmr_perform(_4s, &packet);
 
 		/* Pull an FMR packet asynchronously to launch FMR. */

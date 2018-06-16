@@ -1,22 +1,7 @@
-#include <flipper/i2c.h>
+#include <api/i2c.h>
+#include "twi.h"
 
 LF_FUNC("i2c") int i2c_configure(void) {
-	/* Enable the TWI clock. */
-	PMC -> PMC_PCER0 = (1 << ID_TWI0);
-	/* Create a pinmask for the peripheral pins. */
-	const unsigned int I2C_PIN_MASK = (PIO_PA3A_TWD0 | PIO_PA4A_TWCK0);
-	/* Disable PIOA interrupts on the peripheral pins. */
-	PIOA -> PIO_IDR = I2C_PIN_MASK;
-	/* Disable the peripheral pins from use by the PIOA. */
-	PIOA -> PIO_PDR = I2C_PIN_MASK;
-	/* Hand control of the peripheral pins to peripheral A. */
-	PIOA -> PIO_ABCDSR[0] &= ~I2C_PIN_MASK;
-	PIOA -> PIO_ABCDSR[1] &= ~I2C_PIN_MASK;
-	/* Reset the TWI. */
-	TWI0 -> TWI_CR = TWI_CR_SVDIS | TWI_CR_MSDIS;
-	TWI0 -> TWI_CR = TWI_CR_SWRST;
-	/* Enter master mode. */
-	TWI0 -> TWI_CR = TWI_CR_MSEN;
 	return lf_success;
 }
 

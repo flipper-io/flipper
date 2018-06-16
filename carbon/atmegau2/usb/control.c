@@ -1,4 +1,6 @@
-#include <flipper/atmegau2/megausb.h>
+#include "flipper.h"
+#include "atmegau2.h"
+#include "megausb.h"
 
 volatile uint8_t megausb_configuration = 0;
 

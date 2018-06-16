@@ -6,19 +6,19 @@ void lf_set_debug_level(int level) {
 	lf_debug_level = level;
 }
 
-void lf_debug_call(struct _fmr_invocation *call) {
+void lf_debug_call(struct _fmr_call *call) {
 #ifdef __LF_DEBUG__
 	printf("call\n");
-	printf("  └─module:    0x%x\n", call->index);
+	printf("  └─module:    0x%x\n", call->module);
 	printf("  └─function:  0x%x\n", call->function);
 	char *typestrs[] = { "int8", "int16", "void", "int32", "int", "", "ptr", "int64" };
 	printf("  └─return:    %s\n", typestrs[call->ret & 0x7]);
-	printf("  └─types:     0x%x\n", call->types);
+	printf("  └─types:     0x%x\n", call->argt);
 	printf("  └─argc:      0x%x (%d arguments)\n", call->argc, call->argc);
 	printf("args\n");
 	/* Calculate the offset into the packet at which the arguments will be loaded. */
-	uint8_t *offset = call->parameters;
-	lf_types types = call->types;
+	uint8_t *offset = call->argv;
+	lf_types types = call->argt;
 	for (lf_argc i = 0; i < call->argc; i ++) {
 		lf_type type = types & lf_max_t;
 		lf_arg arg = 0;
@@ -35,21 +35,23 @@ void lf_debug_packet(struct _fmr_packet *packet, uint32_t length) {
 #ifdef __LF_DEBUG__
 	if (lf_debug_level != LF_DEBUG_LEVEL_ALL) return;
 
-	if (packet->header.magic == FMR_MAGIC_NUMBER) {
-		printf("header\n");
-		printf("  └─magic:     0x%x\n", packet->header.magic);
-		printf("  └─checksum:  0x%x\n", packet->header.checksum);
-		printf("  └─length:    %d bytes (%.02f%%)\n", packet->header.length, (float) packet->header.length/sizeof(struct _fmr_packet)*100);
-		char *classstrs[] = { "exec", "push", "pull", "dyld", "malloc", "free" };
-		printf("  └─class:     %s\n", classstrs[packet->header.type]);
+    struct _fmr_header hdr = packet->hdr;
 
-		struct _fmr_invocation_packet *invocation = (struct _fmr_invocation_packet *)(packet);
+	if (hdr.magic == FMR_MAGIC_NUMBER) {
+		printf("header\n");
+		printf("  └─magic:     0x%x\n", hdr.magic);
+		printf("  └─checksum:  0x%x\n", hdr.crc);
+		printf("  └─length:    %d bytes (%.02f%%)\n", hdr.len, (float) hdr.len/sizeof(struct _fmr_packet)*100);
+		char *classstrs[] = { "exec", "push", "pull", "dyld", "malloc", "free" };
+		printf("  └─class:     %s\n", classstrs[hdr.type]);
+
+		struct _fmr_call_packet *invocation = (struct _fmr_call_packet *)(packet);
 		struct _fmr_push_pull_packet *pushpull = (struct _fmr_push_pull_packet *)(packet);
 		struct _fmr_dyld_packet *dyld = (struct _fmr_dyld_packet *)(packet);
 		struct _fmr_memory_packet *mem = (struct _fmr_memory_packet *)(packet);
 
-		switch (packet->header.type) {
-			case fmr_execute_class:
+		switch (hdr.type) {
+			case fmr_rpc_class:
 				lf_debug_call(&invocation->call);
 			break;
 			case fmr_push_class:
@@ -79,7 +81,7 @@ void lf_debug_packet(struct _fmr_packet *packet, uint32_t length) {
 			if (i % 8 == 0 && i < length - 1) printf("\n");
 		}
 	} else {
-		printf("invalid magic number (0x%02x).\n", packet->header.magic);
+		printf("invalid magic number (0x%02x).\n", hdr.magic);
 	}
 	printf("\n\n-----------\n\n");
 #endif

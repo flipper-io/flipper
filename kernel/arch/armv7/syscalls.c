@@ -43,16 +43,6 @@ extern int _read(int file, char *ptr, int len) {
 }
 
 extern int _write(int file, char *ptr, int len) {
-	uint32_t state = PIOA->PIO_ODSR & FMR_PIN;
-	PIOA->PIO_SODR = FMR_PIN;
-	while (len --) uart0_put(*ptr++);
-	/* Wait a bit before raising the FMR pin. */
-	for (size_t i = 0; i < 0x3FF; i ++) __asm__ __volatile__("nop");
-	if (state) {
-		PIOA->PIO_SODR = FMR_PIN;
-	} else {
-		PIOA->PIO_CODR = FMR_PIN;
-	}
 	return 0;
 }
 

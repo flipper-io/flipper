@@ -1,6 +1,6 @@
-#include <flipper.h>
-
-#include <flipper/atmegau2/megausb.h>
+#include "flipper.h"
+#include "atmegau2.h"
+#include "megausb.h"
 
 static struct _fmr_packet packet;
 static struct _lf_device *_u2;
@@ -24,6 +24,8 @@ void loop(void) {
 
 		/* ensure the packet is valid */
 		lf_assert(e, E_USB, "failed to obtain usb packet");
+
+		lf_debug("performing");
 
 		/* execute the packet */
 		fmr_perform(_u2, &packet);
@@ -71,33 +73,38 @@ int main(void) {
 	PCICR |= (1 << PCIE1);
 
 	/* Create a flipper device. */
-#warning Make this static.
-
 	_u2 = lf_device_create(atmegau2_read, atmegau2_write, atmegau2_release);
 	lf_attach(_u2);
 
+#if 0
+
+    /* peripheral configuration */
+
 	extern struct _lf_module button;
+    dyld_register(_u2, &button);
+    button_configure();
+
 	extern struct _lf_module gpio;
+    dyld_register(_u2, &gpio);
+    gpio_configure();
+
 	extern struct _lf_module led;
+    led_configure();
+    dyld_register(_u2, &led);
+
 	extern struct _lf_module spi;
+    dyld_register(_u2, &spi);
+    spi_configure();
+
 	extern struct _lf_module uart0;
+    dyld_register(_u2, &uart0);
+    uart0_configure();
+
 	extern struct _lf_module wdt;
-
-	/* Register all of the modules on this device. */
-	dyld_register(_u2, &button);
-	dyld_register(_u2, &gpio);
-	dyld_register(_u2, &led);
-	dyld_register(_u2, &spi);
-	dyld_register(_u2, &uart0);
 	dyld_register(_u2, &wdt);
-
-	/* Configure all of the peripheral drivers. */
-	button_configure();
-	gpio_configure();
-	led_configure();
-	spi_configure();
-	uart0_configure();
 	wdt_configure();
+
+#endif
 
 	/* connect to the USB host */
 	usb_configure();

@@ -20,14 +20,16 @@
  *                        ------                    ------
  */
 
-#include <flipper.h>
-#include <flipper/posix/usb.h>
-#include <flipper/posix/network.h>
-#include <flipper/atmegau2/atmegau2.h>
+#include "flipper.h"
+
+#include "posix/usb.h"
+#include "posix/network.h"
+
+#include "atmegau2.h"
 
 void sam_reset(void) {
 	struct _lf_device *device = lf_get_selected();
-	carbon_select_u2(device);
+//	carbon_select_u2(device);
 
 	/* reset low (active) */
 	gpio_write(0, (1 << SAM_RESET_PIN));
@@ -40,7 +42,7 @@ void sam_reset(void) {
 
 int sam_enter_dfu(void) {
 	struct _lf_device *device = lf_get_selected();
-	carbon_select_u2(device);
+//	carbon_select_u2(device);
 
 	/* erase high, reset low (active) */
 	gpio_write((1 << SAM_ERASE_PIN), (1 << SAM_RESET_PIN));
@@ -55,7 +57,7 @@ int sam_enter_dfu(void) {
 
 int sam_off(void) {
 	struct _lf_device *device = lf_get_selected();
-	carbon_select_u2(device);
+//	carbon_select_u2(device);
 
 	/* power off, reset low */
 	gpio_write(0, (1 << SAM_POWER_PIN) | (1 << SAM_RESET_PIN));
@@ -66,7 +68,7 @@ int sam_off(void) {
 
 int sam_on(void) {
 	struct _lf_device *device = lf_get_selected();
-	carbon_select_u2(device);
+//	carbon_select_u2(device);
 
 	/* power on, reset high */
 	gpio_write((1 << SAM_POWER_PIN) | (1 << SAM_RESET_PIN), 0);
@@ -75,32 +77,10 @@ int sam_on(void) {
 	return lf_success;
 }
 
-struct _lf_device *carbon_select_4s(struct _lf_device *device) {
-	lf_assert(device, E_NULL, "invalid device");
-
-	struct _carbon_context *ctx = (struct _carbon_context *)device->_dev_ctx;
-	lf_select(ctx->_4s);
-
-	return ctx->_4s;
-fail:
-	return NULL;
-}
-
-struct _lf_device *carbon_select_u2(struct _lf_device *device) {
-	lf_assert(device, E_NULL, "invalid device");
-
-	struct _carbon_context *ctx = (struct _carbon_context *)device->_dev_ctx;
-	lf_select(ctx->_u2);
-
-	return ctx->_u2;
-fail:
-	return NULL;
-}
-
 int atsam4s_read(struct _lf_device *device, void *dst, uint32_t length) {
 	struct _lf_device *prev = lf_get_selected();
 	lf_assert(device, E_NULL, "invalid device");
-	carbon_select_u2(device);
+//	carbon_select_u2(device);
 
 	size_t size = 128;
 	while (length) {
@@ -124,7 +104,7 @@ fail:
 int atsam4s_write(struct _lf_device *device, void *src, uint32_t length) {
 	struct _lf_device *prev = lf_get_selected();
 	lf_assert(device, E_NULL, "invalid device");
-	carbon_select_u2(device);
+//	carbon_select_u2(device);
 
 	size_t size = 128;
 	while (length) {

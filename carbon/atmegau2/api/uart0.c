@@ -1,4 +1,5 @@
-#include <flipper/uart0.h>
+#include <api/uart0.h>
+#include "atmegau2.h"
 
 uint8_t idx = 0;
 
@@ -93,7 +94,7 @@ fail:
 	return lf_error;
 }
 
-#include <flipper/atmegau2/megausb.h>
+#include "megausb.h"
 
 ISR(USART1_RX_vect) {
 	while (!(UCSR1A & (1 << RXC1)));
