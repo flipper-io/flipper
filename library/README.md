@@ -1,5 +1,6 @@
-# Library
+# Runtime
 
+<<<<<<< HEAD
 `libflipper` is the platform level library that gives developers access to
 Flipper hardware.
 
@@ -50,3 +51,7 @@ itself.
 
 To learn more about using fvm, see the WiKi page
 [here](https://github.com/georgemorgan/flipper/wiki/Flipper-Virtual-Machine).
+=======
+The runtime is the cross-platform implementation that communicates with a
+Flipper HAL.
+>>>>>>> restructure project, separate makefiles, fix asf

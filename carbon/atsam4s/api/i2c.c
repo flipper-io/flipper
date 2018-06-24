@@ -1,5 +1,5 @@
 #include <api/i2c.h>
-#include "twi.h"
+#include <twi/twi.h>
 
 LF_FUNC("i2c") int i2c_configure(void) {
 	return lf_success;

@@ -22,7 +22,7 @@
 #define XLEN 128
 
 /* Defines the layout of an XMODEM packet. */
-struct __attribute__((__packed__)) _xpacket {
+struct _xpacket {
 	uint8_t header;
 	uint8_t number;
 	uint8_t _number;

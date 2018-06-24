@@ -1,5 +1,6 @@
 #include <flipper.h>
-#include "posix/network.h"
+#include "network.h"
+#include <unistd.h>
 
 int lf_network_read(struct _lf_device *device, void *dst, uint32_t length) {
 	lf_assert(device, E_NULL, "invalid device");

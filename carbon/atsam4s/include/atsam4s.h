@@ -9,7 +9,7 @@
 #endif
 
 /* Include ASF header. */
-#include "asf/sam4s.h"
+#include "sam4s.h"
 
 /* Run at a base frequency of 96MHz. */
 #define F_CPU 96000000

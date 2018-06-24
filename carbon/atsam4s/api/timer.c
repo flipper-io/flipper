@@ -1,5 +1,5 @@
 #include <api/timer.h>
-#include "tc.h"
+#include <tc/tc.h>
 
 LF_FUNC("timer") int timer_configure(void) {
 	return lf_success;

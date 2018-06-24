@@ -1,6 +1,7 @@
 /* libusb.c - USB endpoint wrapper using libusb. */
 
 #include <flipper.h>
+#include "usb.h"
 #include <libusb.h>
 
 #define LF_USB_TIMEOUT_MS 200
@@ -8,6 +9,8 @@
 struct _lf_libusb_context {
 	struct libusb_device_handle *handle;
 	struct libusb_context *context;
+    uint8_t in_sz, out_sz;
+    uint8_t in, out;
 };
 
 int lf_libusb_read(struct _lf_device *device, void *dst, uint32_t length) {
@@ -22,10 +25,10 @@ int lf_libusb_read(struct _lf_device *device, void *dst, uint32_t length) {
 	lf_assert(ctx, E_NULL, "invalid context");
 
 	while (length) {
-        len = (length > BULK_IN_SIZE) ? BULK_IN_SIZE : length;
+        len = (length > ctx->in_sz) ? ctx->in_sz : length;
 
 		lf_debug("Reading %i from libusb.", length);
-        e = libusb_bulk_transfer(ctx->handle, BULK_IN_ENDPOINT, dst, len, &actual, LF_USB_TIMEOUT_MS);
+        e = libusb_bulk_transfer(ctx->handle, ctx->in, dst, len, &actual, LF_USB_TIMEOUT_MS);
 		lf_assert(e == 0, E_LIBUSB, "read transfer failed (%s)", libusb_error_name(e));
 
 		dst += len;
@@ -49,10 +52,10 @@ int lf_libusb_write(struct _lf_device *device, void *src, uint32_t length) {
 	lf_assert(ctx, E_NULL, "invalid context");
 
 	while (length) {
-        len = (length > BULK_OUT_SIZE) ? BULK_OUT_SIZE : length;
+        len = (length > ctx->out_sz) ? ctx->out_sz : length;
 
 		lf_debug("Sending %i through libusb.", length);
-        e = libusb_bulk_transfer(ctx->handle, BULK_OUT_ENDPOINT, src, len, &actual, LF_USB_TIMEOUT_MS);
+        e = libusb_bulk_transfer(ctx->handle, ctx->out, src, len, &actual, LF_USB_TIMEOUT_MS);
 		lf_assert(e == 0, E_LIBUSB, "write transfer failed (%s)", libusb_error_name(e));
 
 		src += len;
@@ -111,7 +114,7 @@ struct _lf_ll *lf_libusb_devices_for_vid_pid(uint16_t vid, uint16_t pid) {
             e = libusb_open(libusb_device, &(ctx->handle));
 			lf_assert(e == 0, E_NO_DEVICE, "Could not find any devices connected via USB. Ensure that a device is connected.");
 
-            e = libusb_claim_interface(ctx->handle, FMR_INTERFACE);
+            e = libusb_claim_interface(ctx->handle, 0);
 			lf_assert(e == 0, E_LIBUSB, "Failed to claim interface on attached device. Please quit any other programs using your device.");
 
 			lf_assert(lf_ll_append(&devices, device, lf_device_release), E_NULL, "failed to append to device list");
