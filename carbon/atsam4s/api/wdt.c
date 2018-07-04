@@ -1,4 +1,5 @@
-#include <api/wdt.h>
+#include <flipper.h>
+#include "wdt.h"
 #include <wdt/wdt.h>
 
 LF_FUNC("wdt") int wdt_configure(void) {

@@ -1,4 +1,5 @@
-#include <api/button.h>
+#include <flipper.h>
+#include "button.h"
 #include "atmegau2.h"
 
 LF_FUNC("button") int button_configure(void) {

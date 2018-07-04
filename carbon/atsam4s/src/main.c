@@ -1,7 +1,7 @@
 #include <flipper.h>
 #include "atsam4s.h"
 #include "os/scheduler.h"
-#include <api/gpio.h>
+#include "gpio.h"
 
 /* How many clock cycles to wait before giving up initialization. */
 #define CLOCK_TIMEOUT 5000

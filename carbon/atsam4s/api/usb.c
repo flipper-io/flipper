@@ -1,4 +1,5 @@
-#include <api/usb.h>
+#include <flipper.h>
+#include "usb.h"
 
 LF_FUNC("usb") int usb_configure(void) {
 	return lf_success;

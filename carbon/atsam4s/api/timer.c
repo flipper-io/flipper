@@ -1,4 +1,5 @@
-#include <api/timer.h>
+#include <flipper.h>
+#include "timer.h"
 #include <tc/tc.h>
 
 LF_FUNC("timer") int timer_configure(void) {

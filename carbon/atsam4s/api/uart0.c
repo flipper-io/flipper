@@ -1,4 +1,5 @@
-#include <api/uart0.h>
+#include <flipper.h>
+#include "uart0.h"
 
 LF_FUNC("uart0") int uart0_configure(void) {
 

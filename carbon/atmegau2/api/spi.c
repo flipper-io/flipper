@@ -1,4 +1,5 @@
-#include <api/spi.h>
+#include <flipper.h>
+#include "spi.h"
 #include "atmegau2.h"
 
 #define SPI_DATA_MODE_0 0x00

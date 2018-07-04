@@ -1,4 +1,5 @@
-#include <api/usart.h>
+#include <flipper.h>
+#include "usart.h"
 //#include <usart/usart.h>
 
 LF_FUNC("usart") int usart_configure(void) {

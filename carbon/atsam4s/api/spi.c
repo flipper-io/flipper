@@ -1,4 +1,5 @@
-#include <api/spi.h>
+#include <flipper.h>
+#include "spi.h"
 //#include <spi/spi.h>
 
 LF_FUNC("spi") int spi_configure() {

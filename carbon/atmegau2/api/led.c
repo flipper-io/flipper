@@ -1,4 +1,5 @@
-#include <api/led.h>
+#include <flipper.h>
+#include "led.h"
 #include "atmegau2.h"
 
 LF_FUNC("led") int led_configure(void) {

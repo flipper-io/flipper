@@ -1,4 +1,5 @@
-#include <api/led.h>
+#include <flipper.h>
+#include "led.h"
 
 LF_FUNC("led") int led_configure(void) {
 	return lf_success;

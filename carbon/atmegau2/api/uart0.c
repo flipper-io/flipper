@@ -1,4 +1,5 @@
-#include <api/uart0.h>
+#include <flipper.h>
+#include "uart0.h"
 #include "atmegau2.h"
 
 uint8_t idx = 0;

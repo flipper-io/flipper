@@ -1,4 +1,5 @@
-#include <api/temp.h>
+#include <flipper.h>
+#include "temp.h"
 #include <adc/adc.h>
 
 LF_FUNC("temp") int temp_configure(void) {

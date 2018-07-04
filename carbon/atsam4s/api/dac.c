@@ -1,4 +1,5 @@
-#include <api/dac.h>
+#include <flipper.h>
+#include "dac.h"
 #include <dacc/dacc.h>
 
 LF_FUNC("dac") int dac_configure(void) {

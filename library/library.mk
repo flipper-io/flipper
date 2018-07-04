@@ -9,7 +9,7 @@ LIB_LDFLAGS  :=
 
 LIBFLIPPER_TARGET := libflipper
 LIBFLIPPER_PREFIX :=
-LIBFLIPPER_INC_DIRS := $(LIB_INC_DIRS)
+LIBFLIPPER_INC_DIRS := $(LIB_INC_DIRS) api/c
 LIBFLIPPER_SRC_DIRS := $(LIB_SRC_DIRS) library/arch/x64 library/platforms/posix
 LIBFLIPPER_CFLAGS := $(LIB_CFLAGS) $(shell pkg-config --cflags libusb-1.0)
 LIBFLIPPER_LDFLAGS := $(LIB_LDFLAGS) $(shell pkg-config --libs libusb-1.0)
