@@ -20,13 +20,12 @@
  *                        ------                    ------
  */
 
-#include "flipper.h"
-
-#include <posix/usb.h>
-#include <posix/network.h>
-#include <libusb.h>
-
+#include "libflipper.h"
+#include "carbon.h"
+#include "posix/usb.h"
+#include "posix/network.h"
 #include "atmegau2.h"
+#include <unistd.h>
 
 void sam_reset(void) {
 	struct _lf_device *device = lf_get_selected();
@@ -156,9 +155,11 @@ fail:
 /* Attaches to all of the Carbon devices available on the system. */
 int carbon_attach(void) {
     /* TODO: Set in, out, in_sz, out_sz */
-	struct _lf_ll *_u2s = lf_libusb_devices_for_vid_pid(FLIPPER_USB_VENDOR_ID, USB_PRODUCT_ID);
-	if (!_u2s) return lf_error;
-	return lf_ll_apply_func(_u2s, carbon_attach_u2s, NULL);
+	struct _lf_ll *devices = lf_libusb_get_devices();
+	lf_assert(devices, E_NO_DEVICE, "no carbon devices");
+	return lf_ll_apply_func(devices, carbon_attach_u2s, NULL);
+fail:
+	return lf_error;
 }
 
 struct _lf_device *carbon_attach_hostname(char *hostname) {

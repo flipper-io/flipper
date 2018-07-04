@@ -45,8 +45,6 @@
 #define BULK_OUT_ENDPOINT		0x02
 #define BULK_OUT_SIZE			64
 
-#define CONTROL_INTERFACE       0
-
 #define DEBUG_INTERFACE			1
 #define DEBUG_IN_ENDPOINT		(0x03 | USB_IN_MASK)
 #define DEBUG_IN_SIZE			32

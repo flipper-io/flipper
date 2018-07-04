@@ -18,6 +18,7 @@
 #include <string.h>
 
 #define FLIPPER_USB_VENDOR_ID 0x16C0
+#define FLIPPER_USB_CONTROL_INTERFACE 0
 
 /* Terminal colors. */
 #ifdef LF_CONFIG_NO_COLOR

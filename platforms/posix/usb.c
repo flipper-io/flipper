@@ -81,27 +81,36 @@ fail:
 	return lf_error;
 }
 
-struct _lf_ll *lf_libusb_devices_for_vid_pid(uint16_t vid, uint16_t pid) {
+/*
+   Returns a list of all of the Flipper devices attached over USB.
+
+   If a USB device has the Flipper VID, its control endpoint is claimed.
+*/
+
+struct _lf_ll *lf_libusb_get_devices(void) {
 
 	struct libusb_context *context = NULL;
 	struct libusb_device **libusb_devices = NULL;
-	struct libusb_device *libusb_device = NULL;
 	struct libusb_device_descriptor descriptor;
 	struct _lf_ll *devices = NULL;
 	struct _lf_device *device = NULL;
+	size_t count = 0;
     int e;
 
     e = libusb_init(&context);
 	lf_assert(e == 0, E_LIBUSB, "failed to initialize libusb");
 
-	size_t device_count = libusb_get_device_list(context, &libusb_devices);
-	for (size_t i = 0; i < device_count; i ++) {
-		libusb_device = libusb_devices[i];
+	count = libusb_get_device_list(context, &libusb_devices);
+
+	for (size_t i = 0; i < count; i ++) {
+
+		struct libusb_device *libusb_device = libusb_devices[i];
 
 		e = libusb_get_device_descriptor(libusb_device, &descriptor);
 		lf_assert(e == 0, E_LIBUSB, "failed to obtain descriptor for device");
 
-		if (descriptor.idVendor == vid && descriptor.idProduct == pid) {
+		/* check that the device's VID matches our VID */
+		if (descriptor.idVendor == FLIPPER_USB_VENDOR_ID) {
 			device = lf_device_create(lf_libusb_read, lf_libusb_write, lf_libusb_release);
 			lf_assert(device, E_ENDPOINT, "failed to create device");
 
@@ -114,7 +123,7 @@ struct _lf_ll *lf_libusb_devices_for_vid_pid(uint16_t vid, uint16_t pid) {
             e = libusb_open(libusb_device, &(ctx->handle));
 			lf_assert(e == 0, E_NO_DEVICE, "Could not find any devices connected via USB. Ensure that a device is connected.");
 
-            e = libusb_claim_interface(ctx->handle, 0);
+            e = libusb_claim_interface(ctx->handle, FLIPPER_USB_CONTROL_INTERFACE);
 			lf_assert(e == 0, E_LIBUSB, "Failed to claim interface on attached device. Please quit any other programs using your device.");
 
 			lf_assert(lf_ll_append(&devices, device, lf_device_release), E_NULL, "failed to append to device list");
