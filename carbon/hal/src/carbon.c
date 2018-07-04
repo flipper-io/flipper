@@ -129,42 +129,59 @@ int atsam4s_release(struct _lf_device *device) {
 	return lf_success;
 }
 
-int carbon_attach_u2s(const void *__u2, void *_unused) {
+int carbon_attach_applier(const void *__u2, void *_unused) {
 	struct _lf_device *_u2 = (struct _lf_device *)__u2;
-	_u2->_dev_ctx = calloc(1, sizeof(struct _carbon_context));
-	struct _carbon_context *_u2_context = (struct _carbon_context *)_u2->_dev_ctx;
-	lf_assert(_u2_context, E_NULL, "Failed to allocate memory for context");
+	struct _carbon_context *dev_ctx = NULL;
+	struct _lf_libusb_context *ep_ctx = NULL;
+	struct _lf_device *_4s = NULL;
 
-	struct _lf_device *_4s = lf_device_create(atsam4s_read, atsam4s_write, atsam4s_release);
-	lf_assert(_4s, E_NULL, "Failed to create 4s subdevice");
+	lf_assert(__u2, E_NULL, "invalid carbon device");
+
+	_u2->_dev_ctx = calloc(1, sizeof(struct _carbon_context));
+
+	dev_ctx = (struct _carbon_context *)_u2->_dev_ctx;
+	lf_assert(dev_ctx, E_NULL, "failed to allocate device context");
+
+	ep_ctx = (struct _lf_libusb_context *)_u2->_ep_ctx;
+	lf_assert(ep_ctx, E_NULL, "invalid endpoint context");
+
+	/* set endpoint information */
+	ep_ctx->in_sz = BULK_IN_SIZE;
+	ep_ctx->out_sz = BULK_OUT_SIZE;
+	ep_ctx->in = BULK_IN_ENDPOINT;
+	ep_ctx->out = BULK_OUT_ENDPOINT;
+
+	_4s = lf_device_create(atsam4s_read, atsam4s_write, atsam4s_release);
+	lf_assert(_4s, E_NULL, "failed to create 4s subdevice");
 
 	_4s->_dev_ctx = calloc(1, sizeof(struct _carbon_context));
 	struct _carbon_context *_4s_context = (struct _carbon_context *)_4s->_dev_ctx;
-	lf_assert(_4s_context, E_NULL, "Failed to allocate memory for context");
+	lf_assert(_4s_context, E_NULL, "failed to allocate memory for 4s context");
 
-	_u2_context->_u2 = _4s_context->_u2 = _u2;
-	_u2_context->_4s = _4s_context->_4s = _4s;
+	dev_ctx->_u2 = _4s_context->_u2 = _u2;
+	dev_ctx->_4s = _4s_context->_4s = _4s;
 
 	return lf_attach(_4s);
 fail:
 	return lf_error;
 }
 
-#warning Carbon is broken until carbon context is reinstated.
-
 /* Attaches to all of the Carbon devices available on the system. */
 int carbon_attach(void) {
-    /* TODO: Set in, out, in_sz, out_sz */
+
 	struct _lf_ll *devices = lf_libusb_get_devices();
 	lf_assert(devices, E_NO_DEVICE, "no carbon devices");
-	return lf_ll_apply_func(devices, carbon_attach_u2s, NULL);
+
+	return lf_ll_apply_func(devices, carbon_attach_applier, NULL);
 fail:
 	return lf_error;
 }
 
 struct _lf_device *carbon_attach_hostname(char *hostname) {
+
 	struct _lf_device *device = lf_network_device_for_hostname(hostname);
 	lf_assert(device, E_NO_DEVICE, "Failed to find Carbon device with hostname '%s'.", hostname);
+
 	lf_attach(device);
 	return device;
 

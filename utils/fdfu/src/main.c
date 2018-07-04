@@ -223,7 +223,7 @@ int main(int argc, char *argv[]) {
 	//lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
 
 	/* Attach to a Flipper device. */
-	struct _lf_device *device = flipper.attach();
+	struct _lf_device *device = carbon_attach();
 //	carbon_select_u2(device);
 
 	/* Open the firmware image. */
