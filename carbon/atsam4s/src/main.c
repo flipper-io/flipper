@@ -6,7 +6,7 @@
 /* How many clock cycles to wait before giving up initialization. */
 #define CLOCK_TIMEOUT 5000
 
-struct _fmr_packet packet;
+static struct _fmr_packet packet;
 static struct _lf_device *_4s;
 
 extern void uart0_put(uint8_t byte);
@@ -77,8 +77,6 @@ int main(void) {
 	_4s = lf_device_create(atsam4s_read, atsam4s_write, atsam4s_release);
 	lf_attach(_4s);
 
-#if 0
-
     /* peripheral configuration */
 
     extern struct _lf_module adc;
@@ -144,8 +142,6 @@ int main(void) {
     extern struct _lf_module wdt;
 	dyld_register(_4s, &wdt);
 	wdt_configure();
-
-#endif
 
 	/* Enable the FSI pin. */
 	gpio_enable(FMR_PIN, 0);

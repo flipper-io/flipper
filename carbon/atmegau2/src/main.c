@@ -78,8 +78,6 @@ int main(void) {
 	_u2 = lf_device_create(atmegau2_read, atmegau2_write, atmegau2_release);
 	lf_attach(_u2);
 
-#if 0
-
     /* peripheral configuration */
 
 	extern struct _lf_module button;
@@ -105,8 +103,6 @@ int main(void) {
 	extern struct _lf_module wdt;
 	dyld_register(_u2, &wdt);
 	wdt_configure();
-
-#endif
 
 	/* connect to the USB host */
 	usb_configure();
