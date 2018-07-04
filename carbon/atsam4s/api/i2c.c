@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include "libflipper.h"
 #include "i2c.h"
 #include <twi/twi.h>
 

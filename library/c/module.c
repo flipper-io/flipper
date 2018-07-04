@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include "libflipper.h"
 
 struct _lf_module *lf_module_create(const char *name, int idx) {
 	lf_assert(name, E_NULL, "No name");

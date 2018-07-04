@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include "libflipper.h"
 
 int lf_debug_level = LF_DEBUG_LEVEL_OFF;
 
@@ -7,7 +7,7 @@ void lf_set_debug_level(int level) {
 }
 
 void lf_debug_call(struct _fmr_call *call) {
-#ifdef __LF_DEBUG__
+#ifndef LF_DISABLE_DEBUG
 	printf("call\n");
 	printf("  └─module:    0x%x\n", call->module);
 	printf("  └─function:  0x%x\n", call->function);
@@ -32,7 +32,7 @@ void lf_debug_call(struct _fmr_call *call) {
 }
 
 void lf_debug_packet(struct _fmr_packet *packet, uint32_t length) {
-#ifdef __LF_DEBUG__
+#ifndef LF_DISABLE_DEBUG
 	if (lf_debug_level != LF_DEBUG_LEVEL_ALL) return;
 
     struct _fmr_header hdr = packet->hdr;

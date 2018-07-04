@@ -53,7 +53,7 @@ struct _carbon_context {
 };
 
 /* Attaches to all carbon devices. */
-int carbon_attach(void);
+struct _lf_device *carbon_attach(void);
 /* Attaches to a carbon device over the network. */
 struct _lf_device *carbon_attach_hostname(char *hostname);
 

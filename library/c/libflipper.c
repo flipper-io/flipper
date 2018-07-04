@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include "libflipper.h"
 
 static struct _lf_ll *lf_attached_devices;
 static struct _lf_device *lf_current_device;

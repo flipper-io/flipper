@@ -1,4 +1,4 @@
-#include "flipper.h"
+#include "libflipper.h"
 #include "os/exceptions.h"
 
 extern uint32_t _sfixed;

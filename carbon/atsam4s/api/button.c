@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include "libflipper.h"
 #include "button.h"
 
 LF_FUNC("button") int button_configure(void) {

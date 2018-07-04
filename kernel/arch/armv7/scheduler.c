@@ -1,6 +1,6 @@
 /* Osmium scheduler implementation. */
 
-#include <flipper.h>
+#include "libflipper.h"
 #include "os/scheduler.h"
 #include "atsam4s.h"
 

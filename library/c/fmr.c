@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include "libflipper.h"
 
 struct _lf_arg *lf_arg_create(lf_type type, lf_arg value) {
 
@@ -207,9 +207,9 @@ int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet) {
 
 	/* Ensure the packet's checksums match. */
 	_crc = hdr->crc;
-    memset(&hdr->crc, 0, sizeof(hdr->crc));
+    hdr->crc = 0;
 	lf_crc(packet, hdr->len, &crc);
-	lf_assert(!memcmp(&_crc, &crc, sizeof(crc)), E_CHECKSUM, "checksums do not match");
+	lf_assert(!memcmp(&_crc, &crc, sizeof(crc)), E_CHECKSUM, "checksums do not match (0x%04x/0x%04x)", _crc, crc);
 
     /* clear error state */
 	lf_error_set(E_OK);

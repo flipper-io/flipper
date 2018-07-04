@@ -5,7 +5,7 @@
 #include "libflipper.h"
 
 /* Include the 'Flipper: Carbon Edition' device support header. */
-//#include "carbon.h"
+#include "carbon.h"
 
 /* Include the header files for all of the standard modules exposed by the toolbox. */
 #include "adc.h"

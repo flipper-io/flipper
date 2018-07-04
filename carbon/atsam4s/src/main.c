@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include "libflipper.h"
 #include "atsam4s.h"
 #include "os/scheduler.h"
 #include "gpio.h"

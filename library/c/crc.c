@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include "libflipper.h"
 
 /*                                      16   12   5
    This is the CCITT CRC 16 polynomial X  + X  + X  + 1. */

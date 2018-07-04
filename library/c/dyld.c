@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include "libflipper.h"
 
 int dyld_register(struct _lf_device *device, struct _lf_module *module) {
     lf_assert(device, E_NULL, "invalid device");

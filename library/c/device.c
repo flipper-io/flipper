@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include "libflipper.h"
 
 /* Creates a new libflipper device. */
 struct _lf_device *lf_device_create(int (* read)(struct _lf_device *device, void *dst, uint32_t length),

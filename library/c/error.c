@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include "libflipper.h"
 #include <stdarg.h>
 
 #define LF_ERROR_MESSAGE_STRINGS "no error", \

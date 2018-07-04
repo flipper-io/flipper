@@ -3,9 +3,6 @@
 #ifndef __scheduler_h__
 #define __scheduler_h__
 
-#include <flipper.h>
-#include <os/loader.h>
-
 /* An enumerated type of possible task states. */
 typedef enum {
 	os_task_status_unallocated,

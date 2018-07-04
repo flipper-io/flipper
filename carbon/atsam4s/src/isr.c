@@ -1,4 +1,4 @@
-#include "flipper.h"
+#include "libflipper.h"
 
 void null_isr(void) {
 	while (1) __asm__ __volatile__ ("nop");
