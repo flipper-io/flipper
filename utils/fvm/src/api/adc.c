@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include "libflipper.h"
 
 LF_FUNC("adc") int adc_configure(void) {
 	printf("Configured the adc.\n");

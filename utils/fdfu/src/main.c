@@ -1,5 +1,6 @@
 #include <unistd.h>
-#include <flipper.h>
+#include <flipper/flipper.h>
+#include "atmegau2.h"
 
 /* Define bit manipulation macros. */
 #define lo(x) ((uint8_t)(x))

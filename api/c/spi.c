@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include "libflipper.h"
 
 enum { _spi_read, _spi_write, _spi_get, _spi_put, _spi_end, _spi_ready, _spi_disable, _spi_enable, _spi_configure };
 

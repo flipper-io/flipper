@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include "libflipper.h"
 
 enum { _button_read, _button_configure };
 

@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include "libflipper.h"
 
 enum { _gpio_read, _gpio_write, _gpio_enable, _gpio_configure };
 

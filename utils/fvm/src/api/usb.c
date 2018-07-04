@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include "libflipper.h"
 
 LF_FUNC("usb") int usb_configure(void) {
 	printf("Configured USB.\n");

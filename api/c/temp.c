@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include "libflipper.h"
 
 enum { _temp_configure };
 

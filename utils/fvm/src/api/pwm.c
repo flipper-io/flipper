@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include "libflipper.h"
 
 LF_FUNC("pwm") int pwm_configure(void) {
 	printf("Configured the pwm.\n");

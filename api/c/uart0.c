@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include "libflipper.h"
 
 enum { _uart0_read, _uart0_write, _uart0_get, _uart0_put, _uart0_ready, _uart0_reset, _uart0_setbaud, _uart0_configure, _uart0_enable };
 

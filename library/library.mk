@@ -19,6 +19,7 @@ TARGETS += LIBFLIPPER
 
 libflipper: libflipper.so | $(BUILD)/include/flipper/.dir
 	$(_v)cp -r carbon/hal/include/* $(BUILD)/include/flipper
+	$(_v)cp -r api/c/*.h $(BUILD)/include/flipper
 	$(_v)cp -r library/c/*.h $(BUILD)/include/flipper
 
 .PHONY: install-libflipper uninstall-libflipper

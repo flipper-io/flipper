@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include "libflipper.h"
 
 enum { _i2c_stop, _i2c_write, _i2c_read, _i2c_configure, _i2c_start_read };
 

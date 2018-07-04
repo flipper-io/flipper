@@ -106,7 +106,7 @@ test: libflipper
 # --- LANGUAGES --- #
 
 install-python:
-	$(_v)pip3 install languages/python --upgrade -q
+	$(_v)pip3 install library/python --upgrade -q
 
 install:: install-python
 

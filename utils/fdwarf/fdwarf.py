@@ -82,7 +82,7 @@ def generate_c(modules, outdir):
 	for m in modules:
 		outc = open(os.path.join(outdir, m.name + ".c"), "w")
 		ctemplate = """\
-#include <flipper.h>
+#include "libflipper.h"
 
 enum { $TAGS$ };
 

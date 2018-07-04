@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include "libflipper.h"
 
 int main(int argc, char *argv[]) {
 

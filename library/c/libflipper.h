@@ -21,6 +21,7 @@
 #define FLIPPER_USB_CONTROL_INTERFACE 0
 
 /* Terminal colors. */
+#define LF_CONFIG_NO_COLOR
 #ifdef LF_CONFIG_NO_COLOR
 #define KNRM ""
 #define KGRN ""
