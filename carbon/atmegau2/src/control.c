@@ -1,6 +1,9 @@
-#include "flipper.h"
+#include "libflipper.h"
 #include "atmegau2.h"
 #include "megausb.h"
+
+extern const uint8_t PROGMEM endpoint[];
+extern const struct _descriptor PROGMEM descriptors[NUM_DESC_LIST];
 
 volatile uint8_t megausb_configuration = 0;
 
@@ -116,13 +119,13 @@ ISR(USB_COM_vect) {
 				}
 				desc_val = pgm_read_word(list);
 				if (desc_val != wValue) {
-					list += sizeof(struct descriptor);
+					list += sizeof(struct _descriptor);
 					continue;
 				}
 				list += 2;
 				desc_val = pgm_read_word(list);
 				if (desc_val != wIndex) {
-					list += sizeof(struct descriptor)-2;
+					list += sizeof(struct _descriptor)-2;
 					continue;
 				}
 				list += 2;

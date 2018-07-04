@@ -48,14 +48,12 @@ extern volatile uint8_t megausb_configuration;
 
 #define NUM_DESC_LIST 5
 
-extern const uint8_t PROGMEM endpoint[];
-
-extern const struct descriptor {
+struct _descriptor {
 	uint16_t value;
 	uint16_t index;
 	const uint8_t *address;
 	uint8_t length;
-} PROGMEM descriptors[NUM_DESC_LIST];
+};
 
 int megausb_interrupt_receive(void *dst, uint32_t length);
 int megausb_interrupt_transmit(void *src, uint32_t length);
@@ -64,5 +62,7 @@ int megausb_bulk_receive(void *dst, uint32_t length);
 int megausb_bulk_transmit(void *src, uint32_t length);
 
 int usb_debug_putchar(uint8_t c);
+
+int usb_configure(void);
 
 #endif

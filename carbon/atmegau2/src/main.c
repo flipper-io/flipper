@@ -1,4 +1,6 @@
-#include "flipper.h"
+#include "libflipper.h"
+#include "led.h"
+#include "megausb.h"
 #include "atmegau2.h"
 #include "megausb.h"
 

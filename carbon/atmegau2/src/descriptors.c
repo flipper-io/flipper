@@ -126,7 +126,7 @@ static const struct usb_string PROGMEM product = {
     sizeof(USB_PRODUCT), 0x03, USB_PRODUCT
 };
 
-const struct descriptor PROGMEM descriptors[] = {
+const struct _descriptor PROGMEM descriptors[] = {
     { 0x0100, 0x0000, device_descriptor, sizeof(device_descriptor) },
     { 0x0200, 0x0000, configuration, sizeof(configuration) },
     { 0x0300, 0x0000, (const uint8_t *)(&language), 4 },

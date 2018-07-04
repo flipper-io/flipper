@@ -1,4 +1,4 @@
-#include "flipper.h"
+#include "libflipper.h"
 #include <stdarg.h>
 #include "atmegau2.h"
 
