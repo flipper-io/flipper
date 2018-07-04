@@ -4,12 +4,11 @@ ATSAM4S_PREFIX   := arm-none-eabi-
 ATSAM4S_INC_DIRS := api/c                  \
                     carbon/atsam4s/include \
                     kernel/include         \
-                    library/include        \
+                    library/c              \
 
 ATSAM4S_SRC_DIRS := carbon/atsam4s         \
                     kernel/arch/armv7      \
-                    library/arch/armv7     \
-                    library/src            \
+                    library/c              \
 
 ATSAM4S_CFLAGS   := -mcpu=cortex-m4       \
                     -mthumb               \

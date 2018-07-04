@@ -8,7 +8,7 @@
 #define lf_device_big_endian    1
 #define lf_device_little_endian 0
 
-enum {
+typedef enum {
     FLIPPER_DEVICE_CARBON,
     FLIPPER_DEVICE_INVALID
 } lf_device_t;

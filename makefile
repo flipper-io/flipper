@@ -221,5 +221,3 @@ $(foreach target,$(TARGETS),$(call generate_target,$(target)))
 
 clean:
 	$(_v)rm -rf $(BUILD)
-	$(_v)cargo clean --manifest-path=console/Cargo.toml
-	$(_v)cargo clean --manifest-path=languages/rust/Cargo.toml

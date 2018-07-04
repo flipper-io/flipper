@@ -7,11 +7,11 @@ ATMEGAU2_PREFIX   := avr-
 ATMEGAU2_INC_DIRS := api/c                   \
                      carbon/atmegau2/include \
                      kernel/include          \
-                     library/include         \
+                     library/c               \
 
 ATMEGAU2_SRC_DIRS := carbon/atmegau2         \
-                     library/arch/avr8       \
-                     library/src
+                     kernel/arch/avr8       \
+                     library/c               \
 
 ATMEGAU2_CFLAGS   := -mmcu=atmega32u2        \
                      -DARCH=ARCH_AVR8        \
@@ -19,7 +19,7 @@ ATMEGAU2_CFLAGS   := -mmcu=atmega32u2        \
                      -DF_CPU=16000000UL      \
                      -DATMEGAU2              \
 
-ATMEGAU2_LDFLAGS  := -mmcu=atmega32u2 \
+ATMEGAU2_LDFLAGS  := -mmcu=atmega32u2        \
 				     -Wl,--gc-sections
 
 TARGETS += ATMEGAU2
