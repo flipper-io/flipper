@@ -18,6 +18,7 @@ ATMEGAU2_CFLAGS   := -mmcu=atmega32u2        \
                      -D__AVR_ATmega32U2__    \
                      -DF_CPU=16000000UL      \
                      -DATMEGAU2              \
+					 -DLF_DISABLE_DEBUG      \
 
 ATMEGAU2_LDFLAGS  := -mmcu=atmega32u2        \
 				     -Wl,--gc-sections
