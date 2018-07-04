@@ -17,6 +17,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define FLIPPER_USB_VENDOR_ID 0x16C0
+
 /* Terminal colors. */
 #ifdef LF_CONFIG_NO_COLOR
 #define KNRM ""

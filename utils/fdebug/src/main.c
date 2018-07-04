@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
 	e = libusb_init(&context);
 	lf_assert(e == 0, E_LIBUSB, "Failed to initialize libusb.");
 
-	handle = libusb_open_device_with_vid_pid(context, CARBON_USB_VENDOR_ID, CARBON_USB_PRODUCT_ID);
+	handle = libusb_open_device_with_vid_pid(context, FLIPPER_USB_VENDOR_ID, USB_PRODUCT_ID);
 	lf_assert(handle, E_LIBUSB, "Failed to find a device.");
 
 	/* Configure USB device. */

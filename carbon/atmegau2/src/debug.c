@@ -1,4 +1,3 @@
-#include "carbon.h"
 #include "atmegau2.h"
 #include "megausb.h"
 

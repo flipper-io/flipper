@@ -156,7 +156,7 @@ fail:
 /* Attaches to all of the Carbon devices available on the system. */
 int carbon_attach(void) {
     /* TODO: Set in, out, in_sz, out_sz */
-	struct _lf_ll *_u2s = lf_libusb_devices_for_vid_pid(CARBON_USB_VENDOR_ID, CARBON_USB_PRODUCT_ID);
+	struct _lf_ll *_u2s = lf_libusb_devices_for_vid_pid(FLIPPER_USB_VENDOR_ID, USB_PRODUCT_ID);
 	if (!_u2s) return lf_error;
 	return lf_ll_apply_func(_u2s, carbon_attach_u2s, NULL);
 }
