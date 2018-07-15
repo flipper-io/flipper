@@ -76,7 +76,13 @@ all:: $(HOST_TARGET)
 endif
 
 # Target when building for the Flipper Virtual Machine
-fvm: $(FVM_TARGET)
+fvm:: $(FVM_TARGET)
+
+ifeq ($(HOST_SRCS), )
+else
+fvm:: $(HOST_TARGET)
+endif
+
 
 echo[%]:
 	@echo 'Variable "$*" = "$($*)"'
@@ -110,8 +116,8 @@ $(HOST_BUILD)/%.c.o: %.c | $(HOST_BUILD_DIRS)
 $(HOST_GLUE_TARGET): $(HOST_GLUE_OBJS)
 	$(HOST_AR) -rcs $@ $^
 
-$(HOST_TARGET): $(HOST_BUILD)/$(MODULE).a $(HOST_OBJS)
-	$(HOST_LD) $(HOST_LDFLAGS) -lflipper -o $@ $^
+$(HOST_TARGET): $(HOST_OBJS) $(HOST_BUILD)/$(MODULE).a
+	$(HOST_LD) $(HOST_LDFLAGS) -o $@ $^ -lflipper
 
 # Keep track of #include dependencies for incremental builds
 -include $(HOST_DEPS)
@@ -124,7 +130,7 @@ $(FVM_BUILD)/package_data.c: | $(FVM_BUILD_DIRS)
 	echo "unsigned char package_bin[] = {\n};\nunsigned package_bin_len = 0;" > $@
 
 $(FVM_TARGET): $(FVM_OBJS)
-	$(FVM_LD) $(FVM_LDFLAGS) -shared -lflipper -o $@ $^
+	$(FVM_LD) $(FVM_LDFLAGS) -shared -o $@ $^ -lflipper
 
 # Keep track of #include dependencies for incremental builds
 -include $(FVM_DEPS)

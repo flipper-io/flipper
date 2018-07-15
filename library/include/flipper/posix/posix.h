@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <flipper/posix/network.h>
 #include <flipper/posix/usb.h>
+#include <flipper/posix/pio.h>
 
 /* Define the modules that this platform uses. */
 #define __use_adc__
@@ -30,8 +31,8 @@
 #define __use_wdt__
 
 /* Declare the LF_VAR and LF_FUNC types for this platform. */
-#define LF_VAR __attribute__((section("__DATA,.lf.vars")))
-#define LF_FUNC __attribute__((section("__TEXT,.lf.funcs")))
+#define LF_VAR __attribute__((section(".lf.vars")))
+#define LF_FUNC __attribute__((section(".lf.funcs")))
 
 #else
 #error "Error: Multiple platforms targeted."
