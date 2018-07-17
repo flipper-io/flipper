@@ -123,13 +123,22 @@ $(HOST_TARGET): $(HOST_OBJS) $(HOST_BUILD)/$(MODULE).a
 -include $(HOST_DEPS)
 
 # FVM build targets
+$(FVM_BUILD)/cbind.c.o: $(FVM_BUILD)/cbind.c | $(FVM_BUILD_DIRS)
+	$(FVM_CC) $(FVM_CFLAGS) -fPIC -MD -MP -MF $(FVM_BUILD)/$*.c.d -c -o $@ $<
+
 $(FVM_BUILD)/%.c.o: %.c | $(FVM_BUILD_DIRS)
 	$(FVM_CC) $(FVM_CFLAGS) -MD -MP -MF $(FVM_BUILD)/$*.c.d -c -o $@ $<
 
-$(FVM_BUILD)/package_data.c: | $(FVM_BUILD_DIRS)
-	echo "unsigned char package_bin[] = {\n};\nunsigned package_bin_len = 0;" > $@
+$(FVM_BUILD)/package_data.c: $(FLIPPER_TARGET) | $(HOST_BUILD_DIRS)
+	(cd $(<D) && xxd -i $(<F)) > $@
 
-$(FVM_TARGET): $(FVM_OBJS)
+$(FVM_BUILD)/cbind.c: $(FVM_BUILD)/main.elf
+	fdwarf $< $(MODULE) c $(FVM_BUILD)/cbind.c
+
+$(FVM_BUILD)/main.elf: $(FVM_OBJS)
+	$(FVM_LD) $(FVM_LDFLAGS) -shared -o $@ $^ -lflipper
+
+$(FVM_TARGET): $(FVM_OBJS) $(FVM_BUILD)/cbind.c.o
 	$(FVM_LD) $(FVM_LDFLAGS) -shared -o $@ $^ -lflipper
 
 # Keep track of #include dependencies for incremental builds
