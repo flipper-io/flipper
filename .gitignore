@@ -13,3 +13,4 @@ __pycache__
 .idea/
 cmake-build-debug/
 TAGS
+.#*
