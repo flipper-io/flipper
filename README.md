@@ -51,7 +51,7 @@ Rust can be found at [rustup.rs](https://rustup.rs/).
 
 ### Clone and build the repository
 ```
-git clone https://github.com/georgemorgan/flipper.git
+git clone https://github.com/flipper-io/flipper.git
 cd flipper
 make
 ```
