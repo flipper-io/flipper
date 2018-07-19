@@ -5,7 +5,6 @@
 #include <unistd.h>
 #include <flipper/posix/network.h>
 #include <flipper/posix/usb.h>
-#include <flipper/posix/pio.h>
 
 /* Define the modules that this platform uses. */
 #define __use_adc__
