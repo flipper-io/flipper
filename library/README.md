@@ -27,7 +27,7 @@ gpio.write(gpio.IO_1, 0) # Set IO1 HIGH
 You can also connect to a Flipper device over a network.
 
 ```c
-flipper_attach_network("192.168.1.1");
+carbon_attach_hostname("192.168.1.1");
 gpio.enable(IO_1, 0); // Enable IO1
 gpio.write(IO_1, 0); // Set IO1 HIGH
 ```
@@ -39,7 +39,7 @@ right now locally using the Flipper Virtual Machine (FVM). After installing
 the`utils`, simply run FVM and then attach to `localhost`.
 
 ```c
-flipper_attach_network("localhost");
+carbon_attach_hostname("localhost");
 gpio.enable(IO_1, 0); // Enable IO1
 gpio.write(IO_1, 0); // Set IO1 HIGH
 ```

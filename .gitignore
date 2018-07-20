@@ -12,3 +12,5 @@ __pycache__
 *.pyc
 .idea/
 cmake-build-debug/
+TAGS
+.#*
