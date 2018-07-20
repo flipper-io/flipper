@@ -40,6 +40,7 @@ brew install rust libusb avr-gcc dfu-programmer arm-gcc-bin
 apt-get install build-essential libusb-1.0-0-dev
 apt-get install dfu-programmer avr-libc binutils-avr gcc-avr
 apt-get install libnewlib-arm-none-eabi binutils-arm-none-eabi gcc-arm-none-eabi
+apt-get install pkg-config python-pip python-pyelftools
 ```
 
 #### Rust
@@ -50,7 +51,7 @@ Rust can be found at [rustup.rs](https://rustup.rs/).
 
 ### Clone and build the repository
 ```
-git clone https://github.com/georgemorgan/flipper.git
+git clone https://github.com/flipper-io/flipper.git
 cd flipper
 make
 ```
