@@ -35,12 +35,20 @@ brew tap osx-cross/avr osx-cross/arm
 brew install rust libusb avr-gcc dfu-programmer arm-gcc-bin
 ```
 
-#### APT
+#### APT (Ubuntu 18.04)
 ```
 apt-get install build-essential libusb-1.0-0-dev
 apt-get install dfu-programmer avr-libc binutils-avr gcc-avr
 apt-get install libnewlib-arm-none-eabi binutils-arm-none-eabi gcc-arm-none-eabi
 apt-get install pkg-config python-pip python-pyelftools
+```
+
+#### dnf (Fedora 28)
+```
+dnf install libusb-devel-1
+dnf install dfu-programmer avr-{gcc,gdb,binutils,libc}
+dnf install arm-none-eabi-{gcc,gdb,binutils,newlib}
+dnf install pkg-config "python?-pip" "python?-pyelftools"
 ```
 
 #### Rust
