@@ -93,6 +93,17 @@ cp assets/99-flipper.rules /etc/udev/rules.d
 udevadm trigger
 ```
 
+### Add the Libraries to your Linker Path
+
+Once the libraries are installed, you may need to add /usr/local/lib/
+to your linker search path. This can be done by running the following
+command as a user with sudo permissions.
+
+```
+echo /usr/local/lib | sudo tee -a /etc/ld.so.conf.d/local.conf
+sudo ldconfig
+```
+
 ## Updating the Firmware
 
 Once you get everything installed, you should update your board's firmware.
