@@ -1,5 +1,5 @@
 #include <unistd.h>
-#include <flipper/flipper.h>
+#include <flipper.h>
 #include "atmegau2.h"
 
 /* Define bit manipulation macros. */
