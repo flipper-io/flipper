@@ -47,7 +47,7 @@ pub mod boot {
 
     pub fn execute(_: &ArgMatches) -> Result<(), Error> {
         Command::new("dfu-programmer")
-            .arg("at90usb162")
+            .arg("atmega32u2")
             .arg("start")
             .spawn()
             .map_err(|_| HardwareError::BootError)?;
