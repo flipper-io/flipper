@@ -127,7 +127,6 @@ int main(int argc, char *argv[]) {
 		struct _fmr_packet packet;
 		fvm->read(fvm, &packet, sizeof(struct _fmr_packet));
 		lf_debug_packet(&packet, sizeof(struct _fmr_packet));
-		lf_error_set(E_OK);
 		fmr_perform(fvm, &packet);
 	}
 
