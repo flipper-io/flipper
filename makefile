@@ -124,7 +124,6 @@ endif #VERBOSE
 
 %/.dir:
 	$(_v)mkdir -p $* && touch $@
-	@echo ""
 
 # Disable built-in rules
 MAKEFLAGS += --no-builtin-rules
@@ -173,37 +172,30 @@ $1_OBJDUMP := $$($1_PREFIX)objdump
 # Rule to make ELF.
 $$($1_ELF): $$($1_OBJS)
 	$(_v)$$($1_LD) $$($1_LDFLAGS) -o $$($1_BUILD)/$$@ $$^
-	@echo ""
 
 # Rule to make HEX.
 $$($1_HEX): $$($1_ELF)
 	$(_v)$$($1_OBJCOPY) -O ihex $$($1_BUILD)/$$< $$($1_BUILD)/$$@
-	@echo ""
 
 # Rule to make BIN.
 $$($1_BIN): $$($1_ELF)
 	$(_v)$$($1_OBJCOPY) -O binary $$($1_BUILD)/$$< $$($1_BUILD)/$$@
-	@echo ""
 
 # Rule to make static library.
 $$($1_A): $$($1_OBJS)
 	$(_v)$$($1_AR) rcs $$($1_BUILD)/$$@ $$^
-	@echo ""
 
 # Rule to make shared library.
 $$($1_SO): $$($1_OBJS)
 	$(_v)$$($1_LD) -shared -o $$($1_BUILD)/$$@ $$^ $$($1_LDFLAGS)
-	@echo ""
 
 # Rule to build C sources.
 $$($1_BUILD)/%.c.o: %.c | $$($1_BUILD_DIR_FILES)
 	$(_v)$$($1_CC) $(GLOBAL_CFLAGS) $$($1_CFLAGS) -I$$(<D) -MD -MP -MF $$($1_BUILD)/$$*.c.d -c -o $$@ $$<
-	@echo ""
 
 # Rule to build preprocessed assembly sources.
 $$($1_BUILD)/%.S.o: %.S | $$($1_BUILD_DIR_FILES)
 	$(_v)$$($1_AS) $$($1_ASFLAGS) $(GLOBAL_CFLAGS) $$($1_CFLAGS) -I$$(<D) -MD -MP -MF $$($1_BUILD)/$$*.S.d -c -o $$@ $$<
-	@echo ""
 
 # Rule to include build dependancies.
 -include $$($1_DEPS)

@@ -7,35 +7,32 @@
 
 /* fvm - Creates a local server that acts as a virtual flipper device. */
 
-struct _lf_device *fvm = NULL;
-
 int main(int argc, char *argv[]) {
+
+    int e;
+    int sd;
+    struct sockaddr_in addr;
+    struct _lf_device *fvm;
 
 	lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
 
 	/* Create a UDP server. */
-	struct sockaddr_in addr;
-	int sd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	if (sd < 0) {
-		printf("Failed to get socket.\n");
-		return 0;
-	}
+	sd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    lf_assert(sd, E_UNIMPLEMENTED, "failed to open socket");
+
 	bzero(&addr, sizeof(addr));
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(LF_UDP_PORT);
 	addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	int e = bind(sd, (struct sockaddr*)&addr, sizeof(addr));
-	if (e < 0) {
-		printf("Failed to create server.\n");
-		return 0;
-	}
+	e = bind(sd, (struct sockaddr*)&addr, sizeof(addr));
+    lf_assert(e == 0, E_UNIMPLEMENTED, "failed to bind socket");
 
 	/* The network endpoint for the virtual flipper device. */
 	fvm = lf_device_create(lf_network_read, lf_network_write, lf_network_release);
-	lf_assert(fvm, E_ENDPOINT, "Failed to create device for virtual machine.");
+	lf_assert(fvm, E_ENDPOINT, "failed to create device for virtual machine.");
 	fvm->_ep_ctx = calloc(1, sizeof(struct _lf_network_context));
 	struct _lf_network_context *context = (struct _lf_network_context *)fvm->_ep_ctx;
-	lf_assert(context, E_NULL, "Failed to allocate memory for context");
+	lf_assert(context, E_NULL, "failed to allocate memory for context");
 	/* Set server file descriptor. */
 	context->fd = sd;
 	lf_attach(fvm);
@@ -112,12 +109,12 @@ int main(int argc, char *argv[]) {
 		while ((module = *modules++)) {
 			printf("Loading module '%s' from '%s'.", module, lib);
 			void *dlm = dlopen(lib, RTLD_LAZY);
-			lf_assert(dlm, E_NULL, "Failed to open module '%s'.", lib);
+			lf_assert(dlm, E_NULL, "failed to open module '%s'.", lib);
 			struct _lf_module *m = dlsym(dlm, module);
-			lf_assert(m, E_NULL, "Failed to read module '%s' from '%s'.", module, lib);
+			lf_assert(m, E_NULL, "failed to read module '%s' from '%s'.", module, lib);
 			printf("Successfully loaded module '%s'.", module);
 			int e = dyld_register(fvm, m);
-			lf_assert(e , E_NULL, "Failed to register module '%s'.", m->name);
+			lf_assert(e , E_NULL, "failed to register module '%s'.", m->name);
 			printf("Successfully registered module '%s'.", module);
 		}
 		printf("\n");

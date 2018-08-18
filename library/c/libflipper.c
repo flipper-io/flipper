@@ -123,6 +123,7 @@ int lf_push(struct _lf_device *device, void *dst, void *src, size_t len) {
 
 	e = device->write(device, &packet, sizeof(packet));
 	lf_assert(e , E_ENDPOINT, "Failed to send message to device '%s'.", device->name);
+
 	e = device->write(device, src, len);
 	lf_assert(e , E_FMR, "Failed to push data to device '%s'.", device->name);
 
