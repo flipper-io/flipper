@@ -1,4 +1,4 @@
-#include "libflipper.h"
+#include <flipper.h>
 #include <unistd.h>
 #include <arpa/inet.h>
 #define _GNU_SOURCE

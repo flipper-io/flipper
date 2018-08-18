@@ -6,25 +6,26 @@ ATSAM4S_INC_DIRS := api/c                  \
                     kernel/include         \
                     library/c              \
 
-ATSAM4S_SRC_DIRS := carbon/atsam4s         \
+ATSAM4S_SRC_DIRS := api/c                  \
+                    carbon/atsam4s         \
                     kernel/arch/armv7      \
                     library/c              \
 
-ATSAM4S_CFLAGS   := -mcpu=cortex-m4       \
-                    -mthumb               \
-                    -march=armv7e-m       \
-                    -mtune=cortex-m4      \
-                    -mfloat-abi=soft      \
-                    -DATSAM4S             \
-                    -D__SAM4S16B__        \
+ATSAM4S_CFLAGS   := -mcpu=cortex-m4        \
+                    -mthumb                \
+                    -march=armv7e-m        \
+                    -mtune=cortex-m4       \
+                    -mfloat-abi=soft       \
+                    -DATSAM4S              \
+					-D__SAM4S16B__         \
 
-ATSAM4S_LDFLAGS  := -nostartfiles         \
-                    -mcpu=cortex-m4       \
-                    -mthumb               \
-                    -march=armv7e-m       \
-                    -mtune=cortex-m4      \
-                    -mfloat-abi=soft      \
-                    -Wl,--gc-sections     \
+ATSAM4S_LDFLAGS  := -nostartfiles          \
+                    -mcpu=cortex-m4        \
+                    -mthumb                \
+                    -march=armv7e-m        \
+                    -mtune=cortex-m4       \
+                    -mfloat-abi=soft       \
+                    -Wl,--gc-sections      \
 
 
 BIN_ATSAM4S_TARGET := atsam4s
@@ -41,6 +42,8 @@ atsam4s: atsam4s.bin
 .PHONY: install-atsam4s
 
 install-atsam4s: utils $(ATSAM4S_TARGET).bin
+	$(_v)cp assets/ram.ld $(PREFIX)/share/flipper
+	$(_v)cp $(BUILD)/atsam4s/atsam4s.elf $(PREFIX)/share/flipper
 	$(_v)$(BUILD)/utils/fdfu $(BUILD)/$(ATSAM4S_TARGET)/$(ATSAM4S_TARGET).bin
 
 update: install-atmegau2 install-atsam4s

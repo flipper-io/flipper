@@ -1,4 +1,4 @@
-#include "libflipper.h"
+#include <flipper.h>
 
 LF_FUNC("swd") int swd_configure(void) {
 	printf("Configured the swd.\n");

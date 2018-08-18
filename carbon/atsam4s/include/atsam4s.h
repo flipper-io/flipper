@@ -4,12 +4,10 @@
 #ifndef __atsam4s__
 #define __atsam4s__
 
-#ifndef __SAM4S16B__
+#ifdef ATSAM4S
 #define __SAM4S16B__
-#endif
-
-/* Include ASF header. */
 #include "sam4s.h"
+#endif
 
 /* Run at a base frequency of 96MHz. */
 #define F_CPU 96000000

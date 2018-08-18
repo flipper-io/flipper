@@ -3,7 +3,7 @@
 #ifndef __carbon_h__
 #define __carbon_h__
 
-/* Define the IO pins for this board. */
+#include "atsam4s.h"
 
 /* GPIO signals */
 #define IO_1 PIO_PA22

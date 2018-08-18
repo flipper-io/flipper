@@ -1,4 +1,4 @@
-#include "libflipper.h"
+#include <flipper.h>
 
 LF_FUNC("wdt") int wdt_configure(void) {
 	printf("Configured the watchdog.\n");

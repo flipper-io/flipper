@@ -1,4 +1,6 @@
 #include <unistd.h>
+
+#define ATSAM4S
 #include <flipper.h>
 #include "atmegau2.h"
 
@@ -9,9 +11,6 @@
 #define hi16(x) ((uint16_t)(((uint32_t)(x)) >> 16))
 #define little(x) ((((uint16_t)(x)) << 8 ) | (((uint16_t)(x)) >> 8))
 #define little32(x) ((((uint32_t)(x)) << 16 ) | (((uint32_t)(x)) >> 16))
-
-#define __SAM4S16B__
-#include "atsam4s.h"
 
 /* Defines the XMODEM flow control bytes. */
 #define SOH 0x01

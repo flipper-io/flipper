@@ -1,4 +1,4 @@
-#include "libflipper.h"
+#include <flipper.h>
 
 LF_FUNC("led") int led_configure(void) {
 	printf("Configured the led.\n");

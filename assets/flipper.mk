@@ -3,7 +3,7 @@ SELF := $(realpath $(lastword $(MAKEFILE_LIST)))
 
 # Navigate from /usr/local/include/flipper.mk to /usr/local/share/flipper
 INCLUDE := $(realpath $(dir $(SELF)))
-ASSETS := $(INCLUDE)/../share/flipper
+ASSETS := $(INCLUDE)/../../share/flipper
 
 # Directory where build products are stored.
 BUILD := build
@@ -45,12 +45,11 @@ DEVICE_CFLAGS   := -std=c99                    \
                    -mfloat-abi=soft            \
                    -D__no_err_str__            \
                    -fPIC                       \
-                   -DATSAM4S                   \
-                   -D__SAM4S16B__              \
+				   -DATSAM4S                   \
 
-DEVICE_LDFLAGS  := -nostartfiles               \
-                   -Wl,-T $(ASSETS)/ram.ld     \
-                   -Wl,-R $(ASSETS)/osmium.elf \
+DEVICE_LDFLAGS  := -nostartfiles                \
+                   -Wl,-T $(ASSETS)/ram.ld      \
+                   -Wl,-R $(ASSETS)/atsam4s.elf \
 
 device: $(DEVICE_TARGET).bin
 
@@ -77,7 +76,7 @@ HOST_INC_DIRS := include
 HOST_SRC_DIRS := src host $(GEN_DIRS)
 
 $(BUILD)/gen.mk: $(DEVICE_TARGET).elf | $(BUILD)/gen/.dir
-	$(_v)fdwarf $(BUILD)/$(DEVICE_TARGET)/$(DEVICE_TARGET).elf c $(BUILD)/gen
+	$(_v)fdwarf $(BUILD)/$(DEVICE_TARGET)/$(DEVICE_TARGET).elf $(MODULE) c $(BUILD)/gen/$(MODULE).c
 	$(_v)echo "GEN_DIRS = $(BUILD)/gen" > $(BUILD)/gen.mk
 
 HOST_CFLAGS   := -std=gnu99             \

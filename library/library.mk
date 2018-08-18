@@ -18,24 +18,28 @@ TARGETS += LIBFLIPPER
 # --- LIBFLIPPER --- #
 
 libflipper: libflipper.so | $(BUILD)/include/flipper/.dir
+	$(_v)cp -r carbon/asf/include/* $(BUILD)/include/flipper
+	$(_v)cp -r carbon/atmegau2/include/* $(BUILD)/include/flipper
+	$(_v)cp -r carbon/atsam4s/include/* $(BUILD)/include/flipper
 	$(_v)cp -r carbon/hal/include/* $(BUILD)/include/flipper
 	$(_v)cp -r api/c/*.h $(BUILD)/include/flipper
 	$(_v)cp -r library/c/*.h $(BUILD)/include/flipper
+	$(_v)cp assets/flipper.mk $(BUILD)/include/flipper
 
 .PHONY: install-libflipper uninstall-libflipper
 
-install-libflipper: libflipper atsam4s
+install-libflipper: libflipper
 	$(_v)cp $(BUILD)/libflipper/libflipper.so $(PREFIX)/lib/
 	$(_v)cp -r $(BUILD)/include/* $(PREFIX)/include/
-	$(_v)cp assets/flipper.mk $(PREFIX)/include/
+	$(_v)ln -sf $(PREFIX)/include/flipper/flipper.h $(PREFIX)/include
+	$(_v)ln -sf $(PREFIX)/include/flipper/flipper.mk $(PREFIX)/include
 	$(_v)mkdir -p $(PREFIX)/share/flipper
-	$(_v)cp assets/ram.ld $(PREFIX)/share/flipper/
-	$(_v)cp $(BUILD)/atsam4s/atsam4s.elf $(PREFIX)/share/flipper/osmium.elf
 
 install:: install-libflipper
 
 uninstall-libflipper:
 	$(_v)rm $(PREFIX)/include/flipper.h
+	$(_v)rm $(PREFIX)/include/flipper.mk
 	$(_v)rm -r $(PREFIX)/include/flipper
 	$(_v)rm $(PREFIX)/lib/libflipper.so
 	$(_v)rm -rf $(PREFIX)/share/flipper
