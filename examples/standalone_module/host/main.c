@@ -3,7 +3,7 @@
 
 int main(int argc, char *argv[]) {
 
-	flipper_attach();
+	carbon_attach();
 	qux_func(0x10);
 
 	return 0;

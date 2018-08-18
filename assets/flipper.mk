@@ -2,8 +2,8 @@
 SELF := $(realpath $(lastword $(MAKEFILE_LIST)))
 
 # Navigate from /usr/local/include/flipper.mk to /usr/local/share/flipper
-INCLUDE := $(realpath $(dir $(SELF)))
-ASSETS := $(INCLUDE)/../../share/flipper
+INCLUDE := $(realpath $(dir $(SELF)))/..
+ASSETS := $(INCLUDE)/../share/flipper
 
 # Directory where build products are stored.
 BUILD := build

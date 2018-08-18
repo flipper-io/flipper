@@ -33,7 +33,6 @@ install-libflipper: libflipper
 	$(_v)cp -r $(BUILD)/include/* $(PREFIX)/include/
 	$(_v)ln -sf $(PREFIX)/include/flipper/flipper.h $(PREFIX)/include
 	$(_v)ln -sf $(PREFIX)/include/flipper/flipper.mk $(PREFIX)/include
-	$(_v)mkdir -p $(PREFIX)/share/flipper
 
 install:: install-libflipper
 

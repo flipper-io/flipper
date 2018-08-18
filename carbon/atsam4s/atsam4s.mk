@@ -41,9 +41,10 @@ atsam4s: atsam4s.bin
 
 .PHONY: install-atsam4s
 
-install-atsam4s: utils $(ATSAM4S_TARGET).bin
+install-atsam4s: utils $(BIN_ATSAM4S_TARGET).bin
+	$(_v)mkdir -p $(PREFIX)/share/flipper
 	$(_v)cp assets/ram.ld $(PREFIX)/share/flipper
 	$(_v)cp $(BUILD)/atsam4s/atsam4s.elf $(PREFIX)/share/flipper
-	$(_v)$(BUILD)/utils/fdfu $(BUILD)/$(ATSAM4S_TARGET)/$(ATSAM4S_TARGET).bin
+	$(_v)$(BUILD)/utils/fdfu $(BUILD)/$(BIN_ATSAM4S_TARGET)/$(BIN_ATSAM4S_TARGET).bin
 
 update: install-atmegau2 install-atsam4s
