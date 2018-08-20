@@ -31,7 +31,7 @@ void lf_debug_call(struct _fmr_call *call) {
 #endif
 }
 
-void lf_debug_packet(struct _fmr_packet *packet, uint32_t length) {
+void lf_debug_packet(struct _fmr_packet *packet) {
 #ifndef LF_DISABLE_DEBUG
 	if (lf_debug_level != LF_DEBUG_LEVEL_ALL) return;
 
@@ -76,9 +76,9 @@ void lf_debug_packet(struct _fmr_packet *packet, uint32_t length) {
 				printf("invalid packet class.\n");
 			break;
 		}
-		for (size_t i = 1; i <= length; i ++) {
+		for (size_t i = 1; i <= hdr.len; i ++) {
 			printf("0x%02x ", ((uint8_t *)packet)[i - 1]);
-			if (i % 8 == 0 && i < length - 1) printf("\n");
+			if (i % 8 == 0 && i < hdr.len - 1) printf("\n");
 		}
 	} else {
 		printf("invalid magic number (0x%02x).\n", hdr.magic);

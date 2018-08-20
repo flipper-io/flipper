@@ -21,7 +21,7 @@
 #define FLIPPER_USB_CONTROL_INTERFACE 0
 
 /* Terminal colors. */
-#define LF_CONFIG_NO_COLOR
+//#define LF_CONFIG_NO_COLOR
 #ifdef LF_CONFIG_NO_COLOR
 #define KNRM ""
 #define KGRN ""
@@ -116,7 +116,7 @@ enum {
 void lf_set_debug_level(int level);
 
 /* Prints verbose information about the packet disassembly. */
-void lf_debug_packet(struct _fmr_packet *packet, uint32_t length);
+void lf_debug_packet(struct _fmr_packet *packet);
 
 /* Prints verbose information about a function call. */
 void lf_debug_result(struct _fmr_result *result);

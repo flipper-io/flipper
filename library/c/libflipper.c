@@ -80,7 +80,7 @@ int lf_invoke(struct _lf_device *device, const char *module, lf_function functio
 	lf_assert(e , E_NULL, "Failed to generate a valid call to module '%s'.", module);
 
 	lf_crc(&packet, hdr->len, &hdr->crc);
-	lf_debug_packet((struct _fmr_packet *)&packet, sizeof(packet));
+	lf_debug_packet((struct _fmr_packet *)&packet);
 
 	e = device->write(device, &packet, sizeof(packet));
 	lf_assert(e , E_ENDPOINT, "Failed to send message to device '%s'.", device->name);
@@ -119,7 +119,7 @@ int lf_push(struct _lf_device *device, void *dst, void *src, size_t len) {
 	packet.len = len;
 	packet.ptr = (uintptr_t)dst;
 	lf_crc(&packet, hdr->len, &hdr->crc);
-	lf_debug_packet((struct _fmr_packet *)&packet, sizeof(packet));
+	lf_debug_packet((struct _fmr_packet *)&packet);
 
 	e = device->write(device, &packet, sizeof(packet));
 	lf_assert(e , E_ENDPOINT, "Failed to send message to device '%s'.", device->name);
@@ -159,7 +159,7 @@ int lf_pull(struct _lf_device *device, void *dst, void *src, size_t len) {
 	packet.len = len;
 	packet.ptr = (uintptr_t)src;
 	lf_crc(&packet, hdr->len, &hdr->crc);
-	lf_debug_packet((struct _fmr_packet *)&packet, sizeof(packet));
+	lf_debug_packet((struct _fmr_packet *)&packet);
 
 	e = device->write(device, &packet, sizeof(packet));
 	lf_assert(e , E_ENDPOINT, "Failed to send message to device '%s'.", device->name);
@@ -197,7 +197,7 @@ int lf_dyld(struct _lf_device *device, const char *module, int *idx) {
 	hdr->type = fmr_dyld_class;
 	strcpy(packet.module, module);
 	lf_crc(&packet, hdr->len, &hdr->crc);
-	lf_debug_packet((struct _fmr_packet *)&packet, sizeof(packet));
+	lf_debug_packet((struct _fmr_packet *)&packet);
 
 	e = device->write(device, &packet, sizeof(packet));
 	lf_assert(e , E_ENDPOINT, "Failed to send message to device '%s'.", device->name);
@@ -232,7 +232,7 @@ int lf_malloc(struct _lf_device *device, size_t size, void **ptr) {
 	hdr->type = fmr_malloc_class;
 	packet.size = size;
 	lf_crc(&packet, hdr->len, &hdr->crc);
-	lf_debug_packet((struct _fmr_packet *)&packet, sizeof(packet));
+	lf_debug_packet((struct _fmr_packet *)&packet);
 
 	e = device->write(device, &packet, sizeof(packet));
 	lf_assert(e , E_ENDPOINT, "Failed to send message to device '%s'.", device->name);
@@ -267,7 +267,7 @@ int lf_free(struct _lf_device *device, void *ptr) {
 	hdr->type = fmr_free_class;
 	packet.ptr = (uintptr_t)ptr;
 	lf_crc(&packet, hdr->len, &hdr->crc);
-	lf_debug_packet((struct _fmr_packet *)&packet, sizeof(packet));
+	lf_debug_packet((struct _fmr_packet *)&packet);
 
 	e = device->write(device, &packet, sizeof(packet));
 	lf_assert(e , E_ENDPOINT, "Failed to send message to device '%s'.", device->name);
