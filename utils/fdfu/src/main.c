@@ -1,7 +1,7 @@
 #include <unistd.h>
 
 #define ATSAM4S
-#include <flipper.h>
+#include <flipper/flipper.h>
 #include "atmegau2.h"
 
 /* Define bit manipulation macros. */

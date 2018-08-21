@@ -1,6 +1,6 @@
 /* Test suite for libflipper. */
 
-#include <flipper.h>
+#include <flipper/flipper.h>
 
 extern int dyld_test(void);
 extern int ll_test(void);

@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include <flipper/flipper.h>
 
 int main(int argc, char *argv[]) {
     printf("Loaded my application!");

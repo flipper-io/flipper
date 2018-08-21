@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include <flipper/flipper.h>
 
 LF_FUNC("dac") int dac_configure(void) {
 	printf("Configured the dac.\n");

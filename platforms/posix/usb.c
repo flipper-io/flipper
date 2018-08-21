@@ -1,6 +1,6 @@
 /* libusb.c - USB endpoint wrapper using libusb. */
 
-#include <flipper.h>
+#include "libflipper.h"
 #include "usb.h"
 #include <libusb.h>
 

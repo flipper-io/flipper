@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include <flipper/flipper.h>
 
 LF_FUNC("uart0") int uart0_configure(void) {
 	printf("Configured the uart0.\n");

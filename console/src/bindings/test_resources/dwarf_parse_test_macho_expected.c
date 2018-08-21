@@ -1,4 +1,4 @@
-#include <flipper.h>
+#include <flipper/flipper.h>
 
 LF_MODULE(_user, "user", "User module description", NULL, NULL);
 

@@ -1,6 +1,6 @@
 /* libflipper linked-list test */
 
-#include <flipper.h>
+#include <flipper/flipper.h>
 #include <tests.h>
 
 #define ITEM (void *)0xabcd

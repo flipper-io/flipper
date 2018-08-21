@@ -3,8 +3,6 @@
 #ifndef __lf_network_h__
 #define __lf_network_h__
 
-#include <flipper.h>
-
 /* POSIX network includes. */
 #include <arpa/inet.h>
 #include <netdb.h>

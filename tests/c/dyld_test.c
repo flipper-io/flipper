@@ -1,6 +1,6 @@
 /* dyld_test tests the dynamic loader */
 
-#include <flipper.h>
+#include <flipper/flipper.h>
 #include <tests.h>
 
 int test_func(void) {
