@@ -37,10 +37,8 @@ install-libflipper: libflipper
 install:: install-libflipper
 
 uninstall-libflipper:
-	$(_v)rm $(PREFIX)/include/flipper.h
-	$(_v)rm $(PREFIX)/include/flipper.mk
-	$(_v)rm -r $(PREFIX)/include/flipper
-	$(_v)rm $(PREFIX)/lib/libflipper.so
+	$(_v)rm -rf $(PREFIX)/include/flipper
+	$(_v)rm -rf $(PREFIX)/lib/libflipper.so
 	$(_v)rm -rf $(PREFIX)/share/flipper
 
 uninstall:: uninstall-libflipper

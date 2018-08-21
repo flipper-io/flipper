@@ -6,7 +6,7 @@
 #ifndef __atmegau2__
 #define __atmegau2__
 
-#ifdef __AVR__
+#ifdef ATMEGAU2
 
 /* Include the avr-libc standard library headers. */
 #include <avr/common.h>
@@ -99,6 +99,6 @@
 
 #define FMR_DDR DDRC
 #define FMR_IN PINC
-#define FMR_PIN 0x07
+#define U2_FMR_PIN 0x07
 
 #endif

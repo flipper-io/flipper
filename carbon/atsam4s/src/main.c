@@ -144,8 +144,8 @@ int main(void) {
 	wdt_configure();
 
 	/* Enable the FSI pin. */
-	gpio_enable(FMR_PIN, 0);
-	gpio_write(0, FMR_PIN);
+	gpio_enable(SAM_FMR_PIN, 0);
+	gpio_write(0, SAM_FMR_PIN);
 
 	/* Pull an FMR packet asynchronously to launch FMR. */
 	uart0_read(&packet, sizeof(struct _fmr_packet));
@@ -165,7 +165,7 @@ void uart0_isr(void) {
 	/* If an entire packet has been received, process it. */
 	if (_sr & UART_SR_ENDRX) {
 		/* set fmr low (active) */
-		gpio_write(0, FMR_PIN);
+		gpio_write(0, SAM_FMR_PIN);
 
 		UART0->UART_PTCR = UART_PTCR_RXTDIS | UART_PTCR_TXTDIS;
 
@@ -179,7 +179,7 @@ void uart0_isr(void) {
 		for (size_t i = 0; i < 0x3FF; i ++) __asm__ __volatile__("nop");
 
 		/* set fmr high (inactive) */
-		gpio_write(FMR_PIN, 0);
+		gpio_write(SAM_FMR_PIN, 0);
 	} else {
 		UART0->UART_CR = UART_CR_RSTSTA;
 	}

@@ -17,7 +17,6 @@ ATSAM4S_CFLAGS   := -mcpu=cortex-m4        \
                     -mtune=cortex-m4       \
                     -mfloat-abi=soft       \
                     -DATSAM4S              \
-					-D__SAM4S16B__         \
 
 ATSAM4S_LDFLAGS  := -nostartfiles          \
                     -mcpu=cortex-m4        \

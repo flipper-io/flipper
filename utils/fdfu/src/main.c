@@ -2,15 +2,6 @@
 
 #define ATSAM4S
 #include <flipper/flipper.h>
-#include "atmegau2.h"
-
-/* Define bit manipulation macros. */
-#define lo(x) ((uint8_t)(x))
-#define hi(x) ((uint8_t)(x >> 8))
-#define lo16(x) ((uint16_t)(((uint32_t)(x))))
-#define hi16(x) ((uint16_t)(((uint32_t)(x)) >> 16))
-#define little(x) ((((uint16_t)(x)) << 8 ) | (((uint16_t)(x)) >> 8))
-#define little32(x) ((((uint32_t)(x)) << 16 ) | (((uint32_t)(x)) >> 16))
 
 /* Defines the XMODEM flow control bytes. */
 #define SOH 0x01
@@ -223,8 +214,7 @@ int main(int argc, char *argv[]) {
 	//lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
 
 	/* Attach to a Flipper device. */
-	struct _lf_device *device = carbon_attach();
-//	carbon_select_u2(device);
+	carbon_attach();
 
 	/* Open the firmware image. */
 	firmware = fopen(argv[1], "rb");

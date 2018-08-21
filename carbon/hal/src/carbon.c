@@ -22,9 +22,10 @@
 
 #include "libflipper.h"
 #include "carbon.h"
+
 #include "posix/usb.h"
 #include "posix/network.h"
-#include "atmegau2.h"
+
 #include <unistd.h>
 
 void sam_reset(void) {

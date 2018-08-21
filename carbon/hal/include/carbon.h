@@ -3,6 +3,7 @@
 #ifndef __carbon_h__
 #define __carbon_h__
 
+#include "atmegau2.h"
 #include "atsam4s.h"
 
 /* GPIO signals */

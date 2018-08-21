@@ -20,7 +20,7 @@ LF_FUNC("uart0") int uart0_configure(void) {
 	UCSR1B |= (1 << RXCIE1);
 
 	/* Enable the FSI line as an input. */
-	FMR_DDR &= ~(1 << FMR_PIN);
+	FMR_DDR &= ~(1 << U2_FMR_PIN);
 
 	return lf_success;
 }
@@ -101,7 +101,7 @@ ISR(USART1_RX_vect) {
 	while (!(UCSR1A & (1 << RXC1)));
 	if (idx == sizeof(uart0_buffer)) idx = 0;
 	uint8_t c = UDR1;
-	if (FMR_IN & (1 << FMR_PIN)) {
+	if (FMR_IN & (1 << U2_FMR_PIN)) {
 		usb_debug_putchar(c);
 	} else {
 		uart0_buffer[idx++] = c;

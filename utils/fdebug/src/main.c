@@ -1,8 +1,7 @@
-#include "libflipper.h"
+#include <flipper/flipper.h>
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
-#include "atmegau2.h"
 #include <libusb.h>
 
 static volatile int alive = 1;

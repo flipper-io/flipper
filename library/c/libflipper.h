@@ -20,6 +20,14 @@
 #define FLIPPER_USB_VENDOR_ID 0x16C0
 #define FLIPPER_USB_CONTROL_INTERFACE 0
 
+/* Define bit manipulation macros. */
+#define lo(x) ((uint8_t)(x))
+#define hi(x) ((uint8_t)(x >> 8))
+#define lo16(x) ((uint16_t)(((uint32_t)(x))))
+#define hi16(x) ((uint16_t)(((uint32_t)(x)) >> 16))
+#define little(x) ((((uint16_t)(x)) << 8 ) | (((uint16_t)(x)) >> 8))
+#define little32(x) ((((uint32_t)(x)) << 16 ) | (((uint32_t)(x)) >> 16))
+
 /* Terminal colors. */
 //#define LF_CONFIG_NO_COLOR
 #ifdef LF_CONFIG_NO_COLOR
