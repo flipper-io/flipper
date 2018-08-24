@@ -1,12 +1,14 @@
-#include <flipper/uart0.h>
+#include "libflipper.h"
+#include "uart0.h"
 #include <os/loader.h>
+#include "atsam4s.h"
 
 struct _lf_device THIS_DEVICE;
 
 /* Buffer space for incoming message runtime packets. */
 struct _fmr_packet packet;
 
-void uart0_pull_wait(void *destination, lf_size_t length) {
+void uart0_pull_wait(void *destination, size_t length) {
 	/* Disable the PDC receive complete interrupt. */
 	UART0->UART_IDR = UART_IDR_ENDRX;
 	/* Set the transmission length and destination pointer. */

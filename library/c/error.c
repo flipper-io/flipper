@@ -1,6 +1,9 @@
 #include "libflipper.h"
 #include <stdarg.h>
 
+#ifdef LF_CONFIG_OMIT_ERRORS
+#define LF_ERROR_MESSAGE_STRINGS
+#else
 #define LF_ERROR_MESSAGE_STRINGS "no error", \
                                  "malloc failure", \
                                  "null pointer", \
@@ -35,13 +38,14 @@
                                  "uart0 write timeout", \
                                  "uart0 read timeout", \
                                  "usb error"
+#endif
 
 static const char *const err_strs[] = { LF_ERROR_MESSAGE_STRINGS };
 
 static lf_err_t _lf_err;
 
 LF_WEAK void _lf_assert(lf_err_t err, const char *func, int line, const char *fmt, ...) {
-    lf_assert(err < LF_MAX_ERR, E_BOUNDARY, "err out of bounds");
+    lf_assert(err < (sizeof(err_strs)/sizeof(char*)), E_BOUNDARY, "err out of bounds");
     _lf_err = err;
 
     va_list args;

@@ -9,8 +9,9 @@ ATMEGAU2_INC_DIRS := api/c                   \
                      kernel/include          \
                      library/c               \
 
-ATMEGAU2_SRC_DIRS := carbon/atmegau2         \
-                     kernel/arch/avr8       \
+ATMEGAU2_SRC_DIRS := api/c                   \
+                     carbon/atmegau2         \
+                     kernel/arch/avr8        \
                      library/c               \
 
 ATMEGAU2_CFLAGS   := -mmcu=atmega32u2        \
@@ -19,6 +20,7 @@ ATMEGAU2_CFLAGS   := -mmcu=atmega32u2        \
                      -DF_CPU=16000000UL      \
                      -DATMEGAU2              \
 					 -DLF_DISABLE_DEBUG      \
+					 -DLF_CONFIG_OMIT_ERRORS \
 
 ATMEGAU2_LDFLAGS  := -mmcu=atmega32u2        \
 				     -Wl,--gc-sections
