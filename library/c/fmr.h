@@ -3,6 +3,8 @@
 #ifndef __lf_fmr_h__
 #define __lf_fmr_h__
 
+#include "defines.h"
+
 /* The size of a single FMR packet expressed in bytes. */
 #define FMR_PACKET_SIZE 64
 /* The magic number that indicates the start of a packet. */
@@ -33,8 +35,6 @@ typedef uint32_t lf_types;
 #define lf_utype(type) (sizeof(type) - 1)
 /* Converts a C type into a signed lf_type. */
 #define lf_stype(type) ((1 << 3) | lf_utype(type))
-/* Calculates the length of an FMR type. */
-#define lf_sizeof(type) ((type != lf_void_t && type != lf_int_t && type != lf_ptr_t) ? ((type & 0x7) + 1) : 8)
 
 /* Enumerates the basic type signatures an argument can be classified as. */
 enum {
@@ -60,6 +60,9 @@ enum {
 
 /* A type used to reference the values in the enum above. */
 typedef uint8_t lf_type;
+
+/* Calculates the length of an FMR type. */
+int lf_sizeof(lf_type type);
 
 /* Parameter list building macros. */
 
@@ -113,7 +116,7 @@ enum {
 typedef uint8_t fmr_class;
 
 /* Contains the information required to obtain, verify, and parse a packet. */
-struct _fmr_header {
+struct LF_PACKED _fmr_header {
 	/* A magic number indicating the start of the packet. */
 	uint8_t magic;
 	/* The checksum of the packet's contents. */
@@ -125,7 +128,7 @@ struct _fmr_header {
 };
 
 /* Standardizes the notion of an argument. */
-struct _lf_arg {
+struct LF_PACKED _lf_arg {
 	/* The type of the argument. */
 	lf_type type;
 	/* The value of the argument. */
@@ -133,7 +136,7 @@ struct _lf_arg {
 };
 
 /* Generic packet data type that can be passed around by packet parsing equipment. */
-struct _fmr_packet {
+struct LF_PACKED _fmr_packet {
 	/* The header shared by all packet classes. */
 	struct _fmr_header hdr;
 	/* A generic payload that is designed to be casted against the class specific data structures. */
@@ -141,7 +144,7 @@ struct _fmr_packet {
 };
 
 /* Procedure call metadata carried by a packet. */
-struct _fmr_call {
+struct LF_PACKED _fmr_call {
 	/* The index of the module in which the target routine resides. */
 	uint8_t module;
 	/* The index of the function within the module. */
@@ -157,7 +160,7 @@ struct _fmr_call {
 };
 
 /* Contains metadata needed to perform a remote procedure call on a device. */
-struct _fmr_call_packet {
+struct LF_PACKED _fmr_call_packet {
 	/* The packet header programmed with 'fmr_rpc_class'. */
 	struct _fmr_header hdr;
 	/* The procedure call information of the invocation. */
@@ -165,7 +168,7 @@ struct _fmr_call_packet {
 };
 
 /* Contains metadata needed to perform a push/pull operation. */
-struct _fmr_push_pull_packet {
+struct LF_PACKED _fmr_push_pull_packet {
 	/* The packet header programmed with 'fmr_push_class' or 'fmr_pull_class'. */
 	struct _fmr_header hdr;
 	/* The amount of data to be transferred. */
@@ -175,7 +178,7 @@ struct _fmr_push_pull_packet {
 };
 
 /* Asks the dynamic loader for a module index. */
-struct _fmr_dyld_packet {
+struct LF_PACKED _fmr_dyld_packet {
 	/* The packet header programmed with 'fmr_dyld_class'. */
 	struct _fmr_header hdr;
 	/* The module name. */
@@ -183,7 +186,7 @@ struct _fmr_dyld_packet {
 };
 
 /* Allocates memory on the device. */
-struct _fmr_memory_packet {
+struct LF_PACKED _fmr_memory_packet {
 	/* The packet header programmed with 'fmr_dyld_class'. */
 	struct _fmr_header hdr;
 	/* The size. */
@@ -193,7 +196,7 @@ struct _fmr_memory_packet {
 };
 
 /* A generic datastructure that is sent back following any message runtime trancsaction. */
-struct _fmr_result {
+struct LF_PACKED _fmr_result {
 	/* The return value of the function called (if any). */
 	lf_return_t value;
 	/* The error code generated on the device. */

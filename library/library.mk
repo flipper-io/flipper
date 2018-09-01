@@ -2,9 +2,9 @@ LIB_INC_DIRS := library/c
 
 LIB_SRC_DIRS := library/c
 
-LIB_CFLAGS   :=
+LIB_CFLAGS   := -fsanitize=address -fsanitize=undefined
 
-LIB_LDFLAGS  :=
+LIB_LDFLAGS  := -fsanitize=address -fsanitize=undefined
 
 LIBFLIPPER_TARGET := libflipper
 LIBFLIPPER_PREFIX :=

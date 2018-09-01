@@ -41,8 +41,8 @@ GLOBAL_CFLAGS = -std=c99                  \
                 -Wextra                   \
                 -Wno-unused-parameter     \
                 -Wno-expansion-to-defined \
-                -Os                       \
                 -g                        \
+                # -Os                       \
 
 include library/library.mk
 include carbon/carbon.mk
@@ -108,7 +108,7 @@ test: libflipper
 install-python:
 	$(_v)pip3 install library/python --upgrade -q
 
-install:: install-python
+# install:: install-python
 
 # -------------------------------------------------------------------- #
 

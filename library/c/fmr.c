@@ -13,6 +13,26 @@ fail:
 	return NULL;
 }
 
+int lf_sizeof(lf_type type) {
+	switch (type) {
+	case lf_void_t:
+		return 8;
+	case lf_int8_t:
+	case lf_uint8_t:
+		return 1;
+	case lf_int16_t:
+	case lf_uint16_t:
+		return 2;
+	case lf_int32_t:
+	case lf_uint32_t:
+		return 4;
+	case lf_int64_t:
+	case lf_uint64_t:
+		return 8;
+	}
+	return 0;
+}
+
 void lf_arg_release(struct _lf_arg *arg) {
 
 	lf_assert(arg, E_NULL, "invalid argument");
@@ -119,15 +139,15 @@ int fmr_rpc(struct _lf_device *device, struct _fmr_call_packet *packet, lf_retur
     struct _lf_module *m;
     lf_return_t (* f)(void) = NULL;
 
-    struct _fmr_call call = packet->call;
+    struct _fmr_call *call = &packet->call;
 
-    m = lf_ll_item(device->modules, call.module);
-    lf_assert(f, E_NULL, "bad module lookup");
+    m = lf_ll_item(device->modules, call->module);
+    lf_assert(m, E_NULL, "bad module lookup");
 
-    f = m->interface[call.function];
+    f = m->interface[call->function];
 	lf_assert(f, E_NULL, "bad interface address");
 
-	*retval = fmr_call(f, call.ret, call.argc, call.argt, call.argv);
+	*retval = fmr_call(f, call->ret, call->argc, call->argt, &call->argv);
 
 	return lf_success;
 fail:
