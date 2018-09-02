@@ -1,51 +1,17 @@
 #include "libflipper.h"
 #include <stdarg.h>
 
-#ifdef LF_CONFIG_OMIT_ERRORS
-#define LF_ERROR_MESSAGE_STRINGS
-#else
-#define LF_ERROR_MESSAGE_STRINGS "no error", \
-                                 "malloc failure", \
-                                 "null pointer", \
-                                 "overflow", \
-                                 "invalid device", \
-                                 "device not yet attached", \
-                                 "device already attached", \
-                                 "file already exists", \
-                                 "file does not exist", \
-                                 "message runtime packet overflow", \
-                                 "message runtime error", \
-                                 "endpoint error", \
-                                 "libusb error", \
-                                 "communication error", \
-                                 "socket error", \
-                                 "invalid module found", \
-                                 "address resoultion failure", \
-                                 "invalid error string", \
-                                 "checksums do not match", \
-                                 "invalid name", \
-                                 "configuration error", \
-                                 "acknowledgement error", \
-                                 "type error", \
-                                 "boundary error", \
-                                 "timer error", \
-                                 "timeout error", \
-                                 "no task for pid", \
-                                 "invalid task specified", \
-                                 "packet subclass error", \
-                                 "unimplemented error", \
-                                 "test failed", \
-                                 "uart0 write timeout", \
-                                 "uart0 read timeout", \
-                                 "usb error"
-#endif
+lf_err_t _lf_err;
 
-static const char *const err_strs[] = { LF_ERROR_MESSAGE_STRINGS };
+#define LF_ERROR(Err, Str) LF_WEAK const char Err##_string[] = Str;
+#include "errors.def"
 
-static lf_err_t _lf_err;
+LF_WEAK const char *const err_strs[] = {
+#define LF_ERROR(Err, Str) Err##_string,
+#include "errors.def"
+};
 
 LF_WEAK void _lf_assert(lf_err_t err, const char *func, int line, const char *fmt, ...) {
-    lf_assert(err < (sizeof(err_strs)/sizeof(char*)), E_BOUNDARY, "err out of bounds");
     _lf_err = err;
 
     va_list args;
@@ -56,9 +22,6 @@ LF_WEAK void _lf_assert(lf_err_t err, const char *func, int line, const char *fm
     printf(KNRM "\n\n");
 
     va_end(args);
-
-fail:
-	return;
 }
 
 void lf_error_set(lf_err_t err) {

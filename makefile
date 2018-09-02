@@ -41,8 +41,6 @@ GLOBAL_CFLAGS = -std=c99                  \
                 -Wextra                   \
                 -Wno-unused-parameter     \
                 -Wno-expansion-to-defined \
-                -g                        \
-                # -Os                       \
 
 include library/library.mk
 include carbon/carbon.mk

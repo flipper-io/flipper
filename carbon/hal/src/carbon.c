@@ -172,7 +172,7 @@ struct _lf_device *carbon_attach(void) {
 
 	struct _lf_ll *devices = lf_libusb_get_devices();
 	lf_assert(devices, E_NO_DEVICE, "no carbon devices");
-	lf_ll_apply_func(devices, carbon_attach_applier, NULL);
+    int e = lf_ll_apply_func(devices, carbon_attach_applier, NULL);
 
 	return lf_get_selected();
 fail:

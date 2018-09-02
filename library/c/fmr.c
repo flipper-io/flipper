@@ -14,22 +14,14 @@ fail:
 }
 
 int lf_sizeof(lf_type type) {
-	switch (type) {
-	case lf_void_t:
-		return 8;
-	case lf_int8_t:
-	case lf_uint8_t:
+	if (type == lf_int8_t || type == lf_uint8_t)
 		return 1;
-	case lf_int16_t:
-	case lf_uint16_t:
+	if (type == lf_int16_t || type == lf_uint16_t)
 		return 2;
-	case lf_int32_t:
-	case lf_uint32_t:
+	if (type == lf_int32_t || type == lf_uint32_t)
 		return 4;
-	case lf_int64_t:
-	case lf_uint64_t:
+	if (type == lf_int64_t || type == lf_uint64_t || type == lf_void_t)
 		return 8;
-	}
 	return 0;
 }
 

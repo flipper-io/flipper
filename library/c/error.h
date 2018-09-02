@@ -17,51 +17,17 @@
 
 /* Enumerate all of the error codes. */
 typedef enum {
-	E_OK,
-	E_MALLOC,
-	E_NULL,
-	E_OVERFLOW,
-	E_NO_DEVICE,
-	E_NOT_ATTACHED,
-	E_ALREADY_ATTACHED,
-	E_FS_EXISTS,
-	E_FS_NO_FILE,
-	E_FMR_OVERFLOW,
-	E_FMR,
-	E_ENDPOINT,
-	E_LIBUSB,
-	E_COMMUNICATION,
-	E_SOCKET,
-	E_MODULE,
-	E_RESOULTION,
-	E_STRING,
-	E_CHECKSUM,
-	E_NAME,
-	E_CONFIGURATION,
-	E_ACK,
-	E_TYPE,
-	E_BOUNDARY,
-	E_TIMER,
-	E_TIMEOUT,
-	E_NO_PID,
-	E_INVALID_TASK,
-	E_SUBCLASS,
-	E_UNIMPLEMENTED,
-	E_TEST,
-    E_USB,
-
-	/* uart0 */
-	E_UART0_WRITE_TIMEOUT,
-	E_UART0_READ_TIMEOUT,
-
-    /* must be kept at the bottom of this enum */
-    LF_MAX_ERR
+	#define LF_ERROR(Err, Str) Err,
+	#include "errors.def"
 } lf_err_t;
 
 /* Raises an error internally to the current context of libflipper. */
 extern void _lf_assert(lf_err_t err, const char *func, int line, const char *format, ...) __attribute__ ((format (printf, 4, 5)));
 
+extern lf_err_t _lf_err;
+
 void lf_error_set(lf_err_t err);
 lf_err_t lf_error_get(void);
+const char *lf_get_err_str(lf_err_t err);
 
 #endif

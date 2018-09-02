@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
 		e = libusb_interrupt_transfer(handle, DEBUG_IN_ENDPOINT, buf, DEBUG_IN_SIZE, &len, 0);
 		lf_assert(e == 0, E_LIBUSB, "Failed to complete transfer.");
 
-		while (len --) printf("%c", *(uint8_t *)_buf ++);
+		while (len --) printf("%c", *_buf ++);
 	}
 
 fail:

@@ -2,7 +2,7 @@ LIB_INC_DIRS := library/c
 
 LIB_SRC_DIRS := library/c
 
-LIB_CFLAGS   := -fsanitize=address -fsanitize=undefined
+LIB_CFLAGS   := -fsanitize=address -fsanitize=undefined -DLF_CONFIG_NO_COLOR -g
 
 LIB_LDFLAGS  := -fsanitize=address -fsanitize=undefined
 
@@ -24,6 +24,7 @@ libflipper: libflipper.so | $(BUILD)/include/flipper/.dir
 	$(_v)cp -r carbon/hal/include/* $(BUILD)/include/flipper
 	$(_v)cp -r api/c/*.h $(BUILD)/include/flipper
 	$(_v)cp -r library/c/*.h $(BUILD)/include/flipper
+	$(_v)cp -r library/c/*.def $(BUILD)/include/flipper
 	$(_v)cp assets/flipper.mk $(BUILD)/include/flipper
 
 .PHONY: install-libflipper uninstall-libflipper

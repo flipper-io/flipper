@@ -23,7 +23,7 @@
 #define lf_debug(fmt, ...) printf_P(PSTR(fmt"\n"), ##__VA_ARGS__)
 
 #undef lf_assert
-#define lf_assert(cond, err, fmt, ...) if (!(cond)) { _lf_assert(err, __func__, __LINE__, PSTR(fmt), ##__VA_ARGS__); goto fail; }
+#define lf_assert(cond, err, fmt, ...) if (!(cond)) { _lf_assert(err, PSTR("NO FUNC"), __LINE__, PSTR(fmt), ##__VA_ARGS__); goto fail; }
 
 #endif
 

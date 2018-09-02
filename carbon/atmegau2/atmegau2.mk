@@ -21,6 +21,7 @@ ATMEGAU2_CFLAGS   := -mmcu=atmega32u2        \
                      -DATMEGAU2              \
 					 -DLF_DISABLE_DEBUG      \
 					 -DLF_CONFIG_OMIT_ERRORS \
+					 -Os                     \
 
 ATMEGAU2_LDFLAGS  := -mmcu=atmega32u2        \
 				     -Wl,--gc-sections

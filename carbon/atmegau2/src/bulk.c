@@ -2,9 +2,12 @@
 #include "atmegau2.h"
 #include "megausb.h"
 
-#define LF_USB_TIMEOUT_S 2
+#define LF_USB_TIMEOUT 2
 
 int megausb_bulk_receive(void *dst, uint32_t length) {
+
+	uint8_t _sreg = SREG;
+	cli();
 
 	lf_assert(megausb_configuration, E_USB, "usb is not configured");
 
@@ -13,9 +16,24 @@ int megausb_bulk_receive(void *dst, uint32_t length) {
 
 	while (length) {
 
-		/* TODO: use interrupts for USB timeout */
+		/* Wait until the USB controller is ready. */
+		uint8_t timeout = UDFNUMH + LF_USB_TIMEOUT;
 
-		while (!(UEINTX & (1 << RWAL))) __asm__ __volatile__("nop");
+		while (1) {
+			SREG = _sreg;
+
+			/* data is available */
+			if (UEINTX & (1 << RWAL)) break;
+
+			/* TODO: do these need to be wrapped in SREG sets? */
+			lf_assert(UDFNUMH != timeout, E_TIMEOUT, "usb transfer timed out");
+			lf_assert(megausb_configuration, E_USB, "usb is not configured");
+
+			_sreg = SREG;
+			cli();
+
+			UENUM = BULK_OUT_ENDPOINT;
+		}
 
 		/* calculate send length */
 		size_t len = (length > BULK_OUT_SIZE) ? BULK_OUT_SIZE : length;
@@ -28,9 +46,13 @@ int megausb_bulk_receive(void *dst, uint32_t length) {
 	}
 
 	/* TODO: figure out better way to handle SREG */
+	SREG = _sreg;
 
 	return lf_success;
 fail:
+
+	SREG = _sreg;
+
 	return lf_error;
 }
 
@@ -49,7 +71,7 @@ int megausb_bulk_transmit(void *src, uint32_t length) {
 	while (length) {
 
 		/* Wait until the USB controller is ready. */
-		uint8_t timeout = UDFNUMH + LF_USB_TIMEOUT_S;
+		uint8_t timeout = UDFNUMH + LF_USB_TIMEOUT;
 
 		while (1) {
 			SREG = _sreg;
@@ -63,8 +85,8 @@ int megausb_bulk_transmit(void *src, uint32_t length) {
 
 			_sreg = SREG;
 			cli();
-			UENUM = BULK_IN_ENDPOINT & ~USB_IN_MASK;
 
+			UENUM = BULK_IN_ENDPOINT & ~USB_IN_MASK;
 		}
 
 		/* calculate send length */

@@ -59,7 +59,7 @@ int __attribute__((__destructor__)) lf_exit(void) {
 int lf_invoke(struct _lf_device *device, const char *module, lf_function function, lf_type ret, lf_return_t *retval, struct _lf_ll *args) {
 
     struct _fmr_packet _packet;
-    struct _fmr_call_packet *packet = &_packet;
+    struct _fmr_call_packet *packet = (struct _fmr_call_packet *)&_packet;
     struct _fmr_header *hdr = &packet->hdr;
 	struct _fmr_result result;
     struct _lf_module *m = NULL;

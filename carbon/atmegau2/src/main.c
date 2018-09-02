@@ -4,7 +4,6 @@
 #include "atmegau2.h"
 #include "megausb.h"
 
-static struct _fmr_packet packet;
 static struct _lf_device *_u2;
 
 int debug_putchar(char c, FILE *stream) {
@@ -14,7 +13,8 @@ int debug_putchar(char c, FILE *stream) {
 
 void loop(void) {
 
-	int e;
+	struct _fmr_packet packet;
+	int e = lf_error;
 
 	while (1) {
 
@@ -22,10 +22,12 @@ void loop(void) {
 		wdt_reset();
 
 		/* obtain a message runtime packet */
-		e = megausb_bulk_receive(&packet, sizeof(struct _fmr_packet));
+		//e = megausb_bulk_receive(&packet, sizeof(packet));
 
 		/* ensure the packet is valid */
 		lf_assert(e, E_USB, "failed to obtain usb packet");
+
+		_delay_ms(500);
 
 		lf_debug("performing");
 
@@ -80,32 +82,37 @@ int main(void) {
 
     /* peripheral configuration */
 
-	extern struct _lf_module button;
-    dyld_register(_u2, &button);
+	// extern struct _lf_module button;
+    // dyld_register(_u2, &button);
     button_configure();
-
-	extern struct _lf_module gpio;
-    dyld_register(_u2, &gpio);
-    gpio_configure();
+	//
+	// extern struct _lf_module gpio;
+    // dyld_register(_u2, &gpio);
+    // gpio_configure();
 
 	extern struct _lf_module led;
-    led_configure();
     dyld_register(_u2, &led);
+    led_configure();
 
-	extern struct _lf_module spi;
-    dyld_register(_u2, &spi);
-    spi_configure();
-
-	extern struct _lf_module uart0;
-    dyld_register(_u2, &uart0);
-    uart0_configure();
-
-	extern struct _lf_module wdt;
-	dyld_register(_u2, &wdt);
-	wdt_configure();
+	// extern struct _lf_module spi;
+    // dyld_register(_u2, &spi);
+    // spi_configure();
+	//
+	// extern struct _lf_module uart0;
+    // dyld_register(_u2, &uart0);
+    // uart0_configure();
+	//
+	// extern struct _lf_module wdt;
+	// dyld_register(_u2, &wdt);
+	// wdt_configure();
 
 	/* connect to the USB host */
 	usb_configure();
+
+	_delay_ms(500);
+	_delay_ms(500);
+
+	lf_debug("this string is much larger than a packet, my dude!!!!!!!!!!!!!");
 
 	/* Use USB debug as STDOUT. */
 	FILE debug_f = FDEV_SETUP_STREAM(debug_putchar, NULL, _FDEV_SETUP_RW);
