@@ -22,12 +22,10 @@ void loop(void) {
 		wdt_reset();
 
 		/* obtain a message runtime packet */
-		//e = megausb_bulk_receive(&packet, sizeof(packet));
+		e = megausb_bulk_receive(&packet, sizeof(packet));
 
 		/* ensure the packet is valid */
 		lf_assert(e, E_USB, "failed to obtain usb packet");
-
-		_delay_ms(500);
 
 		lf_debug("performing");
 
@@ -35,7 +33,6 @@ void loop(void) {
 		fmr_perform(_u2, &packet);
 
 fail:
-		led_rgb(10, 0, 0);
 		continue;
 	}
 }
@@ -108,11 +105,6 @@ int main(void) {
 
 	/* connect to the USB host */
 	usb_configure();
-
-	_delay_ms(500);
-	_delay_ms(500);
-
-	lf_debug("this string is much larger than a packet, my dude!!!!!!!!!!!!!");
 
 	/* Use USB debug as STDOUT. */
 	FILE debug_f = FDEV_SETUP_STREAM(debug_putchar, NULL, _FDEV_SETUP_RW);
