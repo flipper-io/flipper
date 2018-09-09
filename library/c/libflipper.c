@@ -187,28 +187,31 @@ fail:
 
 int lf_dyld(struct _lf_device *device, const char *module, int *idx) {
 
-    struct _fmr_dyld_packet packet;
-    struct _fmr_header *hdr = &packet.hdr;
+    struct _fmr_packet _packet;
+    memset(&_packet, 0, sizeof(_packet));
+
+	struct _fmr_dyld_packet *packet = (struct _fmr_dyld_packet *)&_packet;
+    struct _fmr_header *hdr = &packet->hdr;
     struct _fmr_result result;
     int e;
-	lf_crc_t crc;
+    lf_crc_t crc;
 
 	lf_assert(device, E_NULL, "invalid device");
-	lf_assert(module, E_NULL, "invalid module");
-	lf_assert(strlen(module) < 16, E_OVERFLOW, "Module name '%s' is invalid. Module names must be 16 characters or less.", module);
+	lf_assert(module, E_NULL, "invalid module name");
 
-	lf_debug("Syncing with loader on device '%s'.", device->name);
-
-	memset(&packet, 0, sizeof(packet));
 	hdr->magic = FMR_MAGIC_NUMBER;
-	hdr->len = sizeof(struct _fmr_dyld_packet);
+	hdr->len = sizeof(hdr);
 	hdr->type = fmr_dyld_class;
-	strcpy(packet.module, module);
-	lf_crc(&packet, hdr->len, &crc);
-	hdr->crc = crc;
-	lf_debug_packet((struct _fmr_packet *)&packet);
 
-	e = device->write(device, &packet, sizeof(packet));
+	strncpy(packet->module, module, sizeof(struct _fmr_packet) - sizeof(struct _fmr_dyld_packet));
+	hdr->len += strlen(module) + 1;
+
+	lf_crc(packet, hdr->len, &crc);
+	hdr->crc = crc;
+
+	lf_debug_packet(&_packet);
+
+	e = device->write(device, packet, hdr->len);
 	lf_assert(e , E_ENDPOINT, "Failed to send message to device '%s'.", device->name);
 
 	e = device->read(device, &result, sizeof(struct _fmr_result));

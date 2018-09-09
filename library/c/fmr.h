@@ -182,7 +182,7 @@ struct LF_PACKED _fmr_dyld_packet {
 	/* The packet header programmed with 'fmr_dyld_class'. */
 	struct _fmr_header hdr;
 	/* The module name. */
-	char module[16];
+	char module[];
 };
 
 /* Allocates memory on the device. */

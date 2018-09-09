@@ -27,14 +27,14 @@ int main(int argc, char *argv[]) {
 	e = bind(sd, (struct sockaddr*)&addr, sizeof(addr));
     lf_assert(e == 0, E_UNIMPLEMENTED, "failed to bind socket");
 
-	/* The network endpoint for the virtual flipper device. */
 	fvm = lf_device_create(lf_network_read, lf_network_write, lf_network_release);
 	lf_assert(fvm, E_ENDPOINT, "failed to create device for virtual machine.");
+
 	fvm->_ep_ctx = calloc(1, sizeof(struct _lf_network_context));
 	struct _lf_network_context *context = (struct _lf_network_context *)fvm->_ep_ctx;
 	lf_assert(context, E_NULL, "failed to allocate memory for context");
-	/* Set server file descriptor. */
 	context->fd = sd;
+
 	lf_attach(fvm);
 
 	printf("Flipper Virtual Machine (FVM) v0.1.0\nListening on 'localhost'.\n\n");
@@ -104,19 +104,25 @@ int main(int argc, char *argv[]) {
 	wdt_configure();
 
 	if (argc > 1) {
+
 		char *lib = argv[1];
 		char *module, **modules = &argv[2];
+
 		while ((module = *modules++)) {
+
 			printf("Loading module '%s' from '%s'.", module, lib);
 			void *dlm = dlopen(lib, RTLD_LAZY);
 			lf_assert(dlm, E_NULL, "failed to open module '%s'.", lib);
+
 			struct _lf_module *m = dlsym(dlm, module);
 			lf_assert(m, E_NULL, "failed to read module '%s' from '%s'.", module, lib);
 			printf("Successfully loaded module '%s'.", module);
-			int e = dyld_register(fvm, m);
+
+			e = dyld_register(fvm, m);
 			lf_assert(e , E_NULL, "failed to register module '%s'.", m->name);
 			printf("Successfully registered module '%s'.", module);
 		}
+
 		printf("\n");
 	}
 

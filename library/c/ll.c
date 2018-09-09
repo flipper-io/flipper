@@ -60,7 +60,7 @@ fail:
 	return;
 }
 
-int lf_ll_apply_func(struct _lf_ll *ll, lf_ll_applier_func func,  void *_ctx) {
+int lf_ll_apply_func(struct _lf_ll *ll, lf_ll_applier_func func, void *_ctx) {
 	lf_assert(ll, E_NULL, "invalid list");
 	lf_assert(func, E_NULL, "invalid applier function");
 
