@@ -25,7 +25,7 @@ struct _lf_device {
     /* Transmits arbitrary data to the device. */
     int (*write)(struct _lf_device *device, void *src, uint32_t length);
     /* Releases device state. */
-    int (*release)(struct _lf_device *device);
+    int (*release)(void *device);
     /* The device's context. */
     void *_dev_ctx;
     /* The endpoint's context. */
@@ -34,7 +34,7 @@ struct _lf_device {
 
 struct _lf_device *lf_device_create(int (*read)(struct _lf_device *device, void *dst, uint32_t length),
                                     int (*write)(struct _lf_device *device, void *src, uint32_t length),
-                                    int (*release)(struct _lf_device *device));
-int lf_device_release(struct _lf_device *device);
+                                    int (*release)(void *device));
+void lf_device_release(void *device);
 
 #endif

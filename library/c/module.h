@@ -7,14 +7,14 @@ struct _lf_module {
     /* The version of the module. */
     lf_version_t version;
     /* The loaded index of the module on the device. */
-    int idx;
+    uint16_t idx;
     /* The module's interface. */
     void **interface;
 };
 
-#define LF_MODULE(sym, name, interface) struct _lf_module sym = { name, 0, -1, interface };
+#define LF_MODULE(sym, name, interface) struct _lf_module sym = { name, 0, UINT16_MAX, interface };
 
-struct _lf_module *lf_module_create(const char *name, int idx);
-int lf_module_release(struct _lf_module *module);
+struct _lf_module *lf_module_create(const char *name, uint16_t idx);
+void lf_module_release(void *module);
 
 #endif

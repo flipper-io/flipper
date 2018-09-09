@@ -15,9 +15,7 @@ install:
 matrix:
   include:
   - language: c
-    compiler:
-    - clang
-    - gcc
+    compiler: gcc
     script: make libflipper atmegau2 atsam4s utils VERBOSE=1
 
   - language: rust

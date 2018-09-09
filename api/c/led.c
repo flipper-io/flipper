@@ -11,8 +11,8 @@ LF_MODULE(led, "led", led_interface);
 
 LF_WEAK void led_rgb(uint8_t r, uint8_t g, uint8_t b) {
     lf_return_t retval;
-    __auto_type args = lf_args(lf_infer(r), lf_infer(g), lf_infer(b));
-    lf_invoke(lf_get_selected(), "led", _led_rgb, lf_void_t, &retval, args);
+    lf_invoke(lf_get_selected(), "led", _led_rgb, lf_void_t, &retval,
+              lf_args(lf_infer(r), lf_infer(g), lf_infer(b)));
 }
 
 LF_WEAK int led_configure(void) {

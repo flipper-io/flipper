@@ -102,7 +102,7 @@ fail:
     return lf_error;
 }
 
-int lf_push(struct _lf_device *device, void *dst, void *src, size_t len) {
+int lf_push(struct _lf_device *device, void *dst, void *src, uint32_t len) {
 
     struct _fmr_push_pull_packet packet;
     struct _fmr_header *hdr = &packet.hdr;
@@ -144,7 +144,7 @@ fail:
     return lf_error;
 }
 
-int lf_pull(struct _lf_device *device, void *dst, void *src, size_t len) {
+int lf_pull(struct _lf_device *device, void *dst, void *src, uint32_t len) {
 
     struct _fmr_push_pull_packet packet;
     struct _fmr_header *hdr = &packet.hdr;
@@ -186,7 +186,7 @@ fail:
     return lf_error;
 }
 
-int lf_dyld(struct _lf_device *device, const char *module, int *idx) {
+int lf_dyld(struct _lf_device *device, const char *module, uint16_t *idx) {
 
     struct _fmr_packet _packet;
     memset(&_packet, 0, sizeof(_packet));
@@ -221,14 +221,15 @@ int lf_dyld(struct _lf_device *device, const char *module, int *idx) {
     lf_debug_result(&result);
     lf_assert(result.error == E_OK, result.error, "An error occured on the device '%s':", device->name);
 
-    *idx = result.value;
+    lf_assert(result.value <= UINT16_MAX, E_MODULE, "Module index '%llu' out of bounds", result.value);
+    *idx = (uint16_t)result.value;
 
     return lf_success;
 fail:
     return lf_error;
 }
 
-int lf_malloc(struct _lf_device *device, size_t size, void **ptr) {
+int lf_malloc(struct _lf_device *device, uint32_t size, void **ptr) {
 
     struct _fmr_memory_packet packet;
     struct _fmr_header *hdr = &packet.hdr;

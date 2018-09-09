@@ -9,7 +9,7 @@ size_t lf_ll_count(struct _lf_ll *ll) {
     return count;
 }
 
-int lf_ll_append(struct _lf_ll **_ll, void *item, void *deconstructor) {
+int lf_ll_append(struct _lf_ll **_ll, void *item, void (*deconstructor)(void *)) {
     lf_assert(_ll, E_NULL, "invalid list reference");
 
     struct _lf_ll *new = malloc(sizeof(struct _lf_ll));
@@ -29,7 +29,7 @@ fail:
     return lf_error;
 }
 
-void *lf_ll_item(struct _lf_ll *ll, int index) {
+void *lf_ll_item(struct _lf_ll *ll, size_t index) {
     while (index-- && ll) ll = ll->next;
     lf_assert(ll, E_NULL, "End of list reached before item.");
 

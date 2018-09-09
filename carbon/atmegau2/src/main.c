@@ -46,7 +46,7 @@ int atmegau2_write(struct _lf_device *device, void *src, uint32_t length) {
     return megausb_bulk_transmit(src, length);
 }
 
-int atmegau2_release(struct _lf_device *device) {
+int atmegau2_release(void *device) {
     return lf_error;
 }
 

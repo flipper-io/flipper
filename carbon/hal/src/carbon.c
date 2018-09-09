@@ -126,8 +126,8 @@ fail:
     return lf_error;
 }
 
-int atsam4s_release(struct _lf_device *device) {
-    return lf_success;
+int atsam4s_release(void *device) {
+    return lf_error;
 }
 
 int carbon_attach_applier(const void *__u2, void *_unused) {
@@ -172,7 +172,7 @@ struct _lf_device *carbon_attach(void) {
 
     struct _lf_ll *devices = lf_libusb_get_devices();
     lf_assert(devices, E_NO_DEVICE, "no carbon devices");
-    int e = lf_ll_apply_func(devices, carbon_attach_applier, NULL);
+    lf_ll_apply_func(devices, carbon_attach_applier, NULL);
 
     return lf_get_selected();
 fail:

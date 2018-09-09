@@ -49,16 +49,16 @@ int lf_invoke(struct _lf_device *device, const char *module, lf_function functio
               struct _lf_ll *args);
 
 /* Moves data from the address space of the host to that of the device. */
-int lf_push(struct _lf_device *device, void *dst, void *src, size_t len);
+int lf_push(struct _lf_device *device, void *dst, void *src, uint32_t len);
 
 /* Moves data from the address space of the device to that of the host. */
-int lf_pull(struct _lf_device *device, void *dst, void *src, size_t len);
+int lf_pull(struct _lf_device *device, void *dst, void *src, uint32_t len);
 
 /* Gets the module index. */
-int lf_dyld(struct _lf_device *device, const char *module, int *idx);
+int lf_dyld(struct _lf_device *device, const char *module, uint16_t *idx);
 
 /* Allocates memory on the device. */
-int lf_malloc(struct _lf_device *device, size_t size, void **ptr);
+int lf_malloc(struct _lf_device *device, uint32_t size, void **ptr);
 
 /* Frees memory on the device. */
 int lf_free(struct _lf_device *device, void *ptr);

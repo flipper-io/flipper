@@ -7,8 +7,7 @@
 #define LF_USB_TIMEOUT_MS 200
 
 int lf_libusb_read(struct _lf_device *device, void *dst, uint32_t length) {
-
-    int len;
+    uint32_t len;
     int actual;
     int e;
 
@@ -21,7 +20,7 @@ int lf_libusb_read(struct _lf_device *device, void *dst, uint32_t length) {
         len = (length > ctx->in_sz) ? ctx->in_sz : length;
 
         lf_debug("Reading %i from libusb.", length);
-        e = libusb_bulk_transfer(ctx->handle, ctx->in, dst, len, &actual, LF_USB_TIMEOUT_MS);
+        e = libusb_bulk_transfer(ctx->handle, ctx->in, (uint8_t *)dst, (int)len, &actual, LF_USB_TIMEOUT_MS);
         lf_assert(e == 0, E_LIBUSB, "read transfer failed (%s)", libusb_error_name(e));
 
         dst += len;
@@ -35,7 +34,7 @@ fail:
 
 int lf_libusb_write(struct _lf_device *device, void *src, uint32_t length) {
 
-    int len;
+    uint32_t len;
     int actual;
     int e;
 
@@ -48,7 +47,7 @@ int lf_libusb_write(struct _lf_device *device, void *src, uint32_t length) {
     while (length) {
         len = (length > ctx->out_sz) ? ctx->out_sz : length;
 
-        e = libusb_bulk_transfer(ctx->handle, ctx->out, src, len, &actual, LF_USB_TIMEOUT_MS);
+        e = libusb_bulk_transfer(ctx->handle, ctx->out, (uint8_t *)src, (int)len, &actual, LF_USB_TIMEOUT_MS);
         lf_assert(e == 0, E_LIBUSB, "write transfer failed (%s)", libusb_error_name(e));
 
         src += len;
@@ -60,7 +59,8 @@ fail:
     return lf_error;
 }
 
-int lf_libusb_release(struct _lf_device *device) {
+int lf_libusb_release(void *_device) {
+    struct _lf_device *device = _device;
     lf_assert(device, E_NULL, "invalid device");
 
     struct _lf_libusb_context *ctx = (struct _lf_libusb_context *)device->_ep_ctx;
@@ -87,7 +87,7 @@ struct _lf_ll *lf_libusb_get_devices(void) {
     struct libusb_device_descriptor descriptor;
     struct _lf_ll *devices = NULL;
     struct _lf_device *device = NULL;
-    size_t count = 0;
+    ssize_t count = 0;
     int e;
 
     e = libusb_init(&context);
@@ -95,7 +95,7 @@ struct _lf_ll *lf_libusb_get_devices(void) {
 
     count = libusb_get_device_list(context, &libusb_devices);
 
-    for (size_t i = 0; i < count; i++) {
+    for (ssize_t i = 0; i < count; i++) {
 
         struct libusb_device *libusb_device = libusb_devices[i];
 

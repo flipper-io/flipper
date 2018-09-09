@@ -18,10 +18,10 @@ typedef int (*lf_ll_applier_func)(const void *_item, void *_ctx);
 size_t lf_ll_count(struct _lf_ll *ll);
 
 /* Appends the item to the list. Creates if necessary. */
-int lf_ll_append(struct _lf_ll **_ll, void *item, void *deconstructor);
+int lf_ll_append(struct _lf_ll **_ll, void *item, void (*deconstructor)(void *));
 
 /* Retrieves an item from the list at the given index. */
-void *lf_ll_item(struct _lf_ll *ll, int index);
+void *lf_ll_item(struct _lf_ll *ll, size_t index);
 
 /* Removes matching items from the list. */
 void lf_ll_remove(struct _lf_ll **_ll, void *item);

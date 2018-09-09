@@ -33,7 +33,8 @@ fail:
     return lf_error;
 }
 
-int lf_network_release(struct _lf_device *device) {
+int lf_network_release(void *_device) {
+    struct _lf_device *device = _device;
     lf_assert(device, E_NULL, "invalid device");
 
     struct _lf_network_context *context = device->_ep_ctx;

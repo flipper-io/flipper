@@ -21,7 +21,7 @@ int lf_sizeof(lf_type type) {
     return 0;
 }
 
-void lf_arg_release(struct _lf_arg *arg) {
+void lf_arg_release(void *arg) {
 
     lf_assert(arg, E_NULL, "invalid argument");
 
@@ -38,6 +38,7 @@ struct _lf_ll *fmr_build(int argc, ...) {
     struct _lf_arg *arg = NULL;
 
     lf_assert(argc < FMR_MAX_ARGC, E_OVERFLOW, "Too many arguments were provided when building (%i) call.", argc);
+    lf_assert(argc >= 0, E_UNDERFLOW, "Negative argument count passed to fmr_build");
 
     /* Initialize the va_list that we created above. */
     va_start(argv, argc);
@@ -149,9 +150,8 @@ fail:
 int fmr_push(struct _lf_device *device, struct _fmr_push_pull_packet *packet) {
 
     void *dst = (void *)(uintptr_t)packet->ptr;
-    size_t len = (size_t)packet->len;
 
-    lf_assert(device->read(device, dst, len), E_FMR, "failed to pull data");
+    lf_assert(device->read(device, dst, packet->len), E_FMR, "failed to pull data");
 
     return lf_success;
 fail:
@@ -161,9 +161,8 @@ fail:
 int fmr_pull(struct _lf_device *device, struct _fmr_push_pull_packet *packet) {
 
     void *src = (void *)(uintptr_t)packet->ptr;
-    size_t len = (size_t)packet->len;
 
-    lf_assert(device->write(device, src, len), E_FMR, "failed to push data");
+    lf_assert(device->write(device, src, packet->len), E_FMR, "failed to push data");
 
     return lf_success;
 fail:
@@ -173,7 +172,7 @@ fail:
 int fmr_dyld(struct _lf_device *device, struct _fmr_dyld_packet *packet, lf_return_t *retval) {
 
     struct _lf_module *module = dyld_module(device, packet->module);
-    lf_assert(module, E_MODULE, "no module '%s' has been registered", module->name);
+    lf_assert(module, E_MODULE, "no module '%s' has been registered", packet->module);
 
     *retval = module->idx;
 
@@ -230,31 +229,31 @@ int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet) {
     switch (hdr->type) {
         /* rpc */
         case fmr_rpc_class:
-            e = fmr_rpc(device, (struct _fmr_call_packet *)packet, &retval);
+            fmr_rpc(device, (struct _fmr_call_packet *)packet, &retval);
             break;
         /* push */
         case fmr_push_class:
-            e = fmr_push(device, (struct _fmr_push_pull_packet *)packet);
+            fmr_push(device, (struct _fmr_push_pull_packet *)packet);
             break;
         /* pull */
         case fmr_pull_class:
-            e = fmr_pull(device, (struct _fmr_push_pull_packet *)packet);
+            fmr_pull(device, (struct _fmr_push_pull_packet *)packet);
             break;
         /* dyld */
         case fmr_dyld_class:
-            e = fmr_dyld(device, (struct _fmr_dyld_packet *)packet, &retval);
+            fmr_dyld(device, (struct _fmr_dyld_packet *)packet, &retval);
             break;
         /* malloc */
         case fmr_malloc_class:
-            e = fmr_malloc((struct _fmr_memory_packet *)packet, &retval);
+            fmr_malloc((struct _fmr_memory_packet *)packet, &retval);
             break;
         /* free */
         case fmr_free_class:
-            e = fmr_free((struct _fmr_memory_packet *)packet);
+            fmr_free((struct _fmr_memory_packet *)packet);
             break;
         /* default */
         default:
-            e = E_UNIMPLEMENTED;
+            lf_assert(false, E_FMR, "unknown header type '%d'", hdr->type);
             break;
     }
 
