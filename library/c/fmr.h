@@ -38,21 +38,21 @@ typedef uint32_t lf_types;
 
 /* Enumerates the basic type signatures an argument can be classified as. */
 enum {
-    lf_void_t = 2,                    // 2
-    lf_int_t = 4,                     // 4
-    lf_ptr_t = 6,                     // 6
+    lf_void_t = 2,  // 2
+    lf_int_t = 4,   // 4
+    lf_ptr_t = 6,   // 6
 
     /* Unsigned types. */
-    lf_uint8_t = lf_utype(uint8_t),   // 0
-    lf_uint16_t = lf_utype(uint16_t), // 1
-    lf_uint32_t = lf_utype(uint32_t), // 3
-    lf_uint64_t = lf_utype(uint64_t), // 7
+    lf_uint8_t = lf_utype(uint8_t),    // 0
+    lf_uint16_t = lf_utype(uint16_t),  // 1
+    lf_uint32_t = lf_utype(uint32_t),  // 3
+    lf_uint64_t = lf_utype(uint64_t),  // 7
 
     /* Signed types. */
-    lf_int8_t = lf_stype(int8_t),     // 8
-    lf_int16_t = lf_stype(int16_t),   // 9
-    lf_int32_t = lf_stype(int32_t),   // 11
-    lf_int64_t = lf_stype(int64_t),   // 15
+    lf_int8_t = lf_stype(int8_t),    // 8
+    lf_int16_t = lf_stype(int16_t),  // 9
+    lf_int32_t = lf_stype(int32_t),  // 11
+    lf_int64_t = lf_stype(int64_t),  // 15
 
     /* Max type is 15. */
     lf_max_t = 15
@@ -68,15 +68,16 @@ int lf_sizeof(lf_type type);
 
 /* Counts the number of arguments within a variadic argument macro. */
 #define __fmr_count_implicit(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _a, _b, _c, _d, _e, _f, _10, n, ...) n
-#define __fmr_count(...) __fmr_count_implicit(_, ##__VA_ARGS__, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
+#define __fmr_count(...) \
+    __fmr_count_implicit(_, ##__VA_ARGS__, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 
 /* Generates and returns a pointer to an 'fmr_parameters' given a list of variadic arguments. */
-#define lf_args(...) fmr_build((__fmr_count(__VA_ARGS__)/2), ##__VA_ARGS__)
+#define lf_args(...) fmr_build((__fmr_count(__VA_ARGS__) / 2), ##__VA_ARGS__)
 
 /* Parser macros for variables. */
 
 /* Creates an 'lf_va' from an 'lf_type' and an immediate value. */
-#define lf_intx(type, arg) (lf_type)type, (lf_arg)(uintptr_t)arg
+#define lf_intx(type, arg) (lf_type) type, (lf_arg)(uintptr_t)arg
 /* Gives the 'lf_va' for a given integer's value. */
 #define lf_int(arg) lf_intx(lf_int_t, arg)
 /* Gives the 'lf_va' for a given 8-bit integer's value. */
@@ -208,7 +209,8 @@ struct LF_PACKED _fmr_result {
 int lf_append(struct _lf_ll *list, lf_type type, lf_arg value);
 
 /* Generates the appropriate data structure needed for the remote procedure call of 'function' in 'module'. */
-int lf_create_call(lf_module module, lf_function function, lf_type ret, struct _lf_ll *args, struct _fmr_header *header, struct _fmr_call *call);
+int lf_create_call(lf_module module, lf_function function, lf_type ret, struct _lf_ll *args, struct _fmr_header *header,
+                   struct _fmr_call *call);
 
 /* Creates a struct _lf_arg * type. */
 struct _lf_arg *lf_arg_create(lf_type type, lf_arg value);
@@ -220,6 +222,6 @@ struct _lf_ll *fmr_build(int argc, ...);
 int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet);
 
 /* platform specific internal functions implemented in assembly */
-extern lf_return_t fmr_call(lf_return_t (* function)(void), lf_type ret, uint8_t argc, uint16_t argt, void *argv);
+extern lf_return_t fmr_call(lf_return_t (*function)(void), lf_type ret, uint8_t argc, uint16_t argt, void *argv);
 
 #endif

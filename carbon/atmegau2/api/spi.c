@@ -36,7 +36,8 @@ LF_FUNC("spi") void spi_put(uint8_t byte) {
     /* Write the byte to the data register. */
     SPDR = byte;
     /* Wait until the byte has been sent. */
-    while (!((SPSR) & (1 << SPIF)));
+    while (!((SPSR) & (1 << SPIF)))
+        ;
 }
 
 LF_FUNC("spi") uint8_t spi_get(void) {
@@ -47,11 +48,11 @@ LF_FUNC("spi") uint8_t spi_get(void) {
 }
 
 LF_FUNC("spi") int spi_write(void *src, uint32_t length) {
-    while (length --) spi_put(*(uint8_t *)(src ++));
+    while (length--) spi_put(*(uint8_t *)(src++));
     return lf_success;
 }
 
 LF_FUNC("spi") int spi_read(void *dst, uint32_t length) {
-    while (length --) *(uint8_t *)(dst ++) = spi_get();
+    while (length--) *(uint8_t *)(dst++) = spi_get();
     return lf_success;
 }

@@ -17,8 +17,8 @@ LF_WEAK void _lf_assert(lf_err_t err, const char *func, int line, const char *fm
     va_list args;
     va_start(args, fmt);
 
-    printf(KRED "flipper runtime error" KNRM ": " KBLU "%s" KNRM " (0x%02x)\n" KGRN "  %s:%i: " KYEL,
-           err_strs[err], err, func, line);
+    printf(KRED "flipper runtime error" KNRM ": " KBLU "%s" KNRM " (0x%02x)\n" KGRN "  %s:%i: " KYEL, err_strs[err],
+           err, func, line);
     vprintf(fmt, args);
     printf(KNRM "\n\n");
 

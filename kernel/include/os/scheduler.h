@@ -19,13 +19,13 @@ struct _os_task {
     /* The PID of this task. */
     int pid;
     /* The entry point of the task. */
-    void (* handler)(void);
+    void (*handler)(void);
     /* The task's status (active or idle). */
     volatile os_task_status status;
     /* The base address of the task's stack, stored for task deallocation. */
     void *stack;
     /* The task's exit function. */
-    void (* exit)(struct _lf_abi_header *header);
+    void (*exit)(struct _lf_abi_header *header);
     /* The task's header. */
     struct _lf_abi_header *header;
     /* The next task to be executed. */
@@ -75,7 +75,8 @@ struct _task_ctx {
 void os_kernel_task(void);
 void os_scheduler_init(void);
 
-struct _os_task *os_task_create(void *_entry, void (* _exit)(struct _lf_abi_header *header), struct _lf_abi_header *header, uint32_t stack_size);
+struct _os_task *os_task_create(void *_entry, void (*_exit)(struct _lf_abi_header *header),
+                                struct _lf_abi_header *header, uint32_t stack_size);
 int os_task_add(struct _os_task *task);
 int os_task_release(struct _os_task *task);
 void os_task_next(void);

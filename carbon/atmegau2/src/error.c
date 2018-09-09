@@ -16,8 +16,8 @@ void _lf_assert(lf_err_t err, const char *func, int line, const char *fmt, ...) 
     va_start(args, fmt);
 
     const char *error_str = pgm_read_ptr(&err_strs[err]);
-    printf_P(PSTR(KRED "flipper runtime error" KNRM ": " KBLU "%S" KNRM " (0x%02x)\n" KGRN "  %s:%i: " KYEL),
-             error_str, err, func, line);
+    printf_P(PSTR(KRED "flipper runtime error" KNRM ": " KBLU "%S" KNRM " (0x%02x)\n" KGRN "  %s:%i: " KYEL), error_str,
+             err, func, line);
     vfprintf_P(stdout, fmt, args);
     printf_P(PSTR(KNRM "\n\n"));
 

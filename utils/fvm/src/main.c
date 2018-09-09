@@ -1,9 +1,9 @@
+#include <arpa/inet.h>
 #include <flipper/flipper.h>
 #include <unistd.h>
-#include <arpa/inet.h>
 #define _GNU_SOURCE
-#include <dlfcn.h>
 #include "posix/network.h"
+#include <dlfcn.h>
 
 /* fvm - Creates a local server that acts as a virtual flipper device. */
 
@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     addr.sin_family = AF_INET;
     addr.sin_port = htons(LF_UDP_PORT);
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    e = bind(sd, (struct sockaddr*)&addr, sizeof(addr));
+    e = bind(sd, (struct sockaddr *)&addr, sizeof(addr));
     lf_assert(e == 0, E_UNIMPLEMENTED, "failed to bind socket");
 
     fvm = lf_device_create(lf_network_read, lf_network_write, lf_network_release);
@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
             printf("Successfully loaded module '%s'.", module);
 
             e = dyld_register(fvm, m);
-            lf_assert(e , E_NULL, "failed to register module '%s'.", m->name);
+            lf_assert(e, E_NULL, "failed to register module '%s'.", m->name);
             printf("Successfully registered module '%s'.", module);
         }
 

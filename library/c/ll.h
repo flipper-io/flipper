@@ -6,13 +6,13 @@ struct _lf_ll {
     /* The item stored at this node in the list. */
     void *item;
     /* A deconstructor for the item, if any. */
-    void (* deconstructor)(void *item);
+    void (*deconstructor)(void *item);
     /* The next node in the list. */
     struct _lf_ll *next;
 };
 
 /* The type signature of a fast enumeration function. */
-typedef int (* lf_ll_applier_func)(const void *_item, void *_ctx);
+typedef int (*lf_ll_applier_func)(const void *_item, void *_ctx);
 
 /* Returns the number of items in the list. */
 size_t lf_ll_count(struct _lf_ll *ll);

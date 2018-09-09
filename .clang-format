@@ -1,0 +1,15 @@
+BasedOnStyle: Google
+IndentWidth: 4
+ColumnLimit: 120
+IndentCaseLabels: true
+AllowShortFunctionsOnASingleLine: None
+IncludeCategories:
+  - Regex:           '.*libflipper.*'
+    Priority:        -1
+  - Regex:           '.*'
+    Priority:        1
+Cpp11BracedListStyle: false
+AllowShortBlocksOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: true
+KeepEmptyLinesAtTheStartOfBlocks: true

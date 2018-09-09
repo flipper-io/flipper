@@ -13,7 +13,8 @@ int usb_configure(void) {
     /* Configure the USB PLL to use the 16MHz system clock. */
     PLLCSR = (1 << PLLE) | (1 << PLLP0);
     /* Wait until USB PLL configuration has succeeded. */
-    while (!(PLLCSR & (1 << PLOCK)));
+    while (!(PLLCSR & (1 << PLOCK)))
+        ;
     /* Unfreeze the USB clock and enable the USB hardware. */
     USBCON = (1 << USBE);
     /* Attach the USB device. */
@@ -65,13 +66,12 @@ ISR(USB_GEN_vect) {
                 UEINTX = 0x3A;
             }
         }
-
     }
-
 }
 
 static inline void usb_wait_in_ready(void) {
-    while (!(UEINTX & (1 << TXINI))) ;
+    while (!(UEINTX & (1 << TXINI)))
+        ;
 }
 
 static inline void usb_send_in(void) {
@@ -91,7 +91,7 @@ ISR(USB_COM_vect) {
     uint16_t wLength;
     uint16_t desc_val;
     const uint8_t *desc_addr;
-    uint8_t    desc_length;
+    uint8_t desc_length;
 
     /* Select the control endpoint. */
     UENUM = USB_CONTROL_ENDPOINT;
@@ -112,9 +112,9 @@ ISR(USB_COM_vect) {
 
         if (bRequest == GET_DESCRIPTOR) {
             list = (const uint8_t *)descriptors;
-            for (i=0; ; i++) {
+            for (i = 0;; i++) {
                 if (i >= NUM_DESC_LIST) {
-                    UECONX = (1 << STALLRQ) | (1 << EPEN);  //stall
+                    UECONX = (1 << STALLRQ) | (1 << EPEN);  // stall
                     return;
                 }
                 desc_val = pgm_read_word(list);
@@ -125,7 +125,7 @@ ISR(USB_COM_vect) {
                 list += 2;
                 desc_val = pgm_read_word(list);
                 if (desc_val != wIndex) {
-                    list += sizeof(struct _descriptor)-2;
+                    list += sizeof(struct _descriptor) - 2;
                     continue;
                 }
                 list += 2;
@@ -137,14 +137,10 @@ ISR(USB_COM_vect) {
             len = (wLength < 256) ? wLength : 255;
             if (len > desc_length) len = desc_length;
             do {
-                do {
-                    i = UEINTX;
-                } while (!(i & ((1 << TXINI) | (1 << RXOUTI))));
+                do { i = UEINTX; } while (!(i & ((1 << TXINI) | (1 << RXOUTI))));
                 if (i & (1 << RXOUTI)) return;
                 n = len < USB_CONTROL_SIZE ? len : USB_CONTROL_SIZE;
-                for (i = n; i; i--) {
-                    UEDATX = pgm_read_byte(desc_addr++);
-                }
+                for (i = n; i; i--) { UEDATX = pgm_read_byte(desc_addr++); }
                 len -= n;
                 usb_send_in();
             } while (len || n == USB_CONTROL_SIZE);
@@ -192,8 +188,7 @@ ISR(USB_COM_vect) {
             usb_send_in();
             return;
         }
-        if ((bRequest == CLEAR_FEATURE || bRequest == SET_FEATURE)
-            && bmRequestType == 0x02 && wValue == 0) {
+        if ((bRequest == CLEAR_FEATURE || bRequest == SET_FEATURE) && bmRequestType == 0x02 && wValue == 0) {
             i = wIndex & 0x7F;
             if (i >= 1 && i <= MAX_ENDPOINT) {
                 usb_send_in();

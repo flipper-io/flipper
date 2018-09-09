@@ -18,12 +18,12 @@
 #include <string.h>
 
 #include "defines.h"
-#include "error.h"
 #include "device.h"
-#include "module.h"
+#include "dyld.h"
+#include "error.h"
 #include "fmr.h"
 #include "ll.h"
-#include "dyld.h"
+#include "module.h"
 
 /* ---------- STATE ---------- */
 
@@ -45,7 +45,8 @@ int lf_exit(void);
 /* ---------- CONTROL ---------- */
 
 /* Performs a remote procedure call to a module's function. */
-int lf_invoke(struct _lf_device *device, const char *module, lf_function function, lf_type ret, lf_return_t *retval, struct _lf_ll *args);
+int lf_invoke(struct _lf_device *device, const char *module, lf_function function, lf_type ret, lf_return_t *retval,
+              struct _lf_ll *args);
 
 /* Moves data from the address space of the host to that of the device. */
 int lf_push(struct _lf_device *device, void *dst, void *src, size_t len);
@@ -67,12 +68,7 @@ int lf_crc(const void *src, uint32_t length, lf_crc_t *crc);
 
 /* ---------- DEBUG ---------- */
 
-enum {
-    LF_DEBUG_LEVEL_OFF,
-    LF_DEBUG_LEVEL_WARNINGS,
-    LF_DEBUG_LEVEL_ERRORS,
-    LF_DEBUG_LEVEL_ALL
-};
+enum { LF_DEBUG_LEVEL_OFF, LF_DEBUG_LEVEL_WARNINGS, LF_DEBUG_LEVEL_ERRORS, LF_DEBUG_LEVEL_ALL };
 
 /* Sets library debug verbosity. */
 void lf_set_debug_level(int level);

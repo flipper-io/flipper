@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
     /* Load the application into RAM. */
     int e = dyld_load(device, fbuf, fsize);
 
-    lf_assert(e , E_MODULE, "Failed to load module.");
+    lf_assert(e, E_MODULE, "Failed to load module.");
 
 fail:
 

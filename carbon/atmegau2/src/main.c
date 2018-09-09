@@ -1,7 +1,6 @@
 #include "libflipper.h"
-#include "led.h"
-#include "megausb.h"
 #include "atmegau2.h"
+#include "led.h"
 #include "megausb.h"
 
 static struct _lf_device *_u2;
@@ -32,7 +31,7 @@ void loop(void) {
         /* execute the packet */
         fmr_perform(_u2, &packet);
 
-fail:
+    fail:
         continue;
     }
 }
@@ -54,7 +53,7 @@ int atmegau2_release(struct _lf_device *device) {
 int main(void) {
 
     /* Configure the AVR. */
-    //wdt_enable(WDTO_500MS);
+    // wdt_enable(WDTO_500MS);
     CLKPR = (1 << CLKPCE);
     CLKPR = 0;
     sei();
@@ -120,7 +119,7 @@ int main(void) {
 }
 
 /* PCINT8 interrupt service routine; captures reset button press and resets the device using the WDT. */
-ISR (PCINT1_vect) {
+ISR(PCINT1_vect) {
     led_rgb(LED_OFF);
     SAM_RESET_PORT &= ~(1 << SAM_RESET_PIN);
     SAM_POWER_PORT &= ~(1 << SAM_POWER_PIN);

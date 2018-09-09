@@ -12,17 +12,8 @@ void spi_disable(void);
 void spi_enable(void);
 int spi_configure(void);
 
-void *spi_interface[] = {
-    &spi_read,
-    &spi_write,
-    &spi_get,
-    &spi_put,
-    &spi_end,
-    &spi_ready,
-    &spi_disable,
-    &spi_enable,
-    &spi_configure
-};
+void* spi_interface[] = { &spi_read,  &spi_write,   &spi_get,    &spi_put,      &spi_end,
+                          &spi_ready, &spi_disable, &spi_enable, &spi_configure };
 
 LF_MODULE(spi, "spi", spi_interface);
 
@@ -47,13 +38,11 @@ LF_WEAK uint8_t spi_get(void) {
 LF_WEAK void spi_put(uint8_t byte) {
     lf_return_t retval;
     lf_invoke(lf_get_selected(), "spi", _spi_put, lf_void_t, &retval, lf_args(lf_infer(byte)));
-    
 }
 
 LF_WEAK void spi_end(void) {
     lf_return_t retval;
     lf_invoke(lf_get_selected(), "spi", _spi_end, lf_void_t, &retval, NULL);
-    
 }
 
 LF_WEAK uint8_t spi_ready(void) {
@@ -65,13 +54,11 @@ LF_WEAK uint8_t spi_ready(void) {
 LF_WEAK void spi_disable(void) {
     lf_return_t retval;
     lf_invoke(lf_get_selected(), "spi", _spi_disable, lf_void_t, &retval, NULL);
-    
 }
 
 LF_WEAK void spi_enable(void) {
     lf_return_t retval;
     lf_invoke(lf_get_selected(), "spi", _spi_enable, lf_void_t, &retval, NULL);
-    
 }
 
 LF_WEAK int spi_configure(void) {
@@ -79,4 +66,3 @@ LF_WEAK int spi_configure(void) {
     lf_invoke(lf_get_selected(), "spi", _spi_configure, lf_int_t, &retval, NULL);
     return (int)retval;
 }
-

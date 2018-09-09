@@ -5,10 +5,7 @@ enum { _led_rgb, _led_configure };
 void led_rgb(uint8_t r, uint8_t g, uint8_t b);
 int led_configure(void);
 
-void *led_interface[] = {
-    &led_rgb,
-    &led_configure
-};
+void *led_interface[] = { &led_rgb, &led_configure };
 
 LF_MODULE(led, "led", led_interface);
 
@@ -23,4 +20,3 @@ LF_WEAK int led_configure(void) {
     lf_invoke(lf_get_selected(), "led", _led_configure, lf_int_t, &retval, NULL);
     return (int)retval;
 }
-

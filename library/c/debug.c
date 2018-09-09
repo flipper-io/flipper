@@ -19,7 +19,7 @@ void lf_debug_call(struct _fmr_call *call) {
     /* Calculate the offset into the packet at which the arguments will be loaded. */
     uint8_t *offset = call->argv;
     lf_types types = call->argt;
-    for (lf_argc i = 0; i < call->argc; i ++) {
+    for (lf_argc i = 0; i < call->argc; i++) {
         lf_type type = types & lf_max_t;
         lf_arg arg = 0;
         memcpy(&arg, offset, lf_sizeof(type));
@@ -41,7 +41,7 @@ void lf_debug_packet(struct _fmr_packet *packet) {
         printf("header\n");
         printf("  └─magic:     0x%x\n", hdr.magic);
         printf("  └─checksum:  0x%x\n", hdr.crc);
-        printf("  └─length:    %d bytes (%.02f%%)\n", hdr.len, (float) hdr.len/sizeof(struct _fmr_packet)*100);
+        printf("  └─length:    %d bytes (%.02f%%)\n", hdr.len, (float)hdr.len / sizeof(struct _fmr_packet) * 100);
         char *classstrs[] = { "exec", "push", "pull", "dyld", "malloc", "free" };
         printf("  └─class:     %s\n", classstrs[hdr.type]);
 
@@ -53,30 +53,30 @@ void lf_debug_packet(struct _fmr_packet *packet) {
         switch (hdr.type) {
             case fmr_rpc_class:
                 lf_debug_call(&invocation->call);
-            break;
+                break;
             case fmr_push_class:
             case fmr_pull_class:
                 printf("length:\n");
                 printf("   └─ ptr:     0x%llx\n", pushpull->ptr);
                 printf("   └─ len:     0x%x\n\n", pushpull->len);
-            break;
+                break;
             case fmr_dyld_class:
                 printf("module:\n");
                 printf("   └─ module: '%s'\n", dyld->module);
-            break;
+                break;
             case fmr_malloc_class:
                 printf("malloc:\n");
                 printf("   └─ size: '0x%x'\n", mem->size);
-            break;
+                break;
             case fmr_free_class:
                 printf("free:\n");
                 printf("   └─ ptr: '0x%llx'\n", mem->ptr);
-            break;
+                break;
             default:
                 printf("invalid packet class.\n");
-            break;
+                break;
         }
-        for (size_t i = 1; i <= hdr.len; i ++) {
+        for (size_t i = 1; i <= hdr.len; i++) {
             printf("0x%02x ", ((uint8_t *)packet)[i - 1]);
             if (i % 8 == 0 && i < hdr.len - 1) printf("\n");
         }

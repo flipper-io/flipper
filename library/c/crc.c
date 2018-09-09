@@ -9,7 +9,7 @@ uint16_t calcrc(const char *ptr, uint32_t count) {
     uint8_t i;
     crc = 0;
     while (count-- != 0) {
-        crc = crc ^ (uint16_t)*ptr ++ << 8;
+        crc = crc ^ (uint16_t)*ptr++ << 8;
         i = 8;
         do {
             if (crc & 0x8000) {
@@ -17,7 +17,7 @@ uint16_t calcrc(const char *ptr, uint32_t count) {
             } else {
                 crc = crc << 1;
             }
-        } while(-- i);
+        } while (--i);
     }
     return crc;
 }

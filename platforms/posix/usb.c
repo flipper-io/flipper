@@ -95,7 +95,7 @@ struct _lf_ll *lf_libusb_get_devices(void) {
 
     count = libusb_get_device_list(context, &libusb_devices);
 
-    for (size_t i = 0; i < count; i ++) {
+    for (size_t i = 0; i < count; i++) {
 
         struct libusb_device *libusb_device = libusb_devices[i];
 
@@ -114,10 +114,13 @@ struct _lf_ll *lf_libusb_get_devices(void) {
             ctx->context = context;
 
             e = libusb_open(libusb_device, &(ctx->handle));
-            lf_assert(e == 0, E_NO_DEVICE, "Could not find any devices connected via USB. Ensure that a device is connected.");
+            lf_assert(e == 0, E_NO_DEVICE,
+                      "Could not find any devices connected via USB. Ensure that a device is connected.");
 
             e = libusb_claim_interface(ctx->handle, FLIPPER_USB_CONTROL_INTERFACE);
-            lf_assert(e == 0, E_LIBUSB, "Failed to claim interface on attached device. Please quit any other programs using your device.");
+            lf_assert(
+                e == 0, E_LIBUSB,
+                "Failed to claim interface on attached device. Please quit any other programs using your device.");
 
             lf_assert(lf_ll_append(&devices, device, lf_device_release), E_NULL, "failed to append to device list");
         }

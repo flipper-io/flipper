@@ -1,7 +1,7 @@
 #include "libflipper.h"
+#include "atsam4s.h"
 #include "uart0.h"
 #include <os/loader.h>
-#include "atsam4s.h"
 
 struct _lf_device THIS_DEVICE;
 
@@ -17,7 +17,8 @@ void uart0_pull_wait(void *destination, size_t length) {
     /* Enable the receiver. */
     UART0->UART_PTCR = UART_PTCR_RXTEN;
     /* Wait until the transfer has finished. */
-    while (!(UART0->UART_SR & UART_SR_ENDRX));
+    while (!(UART0->UART_SR & UART_SR_ENDRX))
+        ;
     /* Disable the PDC receiver. */
     UART0->UART_PTCR = UART_PTCR_RXTDIS;
     /* Enable the PDC receive complete interrupt. */
@@ -41,8 +42,8 @@ lf_return_t fmr_push(struct _fmr_push_pull_packet *packet) {
     //     return lf_success;
     // } else {
     //     *(uint64_t *)(packet->call.parameters) = (uintptr_t)push_buffer;
-    //     _e = fmr_execute(packet->call.index, packet->call.function, packet->call.ret, packet->call.argc, packet->call.types, (void *)(packet->call.parameters));
-    //     free(push_buffer);
+    //     _e = fmr_execute(packet->call.index, packet->call.function, packet->call.ret, packet->call.argc,
+    //     packet->call.types, (void *)(packet->call.parameters)); free(push_buffer);
     // }
     return _e;
 }
@@ -60,8 +61,8 @@ lf_return_t fmr_pull(struct _fmr_push_pull_packet *packet) {
     //         return lf_error;
     //     }
     //     *(uint64_t *)(packet->call.parameters) = (uintptr_t)pull_buffer;
-    //     _e = fmr_execute(packet->call.index, packet->call.function, packet->call.ret, packet->call.argc, packet->call.types, (void *)(packet->call.parameters));
-    //     uart0_push(pull_buffer, packet->length);
+    //     _e = fmr_execute(packet->call.index, packet->call.function, packet->call.ret, packet->call.argc,
+    //     packet->call.types, (void *)(packet->call.parameters)); uart0_push(pull_buffer, packet->length);
     //     free(pull_buffer);
     // }
     return _e;

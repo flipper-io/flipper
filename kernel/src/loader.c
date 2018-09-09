@@ -14,40 +14,39 @@
  *
  */
 
+/* FDL Module/Application ABI Specification */
 
- /* FDL Module/Application ABI Specification */
-
- /*------------------------------+  0x0000     --+
-  |          sizeof(name)        |               |
-  +------------------------------+  0x0004       |
-  |            &(name)           |               |
-  +------------------------------+  0x0008       |
-  |            &(main)           |               |
-  +------------------------------+  0x000c       |
-  |        sizeof(.module)       |               |
-  +------------------------------+  0x0010       |
-  |           &(.module)         |               |
-  +------------------------------+  0x0014       |
-  |          sizeof(.data)       |               |
-  +------------------------------+  0x0018       | - HEADER
-  |            &(.data)          |               |
-  +------------------------------+  0x001c       |
-  |          sizeof(.bss)        |               |
-  +------------------------------+  0x0020       |
-  |            &(.bss)           |               |
-  +------------------------------+  0x0024       |
-  |          sizeof(.got)        |               |
-  +------------------------------+  0x0028     --+
-  |            &(.got)           |
-  +------------------------------+  [0x000c]
-  |           .module            |
-  +------------------------------+
-  |            .text             |
-  +------------------------------+  [0x0018]
-  |            .data             |
-  +------------------------------+  [0x0020]
-  |             .bss             |
-  +------------------------------*/
+/*------------------------------+  0x0000     --+
+ |          sizeof(name)        |               |
+ +------------------------------+  0x0004       |
+ |            &(name)           |               |
+ +------------------------------+  0x0008       |
+ |            &(main)           |               |
+ +------------------------------+  0x000c       |
+ |        sizeof(.module)       |               |
+ +------------------------------+  0x0010       |
+ |           &(.module)         |               |
+ +------------------------------+  0x0014       |
+ |          sizeof(.data)       |               |
+ +------------------------------+  0x0018       | - HEADER
+ |            &(.data)          |               |
+ +------------------------------+  0x001c       |
+ |          sizeof(.bss)        |               |
+ +------------------------------+  0x0020       |
+ |            &(.bss)           |               |
+ +------------------------------+  0x0024       |
+ |          sizeof(.got)        |               |
+ +------------------------------+  0x0028     --+
+ |            &(.got)           |
+ +------------------------------+  [0x000c]
+ |           .module            |
+ +------------------------------+
+ |            .text             |
+ +------------------------------+  [0x0018]
+ |            .data             |
+ +------------------------------+  [0x0020]
+ |             .bss             |
+ +------------------------------*/
 
 struct _lf_ll *tasks;
 
@@ -85,21 +84,15 @@ int os_load_image(struct _lf_abi_header *header) {
 
     /* Patch the function pointers in the module structure. */
     void **_functions = (void **)header + header->module_offset;
-    for (unsigned i = 0; i < header->module_size / sizeof(void **); i ++) {
-        _functions[i] += (uintptr_t)header;
-    }
+    for (unsigned i = 0; i < header->module_size / sizeof(void **); i++) { _functions[i] += (uintptr_t)header; }
 
     /* Patch the Global Offset Table of the image. */
     void **_got = (void **)header + header->got_offset;
-    for (unsigned i = 0; i < header->got_size / sizeof(void **); i ++) {
-        _got[i] += (uintptr_t)header;
-    }
+    for (unsigned i = 0; i < header->got_size / sizeof(void **); i++) { _got[i] += (uintptr_t)header; }
 
     /* Zero the BSS. */
     uint32_t *_bss = (void *)header + header->got_offset;
-    for (unsigned i = 0; i < header->bss_size / sizeof(uint32_t); i ++) {
-        _bss[i] = 0;
-    }
+    for (unsigned i = 0; i < header->bss_size / sizeof(uint32_t); i++) { _bss[i] = 0; }
 
 #warning Actually load the module here.
 

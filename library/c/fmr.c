@@ -14,14 +14,10 @@ fail:
 }
 
 int lf_sizeof(lf_type type) {
-    if (type == lf_int8_t || type == lf_uint8_t)
-        return 1;
-    if (type == lf_int16_t || type == lf_uint16_t)
-        return 2;
-    if (type == lf_int32_t || type == lf_uint32_t)
-        return 4;
-    if (type == lf_int64_t || type == lf_uint64_t || type == lf_void_t)
-        return 8;
+    if (type == lf_int8_t || type == lf_uint8_t) return 1;
+    if (type == lf_int16_t || type == lf_uint16_t) return 2;
+    if (type == lf_int32_t || type == lf_uint32_t) return 4;
+    if (type == lf_int64_t || type == lf_uint64_t || type == lf_void_t) return 8;
     return 0;
 }
 
@@ -47,12 +43,15 @@ struct _lf_ll *fmr_build(int argc, ...) {
     va_start(argv, argc);
 
     /* Walk the variadic argument list, appending arguments to the list created above. */
-    while (argc --) {
+    while (argc--) {
 
         int type = va_arg(argv, int);
         lf_arg value = va_arg(argv, lf_arg);
 
-        lf_assert(type <= lf_max_t, E_TYPE, "An invalid type was provided while appending the parameter '%llx' with type '%x' to the argument list.", value, type);
+        lf_assert(
+            type <= lf_max_t, E_TYPE,
+            "An invalid type was provided while appending the parameter '%llx' with type '%x' to the argument list.",
+            value, type);
 
         arg = lf_arg_create(type, value);
         lf_assert(arg, E_MALLOC, "failed to append new lf_arg");
@@ -71,7 +70,8 @@ fail:
     return NULL;
 }
 
-int lf_create_call(lf_module module, lf_function function, lf_type ret, struct _lf_ll *args, struct _fmr_header *header, struct _fmr_call *call) {
+int lf_create_call(lf_module module, lf_function function, lf_type ret, struct _lf_ll *args, struct _fmr_header *header,
+                   struct _fmr_call *call) {
 
     size_t argc = 0;
     uint8_t *offset = NULL;
@@ -91,7 +91,7 @@ int lf_create_call(lf_module module, lf_function function, lf_type ret, struct _
     offset = (uint8_t *)&(call->argv);
 
     /* Load arguments into the packet, encoding the type of each. */
-    for (size_t i = 0; i < argc; i ++) {
+    for (size_t i = 0; i < argc; i++) {
 
         struct _lf_arg *arg = NULL;
         uint8_t size = 0;
@@ -129,7 +129,7 @@ fail:
 int fmr_rpc(struct _lf_device *device, struct _fmr_call_packet *packet, lf_return_t *retval) {
 
     struct _lf_module *m;
-    lf_return_t (* f)(void) = NULL;
+    lf_return_t (*f)(void) = NULL;
 
     struct _fmr_call *call = &packet->call;
 
@@ -151,7 +151,7 @@ int fmr_push(struct _lf_device *device, struct _fmr_push_pull_packet *packet) {
     void *dst = (void *)(uintptr_t)packet->ptr;
     size_t len = (size_t)packet->len;
 
-    lf_assert(device->read(device, dst, len) , E_FMR, "failed to pull data");
+    lf_assert(device->read(device, dst, len), E_FMR, "failed to pull data");
 
     return lf_success;
 fail:
@@ -163,7 +163,7 @@ int fmr_pull(struct _lf_device *device, struct _fmr_push_pull_packet *packet) {
     void *src = (void *)(uintptr_t)packet->ptr;
     size_t len = (size_t)packet->len;
 
-    lf_assert(device->write(device, src, len) , E_FMR, "failed to push data");
+    lf_assert(device->write(device, src, len), E_FMR, "failed to push data");
 
     return lf_success;
 fail:
@@ -231,31 +231,31 @@ int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet) {
         /* rpc */
         case fmr_rpc_class:
             e = fmr_rpc(device, (struct _fmr_call_packet *)packet, &retval);
-        break;
+            break;
         /* push */
         case fmr_push_class:
             e = fmr_push(device, (struct _fmr_push_pull_packet *)packet);
-        break;
+            break;
         /* pull */
         case fmr_pull_class:
             e = fmr_pull(device, (struct _fmr_push_pull_packet *)packet);
-        break;
+            break;
         /* dyld */
         case fmr_dyld_class:
             e = fmr_dyld(device, (struct _fmr_dyld_packet *)packet, &retval);
-        break;
+            break;
         /* malloc */
         case fmr_malloc_class:
             e = fmr_malloc((struct _fmr_memory_packet *)packet, &retval);
-        break;
+            break;
         /* free */
         case fmr_free_class:
             e = fmr_free((struct _fmr_memory_packet *)packet);
-        break;
+            break;
         /* default */
         default:
             e = E_UNIMPLEMENTED;
-        break;
+            break;
     }
 
 fail:

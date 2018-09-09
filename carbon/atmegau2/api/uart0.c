@@ -51,7 +51,8 @@ LF_FUNC("uart0") void uart0_disable(void) {
 
 LF_FUNC("uart0") void uart0_put(uint8_t byte) {
     uint8_t timeout = UDFNUML + LF_UART_TIMEOUT_MS;
-    while (!(UCSR1A & (1 << UDRE1))) lf_assert(UDFNUML != timeout, E_UART0_WRITE_TIMEOUT, "Error occurred while putting to uart0.");
+    while (!(UCSR1A & (1 << UDRE1)))
+        lf_assert(UDFNUML != timeout, E_UART0_WRITE_TIMEOUT, "Error occurred while putting to uart0.");
     UDR1 = byte;
 fail:
     return;
@@ -64,7 +65,7 @@ LF_FUNC("uart0") uint8_t uart0_get(void) {
 }
 
 LF_FUNC("uart0") int uart0_write(void *src, uint32_t length) {
-    while (length --) uart0_put(*(uint8_t *)src++);
+    while (length--) uart0_put(*(uint8_t *)src++);
     return lf_success;
 }
 
@@ -86,8 +87,9 @@ LF_FUNC("uart0") int uart0_read(void *dst, uint32_t length) {
     }
     while (length--) {
         uint8_t timeout = UDFNUML + LF_UART_TIMEOUT_MS;
-        while (!(UCSR1A & (1 << RXC1))) lf_assert(UDFNUML != timeout, E_UART0_READ_TIMEOUT, "Timeout occurred while pulling from uart0.");
-        *(uint8_t *) dst++ = UDR1;
+        while (!(UCSR1A & (1 << RXC1)))
+            lf_assert(UDFNUML != timeout, E_UART0_READ_TIMEOUT, "Timeout occurred while pulling from uart0.");
+        *(uint8_t *)dst++ = UDR1;
     }
     return lf_success;
 
@@ -98,7 +100,8 @@ fail:
 #include "megausb.h"
 
 ISR(USART1_RX_vect) {
-    while (!(UCSR1A & (1 << RXC1)));
+    while (!(UCSR1A & (1 << RXC1)))
+        ;
     if (idx == sizeof(uart0_buffer)) idx = 0;
     uint8_t c = UDR1;
     if (FMR_IN & (1 << U2_FMR_PIN)) {

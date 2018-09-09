@@ -4,9 +4,7 @@ enum { _adc_configure };
 
 int adc_configure(void);
 
-void *adc_interface[] = {
-    &adc_configure
-};
+void *adc_interface[] = { &adc_configure };
 
 LF_MODULE(adc, "adc", adc_interface);
 

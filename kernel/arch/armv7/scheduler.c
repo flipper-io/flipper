@@ -56,7 +56,7 @@ void os_scheduler_init(void) {
     task->handler();
 
     /* Must hang here, otherwise this routine will pop values meant for MSP onto PSP. */
-    while (1) __asm__ __volatile__ ("nop");
+    while (1) __asm__ __volatile__("nop");
 }
 
 int os_task_add(struct _os_task *task) {
@@ -65,18 +65,19 @@ int os_task_add(struct _os_task *task) {
         /* Walk to the end of the task list. */
         struct _os_task *_tail = schedule.head;
         int count = schedule.count;
-        while (-- count) _tail = _tail->next;
+        while (--count) _tail = _tail->next;
         /* Set the tail of the task list's next task equal to the newly allocated task. */
         _tail->next = task;
     }
 
     /* Increment the number of active tasks. */
-    schedule.count ++;
+    schedule.count++;
 
     return lf_success;
 }
 
-struct _os_task *os_task_create(void *_entry, void (* _exit)(struct _lf_abi_header *header), struct _lf_abi_header *header, uint32_t stack_size) {
+struct _os_task *os_task_create(void *_entry, void (*_exit)(struct _lf_abi_header *header),
+                                struct _lf_abi_header *header, uint32_t stack_size) {
     /* Allocate the next available task slot. */
     struct _os_task *task = malloc(sizeof(struct _os_task));
     lf_assert(task, E_NULL, "Failed to allocate memory to create task");
@@ -86,7 +87,7 @@ struct _os_task *os_task_create(void *_entry, void (* _exit)(struct _lf_abi_head
     /* Set the task's stack pointer to the top of the task's stack. */
     task->sp = (uintptr_t)stack + stack_size;
     /* Set the PID of the task. */
-    task->pid = schedule.next_pid ++;
+    task->pid = schedule.next_pid++;
     /* Set the entry point of the task. */
     task->handler = _entry;
     /* Mark the task as idle. */
@@ -142,7 +143,7 @@ int os_task_release(struct _os_task *task) {
     __enable_irq();
     /* Update the parent task's next pointer. */
     struct _os_task *parent = schedule.head;
-    for (int i = 0; i < schedule.count; i ++) {
+    for (int i = 0; i < schedule.count; i++) {
         if (parent->next == task) {
             parent->next = task->next;
             break;
@@ -157,7 +158,7 @@ int os_task_release(struct _os_task *task) {
     /* Free the task record. */
     free(task);
     /* Decrement the number of active tasks. */
-    schedule.count --;
+    schedule.count--;
     return lf_success;
 fail:
     return lf_error;
@@ -193,10 +194,8 @@ void os_update_task_pointers(void) {
 /* Gets the task pointer for a given PID. */
 struct _os_task *os_task_from_pid(int pid) {
     struct _os_task *task = schedule.head;
-    for (int i = 0; i < schedule.count; i ++) {
-        if (pid == task->pid) {
-            return task;
-        }
+    for (int i = 0; i < schedule.count; i++) {
+        if (pid == task->pid) { return task; }
         task = task->next;
     }
     return NULL;
@@ -211,9 +210,7 @@ int os_task_pause(int pid) {
     lf_assert(task, E_NULL, "invalid task");
 
     /* If the task is the currently executing task, queue the move to the next task. */
-    if (os_current_task == task) {
-        os_task_next();
-    }
+    if (os_current_task == task) { os_task_next(); }
 
     /* Mark the task as paused. */
     task->status = os_task_status_paused;

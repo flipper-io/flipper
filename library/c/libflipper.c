@@ -56,7 +56,8 @@ int __attribute__((__destructor__)) lf_exit(void) {
     return lf_success;
 }
 
-int lf_invoke(struct _lf_device *device, const char *module, lf_function function, lf_type ret, lf_return_t *retval, struct _lf_ll *args) {
+int lf_invoke(struct _lf_device *device, const char *module, lf_function function, lf_type ret, lf_return_t *retval,
+              struct _lf_ll *args) {
 
     struct _fmr_packet _packet;
     struct _fmr_call_packet *packet = (struct _fmr_call_packet *)&_packet;
@@ -79,17 +80,17 @@ int lf_invoke(struct _lf_device *device, const char *module, lf_function functio
     lf_assert(m, E_MODULE, "No counterpart found for module '%s'.", module);
 
     e = lf_create_call(m->idx, function, ret, args, hdr, &packet->call);
-    lf_assert(e , E_NULL, "Failed to generate a valid call to module '%s'.", module);
+    lf_assert(e, E_NULL, "Failed to generate a valid call to module '%s'.", module);
 
     lf_crc(packet, hdr->len, &crc);
     hdr->crc = crc;
     lf_debug_packet((struct _fmr_packet *)packet);
 
     e = device->write(device, packet, sizeof(_packet));
-    lf_assert(e , E_ENDPOINT, "Failed to send message to device '%s'.", device->name);
+    lf_assert(e, E_ENDPOINT, "Failed to send message to device '%s'.", device->name);
 
     e = device->read(device, &result, sizeof(struct _fmr_result));
-    lf_assert(e , E_ENDPOINT, "Failed to receive message from the device '%s'.", device->name);
+    lf_assert(e, E_ENDPOINT, "Failed to receive message from the device '%s'.", device->name);
 
     lf_debug_result(&result);
     lf_assert(result.error == E_OK, result.error, "An error occured on the device '%s':", device->name);
@@ -127,13 +128,13 @@ int lf_push(struct _lf_device *device, void *dst, void *src, size_t len) {
     lf_debug_packet((struct _fmr_packet *)&packet);
 
     e = device->write(device, &packet, sizeof(packet));
-    lf_assert(e , E_ENDPOINT, "Failed to send message to device '%s'.", device->name);
+    lf_assert(e, E_ENDPOINT, "Failed to send message to device '%s'.", device->name);
 
     e = device->write(device, src, len);
-    lf_assert(e , E_FMR, "Failed to push data to device '%s'.", device->name);
+    lf_assert(e, E_FMR, "Failed to push data to device '%s'.", device->name);
 
     e = device->read(device, &result, sizeof(struct _fmr_result));
-    lf_assert(e , E_ENDPOINT, "Failed to receive message from the device '%s'.", device->name);
+    lf_assert(e, E_ENDPOINT, "Failed to receive message from the device '%s'.", device->name);
 
     lf_debug_result(&result);
     lf_assert(result.error == E_OK, result.error, "An error occured on the device '%s':", device->name);
@@ -169,13 +170,13 @@ int lf_pull(struct _lf_device *device, void *dst, void *src, size_t len) {
     lf_debug_packet((struct _fmr_packet *)&packet);
 
     e = device->write(device, &packet, sizeof(packet));
-    lf_assert(e , E_ENDPOINT, "Failed to send message to device '%s'.", device->name);
+    lf_assert(e, E_ENDPOINT, "Failed to send message to device '%s'.", device->name);
 
     e = device->read(device, dst, len);
-    lf_assert(e , E_FMR, "Failed to pull data from device '%s'.", device->name);
+    lf_assert(e, E_FMR, "Failed to pull data from device '%s'.", device->name);
 
     e = device->read(device, &result, sizeof(struct _fmr_result));
-    lf_assert(e , E_ENDPOINT, "Failed to receive message from the device '%s'.", device->name);
+    lf_assert(e, E_ENDPOINT, "Failed to receive message from the device '%s'.", device->name);
 
     lf_debug_result(&result);
     lf_assert(result.error == E_OK, result.error, "An error occured on the device '%s':", device->name);
@@ -212,10 +213,10 @@ int lf_dyld(struct _lf_device *device, const char *module, int *idx) {
     lf_debug_packet(&_packet);
 
     e = device->write(device, packet, hdr->len);
-    lf_assert(e , E_ENDPOINT, "Failed to send message to device '%s'.", device->name);
+    lf_assert(e, E_ENDPOINT, "Failed to send message to device '%s'.", device->name);
 
     e = device->read(device, &result, sizeof(struct _fmr_result));
-    lf_assert(e , E_ENDPOINT, "Failed to receive message from the device '%s'.", device->name);
+    lf_assert(e, E_ENDPOINT, "Failed to receive message from the device '%s'.", device->name);
 
     lf_debug_result(&result);
     lf_assert(result.error == E_OK, result.error, "An error occured on the device '%s':", device->name);
@@ -249,10 +250,10 @@ int lf_malloc(struct _lf_device *device, size_t size, void **ptr) {
     lf_debug_packet((struct _fmr_packet *)&packet);
 
     e = device->write(device, &packet, sizeof(packet));
-    lf_assert(e , E_ENDPOINT, "Failed to send message to device '%s'.", device->name);
+    lf_assert(e, E_ENDPOINT, "Failed to send message to device '%s'.", device->name);
 
     e = device->read(device, &result, sizeof(struct _fmr_result));
-    lf_assert(e , E_ENDPOINT, "Failed to receive message from the device '%s'.", device->name);
+    lf_assert(e, E_ENDPOINT, "Failed to receive message from the device '%s'.", device->name);
 
     lf_debug_result(&result);
     lf_assert(result.error == E_OK, result.error, "An error occured on the device '%s':", device->name);
@@ -286,10 +287,10 @@ int lf_free(struct _lf_device *device, void *ptr) {
     lf_debug_packet((struct _fmr_packet *)&packet);
 
     e = device->write(device, &packet, sizeof(packet));
-    lf_assert(e , E_ENDPOINT, "Failed to send message to device '%s'.", device->name);
+    lf_assert(e, E_ENDPOINT, "Failed to send message to device '%s'.", device->name);
 
     e = device->read(device, &result, sizeof(struct _fmr_result));
-    lf_assert(e , E_ENDPOINT, "Failed to receive message from the device '%s'.", device->name);
+    lf_assert(e, E_ENDPOINT, "Failed to receive message from the device '%s'.", device->name);
 
     lf_debug_result(&result);
     lf_assert(result.error == E_OK, result.error, "An error occured on the device '%s':", device->name);

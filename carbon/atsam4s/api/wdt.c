@@ -7,5 +7,4 @@ LF_FUNC("wdt") int wdt_configure(void) {
 }
 
 LF_FUNC("wdt") void wdt_fire(void) {
-
 }

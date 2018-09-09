@@ -10,7 +10,6 @@
 
 /* Include the avr-libc standard library headers. */
 #include <avr/common.h>
-#include <util/delay.h>
 #include <avr/eeprom.h>
 #include <avr/interrupt.h>
 #include <avr/io.h>
@@ -18,36 +17,41 @@
 #include <avr/power.h>
 #include <avr/sleep.h>
 #include <avr/wdt.h>
+#include <util/delay.h>
 
 #undef lf_debug
-#define lf_debug(fmt, ...) printf_P(PSTR(fmt"\n"), ##__VA_ARGS__)
+#define lf_debug(fmt, ...) printf_P(PSTR(fmt "\n"), ##__VA_ARGS__)
 
 #undef lf_assert
-#define lf_assert(cond, err, fmt, ...) if (!(cond)) { _lf_assert(err, __func__, __LINE__, PSTR(fmt), ##__VA_ARGS__); goto fail; }
+#define lf_assert(cond, err, fmt, ...)                                 \
+    if (!(cond)) {                                                     \
+        _lf_assert(err, __func__, __LINE__, PSTR(fmt), ##__VA_ARGS__); \
+        goto fail;                                                     \
+    }
 
 #endif
 
 /* Descriptor information for USB. */
-#define USB_MANUFACTURER        L"flipper.io"
-#define USB_PRODUCT             L"Flipper: Carbon"
-#define USB_PRODUCT_ID          0x0480
+#define USB_MANUFACTURER L"flipper.io"
+#define USB_PRODUCT L"Flipper: Carbon"
+#define USB_PRODUCT_ID 0x0480
 
 /* NOTE: Summing the size parameters of each endpoints below should be less than or equal to 160. */
-#define USB_IN_MASK             0x80
+#define USB_IN_MASK 0x80
 
-#define INTERRUPT_IN_ENDPOINT    (0x01 | USB_IN_MASK)
-#define INTERRUPT_IN_SIZE        16
-#define INTERRUPT_OUT_ENDPOINT    0x02
-#define INTERRUPT_OUT_SIZE        16
+#define INTERRUPT_IN_ENDPOINT (0x01 | USB_IN_MASK)
+#define INTERRUPT_IN_SIZE 16
+#define INTERRUPT_OUT_ENDPOINT 0x02
+#define INTERRUPT_OUT_SIZE 16
 
-#define BULK_IN_ENDPOINT        (0x01 | USB_IN_MASK)
-#define BULK_IN_SIZE            64
-#define BULK_OUT_ENDPOINT        0x02
-#define BULK_OUT_SIZE            64
+#define BULK_IN_ENDPOINT (0x01 | USB_IN_MASK)
+#define BULK_IN_SIZE 64
+#define BULK_OUT_ENDPOINT 0x02
+#define BULK_OUT_SIZE 64
 
-#define DEBUG_INTERFACE            1
-#define DEBUG_IN_ENDPOINT        (0x03 | USB_IN_MASK)
-#define DEBUG_IN_SIZE            32
+#define DEBUG_INTERFACE 1
+#define DEBUG_IN_ENDPOINT (0x03 | USB_IN_MASK)
+#define DEBUG_IN_SIZE 32
 
 /* NOTE: Move these to platform. */
 #define DFU_BAUD 115200

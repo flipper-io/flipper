@@ -1,6 +1,6 @@
 #include "libflipper.h"
-#include "megausb.h"
 #include "atmegau2.h"
+#include "megausb.h"
 
 /* Has bulk already timed out? */
 
@@ -12,9 +12,7 @@
 int megausb_bulk_receive(void *dst, uint32_t length) {
 
     /* If USB is not configured, return with error. */
-    if (!megausb_configuration) {
-        return lf_error;
-    }
+    if (!megausb_configuration) { return lf_error; }
 
     uint8_t _sreg = SREG;
     cli();
@@ -23,7 +21,7 @@ int megausb_bulk_receive(void *dst, uint32_t length) {
     UENUM = BULK_OUT_ENDPOINT;
 
     int total = lf_ceiling(length, BULK_OUT_SIZE);
-    for (int i = 0; i < total; i ++) {
+    for (int i = 0; i < total; i++) {
 
         /* Wait until the USB controller is ready. */
         uint8_t timeout = UDFNUML + LF_USB_TIMEOUT_MS;
@@ -44,12 +42,12 @@ int megausb_bulk_receive(void *dst, uint32_t length) {
 
         /* Transfer the buffered data to the destination. */
         uint8_t len = BULK_OUT_SIZE;
-        while (len --) {
+        while (len--) {
             if (length) {
                 /* If there is still valid data to send, load it from the receive buffer. */
                 *(uint8_t *)dst++ = UEDATX;
                 /* Decrement the length. */
-                length --;
+                length--;
             } else {
                 /* Otherwise, flush the buffer. */
                 while ((UEINTX & (1 << RWAL))) (void)UEDATX;
@@ -74,9 +72,7 @@ int megausb_bulk_receive(void *dst, uint32_t length) {
 int megausb_bulk_transmit(void *src, uint32_t length) {
 
     /* If USB is not configured, return with error. */
-    if (!megausb_configuration) {
-        return lf_error;
-    }
+    if (!megausb_configuration) { return lf_error; }
 
     uint8_t _sreg = SREG;
     cli();
@@ -85,7 +81,7 @@ int megausb_bulk_transmit(void *src, uint32_t length) {
     UENUM = BULK_IN_ENDPOINT & ~USB_IN_MASK;
 
     int total = lf_ceiling(length, BULK_OUT_SIZE);
-    for (int i = 0; i < total; i ++) {
+    for (int i = 0; i < total; i++) {
 
         /* Wait until the USB controller is ready. */
         uint8_t timeout = UDFNUML + LF_USB_TIMEOUT_MS;
@@ -106,12 +102,12 @@ int megausb_bulk_transmit(void *src, uint32_t length) {
 
         /* Transfer the buffered data to the destination. */
         uint8_t len = BULK_IN_SIZE;
-        while (len --) {
+        while (len--) {
             if (length) {
                 /* If there is still valid data to send, load it into the transmit buffer. */
                 UEDATX = *(uint8_t *)src++;
                 /* Decrement the length. */
-                length --;
+                length--;
             } else {
                 /* Otherwise, flush the buffer. */
                 while ((UEINTX & (1 << RWAL))) UEDATX = 0;
@@ -130,5 +126,4 @@ int megausb_bulk_transmit(void *src, uint32_t length) {
     //     /* Flush the transmit buffer and reset the interrupt state machine. */
     //     UEINTX = (1 << RWAL) | (1 << NAKOUTI) | (1 << RXSTPI) | (1 << STALLEDI);
     // }
-
 }

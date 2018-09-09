@@ -21,28 +21,13 @@ struct _xpacket {
     uint16_t crc;
 };
 
-/* See utils/copy_x.s for the source of this applet. These are the raw thumb instructions that result from the compilation of the applet. */
-uint8_t applet[] = {
-    0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00,
-    0x09, 0x48, 0x0A, 0x49,
-    0x0B, 0x4A, 0x02, 0xE0,
-    0x08, 0xC9, 0x08, 0xC0,
-    0x01, 0x3A, 0x00, 0x2A,
-    0xFA, 0xD1, 0x09, 0x48,
-    0x0A, 0x49, 0x06, 0x4A,
-    0x11, 0x43, 0x01, 0x60,
-    0x70, 0x47, 0x00, 0xBF,
-    0xAF, 0xF3, 0x00, 0x80,
-    0xAF, 0xF3, 0x00, 0x80,
-    0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00,
-    0x80, 0x00, 0x00, 0x00,
-    0x04, 0x0A, 0x0E, 0x40,
-    0x08, 0x0A, 0x0E, 0x40,
-    0x01, 0x00, 0x00, 0x5A
-};
+/* See utils/copy_x.s for the source of this applet. These are the raw thumb instructions that result from the
+ * compilation of the applet. */
+uint8_t applet[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x48, 0x0A, 0x49, 0x0B, 0x4A, 0x02, 0xE0,
+                     0x08, 0xC9, 0x08, 0xC0, 0x01, 0x3A, 0x00, 0x2A, 0xFA, 0xD1, 0x09, 0x48, 0x0A, 0x49, 0x06, 0x4A,
+                     0x11, 0x43, 0x01, 0x60, 0x70, 0x47, 0x00, 0xBF, 0xAF, 0xF3, 0x00, 0x80, 0xAF, 0xF3, 0x00, 0x80,
+                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00,
+                     0x04, 0x0A, 0x0E, 0x40, 0x08, 0x0A, 0x0E, 0x40, 0x01, 0x00, 0x00, 0x5A };
 
 /* Place the applet in RAM somewhere far away from the region used by the SAM-BA. */
 #define _APPLET IRAM_ADDR + 0x800
@@ -83,7 +68,8 @@ uint8_t sam_ba_read_byte(uint32_t source) {
     sprintf(buffer, "o%08X,#", source);
     uart0_write(buffer, sizeof(buffer) - 1);
     uint32_t retries = 0;
-    while(!uart0_ready() && retries ++ < 8);
+    while (!uart0_ready() && retries++ < 8)
+        ;
     return uart0_get();
 }
 
@@ -100,7 +86,8 @@ uint32_t sam_ba_read_word(uint32_t source) {
     sprintf(buffer, "w%08X,#", source);
     uart0_write(buffer, sizeof(buffer) - 1);
     uint8_t retries = 0;
-    while(!uart0_ready() && retries ++ < 8);
+    while (!uart0_ready() && retries++ < 8)
+        ;
     uint32_t result = 0;
     uart0_read(&result, sizeof(uint32_t));
     return result;
@@ -142,7 +129,7 @@ int sam_ba_copy(uint32_t destination, void *src, uint32_t length) {
 
         /* Decrement the length appropriately. */
         length -= len;
-        i ++;
+        i++;
     }
 
     /* Send end of transmission. */
@@ -162,8 +149,8 @@ fail:
 void *load_page_data(FILE *firmware, size_t size) {
     size_t pages = lf_ceiling(size, IFLASH0_PAGE_SIZE);
     uint8_t *raw = (uint8_t *)malloc(pages * IFLASH0_PAGE_SIZE);
-    for (size_t i = 0; i < pages; i ++) {
-        for (size_t j = 0; j < IFLASH0_PAGE_SIZE; j ++) {
+    for (size_t i = 0; i < pages; i++) {
+        for (size_t j = 0; j < IFLASH0_PAGE_SIZE; j++) {
             uint8_t c = fgetc(firmware);
             if (!feof(firmware)) {
                 raw[((i * IFLASH0_PAGE_SIZE) + j)] = c;
@@ -171,7 +158,6 @@ void *load_page_data(FILE *firmware, size_t size) {
                 raw[((i * IFLASH0_PAGE_SIZE) + j)] = 0;
             }
         }
-
     }
     /* Close the file. */
     fclose(firmware);
@@ -187,18 +173,15 @@ int enter_normal_mode(void) {
         uart0_write("N#", 2);
         usleep(1000);
         uart0_read(ack, sizeof(ack));
-        if (!memcmp(ack, (const uint8_t []){ '\n', '\r' }, 2)) return lf_success;
+        if (!memcmp(ack, (const uint8_t[]){ '\n', '\r' }, 2)) return lf_success;
 
         /* If we failed the first time around, enter DFU. */
-        if (!tries) {
-            sam_enter_dfu();
-        }
+        if (!tries) { sam_enter_dfu(); }
 
     } while (tries++ < 4);
 
     return lf_error;
 }
-
 
 int main(int argc, char *argv[]) {
 
@@ -211,7 +194,7 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    //lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
+    // lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
 
     /* Attach to a Flipper device. */
     carbon_attach();
@@ -233,18 +216,19 @@ int main(int argc, char *argv[]) {
 
     /* Enter normal mode. (Values are sent as binary.)*/
     lf_debug("Entering device firmware update mode.");
-    lf_assert(enter_normal_mode() , E_UNIMPLEMENTED, "Failed to enter normal mode.");
+    lf_assert(enter_normal_mode(), E_UNIMPLEMENTED, "Failed to enter normal mode.");
     lf_debug(KGRN " Successfully entered DFU mode." KNRM);
 
     /* Ensure the security bit is clear. */
     lf_debug("Checking security bit.");
     sam_ba_write_efc_fcr(EEFC_FCR_FCMD_GGPB, 0);
-    lf_assert((sam_ba_read_word(REGADDR(EFC0->EEFC_FRR)) & 0x01) == 0, E_UNIMPLEMENTED, KRED "The device's security bit is set." KNRM);
+    lf_assert((sam_ba_read_word(REGADDR(EFC0->EEFC_FRR)) & 0x01) == 0, E_UNIMPLEMENTED,
+              KRED "The device's security bit is set." KNRM);
     lf_debug(KGRN " Security bit is clear." KNRM);
 
     /* Move the copy applet into RAM. */
     lf_debug("Uploading copy applet.");
-    lf_assert(sam_ba_copy(_APPLET, applet, sizeof(applet)) , E_UNIMPLEMENTED, KRED "Failed to upload copy applet." KNRM);
+    lf_assert(sam_ba_copy(_APPLET, applet, sizeof(applet)), E_UNIMPLEMENTED, KRED "Failed to upload copy applet." KNRM);
     lf_debug(KGRN " Successfully uploaded copy applet." KNRM);
 
     /* Write the stack address into the applet. */
@@ -262,13 +246,13 @@ int main(int argc, char *argv[]) {
     /* Calculate the number of pages to send. */
     size_t pages = lf_ceiling(firmware_size, IFLASH0_PAGE_SIZE);
     /* Send the firmware, page by page. */
-    for (size_t page = 0; page < pages; page ++) {
+    for (size_t page = 0; page < pages; page++) {
         /* Print the page count. */
-        printf("Uploading page %zu / %zu. (%.2f%%)", page + 1, pages, ((float)(page + 1))/pages*100);
+        printf("Uploading page %zu / %zu. (%.2f%%)", page + 1, pages, ((float)(page + 1)) / pages * 100);
         fflush(stdout);
         /* Copy the page. */
         int e = sam_ba_copy(_PAGEBUFFER, (void *)(pagedata + (page * IFLASH0_PAGE_SIZE)), IFLASH0_PAGE_SIZE);
-        lf_assert(e , E_UNIMPLEMENTED, KRED "Failed to upload page %zu of %zu." KNRM, page + 1, pages);
+        lf_assert(e, E_UNIMPLEMENTED, KRED "Failed to upload page %zu of %zu." KNRM, page + 1, pages);
 
         /* Write the page number into the applet. */
         sam_ba_write_word(_APPLET_PAGE, EEFC_FCR_FARG(page));
@@ -277,10 +261,8 @@ int main(int argc, char *argv[]) {
 
         /* Wait until the EFC has finished writing the page. */
         uint8_t retries = 0, fsr = 0;
-        while(!((fsr = sam_ba_read_byte(REGADDR(EFC0->EEFC_FSR))) & 1) && retries ++ < 4) {
-            if (fsr & 0xE) {
-                fprintf(stderr, KRED "Flash write error on page %zu.\n" KNRM, page);
-            }
+        while (!((fsr = sam_ba_read_byte(REGADDR(EFC0->EEFC_FSR))) & 1) && retries++ < 4) {
+            if (fsr & 0xE) { fprintf(stderr, KRED "Flash write error on page %zu.\n" KNRM, page); }
         }
 
         retries = 0;
@@ -289,7 +271,8 @@ int main(int argc, char *argv[]) {
     }
 
     /* Print statistics about the memory usage. */
-    printf(KGRN "\n Successfully uploaded all pages. %zu bytes used. (%.2f%% of flash)\n" KNRM, firmware_size, (float)firmware_size/IFLASH0_SIZE*100);
+    printf(KGRN "\n Successfully uploaded all pages. %zu bytes used. (%.2f%% of flash)\n" KNRM, firmware_size,
+           (float)firmware_size / IFLASH0_SIZE * 100);
 
     /* Set GPNVM1 to boot from flash memory. */
     sam_ba_write_efc_fcr(EEFC_FCR_FCMD_SGPB, 0x01);
@@ -297,7 +280,7 @@ int main(int argc, char *argv[]) {
     printf("Checking GPNVM1 bit.\n");
     sam_ba_write_efc_fcr(EEFC_FCR_FCMD_GGPB, 0);
     uint8_t retries = 0;
-    if (!(sam_ba_read_byte(REGADDR(EFC0->EEFC_FRR)) & (1 << 1)) && retries ++ < RETRIES) {
+    if (!(sam_ba_read_byte(REGADDR(EFC0->EEFC_FRR)) & (1 << 1)) && retries++ < RETRIES) {
         if (retries > RETRIES) {
             printf(KRED " GPNVM1 bit is not set.\n" KNRM);
             return EXIT_FAILURE;
@@ -314,21 +297,23 @@ int main(int argc, char *argv[]) {
             printf("\nVerifying flash contents.\n");
             uint32_t errors = 0, perrors = 0, total = lf_ceiling(firmware_size, sizeof(uint32_t));
             uint8_t retries = 0;
-            for (uint32_t i = 0; i < total; i ++) {
+            for (uint32_t i = 0; i < total; i++) {
                 uint32_t addr = IFLASH0_ADDR + (i * sizeof(uint32_t));
-                if ((i % (IFLASH0_PAGE_SIZE/sizeof(uint32_t)) == 0)) {
-                    printf(" Checking address 0x%08x (page %lu)->%s\n", addr, i / (IFLASH0_PAGE_SIZE/sizeof(uint32_t)), (!perrors) ? KGRN "GOOD" KNRM : KRED "BAD" KNRM);
+                if ((i % (IFLASH0_PAGE_SIZE / sizeof(uint32_t)) == 0)) {
+                    printf(" Checking address 0x%08x (page %lu)->%s\n", addr,
+                           i / (IFLASH0_PAGE_SIZE / sizeof(uint32_t)), (!perrors) ? KGRN "GOOD" KNRM : KRED "BAD" KNRM);
                 }
                 uint32_t word = sam_ba_read_word(addr);
                 uint32_t _word = *(uint32_t *)(pagedata + (i * sizeof(uint32_t)));
                 uint8_t match = ((uint16_t)word == (uint16_t)_word);
-                //printf("0x%08x: 0x%08x (0x%08x)->%s\n", addr, word, _word, (match) ? KGRN "GOOD" KNRM : KRED "BAD" KNRM);
+                // printf("0x%08x: 0x%08x (0x%08x)->%s\n", addr, word, _word, (match) ? KGRN "GOOD" KNRM : KRED "BAD"
+                // KNRM);
                 if (!match && retries < RETRIES) {
                     if (retries == 0) {
-                        perrors ++;
-                        errors ++;
+                        perrors++;
+                        errors++;
                     }
-                    retries ++;
+                    retries++;
                     continue;
                 }
                 retries = 0;

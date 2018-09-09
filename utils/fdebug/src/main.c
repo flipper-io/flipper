@@ -1,8 +1,8 @@
 #include <flipper/flipper.h>
+#include <libusb.h>
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
-#include <libusb.h>
 
 static volatile int alive = 1;
 
@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
         e = libusb_interrupt_transfer(handle, DEBUG_IN_ENDPOINT, buf, DEBUG_IN_SIZE, &len, 0);
         lf_assert(e == 0, E_LIBUSB, "Failed to complete transfer.");
 
-        while (len --) printf("%c", *_buf ++);
+        while (len--) printf("%c", *_buf++);
     }
 
 fail:

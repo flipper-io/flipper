@@ -12,13 +12,7 @@ struct _lf_module {
     void **interface;
 };
 
-#define LF_MODULE(sym, name, interface) \
-    struct _lf_module sym = {           \
-        name,                           \
-        0,                              \
-        -1,                             \
-        interface                       \
-    };
+#define LF_MODULE(sym, name, interface) struct _lf_module sym = { name, 0, -1, interface };
 
 struct _lf_module *lf_module_create(const char *name, int idx);
 int lf_module_release(struct _lf_module *module);

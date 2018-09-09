@@ -12,7 +12,6 @@ LF_FUNC("timer") int timer_register(uint32_t ticks, void *callback) {
 }
 
 void tcx_isr(uint8_t timer) {
-
 }
 
 /* timer0 isr */

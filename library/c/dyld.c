@@ -6,7 +6,7 @@ int dyld_register(struct _lf_device *device, struct _lf_module *module) {
 
 #warning This is not a good way to increment the count.
     if (module->idx == -1) module->idx = lf_ll_count(device->modules);
-    //lf_debug("Registering module '%s' with index '%i'.", module->name, module->idx);
+        // lf_debug("Registering module '%s' with index '%i'.", module->name, module->idx);
 #warning Need to handle reloading an existing moudle here.
     return lf_ll_append(&device->modules, module, lf_module_release);
 
@@ -25,20 +25,21 @@ struct _lf_module *dyld_module(struct _lf_device *device, const char *module) {
     lf_assert(module, E_NULL, "invalid module");
 
     int count = lf_ll_count(device->modules);
-    for (int i = 0; i < count; i ++) {
+    for (int i = 0; i < count; i++) {
         struct _lf_module *m = lf_ll_item(device->modules, i);
         if (!strcmp(m->name, module)) return m;
     }
 
     /* If the module hasn't already been registered, try to register it. */
     int idx;
-    lf_assert(lf_dyld(device, module, &idx) , E_MODULE, "Failed to find counterpart for module '%s' on device '%s'.", module, device->name);
+    lf_assert(lf_dyld(device, module, &idx), E_MODULE, "Failed to find counterpart for module '%s' on device '%s'.",
+              module, device->name);
 
     struct _lf_module *m = lf_module_create(module, idx);
     lf_assert(module, E_NULL, "Failed to create new module '%s'.", module);
 
     int e = dyld_register(device, m);
-    lf_assert(e , E_MODULE, "Failed to register module '%s'.", module);
+    lf_assert(e, E_MODULE, "Failed to register module '%s'.", module);
     return m;
 
 fail:

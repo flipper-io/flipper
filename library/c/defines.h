@@ -9,8 +9,8 @@
 #define hi(x) ((uint8_t)(x >> 8))
 #define lo16(x) ((uint16_t)(((uint32_t)(x))))
 #define hi16(x) ((uint16_t)(((uint32_t)(x)) >> 16))
-#define little(x) ((((uint16_t)(x)) << 8 ) | (((uint16_t)(x)) >> 8))
-#define little32(x) ((((uint32_t)(x)) << 16 ) | (((uint32_t)(x)) >> 16))
+#define little(x) ((((uint16_t)(x)) << 8) | (((uint16_t)(x)) >> 8))
+#define little32(x) ((((uint32_t)(x)) << 16) | (((uint32_t)(x)) >> 16))
 
 /* Terminal colors. */
 //#define LF_CONFIG_NO_COLOR
@@ -28,7 +28,7 @@
 #define KYEL "\x1B[33m"
 #endif
 
-#define lf_debug(fmt, ...) printf(fmt"\n", ##__VA_ARGS__)
+#define lf_debug(fmt, ...) printf(fmt "\n", ##__VA_ARGS__)
 
 /* Packed attribute. */
 #define LF_PACKED __attribute__((__packed__))

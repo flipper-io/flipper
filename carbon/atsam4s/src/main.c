@@ -1,7 +1,7 @@
 #include "libflipper.h"
 #include "atsam4s.h"
-#include "os/scheduler.h"
 #include "gpio.h"
+#include "os/scheduler.h"
 
 /* How many clock cycles to wait before giving up initialization. */
 #define CLOCK_TIMEOUT 5000
@@ -52,24 +52,30 @@ int main(void) {
     /* Configure the primary clock source. */
     if (!(PMC->CKGR_MOR & CKGR_MOR_MOSCSEL)) {
         PMC->CKGR_MOR = CKGR_MOR_KEY_PASSWD | BOARD_OSCOUNT | CKGR_MOR_MOSCRCEN | CKGR_MOR_MOSCXTEN;
-        for (uint32_t timeout = 0; !(PMC->PMC_SR & PMC_SR_MOSCXTS) && (timeout ++ < CLOCK_TIMEOUT););
+        for (uint32_t timeout = 0; !(PMC->PMC_SR & PMC_SR_MOSCXTS) && (timeout++ < CLOCK_TIMEOUT);)
+            ;
     }
 
     /* Select external 20MHz oscillator. */
     PMC->CKGR_MOR = CKGR_MOR_KEY_PASSWD | BOARD_OSCOUNT | CKGR_MOR_MOSCRCEN | CKGR_MOR_MOSCXTEN | CKGR_MOR_MOSCSEL;
-    for (uint32_t timeout = 0; !(PMC->PMC_SR & PMC_SR_MOSCSELS) && (timeout ++ < CLOCK_TIMEOUT););
+    for (uint32_t timeout = 0; !(PMC->PMC_SR & PMC_SR_MOSCSELS) && (timeout++ < CLOCK_TIMEOUT);)
+        ;
     PMC->PMC_MCKR = (PMC->PMC_MCKR & ~(uint32_t)PMC_MCKR_CSS_Msk) | PMC_MCKR_CSS_MAIN_CLK;
-    for (uint32_t timeout = 0; !(PMC->PMC_SR & PMC_SR_MCKRDY) && (timeout++ < CLOCK_TIMEOUT););
+    for (uint32_t timeout = 0; !(PMC->PMC_SR & PMC_SR_MCKRDY) && (timeout++ < CLOCK_TIMEOUT);)
+        ;
 
     /* Configure PLLB as the master clock PLL. */
     PMC->CKGR_PLLBR = BOARD_PLLBR;
-    for (uint32_t timeout = 0; !(PMC->PMC_SR & PMC_SR_LOCKB) && (timeout++ < CLOCK_TIMEOUT););
+    for (uint32_t timeout = 0; !(PMC->PMC_SR & PMC_SR_LOCKB) && (timeout++ < CLOCK_TIMEOUT);)
+        ;
 
     /* Switch to the main clock. */
     PMC->PMC_MCKR = (BOARD_MCKR & ~PMC_MCKR_CSS_Msk) | PMC_MCKR_CSS_MAIN_CLK;
-    for (uint32_t timeout = 0; !(PMC->PMC_SR & PMC_SR_MCKRDY) && (timeout++ < CLOCK_TIMEOUT););
+    for (uint32_t timeout = 0; !(PMC->PMC_SR & PMC_SR_MCKRDY) && (timeout++ < CLOCK_TIMEOUT);)
+        ;
     PMC->PMC_MCKR = BOARD_MCKR;
-    for (uint32_t timeout = 0; !(PMC->PMC_SR & PMC_SR_MCKRDY) && (timeout++ < CLOCK_TIMEOUT););
+    for (uint32_t timeout = 0; !(PMC->PMC_SR & PMC_SR_MCKRDY) && (timeout++ < CLOCK_TIMEOUT);)
+        ;
 
     /* Allow the reset pin to reset the device. */
     RSTC->RSTC_MR = RSTC_MR_KEY_PASSWD | RSTC_MR_URSTEN;
@@ -176,7 +182,7 @@ void uart0_isr(void) {
         uart0_read(&packet, sizeof(struct _fmr_packet));
 
         /* Wait a bit before raising the FMR pin. */
-        for (size_t i = 0; i < 0x3FF; i ++) __asm__ __volatile__("nop");
+        for (size_t i = 0; i < 0x3FF; i++) __asm__ __volatile__("nop");
 
         /* set fmr high (inactive) */
         gpio_write(SAM_FMR_PIN, 0);
@@ -185,7 +191,6 @@ void uart0_isr(void) {
     }
 
     __enable_irq();
-
 }
 
 void uart0_pull_wait(void *dst, uint32_t length) {
@@ -197,7 +202,8 @@ void uart0_pull_wait(void *dst, uint32_t length) {
     /* Enable the receiver. */
     UART0->UART_PTCR = UART_PTCR_RXTEN;
     /* Wait until the transfer has finished. */
-    while (!(UART0->UART_SR & UART_SR_ENDRX));
+    while (!(UART0->UART_SR & UART_SR_ENDRX))
+        ;
     /* Disable the PDC receiver. */
     UART0->UART_PTCR = UART_PTCR_RXTDIS;
     /* Enable the PDC receive complete interrupt. */
