@@ -41,10 +41,10 @@ IO_A7 = (1 << 1)
 IO_A8 = (1 << 0)
 
 def configure():
-	lf.invoke("gpio", 3, lf.types['void'], [lf.uint32(enable), lf.uint32(disable)])
+    lf.invoke("gpio", 3, lf.types['void'], [lf.uint32(enable), lf.uint32(disable)])
 def enable(enable, disable):
-	lf.invoke("gpio", 2, lf.types['void'], [lf.uint32(enable), lf.uint32(disable)])
+    lf.invoke("gpio", 2, lf.types['void'], [lf.uint32(enable), lf.uint32(disable)])
 def write(set, clear):
-	lf.invoke("gpio", 1, lf.types['void'], [lf.uint32(set), lf.uint32(clear)])
+    lf.invoke("gpio", 1, lf.types['void'], [lf.uint32(set), lf.uint32(clear)])
 def read(mask):
-	lf.invoke("gpio", 0, lf.types['void'], [lf.uint32(mask)])
+    lf.invoke("gpio", 0, lf.types['void'], [lf.uint32(mask)])

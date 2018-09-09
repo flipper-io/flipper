@@ -1,7 +1,7 @@
 #include "libflipper.h"
 
 void null_isr(void) {
-	while (1) __asm__ __volatile__ ("nop");
+    while (1) __asm__ __volatile__ ("nop");
 }
 
 LF_WEAK void nmi_exception(void) {

@@ -2,8 +2,8 @@
 #define __lf_usb_h__
 
 struct _lf_libusb_context {
-	struct libusb_device_handle *handle;
-	struct libusb_context *context;
+    struct libusb_device_handle *handle;
+    struct libusb_context *context;
     uint8_t in_sz, out_sz;
     uint8_t in, out;
 };

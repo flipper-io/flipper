@@ -33,74 +33,74 @@ FLAGS = --target=$(TARGET) --with-cpu=$(CPU) --with-mode=thumb --disable-shared 
 all: configure binutils gcc gdb
 
 clean:
-	rm -rf *-build
+    rm -rf *-build
 
 configure:
-	mkdir -p $(PREFIX)
+    mkdir -p $(PREFIX)
 
 install:
-	rsync -avr $(TARGET)/* /usr/local/$(TARGET)
+    rsync -avr $(TARGET)/* /usr/local/$(TARGET)
 
 gmp:
-	mkdir -p gmp-build
-	cd gmp-build && $(ROOT)/$(GMP)/configure --disable-shared --enable-static --prefix=$(PREFIX)/gmp
-	$(MAKE) -C gmp-build -j8 all
-	$(MAKE) -C gmp-build -j8 check
-	$(MAKE) -C gmp-build -j8 install
+    mkdir -p gmp-build
+    cd gmp-build && $(ROOT)/$(GMP)/configure --disable-shared --enable-static --prefix=$(PREFIX)/gmp
+    $(MAKE) -C gmp-build -j8 all
+    $(MAKE) -C gmp-build -j8 check
+    $(MAKE) -C gmp-build -j8 install
 
 mpfr: gmp
-	mkdir -p mpfr-build
-	cd mpfr-build && $(ROOT)/$(MPFR)/configure --disable-shared --enable-static --prefix=$(PREFIX)/mpfr --with-gmp=$(PREFIX)/gmp
-	$(MAKE) -C mpfr-build -j8 all
-	$(MAKE) -C mpfr-build -j8 check
-	$(MAKE) -C mpfr-build -j8 install
+    mkdir -p mpfr-build
+    cd mpfr-build && $(ROOT)/$(MPFR)/configure --disable-shared --enable-static --prefix=$(PREFIX)/mpfr --with-gmp=$(PREFIX)/gmp
+    $(MAKE) -C mpfr-build -j8 all
+    $(MAKE) -C mpfr-build -j8 check
+    $(MAKE) -C mpfr-build -j8 install
 
 mpc: gmp mpfr
-	mkdir -p mpc-build
-	cd mpc-build && $(ROOT)/$(MPC)/configure --disable-shared --enable-static --prefix=$(PREFIX)/mpc --with-gmp=$(PREFIX)/gmp --with-mpfr=$(PREFIX)/mpfr
-	$(MAKE) -C mpc-build -j8 all
-	$(MAKE) -C mpc-build -j8 check
-	$(MAKE) -C mpc-build -j8 install
+    mkdir -p mpc-build
+    cd mpc-build && $(ROOT)/$(MPC)/configure --disable-shared --enable-static --prefix=$(PREFIX)/mpc --with-gmp=$(PREFIX)/gmp --with-mpfr=$(PREFIX)/mpfr
+    $(MAKE) -C mpc-build -j8 all
+    $(MAKE) -C mpc-build -j8 check
+    $(MAKE) -C mpc-build -j8 install
 
 isl: gmp
-	mkdir -p isl-build
-	cd isl-build && $(ROOT)/$(ISL)/configure --disable-shared --enable-static --prefix=$(PREFIX)/isl --with-gmp-prefix=$(PREFIX)/gmp
-	$(MAKE) -C isl-build -j8 all
-	$(MAKE) -C isl-build -j8 check
-	$(MAKE) -C isl-build -j8 install
+    mkdir -p isl-build
+    cd isl-build && $(ROOT)/$(ISL)/configure --disable-shared --enable-static --prefix=$(PREFIX)/isl --with-gmp-prefix=$(PREFIX)/gmp
+    $(MAKE) -C isl-build -j8 all
+    $(MAKE) -C isl-build -j8 check
+    $(MAKE) -C isl-build -j8 install
 
 libelf:
-	mkdir -p libelf-build
-	cd libelf-build && $(ROOT)/$(LIBELF)/configure --disable-shared --enable-static --prefix=$(PREFIX)/libelf
-	$(MAKE) -C libelf-build -j8 all
-	$(MAKE) -C libelf-build -j8 install
+    mkdir -p libelf-build
+    cd libelf-build && $(ROOT)/$(LIBELF)/configure --disable-shared --enable-static --prefix=$(PREFIX)/libelf
+    $(MAKE) -C libelf-build -j8 all
+    $(MAKE) -C libelf-build -j8 install
 
 binutils:
-	mkdir -p binutils-build
-	cd binutils-build && $(ROOT)/$(BINUTILS)/configure --prefix=$(PREFIX) $(FLAGS) --disable-werror
-	$(MAKE) -C binutils-build -j8 all
-	$(MAKE) -C binutils-build -j8 install
+    mkdir -p binutils-build
+    cd binutils-build && $(ROOT)/$(BINUTILS)/configure --prefix=$(PREFIX) $(FLAGS) --disable-werror
+    $(MAKE) -C binutils-build -j8 all
+    $(MAKE) -C binutils-build -j8 install
 
 gcc-1: gmp mpfr mpc isl libelf
-	mkdir -p gcc-build
-	cd gcc-build && $(ROOT)/$(GCC)/configure --enable-languages=c $(FLAGS) --prefix=$(PREFIX)
-	$(MAKE) -C gcc-build -j8 all
-	$(MAKE) -C gcc-build -j8 install
+    mkdir -p gcc-build
+    cd gcc-build && $(ROOT)/$(GCC)/configure --enable-languages=c $(FLAGS) --prefix=$(PREFIX)
+    $(MAKE) -C gcc-build -j8 all
+    $(MAKE) -C gcc-build -j8 install
 
 newlib: gcc-1
-	mkdir -p newlib-build
-	cd newlib-build && $(ROOT)/$(NEWLIB)/configure --target=$(TARGET) -disable-newlib-supplied-syscalls --prefix=$(PREFIX)
-	$(MAKE) -C newlib-build -j8 all
-	$(MAKE) -C newlib-build -j8 install
+    mkdir -p newlib-build
+    cd newlib-build && $(ROOT)/$(NEWLIB)/configure --target=$(TARGET) -disable-newlib-supplied-syscalls --prefix=$(PREFIX)
+    $(MAKE) -C newlib-build -j8 all
+    $(MAKE) -C newlib-build -j8 install
 
 gcc: newlib gmp mpfr mpc isl libelf
-	mkdir -p gcc-build
-	cd gcc-build && $(ROOT)/$(GCC)/configure --enable-languages=c $(FLAGS) --prefix=$(PREFIX)
-	$(MAKE) -C gcc-build -j8 all
-	$(MAKE) -C gcc-build -j8 install
+    mkdir -p gcc-build
+    cd gcc-build && $(ROOT)/$(GCC)/configure --enable-languages=c $(FLAGS) --prefix=$(PREFIX)
+    $(MAKE) -C gcc-build -j8 all
+    $(MAKE) -C gcc-build -j8 install
 
 gdb:
-	mkdir -p gdb-build
-	cd gdb-build && $(ROOT)/$(GDB)/configure $(FLAGS) --prefix=$(PREFIX)
-	$(MAKE) -C gdb-build -j8 all
-	$(MAKE) -C gdb-build -j8 install
+    mkdir -p gdb-build
+    cd gdb-build && $(ROOT)/$(GDB)/configure $(FLAGS) --prefix=$(PREFIX)
+    $(MAKE) -C gdb-build -j8 all
+    $(MAKE) -C gdb-build -j8 install

@@ -11,9 +11,9 @@
 #define LF_UDP_PORT 3258
 
 struct _lf_network_context {
-	int fd;
-	char host[64];
-	struct sockaddr_in device;
+    int fd;
+    char host[64];
+    struct sockaddr_in device;
 };
 
 int lf_network_read(struct _lf_device *device, void *dst, uint32_t length);

@@ -10,16 +10,16 @@ ENTRY(_ENTRY);
 
 /* The only memory section we need to worry about is RAM. */
 MEMORY {
-	RAM (rwx)  : ORIGIN = 0x00000000, LENGTH = 128K
+    RAM (rwx)  : ORIGIN = 0x00000000, LENGTH = 128K
 }
 
 SECTIONS {
 
     /* Place the sections in memory at the beginning of the image. */
-	. = ORIGIN(RAM);
+    . = ORIGIN(RAM);
 
     /* Build the Flipper ABI header. */
-	.header : {
+    .header : {
         /* The address of the entry point (if image is an application). */
         LONG(_ENTRY);
 
@@ -28,7 +28,7 @@ SECTIONS {
         /* The offset into the image at which the module structure exists. */
         LONG(ADDR(.module));
 
-		/* Compiler generated sections. */
+        /* Compiler generated sections. */
 
         /* The size of the .data section. */
         LONG(SIZEOF(.data));
@@ -46,31 +46,31 @@ SECTIONS {
         LONG(DEFINED(_GLOBAL_OFFSET_TABLE) ? ADDR(.got) : 0);
     } > RAM
 
-	/* The first section placed into memory is the module structure. */
+    /* The first section placed into memory is the module structure. */
     .module : {
         /* All images start with the entry glue symbols. */
         * (.start);
         /* The module structure. */
         * (.module);
-		. = ALIGN(4);
+        . = ALIGN(4);
     } > RAM
 
     /* Next, the text section is placed into memory. */
-	.text : {
+    .text : {
         * (.text .text.*);
-		. = ALIGN(4);
+        . = ALIGN(4);
     } > RAM
 
     /* Followed by the data section. */
-	.data : {
+    .data : {
         * (.data .data.*);
-		. = ALIGN(4);
+        . = ALIGN(4);
     } > RAM
 
     /* Ending with the .bss section, word aligned. */
-	.bss : {
+    .bss : {
         * (.bss .bss.*);
-		. = ALIGN(4);
-	} > RAM = 0x00
+        . = ALIGN(4);
+    } > RAM = 0x00
 
 }

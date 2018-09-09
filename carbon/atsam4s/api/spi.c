@@ -4,7 +4,7 @@
 
 LF_FUNC("spi") int spi_configure() {
 
-	return lf_success;
+    return lf_success;
 }
 
 LF_FUNC("spi") void spi_enable(void) {
@@ -32,11 +32,11 @@ LF_FUNC("spi") uint8_t spi_get(void) {
 }
 
 LF_FUNC("spi") int spi_write(void *src, uint32_t length) {
-	return lf_success;
+    return lf_success;
 }
 
 LF_FUNC("spi") int spi_read(void *dst, uint32_t length) {
-	return lf_success;
+    return lf_success;
 }
 
 /* interrupt handler for spi */

@@ -17,8 +17,8 @@
 
 /* Enumerate all of the error codes. */
 typedef enum {
-	#define LF_ERROR(Err, Str) Err,
-	#include "errors.def"
+    #define LF_ERROR(Err, Str) Err,
+    #include "errors.def"
 } lf_err_t;
 
 /* Raises an error internally to the current context of libflipper. */

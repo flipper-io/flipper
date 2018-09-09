@@ -47,10 +47,10 @@
 #define IO_A8 PIO_PB0X1_AD4
 
 struct _carbon_context {
-	/* Device that handles interacting with the u2. (ATMEGA16U2) */
-	struct _lf_device *_u2;
-	/* Microprocessor that handles code execution. (ATSAM4S16B) */
-	struct _lf_device *_4s;
+    /* Device that handles interacting with the u2. (ATMEGA16U2) */
+    struct _lf_device *_u2;
+    /* Microprocessor that handles code execution. (ATSAM4S16B) */
+    struct _lf_device *_4s;
 };
 
 /* Attaches to all carbon devices. */

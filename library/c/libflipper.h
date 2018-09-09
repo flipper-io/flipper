@@ -68,10 +68,10 @@ int lf_crc(const void *src, uint32_t length, lf_crc_t *crc);
 /* ---------- DEBUG ---------- */
 
 enum {
-	LF_DEBUG_LEVEL_OFF,
-	LF_DEBUG_LEVEL_WARNINGS,
-	LF_DEBUG_LEVEL_ERRORS,
-	LF_DEBUG_LEVEL_ALL
+    LF_DEBUG_LEVEL_OFF,
+    LF_DEBUG_LEVEL_WARNINGS,
+    LF_DEBUG_LEVEL_ERRORS,
+    LF_DEBUG_LEVEL_ALL
 };
 
 /* Sets library debug verbosity. */

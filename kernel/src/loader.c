@@ -53,67 +53,67 @@ struct _lf_ll *tasks;
 
 /* Called when an app finishes running. */
 void os_app_exit(struct _lf_abi_header *header) {
-	free(header);
+    free(header);
 }
 
 /* Loads an application into RAM. */
 int os_load_application(struct _lf_abi_header *header) {
-	struct _os_task *task = NULL;
+    struct _os_task *task = NULL;
 
 #warning Check here if the task exists.
 
-	void *_main = header + header->entry;
-	task = os_task_create(_main, os_app_exit, header, APPLICATION_STACK_SIZE_WORDS * sizeof(uint32_t));
-	lf_assert(task, E_NULL, "Failed to allocate memory for task");
+    void *_main = header + header->entry;
+    task = os_task_create(_main, os_app_exit, header, APPLICATION_STACK_SIZE_WORDS * sizeof(uint32_t));
+    lf_assert(task, E_NULL, "Failed to allocate memory for task");
 
-	/* Add the task. */
-	os_task_add(task);
-	/* Launch the task. */
-	os_task_next();
+    /* Add the task. */
+    os_task_add(task);
+    /* Launch the task. */
+    os_task_next();
 
-	return lf_success;
+    return lf_success;
 fail:
-	if (task) os_task_release(task);
-	return lf_error;
+    if (task) os_task_release(task);
+    return lf_error;
 }
 
 /* Loads an image into RAM. */
 int os_load_image(struct _lf_abi_header *header) {
-	lf_assert(header, E_NULL, "invalid module header provided for module load.");
+    lf_assert(header, E_NULL, "invalid module header provided for module load.");
 
 #warning Make sure the module is valid here.
 
-	/* Patch the function pointers in the module structure. */
-	void **_functions = (void **)header + header->module_offset;
-	for (unsigned i = 0; i < header->module_size / sizeof(void **); i ++) {
-		_functions[i] += (uintptr_t)header;
-	}
+    /* Patch the function pointers in the module structure. */
+    void **_functions = (void **)header + header->module_offset;
+    for (unsigned i = 0; i < header->module_size / sizeof(void **); i ++) {
+        _functions[i] += (uintptr_t)header;
+    }
 
-	/* Patch the Global Offset Table of the image. */
-	void **_got = (void **)header + header->got_offset;
-	for (unsigned i = 0; i < header->got_size / sizeof(void **); i ++) {
-		_got[i] += (uintptr_t)header;
-	}
+    /* Patch the Global Offset Table of the image. */
+    void **_got = (void **)header + header->got_offset;
+    for (unsigned i = 0; i < header->got_size / sizeof(void **); i ++) {
+        _got[i] += (uintptr_t)header;
+    }
 
-	/* Zero the BSS. */
-	uint32_t *_bss = (void *)header + header->got_offset;
-	for (unsigned i = 0; i < header->bss_size / sizeof(uint32_t); i ++) {
-		_bss[i] = 0;
-	}
+    /* Zero the BSS. */
+    uint32_t *_bss = (void *)header + header->got_offset;
+    for (unsigned i = 0; i < header->bss_size / sizeof(uint32_t); i ++) {
+        _bss[i] = 0;
+    }
 
 #warning Actually load the module here.
 
-	if (header->entry) {
-		/* Load an application. */
+    if (header->entry) {
+        /* Load an application. */
 
-	} else {
-		/* Load a module. */
-		struct _lf_module *_module = (struct _lf_module *)header + header->module_offset;
-		dyld_register(lf_get_selected(), _module);
-	}
+    } else {
+        /* Load a module. */
+        struct _lf_module *_module = (struct _lf_module *)header + header->module_offset;
+        dyld_register(lf_get_selected(), _module);
+    }
 
-	return lf_success;
+    return lf_success;
 fail:
-	free(header);
-	return lf_error;
+    free(header);
+    return lf_error;
 }

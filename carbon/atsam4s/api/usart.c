@@ -3,7 +3,7 @@
 //#include <usart/usart.h>
 
 LF_FUNC("usart") int usart_configure(void) {
-	return lf_success;
+    return lf_success;
 }
 
 LF_FUNC("usart") void usart_enable(void) {
@@ -27,11 +27,11 @@ LF_FUNC("usart") uint8_t usart_get(void) {
 }
 
 LF_FUNC("usart") int usart_write(void *src, uint32_t length) {
-	return lf_success;
+    return lf_success;
 }
 
 LF_FUNC("usart") int usart_read(void *dst, uint32_t length) {
-	return lf_success;
+    return lf_success;
 }
 
 /* uart isr */

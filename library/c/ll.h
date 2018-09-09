@@ -3,12 +3,12 @@
 
 /* Generic linked list data structure used throughout libflipper */
 struct _lf_ll {
-	/* The item stored at this node in the list. */
-	void *item;
-	/* A deconstructor for the item, if any. */
-	void (* deconstructor)(void *item);
-	/* The next node in the list. */
-	struct _lf_ll *next;
+    /* The item stored at this node in the list. */
+    void *item;
+    /* A deconstructor for the item, if any. */
+    void (* deconstructor)(void *item);
+    /* The next node in the list. */
+    struct _lf_ll *next;
 };
 
 /* The type signature of a fast enumeration function. */

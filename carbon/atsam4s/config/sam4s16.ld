@@ -38,8 +38,8 @@ SEARCH_DIR(.)
 /* Memory Spaces Definitions */
 MEMORY
 {
-	rom (rx)  : ORIGIN = 0x00400000, LENGTH = 0x00100000 /* flash, 1024K */
-	SRAM (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00020000 /* sram, 128K */
+    rom (rx)  : ORIGIN = 0x00400000, LENGTH = 0x00100000 /* flash, 1024K */
+    SRAM (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00020000 /* sram, 128K */
 }
 
 _estack = ORIGIN(SRAM) + LENGTH(SRAM);
@@ -47,96 +47,96 @@ _estack = ORIGIN(SRAM) + LENGTH(SRAM);
 /* Section Definitions */
 SECTIONS
 {
-	.text :
-	{
-		. = ALIGN(4);
-		_sfixed = .;
-		KEEP(*(.vectors .vectors.*))
-		*(.text .text.* .gnu.linkonce.t.*)
-		*(.glue_7t) *(.glue_7)
-		*(.rodata .rodata* .gnu.linkonce.r.*)
-		*(.ARM.extab* .gnu.linkonce.armextab.*)
+    .text :
+    {
+        . = ALIGN(4);
+        _sfixed = .;
+        KEEP(*(.vectors .vectors.*))
+        *(.text .text.* .gnu.linkonce.t.*)
+        *(.glue_7t) *(.glue_7)
+        *(.rodata .rodata* .gnu.linkonce.r.*)
+        *(.ARM.extab* .gnu.linkonce.armextab.*)
 
-		/* Support C constructors, and C destructors in both user code
-		   and the C library. This also provides support for C++ code. */
+        /* Support C constructors, and C destructors in both user code
+           and the C library. This also provides support for C++ code. */
 
 /*
-		. = ALIGN(4);
-		KEEP(*(.init))
-		. = ALIGN(4);
-		__preinit_array_start = .;
-		KEEP (*(.preinit_array))
-		__preinit_array_end = .;
+        . = ALIGN(4);
+        KEEP(*(.init))
+        . = ALIGN(4);
+        __preinit_array_start = .;
+        KEEP (*(.preinit_array))
+        __preinit_array_end = .;
 
 
-		. = ALIGN(4);
-		__init_array_start = .;
-		KEEP (*(SORT(.init_array.*)))
-		KEEP (*(.init_array))
-		__init_array_end = .;
+        . = ALIGN(4);
+        __init_array_start = .;
+        KEEP (*(SORT(.init_array.*)))
+        KEEP (*(.init_array))
+        __init_array_end = .;
 
-		. = ALIGN(0x4);
-		KEEP (*crtbegin.o(.ctors))
-		KEEP (*(EXCLUDE_FILE (*crtend.o) .ctors))
-		KEEP (*(SORT(.ctors.*)))
-		KEEP (*crtend.o(.ctors))
+        . = ALIGN(0x4);
+        KEEP (*crtbegin.o(.ctors))
+        KEEP (*(EXCLUDE_FILE (*crtend.o) .ctors))
+        KEEP (*(SORT(.ctors.*)))
+        KEEP (*crtend.o(.ctors))
 
-		. = ALIGN(4);
-		KEEP(*(.fini))
+        . = ALIGN(4);
+        KEEP(*(.fini))
 
-		. = ALIGN(4);
-		__fini_array_start = .;
-		KEEP (*(.fini_array))
-		KEEP (*(SORT(.fini_array.*)))
-		__fini_array_end = .;
+        . = ALIGN(4);
+        __fini_array_start = .;
+        KEEP (*(.fini_array))
+        KEEP (*(SORT(.fini_array.*)))
+        __fini_array_end = .;
 
-		KEEP (*crtbegin.o(.dtors))
-		KEEP (*(EXCLUDE_FILE (*crtend.o) .dtors))
-		KEEP (*(SORT(.dtors.*)))
-		KEEP (*crtend.o(.dtors))
+        KEEP (*crtbegin.o(.dtors))
+        KEEP (*(EXCLUDE_FILE (*crtend.o) .dtors))
+        KEEP (*(SORT(.dtors.*)))
+        KEEP (*crtend.o(.dtors))
 */
 
-		. = ALIGN(4);
-		_efixed = .;            /* End of text section */
-	} > rom
+        . = ALIGN(4);
+        _efixed = .;            /* End of text section */
+    } > rom
 
-	/* .ARM.exidx is sorted, so has to go in its own output section.  */
-	PROVIDE_HIDDEN (__exidx_start = .);
-	.ARM.exidx :
-	{
-	  *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-	} > rom
-	PROVIDE_HIDDEN (__exidx_end = .);
+    /* .ARM.exidx is sorted, so has to go in its own output section.  */
+    PROVIDE_HIDDEN (__exidx_start = .);
+    .ARM.exidx :
+    {
+      *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+    } > rom
+    PROVIDE_HIDDEN (__exidx_end = .);
 
-	. = ALIGN(4);
-	_etext = .;
+    . = ALIGN(4);
+    _etext = .;
 
-	.relocate : AT (_etext)
-	{
-		. = ALIGN(4);
-		_srelocate = .;
-		*(.ramfunc .ramfunc.*);
-		*(.data .data.*);
-		. = ALIGN(4);
-		_erelocate = .;
-	} > SRAM
+    .relocate : AT (_etext)
+    {
+        . = ALIGN(4);
+        _srelocate = .;
+        *(.ramfunc .ramfunc.*);
+        *(.data .data.*);
+        . = ALIGN(4);
+        _erelocate = .;
+    } > SRAM
 
-	/* .bss section which is used for uninitialized data */
-	.bss (NOLOAD) :
-	{
-		. = ALIGN(4);
-		_sbss = . ;
-		_szero = .;
-		__bss_start__ = .;
-		*(.bss .bss.*)
-		*(COMMON)
-		. = ALIGN(4);
-		__bss_end__ = .;
-		_ebss = . ;
-		_ezero = .;
-	} > SRAM
+    /* .bss section which is used for uninitialized data */
+    .bss (NOLOAD) :
+    {
+        . = ALIGN(4);
+        _sbss = . ;
+        _szero = .;
+        __bss_start__ = .;
+        *(.bss .bss.*)
+        *(COMMON)
+        . = ALIGN(4);
+        __bss_end__ = .;
+        _ebss = . ;
+        _ezero = .;
+    } > SRAM
 
-	. = ALIGN(4);
-	_end = . ;
-	__end__ = .;
+    . = ALIGN(4);
+    _end = . ;
+    __end__ = .;
 }
