@@ -47,7 +47,7 @@ extern int _write(int file, char *ptr, int len) {
 }
 
 extern void _exit(int status) {
-    while (1);
+    while (1) {}
 }
 
 extern void _kill(int pid, int sig) {

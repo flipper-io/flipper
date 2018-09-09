@@ -115,5 +115,5 @@ void reset_exception(void) {
     main();
 
     /* Loop if main were ever to return. */
-    while (1);
+    while (1) {}
 }

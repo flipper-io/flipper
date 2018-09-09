@@ -19,7 +19,7 @@ void os_task_finished(void) {
     /* Release the current task. */
     os_task_release(os_current_task);
     /* Prevent the CPU from wandering off. */
-    while (1);
+    while (1) {}
 }
 
 /* Initializes the scheduler. */
