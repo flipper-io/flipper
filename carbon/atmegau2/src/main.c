@@ -13,23 +13,19 @@ int debug_putchar(char c, FILE *stream) {
 void loop(void) {
 
     struct _fmr_packet packet;
-    int e = lf_error;
 
     while (1) {
 
         /* pet the watchdog */
-        wdt_reset();
+        // wdt_reset();
 
         /* obtain a message runtime packet */
-        e = megausb_bulk_receive(&packet, sizeof(packet));
+        int e = megausb_bulk_receive(&packet, sizeof(packet));
 
-        /* ensure the packet is valid */
-        lf_assert(e, E_USB, "failed to obtain usb packet");
-
-        lf_debug("performing");
-
-        /* execute the packet */
-        fmr_perform(_u2, &packet);
+        if (e == lf_success) {
+            lf_debug("performing");
+            fmr_perform(_u2, &packet);
+        }
 
     fail:
         continue;

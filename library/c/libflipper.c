@@ -212,7 +212,7 @@ int lf_dyld(struct _lf_device *device, const char *module, uint16_t *idx) {
 
     lf_debug_packet(&_packet);
 
-    e = device->write(device, packet, hdr->len);
+    e = device->write(device, packet, sizeof(_packet));
     lf_assert(e, E_ENDPOINT, "Failed to send message to device '%s'.", device->name);
 
     e = device->read(device, &result, sizeof(struct _fmr_result));
