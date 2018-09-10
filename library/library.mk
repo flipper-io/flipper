@@ -32,13 +32,14 @@ libflipper: libflipper.so | $(BUILD)/include/flipper/.dir
 install-libflipper: libflipper
 	$(_v)cp $(BUILD)/libflipper/libflipper.so $(PREFIX)/lib/
 	$(_v)cp -r $(BUILD)/include/* $(PREFIX)/include/
-	$(_v)ln -sf $(PREFIX)/include/flipper/flipper.h $(PREFIX)/include
+	$(_v)mv $(PREFIX)/include/flipper/flipper.h $(PREFIX)/include
 	$(_v)ln -sf $(PREFIX)/include/flipper/flipper.mk $(PREFIX)/include
 
 install:: install-libflipper
 
 uninstall-libflipper:
 	$(_v)rm -rf $(PREFIX)/include/flipper
+	$(_v)rm     $(PREFIX)/include/flipper.h
 	$(_v)rm -rf $(PREFIX)/lib/libflipper.so
 	$(_v)rm -rf $(PREFIX)/share/flipper
 

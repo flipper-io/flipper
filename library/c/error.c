@@ -11,6 +11,10 @@ LF_WEAK const char *const err_strs[] = {
 #include "errors.def"
 };
 
+LF_WEAK const char *lf_error_string(lf_err_t error) {
+    return err_strs[error];
+}
+
 LF_WEAK void _lf_assert(lf_err_t err, const char *func, int line, const char *fmt, ...) {
     _lf_err = err;
 

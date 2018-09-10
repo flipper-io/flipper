@@ -34,6 +34,6 @@ extern lf_err_t _lf_err;
 
 void lf_error_set(lf_err_t err);
 lf_err_t lf_error_get(void);
-const char *lf_get_err_str(lf_err_t err);
+const char *lf_error_string(lf_err_t err);
 
 #endif

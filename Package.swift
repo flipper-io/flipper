@@ -20,5 +20,9 @@ let package = Package(
             name: "Flipper",
             dependencies: ["Clibflipper"],
             path: "languages/swift/Flipper"),
+        .target(
+            name: "Example",
+            dependencies: ["Flipper"],
+            path: "languages/swift/Example"),
     ]
 )
