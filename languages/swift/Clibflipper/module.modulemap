@@ -1,0 +1,4 @@
+module Clibflipper [system] {
+  header "/usr/local/include/flipper.h"
+  export *
+}

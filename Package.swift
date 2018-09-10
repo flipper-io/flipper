@@ -1,4 +1,4 @@
-// swift-tools-version:4.1
+// swift-tools-version:4.2
 
 import PackageDescription
 
@@ -10,12 +10,15 @@ let package = Package(
             targets: ["Flipper"]),
     ],
     dependencies: [
-      .package(url: "../Clibflipper", .branch("master"))
     ],
     targets: [
+        .systemLibrary(
+            name: "Clibflipper",
+            path: "languages/swift/Clibflipper",
+            pkgConfig: "flipper"),
         .target(
             name: "Flipper",
-            dependencies: [],
+            dependencies: ["Clibflipper"],
             path: "languages/swift/Flipper"),
     ]
 )
