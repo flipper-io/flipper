@@ -65,8 +65,8 @@ int main(void) {
     FLASH_RESET_DDR |= FLASH_RESET_PIN;
 
     /* Configure the button to reset. */
-    PCMSK1 |= (1 << PCINT8);
-    PCICR |= (1 << PCIE1);
+    // PCMSK1 |= (1 << PCINT8);
+    // PCICR |= (1 << PCIE1);
 
     /* Create a flipper device. */
     _u2 = lf_device_create(atmegau2_read, atmegau2_write, atmegau2_release);
@@ -74,29 +74,29 @@ int main(void) {
 
     /* peripheral configuration */
 
-    // extern struct _lf_module button;
-    // dyld_register(_u2, &button);
+    extern struct _lf_module button;
+    dyld_register(_u2, &button);
     button_configure();
-    //
-    // extern struct _lf_module gpio;
-    // dyld_register(_u2, &gpio);
-    // gpio_configure();
+
+    extern struct _lf_module gpio;
+    dyld_register(_u2, &gpio);
+    gpio_configure();
 
     extern struct _lf_module led;
     dyld_register(_u2, &led);
     led_configure();
 
-    // extern struct _lf_module spi;
-    // dyld_register(_u2, &spi);
-    // spi_configure();
-    //
-    // extern struct _lf_module uart0;
-    // dyld_register(_u2, &uart0);
-    // uart0_configure();
-    //
-    // extern struct _lf_module wdt;
-    // dyld_register(_u2, &wdt);
-    // wdt_configure();
+    extern struct _lf_module spi;
+    dyld_register(_u2, &spi);
+    spi_configure();
+
+    extern struct _lf_module uart0;
+    dyld_register(_u2, &uart0);
+    uart0_configure();
+
+    extern struct _lf_module wdt;
+    dyld_register(_u2, &wdt);
+    wdt_configure();
 
     /* connect to the USB host */
     usb_configure();

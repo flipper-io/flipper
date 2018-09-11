@@ -2,98 +2,123 @@
 #include "atmegau2.h"
 #include "megausb.h"
 
-#define LF_USB_TIMEOUT 3
+#define LF_USB_TIMEOUT_MS 3
 
-int megausb_bulk_receive(void *dst, uint32_t length) {
+#define lf_ceiling(x, y) ((x + y - 1) / y)
 
-    uint8_t _sreg = SREG;
+/* Receive a packet using the appropriate bulk endpoint. */
+int megausb_bulk_receive(void *destination, uint32_t length) {
 
-    if (!megausb_configuration) return lf_error;
+	/* If USB is not configured, return with error. */
+	if (!megausb_configuration) {
+		return lf_error;
+	}
 
-    cli();
+	uint8_t _sreg = SREG;
+	cli();
 
-    /* Select the endpoint that has been configured to receive bulk data. */
-    UENUM = BULK_OUT_ENDPOINT;
+	/* Select the endpoint that has been configured to receive bulk data. */
+	UENUM = BULK_OUT_ENDPOINT;
 
-    while (length) {
+	int total = lf_ceiling(length, BULK_OUT_SIZE);
+	for (int i = 0; i < total; i ++) {
 
-        /* Wait until the USB controller is ready. */
-        uint8_t timeout = UDFNUML + LF_USB_TIMEOUT;
+		/* Wait until the USB controller is ready. */
+		uint8_t timeout = UDFNUML + LF_USB_TIMEOUT_MS;
+		while (1) {
 
-        while (1) {
+			if ((UEINTX & (1 << RWAL))) break;
+			SREG = _sreg;
 
-            if (UEINTX & (1 << RWAL)) break;
+			if (UDFNUML == timeout) return lf_error;
 
-            SREG = _sreg;
-            if (UDFNUML >= timeout) return lf_error;
-            if (!megausb_configuration) return lf_error;
-            _sreg = SREG;
-            cli();
+			if (!megausb_configuration) return lf_error;
 
-            UENUM = BULK_OUT_ENDPOINT;
-        }
+			_sreg = SREG;
+			cli();
 
-        /* calculate send length */
-        size_t len = (length > BULK_OUT_SIZE) ? BULK_OUT_SIZE : length;
-        length -= len;
+			UENUM = BULK_OUT_ENDPOINT;
+		}
 
-        lf_debug("reading %i bytes\n", len);
+		/* Transfer the buffered data to the destination. */
+		uint8_t len = BULK_OUT_SIZE;
+		while (len --) {
+			if (length) {
+				/* If there is still valid data to send, load it from the receive buffer. */
+				*(uint8_t *)destination++ = UEDATX;
+				/* Decrement the length. */
+				length --;
+			}
+		}
 
-        /* fill the fifo with the available data */
-        for (size_t i = 0; i < len; i++) *(uint8_t *)dst++ = UEDATX;
-        /* clear the fifo */
-        UEINTX = (1 << NAKINI) | (1 << RWAL) | (1 << RXSTPI) | (1 << STALLEDI) | (1 << TXINI);
-    }
+		/* Flush the receive buffer and reset the interrupt state machine. */
+		UEINTX = (1 << NAKINI) | (1 << RWAL) | (1 << RXSTPI) | (1 << STALLEDI) | (1 << TXINI);
+	}
 
-    SREG = _sreg;
+	SREG = _sreg;
+	return lf_success;
 
-    return lf_success;
+	// while (UEINTX & (1 << RWAL)) {
+	// 	/* Flush the receive buffer and reset the interrupt state machine. */
+	// 	UEINTX = (1 << NAKINI) | (1 << RWAL) | (1 << RXSTPI) | (1 << STALLEDI) | (1 << TXINI);
+	// }
 }
 
-int megausb_bulk_transmit(void *src, uint32_t length) {
+/* Receive a packet using the appropriate bulk endpoint. */
+int megausb_bulk_transmit(void *source, uint32_t length) {
 
-    uint8_t _sreg = SREG;
+	/* If USB is not configured, return with error. */
+	if (!megausb_configuration) {
+		return lf_error;
+	}
 
-    if (!megausb_configuration) return lf_error;
+	uint8_t _sreg = SREG;
+	cli();
 
-    cli();
+	/* Select the endpoint that has been configured to receive bulk data. */
+	UENUM = BULK_IN_ENDPOINT & ~USB_IN_MASK;
 
-    /* Select the endpoint that has been configured to receive bulk data. */
-    UENUM = BULK_IN_ENDPOINT & ~USB_IN_MASK;
+	int total = lf_ceiling(length, BULK_OUT_SIZE);
+	for (int i = 0; i < total; i ++) {
 
-    lf_debug("sending %i from bulk", length);
+		/* Wait until the USB controller is ready. */
+		uint8_t timeout = UDFNUML + LF_USB_TIMEOUT_MS;
+		while (1) {
 
-    while (length) {
+			if ((UEINTX & (1 << RWAL))) break;
+			SREG = _sreg;
 
-        /* Wait until the USB controller is ready. */
-        uint8_t timeout = UDFNUML + LF_USB_TIMEOUT;
+			if (UDFNUML == timeout) return lf_error;
 
-        while (1) {
+			if (!megausb_configuration) return lf_error;
 
-            if (UEINTX & (1 << RWAL)) break;
+			_sreg = SREG;
+			cli();
 
-            SREG = _sreg;
-            if (UDFNUML >= timeout) return lf_error;
-            if (!megausb_configuration) return lf_error;
-            _sreg = SREG;
-            cli();
+			UENUM = BULK_IN_ENDPOINT & ~USB_IN_MASK;
+		}
 
-            UENUM = BULK_IN_ENDPOINT & ~USB_IN_MASK;
-        }
+		/* Transfer the buffered data to the destination. */
+		uint8_t len = BULK_IN_SIZE;
+		while (len --) {
+			if (length) {
+				/* If there is still valid data to send, load it into the transmit buffer. */
+				UEDATX = *(uint8_t *)source++;
+				/* Decrement the length. */
+				length --;
+			}
+		}
 
-        /* calculate send length */
-        size_t len = (length > BULK_IN_SIZE) ? BULK_IN_SIZE : length;
-        length -= len;
+		/* Flush the transmit buffer and reset the interrupt state machine. */
+		UEINTX = (1 << RWAL) | (1 << NAKOUTI) | (1 << RXSTPI) | (1 << STALLEDI);
+	}
 
-        lf_debug("writing %i bytes\n", len);
+	SREG = _sreg;
+	return lf_success;
 
-        /* fill the fifo with the available data */
-        for (size_t i = 0; i < len; i++) UEDATX = *(uint8_t *)src++;
-        /* shift the fifo out */
-        UEINTX = (1 << RWAL) | (1 << NAKOUTI) | (1 << RXSTPI) | (1 << STALLEDI);
-    }
+	// while (UEINTX & (1 << RWAL)) {
+	// 	/* Flush the transmit buffer and reset the interrupt state machine. */
+	// 	UEINTX = (1 << RWAL) | (1 << NAKOUTI) | (1 << RXSTPI) | (1 << STALLEDI);
+	// }
 
-    SREG = _sreg;
-
-    return lf_success;
 }

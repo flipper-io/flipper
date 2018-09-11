@@ -70,8 +70,6 @@ int lf_invoke(struct _lf_device *device, const char *module, lf_function functio
     lf_assert(device, E_NULL, "invalid device");
     lf_assert(module, E_NULL, "invalid module");
 
-    lf_debug("Invoking function on device '%s'.", device->name);
-
     memset(&_packet, 0, sizeof(_packet));
     hdr->magic = FMR_MAGIC_NUMBER;
     hdr->len = sizeof(packet->hdr);
