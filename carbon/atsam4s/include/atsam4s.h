@@ -27,7 +27,7 @@
 /* Communicate at 1 megabaud. */
 #define PLATFORM_BAUDRATE 1000000
 
-#define SAM_SAM_FMR_PIN PIO_PA0
+#define SAM_FMR_PIN PIO_PA0
 
 #define FLASH_PCS 0
 #define FLASH_PCS_PIN PIO_PA11A_NPCS0
