@@ -14,15 +14,15 @@ let package = Package(
     targets: [
         .systemLibrary(
             name: "Clibflipper",
-            path: "languages/swift/Clibflipper",
+            path: "library/swift/Clibflipper",
             pkgConfig: "flipper"),
         .target(
             name: "Flipper",
             dependencies: ["Clibflipper"],
-            path: "languages/swift/Flipper"),
+            path: "library/swift/Flipper"),
         .target(
             name: "Example",
             dependencies: ["Flipper"],
-            path: "languages/swift/Example"),
+            path: "library/swift/Example"),
     ]
 )
