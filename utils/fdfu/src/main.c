@@ -13,7 +13,7 @@
 #define XLEN 128
 
 /* Defines the layout of an XMODEM packet. */
-struct _xpacket {
+struct LF_PACKED _xpacket {
     uint8_t header;
     uint8_t number;
     uint8_t _number;
@@ -101,6 +101,8 @@ void sam_ba_write_efc_fcr(uint8_t command, uint32_t arg) {
 /* Moves data from the host to the device's RAM using the SAM-BA and XMODEM protocol. */
 int sam_ba_copy(uint32_t destination, void *src, uint32_t length) {
 
+    uint16_t crc;
+
     char buffer[20];
     uart0_reset();
     sprintf(buffer, "S%08X,%08X#", destination, length);
@@ -117,15 +119,24 @@ int sam_ba_copy(uint32_t destination, void *src, uint32_t length) {
         uint32_t len = (length > XLEN) ? XLEN : length;
 
         /* Construct the XMODEM packet. */
-        struct _xpacket packet = { SOH, i, ~i, { 0 }, 0x0000 };
+        struct _xpacket packet = { SOH, (i + 1), ~(i + 1), { 0 }, 0x0000 };
         /* Copy the chunk of data into the packet. */
         memcpy(packet.data, (void *)(src + (i * XLEN)), len);
         /* Calculate the checksum of the data and write it to the packet in little endian format. */
-        lf_crc(packet.data, sizeof(packet.data), &packet.crc);
+        lf_crc(packet.data, sizeof(packet.data), &crc);
+        packet.crc = little(crc);
+
         /* Transfer the packet to the SAM-BA. */
         uart0_write(&packet, sizeof(packet));
 
-        lf_assert(uart0_get() == ACK, E_UNIMPLEMENTED, "Failed to get ACK.");
+        char c = uart0_get();
+
+        if (c == CAN) {
+            lf_assert(false, E_TIMEOUT, "XMODEM cancelled transfer.");
+            return lf_error;
+        }
+
+        lf_assert(c == ACK, E_UNIMPLEMENTED, "Failed to get ACK.");
 
         /* Decrement the length appropriately. */
         length -= len;
@@ -198,6 +209,7 @@ int main(int argc, char *argv[]) {
 
     /* Attach to a Flipper device. */
     lf_assert(carbon_attach(), E_NO_DEVICE, "failed to attach device");
+    carbon_select_u2(lf_get_selected());
 
     /* Open the firmware image. */
     firmware = fopen(argv[1], "rb");
@@ -207,9 +219,6 @@ int main(int argc, char *argv[]) {
     fseek(firmware, 0L, SEEK_END);
     size_t firmware_size = ftell(firmware);
     fseek(firmware, 0L, SEEK_SET);
-
-    /* DFU baud. */
-    uart0_setbaud(DFU_BAUD);
 
     /* Reset the 4S. */
     sam_reset();
@@ -326,7 +335,7 @@ int main(int argc, char *argv[]) {
     free(pagedata);
 
     /* Go back to FMR mode. */
-    uart0_setbaud(FMR_BAUD);
+    sam_exit_dfu();
 
     lf_debug("Resetting the CPU.");
     sam_reset();

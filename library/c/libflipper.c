@@ -113,8 +113,6 @@ int lf_push(struct _lf_device *device, void *dst, void *src, uint32_t len) {
     lf_assert(src, E_NULL, "NULL src");
     lf_assert(len, E_NULL, "Zero length");
 
-    lf_debug("Pushing to memory on device '%s'.", device->name);
-
     memset(&packet, 0, sizeof(packet));
     hdr->magic = FMR_MAGIC_NUMBER;
     hdr->len = sizeof(struct _fmr_push_pull_packet);
@@ -154,8 +152,6 @@ int lf_pull(struct _lf_device *device, void *dst, void *src, uint32_t len) {
     lf_assert(dst, E_NULL, "NULL dst");
     lf_assert(src, E_NULL, "NULL src");
     lf_assert(len, E_NULL, "Zero length");
-
-    lf_debug("Pulling from memory on device '%s'.", device->name);
 
     memset(&packet, 0, sizeof(packet));
     hdr->magic = FMR_MAGIC_NUMBER;
@@ -237,8 +233,6 @@ int lf_malloc(struct _lf_device *device, uint32_t size, void **ptr) {
 
     lf_assert(device, E_NULL, "invalid device");
 
-    lf_debug("Allocating memory on device '%s'.", device->name);
-
     memset(&packet, 0, sizeof(packet));
     hdr->magic = FMR_MAGIC_NUMBER;
     hdr->len = sizeof(struct _fmr_dyld_packet);
@@ -273,8 +267,6 @@ int lf_free(struct _lf_device *device, void *ptr) {
     lf_crc_t crc;
 
     lf_assert(device, E_NULL, "invalid device");
-
-    lf_debug("Freeing memory on device '%s'.", device->name);
 
     memset(&packet, 0, sizeof(packet));
     hdr->magic = FMR_MAGIC_NUMBER;

@@ -26,6 +26,7 @@ LF_FUNC("uart0") int uart0_configure(void) {
 }
 
 LF_FUNC("uart0") int uart0_setbaud(uint32_t baud) {
+    lf_debug("setting baud to %i", baud);
     uint8_t b = BAUDRATE(baud);
     UBRR1L = b;
     return lf_success;

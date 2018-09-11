@@ -26,6 +26,9 @@
 #include "posix/network.h"
 #include "posix/usb.h"
 
+#include "gpio.h"
+#include "uart0.h"
+
 #include <unistd.h>
 
 int carbon_select_u2(struct _lf_device *device) {
@@ -55,12 +58,24 @@ int sam_enter_dfu(void) {
     struct _lf_device *device = lf_get_selected();
     carbon_select_u2(device);
 
+    uart0_setbaud(DFU_BAUD);
+
     /* erase high, reset low (active) */
     gpio_write((1 << SAM_ERASE_PIN), (1 << SAM_RESET_PIN));
     /* Wait for chip to erase. */
     usleep(8000000);
     /* erase low, reset high (inactive) */
     gpio_write((1 << SAM_RESET_PIN), (1 << SAM_ERASE_PIN));
+
+    lf_select(device);
+    return lf_success;
+}
+
+int sam_exit_dfu(void) {
+    struct _lf_device *device = lf_get_selected();
+    carbon_select_u2(device);
+
+    uart0_setbaud(FMR_BAUD);
 
     lf_select(device);
     return lf_success;
