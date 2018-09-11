@@ -77,7 +77,7 @@ int lf_sizeof(lf_type type);
 /* Parser macros for variables. */
 
 /* Creates an 'lf_va' from an 'lf_type' and an immediate value. */
-#define lf_intx(type, arg) (lf_type) type, (lf_arg)(uintptr_t)arg
+#define lf_intx(type, arg) (lf_type)type, (lf_arg)(uintptr_t)arg
 /* Gives the 'lf_va' for a given integer's value. */
 #define lf_int(arg) lf_intx(lf_int_t, arg)
 /* Gives the 'lf_va' for a given 8-bit integer's value. */

@@ -34,6 +34,7 @@ LF_WEAK int uart0_read(void *destination, uint32_t length) {
     struct _lf_device *device = lf_get_selected();
     lf_assert(device, E_UNIMPLEMENTED, "invalid device");
     lf_assert(lf_malloc(device, length, &buffer), E_NULL, "Failed to allocate remote memory for uart0_read.");
+    printf("Allocated to buffer %p\n", buffer);
     lf_assert(lf_invoke(device, "uart0", _uart0_read, lf_int_t, &retval, lf_args(lf_ptr(buffer), lf_infer(length))),
               E_UNIMPLEMENTED, "Failed to invoke uart0_read.");
     lf_assert(lf_pull(device, destination, buffer, length), E_UNIMPLEMENTED, "Failed to pull uart0.");
@@ -50,6 +51,7 @@ LF_WEAK int uart0_write(void *source, uint32_t length) {
     struct _lf_device *device = lf_get_selected();
     lf_assert(device, E_UNIMPLEMENTED, "invalid device");
     lf_assert(lf_malloc(device, length, &buffer), E_NULL, "Failed to allocate remote memory for uart0_write.");
+    printf("Allocated to buffer %p\n", buffer);
     lf_assert(lf_push(device, buffer, source, length), E_UNIMPLEMENTED, "Failed to push uart0.");
     lf_assert(lf_invoke(device, "uart0", _uart0_write, lf_int_t, &retval, lf_args(lf_ptr(buffer), lf_infer(length))),
               E_UNIMPLEMENTED, "Failed to invoke uart0_write.");

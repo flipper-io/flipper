@@ -28,9 +28,19 @@
 
 #include <unistd.h>
 
+int carbon_select_u2(struct _lf_device *device) {
+    lf_assert(device, E_NO_DEVICE, "null device");
+    struct _carbon_context *_dev_ctx = (struct _carbon_context *)device->_dev_ctx;
+    lf_assert(_dev_ctx, E_NO_DEVICE, "null device context");
+    lf_select(_dev_ctx->_u2);
+    return lf_success;
+fail:
+    return lf_error;
+}
+
 void sam_reset(void) {
     struct _lf_device *device = lf_get_selected();
-    //    carbon_select_u2(device);
+    carbon_select_u2(device);
 
     /* reset low (active) */
     gpio_write(0, (1 << SAM_RESET_PIN));
@@ -43,7 +53,7 @@ void sam_reset(void) {
 
 int sam_enter_dfu(void) {
     struct _lf_device *device = lf_get_selected();
-    //    carbon_select_u2(device);
+    carbon_select_u2(device);
 
     /* erase high, reset low (active) */
     gpio_write((1 << SAM_ERASE_PIN), (1 << SAM_RESET_PIN));
@@ -58,7 +68,7 @@ int sam_enter_dfu(void) {
 
 int sam_off(void) {
     struct _lf_device *device = lf_get_selected();
-    //    carbon_select_u2(device);
+    carbon_select_u2(device);
 
     /* power off, reset low */
     gpio_write(0, (1 << SAM_POWER_PIN) | (1 << SAM_RESET_PIN));
@@ -69,7 +79,7 @@ int sam_off(void) {
 
 int sam_on(void) {
     struct _lf_device *device = lf_get_selected();
-    //    carbon_select_u2(device);
+    carbon_select_u2(device);
 
     /* power on, reset high */
     gpio_write((1 << SAM_POWER_PIN) | (1 << SAM_RESET_PIN), 0);
@@ -81,7 +91,7 @@ int sam_on(void) {
 int atsam4s_read(struct _lf_device *device, void *dst, uint32_t length) {
     struct _lf_device *prev = lf_get_selected();
     lf_assert(device, E_NULL, "invalid device");
-    //    carbon_select_u2(device);
+    carbon_select_u2(device);
 
     size_t size = 128;
     while (length) {
@@ -105,7 +115,7 @@ fail:
 int atsam4s_write(struct _lf_device *device, void *src, uint32_t length) {
     struct _lf_device *prev = lf_get_selected();
     lf_assert(device, E_NULL, "invalid device");
-    //    carbon_select_u2(device);
+    carbon_select_u2(device);
 
     size_t size = 128;
     while (length) {

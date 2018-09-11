@@ -197,7 +197,7 @@ int main(int argc, char *argv[]) {
     // lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
 
     /* Attach to a Flipper device. */
-    carbon_attach();
+    lf_assert(carbon_attach(), E_NO_DEVICE, "failed to attach device");
 
     /* Open the firmware image. */
     firmware = fopen(argv[1], "rb");
@@ -339,6 +339,6 @@ int main(int argc, char *argv[]) {
     return EXIT_SUCCESS;
 
 fail:
-    free(pagedata);
+    if (pagedata) free(pagedata);
     return EXIT_FAILURE;
 }

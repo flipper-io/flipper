@@ -17,7 +17,7 @@ int lf_sizeof(lf_type type) {
     if (type == lf_int8_t || type == lf_uint8_t) return 1;
     if (type == lf_int16_t || type == lf_uint16_t) return 2;
     if (type == lf_int32_t || type == lf_uint32_t) return 4;
-    if (type == lf_int64_t || type == lf_uint64_t || type == lf_void_t) return 8;
+    if (type == lf_int64_t || type == lf_uint64_t || type == lf_ptr_t || type == lf_void_t) return 8;
     return 0;
 }
 
@@ -139,6 +139,8 @@ int fmr_rpc(struct _lf_device *device, struct _fmr_call_packet *packet, lf_retur
 
     f = m->interface[call->function];
     lf_assert(f, E_NULL, "bad interface address");
+
+    lf_debug("performing in module %s", m->name);
 
     *retval = fmr_call(f, call->ret, call->argc, call->argt, &call->argv);
 

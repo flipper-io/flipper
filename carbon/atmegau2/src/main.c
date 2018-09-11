@@ -23,7 +23,6 @@ void loop(void) {
         int e = megausb_bulk_receive(&packet, sizeof(packet));
 
         if (e == lf_success) {
-            lf_debug("performing");
             fmr_perform(_u2, &packet);
         }
 
