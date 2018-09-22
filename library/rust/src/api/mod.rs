@@ -3,8 +3,8 @@
 pub mod uart0;
 
 flipper_module!(Led, led,
-    0, fn configure() -> (),
-    1, fn rgb(red: u8, green: u8, blue: u8) -> (),
+    0, fn rgb(red: u8, green: u8, blue: u8) -> (),
+    1, fn configure() -> (),
 );
 
 flipper_module! (Gpio, gpio,

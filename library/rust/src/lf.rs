@@ -9,6 +9,7 @@
 
 use libc;
 use libc::{c_void, c_int, c_char};
+use std::mem;
 use std::ops::Deref;
 use std::ptr;
 use std::ffi::CString;
@@ -39,8 +40,7 @@ const LF_TYPE_U64: _lf_type = 7;
 /// The internal `libflipper` representation of a function argument.
 /// This is used for FFI when we ask libflipper to execute a function
 /// on a device.
-#[repr(C)]
-#[derive(Debug, PartialEq, PartialOrd)]
+#[repr(C, packed)]
 struct _lf_arg {
     arg_type: _lf_type,
     arg_value: _lf_value,
@@ -61,7 +61,7 @@ mod libflipper {
     extern {
         pub(crate) fn lf_get_selected() -> _lf_device;
         pub(crate) fn lf_ll_append(ll: *mut *mut _lf_ll, item: *const c_void, destructor: *const c_void) -> c_int;
-        pub(crate) fn lf_invoke(device: _lf_device, module: *const c_char, function: _lf_index, ret: u8, args: *const _lf_ll) -> _lf_value;
+        pub(crate) fn lf_invoke(device: _lf_device, module: *const c_char, function: _lf_index, ret_type: u8, ret_val: *const _lf_value, args: *const _lf_ll) -> i32;
         pub(crate) fn lf_push(device: _lf_device, module: *const c_char, function: _lf_index, source: *const c_void, length: u32, args: *const _lf_ll) -> _lf_value;
         pub(crate) fn lf_pull(device: _lf_device, module: *const c_char, function: _lf_index, dest: *mut c_void, length: u32, args: *const _lf_ll) -> _lf_value;
     }
@@ -250,7 +250,8 @@ pub fn invoke<T: LfReturnable>(flipper: &Flipper, module: &str, index: u8, args:
             libflipper::lf_ll_append(&mut arglist, &arg.0 as *const _lf_arg as *const c_void, ptr::null());
         }
         let module_name = CString::new(module).unwrap();
-        let ret = libflipper::lf_invoke(flipper.device, module_name.as_ptr(), index, T::lf_type(), arglist);
+        let mut ret: _lf_value = mem::uninitialized();
+        libflipper::lf_invoke(libflipper::lf_get_selected(), module_name.as_ptr(), index, T::lf_type(), &mut ret as *mut _lf_value, arglist);
         T::from(LfReturn(ret))
     }
 }
