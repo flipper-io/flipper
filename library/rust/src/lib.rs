@@ -12,6 +12,9 @@ extern crate log;
 extern crate failure;
 extern crate libc;
 
+#[macro_use]
+pub mod macros;
+
 pub mod api;
 pub mod lf;
 
@@ -35,8 +38,9 @@ type Result<T> = std::result::Result<T, FlipperError>;
 
 #[link(name = "flipper")]
 extern {
-    fn flipper_attach() -> _lf_device;
+    fn carbon_attach() -> _lf_device;
     fn carbon_attach_hostname(hostname: *const c_char) -> _lf_device;
+    fn carbon_select_u2(device: _lf_device);
 }
 
 pub struct Flipper {
@@ -49,7 +53,7 @@ pub struct Flipper {
 impl Flipper {
     pub fn attach() -> Result<Flipper> {
         unsafe {
-            let device = flipper_attach();
+            let device = carbon_attach();
             if device == ptr::null() { return Err(FlipperError::Attach); }
             Ok(Flipper { device })
         }
@@ -61,6 +65,12 @@ impl Flipper {
             let device = carbon_attach_hostname(hostname_string.as_ptr());
             if device == ptr::null() { return Err(FlipperError::Attach); }
             Ok(Flipper { device })
+        }
+    }
+
+    pub fn select_u2(&self) {
+        unsafe {
+            carbon_select_u2(self.device);
         }
     }
 }
