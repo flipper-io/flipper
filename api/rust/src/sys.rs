@@ -1,7 +1,3 @@
-//! API definitions for Flipper's standard modules.
-
-pub mod uart0;
-
 flipper_module!(Led, led,
     0, fn rgb(red: u8, green: u8, blue: u8) -> (),
     1, fn configure() -> (),

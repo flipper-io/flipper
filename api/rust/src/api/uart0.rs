@@ -1,5 +1,5 @@
 use std::io::{Read, Write, Result};
-use ::{
+use flipper_core::{
     lf,
     Flipper,
 };

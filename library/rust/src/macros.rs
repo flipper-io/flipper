@@ -86,6 +86,8 @@ macro_rules! flipper_module (
     }
 );
 
+#[doc(hidden)]
+#[macro_export]
 macro_rules! __flipper_module_func_impl (
     ($self_:ident, $key:expr, $idx:expr, $($name:ident: $typ:ty),*$(,)*) => {{
         let args = lf::Args::new();

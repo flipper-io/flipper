@@ -14,8 +14,6 @@ extern crate libc;
 
 #[macro_use]
 pub mod macros;
-
-pub mod api;
 pub mod lf;
 
 use libc::{c_void, c_char};

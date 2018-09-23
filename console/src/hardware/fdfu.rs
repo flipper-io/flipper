@@ -17,10 +17,8 @@ use failure::Error;
 
 use flipper::{
     Flipper,
-    api::{
-        gpio::Gpio,
-        uart0::{Uart0, UartBaud},
-    }
+    gpio::Gpio,
+    uart0::{Uart0, UartBaud},
 };
 
 use std::sync::{
