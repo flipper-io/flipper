@@ -6,7 +6,7 @@
 #include "atmegau2.h"
 #include "atsam4s.h"
 
-struct _carbon_context {
+struct _carbon_device {
     /* Device that handles interacting with the u2. (ATMEGA16U2) */
     struct _lf_device *_u2;
     /* Microprocessor that handles code execution. (ATSAM4S16B) */
@@ -14,16 +14,18 @@ struct _carbon_context {
 };
 
 /* Attaches to all carbon devices. */
-struct _lf_device *carbon_attach(void);
+struct _carbon_device *carbon_attach(void);
 /* Attaches to a carbon device over the network. */
 struct _lf_device *carbon_attach_hostname(char *hostname);
 
-int carbon_select_u2(struct _lf_device *device);
+struct _lf_device *carbon_u2(struct _carbon_device *carbon);
 
-void sam_reset(void);
-int sam_enter_dfu(void);
-int sam_exit_dfu(void);
-int sam_off(void);
-int sam_on(void);
+struct _lf_device *carbon_4s(struct _carbon_device *carbon);
+
+void sam_reset(struct _carbon_device *carbon);
+int sam_enter_dfu(struct _carbon_device *carbon);
+int sam_exit_dfu(struct _carbon_device *carbon);
+int sam_off(struct _carbon_device *carbon);
+int sam_on(struct _carbon_device *carbon);
 
 #endif

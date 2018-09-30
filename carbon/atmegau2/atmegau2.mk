@@ -4,7 +4,8 @@ ATMEGAU2_TARGET   := atmegau2
 ATMEGAU2_PREFIX   := avr-
 
 # Directories that need to be included for this target.
-ATMEGAU2_INC_DIRS := api/c                   \
+ATMEGAU2_INC_DIRS := api/c/driver/include    \
+                     carbon/atmegau2/api     \
                      carbon/atmegau2/include \
                      kernel/include          \
                      library/c               \

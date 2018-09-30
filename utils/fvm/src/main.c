@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
 
     extern struct _lf_module gpio;
     dyld_register(fvm, &gpio);
-    gpio_configure();
+    gpio_configure(fvm);
 
     extern struct _lf_module i2c;
     dyld_register(fvm, &i2c);
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
 
     extern struct _lf_module uart0;
     dyld_register(fvm, &uart0);
-    uart0_configure();
+    uart0_configure(fvm);
 
     extern struct _lf_module usart;
     dyld_register(fvm, &usart);

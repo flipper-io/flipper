@@ -66,7 +66,7 @@ int lf_ll_apply_func(struct _lf_ll *ll, lf_ll_applier_func func, void *_ctx) {
 
     int e = lf_success;
     do {
-        e = func(ll->item, _ctx);
+        e = func(&ll->item, _ctx);
         if (e != lf_success) break;
     } while ((ll = ll->next));
 

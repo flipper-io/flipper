@@ -2,14 +2,14 @@
 
 enum { _adc_configure };
 
-int adc_configure(void);
+int adc_configure(struct _lf_device *device);
 
 void *adc_interface[] = { &adc_configure };
 
 LF_MODULE(adc, "adc", adc_interface);
 
-LF_WEAK int adc_configure(void) {
+LF_WEAK int adc_configure(struct _lf_device *device) {
     lf_return_t retval;
-    lf_invoke(lf_get_selected(), "adc", _adc_configure, lf_int_t, &retval, NULL);
+    lf_invoke(device, "adc", _adc_configure, lf_int_t, &retval, NULL);
     return (int)retval;
 }

@@ -1,7 +1,7 @@
 ATSAM4S_PREFIX   := arm-none-eabi-
 
 # Directories that need to be included for this target.
-ATSAM4S_INC_DIRS := api/c                  \
+ATSAM4S_INC_DIRS := carbon/atsam4s/api     \
                     carbon/atsam4s/include \
                     kernel/include         \
                     library/c              \

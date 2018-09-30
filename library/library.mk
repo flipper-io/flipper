@@ -5,7 +5,7 @@ LIB_LDFLAGS  :=
 
 LIBFLIPPER_TARGET := libflipper
 LIBFLIPPER_PREFIX :=
-LIBFLIPPER_INC_DIRS := $(LIB_INC_DIRS) api/c carbon/atmegau2/include carbon/atsam4s/include carbon/hal/include platforms
+LIBFLIPPER_INC_DIRS := $(LIB_INC_DIRS) api/c/client/include carbon/atmegau2/include carbon/atsam4s/include carbon/hal/include platforms
 LIBFLIPPER_SRC_DIRS := $(LIB_SRC_DIRS) api/c kernel/arch/x64 carbon/hal/src platforms/posix
 LIBFLIPPER_CFLAGS := $(LIB_CFLAGS) -fsanitize=address -g -fPIC $(shell pkg-config --cflags libusb-1.0)
 LIBFLIPPER_LDFLAGS := $(LIB_LDFLAGS) -fsanitize=address $(shell pkg-config --libs libusb-1.0)
@@ -19,7 +19,7 @@ libflipper: libflipper.so | $(BUILD)/include/flipper/.dir
 	$(_v)cp -r carbon/atmegau2/include/* $(BUILD)/include/flipper
 	$(_v)cp -r carbon/atsam4s/include/* $(BUILD)/include/flipper
 	$(_v)cp -r carbon/hal/include/* $(BUILD)/include/flipper
-	$(_v)cp -r api/c/*.h $(BUILD)/include/flipper
+	$(_v)cp -r api/c/client/include/*.h $(BUILD)/include/flipper
 	$(_v)cp -r library/c/*.h $(BUILD)/include/flipper
 	$(_v)cp -r library/c/*.def $(BUILD)/include/flipper
 	$(_v)cp assets/flipper.mk $(BUILD)/include/flipper
