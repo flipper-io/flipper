@@ -21,7 +21,7 @@ add_executable(atsam4s
         )
 
 include_directories(atsam4s
-        ${PROJECT_SOURCE_DIR}/api/c
+        ${PROJECT_SOURCE_DIR}/api/c/driver/include
         ${PROJECT_SOURCE_DIR}/library/c
         ${PROJECT_SOURCE_DIR}/kernel/include
         ${PROJECT_SOURCE_DIR}/carbon/atsam4s/include
