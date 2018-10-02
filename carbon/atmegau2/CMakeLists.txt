@@ -1,7 +1,7 @@
-set(CMAKE_SYSTEM_PROCESSOR avr)
-set(CMAKE_C_COMPILER avr-gcc)
+project(atmegau2 C ASM)
+include(${CMAKE_SOURCE_DIR}/cmake/avr.cmake)
 
-add_executable(atmegau2
+add_avr_executable(atmegau2
         src/main.c
         src/bulk.c
         src/control.c
@@ -15,27 +15,43 @@ add_executable(atmegau2
         api/spi.c
         api/uart0.c
         api/wdt.c
+        ${CMAKE_SOURCE_DIR}/library/c/crc.c
+        ${CMAKE_SOURCE_DIR}/library/c/debug.c
+        ${CMAKE_SOURCE_DIR}/library/c/device.c
+        ${CMAKE_SOURCE_DIR}/library/c/dyld.c
+        ${CMAKE_SOURCE_DIR}/library/c/error.c
+        ${CMAKE_SOURCE_DIR}/library/c/fmr.c
+        ${CMAKE_SOURCE_DIR}/library/c/libflipper.c
+        ${CMAKE_SOURCE_DIR}/library/c/ll.c
+        ${CMAKE_SOURCE_DIR}/library/c/module.c
+        ${CMAKE_SOURCE_DIR}/kernel/arch/avr8/fmr.S
+        ${CMAKE_SOURCE_DIR}/api/c/client/adc.c
+        ${CMAKE_SOURCE_DIR}/api/c/client/button.c
+        ${CMAKE_SOURCE_DIR}/api/c/client/dac.c
+        ${CMAKE_SOURCE_DIR}/api/c/client/gpio.c
+        ${CMAKE_SOURCE_DIR}/api/c/client/i2c.c
+        ${CMAKE_SOURCE_DIR}/api/c/client/led.c
+        ${CMAKE_SOURCE_DIR}/api/c/client/pwm.c
+        ${CMAKE_SOURCE_DIR}/api/c/client/rtc.c
+        ${CMAKE_SOURCE_DIR}/api/c/client/spi.c
+        ${CMAKE_SOURCE_DIR}/api/c/client/swd.c
+        ${CMAKE_SOURCE_DIR}/api/c/client/temp.c
+        ${CMAKE_SOURCE_DIR}/api/c/client/timer.c
+        ${CMAKE_SOURCE_DIR}/api/c/client/uart0.c
+        ${CMAKE_SOURCE_DIR}/api/c/client/usart.c
+        ${CMAKE_SOURCE_DIR}/api/c/client/wdt.c
         )
 
 include_directories(atmegau2
-        ${PROJECT_SOURCE_DIR}/api/c
-        ${PROJECT_SOURCE_DIR}/library/c
-        ${PROJECT_SOURCE_DIR}/kernel/include
-        ${PROJECT_SOURCE_DIR}/carbon/atmegau2/include
+        ${CMAKE_SOURCE_DIR}/api/c/driver/include
+        ${CMAKE_SOURCE_DIR}/library/c
+        ${CMAKE_SOURCE_DIR}/kernel/include
+        ${CMAKE_SOURCE_DIR}/carbon/atmegau2/include
         )
 
-set_target_properties(atmegau2 PROPERTIES
-        COMPILE_FLAGS "-mmcu=atmega32u2"
-        COMPILE_FLAGS "-DARCH=ARCH_AVR8"
-        COMPILE_FLAGS "-D__AVR_ATmega32U2__"
-        COMPILE_FLAGS "-DF_CPU=16000000UL"
-        COMPILE_FLAGS "-DATMEGAU2"
-        COMPILE_FLAGS "-DLF_DISABLE_DEBUG"
-        COMPILE_FLAGS "-DLF_CONFIG_OMIT_ERRORS"
-        COMPILE_FLAGS "-Os"
-        )
-
-set_target_properties(atmegau2 PROPERTIES
-        LINK_FLAGS "-mmcu=atmega32u2"
-        LINK_FLAGS "-Wl,--gc-sections"
+add_custom_target(install-atmegau2
+        COMMAND dfu-programmer atmega32u2 erase --force
+        COMMAND dfu-programmer atmega32u2 flash atmegau2.hex
+        COMMAND dfu-programmer atmega32u2 start
+        DEPENDS atmegau2.hex
         )
