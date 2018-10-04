@@ -1,5 +1,6 @@
+cmake_minimum_required(VERSION 3.11)
 project(atmegau2 C ASM)
-include(${CMAKE_SOURCE_DIR}/cmake/avr.cmake)
+include(../../cmake/avr.cmake)
 
 add_avr_executable(atmegau2
         src/main.c
@@ -15,38 +16,38 @@ add_avr_executable(atmegau2
         api/spi.c
         api/uart0.c
         api/wdt.c
-        ${CMAKE_SOURCE_DIR}/library/c/crc.c
-        ${CMAKE_SOURCE_DIR}/library/c/debug.c
-        ${CMAKE_SOURCE_DIR}/library/c/device.c
-        ${CMAKE_SOURCE_DIR}/library/c/dyld.c
-        ${CMAKE_SOURCE_DIR}/library/c/error.c
-        ${CMAKE_SOURCE_DIR}/library/c/fmr.c
-        ${CMAKE_SOURCE_DIR}/library/c/libflipper.c
-        ${CMAKE_SOURCE_DIR}/library/c/ll.c
-        ${CMAKE_SOURCE_DIR}/library/c/module.c
-        ${CMAKE_SOURCE_DIR}/kernel/arch/avr8/fmr.S
-        ${CMAKE_SOURCE_DIR}/api/c/client/adc.c
-        ${CMAKE_SOURCE_DIR}/api/c/client/button.c
-        ${CMAKE_SOURCE_DIR}/api/c/client/dac.c
-        ${CMAKE_SOURCE_DIR}/api/c/client/gpio.c
-        ${CMAKE_SOURCE_DIR}/api/c/client/i2c.c
-        ${CMAKE_SOURCE_DIR}/api/c/client/led.c
-        ${CMAKE_SOURCE_DIR}/api/c/client/pwm.c
-        ${CMAKE_SOURCE_DIR}/api/c/client/rtc.c
-        ${CMAKE_SOURCE_DIR}/api/c/client/spi.c
-        ${CMAKE_SOURCE_DIR}/api/c/client/swd.c
-        ${CMAKE_SOURCE_DIR}/api/c/client/temp.c
-        ${CMAKE_SOURCE_DIR}/api/c/client/timer.c
-        ${CMAKE_SOURCE_DIR}/api/c/client/uart0.c
-        ${CMAKE_SOURCE_DIR}/api/c/client/usart.c
-        ${CMAKE_SOURCE_DIR}/api/c/client/wdt.c
+        ../../library/c/crc.c
+        ../../library/c/debug.c
+        ../../library/c/device.c
+        ../../library/c/dyld.c
+        ../../library/c/error.c
+        ../../library/c/fmr.c
+        ../../library/c/libflipper.c
+        ../../library/c/ll.c
+        ../../library/c/module.c
+        ../../kernel/arch/avr8/fmr.S
+        ../../api/c/client/adc.c
+        ../../api/c/client/button.c
+        ../../api/c/client/dac.c
+        ../../api/c/client/gpio.c
+        ../../api/c/client/i2c.c
+        ../../api/c/client/led.c
+        ../../api/c/client/pwm.c
+        ../../api/c/client/rtc.c
+        ../../api/c/client/spi.c
+        ../../api/c/client/swd.c
+        ../../api/c/client/temp.c
+        ../../api/c/client/timer.c
+        ../../api/c/client/uart0.c
+        ../../api/c/client/usart.c
+        ../../api/c/client/wdt.c
         )
 
 include_directories(atmegau2
-        ${CMAKE_SOURCE_DIR}/api/c/driver/include
-        ${CMAKE_SOURCE_DIR}/library/c
-        ${CMAKE_SOURCE_DIR}/kernel/include
-        ${CMAKE_SOURCE_DIR}/carbon/atmegau2/include
+        ../../api/c/driver/include
+        ../../library/c
+        ../../kernel/include
+        ../../carbon/atmegau2/include
         )
 
 add_custom_target(install-atmegau2

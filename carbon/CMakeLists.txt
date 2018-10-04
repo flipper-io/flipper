@@ -1,2 +1,0 @@
-add_subdirectory(atmegau2)
-#add_subdirectory(atsam4s)

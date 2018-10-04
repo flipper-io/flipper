@@ -1,42 +1,65 @@
+#find_path(HOST_TOOLCHAIN_ROOT
+#        NAMES
+#        gcc
+#        PATHS
+#        /usr/bin
+#        /usr/local/bin
+#        /bin
+#        $ENV{AVR_ROOT}
+#        )
+#
+#set(CMAKE_C_COMPILER   ${HOST_TOOLCHAIN_ROOT}/gcc     CACHE PATH "gcc" FORCE)
+#set(CMAKE_ASM_COMPILER ${HOST_TOOLCHAIN_ROOT}/gcc     CACHE PATH "asm" FORCE)
+#set(CMAKE_CXX_COMPILER ${HOST_TOOLCHAIN_ROOT}/g++     CACHE PATH "g++" FORCE)
+#set(CMAKE_AR           ${HOST_TOOLCHAIN_ROOT}/ar      CACHE PATH "ar" FORCE)
+#set(CMAKE_LINKER       ${HOST_TOOLCHAIN_ROOT}/ld      CACHE PATH "ld" FORCE)
+#set(CMAKE_NM           ${HOST_TOOLCHAIN_ROOT}/nm      CACHE PATH "nm" FORCE)
+#set(CMAKE_OBJCOPY      ${HOST_TOOLCHAIN_ROOT}/objcopy CACHE PATH "objcopy" FORCE)
+#set(CMAKE_OBJDUMP      ${HOST_TOOLCHAIN_ROOT}/objdump CACHE PATH "objdump" FORCE)
+#set(CMAKE_STRIP        ${HOST_TOOLCHAIN_ROOT}/strip   CACHE PATH "strip" FORCE)
+#set(CMAKE_RANLIB       ${HOST_TOOLCHAIN_ROOT}/ranlib  CACHE PATH "ranlib" FORCE)
+cmake_minimum_required(VERSION 3.11)
+project(Flipper C ASM)
+
 add_library(flipper SHARED
-        ${PROJECT_SOURCE_DIR}/library/c/crc.c
-        ${PROJECT_SOURCE_DIR}/library/c/debug.c
-        ${PROJECT_SOURCE_DIR}/library/c/device.c
-        ${PROJECT_SOURCE_DIR}/library/c/dyld.c
-        ${PROJECT_SOURCE_DIR}/library/c/error.c
-        ${PROJECT_SOURCE_DIR}/library/c/fmr.c
-        ${PROJECT_SOURCE_DIR}/library/c/libflipper.c
-        ${PROJECT_SOURCE_DIR}/library/c/ll.c
-        ${PROJECT_SOURCE_DIR}/library/c/module.c
-        ${PROJECT_SOURCE_DIR}/kernel/arch/x64/fmr.S
-        ${PROJECT_SOURCE_DIR}/carbon/hal/src/carbon.c
-        ${PROJECT_SOURCE_DIR}/platforms/posix/network.c
-        ${PROJECT_SOURCE_DIR}/platforms/posix/usb.c
-        ${PROJECT_SOURCE_DIR}/api/c/client/adc.c
-        ${PROJECT_SOURCE_DIR}/api/c/client/button.c
-        ${PROJECT_SOURCE_DIR}/api/c/client/dac.c
-        ${PROJECT_SOURCE_DIR}/api/c/client/gpio.c
-        ${PROJECT_SOURCE_DIR}/api/c/client/i2c.c
-        ${PROJECT_SOURCE_DIR}/api/c/client/led.c
-        ${PROJECT_SOURCE_DIR}/api/c/client/pwm.c
-        ${PROJECT_SOURCE_DIR}/api/c/client/rtc.c
-        ${PROJECT_SOURCE_DIR}/api/c/client/spi.c
-        ${PROJECT_SOURCE_DIR}/api/c/client/swd.c
-        ${PROJECT_SOURCE_DIR}/api/c/client/temp.c
-        ${PROJECT_SOURCE_DIR}/api/c/client/timer.c
-        ${PROJECT_SOURCE_DIR}/api/c/client/uart0.c
-        ${PROJECT_SOURCE_DIR}/api/c/client/usart.c
-        ${PROJECT_SOURCE_DIR}/api/c/client/usb.c
-        ${PROJECT_SOURCE_DIR}/api/c/client/wdt.c
+        c/crc.c
+        c/debug.c
+        c/device.c
+        c/dyld.c
+        c/error.c
+        c/fmr.c
+        c/libflipper.c
+        c/ll.c
+        c/module.c
+        ../kernel/arch/x64/fmr.S
+        ../carbon/hal/src/carbon.c
+        ../platforms/posix/network.c
+        ../platforms/posix/usb.c
+        ../api/c/client/adc.c
+        ../api/c/client/button.c
+        ../api/c/client/dac.c
+        ../api/c/client/gpio.c
+        ../api/c/client/i2c.c
+        ../api/c/client/led.c
+        ../api/c/client/pwm.c
+        ../api/c/client/rtc.c
+        ../api/c/client/spi.c
+        ../api/c/client/swd.c
+        ../api/c/client/temp.c
+        ../api/c/client/timer.c
+        ../api/c/client/uart0.c
+        ../api/c/client/usart.c
+        ../api/c/client/usb.c
+        ../api/c/client/wdt.c
         )
 
 include_directories(flipper
-        ${PROJECT_SOURCE_DIR}/api/c/client/include
-        ${PROJECT_SOURCE_DIR}/library/c
-        ${PROJECT_SOURCE_DIR}/carbon/atmegau2/include
-        ${PROJECT_SOURCE_DIR}/carbon/atsam4s/include
-        ${PROJECT_SOURCE_DIR}/carbon/hal/include
-        ${PROJECT_SOURCE_DIR}/platforms
+        ./c
+        ../api/c/client/include
+        ../carbon/atmegau2/include
+        ../carbon/atsam4s/include
+        ../carbon/hal/include
+        ../platforms
         )
 
 find_path(LIBUSB_INCLUDE_DIR
