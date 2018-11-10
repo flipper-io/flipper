@@ -1,4 +1,4 @@
-import lf
+import flipper.lf as lf
 
 # ! KEEP IN SYNC WITH THE FILES BELOW
 # carbon/include/flipper/carbon.h

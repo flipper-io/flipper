@@ -248,10 +248,11 @@ uninstall-utils:
 
 # --- LANGUAGES --- #
 
-PY_DIR = $(shell python3 -m site --user-site)
+install-python2:
+	$(_v)pip2 install --user languages/python --upgrade
 
 install-python:
-	$(_v)pip3 install languages/python --upgrade
+	$(_v)pip3 install --user languages/python --upgrade
 
 install:: install-python
 
