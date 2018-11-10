@@ -9,13 +9,13 @@ install:
 - sudo apt-get install libusb-1.0-0-dev
 - sudo apt-get install avr-libc binutils-avr gcc-avr
 - sudo apt-get install libnewlib-arm-none-eabi binutils-arm-none-eabi gcc-arm-none-eabi
+- sudo apt-get install python3-pip
+- sudo pip3 install pyelftools
 
 matrix:
   include:
   - language: c
-    compiler:
-    - clang
-    - gcc
+    compiler: gcc
     script: make libflipper atmegau2 atsam4s utils VERBOSE=1
 
   - language: rust

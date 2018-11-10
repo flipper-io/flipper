@@ -1,7 +1,7 @@
 #ifndef __exceptions_h__
 #define __exceptions_h__
 
-typedef void (* isr_t)(void);
+typedef void (*isr_t)(void);
 
 /* Null handler. */
 extern void null_isr(void);

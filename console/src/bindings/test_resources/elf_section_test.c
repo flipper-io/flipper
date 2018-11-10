@@ -6,11 +6,11 @@
 
 // This function should appear in the ".lf.funcs" binary section.
 LF_FUNC int sayHi(char *name) {
-	printf("Hi, %s\n");
+    printf("Hi, %s\n");
 }
 
 int main(int argc, char *argv[]) {
-	printf("Hello!\n");
-	sayHi("George");
-	return 0;
+    printf("Hello!\n");
+    sayHi("George");
+    return 0;
 }

@@ -1,144 +1,140 @@
-#include <flipper.h>
-#include <unistd.h>
 #include <arpa/inet.h>
+#include <flipper/flipper.h>
+#include <unistd.h>
 #define _GNU_SOURCE
+#include "posix/network.h"
 #include <dlfcn.h>
-#include <flipper/posix/network.h>
 
-/* fserve - Creates a local server that acts as a virtual flipper device. */
-
-struct _fvm_module {
-	char name[32];
-	void **functions;
-};
-
-struct _fvm_module fvm_modules[16];
-int modulec = 0;
-
-struct _lf_endpoint *nep = NULL;
-
-int fld_index(lf_crc_t identifier) {
-	lf_debug("Searching for counterpart module to '0x%04x'.", identifier);
-	for (int i = 0; i < modulec; i ++) {
-		char *name = fvm_modules[i].name;
-		lf_crc_t _crc = lf_crc(name, strlen(name) + 1);
-		if (_crc == identifier) {
-			lf_debug("Found counterpart '%s' at index '%i'.", name, i);
-			return i;
-		}
-	}
-	return -1;
-}
-
-int fvm_load_module(char *path) {
-	void *dlm = dlopen(path, RTLD_LAZY);
-	lf_assert(dlm, failure, E_NULL, "Failed to open '%s'.", path);
-	struct _lf_module *module = dlsym(dlm, "_module");
-	lf_assert(module, failure, E_NULL, "Failed to read package.");
-	lf_debug("Loaded package '%s'.", module->name);
-	void **jumptable = dlsym(dlm, "_jumptable");
-	lf_assert(jumptable, failure, E_NULL, "Failed to read jumptable from package '%s'.", module->name);
-	lf_debug("Read jumptable from package '%s'.", module->name);
-	struct _fvm_module *m = &fvm_modules[modulec++];
-	strcpy(m->name, module->name);
-	m->functions = jumptable;
-	lf_debug("Successfully loaded package '%s'.", module->name);
-	return lf_success;
-failure:
-	return lf_error;
-}
-
-lf_return_t fmr_perform_user_invocation(struct _fmr_invocation *invocation, struct _fmr_result *result) {
-	lf_assert(invocation->index < modulec, failure, E_BOUNDARY, "Module index was out of bounds.");
-	lf_return_t (* function)(void) = fvm_modules[invocation->index].functions[invocation->function];
-	lf_assert(function, failure, E_NULL, "NULL function for user invocation.");
-	return fmr_call(function, invocation->ret, invocation->argc, invocation->types, invocation->parameters);
-failure:
-	return lf_error;
-}
+/* fvm - Creates a local server that acts as a virtual flipper device. */
 
 int main(int argc, char *argv[]) {
 
-	//lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
+    int e;
+    int sd;
+    struct sockaddr_in addr;
+    struct _lf_device *fvm;
 
-	if (argc > 1) {
-		char **modules = &argv[1];
-		for (int i = 0; i < (argc-1); i ++) {
-			lf_debug("Loading package '%s'.", *modules);
-			fvm_load_module(*modules++);
-		}
-	}
+    lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
 
-	/* Create a UDP server. */
-	struct sockaddr_in addr;
-	int sd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	if (sd < 0) {
-		printf("Failed to get socket.\n");
-		return 0;
-	}
-	bzero(&addr, sizeof(addr));
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons(LF_UDP_PORT);
-	addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	int _e = bind(sd, (struct sockaddr*)&addr, sizeof(addr));
-	if (_e < 0) {
-		printf("Failed to create server.\n");
-		return 0;
-	}
+    /* Create a UDP server. */
+    sd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    lf_assert(sd, E_UNIMPLEMENTED, "failed to open socket");
 
-	/* The network endpoint for the virtual flipper device. */
-	struct _lf_network_context *context = NULL;
-	nep = lf_endpoint_create(lf_network_configure,
-												  lf_network_ready,
-												  lf_network_push,
-												  lf_network_pull,
-												  lf_network_destroy,
-												  sizeof(struct _lf_network_context));
-	lf_assert(nep, failure, E_ENDPOINT, "Failed to create endpoint for networked device.");
-	context = (struct _lf_network_context *)nep->_ctx;
-	context->fd = sd;
+    bzero(&addr, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(LF_UDP_PORT);
+    addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    e = bind(sd, (struct sockaddr *)&addr, sizeof(addr));
+    lf_assert(e == 0, E_UNIMPLEMENTED, "failed to bind socket");
 
-	printf("Flipper Virtual Machine (FVM) v0.1.0\nListening on 'localhost'.\n\n");
+    fvm = lf_device_create(lf_network_read, lf_network_write, lf_network_release);
+    lf_assert(fvm, E_ENDPOINT, "failed to create device for virtual machine.");
 
-	while (1) {
-		struct _fmr_packet packet;
-		nep->pull(nep, &packet, sizeof(struct _fmr_packet));
-		lf_debug_packet(&packet, sizeof(struct _fmr_packet));
-		struct _fmr_result result;
-		lf_error_clear();
-		fmr_perform(&packet, &result);
-		lf_debug_result(&result);
-		nep->push(nep, &result, sizeof(struct _fmr_result));
-	}
+    fvm->_ep_ctx = calloc(1, sizeof(struct _lf_network_context));
+    struct _lf_network_context *context = (struct _lf_network_context *)fvm->_ep_ctx;
+    lf_assert(context, E_NULL, "failed to allocate memory for context");
+    context->fd = sd;
 
-	close(sd);
+    lf_attach(fvm);
 
-failure:
-	return EXIT_FAILURE;
-}
+    printf("Flipper Virtual Machine (FVM) v0.1.0\nListening on 'localhost'.\n\n");
 
-lf_return_t fmr_push(struct _fmr_push_pull_packet *packet) {
-	int retval;
-	void *swap = malloc(packet->length);
-	lf_assert(swap, failure, E_MALLOC, "Failed to allocate push buffer");
-	nep->pull(nep, swap, packet->length);
-	*(uint64_t *)(packet->call.parameters) = (uintptr_t)swap;
-	retval = fmr_execute(packet->call.index, packet->call.function, packet->call.ret, packet->call.argc, packet->call.types, (void *)(packet->call.parameters));
-	free(swap);
-	return retval;
-failure:
-	return lf_error;
-}
+    extern struct _lf_module adc;
+    dyld_register(fvm, &adc);
+    adc_configure();
 
-lf_return_t fmr_pull(struct _fmr_push_pull_packet *packet) {
-	lf_return_t retval;
-	void *swap = malloc(packet->length);
-	lf_assert(swap, failure, E_MALLOC, "Failed to allocate pull buffer");
-	*(uint64_t *)(packet->call.parameters) = (uintptr_t)swap;
-	retval = fmr_execute(packet->call.index, packet->call.function, packet->call.ret, packet->call.argc, packet->call.types, (void *)(packet->call.parameters));
-	nep->push(nep, swap, packet->length);
-	free(swap);
-	return retval;
-failure:
-	return lf_error;
+    extern struct _lf_module button;
+    dyld_register(fvm, &button);
+    button_configure();
+
+    extern struct _lf_module dac;
+    dyld_register(fvm, &dac);
+    dac_configure();
+
+    extern struct _lf_module gpio;
+    dyld_register(fvm, &gpio);
+    gpio_configure();
+
+    extern struct _lf_module i2c;
+    dyld_register(fvm, &i2c);
+    i2c_configure();
+
+    extern struct _lf_module led;
+    dyld_register(fvm, &led);
+    led_configure();
+
+    extern struct _lf_module pwm;
+    dyld_register(fvm, &pwm);
+    pwm_configure();
+
+    extern struct _lf_module rtc;
+    dyld_register(fvm, &rtc);
+    rtc_configure();
+
+    extern struct _lf_module spi;
+    dyld_register(fvm, &spi);
+    spi_configure();
+
+    extern struct _lf_module swd;
+    dyld_register(fvm, &swd);
+    swd_configure();
+
+    extern struct _lf_module temp;
+    dyld_register(fvm, &temp);
+    temp_configure();
+
+    extern struct _lf_module timer;
+    dyld_register(fvm, &timer);
+    timer_configure();
+
+    extern struct _lf_module uart0;
+    dyld_register(fvm, &uart0);
+    uart0_configure();
+
+    extern struct _lf_module usart;
+    dyld_register(fvm, &usart);
+    usart_configure();
+
+    extern struct _lf_module usb;
+    dyld_register(fvm, &usb);
+    usb_configure();
+
+    extern struct _lf_module wdt;
+    dyld_register(fvm, &wdt);
+    wdt_configure();
+
+    if (argc > 1) {
+
+        char *lib = argv[1];
+        char *module, **modules = &argv[2];
+
+        while ((module = *modules++)) {
+
+            printf("Loading module '%s' from '%s'.", module, lib);
+            void *dlm = dlopen(lib, RTLD_LAZY);
+            lf_assert(dlm, E_NULL, "failed to open module '%s'.", lib);
+
+            struct _lf_module *m = dlsym(dlm, module);
+            lf_assert(m, E_NULL, "failed to read module '%s' from '%s'.", module, lib);
+            printf("Successfully loaded module '%s'.", module);
+
+            e = dyld_register(fvm, m);
+            lf_assert(e, E_NULL, "failed to register module '%s'.", m->name);
+            printf("Successfully registered module '%s'.", module);
+        }
+
+        printf("\n");
+    }
+
+    while (1) {
+        struct _fmr_packet packet;
+        fvm->read(fvm, &packet, sizeof(packet));
+        lf_debug_packet(&packet);
+        fmr_perform(fvm, &packet);
+    }
+
+    close(sd);
+
+fail:
+    return EXIT_FAILURE;
 }

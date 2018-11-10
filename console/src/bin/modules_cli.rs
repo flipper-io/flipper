@@ -19,11 +19,9 @@
 use Result;
 use flipper::{
     Flipper,
-    fsm::led::Led,
+    led::Led,
 };
 use console::CliError;
-#[allow(unused_imports)]
-use flipper::StandardModule;
 use clap::{App, AppSettings, Arg, ArgMatches};
 use failure::Error;
 
@@ -122,7 +120,7 @@ pub mod led {
         let blue = args.value_of("blue").unwrap().parse::<u8>().unwrap();
 
         let flipper = Flipper::attach().map_err(Error::from)?;
-        let led = Led::bind(&flipper);
+        let led = Led::new(&flipper);
         led.rgb(red, green, blue);
         Ok(())
     }

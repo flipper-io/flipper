@@ -9,6 +9,12 @@ microcontroller and a microprocessor.
 
 ---
 
+### ASF (Advanced Software Framework for Atmel SAM)
+
+**Products: ** asf_4s.a
+
+---
+
 ### Microcontroller (Atmel ATMEGA32U2) Firmware
 
 The microcontroller connects to the host via USB since we wanted to keep the

@@ -1,89 +1,49 @@
+#include <flipper/flipper.h>
+#include <libusb.h>
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
-#include <libusb.h>
-
-#define VENDOR 0x16C0
-#define PRODUCT 0x0480
-#define DEBUG_INTERFACE 1
-#define DEBUG_BUFFER_SIZE 32
-#define DEBUG_IN_ENDPOINT 0x03 | 0x80
-/* Timeout here must be larger than the flush rate of the device. */
-#define DEBUG_TIMEOUT 0
 
 static volatile int alive = 1;
 
 void sigint(int signal) {
-	alive = 0;
-}
-
-void print_time(void) {
-	time_t rawtime;
-	struct tm * timeinfo;
-	time(&rawtime);
-	timeinfo = localtime(&rawtime);
-	printf("%02d:%02d:%02d ", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
+    alive = 0;
 }
 
 int main(int argc, char *argv[]) {
 
-	signal(SIGINT, sigint);
+    struct libusb_context *context = NULL;
+    struct libusb_device_handle *handle = NULL;
+    int e;
+    int len;
+    uint8_t buf[DEBUG_IN_SIZE];
 
-	struct libusb_context *context;
+    /* capture interrupt signal */
+    signal(SIGKILL, sigint);
 
-	int _e = libusb_init(&context);
-	if (_e) {
-		fprintf(stderr, "Failed to initialize libusb.\n");
-	}
+    e = libusb_init(&context);
+    lf_assert(e == 0, E_LIBUSB, "Failed to initialize libusb.");
 
-	libusb_set_debug(context, LIBUSB_LOG_LEVEL_ERROR);
+    handle = libusb_open_device_with_vid_pid(context, FLIPPER_USB_VENDOR_ID, USB_PRODUCT_ID);
+    lf_assert(handle, E_LIBUSB, "Failed to find a device.");
 
-	struct libusb_device_handle *handle = libusb_open_device_with_vid_pid(context, VENDOR, PRODUCT);
-	if (!handle) {
-		fprintf(stderr, "Failed to open the device.\n");
-		goto exit;
-	}
+    /* Configure USB device. */
+    e = libusb_claim_interface(handle, DEBUG_INTERFACE);
+    lf_assert(e == 0, E_LIBUSB, "Failed to claim the debug interface.");
 
-	/* Configure USB device. */
-	_e = libusb_claim_interface(handle, DEBUG_INTERFACE);
-	if (_e) {
-		fprintf(stderr, "Failed to claim the debug interface.\n");
-		goto exit;
-	}
+    while (alive) {
+        uint8_t *_buf = buf;
 
-	int len;
+        e = libusb_interrupt_transfer(handle, DEBUG_IN_ENDPOINT, buf, DEBUG_IN_SIZE, &len, 0);
+        lf_assert(e == 0, E_LIBUSB, "Failed to complete transfer.");
 
-	unsigned char incoming[DEBUG_BUFFER_SIZE + 1]; // don't forget the null
+        while (len--) printf("%c", *_buf++);
+    }
 
-	int printtime = 1;
+fail:
 
-	print_time();
+    libusb_close(handle);
+    libusb_exit(context);
 
-	while (alive) {
-		memset(incoming, '\0', sizeof(incoming));
-		_e = libusb_interrupt_transfer(handle, DEBUG_IN_ENDPOINT, incoming, DEBUG_BUFFER_SIZE, &len, DEBUG_TIMEOUT);
-		if (_e == 0) {
-			if (len > 0) {
-				printf("%s", incoming);
-				fflush(stdout);
-				printtime = 1;
-			}
-		} else if (_e == LIBUSB_ERROR_TIMEOUT) {
-			if (printtime) {
-				print_time();
-				printtime = 0;
-			}
-		} else {
-			fprintf(stderr, "Something went wrong with the transfer.\n");
-			goto exit;
-		}
-	}
-
-exit:
-
-	if (handle) libusb_close(handle);
-	if (context) libusb_exit(context);
-
-	return 0;
-
+    return 0;
 }
