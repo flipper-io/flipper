@@ -142,7 +142,8 @@ X86_SRC_DIRS := carbon/hal              \
                 library/platforms/posix \
                 runtime/src
 
-X86_CFLAGS :=   -std=gnu99              \
+X86_CFLAGS   := -std=gnu99              \
+                -g                      \
                 -Wall                   \
                 -Wextra                 \
                 -Wno-unused-parameter   \
@@ -247,10 +248,11 @@ uninstall-utils:
 
 # --- LANGUAGES --- #
 
-PY_DIR = $(shell python -m site --user-site)
+install-python2:
+	$(_v)pip2 install --user languages/python --upgrade
 
 install-python:
-	$(_v)pip2 install languages/python --upgrade -q
+	$(_v)pip3 install --user languages/python --upgrade
 
 install:: install-python
 
