@@ -7,8 +7,13 @@ LIBFLIPPER_TARGET := libflipper
 LIBFLIPPER_PREFIX :=
 LIBFLIPPER_INC_DIRS := $(LIB_INC_DIRS) api/c carbon/atmegau2/include carbon/atsam4s/include carbon/hal/include platforms
 LIBFLIPPER_SRC_DIRS := $(LIB_SRC_DIRS) api/c kernel/arch/x64 carbon/hal/src platforms/posix
+ifdef DEBUG
 LIBFLIPPER_CFLAGS := $(LIB_CFLAGS) -fsanitize=address -g -fPIC $(shell pkg-config --cflags libusb-1.0)
 LIBFLIPPER_LDFLAGS := $(LIB_LDFLAGS) -fsanitize=address $(shell pkg-config --libs libusb-1.0)
+else
+LIBFLIPPER_CFLAGS := $(LIB_CFLAGS) -g -fPIC $(shell pkg-config --cflags libusb-1.0)
+LIBFLIPPER_LDFLAGS := $(LIB_LDFLAGS) $(shell pkg-config --libs libusb-1.0)
+endif
 
 TARGETS += LIBFLIPPER
 
