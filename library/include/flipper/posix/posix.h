@@ -30,8 +30,13 @@
 #define __use_wdt__
 
 /* Declare the LF_VAR and LF_FUNC types for this platform. */
+#ifdef __clang__
 #define LF_VAR __attribute__((section("__DATA,.lf.vars")))
 #define LF_FUNC __attribute__((section("__TEXT,.lf.funcs")))
+#else
+#define LF_VAR __attribute__((section(".lf.vars")))
+#define LF_FUNC __attribute__((section(".lf.funcs")))
+#endif
 
 #else
 #error "Error: Multiple platforms targeted."

@@ -10,6 +10,7 @@
 #include <flipper/atmegau2/atmegau2.h>
 #elif defined(POSIX)
 #include <flipper/posix/posix.h>
+#include <flipper/atsam4s/asf/pio/pio_sam4s16b.h>
 #else
 #error "Invalid target platform."
 #endif
