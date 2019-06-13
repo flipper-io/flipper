@@ -2,11 +2,11 @@
 SELF := $(realpath $(lastword $(MAKEFILE_LIST)))
 
 # Navigate from /usr/local/include/flipper.mk to /usr/local/share/flipper
-INCLUDE := $(realpath $(dir $(SELF)))/..
-ASSETS := $(INCLUDE)/../share/flipper
+INCLUDE := $(realpath $(dir $(SELF)))
+ASSETS := $(INCLUDE)/../..//share/flipper
 
 # Directory where build products are stored.
-BUILD := build
+BUILD := .build
 
 # Prefix where build projects are installed
 PREFIX ?= /usr/local
@@ -45,7 +45,6 @@ DEVICE_CFLAGS   := -std=c99                    \
                    -mfloat-abi=soft            \
                    -D__no_err_str__            \
                    -fPIC                       \
-				   -DATSAM4S                   \
 
 DEVICE_LDFLAGS  := -nostartfiles                \
                    -Wl,-T $(ASSETS)/ram.ld      \
@@ -76,7 +75,7 @@ HOST_INC_DIRS := include
 HOST_SRC_DIRS := src host $(GEN_DIRS)
 
 $(BUILD)/gen.mk: $(DEVICE_TARGET).elf | $(BUILD)/gen/.dir
-	$(_v)fdwarf $(BUILD)/$(DEVICE_TARGET)/$(DEVICE_TARGET).elf $(MODULE) c $(BUILD)/gen/$(MODULE).c
+	$(_v)fdwarf $(BUILD)/$(DEVICE_TARGET)/$(DEVICE_TARGET).elf c $(BUILD)/gen
 	$(_v)echo "GEN_DIRS = $(BUILD)/gen" > $(BUILD)/gen.mk
 
 HOST_CFLAGS   := -std=gnu99             \
@@ -84,7 +83,6 @@ HOST_CFLAGS   := -std=gnu99             \
                  -Wall                  \
                  -Wextra                \
                  -Wno-unused-parameter  \
-                 -DPOSIX                \
 
 HOST_LDFLAGS  := -lflipper
 

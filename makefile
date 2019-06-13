@@ -1,5 +1,5 @@
 # Directory where build products are stored.
-BUILD := build
+BUILD := .build
 
 # Prefix where build projects are installed
 PREFIX ?= /usr/local
@@ -54,7 +54,7 @@ Description: The libflipper C library
 Version: 0.0.1
 Libs: -L$(PREFIX)/lib -lflipper
 Requires.private:
-Cflags: -I$(PREFIX)/include -DPOSIX
+Cflags: -I$(PREFIX)/include
 endef
 
 export PKGCONFIG_BODY

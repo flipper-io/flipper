@@ -2,27 +2,27 @@
 #define __flipper_h__
 
 /* Include the top-level libflipper header. */
-#include <flipper/libflipper.h>
+#include "libflipper.h"
 
 /* Include the 'Flipper: Carbon Edition' device support header. */
-#include <flipper/carbon.h>
+#include "carbon.h"
 
 /* Include the header files for all of the standard modules exposed by the toolbox. */
-#include <flipper/adc.h>
-#include <flipper/button.h>
-#include <flipper/dac.h>
-#include <flipper/gpio.h>
-#include <flipper/i2c.h>
-#include <flipper/led.h>
-#include <flipper/pwm.h>
-#include <flipper/rtc.h>
-#include <flipper/spi.h>
-#include <flipper/swd.h>
-#include <flipper/temp.h>
-#include <flipper/timer.h>
-#include <flipper/uart0.h>
-#include <flipper/usart.h>
-#include <flipper/usb.h>
-#include <flipper/wdt.h>
+#include "adc.h"
+#include "button.h"
+#include "dac.h"
+#include "gpio.h"
+#include "i2c.h"
+#include "led.h"
+#include "pwm.h"
+#include "rtc.h"
+#include "spi.h"
+#include "swd.h"
+#include "temp.h"
+#include "timer.h"
+#include "uart0.h"
+#include "usart.h"
+#include "usb.h"
+#include "wdt.h"
 
 #endif

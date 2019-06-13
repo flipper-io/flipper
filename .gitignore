@@ -6,7 +6,6 @@
 *.hex
 *.elf
 *.o
-build
 projects
 xcuserdata
 __pycache__

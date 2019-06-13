@@ -1,6 +1,5 @@
 #include "libflipper.h"
-#include "spi.h"
-//#include <spi/spi.h>
+//#include <spi.h>
 
 LF_FUNC("spi") int spi_configure() {
 
@@ -27,6 +26,8 @@ LF_FUNC("spi") uint8_t spi_get(void) {
     return 0;
 }
 
+/*
+
 LF_FUNC("spi") int spi_write(void *src, uint32_t length) {
     return lf_success;
 }
@@ -34,6 +35,8 @@ LF_FUNC("spi") int spi_write(void *src, uint32_t length) {
 LF_FUNC("spi") int spi_read(void *dst, uint32_t length) {
     return lf_success;
 }
+
+*/
 
 /* interrupt handler for spi */
 void spi_isr(void) {

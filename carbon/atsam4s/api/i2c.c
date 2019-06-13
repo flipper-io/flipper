@@ -1,6 +1,5 @@
 #include "libflipper.h"
-#include "i2c.h"
-#include <twi/twi.h>
+#include <twi.h>
 
 LF_FUNC("i2c") int i2c_configure(void) {
     return lf_success;

@@ -4,10 +4,8 @@
 #ifndef __atsam4s__
 #define __atsam4s__
 
-#ifdef ATSAM4S
 #define __SAM4S16B__
 #include "sam4s.h"
-#endif
 
 /* GPIO signals */
 #define IO_1 PIO_PA22

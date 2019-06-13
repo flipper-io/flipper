@@ -1,5 +1,5 @@
 #include "libflipper.h"
-#include "uart0.h"
+#include <uart.h>
 
 LF_FUNC("uart0") int uart0_configure(void) {
 
