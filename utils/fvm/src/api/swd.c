@@ -1,6 +1,6 @@
 #include <flipper/flipper.h>
 
-LF_FUNC("swd") int swd_configure(void) {
+LF_FUNC int swd_configure(void) {
     printf("Configured the swd.\n");
     return lf_success;
 }

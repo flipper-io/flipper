@@ -7,4 +7,5 @@ setup(
     version='0.1',
     author_email='george@flipper.io',
     packages=['flipper']
+    data_files = ['../../api/python/*.py']
 )

@@ -7,7 +7,7 @@
 #define SPI_DATA_MODE_2 0x08
 #define SPI_DATA_MODE_3 0x0C
 
-LF_FUNC("spi") int spi_configure() {
+LF_FUNC int spi_configure() {
     /* Configure MOSI and SCK as inputs. */
     SPI_DDR |= (1 << MOSI) | (1 << SCK);
     /* Put the SPI bus into MODE3. */
@@ -17,22 +17,22 @@ LF_FUNC("spi") int spi_configure() {
     return lf_success;
 }
 
-LF_FUNC("spi") void spi_enable(void) {
+LF_FUNC void spi_enable(void) {
     SPI_DDR |= (1 << MOSI) | (1 << SCK);
     SPCR |= (1 << MSTR) | (1 << SPE);
 }
 
-LF_FUNC("spi") void spi_disable(void) {
+LF_FUNC void spi_disable(void) {
     SPCR &= ~((1 << MSTR) | (1 << SPE));
     SPI_DDR &= ~((1 << MOSI) | (1 << SCK));
 }
 
-LF_FUNC("spi") uint8_t spi_ready(void) {
+LF_FUNC uint8_t spi_ready(void) {
     /* The ready state of the SPI can be determined by reading its interrupt flag. */
     return (SPSR) & (1 << SPIF);
 }
 
-LF_FUNC("spi") void spi_put(uint8_t byte) {
+LF_FUNC void spi_put(uint8_t byte) {
     /* Write the byte to the data register. */
     SPDR = byte;
     /* Wait until the byte has been sent. */
@@ -40,19 +40,19 @@ LF_FUNC("spi") void spi_put(uint8_t byte) {
         ;
 }
 
-LF_FUNC("spi") uint8_t spi_get(void) {
+LF_FUNC uint8_t spi_get(void) {
     /* Send a byte to begin transmission. */
     spi_put(0x00);
     /* Read the data received. */
     return SPDR;
 }
 
-LF_FUNC("spi") int spi_write(void *src, uint32_t length) {
+LF_FUNC int spi_write(void *src, uint32_t length) {
     while (length--) spi_put(*(uint8_t *)(src++));
     return lf_success;
 }
 
-LF_FUNC("spi") int spi_read(void *dst, uint32_t length) {
+LF_FUNC int spi_read(void *dst, uint32_t length) {
     while (length--) *(uint8_t *)(dst++) = spi_get();
     return lf_success;
 }

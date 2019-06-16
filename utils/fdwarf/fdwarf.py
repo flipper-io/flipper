@@ -92,7 +92,7 @@ void *$MODULE$_interface[] = {
 $STRUCTBODY$
 };
 
-LF_MODULE($MODULE$, "$MODULE$", $MODULE$_interface);
+LF_MODULE($MODULE$);
 
 $FUNCTIONS$
 """

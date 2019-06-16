@@ -1,12 +1,12 @@
 #include "libflipper.h"
 #include <tc.h>
 
-LF_FUNC("timer") int timer_configure(void) {
+LF_FUNC int timer_configure(void) {
     return lf_success;
 }
 
 /* Registers a callback with the next available timer. */
-LF_FUNC("timer") int timer_register(uint32_t ticks, void *callback) {
+LF_FUNC int timer_register(uint32_t ticks, void *callback) {
     return lf_error;
 }
 

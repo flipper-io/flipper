@@ -25,7 +25,7 @@ void uart0_enable(void);
 void *uart0_interface[] = { &uart0_read,  &uart0_write,   &uart0_get,       &uart0_put,   &uart0_ready,
                             &uart0_reset, &uart0_setbaud, &uart0_configure, &uart0_enable };
 
-LF_MODULE(uart0, "uart0", uart0_interface);
+LF_MODULE(uart0);
 
 #warning Memory not freed if invoke or pull fail.
 LF_WEAK int uart0_read(void *destination, uint32_t length) {

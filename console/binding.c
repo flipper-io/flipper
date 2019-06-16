@@ -1,6 +1,6 @@
 #include <flipper.h>
 
-LF_MODULE(_Test, "Test", "", NULL, NULL);
+LF_MODULE(NULL, NULL);
 
 const struct _Test_interface Test { Test_test };
 

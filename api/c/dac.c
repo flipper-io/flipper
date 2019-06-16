@@ -6,7 +6,7 @@ int dac_configure(void);
 
 void *dac_interface[] = { &dac_configure };
 
-LF_MODULE(dac, "dac", dac_interface);
+LF_MODULE(dac);
 
 LF_WEAK int dac_configure(void) {
     lf_return_t retval;

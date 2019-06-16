@@ -6,7 +6,9 @@ LIB_INC_DIRS := library/c \
 				carbon/hal/include \
 
 LIB_SRC_DIRS := library/c \
-	            api/c \
+	            api/c
+
+LIB_SRCS	 := $(BUILD)/git_hash/git_hash.c
 
 LIB_CFLAGS   :=
 LIB_LDFLAGS  :=
@@ -14,7 +16,8 @@ LIB_LDFLAGS  :=
 LIBFLIPPER_TARGET := libflipper
 LIBFLIPPER_PREFIX :=
 LIBFLIPPER_INC_DIRS := $(LIB_INC_DIRS) platforms
-LIBFLIPPER_SRC_DIRS := $(LIB_SRC_DIRS) api/c kernel/arch/x64 carbon/hal/src platforms/posix
+LIBFLIPPER_SRC_DIRS := $(LIB_SRC_DIRS) kernel/arch/x64 carbon/hal/src platforms/posix
+LIBFLIPPER_SRCS := $(LIB_SRCS)
 ifdef DEBUG
 LIBFLIPPER_CFLAGS := $(LIB_CFLAGS) -fsanitize=address -g -fPIC $(shell pkg-config --cflags libusb-1.0)
 LIBFLIPPER_LDFLAGS := $(LIB_LDFLAGS) -fsanitize=address $(shell pkg-config --libs libusb-1.0)

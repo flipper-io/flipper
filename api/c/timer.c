@@ -7,7 +7,7 @@ int timer_configure(void);
 
 void* timer_interface[] = { &timer_register, &timer_configure };
 
-LF_MODULE(timer, "timer", timer_interface);
+LF_MODULE(timer);
 
 LF_WEAK int timer_register(uint32_t ticks, void* callback) {
     lf_return_t retval;

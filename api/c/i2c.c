@@ -10,7 +10,7 @@ void i2c_start_read(uint8_t address, uint8_t length);
 
 void *i2c_interface[] = { &i2c_stop, &i2c_write, &i2c_read, &i2c_configure, &i2c_start_read };
 
-LF_MODULE(i2c, "i2c", i2c_interface);
+LF_MODULE(i2c);
 
 LF_WEAK void i2c_stop(void) {
     lf_return_t retval;

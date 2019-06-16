@@ -9,7 +9,7 @@ int gpio_configure(void);
 
 void *gpio_interface[] = { &gpio_read, &gpio_write, &gpio_enable, &gpio_configure };
 
-LF_MODULE(gpio, "gpio", gpio_interface);
+LF_MODULE(gpio);
 
 LF_WEAK uint32_t gpio_read(uint32_t mask) {
     lf_return_t retval;

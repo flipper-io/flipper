@@ -6,7 +6,7 @@ int swd_configure(void);
 
 void *swd_interface[] = { &swd_configure };
 
-LF_MODULE(swd, "swd", swd_interface);
+LF_MODULE(swd);
 
 LF_WEAK int swd_configure(void) {
     lf_return_t retval;

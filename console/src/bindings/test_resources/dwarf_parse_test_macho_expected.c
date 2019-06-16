@@ -1,6 +1,6 @@
 #include <flipper/flipper.h>
 
-LF_MODULE(_user, "user", "User module description", NULL, NULL);
+LF_MODULE(NULL, NULL);
 
 const struct _user_interface user { user_test };
 

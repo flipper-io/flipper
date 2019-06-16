@@ -35,10 +35,13 @@
 /* Weak attribute. */
 #define LF_WEAK __attribute__((weak))
 
+#define _LF_XSTR_RAW(x) #x
+#define _LF_XSTR(x) _LF_XSTR_RAW(x)
+
 #ifdef __clang__
-#define LF_FUNC(MODULE) __attribute__((section("__TEXT,.lm." MODULE), used))
+#define LF_FUNC __attribute__((section("__TEXT,.lm." _LF_XSTR(__FILE_NAME__)), used))
 #else
-#define LF_FUNC(MODULE) __attribute__((section(".lm." MODULE), used))
+#define LF_FUNC __attribute__((section(SECTION), used))
 #endif
 
 /* Used to contain the result of checksumming operations. */

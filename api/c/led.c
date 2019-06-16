@@ -7,7 +7,7 @@ int led_configure(void);
 
 void *led_interface[] = { &led_rgb, &led_configure };
 
-LF_MODULE(led, "led", led_interface);
+LF_MODULE(led);
 
 LF_WEAK void led_rgb(uint8_t r, uint8_t g, uint8_t b) {
     lf_return_t retval;

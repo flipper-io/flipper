@@ -14,6 +14,8 @@ ATMEGAU2_SRC_DIRS := api/c                   \
                      kernel/arch/avr8        \
                      library/c               \
 
+ATMEGAU2_SRCS	  := $(BUILD)/git_hash/git_hash.c
+
 ATMEGAU2_CFLAGS   := -mmcu=atmega32u2        \
                      -DARCH=ARCH_AVR8        \
                      -D__AVR_ATmega32U2__    \

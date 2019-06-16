@@ -189,7 +189,7 @@ $$($1_SO): $$($1_OBJS)
 
 # Rule to build C sources.
 $$($1_BUILD)/%.c.o: %.c | $$($1_BUILD_DIR_FILES)
-	$(_v)$$($1_CC) $(GLOBAL_CFLAGS) $$($1_CFLAGS) -I$$(<D) -MD -MP -MF $$($1_BUILD)/$$*.c.d -c -o $$@ $$<
+	$(_v)$$($1_CC) $(GLOBAL_CFLAGS) $$($1_CFLAGS) -D__FILE_NAME__=$$(basename $$(notdir $$<)) -I$$(<D) -MD -MP -MF $$($1_BUILD)/$$*.c.d -c -o $$@ $$<
 
 # Rule to build preprocessed assembly sources.
 $$($1_BUILD)/%.S.o: %.S | $$($1_BUILD_DIR_FILES)
@@ -203,6 +203,9 @@ endef
 generate_target = $(eval $(call _generate_target,$1))
 
 #####
+
+git_hash.c:
+	$(_v)echo 'const char lf_git_hash[7] = "$(shell git rev-parse --short HEAD)";' > $@
 
 # Generate all of the rules for every target
 $(foreach target,$(TARGETS),$(call generate_target,$(target)))

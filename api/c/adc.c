@@ -6,7 +6,7 @@ int adc_configure(void);
 
 void *adc_interface[] = { &adc_configure };
 
-LF_MODULE(adc, "adc", adc_interface);
+LF_MODULE(adc);
 
 LF_WEAK int adc_configure(void) {
     lf_return_t retval;

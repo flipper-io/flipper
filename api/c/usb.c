@@ -6,7 +6,7 @@ int usb_configure(void);
 
 void *usb_interface[] = { &usb_configure };
 
-LF_MODULE(usb, "usb", usb_interface);
+LF_MODULE(usb);
 
 LF_WEAK int usb_configure(void) {
     lf_return_t retval;

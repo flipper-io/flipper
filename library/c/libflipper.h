@@ -25,6 +25,8 @@
 #include "ll.h"
 #include "module.h"
 
+const char *lf_get_git_hash(void);
+
 /* ---------- STATE ---------- */
 
 /* Attaches to a device. */

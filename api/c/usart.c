@@ -23,7 +23,7 @@ int usart_configure(void);
 void* usart_interface[] = { &_usart_read, &_usart_write,  &usart_get,    &usart_put,
                             &usart_ready, &usart_disable, &usart_enable, &usart_configure };
 
-LF_MODULE(usart, "usart", usart_interface);
+LF_MODULE(usart);
 
 LF_WEAK int _usart_read(void* dst, uint32_t length) {
     lf_return_t retval;

@@ -3,6 +3,12 @@
 static struct _lf_ll *lf_attached_devices;
 static struct _lf_device *lf_current_device;
 
+extern const char *lf_git_hash;
+
+const char *lf_get_git_hash(void) {
+    return lf_git_hash;
+}
+
 /* Setter for the lf_current_device global. */
 static void lf_set_current_device(struct _lf_device *device) {
     lf_current_device = device;

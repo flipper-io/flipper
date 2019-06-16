@@ -15,7 +15,7 @@ int spi_configure(void);
 void* spi_interface[] = { &spi_read,  &spi_write,   &spi_get,    &spi_put,      &spi_end,
                           &spi_ready, &spi_disable, &spi_enable, &spi_configure };
 
-LF_MODULE(spi, "spi", spi_interface);
+LF_MODULE(spi);
 
 LF_WEAK int spi_read(void* dst, uint32_t length) {
     lf_return_t retval;

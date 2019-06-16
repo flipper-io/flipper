@@ -7,7 +7,7 @@ uint8_t idx = 0;
 #define LF_UART_TIMEOUT_MS 100
 #define BAUDRATE(baud) (((F_CPU / (baud * 16.0)) + 0.5) - 1)
 
-LF_FUNC("uart0") int uart0_configure(void) {
+LF_FUNC int uart0_configure(void) {
 
     UBRR1L = BAUDRATE(FMR_BAUD);
     UCSR1A &= ~(1 << U2X1);
@@ -25,32 +25,32 @@ LF_FUNC("uart0") int uart0_configure(void) {
     return lf_success;
 }
 
-LF_FUNC("uart0") int uart0_setbaud(uint32_t baud) {
+LF_FUNC int uart0_setbaud(uint32_t baud) {
     lf_debug("setting baud to %i", baud);
     uint8_t b = BAUDRATE(baud);
     UBRR1L = b;
     return lf_success;
 }
 
-LF_FUNC("uart0") int uart0_reset(void) {
+LF_FUNC int uart0_reset(void) {
     idx = 0;
     while (UCSR1A & (1 << RXC1)) (void)UDR1;
     return lf_success;
 }
 
-LF_FUNC("uart0") int uart0_ready(void) {
+LF_FUNC int uart0_ready(void) {
     return (UCSR1A & (1 << RXC1)) || idx;
 }
 
-LF_FUNC("uart0") void uart0_enable(void) {
+LF_FUNC void uart0_enable(void) {
     UCSR1B = (1 << RXEN1) | (1 << TXEN1) | (1 << RXCIE1);
 }
 
-LF_FUNC("uart0") void uart0_disable(void) {
+LF_FUNC void uart0_disable(void) {
     UCSR1B &= ~((1 << RXEN1) | (1 << TXEN1) | (1 << RXCIE1));
 }
 
-LF_FUNC("uart0") void uart0_put(uint8_t byte) {
+LF_FUNC void uart0_put(uint8_t byte) {
     uint8_t timeout = UDFNUML + LF_UART_TIMEOUT_MS;
     while (!(UCSR1A & (1 << UDRE1)))
         lf_assert(UDFNUML != timeout, E_UART0_WRITE_TIMEOUT, "Error occurred while putting to uart0.");
@@ -59,20 +59,20 @@ fail:
     return;
 }
 
-LF_FUNC("uart0") uint8_t uart0_get(void) {
+LF_FUNC uint8_t uart0_get(void) {
     uint8_t b;
     uart0_read(&b, 1);
     return b;
 }
 
-LF_FUNC("uart0") int uart0_write(void *src, uint32_t length) {
+LF_FUNC int uart0_write(void *src, uint32_t length) {
     while (length--) uart0_put(*(uint8_t *)src++);
     return lf_success;
 }
 
 uint8_t uart0_buffer[64];
 
-LF_FUNC("uart0") int uart0_read(void *dst, uint32_t length) {
+LF_FUNC int uart0_read(void *dst, uint32_t length) {
     if (idx) {
         if (length >= idx) {
             memcpy(dst, uart0_buffer, idx);

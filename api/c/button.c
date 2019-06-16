@@ -7,7 +7,7 @@ int button_configure(void);
 
 void *button_interface[] = { &button_read, &button_configure };
 
-LF_MODULE(button, "button", button_interface);
+LF_MODULE(button);
 
 LF_WEAK uint8_t button_read(void) {
     lf_return_t retval;

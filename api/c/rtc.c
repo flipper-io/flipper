@@ -6,7 +6,7 @@ int rtc_configure(void);
 
 void *rtc_interface[] = { &rtc_configure };
 
-LF_MODULE(rtc, "rtc", rtc_interface);
+LF_MODULE(rtc);
 
 LF_WEAK int rtc_configure(void) {
     lf_return_t retval;

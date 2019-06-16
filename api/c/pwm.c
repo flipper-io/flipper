@@ -6,7 +6,7 @@ int pwm_configure(void);
 
 void *pwm_interface[] = { &pwm_configure };
 
-LF_MODULE(pwm, "pwm", pwm_interface);
+LF_MODULE(pwm);
 
 LF_WEAK int pwm_configure(void) {
     lf_return_t retval;

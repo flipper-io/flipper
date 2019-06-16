@@ -2,13 +2,13 @@
 #include "led.h"
 #include "atmegau2.h"
 
-LF_FUNC("led") int led_configure(void) {
+LF_FUNC int led_configure(void) {
     /* Configure the DI (data in) pin of the LED as an output. */
     LED_DDR |= (1 << LED_DI);
     return lf_success;
 }
 
-LF_FUNC("led") void led_rgb(uint8_t r, uint8_t g, uint8_t b) {
+LF_FUNC void led_rgb(uint8_t r, uint8_t g, uint8_t b) {
 
     /* Create an array to be sent to the LED in GRB format. */
     uint8_t *data = (uint8_t *)&((uint8_t[]){ g, r, b });

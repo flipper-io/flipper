@@ -7,7 +7,7 @@ int wdt_configure(void);
 
 void *wdt_interface[] = { &wdt_fire, &wdt_configure };
 
-LF_MODULE(wdt, "wdt", wdt_interface);
+LF_MODULE(wdt);
 
 LF_WEAK void wdt_fire(void) {
     lf_return_t retval;
