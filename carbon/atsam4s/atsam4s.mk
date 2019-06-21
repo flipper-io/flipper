@@ -17,8 +17,8 @@ ATSAM4S_CFLAGS   := -mcpu=cortex-m4        \
                     -mtune=cortex-m4       \
                     -mfloat-abi=soft       \
                     -DATSAM4S              \
-										-D__SAM4S16B__         \
-										$(LIB_CFLAGS)
+					-D__SAM4S16B__         \
+					$(LIB_CFLAGS)
 
 ATSAM4S_LDFLAGS  := -nostartfiles          \
                     -mcpu=cortex-m4        \
@@ -27,19 +27,13 @@ ATSAM4S_LDFLAGS  := -nostartfiles          \
                     -mtune=cortex-m4       \
                     -mfloat-abi=soft       \
                     -Wl,--gc-sections      \
+					-Wl,-T carbon/atsam4s/config/sam4s16.ld \
+					$(LIB_LDFLAGS)
 
 
-BIN_ATSAM4S_TARGET := atsam4s
-BIN_ATSAM4S_PREFIX := $(ATSAM4S_PREFIX)
-BIN_ATSAM4S_INC_DIRS := $(ATSAM4S_INC_DIRS)
-BIN_ATSAM4S_SRC_DIRS := $(ATSAM4S_SRC_DIRS)
-BIN_ATSAM4S_GENERATED := $(ATSAM4S_GENERATED)
-BIN_ATSAM4S_CFLAGS := $(ATSAM4S_CFLAGS)
-BIN_ATSAM4S_LDFLAGS := $(ATSAM4S_LDFLAGS) $(LIB_LDFLAGS) -Wl,-T carbon/atsam4s/config/sam4s16.ld \
+TARGETS += ATSAM4S
 
-TARGETS += BIN_ATSAM4S
-
-atsam4s: atsam4s.bin
+atsam4s: ATSAM4S.bin
 
 all:: atsam4s
 

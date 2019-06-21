@@ -1,6 +1,4 @@
 # AVR target variables
-ATMEGAU2_TARGET   := atmegau2
-
 ATMEGAU2_PREFIX   := avr-
 
 # Directories that need to be included for this target.

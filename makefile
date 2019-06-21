@@ -143,13 +143,16 @@ SRC_EXTS := c S
 # Generate all of the target-specific build rules for the given target.
 #####
 
-define _generate_target
+define _ADD_TARGET
+
+$1_TARGET = $1
 
 # Generate target-specific variables.
 $1_BUILD := $$(BUILD)/$$($1_TARGET)
 $1_ELF :=  $$($1_TARGET).elf
 $1_HEX := $$($1_TARGET).hex
 $1_BIN := $$($1_TARGET).bin
+$1_EXE := $$($1_TARGET).exe
 $1_A := $$($1_TARGET).a
 $1_SO := $$($1_TARGET).so
 $1_GEN_SRCS := $$(patsubst %,$$($1_BUILD)/gen/%,$$($1_GENERATED))
@@ -167,10 +170,12 @@ $1_LD := $$($1_PREFIX)gcc
 $1_OBJCOPY := $$($1_PREFIX)objcopy
 $1_OBJDUMP := $$($1_PREFIX)objdump
 
-.PHONY: $$($1_TARGET)
+# Rule to make ELF.
+$$($1_EXE): $$($1_OBJS) $$($1_GEN_OBJS) | $$($1_DEPENDENCIES)
+	$(_v)$$($1_LD) -o $$(basename $$($1_BUILD)/$$@) $$^ $$($1_LDFLAGS)
 
 # Rule to make ELF.
-$$($1_ELF): $$($1_OBJS) $$($1_GEN_OBJS)
+$$($1_ELF): $$($1_OBJS) $$($1_GEN_OBJS) | $$($1_DEPENDENCIES)
 	$(_v)$$($1_LD) $$($1_LDFLAGS) -o $$($1_BUILD)/$$@ $$^
 
 # Rule to make HEX.
@@ -182,11 +187,11 @@ $$($1_BIN): $$($1_ELF)
 	$(_v)$$($1_OBJCOPY) -O binary $$($1_BUILD)/$$< $$($1_BUILD)/$$@
 
 # Rule to make static library.
-$$($1_A): $$($1_OBJS) $$($1_GEN_OBJS)
+$$($1_A): $$($1_OBJS) $$($1_GEN_OBJS) | $$($1_DEPENDENCIES)
 	$(_v)$$($1_AR) rcs $$($1_BUILD)/$$@ $$^
 
 # Rule to make shared library.
-$$($1_SO): $$($1_OBJS) $$($1_GEN_OBJS)
+$$($1_SO): $$($1_OBJS) $$($1_GEN_OBJS) | $$($1_DEPENDENCIES)
 	$(_v)$$($1_LD) -shared -o $$($1_BUILD)/$$@ $$^ $$($1_LDFLAGS)
 
 # Rule to build C sources.
@@ -213,12 +218,12 @@ $$($1_BUILD)/gen/git_hash.c: | $$($1_BUILD)/gen/.dir
 
 endef
 
-generate_target = $(eval $(call _generate_target,$1))
+ADD_TARGET = $(eval $(call _ADD_TARGET,$1))
 
 #####
 
 # Generate all of the rules for every target
-$(foreach target,$(TARGETS),$(call generate_target,$(target)))
+$(foreach target,$(TARGETS),$(call ADD_TARGET,$(target)))
 
 .PHONY: clean
 

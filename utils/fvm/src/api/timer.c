@@ -1,4 +1,4 @@
-#include <flipper/flipper.h>
+#include "libflipper.h"
 
 LF_FUNC int timer_configure(void) {
     printf("Configured the timer.\n");

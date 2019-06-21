@@ -1,5 +1,5 @@
 #include <arpa/inet.h>
-#include <flipper/flipper.h>
+#include "libflipper.h"
 #include <unistd.h>
 #define _GNU_SOURCE
 #include "posix/network.h"
@@ -13,6 +13,12 @@ int main(int argc, char *argv[]) {
     int sd;
     struct sockaddr_in addr;
     struct _lf_device *fvm;
+
+    if (argv > 1) {
+        if (!strcmp(argv[2], "--version")) {
+            printf("FVM version: %s\n\n", lf_get_git_hash());
+        }
+    }
 
     lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
 
@@ -39,68 +45,68 @@ int main(int argc, char *argv[]) {
 
     printf("Flipper Virtual Machine (FVM) v0.1.0\nListening on 'localhost'.\n\n");
 
-    extern struct _lf_module adc;
-    dyld_register(fvm, &adc);
+    extern struct _lf_module _adc_module;
+    dyld_register(fvm, &_adc_module);
     adc_configure();
 
-    extern struct _lf_module button;
-    dyld_register(fvm, &button);
+    extern struct _lf_module _button_module;
+    dyld_register(fvm, &_button_module);
     button_configure();
 
-    extern struct _lf_module dac;
-    dyld_register(fvm, &dac);
+    extern struct _lf_module _dac_module;
+    dyld_register(fvm, &_dac_module);
     dac_configure();
 
-    extern struct _lf_module gpio;
-    dyld_register(fvm, &gpio);
+    extern struct _lf_module _gpio_module;
+    dyld_register(fvm, &_gpio_module);
     gpio_configure();
 
-    extern struct _lf_module i2c;
-    dyld_register(fvm, &i2c);
+    extern struct _lf_module _i2c_module;
+    dyld_register(fvm, &_i2c_module);
     i2c_configure();
 
-    extern struct _lf_module led;
-    dyld_register(fvm, &led);
+    extern struct _lf_module _led_module;
+    dyld_register(fvm, &_led_module);
     led_configure();
 
-    extern struct _lf_module pwm;
-    dyld_register(fvm, &pwm);
+    extern struct _lf_module _pwm_module;
+    dyld_register(fvm, &_pwm_module);
     pwm_configure();
 
-    extern struct _lf_module rtc;
-    dyld_register(fvm, &rtc);
+    extern struct _lf_module _rtc_module;
+    dyld_register(fvm, &_rtc_module);
     rtc_configure();
 
-    extern struct _lf_module spi;
-    dyld_register(fvm, &spi);
+    extern struct _lf_module _spi_module;
+    dyld_register(fvm, &_spi_module);
     spi_configure();
 
-    extern struct _lf_module swd;
-    dyld_register(fvm, &swd);
+    extern struct _lf_module _swd_module;
+    dyld_register(fvm, &_swd_module);
     swd_configure();
 
-    extern struct _lf_module temp;
-    dyld_register(fvm, &temp);
+    extern struct _lf_module _temp_module;
+    dyld_register(fvm, &_temp_module);
     temp_configure();
 
-    extern struct _lf_module timer;
-    dyld_register(fvm, &timer);
+    extern struct _lf_module _timer_module;
+    dyld_register(fvm, &_timer_module);
     timer_configure();
 
-    extern struct _lf_module uart0;
-    dyld_register(fvm, &uart0);
+    extern struct _lf_module _uart0_module;
+    dyld_register(fvm, &_uart0_module);
     uart0_configure();
 
-    extern struct _lf_module usart;
-    dyld_register(fvm, &usart);
+    extern struct _lf_module _usart_module;
+    dyld_register(fvm, &_usart_module);
     usart_configure();
 
-    extern struct _lf_module usb;
-    dyld_register(fvm, &usb);
+    extern struct _lf_module _usb_module;
+    dyld_register(fvm, &_usb_module);
     usb_configure();
 
-    extern struct _lf_module wdt;
-    dyld_register(fvm, &wdt);
+    extern struct _lf_module _wdt_module;
+    dyld_register(fvm, &_wdt_module);
     wdt_configure();
 
     if (argc > 1) {

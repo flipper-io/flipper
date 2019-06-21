@@ -25,6 +25,7 @@
 #include "ll.h"
 #include "module.h"
 
+/* Returns the short version string of the library. */
 const char *lf_get_git_hash(void);
 
 /* ---------- STATE ---------- */

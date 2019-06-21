@@ -13,7 +13,6 @@ LIB_GENERATED := git_hash.c
 LIB_CFLAGS   :=
 LIB_LDFLAGS  :=
 
-LIBFLIPPER_TARGET := libflipper
 LIBFLIPPER_PREFIX :=
 LIBFLIPPER_INC_DIRS := $(LIB_INC_DIRS) platforms
 LIBFLIPPER_SRC_DIRS := $(LIB_SRC_DIRS) kernel/arch/x64 carbon/hal/src platforms/posix
@@ -31,7 +30,7 @@ TARGETS += LIBFLIPPER
 
 # --- LIBFLIPPER --- #
 
-libflipper: libflipper.so | $(BUILD)/include/flipper/.dir
+libflipper: LIBFLIPPER.so | $(BUILD)/include/flipper/.dir
 	$(_v)cp -r api/c/*.h $(BUILD)/include/flipper
 	$(_v)cp -r library/c/*.h $(BUILD)/include/flipper
 	$(_v)cp -r library/c/*.def $(BUILD)/include/flipper

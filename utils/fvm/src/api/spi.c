@@ -1,4 +1,4 @@
-#include <flipper/flipper.h>
+#include "libflipper.h"
 
 LF_FUNC int spi_configure() {
     printf("Configured the spi bus.\n");
