@@ -152,6 +152,8 @@ $1_HEX := $$($1_TARGET).hex
 $1_BIN := $$($1_TARGET).bin
 $1_A := $$($1_TARGET).a
 $1_SO := $$($1_TARGET).so
+$1_GEN_SRCS := $$(patsubst %,$$($1_BUILD)/gen/%,$$($1_GENERATED))
+$1_GEN_OBJS := $$(patsubst %,%.o,$$($1_GEN_SRCS))
 $1_SRCS += $$(call find_srcs,$$($1_SRC_DIRS))
 $1_OBJS := $$(patsubst %,$$($1_BUILD)/%.o,$$($1_SRCS))
 $1_DEPS := $$($1_OBJS:.o=.d)
@@ -168,7 +170,7 @@ $1_OBJDUMP := $$($1_PREFIX)objdump
 .PHONY: $$($1_TARGET)
 
 # Rule to make ELF.
-$$($1_ELF): $$($1_OBJS)
+$$($1_ELF): $$($1_OBJS) $$($1_GEN_OBJS)
 	$(_v)$$($1_LD) $$($1_LDFLAGS) -o $$($1_BUILD)/$$@ $$^
 
 # Rule to make HEX.
@@ -180,20 +182,31 @@ $$($1_BIN): $$($1_ELF)
 	$(_v)$$($1_OBJCOPY) -O binary $$($1_BUILD)/$$< $$($1_BUILD)/$$@
 
 # Rule to make static library.
-$$($1_A): $$($1_OBJS)
+$$($1_A): $$($1_OBJS) $$($1_GEN_OBJS)
 	$(_v)$$($1_AR) rcs $$($1_BUILD)/$$@ $$^
 
 # Rule to make shared library.
-$$($1_SO): $$($1_OBJS)
+$$($1_SO): $$($1_OBJS) $$($1_GEN_OBJS)
 	$(_v)$$($1_LD) -shared -o $$($1_BUILD)/$$@ $$^ $$($1_LDFLAGS)
 
 # Rule to build C sources.
 $$($1_BUILD)/%.c.o: %.c | $$($1_BUILD_DIR_FILES)
 	$(_v)$$($1_CC) $(GLOBAL_CFLAGS) $$($1_CFLAGS) -D__FILE_NAME__=$$(basename $$(notdir $$<)) -I$$(<D) -MD -MP -MF $$($1_BUILD)/$$*.c.d -c -o $$@ $$<
 
+# Rule to build generated C sources.
+$$($1_BUILD)/gen/%.c.o: $$($1_GEN_SRCS) | $$($1_BUILD_DIR_FILES)
+	$(_v)$$($1_CC) $(GLOBAL_CFLAGS) $$($1_CFLAGS) -D__FILE_NAME__=$$(basename $$(notdir $$<)) -I$$(<D) -MD -MP -MF $$($1_BUILD)/$$*.c.d -c -o $$@ $$<
+
 # Rule to build preprocessed assembly sources.
 $$($1_BUILD)/%.S.o: %.S | $$($1_BUILD_DIR_FILES)
 	$(_v)$$($1_AS) $$($1_ASFLAGS) $(GLOBAL_CFLAGS) $$($1_CFLAGS) -I$$(<D) -MD -MP -MF $$($1_BUILD)/$$*.S.d -c -o $$@ $$<
+
+# Re-generate the git hash every time.
+.PHONY: $$($1_BUILD)/gen/git_hash.c
+
+# Rule to autogenerate the git hash file.
+$$($1_BUILD)/gen/git_hash.c: | $$($1_BUILD)/gen/.dir
+	$(_v)echo 'const char lf_git_hash[7] = "$$(shell git rev-parse --short HEAD)";' > $$@
 
 # Rule to include build dependancies.
 -include $$($1_DEPS)
@@ -203,9 +216,6 @@ endef
 generate_target = $(eval $(call _generate_target,$1))
 
 #####
-
-%/git_hash.c:
-	$(_v)echo 'const char lf_git_hash[7] = "$(shell git rev-parse --short HEAD)";' > $@
 
 # Generate all of the rules for every target
 $(foreach target,$(TARGETS),$(call generate_target,$(target)))

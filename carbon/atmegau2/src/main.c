@@ -73,28 +73,28 @@ int main(void) {
 
     /* peripheral configuration */
 
-    extern struct _lf_module button;
-    dyld_register(_u2, &button);
+    extern struct _lf_module _button_module;
+    dyld_register(_u2, &_button_module);
     button_configure();
 
-    extern struct _lf_module gpio;
-    dyld_register(_u2, &gpio);
+    extern struct _lf_module _gpio_module;
+    dyld_register(_u2, &_gpio_module);
     gpio_configure();
 
-    extern struct _lf_module led;
-    dyld_register(_u2, &led);
+    extern struct _lf_module _led_module;
+    dyld_register(_u2, &_led_module);
     led_configure();
 
-    extern struct _lf_module spi;
-    dyld_register(_u2, &spi);
+    extern struct _lf_module _spi_module;
+    dyld_register(_u2, &_spi_module);
     spi_configure();
 
-    extern struct _lf_module uart0;
-    dyld_register(_u2, &uart0);
+    extern struct _lf_module _uart0_module;
+    dyld_register(_u2, &_uart0_module);
     uart0_configure();
 
-    extern struct _lf_module wdt;
-    dyld_register(_u2, &wdt);
+    extern struct _lf_module _wdt_module;
+    dyld_register(_u2, &_wdt_module);
     wdt_configure();
 
     /* connect to the USB host */

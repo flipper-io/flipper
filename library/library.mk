@@ -1,14 +1,14 @@
 LIB_INC_DIRS := library/c \
-				api/c \
-				carbon/atmegau2/include \
-				carbon/atsam4s/include \
-				carbon/atsam4s/asf/include \
-				carbon/hal/include \
+								api/c \
+								carbon/atmegau2/include \
+								carbon/atsam4s/include \
+								carbon/atsam4s/asf/include \
+								carbon/hal/include \
 
 LIB_SRC_DIRS := library/c \
-	            api/c
+	              api/c
 
-LIB_SRCS := git_hash.c
+LIB_GENERATED := git_hash.c
 
 LIB_CFLAGS   :=
 LIB_LDFLAGS  :=
@@ -17,8 +17,7 @@ LIBFLIPPER_TARGET := libflipper
 LIBFLIPPER_PREFIX :=
 LIBFLIPPER_INC_DIRS := $(LIB_INC_DIRS) platforms
 LIBFLIPPER_SRC_DIRS := $(LIB_SRC_DIRS) kernel/arch/x64 carbon/hal/src platforms/posix
-
-LIBFLIPPER_SRCS := git_hash.c
+LIBFLIPPER_GENERATED := $(LIB_GENERATED)
 
 ifdef DEBUG
 LIBFLIPPER_CFLAGS := $(LIB_CFLAGS) -fsanitize=address -g -fPIC $(shell pkg-config --cflags libusb-1.0)

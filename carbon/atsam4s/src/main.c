@@ -85,68 +85,68 @@ int main(void) {
 
     /* peripheral configuration */
 
-    extern struct _lf_module adc;
-    dyld_register(_4s, &adc);
+    extern struct _lf_module _adc_module;
+    dyld_register(_4s, &_adc_module);
     adc_configure();
 
-    extern struct _lf_module button;
-    dyld_register(_4s, &button);
+    extern struct _lf_module _button_module;
+    dyld_register(_4s, &_button_module);
     button_configure();
 
-    extern struct _lf_module dac;
-    dyld_register(_4s, &dac);
+    extern struct _lf_module _dac_module;
+    dyld_register(_4s, &_dac_module);
     dac_configure();
 
-    extern struct _lf_module gpio;
-    dyld_register(_4s, &gpio);
+    extern struct _lf_module _gpio_module;
+    dyld_register(_4s, &_gpio_module);
     gpio_configure();
 
-    extern struct _lf_module i2c;
-    dyld_register(_4s, &i2c);
+    extern struct _lf_module _i2c_module;
+    dyld_register(_4s, &_i2c_module);
     i2c_configure();
 
-    extern struct _lf_module led;
-    dyld_register(_4s, &led);
+    extern struct _lf_module _led_module;
+    dyld_register(_4s, &_led_module);
     led_configure();
 
-    extern struct _lf_module pwm;
-    dyld_register(_4s, &pwm);
+    extern struct _lf_module _pwm_module;
+    dyld_register(_4s, &_pwm_module);
     pwm_configure();
 
-    extern struct _lf_module rtc;
-    dyld_register(_4s, &rtc);
+    extern struct _lf_module _rtc_module;
+    dyld_register(_4s, &_rtc_module);
     rtc_configure();
 
-    extern struct _lf_module spi;
-    dyld_register(_4s, &spi);
+    extern struct _lf_module _spi_module;
+    dyld_register(_4s, &_spi_module);
     spi_configure();
 
-    extern struct _lf_module swd;
-    dyld_register(_4s, &swd);
+    extern struct _lf_module _swd_module;
+    dyld_register(_4s, &_swd_module);
     swd_configure();
 
-    extern struct _lf_module temp;
-    dyld_register(_4s, &temp);
+    extern struct _lf_module _temp_module;
+    dyld_register(_4s, &_temp_module);
     temp_configure();
 
-    extern struct _lf_module timer;
-    dyld_register(_4s, &timer);
+    extern struct _lf_module _timer_module;
+    dyld_register(_4s, &_timer_module);
     timer_configure();
 
-    extern struct _lf_module uart0;
-    dyld_register(_4s, &uart0);
+    extern struct _lf_module _uart0_module;
+    dyld_register(_4s, &_uart0_module);
     uart0_configure();
 
-    extern struct _lf_module usart;
-    dyld_register(_4s, &usart);
+    extern struct _lf_module _usart_module;
+    dyld_register(_4s, &_usart_module);
     usart_configure();
 
-    extern struct _lf_module usb;
-    dyld_register(_4s, &usb);
+    extern struct _lf_module _usb_module;
+    dyld_register(_4s, &_usb_module);
     usb_configure();
 
-    extern struct _lf_module wdt;
-    dyld_register(_4s, &wdt);
+    extern struct _lf_module _wdt_module;
+    dyld_register(_4s, &_wdt_module);
     wdt_configure();
 
     /* Enable the FSI pin. */

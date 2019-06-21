@@ -41,7 +41,7 @@
 #ifdef __clang__
 #define LF_FUNC __attribute__((section("__TEXT,.lm." _LF_XSTR(__FILE_NAME__)), used))
 #else
-#define LF_FUNC __attribute__((section(SECTION), used))
+#define LF_FUNC __attribute__((section(".lm." _LF_XSTR(__FILE_NAME__)), used))
 #endif
 
 /* Used to contain the result of checksumming operations. */
