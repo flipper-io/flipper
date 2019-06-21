@@ -204,7 +204,7 @@ generate_target = $(eval $(call _generate_target,$1))
 
 #####
 
-git_hash.c:
+%/git_hash.c:
 	$(_v)echo 'const char lf_git_hash[7] = "$(shell git rev-parse --short HEAD)";' > $@
 
 # Generate all of the rules for every target
