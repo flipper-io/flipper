@@ -23,7 +23,7 @@ CFLAGS   := -mmcu=atmega32u2        \
 			$(LIB_CFLAGS)
 
 LDFLAGS  := -mmcu=atmega32u2        \
-				     -Wl,--gc-sections
+			-Wl,--gc-sections
 
 $(call ADD_TARGET,atmegau2)
 
@@ -36,7 +36,7 @@ all:: atmegau2
 # flashes an image to a flipper in DFU mode
 install-atmegau2: atmegau2
 	$(_v)dfu-programmer atmega32u2 erase --force
-	$(_v)dfu-programmer atmega32u2 flash $(BUILD)/$(ATMEGAU2_TARGET)/$(ATMEGAU2_TARGET).hex
+	$(_v)dfu-programmer atmega32u2 flash $(BUILD)/atmegau2/atmegau2.hex
 	$(_v)dfu-programmer atmega32u2 start
 
 # boots a flipper in DFU mode
