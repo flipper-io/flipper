@@ -27,7 +27,7 @@ LDFLAGS  := -mmcu=atmega32u2        \
 
 $(call ADD_TARGET,atmegau2)
 
-atmegau2: atmegau2.hex
+atmegau2: $(BUILD)/atmegau2/atmegau2.hex
 
 all:: atmegau2
 

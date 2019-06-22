@@ -76,9 +76,11 @@ $1_OBJDUMP := $$(COMPILER_PREFIX)objdump
 ELF :=  $1.elf
 HEX := $1.hex
 BIN := $1.bin
-EXE := $1.exe
+EXE := $1
 A := $1.a
 SO := $1.so
+
+$$(info $1 DEPS: $$(DEPENDENCIES))
 
 # Generate!
 $(foreach gen,$(GEN),-include $(BUILD)/$1/$(gen))
@@ -100,36 +102,36 @@ $1_LDFLAGS := $$(LDFLAGS)
 $1_CFLAGS := $$(CFLAGS) $$(foreach inc,$$(INC_DIRS),-I$$(inc))
 
 # Rule to build C sources.
-$(BUILD)/$1/%.o: %.S | $$(BUILD_DIR_FILES)
+$(BUILD)/$1/%.o: %.S | $$(BUILD_DIR_FILES) $$(DEPENDENCIES)
 	$(_v)$$($1_AS) $$($1_ASFLAGS) $(GLOBAL_CFLAGS) $$($1_CFLAGS) -D__FILE_NAME__=$$(basename $$(notdir $$<)) -I$$(<D) -MD -MP -MF $$@.d -c -o $$@ $$<
 
 # Rule to make HEX.
-$$(HEX): $$(ELF)
-	$(_v)$$($1_OBJCOPY) -O ihex $(BUILD)/$1/$$< $(BUILD)/$1/$$@
+$(BUILD)/$1/$$(HEX): $(BUILD)/$1/$$(ELF)
+	$(_v)$$($1_OBJCOPY) -O ihex $$< $$@
 
 # Rule to make BIN.
-$$(BIN): $$(ELF)
-	$(_v)$$($1_OBJCOPY) -O binary $(BUILD)/$1/$$< $(BUILD)/$1/$$@
+$(BUILD)/$1/$$(BIN): $(BUILD)/$1/$$(ELF)
+	$(_v)$$($1_OBJCOPY) -O binary $$< $$@
 
 # Rule to make executable.
-$$(EXE): $$(OBJS) $$(GEN_OBJS)
-	$(_v)$$($1_LD) -o $$(basename $(BUILD)/$1/$$@) $$^ $$($1_LDFLAGS)
+$(BUILD)/$1/$$(EXE): $$(OBJS) $$(GEN_OBJS)
+	$(_v)$$($1_LD) -o $$(basename $$@) $$^ $$($1_LDFLAGS)
 
 # Rule to make static library.
-$$(A): $$(OBJS) $$(GEN_OBJS)
-	$(_v)$$($1_AR) rcs $(BUILD)/$1/$$@ $$^
+$(BUILD)/$1/$$(A): $$(OBJS) $$(GEN_OBJS)
+	$(_v)$$($1_AR) rcs $$@ $$^
 
 # Rule to make shared library.
-$$(SO): $$(OBJS) $$(GEN_OBJS)
-	$(_v)$$($1_LD) -shared -o $(BUILD)/$1/$$@ $$^ $$($1_LDFLAGS)
+$(BUILD)/$1/$$(SO): $$(OBJS) $$(GEN_OBJS)
+	$(_v)$$($1_LD) -shared -o $$@ $$^ $$($1_LDFLAGS)
 
 # Rule to make ELF.
-$$(ELF): $$(OBJS) $$(GEN_OBJS)
-	$(_v)$$($1_LD) $$($1_LDFLAGS) -o $(BUILD)/$1/$$@ $$^
+$(BUILD)/$1/$$(ELF): $$(OBJS) $$(GEN_OBJS)
+	$(_v)$$($1_LD) $$($1_LDFLAGS) -o $$@ $$^
 
 # Rule to make an unlinked ELF.
-$$(ELF).debug: $$(OBJS)
-	$(_v)$$($1_LD) -Wl,--unresolved-symbols=ignore-all $$($1_LDFLAGS) -o $(BUILD)/$1/$$@ $$^
+$(BUILD)/$1/$$(ELF).debug: $$(OBJS)
+	$(_v)$$($1_LD) -Wl,--unresolved-symbols=ignore-all $$($1_LDFLAGS) -o $$@ $$^
 
 # Rule to autogenerate the git hash file.
 $(BUILD)/$1/git.mk: | $(BUILD)/$1/gen/git/.dir
@@ -137,12 +139,12 @@ $(BUILD)/$1/git.mk: | $(BUILD)/$1/gen/git/.dir
 	$(_v)echo 'GEN_DIRS += git' > $$@
 
 # Rule to build the generated API C files
-$(BUILD)/$1/api.mk: $$(ELF).debug | $(BUILD)/$1/gen/api/.dir
-	$(_v)python3 utils/fdwarf/fdwarf.py $(BUILD)/$1/$$< c $(BUILD)/$1/gen/api
+$(BUILD)/$1/api.mk: $(BUILD)/$1/$$(ELF).debug | $(BUILD)/$1/gen/api/.dir
+	$(_v)python3 utils/fdwarf/fdwarf.py $$< c $(BUILD)/$1/gen/api
 	$(_v)echo 'GEN_DIRS += api' > $$@
 
 # Rule to build C sources.
-$(BUILD)/$1/%.o: %.c | $$(BUILD_DIR_FILES)
+$(BUILD)/$1/%.o: %.c | $$(BUILD_DIR_FILES) $$(DEPENDENCIES)
 	$(_v)$$($1_CC) $(GLOBAL_CFLAGS) $$($1_CFLAGS) -D__FILE_NAME__=$$(basename $$(notdir $$<)) -I$$(<D) -MD -MP -MF $$@.d -c -o $$@ $$<
 
 # Rule to build C sources.
@@ -157,6 +159,7 @@ undefine INC_DIRS
 undefine SRC_DIRS
 undefine LDFLAGS
 undefine GENERATED
+undefine DEPENDENCIES
 
 undefine CC
 undefine AS

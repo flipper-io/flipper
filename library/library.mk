@@ -27,7 +27,7 @@ $(call ADD_TARGET,libflipper)
 
 # --- LIBFLIPPER --- #
 
-libflipper: libflipper.so | $(BUILD)/include/flipper/.dir
+libflipper: $(BUILD)/libflipper/libflipper.so | $(BUILD)/include/flipper/.dir
 	$(_v)cp -r api/c/*.h $(BUILD)/include/flipper
 	$(_v)cp -r library/c/*.h $(BUILD)/include/flipper
 	$(_v)cp -r library/c/*.def $(BUILD)/include/flipper

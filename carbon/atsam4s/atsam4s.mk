@@ -33,7 +33,7 @@ LDFLAGS  := -nostartfiles          \
 
 $(call ADD_TARGET,atsam4s)
 
-atsam4s: atsam4s.bin
+atsam4s: $(BUILD)/atsam4s/atsam4s.bin
 
 all:: atsam4s
 
