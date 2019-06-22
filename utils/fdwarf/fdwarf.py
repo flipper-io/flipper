@@ -167,16 +167,6 @@ def get_modules(elffile, dwarfinfo):
                             break
     return modules
 
-def test():
-    file = "/Users/George/Development/flipper/build/atmegau2/atmegau2.elf"
-    elf = ELFFile(open(file, "rb"))
-    dwarf = elf.get_dwarf_info()
-    modules = get_modules(elf, dwarf)
-    for m in modules:
-        print("Got module %s" % m.name)
-        for f in m.funcs:
-            print("\t%s" % str(f))
-
 def process_file(filename, language, outdir):
     functions = []
 

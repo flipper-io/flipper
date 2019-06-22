@@ -46,6 +46,7 @@ GLOBAL_CFLAGS = -std=c99                  \
                 -Wextra                   \
                 -Wno-unused-parameter     \
                 -Wno-expansion-to-defined \
+				-g
 
 #####
 # find_srcs($1: source directories, $2: source file extensions)
