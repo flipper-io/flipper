@@ -111,6 +111,8 @@ enum {
     fmr_malloc_class,
     /* frees memory on the device */
     fmr_free_class,
+    /* total count */
+    FMR_CLASS_COUNT
 };
 
 /* A type used to reference the values in the enum above. */
@@ -222,6 +224,6 @@ struct _lf_ll *fmr_build(int argc, ...);
 int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet);
 
 /* platform specific internal functions implemented in assembly */
-extern lf_return_t fmr_call(lf_return_t (*function)(void), lf_type ret, uint8_t argc, uint16_t argt, void *argv);
+extern lf_return_t fmr_call(lf_return_t (*const function)(void), lf_type ret, uint8_t argc, uint16_t argt, const void *argv);
 
 #endif

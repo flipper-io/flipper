@@ -127,12 +127,14 @@ fail:
     return lf_error;
 }
 
-int fmr_rpc(struct _lf_device *device, struct _fmr_call_packet *packet, lf_return_t *retval) {
+int fmr_rpc(struct _lf_device *device, const struct _fmr_packet *_packet, lf_return_t *retval) {
+
+    const struct _fmr_call_packet *packet = (struct _fmr_call_packet *)_packet;
 
     struct _lf_module *m;
     lf_return_t (*f)(void) = NULL;
 
-    struct _fmr_call *call = &packet->call;
+    const struct _fmr_call *call = &packet->call;
 
     m = lf_ll_item(device->modules, call->module);
     lf_assert(m, E_NULL, "bad module lookup");
@@ -149,7 +151,9 @@ fail:
     return lf_error;
 }
 
-int fmr_push(struct _lf_device *device, struct _fmr_push_pull_packet *packet) {
+int fmr_push(struct _lf_device *device, const struct _fmr_packet *_packet, lf_return_t *retval) {
+
+    const struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)_packet;
 
     void *dst = (void *)(uintptr_t)packet->ptr;
 
@@ -160,7 +164,9 @@ fail:
     return lf_error;
 }
 
-int fmr_pull(struct _lf_device *device, struct _fmr_push_pull_packet *packet) {
+int fmr_pull(struct _lf_device *device, const struct _fmr_packet *_packet, lf_return_t *retval) {
+
+    const struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)_packet;
 
     void *src = (void *)(uintptr_t)packet->ptr;
 
@@ -171,7 +177,9 @@ fail:
     return lf_error;
 }
 
-int fmr_dyld(struct _lf_device *device, struct _fmr_dyld_packet *packet, lf_return_t *retval) {
+int fmr_dyld(struct _lf_device *device, const struct _fmr_packet *_packet, lf_return_t *retval) {
+
+    const struct _fmr_dyld_packet *packet = (struct _fmr_dyld_packet *)_packet;
 
     struct _lf_module *module = dyld_module(device, packet->module);
     lf_assert(module, E_MODULE, "no module '%s' has been registered", packet->module);
@@ -183,7 +191,9 @@ fail:
     return lf_error;
 }
 
-int fmr_malloc(struct _fmr_memory_packet *packet, lf_return_t *retval) {
+int fmr_malloc(struct _lf_device *device, const struct _fmr_packet *_packet, lf_return_t *retval) {
+
+    const struct _fmr_memory_packet *packet = (struct _fmr_memory_packet *)_packet;
 
     void *ptr = NULL;
     size_t size = (size_t)packet->size;
@@ -198,7 +208,9 @@ fail:
     return lf_error;
 }
 
-int fmr_free(struct _fmr_memory_packet *packet) {
+int fmr_free(struct _lf_device *device, const struct _fmr_packet *_packet, lf_return_t *retval) {
+
+    const struct _fmr_memory_packet *packet = (struct _fmr_memory_packet *)_packet;
 
     void *ptr = (void *)(uintptr_t)packet->ptr;
 
@@ -206,6 +218,15 @@ int fmr_free(struct _fmr_memory_packet *packet) {
 
     return lf_success;
 }
+
+static int (* const fmr_dispatchers[FMR_CLASS_COUNT])(struct _lf_device *device, const struct _fmr_packet *_packet, lf_return_t *retval) = {
+    &fmr_rpc,
+    &fmr_push,
+    &fmr_pull,
+    &fmr_dyld,
+    &fmr_malloc,
+    &fmr_free
+};
 
 int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet) {
 
@@ -227,37 +248,10 @@ int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet) {
     /* clear error state */
     lf_error_set(E_OK);
 
-    /* Switch through the packet subclasses and invoke the appropriate handler for each. */
-    switch (hdr->type) {
-        /* rpc */
-        case fmr_rpc_class:
-            fmr_rpc(device, (struct _fmr_call_packet *)packet, &retval);
-            break;
-        /* push */
-        case fmr_push_class:
-            fmr_push(device, (struct _fmr_push_pull_packet *)packet);
-            break;
-        /* pull */
-        case fmr_pull_class:
-            fmr_pull(device, (struct _fmr_push_pull_packet *)packet);
-            break;
-        /* dyld */
-        case fmr_dyld_class:
-            fmr_dyld(device, (struct _fmr_dyld_packet *)packet, &retval);
-            break;
-        /* malloc */
-        case fmr_malloc_class:
-            fmr_malloc((struct _fmr_memory_packet *)packet, &retval);
-            break;
-        /* free */
-        case fmr_free_class:
-            fmr_free((struct _fmr_memory_packet *)packet);
-            break;
-        /* default */
-        default:
-            lf_assert(false, E_FMR, "unknown header type '%d'", hdr->type);
-            break;
-    }
+    lf_assert(hdr->type < FMR_CLASS_COUNT, E_FMR, "unknown header type '%d'", hdr->type);
+
+    /* call the dispatcher */
+    lf_assert(fmr_dispatchers[hdr->type](device, packet, &retval), E_FMR, "failed to dispatch call");
 
 fail:
 
