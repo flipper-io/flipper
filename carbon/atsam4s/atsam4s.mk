@@ -1,5 +1,7 @@
 COMPILER_PREFIX   := arm-none-eabi-
 
+GEN := git.mk api.mk
+
 # Directories that need to be included for this target.
 INC_DIRS := kernel/include         \
 			carbon/atsam4s/asf/src \
@@ -8,8 +10,6 @@ INC_DIRS := kernel/include         \
 SRC_DIRS := carbon/atsam4s         \
 			kernel/arch/armv7      \
 			$(LIB_SRC_DIRS)
-
-GENERATED := $(LIB_GENERATED)
 
 CFLAGS   := -mcpu=cortex-m4        \
             -mthumb                \

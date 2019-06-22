@@ -1,16 +1,16 @@
 # AVR target variables
 COMPILER_PREFIX   := avr-
 
+GEN := git.mk api.mk
+
 # Directories that need to be included for this target.
 INC_DIRS := carbon/atmegau2/include \
 			kernel/include          \
 			$(LIB_INC_DIRS)
 
-SRC_DIRS := carbon/atmegau2         \
-			kernel/arch/avr8        \
+SRC_DIRS := carbon/atmegau2           \
+			kernel/arch/avr8          \
 			$(LIB_SRC_DIRS)
-
-GENERATED := $(LIB_GENERATED)
 
 CFLAGS   := -mmcu=atmega32u2        \
 			-DARCH=ARCH_AVR8        \

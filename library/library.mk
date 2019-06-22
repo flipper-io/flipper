@@ -1,21 +1,19 @@
 LIB_INC_DIRS := library/c \
-								api/c \
-								carbon/atmegau2/include \
-								carbon/atsam4s/include \
-								carbon/atsam4s/asf/include \
-								carbon/hal/include \
+				api/c \
+				carbon/atmegau2/include \
+				carbon/atsam4s/include \
+				carbon/atsam4s/asf/include \
+				carbon/hal/include \
 
-LIB_SRC_DIRS := library/c \
-	              api/c
+LIB_SRC_DIRS := library/c
 
-LIB_GENERATED := git_hash.c
+LIB_CFLAGS :=
+LIB_LDFLAGS :=
 
-LIB_CFLAGS   :=
-LIB_LDFLAGS  :=
+GEN := git.mk
 
 INC_DIRS := $(LIB_INC_DIRS) platforms
 SRC_DIRS := $(LIB_SRC_DIRS) kernel/arch/x64 carbon/hal/src platforms/posix
-GENERATED := $(LIB_GENERATED)
 
 ifdef DEBUG
 CFLAGS := $(LIB_CFLAGS) -fsanitize=address -g -fPIC $(shell pkg-config --cflags libusb-1.0)

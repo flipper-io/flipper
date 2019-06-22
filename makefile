@@ -42,11 +42,11 @@ help:
 
 # Global CFLAGS
 GLOBAL_CFLAGS = -std=c99                  \
-                -Wall                     \
-                -Wextra                   \
-                -Wno-unused-parameter     \
-                -Wno-expansion-to-defined \
-				-g
+				-Wall                     \
+				-Wextra                   \
+				-Wno-unused-parameter     \
+				-Wno-expansion-to-defined \
+	-g
 
 #####
 # find_srcs($1: source directories, $2: source file extensions)
@@ -80,27 +80,28 @@ EXE := $1.exe
 A := $1.a
 SO := $1.so
 
-GEN_SRCS := $$(patsubst %,$(BUILD)/$1/gen/%,$$(GENERATED))
-GEN_OBJS := $$(patsubst %,%.o,$$(GEN_SRCS))
+# Generate!
+$(foreach gen,$(GEN),-include $(BUILD)/$1/$(gen))
 
 SRCS += $$(call find_srcs,$$(SRC_DIRS))
-OBJS := $$(patsubst %,$(BUILD)/$1/%.o,$$(SRCS)) $$(GEN_OBJS)
 
-DEPS := $$(OBJS:.o=.d)
-BUILD_DIRS := $(BUILD)/$1 $$(addprefix $(BUILD)/$1/,$$(shell find $$(SRC_DIRS) -type d))
-BUILD_DIR_FILES := $$(addsuffix /.dir,$$(BUILD_DIRS))
+GEN_SRCS := $$(foreach dir,$$(GEN_DIRS),$$(call find_srcs,$(BUILD)/$1/gen$(dir)))
+
+OBJS := $$(patsubst %,$(BUILD)/$1/%,$$(patsubst %.c,%.o,$$(patsubst %.S,%.o,$$(SRCS))))
+GEN_OBJS := $$(patsubst %.c,%.o,$$(GEN_SRCS))
+
+BUILD_DIRS := $$(dir $$(OBJS))
+BUILD_DIR_FILES := $$(patsubst %,%.dir,$$(BUILD_DIRS))
+
+DEPS := $$(patsubst %.o,$(BUILD)/%.d,$$(OBJS))
 
 $1_ASFLAGS := $$(ASFLAGS)
 $1_LDFLAGS := $$(LDFLAGS)
 $1_CFLAGS := $$(CFLAGS) $$(foreach inc,$$(INC_DIRS),-I$$(inc))
 
-# Rule to make ELF.
-$$(EXE): $$(OBJS) | $$(DEPENDENCIES)
-	$(_v)$$($1_LD) -o $$(basename $(BUILD)/$1/$$@) $$^ $$($1_LDFLAGS)
-
-# Rule to make ELF.
-$$(ELF): $$(OBJS) | $$(DEPENDENCIES)
-	$(_v)$$($1_LD) $$($1_LDFLAGS) -o $(BUILD)/$1/$$@ $$^
+# Rule to build C sources.
+$(BUILD)/$1/%.o: %.S | $$(BUILD_DIR_FILES)
+	$(_v)$$($1_AS) $$($1_ASFLAGS) $(GLOBAL_CFLAGS) $$($1_CFLAGS) -D__FILE_NAME__=$$(basename $$(notdir $$<)) -I$$(<D) -MD -MP -MF $$@.d -c -o $$@ $$<
 
 # Rule to make HEX.
 $$(HEX): $$(ELF)
@@ -110,32 +111,43 @@ $$(HEX): $$(ELF)
 $$(BIN): $$(ELF)
 	$(_v)$$($1_OBJCOPY) -O binary $(BUILD)/$1/$$< $(BUILD)/$1/$$@
 
+# Rule to make executable.
+$$(EXE): $$(OBJS) $$(GEN_OBJS)
+	$(_v)$$($1_LD) -o $$(basename $(BUILD)/$1/$$@) $$^ $$($1_LDFLAGS)
+
 # Rule to make static library.
-$$(A): $$(OBJS) | $$(DEPENDENCIES)
+$$(A): $$(OBJS) $$(GEN_OBJS)
 	$(_v)$$($1_AR) rcs $(BUILD)/$1/$$@ $$^
 
 # Rule to make shared library.
-$$(SO): $$(OBJS) | $$(DEPENDENCIES)
+$$(SO): $$(OBJS) $$(GEN_OBJS)
 	$(_v)$$($1_LD) -shared -o $(BUILD)/$1/$$@ $$^ $$($1_LDFLAGS)
 
-# Rule to build C sources.
-$(BUILD)/$1/%.c.o: %.c | $$(BUILD_DIR_FILES)
-	$(_v)$$($1_CC) $(GLOBAL_CFLAGS) $$($1_CFLAGS) -D__FILE_NAME__=$$(basename $$(notdir $$<)) -I$$(<D) -MD -MP -MF $$@.d -c -o $$@ $$<
+# Rule to make ELF.
+$$(ELF): $$(OBJS) $$(GEN_OBJS)
+	$(_v)$$($1_LD) $$($1_LDFLAGS) -o $(BUILD)/$1/$$@ $$^
 
-# Rule to build generated C sources.
-$(BUILD)/$1/gen/%.c.o: $$(GEN_SRCS) | $$(BUILD_DIR_FILES)
-	$(_v)$$($1_CC) $(GLOBAL_CFLAGS) $$($1_CFLAGS) -D__FILE_NAME__=$$(basename $$(notdir $$<)) -I$$(<D) -MD -MP -MF $$@.d -c -o $$@ $$<
-
-# Rule to build preprocessed assembly sources.
-$(BUILD)/$1/%.S.o: %.S | $$(BUILD_DIR_FILES)
-	$(_v)$$($1_AS) $$($1_ASFLAGS) $(GLOBAL_CFLAGS) $$($1_CFLAGS) -I$$(<D) -MD -MP -MF $$@.d -c -o $$@ $$<
-
-# Re-generate the git hash every time.
-.PHONY: $(BUILD)/$1/gen/git_hash.c
+# Rule to make an unlinked ELF.
+$$(ELF).debug: $$(OBJS)
+	$(_v)$$($1_LD) -Wl,--unresolved-symbols=ignore-all $$($1_LDFLAGS) -o $(BUILD)/$1/$$@ $$^
 
 # Rule to autogenerate the git hash file.
-$(BUILD)/$1/gen/git_hash.c: | $(BUILD)/$1/gen/.dir
-	$(_v)echo 'const char lf_git_hash[7] = "$$(shell git rev-parse --short HEAD)";' > $$@
+$(BUILD)/$1/git.mk: | $(BUILD)/$1/gen/git/.dir
+	$(_v)echo 'const char lf_git_hash[7] = "$$(shell git rev-parse --short HEAD)";' > $(BUILD)/$1/gen/git/git.c
+	$(_v)echo 'GEN_DIRS += git' > $$@
+
+# Rule to build the generated API C files
+$(BUILD)/$1/api.mk: $$(ELF).debug | $(BUILD)/$1/gen/api/.dir
+	$(_v)python3 utils/fdwarf/fdwarf.py $(BUILD)/$1/$$< c $(BUILD)/$1/gen/api
+	$(_v)echo 'GEN_DIRS += api' > $$@
+
+# Rule to build C sources.
+$(BUILD)/$1/%.o: %.c | $$(BUILD_DIR_FILES)
+	$(_v)$$($1_CC) $(GLOBAL_CFLAGS) $$($1_CFLAGS) -D__FILE_NAME__=$$(basename $$(notdir $$<)) -I$$(<D) -MD -MP -MF $$@.d -c -o $$@ $$<
+
+# Rule to build C sources.
+$(BUILD)/$1/gen/%.o: $(BUILD)/$1/gen/%.c
+	$(_v)$$($1_CC) $(GLOBAL_CFLAGS) $$($1_CFLAGS) -D__FILE_NAME__=$$(basename $$(notdir $$<)) -I$$(<D) -MD -MP -MF $$@.d -c -o $$@ $$<
 
 # Rule to include build dependancies.
 -include $$(DEPS)
@@ -158,9 +170,10 @@ undefine BIN
 undefine EXE
 undefine A
 undefine SO
-undefine GEN_SRCS
-undefine GEN_OBJS
+undefine GEN
+undefine GEN_DIRS
 undefine SRCS
+undefine GEN_SRCS
 undefine OBJS
 undefine DEPS
 undefine BUILD_DIRS
