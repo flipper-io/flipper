@@ -4,9 +4,14 @@ BUILD := .build
 # Prefix where build projects are installed
 PREFIX ?= /usr/local
 
-.PHONY: all install uninstall help
+# Print all commands executed when VERBOSE is defined
+ifdef VERBOSE
+_v :=
+else #VERBOSE
+_v := @
+endif #VERBOSE
 
-TARGETS :=
+.PHONY: all install uninstall help
 
 all::
 install::
@@ -41,6 +46,129 @@ GLOBAL_CFLAGS = -std=c99                  \
                 -Wextra                   \
                 -Wno-unused-parameter     \
                 -Wno-expansion-to-defined \
+
+#####
+# find_srcs($1: source directories, $2: source file extensions)
+#####
+find_srcs = $(foreach sd,$1,$(foreach ext,$(SRC_EXTS),$(shell find $(sd) -name '*.$(ext)')))
+#####
+
+# All supported source file extensions.
+SRC_EXTS := c S
+
+#####
+# generate_target($1: target prefix)
+#
+# Generate all of the target-specific build rules for the given target.
+#####
+
+define _ADD_TARGET
+
+$1_CC := $$(COMPILER_PREFIX)gcc
+$1_AS := $$(COMPILER_PREFIX)gcc
+$1_AR := $$(COMPILER_PREFIX)ar
+$1_LD := $$(COMPILER_PREFIX)gcc
+$1_OBJCOPY := $$(COMPILER_PREFIX)objcopy
+$1_OBJDUMP := $$(COMPILER_PREFIX)objdump
+
+# Generate target-specific variables.
+ELF :=  $1.elf
+HEX := $1.hex
+BIN := $1.bin
+EXE := $1.exe
+A := $1.a
+SO := $1.so
+
+GEN_SRCS := $$(patsubst %,$(BUILD)/$1/gen/%,$$(GENERATED))
+GEN_OBJS := $$(patsubst %,%.o,$$(GEN_SRCS))
+
+SRCS += $$(call find_srcs,$$(SRC_DIRS))
+OBJS := $$(patsubst %,$(BUILD)/$1/%.o,$$(SRCS)) $$(GEN_OBJS)
+
+DEPS := $$(OBJS:.o=.d)
+BUILD_DIRS := $(BUILD)/$1 $$(addprefix $(BUILD)/$1/,$$(shell find $$(SRC_DIRS) -type d))
+BUILD_DIR_FILES := $$(addsuffix /.dir,$$(BUILD_DIRS))
+
+$1_ASFLAGS := $$(ASFLAGS)
+$1_LDFLAGS := $$(LDFLAGS)
+$1_CFLAGS := $$(CFLAGS) $$(foreach inc,$$(INC_DIRS),-I$$(inc))
+
+# Rule to make ELF.
+$$(EXE): $$(OBJS) | $$(DEPENDENCIES)
+	$(_v)$$($1_LD) -o $$(basename $(BUILD)/$1/$$@) $$^ $$($1_LDFLAGS)
+
+# Rule to make ELF.
+$$(ELF): $$(OBJS) | $$(DEPENDENCIES)
+	$(_v)$$($1_LD) $$($1_LDFLAGS) -o $(BUILD)/$1/$$@ $$^
+
+# Rule to make HEX.
+$$(HEX): $$(ELF)
+	$(_v)$$($1_OBJCOPY) -O ihex $(BUILD)/$1/$$< $(BUILD)/$1/$$@
+
+# Rule to make BIN.
+$$(BIN): $$(ELF)
+	$(_v)$$($1_OBJCOPY) -O binary $(BUILD)/$1/$$< $(BUILD)/$1/$$@
+
+# Rule to make static library.
+$$(A): $$(OBJS) | $$(DEPENDENCIES)
+	$(_v)$$($1_AR) rcs $(BUILD)/$1/$$@ $$^
+
+# Rule to make shared library.
+$$(SO): $$(OBJS) | $$(DEPENDENCIES)
+	$(_v)$$($1_LD) -shared -o $(BUILD)/$1/$$@ $$^ $$($1_LDFLAGS)
+
+# Rule to build C sources.
+$(BUILD)/$1/%.c.o: %.c | $$(BUILD_DIR_FILES)
+	$(_v)$$($1_CC) $(GLOBAL_CFLAGS) $$($1_CFLAGS) -D__FILE_NAME__=$$(basename $$(notdir $$<)) -I$$(<D) -MD -MP -MF $$@.d -c -o $$@ $$<
+
+# Rule to build generated C sources.
+$(BUILD)/$1/gen/%.c.o: $$(GEN_SRCS) | $$(BUILD_DIR_FILES)
+	$(_v)$$($1_CC) $(GLOBAL_CFLAGS) $$($1_CFLAGS) -D__FILE_NAME__=$$(basename $$(notdir $$<)) -I$$(<D) -MD -MP -MF $$@.d -c -o $$@ $$<
+
+# Rule to build preprocessed assembly sources.
+$(BUILD)/$1/%.S.o: %.S | $$(BUILD_DIR_FILES)
+	$(_v)$$($1_AS) $$($1_ASFLAGS) $(GLOBAL_CFLAGS) $$($1_CFLAGS) -I$$(<D) -MD -MP -MF $$@.d -c -o $$@ $$<
+
+# Re-generate the git hash every time.
+.PHONY: $(BUILD)/$1/gen/git_hash.c
+
+# Rule to autogenerate the git hash file.
+$(BUILD)/$1/gen/git_hash.c: | $(BUILD)/$1/gen/.dir
+	$(_v)echo 'const char lf_git_hash[7] = "$$(shell git rev-parse --short HEAD)";' > $$@
+
+# Rule to include build dependancies.
+-include $$(DEPS)
+
+undefine COMPILER_PREFIX
+undefine INC_DIRS
+undefine SRC_DIRS
+undefine LDFLAGS
+undefine GENERATED
+
+undefine CC
+undefine AS
+undefine AR
+undefine LD
+undefine OBJCOPY
+undefine OBJDUMP
+undefine ELF
+undefine HEX
+undefine BIN
+undefine EXE
+undefine A
+undefine SO
+undefine GEN_SRCS
+undefine GEN_OBJS
+undefine SRCS
+undefine OBJS
+undefine DEPS
+undefine BUILD_DIRS
+undefine BUILD_DIR_FILES
+undefine CFLAGS
+
+endef
+
+ADD_TARGET = $(eval $(call _ADD_TARGET,$1))
 
 include library/library.mk
 include carbon/carbon.mk
@@ -110,13 +238,6 @@ install-python:
 
 # -------------------------------------------------------------------- #
 
-# Print all commands executed when VERBOSE is defined
-ifdef VERBOSE
-_v :=
-else #VERBOSE
-_v := @
-endif #VERBOSE
-
 # Make sure that the .dir files aren't automatically deleted after building.
 .SECONDARY:
 
@@ -126,104 +247,6 @@ endif #VERBOSE
 # Disable built-in rules
 MAKEFLAGS += --no-builtin-rules
 .SUFFIXES:
-
-
-#####
-# find_srcs($1: source directories, $2: source file extensions)
-#####
-find_srcs = $(foreach sd,$1,$(foreach ext,$(SRC_EXTS),$(shell find $(sd) -name '*.$(ext)')))
-#####
-
-# All supported source file extensions.
-SRC_EXTS := c S
-
-#####
-# generate_target($1: target prefix)
-#
-# Generate all of the target-specific build rules for the given target.
-#####
-
-define _ADD_TARGET
-
-$1_TARGET = $1
-
-# Generate target-specific variables.
-$1_BUILD := $$(BUILD)/$$($1_TARGET)
-$1_ELF :=  $$($1_TARGET).elf
-$1_HEX := $$($1_TARGET).hex
-$1_BIN := $$($1_TARGET).bin
-$1_EXE := $$($1_TARGET).exe
-$1_A := $$($1_TARGET).a
-$1_SO := $$($1_TARGET).so
-$1_GEN_SRCS := $$(patsubst %,$$($1_BUILD)/gen/%,$$($1_GENERATED))
-$1_GEN_OBJS := $$(patsubst %,%.o,$$($1_GEN_SRCS))
-$1_SRCS += $$(call find_srcs,$$($1_SRC_DIRS))
-$1_OBJS := $$(patsubst %,$$($1_BUILD)/%.o,$$($1_SRCS))
-$1_DEPS := $$($1_OBJS:.o=.d)
-$1_BUILD_DIRS := $$($1_BUILD) $$(addprefix $$($1_BUILD)/,$$(shell find $$($1_SRC_DIRS) -type d))
-$1_BUILD_DIR_FILES := $$(addsuffix /.dir,$$($1_BUILD_DIRS))
-$1_CFLAGS += $$(foreach inc,$$($1_INC_DIRS),-I$$(inc))
-$1_CC := $$($1_PREFIX)gcc
-$1_AS := $$($1_PREFIX)gcc
-$1_AR := $$($1_PREFIX)ar
-$1_LD := $$($1_PREFIX)gcc
-$1_OBJCOPY := $$($1_PREFIX)objcopy
-$1_OBJDUMP := $$($1_PREFIX)objdump
-
-# Rule to make ELF.
-$$($1_EXE): $$($1_OBJS) $$($1_GEN_OBJS) | $$($1_DEPENDENCIES)
-	$(_v)$$($1_LD) -o $$(basename $$($1_BUILD)/$$@) $$^ $$($1_LDFLAGS)
-
-# Rule to make ELF.
-$$($1_ELF): $$($1_OBJS) $$($1_GEN_OBJS) | $$($1_DEPENDENCIES)
-	$(_v)$$($1_LD) $$($1_LDFLAGS) -o $$($1_BUILD)/$$@ $$^
-
-# Rule to make HEX.
-$$($1_HEX): $$($1_ELF)
-	$(_v)$$($1_OBJCOPY) -O ihex $$($1_BUILD)/$$< $$($1_BUILD)/$$@
-
-# Rule to make BIN.
-$$($1_BIN): $$($1_ELF)
-	$(_v)$$($1_OBJCOPY) -O binary $$($1_BUILD)/$$< $$($1_BUILD)/$$@
-
-# Rule to make static library.
-$$($1_A): $$($1_OBJS) $$($1_GEN_OBJS) | $$($1_DEPENDENCIES)
-	$(_v)$$($1_AR) rcs $$($1_BUILD)/$$@ $$^
-
-# Rule to make shared library.
-$$($1_SO): $$($1_OBJS) $$($1_GEN_OBJS) | $$($1_DEPENDENCIES)
-	$(_v)$$($1_LD) -shared -o $$($1_BUILD)/$$@ $$^ $$($1_LDFLAGS)
-
-# Rule to build C sources.
-$$($1_BUILD)/%.c.o: %.c | $$($1_BUILD_DIR_FILES)
-	$(_v)$$($1_CC) $(GLOBAL_CFLAGS) $$($1_CFLAGS) -D__FILE_NAME__=$$(basename $$(notdir $$<)) -I$$(<D) -MD -MP -MF $$($1_BUILD)/$$*.c.d -c -o $$@ $$<
-
-# Rule to build generated C sources.
-$$($1_BUILD)/gen/%.c.o: $$($1_GEN_SRCS) | $$($1_BUILD_DIR_FILES)
-	$(_v)$$($1_CC) $(GLOBAL_CFLAGS) $$($1_CFLAGS) -D__FILE_NAME__=$$(basename $$(notdir $$<)) -I$$(<D) -MD -MP -MF $$($1_BUILD)/$$*.c.d -c -o $$@ $$<
-
-# Rule to build preprocessed assembly sources.
-$$($1_BUILD)/%.S.o: %.S | $$($1_BUILD_DIR_FILES)
-	$(_v)$$($1_AS) $$($1_ASFLAGS) $(GLOBAL_CFLAGS) $$($1_CFLAGS) -I$$(<D) -MD -MP -MF $$($1_BUILD)/$$*.S.d -c -o $$@ $$<
-
-# Re-generate the git hash every time.
-.PHONY: $$($1_BUILD)/gen/git_hash.c
-
-# Rule to autogenerate the git hash file.
-$$($1_BUILD)/gen/git_hash.c: | $$($1_BUILD)/gen/.dir
-	$(_v)echo 'const char lf_git_hash[7] = "$$(shell git rev-parse --short HEAD)";' > $$@
-
-# Rule to include build dependancies.
--include $$($1_DEPS)
-
-endef
-
-ADD_TARGET = $(eval $(call _ADD_TARGET,$1))
-
-#####
-
-# Generate all of the rules for every target
-$(foreach target,$(TARGETS),$(call ADD_TARGET,$(target)))
 
 .PHONY: clean
 

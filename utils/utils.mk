@@ -1,49 +1,44 @@
 # --- UTILITIES --- #
 
-FDFU_DEPENDENCIES := LIBFLIPPER.so
-FDFU_INC_DIRS := $(LIBFLIPPER_INC_DIRS)
-FDFU_SRC_DIRS := utils/fdfu/src
-FDFU_LDFLAGS  := -L$(BUILD)/libflipper -lflipper
-FDFU_GENERATED := $(LIB_GENERATED)
+DEPENDENCIES := libflipper.so
+INC_DIRS := $(BUILD)/include
+SRC_DIRS := utils/fdfu/src
+LDFLAGS  := -L$(BUILD)/libflipper -lflipper
 
-TARGETS += FDFU
+$(call ADD_TARGET,fdfu)
 
-FDEBUG_DEPENDENCIES := LIBFLIPPER.so
-FDEBUG_INC_DIRS := $(LIBFLIPPER_INC_DIRS)
-FDEBUG_SRC_DIRS := utils/fdebug/src
-FDEBUG_CFLAGS   := $(shell pkg-config --cflags libusb-1.0)
-FDEBUG_LDFLAGS  := -L$(BUILD)/libflipper -lflipper $(shell pkg-config --libs libusb-1.0)
-FDEBUG_GENERATED := $(LIB_GENERATED)
+DEPENDENCIES := libflipper.so
+INC_DIRS := $(BUILD)/include
+SRC_DIRS := utils/fdebug/src
+CFLAGS   := $(shell pkg-config --cflags libusb-1.0)
+LDFLAGS  := -L$(BUILD)/libflipper -lflipper $(shell pkg-config --libs libusb-1.0)
 
-TARGETS += FDEBUG
+$(call ADD_TARGET,fdebug)
 
-FLOAD_DEPENDENCIES := LIBFLIPPER.so
-FLOAD_INC_DIRS := $(LIBFLIPPER_INC_DIRS)
-FLOAD_SRC_DIRS := utils/fload/src
-FLOAD_LDFLAGS  := -L$(BUILD)/libflipper -lflipper
-FLOAD_GENERATED := $(LIB_GENERATED)
+DEPENDENCIES := libflipper.so
+INC_DIRS := $(BUILD)/include
+SRC_DIRS := utils/fload/src
+LDFLAGS  := -L$(BUILD)/libflipper -lflipper
 
-TARGETS += FLOAD
+$(call ADD_TARGET,fload)
 
-FVM_DEPENDENCIES := LIBFLIPPER.so
-FVM_INC_DIRS := $(LIBFLIPPER_INC_DIRS)
-FVM_SRC_DIRS := utils/fvm/src
-FVM_LDFLAGS  := -L$(BUILD)/libflipper -lflipper -ldl
-FVM_GENERATED := $(LIB_GENERATED)
+DEPENDENCIES := libflipper.so
+INC_DIRS := $(BUILD)/include platforms
+SRC_DIRS := utils/fvm/src
+LDFLAGS  := -L$(BUILD)/libflipper -lflipper -ldl
 
-TARGETS += FVM
+$(call ADD_TARGET,fvm)
 
-FTEST_DEPENDENCIES := LIBFLIPPER.so
-FTEST_INC_DIRS := $(LIBFLIPPER_INC_DIRS)
-FTEST_SRC_DIRS := utils/ftest/src
-FTEST_LDFLAGS  :=  -L$(BUILD)/libflipper -lflipper
-FTEST_GENERATED := $(LIB_GENERATED)
+DEPENDENCIES := libflipper.so
+INC_DIRS := $(BUILD)/include
+SRC_DIRS := utils/ftest/src
+LDFLAGS  :=  -L$(BUILD)/libflipper -lflipper
 
-TARGETS += FTEST
+$(call ADD_TARGET,ftest)
 
 # --- UTILS --- #
 
-utils: FDFU.exe FDEBUG.exe FLOAD.exe FVM.exe FTEST.exe | $(BUILD)/utils/fdwarf/.dir
+utils: fdfu.exe fdebug.exe fload.exe fvm.exe ftest.exe | $(BUILD)/utils/fdwarf/.dir
 	$(_v)cp utils/fdwarf/fdwarf.py $(BUILD)/utils/fdwarf
 	$(_v)chmod +x $(BUILD)/utils/fdwarf
 

@@ -13,24 +13,23 @@ LIB_GENERATED := git_hash.c
 LIB_CFLAGS   :=
 LIB_LDFLAGS  :=
 
-LIBFLIPPER_PREFIX :=
-LIBFLIPPER_INC_DIRS := $(LIB_INC_DIRS) platforms
-LIBFLIPPER_SRC_DIRS := $(LIB_SRC_DIRS) kernel/arch/x64 carbon/hal/src platforms/posix
-LIBFLIPPER_GENERATED := $(LIB_GENERATED)
+INC_DIRS := $(LIB_INC_DIRS) platforms
+SRC_DIRS := $(LIB_SRC_DIRS) kernel/arch/x64 carbon/hal/src platforms/posix
+GENERATED := $(LIB_GENERATED)
 
 ifdef DEBUG
-LIBFLIPPER_CFLAGS := $(LIB_CFLAGS) -fsanitize=address -g -fPIC $(shell pkg-config --cflags libusb-1.0)
-LIBFLIPPER_LDFLAGS := $(LIB_LDFLAGS) -fsanitize=address $(shell pkg-config --libs libusb-1.0)
+CFLAGS := $(LIB_CFLAGS) -fsanitize=address -g -fPIC $(shell pkg-config --cflags libusb-1.0)
+LDFLAGS := $(LIB_LDFLAGS) -fsanitize=address $(shell pkg-config --libs libusb-1.0)
 else
-LIBFLIPPER_CFLAGS := $(LIB_CFLAGS) -g -fPIC $(shell pkg-config --cflags libusb-1.0)
-LIBFLIPPER_LDFLAGS := $(LIB_LDFLAGS) $(shell pkg-config --libs libusb-1.0)
+CFLAGS := $(LIB_CFLAGS) -g -fPIC $(shell pkg-config --cflags libusb-1.0)
+LDFLAGS := $(LIB_LDFLAGS) $(shell pkg-config --libs libusb-1.0)
 endif
 
-TARGETS += LIBFLIPPER
+$(call ADD_TARGET,libflipper)
 
 # --- LIBFLIPPER --- #
 
-libflipper: LIBFLIPPER.so | $(BUILD)/include/flipper/.dir
+libflipper: libflipper.so | $(BUILD)/include/flipper/.dir
 	$(_v)cp -r api/c/*.h $(BUILD)/include/flipper
 	$(_v)cp -r library/c/*.h $(BUILD)/include/flipper
 	$(_v)cp -r library/c/*.def $(BUILD)/include/flipper

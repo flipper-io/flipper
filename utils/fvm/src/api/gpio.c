@@ -1,4 +1,4 @@
-#include "libflipper.h"
+#include <flipper/flipper.h>
 
 LF_FUNC int gpio_configure(void) {
     printf("Configured gpio controller.\n");

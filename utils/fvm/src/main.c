@@ -1,5 +1,5 @@
 #include <arpa/inet.h>
-#include "libflipper.h"
+#include <flipper/flipper.h>
 #include <unistd.h>
 #define _GNU_SOURCE
 #include "posix/network.h"

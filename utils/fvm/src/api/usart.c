@@ -1,4 +1,4 @@
-#include "libflipper.h"
+#include <flipper/flipper.h>
 
 LF_FUNC int usart_configure(void) {
     printf("Configured the usart.\n");
