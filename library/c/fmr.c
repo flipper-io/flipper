@@ -127,7 +127,7 @@ fail:
     return lf_error;
 }
 
-int fmr_rpc(struct _lf_device *device, const struct _fmr_packet *_packet, lf_return_t *retval) {
+static int fmr_rpc(struct _lf_device *device, const struct _fmr_packet *_packet, lf_return_t *retval) {
 
     const struct _fmr_call_packet *packet = (struct _fmr_call_packet *)_packet;
 
@@ -151,7 +151,7 @@ fail:
     return lf_error;
 }
 
-int fmr_push(struct _lf_device *device, const struct _fmr_packet *_packet, lf_return_t *retval) {
+static int fmr_push(struct _lf_device *device, const struct _fmr_packet *_packet, lf_return_t *retval) {
 
     const struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)_packet;
 
@@ -164,7 +164,7 @@ fail:
     return lf_error;
 }
 
-int fmr_pull(struct _lf_device *device, const struct _fmr_packet *_packet, lf_return_t *retval) {
+static int fmr_pull(struct _lf_device *device, const struct _fmr_packet *_packet, lf_return_t *retval) {
 
     const struct _fmr_push_pull_packet *packet = (struct _fmr_push_pull_packet *)_packet;
 
@@ -177,7 +177,7 @@ fail:
     return lf_error;
 }
 
-int fmr_dyld(struct _lf_device *device, const struct _fmr_packet *_packet, lf_return_t *retval) {
+static int fmr_dyld(struct _lf_device *device, const struct _fmr_packet *_packet, lf_return_t *retval) {
 
     const struct _fmr_dyld_packet *packet = (struct _fmr_dyld_packet *)_packet;
 
@@ -191,7 +191,7 @@ fail:
     return lf_error;
 }
 
-int fmr_malloc(struct _lf_device *device, const struct _fmr_packet *_packet, lf_return_t *retval) {
+static int fmr_malloc(struct _lf_device *device, const struct _fmr_packet *_packet, lf_return_t *retval) {
 
     const struct _fmr_memory_packet *packet = (struct _fmr_memory_packet *)_packet;
 
@@ -208,7 +208,7 @@ fail:
     return lf_error;
 }
 
-int fmr_free(struct _lf_device *device, const struct _fmr_packet *_packet, lf_return_t *retval) {
+static int fmr_free(struct _lf_device *device, const struct _fmr_packet *_packet, lf_return_t *retval) {
 
     const struct _fmr_memory_packet *packet = (struct _fmr_memory_packet *)_packet;
 
