@@ -47,7 +47,10 @@ all:: utils
 .PHONY: install-utils uninstall-utils
 
 install-utils: utils
-	$(_v)cp -r $(BUILD)/utils/* $(PREFIX)/bin
+	$(_v)cp -r $(BUILD)/fdfu/fdfu $(PREFIX)/bin
+	$(_v)cp -r $(BUILD)/fdebug/fdebug $(PREFIX)/bin
+	$(_v)cp -r $(BUILD)/fvm/fvm $(PREFIX)/bin
+	$(_v)cp -r $(BUILD)/ftest/ftest $(PREFIX)/bin
 
 install:: install-utils
 

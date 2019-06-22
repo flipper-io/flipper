@@ -153,11 +153,11 @@ all:: $$($1_TARGET)
 
 # Linking rule
 $$($1_TARGET): $$($1_OBJS)
-	$(_v)$$($1_LD) -o $$($1_BUILD)/$$@ $$^ $$($1_LDFLAGS) 
+	$(_v)$$($1_LD) -o $$($1_BUILD)/$$@ $$^ $$($1_LDFLAGS)
 
 # Linking rule
 $$($1_ELF): $$($1_OBJS)
-	$(_v)$$($1_LD) -o $$($1_BUILD)/$$@ $$^ $$($1_LDFLAGS) 
+	$(_v)$$($1_LD) -o $$($1_BUILD)/$$@ $$^ $$($1_LDFLAGS)
 
 # Objcopy-ing rule
 $$($1_HEX): $$($1_ELF)

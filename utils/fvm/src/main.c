@@ -14,10 +14,11 @@ int main(int argc, char *argv[]) {
     struct sockaddr_in addr;
     struct _lf_device *fvm;
 
-    if (argv > 1) {
-        if (!strcmp(argv[2], "--version")) {
+    if (argc > 1) {
+        if (!strcmp(argv[1], "--version")) {
             printf("FVM version: %s\n\n", lf_get_git_hash());
         }
+        return EXIT_SUCCESS;
     }
 
     lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
