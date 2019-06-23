@@ -22,8 +22,6 @@ LDFLAGS  := -L$(BUILD)/libflipper -lflipper
 
 $(call ADD_TARGET,fload)
 
-GEN := api.mk
-
 DEPENDENCIES := libflipper
 INC_DIRS := $(BUILD)/include platforms
 SRC_DIRS := utils/fvm/src

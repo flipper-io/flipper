@@ -80,8 +80,6 @@ EXE := $1
 A := $1.a
 SO := $1.so
 
-$$(info $1 DEPS: $$(DEPENDENCIES))
-
 # Generate!
 $(foreach gen,$(GEN),-include $(BUILD)/$1/$(gen))
 
