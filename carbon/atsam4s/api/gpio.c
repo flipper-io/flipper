@@ -1,5 +1,4 @@
 #include "libflipper.h"
-#include <gpio.h>
 
 LF_FUNC int gpio_configure(void) {
     return lf_success;

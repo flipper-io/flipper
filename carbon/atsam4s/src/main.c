@@ -1,6 +1,5 @@
 #include "libflipper.h"
 #include "atsam4s.h"
-#include "gpio.h"
 #include "os/scheduler.h"
 
 /* How many clock cycles to wait before giving up initialization. */

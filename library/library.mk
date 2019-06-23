@@ -13,7 +13,7 @@ LIB_LDFLAGS :=
 GEN := git.mk
 
 INC_DIRS := $(LIB_INC_DIRS) platforms
-SRC_DIRS := $(LIB_SRC_DIRS) kernel/arch/x64 carbon/hal/src platforms/posix
+SRC_DIRS := $(LIB_SRC_DIRS) kernel/arch/x64 carbon/hal/src platforms/posix $(BUILD)/atsam4s/gen/api
 
 ifdef DEBUG
 CFLAGS := $(LIB_CFLAGS) -fsanitize=address -g -fPIC $(shell pkg-config --cflags libusb-1.0)
@@ -28,7 +28,7 @@ $(call ADD_TARGET,libflipper)
 # --- LIBFLIPPER --- #
 
 libflipper: $(BUILD)/libflipper/libflipper.so | $(BUILD)/include/flipper/.dir
-	$(_v)cp -r api/c/*.h $(BUILD)/include/flipper
+	$(_v)cp -r $(BUILD)/atsam4s/gen/api/*.h $(BUILD)/include/flipper
 	$(_v)cp -r library/c/*.h $(BUILD)/include/flipper
 	$(_v)cp -r library/c/*.def $(BUILD)/include/flipper
 	$(_v)cp -r carbon/hal/include/*.h $(BUILD)/include/flipper

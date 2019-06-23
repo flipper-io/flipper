@@ -12,9 +12,6 @@ struct _lf_module {
     void **interface;
 };
 
-#define LF_MODULE(name) \
-    const struct _lf_module _ ## name ## _module __attribute__((used)) = { _LF_XSTR(name), 0, UINT16_MAX, name ## _interface };
-
 struct _lf_module *lf_module_create(const char *name, uint16_t idx);
 void lf_module_release(void *module);
 

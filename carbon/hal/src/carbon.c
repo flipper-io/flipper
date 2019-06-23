@@ -26,9 +26,6 @@
 #include "posix/network.h"
 #include "posix/usb.h"
 
-#include "gpio.h"
-#include "uart0.h"
-
 #include <unistd.h>
 
 void sam_reset(void) {

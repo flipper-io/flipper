@@ -80,6 +80,8 @@ EXE := $1
 A := $1.a
 SO := $1.so
 
+GEN_CFLAGS = -Wno-implicit-function-declaration
+
 # Generate!
 $(foreach gen,$(GEN),-include $(BUILD)/$1/$(gen))
 
@@ -97,7 +99,7 @@ DEPS := $$(patsubst %.o,$(BUILD)/%.d,$$(OBJS))
 
 $1_ASFLAGS := $$(ASFLAGS)
 $1_LDFLAGS := $$(LDFLAGS)
-$1_CFLAGS := $$(CFLAGS) $$(foreach inc,$$(INC_DIRS),-I$$(inc))
+$1_CFLAGS := $$(GEN_CFLAGS) $$(CFLAGS) $$(foreach inc,$$(INC_DIRS),-I$$(inc)) $$(foreach dir,$$(GEN_DIRS),-I$(BUILD)/$1/gen$(dir))
 
 # Rule to build C sources.
 $(BUILD)/$1/%.o: %.S | $$(BUILD_DIR_FILES) $$(DEPENDENCIES)
@@ -134,12 +136,13 @@ $(BUILD)/$1/$$(ELF).debug: $$(OBJS)
 # Rule to autogenerate the git hash file.
 $(BUILD)/$1/git.mk: | $(BUILD)/$1/gen/git/.dir
 	$(_v)echo 'const char lf_git_hash[7] = "$$(shell git rev-parse --short HEAD)";' > $(BUILD)/$1/gen/git/git.c
-	$(_v)echo 'GEN_DIRS += git' > $$@
+	$(_v)echo 'GEN_DIRS += git' >> $$@
 
 # Rule to build the generated API C files
 $(BUILD)/$1/api.mk: $(BUILD)/$1/$$(ELF).debug | $(BUILD)/$1/gen/api/.dir
 	$(_v)python3 utils/fdwarf/fdwarf.py $$< c $(BUILD)/$1/gen/api
-	$(_v)echo 'GEN_DIRS += api' > $$@
+	$(_v)echo 'GEN_DIRS += api' >> $$@
+	$(_v)echo 'GEN_CFLAGS =' >> $$@
 
 # Rule to build C sources.
 $(BUILD)/$1/%.o: %.c | $$(BUILD_DIR_FILES) $$(DEPENDENCIES)

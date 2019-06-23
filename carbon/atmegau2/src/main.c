@@ -1,6 +1,5 @@
 #include "libflipper.h"
 #include "atmegau2.h"
-#include "led.h"
 #include "megausb.h"
 
 static struct _lf_device *_u2;
@@ -107,7 +106,7 @@ int main(void) {
     /* Bring the 4S out of reset. */
     SAM_POWER_PORT |= (1 << SAM_RESET_PIN);
 
-    led_rgb(LED_GREEN);
+    led_rgb(0, 10, 0);
 
     /* Run the main loop. */
     loop();
@@ -115,7 +114,7 @@ int main(void) {
 
 /* PCINT8 interrupt service routine; captures reset button press and resets the device using the WDT. */
 ISR(PCINT1_vect) {
-    led_rgb(LED_OFF);
+    led_rgb(0, 0, 0);
     SAM_RESET_PORT &= ~(1 << SAM_RESET_PIN);
     SAM_POWER_PORT &= ~(1 << SAM_POWER_PIN);
     wdt_enable(WDTO_15MS);

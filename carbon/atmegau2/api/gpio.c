@@ -1,5 +1,4 @@
 #include "libflipper.h"
-#include "gpio.h"
 #include "atmegau2.h"
 
 LF_FUNC int gpio_configure(void) {

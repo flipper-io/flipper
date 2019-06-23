@@ -80,19 +80,36 @@ def get_parameters_from_die(cu, die):
 def generate_c(modules, outdir):
 
     for m in modules:
+        outh = open(os.path.join(outdir, m.name + ".h"), "w")
         outc = open(os.path.join(outdir, m.name + ".c"), "w")
-        ctemplate = """\
+        htemplate = """\
+#ifndef __$MODULE$_h__
+#define __$MODULE$_h__
+
 #include "libflipper.h"
 
-enum { $TAGS$ };
+extern const struct _lf_module _$MODULE$_module;
 
 $FUNCTIONPROTOS$
 
-void *$MODULE$_interface[] = {
+#endif
+"""
+        ctemplate = """\
+#include "libflipper.h"
+#include "$MODULE$.h"
+
+enum { $TAGS$ };
+
+static void *_$MODULE$_interface[] = {
 $STRUCTBODY$
 };
 
-LF_MODULE($MODULE$);
+const struct _lf_module _$MODULE$_module __attribute__((used)) = {
+    "$MODULE$",
+    0,
+    UINT16_MAX,
+    _$MODULE$_interface
+};
 
 $FUNCTIONS$
 """
@@ -100,10 +117,11 @@ $FUNCTIONS$
         struct = []
         tags = []
         for f in m.funcs:
-            functs.append(str(f) + ";")
+            functs.append("extern " + str(f) + ";")
             tags.append("_" + f.name)
             struct.append("%s (*%s)(%s);" % (f.type, f.name, ", ".join(map(str, f.parameters))))
-        ctemplate = ctemplate.replace("$FUNCTIONPROTOS$", "\n".join(functs))
+        htemplate = htemplate.replace("$FUNCTIONPROTOS$", "\n".join(functs))
+        htemplate = htemplate.replace("$MODULE$", m.name)
         ctemplate = ctemplate.replace("$STRUCTDEF$", "\t" + "\n\t".join(struct))
         ctemplate = ctemplate.replace("$TAGS$", ", ".join(tags))
 
@@ -134,6 +152,7 @@ $FUNCTIONS$
         ctemplate = ctemplate.replace("$STRUCTBODY$", "\t" + ",\n\t".join(struct))
         ctemplate = ctemplate.replace("$FUNCTIONS$", "\n".join(functs))
         ctemplate = ctemplate.replace("$MODULE$", m.name)
+        outh.write(htemplate)
         outc.write(ctemplate)
         outc.close()
 
