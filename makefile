@@ -76,12 +76,10 @@ $1_OBJDUMP := $$(COMPILER_PREFIX)objdump
 ELF :=  $1.elf
 HEX := $1.hex
 BIN := $1.bin
-EXE := $1
 A := $1.a
 SO := $1.so
 
 GEN_CFLAGS = -Wno-implicit-function-declaration -DAPIGEN
-GEN_LDFLAGS = -Wl,--unresolved-symbols=ignore-all
 
 # Generate!
 $(foreach gen,$(GEN),-include $(BUILD)/$1/$(gen))
@@ -115,7 +113,7 @@ $(BUILD)/$1/$$(BIN): $(BUILD)/$1/$$(ELF)
 	$(_v)$$($1_OBJCOPY) -O binary $$< $$@
 
 # Rule to make executable.
-$(BUILD)/$1/$$(EXE): $$(OBJS) $$(GEN_OBJS)
+$(BUILD)/$1/$1: $$(OBJS) $$(GEN_OBJS)
 	$(_v)$$($1_LD) -o $$(basename $$@) $$^ $$($1_LDFLAGS)
 
 # Rule to make static library.
@@ -128,7 +126,7 @@ $(BUILD)/$1/$$(SO): $$(OBJS) $$(GEN_OBJS)
 
 # Rule to make ELF.
 $(BUILD)/$1/gen/$$(ELF): $$(OBJS)
-	$(_v)$$($1_LD) $$($1_LDFLAGS) -o $$@ $$^
+	$(_v)$$($1_LD) $$($1_LDFLAGS) -Wl,--unresolved-symbols=ignore-all -o $$@ $$^
 
 # Rule to make ELF.
 $(BUILD)/$1/$$(ELF): $$(OBJS) $$(GEN_OBJS)
@@ -175,7 +173,6 @@ undefine OBJDUMP
 undefine ELF
 undefine HEX
 undefine BIN
-undefine EXE
 undefine A
 undefine SO
 undefine GEN

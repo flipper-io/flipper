@@ -11,8 +11,8 @@ LIB_LDFLAGS :=
 
 GEN := git.mk
 
-INC_DIRS := $(LIB_INC_DIRS) platforms $(BUILD)/atmegau2/gen/api
-SRC_DIRS := $(LIB_SRC_DIRS) kernel/arch/x64 carbon/hal/src platforms/posix $(BUILD)/atmegau2/gen/api
+INC_DIRS := $(LIB_INC_DIRS) platforms $(BUILD)/atsam4s/gen/api
+SRC_DIRS := $(LIB_SRC_DIRS) kernel/arch/x64 carbon/hal/src platforms/posix $(BUILD)/atsam4s/gen/api
 
 ifdef DEBUG
 CFLAGS := $(LIB_CFLAGS) -fsanitize=address -g -fPIC $(shell pkg-config --cflags libusb-1.0)
@@ -26,8 +26,10 @@ $(call ADD_TARGET,libflipper)
 
 # --- LIBFLIPPER --- #
 
+.PHONY: libflipper install-libflipper uninstall-libflipper
+
 libflipper: $(BUILD)/libflipper/libflipper.so | $(BUILD)/include/flipper/.dir
-	$(_v)cp -r $(BUILD)/atmegau2/gen/api/*.h $(BUILD)/include/flipper
+	$(_v)cp -r $(BUILD)/atsam4s/gen/api/*.h $(BUILD)/include/flipper
 	$(_v)cp -r library/c/*.h $(BUILD)/include/flipper
 	$(_v)cp -r library/c/*.def $(BUILD)/include/flipper
 	$(_v)cp -r carbon/hal/include/*.h $(BUILD)/include/flipper
@@ -37,8 +39,6 @@ libflipper: $(BUILD)/libflipper/libflipper.so | $(BUILD)/include/flipper/.dir
 	$(_v)cp assets/flipper.mk $(BUILD)/include/flipper
 
 all:: libflipper
-
-.PHONY: install-libflipper uninstall-libflipper
 
 install-libflipper: libflipper
 	$(_v)cp $(BUILD)/libflipper/libflipper.so $(PREFIX)/lib/

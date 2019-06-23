@@ -38,11 +38,11 @@ $(call ADD_TARGET,ftest)
 
 # --- UTILS --- #
 
+.PHONY: utils install-utils uninstall-utils
+
 utils: $(BUILD)/fdfu/fdfu $(BUILD)/fdebug/fdebug $(BUILD)/fload/fload $(BUILD)/fvm/fvm $(BUILD)/ftest/ftest
 
 all:: utils
-
-.PHONY: install-utils uninstall-utils
 
 install-utils: utils | $(BUILD)/utils/fdwarf/.dir
 	$(_v)cp -r $(BUILD)/fdfu/fdfu $(PREFIX)/bin

@@ -33,11 +33,11 @@ LDFLAGS  := -nostartfiles          \
 
 $(call ADD_TARGET,atsam4s)
 
+.PHONY: atsam4s install-atsam4s flash-atsam4s
+
 atsam4s: $(BUILD)/atsam4s/atsam4s.bin
 
 all:: atsam4s
-
-.PHONY: install-atsam4s
 
 install-atsam4s: utils $(BIN_ATSAM4S_TARGET).bin
 	$(_v)mkdir -p $(PREFIX)/share/flipper
@@ -46,5 +46,3 @@ install-atsam4s: utils $(BIN_ATSAM4S_TARGET).bin
 
 flash-atsam4s:
 	$(_v)$(BUILD)/utils/fdfu $(BUILD)/$(BIN_ATSAM4S_TARGET)/$(BIN_ATSAM4S_TARGET).bin
-
-update: install-atmegau2 install-atsam4s
