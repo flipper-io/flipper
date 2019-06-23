@@ -63,8 +63,8 @@ int main(void) {
     FLASH_RESET_DDR |= FLASH_RESET_PIN;
 
     /* Configure the button to reset. */
-    // PCMSK1 |= (1 << PCINT8);
-    // PCICR |= (1 << PCIE1);
+    PCMSK1 |= (1 << PCINT8);
+    PCICR |= (1 << PCIE1);
 
     /* Create a flipper device. */
     _u2 = lf_device_create(atmegau2_read, atmegau2_write, atmegau2_release);

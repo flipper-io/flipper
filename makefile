@@ -88,7 +88,7 @@ $(foreach gen,$(GEN),-include $(BUILD)/$1/$(gen))
 
 SRCS += $$(call find_srcs,$$(SRC_DIRS))
 
-GEN_SRCS := $$(foreach dir,$$(GEN_DIRS),$$(call find_srcs,$(BUILD)/$1/gen$(dir)))
+GEN_SRCS := $$(foreach d,$$(GEN_DIRS),$$(call find_srcs,$(BUILD)/$1/gen$(d)))
 
 OBJS := $$(patsubst %,$(BUILD)/$1/%,$$(patsubst %.c,%.o,$$(patsubst %.S,%.o,$$(SRCS))))
 GEN_OBJS := $$(patsubst %.c,%.o,$$(GEN_SRCS))
@@ -100,7 +100,7 @@ DEPS := $$(patsubst %.o,$(BUILD)/%.d,$$(OBJS))
 
 $1_ASFLAGS := $$(ASFLAGS)
 $1_LDFLAGS := $$(LDFLAGS) $$(GEN_LDFLAGS)
-$1_CFLAGS := $$(GEN_CFLAGS) $$(CFLAGS) $$(foreach inc,$$(INC_DIRS),-I$$(inc)) $$(foreach dir,$$(GEN_DIRS),-I$(BUILD)/$1/gen$(dir))
+$1_CFLAGS := $$(GEN_CFLAGS) $$(CFLAGS) $$(foreach inc,$$(INC_DIRS),-I$$(inc)) $$(foreach d,$$(GEN_DIRS),-I$(BUILD)/$1/gen$(d))
 
 # Rule to build C sources.
 $(BUILD)/$1/%.o: %.S | $$(BUILD_DIR_FILES) $$(DEPENDENCIES)

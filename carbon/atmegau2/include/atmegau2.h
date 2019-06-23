@@ -6,10 +6,6 @@
 #ifndef __atmegau2__
 #define __atmegau2__
 
-#ifndef APIGEN
-#include "api.h"
-#endif
-
 #ifdef ATMEGAU2
 
 /* Include the avr-libc standard library headers. */
