@@ -78,8 +78,10 @@ def get_parameters_from_die(cu, die):
     return parameters
 
 def generate_c(modules, outdir):
-
+    outapih = open(os.path.join(outdir, "api.h"), "w")
+    header_incs = []
     for m in modules:
+        header_incs.append("#include \"" + m.name + ".h\"")
         outh = open(os.path.join(outdir, m.name + ".h"), "w")
         outc = open(os.path.join(outdir, m.name + ".c"), "w")
         htemplate = """\
@@ -155,6 +157,7 @@ $FUNCTIONS$
         outh.write(htemplate)
         outc.write(ctemplate)
         outc.close()
+    outapih.write("\n".join(header_incs))
 
 def generate_py(modules, outfile):
     print("Not yet implemented!")

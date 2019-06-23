@@ -80,7 +80,7 @@ EXE := $1
 A := $1.a
 SO := $1.so
 
-GEN_CFLAGS = -Wno-implicit-function-declaration
+GEN_CFLAGS = -Wno-implicit-function-declaration -DAPIGEN
 GEN_LDFLAGS = -Wl,--unresolved-symbols=ignore-all
 
 # Generate!
