@@ -81,6 +81,7 @@ A := $1.a
 SO := $1.so
 
 GEN_CFLAGS = -Wno-implicit-function-declaration
+GEN_LDFLAGS = -Wl,--unresolved-symbols=ignore-all
 
 # Generate!
 $(foreach gen,$(GEN),-include $(BUILD)/$1/$(gen))
@@ -98,7 +99,7 @@ BUILD_DIR_FILES := $$(patsubst %,%.dir,$$(BUILD_DIRS))
 DEPS := $$(patsubst %.o,$(BUILD)/%.d,$$(OBJS))
 
 $1_ASFLAGS := $$(ASFLAGS)
-$1_LDFLAGS := $$(LDFLAGS)
+$1_LDFLAGS := $$(LDFLAGS) $$(GEN_LDFLAGS)
 $1_CFLAGS := $$(GEN_CFLAGS) $$(CFLAGS) $$(foreach inc,$$(INC_DIRS),-I$$(inc)) $$(foreach dir,$$(GEN_DIRS),-I$(BUILD)/$1/gen$(dir))
 
 # Rule to build C sources.
@@ -126,23 +127,26 @@ $(BUILD)/$1/$$(SO): $$(OBJS) $$(GEN_OBJS)
 	$(_v)$$($1_LD) -shared -o $$@ $$^ $$($1_LDFLAGS)
 
 # Rule to make ELF.
-$(BUILD)/$1/$$(ELF): $$(OBJS) $$(GEN_OBJS)
+$(BUILD)/$1/gen/$$(ELF): $$(OBJS)
 	$(_v)$$($1_LD) $$($1_LDFLAGS) -o $$@ $$^
 
-# Rule to make an unlinked ELF.
-$(BUILD)/$1/$$(ELF).debug: $$(OBJS)
-	$(_v)$$($1_LD) -Wl,--unresolved-symbols=ignore-all $$($1_LDFLAGS) -o $$@ $$^
+# Rule to make ELF.
+$(BUILD)/$1/$$(ELF): $$(OBJS) $$(GEN_OBJS)
+	$(_v)$$($1_LD) $$($1_LDFLAGS) -o $$@ $$^
 
 # Rule to autogenerate the git hash file.
 $(BUILD)/$1/git.mk: | $(BUILD)/$1/gen/git/.dir
 	$(_v)echo 'const char lf_git_hash[7] = "$$(shell git rev-parse --short HEAD)";' > $(BUILD)/$1/gen/git/git.c
 	$(_v)echo 'GEN_DIRS += git' >> $$@
+	$(_v)echo 'GEN_CFLAGS =' >> $$@
+	$(_v)echo 'GEN_LDFLAGS =' >> $$@
 
 # Rule to build the generated API C files
-$(BUILD)/$1/api.mk: $(BUILD)/$1/$$(ELF).debug | $(BUILD)/$1/gen/api/.dir
+$(BUILD)/$1/api.mk: $(BUILD)/$1/gen/$$(ELF) | $(BUILD)/$1/gen/api/.dir
 	$(_v)python3 utils/fdwarf/fdwarf.py $$< c $(BUILD)/$1/gen/api
 	$(_v)echo 'GEN_DIRS += api' >> $$@
 	$(_v)echo 'GEN_CFLAGS =' >> $$@
+	$(_v)echo 'GEN_LDFLAGS =' >> $$@
 
 # Rule to build C sources.
 $(BUILD)/$1/%.o: %.c | $$(BUILD_DIR_FILES) $$(DEPENDENCIES)
