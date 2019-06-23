@@ -33,16 +33,14 @@ LDFLAGS  := -nostartfiles          \
 
 $(call ADD_TARGET,atsam4s)
 
-.PHONY: atsam4s install-atsam4s flash-atsam4s
+.PHONY: atsam4s install-atsam4s
 
-atsam4s: $(BUILD)/atsam4s/atsam4s.bin
-
-all:: atsam4s
-
-install-atsam4s: utils $(BIN_ATSAM4S_TARGET).bin
+atsam4s: $(BUILD)/atsam4s/atsam4s.elf
 	$(_v)mkdir -p $(PREFIX)/share/flipper
 	$(_v)cp assets/ram.ld $(PREFIX)/share/flipper
 	$(_v)cp $(BUILD)/atsam4s/atsam4s.elf $(PREFIX)/share/flipper
 
-flash-atsam4s:
-	$(_v)$(BUILD)/utils/fdfu $(BUILD)/$(BIN_ATSAM4S_TARGET)/$(BIN_ATSAM4S_TARGET).bin
+all:: atsam4s
+
+install-atsam4s: utils atsam4s $(BUILD)/atsam4s/atsam4s.bin
+	$(_v)$(BUILD)/fdfu/fdfu $(BUILD)/atsam4s/atsam4s.bin

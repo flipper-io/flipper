@@ -180,10 +180,10 @@ int enter_normal_mode(void) {
     char ack[2];
 
     do {
-        uart0_reset();
-        uart0_write("N#", 2);
+        lf_assert(uart0_reset(), E_UNIMPLEMENTED, "failed to reset");
+        lf_assert(uart0_write("N#", 2), E_UNIMPLEMENTED, "failed to write");
         usleep(1000);
-        uart0_read(ack, sizeof(ack));
+        lf_assert(uart0_read(ack, sizeof(ack)), E_UNIMPLEMENTED, "failed to read");
         if (!memcmp(ack, (const uint8_t[]){ '\n', '\r' }, 2)) return lf_success;
 
         /* If we failed the first time around, enter DFU. */
@@ -191,6 +191,7 @@ int enter_normal_mode(void) {
 
     } while (tries++ < 4);
 
+fail:
     return lf_error;
 }
 

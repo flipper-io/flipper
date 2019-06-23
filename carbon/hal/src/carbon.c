@@ -28,27 +28,6 @@
 
 #include <unistd.h>
 
-void sam_reset(void) {
-
-}
-
-int sam_enter_dfu(void) {
-    return lf_success;
-}
-
-int sam_exit_dfu(void) {
-    return lf_success;
-}
-
-int sam_off(void) {
-    return lf_success;
-}
-
-int sam_on(void) {
-    return lf_success;
-}
-
-
 int carbon_select_u2(struct _lf_device *device) {
     lf_assert(device, E_NO_DEVICE, "null device");
     struct _carbon_context *_dev_ctx = (struct _carbon_context *)device->_dev_ctx;
@@ -59,8 +38,86 @@ fail:
     return lf_error;
 }
 
-int atsam4s_read(struct _lf_device *device, void *dst, uint32_t length) {
+void sam_reset(void) {
+    struct _lf_device *device = lf_get_selected();
+    carbon_select_u2(device);
 
+    /* reset low (active) */
+    gpio_write(0, (1 << SAM_RESET_PIN));
+    usleep(10000);
+    /* reset high (inactive) */
+    gpio_write((1 << SAM_RESET_PIN), 0);
+
+    lf_select(device);
+}
+
+int sam_enter_dfu(void) {
+    struct _lf_device *device = lf_get_selected();
+    carbon_select_u2(device);
+
+    uart0_setbaud(DFU_BAUD);
+
+    /* erase high, reset low (active) */
+    gpio_write((1 << SAM_ERASE_PIN), (1 << SAM_RESET_PIN));
+    /* Wait for chip to erase. */
+    usleep(8000000);
+    /* erase low, reset high (inactive) */
+    gpio_write((1 << SAM_RESET_PIN), (1 << SAM_ERASE_PIN));
+
+    lf_select(device);
+    return lf_success;
+}
+
+int sam_exit_dfu(void) {
+    struct _lf_device *device = lf_get_selected();
+    carbon_select_u2(device);
+
+    uart0_setbaud(FMR_BAUD);
+
+    lf_select(device);
+    return lf_success;
+}
+
+int sam_off(void) {
+    struct _lf_device *device = lf_get_selected();
+    carbon_select_u2(device);
+
+    /* power off, reset low */
+    gpio_write(0, (1 << SAM_POWER_PIN) | (1 << SAM_RESET_PIN));
+
+    lf_select(device);
+    return lf_success;
+}
+
+int sam_on(void) {
+    struct _lf_device *device = lf_get_selected();
+    carbon_select_u2(device);
+
+    /* power on, reset high */
+    gpio_write((1 << SAM_POWER_PIN) | (1 << SAM_RESET_PIN), 0);
+
+    lf_select(device);
+    return lf_success;
+}
+
+int atsam4s_read(struct _lf_device *device, void *dst, uint32_t length) {
+    struct _lf_device *prev = lf_get_selected();
+    lf_assert(device, E_NULL, "invalid device");
+    carbon_select_u2(device);
+
+    size_t size = 128;
+    while (length) {
+        size_t len = (length > size) ? size : length;
+        int e = uart0_read(dst, len);
+        if (e) {
+            lf_select(prev);
+            return e;
+        }
+        dst += size;
+        length -= size;
+    }
+
+    lf_select(prev);
 
     return lf_success;
 fail:
@@ -68,6 +125,23 @@ fail:
 }
 
 int atsam4s_write(struct _lf_device *device, void *src, uint32_t length) {
+    struct _lf_device *prev = lf_get_selected();
+    lf_assert(device, E_NULL, "invalid device");
+    carbon_select_u2(device);
+
+    size_t size = 128;
+    while (length) {
+        size_t len = (length > size) ? size : length;
+        int e = uart0_write(src, len);
+        if (e) {
+            lf_select(prev);
+            return e;
+        }
+        src += size;
+        length -= size;
+    }
+
+    lf_select(prev);
 
     return lf_success;
 fail:

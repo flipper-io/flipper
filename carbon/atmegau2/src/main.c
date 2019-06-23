@@ -103,6 +103,8 @@ int main(void) {
     FILE debug_f = FDEV_SETUP_STREAM(debug_putchar, NULL, _FDEV_SETUP_RW);
     stdout = &debug_f;
 
+    printf(KGRN "ATMEGAU2" KNRM " booted (%s)\r\n\r\n", lf_get_git_hash);
+
     /* Bring the 4S out of reset. */
     SAM_POWER_PORT |= (1 << SAM_RESET_PIN);
 
