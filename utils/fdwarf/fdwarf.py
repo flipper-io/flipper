@@ -187,6 +187,10 @@ def get_modules(elffile, dwarfinfo):
                             bs = get_bytesize(cu, child)
                             module.funcs.append(Function(type, name, bs, params))
                             break
+    # Normalize function order
+    for m in modules:
+        m.funcs = sorted(m.funcs, key=lambda x: x.name)
+
     return modules
 
 def process_file(filename, language, outdir):
