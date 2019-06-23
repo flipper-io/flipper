@@ -31,6 +31,27 @@
 
 #include <unistd.h>
 
+void sam_reset(void) {
+
+}
+
+int sam_enter_dfu(void) {
+    return lf_success;
+}
+
+int sam_exit_dfu(void) {
+    return lf_success;
+}
+
+int sam_off(void) {
+    return lf_success;
+}
+
+int sam_on(void) {
+    return lf_success;
+}
+
+
 int carbon_select_u2(struct _lf_device *device) {
     lf_assert(device, E_NO_DEVICE, "null device");
     struct _carbon_context *_dev_ctx = (struct _carbon_context *)device->_dev_ctx;
