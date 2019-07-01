@@ -134,7 +134,10 @@ $FUNCTIONS$
 
             args = []
             for p in f.parameters:
-                args.append("lf_infer(%s)" % p.name)
+                if "*" in p.type:
+                    args.append("lf_ptr(%s)" % p.name)
+                else:
+                    args.append("lf_infer(%s)" % p.name)
             retl = ["lf_void_t", "", "lf_int8_t", "lf_int16_t", "", "lf_int32_t"]
             ftype = retl[f.ret + 1]
             if f.type == "int":

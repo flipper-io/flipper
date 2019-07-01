@@ -13,7 +13,7 @@ typedef enum { FLIPPER_DEVICE_CARBON, FLIPPER_DEVICE_INVALID } lf_device_t;
 /* Describes a device capible of responding to FMR packets. */
 struct _lf_device {
     /* The human readable name of the device. */
-    char *name;
+    char name[16];
     /* The device's firmware version. */
     lf_version_t version;
     /* The type of device */

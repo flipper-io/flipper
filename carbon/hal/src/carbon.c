@@ -104,23 +104,24 @@ int atsam4s_read(struct _lf_device *device, void *dst, uint32_t length) {
     struct _lf_device *prev = lf_get_selected();
     lf_assert(device, E_NULL, "invalid device");
     carbon_select_u2(device);
+    struct _lf_device *dev = lf_get_selected();
 
+    void *ptr;
     size_t size = 128;
+    lf_assert(lf_malloc(dev, size, &ptr), E_MALLOC, "failed to allocate");
     while (length) {
-        size_t len = (length > size) ? size : length;
-        int e = uart0_read(dst, len);
-        if (e) {
-            lf_select(prev);
-            return e;
-        }
-        dst += size;
-        length -= size;
+        size_t len = (length >= size) ? size : length;
+        lf_assert(uart0_read(ptr, len), E_UNIMPLEMENTED, "failed to read");
+        lf_assert(lf_pull(dev, dst, ptr, len), E_UNIMPLEMENTED, "failed to pull");
+        dst += len;
+        length -= len;
     }
+    lf_assert(lf_free(dev, ptr), E_MALLOC, "failed to free");
 
     lf_select(prev);
-
     return lf_success;
 fail:
+    lf_select(prev);
     return lf_error;
 }
 
@@ -128,23 +129,24 @@ int atsam4s_write(struct _lf_device *device, void *src, uint32_t length) {
     struct _lf_device *prev = lf_get_selected();
     lf_assert(device, E_NULL, "invalid device");
     carbon_select_u2(device);
+    struct _lf_device *dev = lf_get_selected();
 
+    void *ptr;
     size_t size = 128;
+    lf_assert(lf_malloc(dev, size, &ptr), E_MALLOC, "failed to allocate");
     while (length) {
-        size_t len = (length > size) ? size : length;
-        int e = uart0_write(src, len);
-        if (e) {
-            lf_select(prev);
-            return e;
-        }
-        src += size;
-        length -= size;
+        size_t len = (length >= size) ? size : length;
+        lf_assert(lf_push(dev, ptr, src, len), E_UNIMPLEMENTED, "failed to push");
+        lf_assert(uart0_write(ptr, len), E_UNIMPLEMENTED, "failed to write");
+        src += len;
+        length -= len;
     }
+    lf_assert(lf_free(dev, ptr), E_MALLOC, "failed to free");
 
     lf_select(prev);
-
     return lf_success;
 fail:
+    lf_select(prev);
     return lf_error;
 }
 
@@ -180,6 +182,10 @@ int carbon_attach_applier(const void *__u2, void *_unused) {
     _4s->_dev_ctx = calloc(1, sizeof(struct _carbon_context));
     struct _carbon_context *_4s_context = (struct _carbon_context *)_4s->_dev_ctx;
     lf_assert(_4s_context, E_NULL, "failed to allocate memory for 4s context");
+
+    // /* name them */
+    // strcpy(_u2->name, "u2");
+    // strcpy(_4s->name, "4s");
 
     dev_ctx->_u2 = _4s_context->_u2 = _u2;
     dev_ctx->_4s = _4s_context->_4s = _4s;

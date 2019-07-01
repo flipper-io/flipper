@@ -19,7 +19,6 @@ fail:
 void lf_device_release(void *_device) {
     struct _lf_device *device = (struct _lf_device *)_device;
     lf_assert(device, E_NULL, "invalid device");
-    free(device->name);
     free(device);
 fail:
     return;

@@ -48,25 +48,67 @@ uint8_t applet[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x48,
 /* Defines the number of times communication will be retried. */
 #define RETRIES 4
 
+int sam_read(void *dst, uint32_t length) {
+    struct _lf_device *dev = lf_get_selected();
+
+    void *ptr;
+    size_t size = 128;
+    lf_assert(lf_malloc(dev, size, &ptr), E_MALLOC, "failed to allocate");
+    while (length) {
+        size_t len = (length >= size) ? size : length;
+        lf_assert(uart0_read(ptr, len), E_UNIMPLEMENTED, "failed to read");
+        lf_assert(lf_pull(dev, dst, ptr, len), E_UNIMPLEMENTED, "failed to pull");
+        dst += len;
+        length -= len;
+    }
+
+    lf_assert(lf_free(dev, ptr), E_MALLOC, "failed to free");
+    return lf_success;
+fail:
+    lf_assert(lf_free(dev, ptr), E_MALLOC, "failed to free");
+    return lf_error;
+}
+
+int sam_write(void *src, uint32_t length) {
+    struct _lf_device *dev = lf_get_selected();
+
+    void *ptr;
+    size_t size = 128;
+    lf_assert(lf_malloc(dev, size, &ptr), E_MALLOC, "failed to allocate");
+    while (length) {
+        size_t len = (length >= size) ? size : length;
+        lf_assert(lf_push(dev, ptr, src, len), E_UNIMPLEMENTED, "failed to push");
+        lf_assert(uart0_write(ptr, len), E_UNIMPLEMENTED, "failed to write");
+        src += len;
+        length -= len;
+    }
+
+    lf_assert(lf_free(dev, ptr), E_MALLOC, "failed to free");
+    return lf_success;
+fail:
+    lf_assert(lf_free(dev, ptr), E_MALLOC, "failed to free");
+    return lf_error;
+}
+
 /* Instructs the SAM-BA to jump to the given address. */
 void sam_ba_jump(uint32_t address) {
     char buffer[11];
     sprintf(buffer, "G%08X#", address);
-    uart0_write(buffer, sizeof(buffer) - 1);
+    sam_write(buffer, sizeof(buffer) - 1);
 }
 
 /* Instructs the SAM-BA to write a word to the address provided. */
 void sam_ba_write_word(uint32_t destination, uint32_t word) {
     char buffer[20];
     sprintf(buffer, "W%08X,%08X#", destination, word);
-    uart0_write(buffer, sizeof(buffer) - 1);
+    sam_write(buffer, sizeof(buffer) - 1);
 }
 
 /* Instructs the SAM-BA to read a byte from the address provided. */
 uint8_t sam_ba_read_byte(uint32_t source) {
     char buffer[12];
     sprintf(buffer, "o%08X,#", source);
-    uart0_write(buffer, sizeof(buffer) - 1);
+    sam_write(buffer, sizeof(buffer) - 1);
     uint32_t retries = 0;
     while (!uart0_ready() && retries++ < 8)
         ;
@@ -77,19 +119,19 @@ uint8_t sam_ba_read_byte(uint32_t source) {
 void sam_ba_write_byte(uint32_t destination, uint8_t byte) {
     char buffer[20];
     sprintf(buffer, "O%08X,%02X#", destination, byte);
-    uart0_write(buffer, sizeof(buffer) - 1);
+    sam_write(buffer, sizeof(buffer) - 1);
 }
 
 /* Instructs the SAM-BA to read a word from the address provided. */
 uint32_t sam_ba_read_word(uint32_t source) {
     char buffer[12];
     sprintf(buffer, "w%08X,#", source);
-    uart0_write(buffer, sizeof(buffer) - 1);
+    sam_write(buffer, sizeof(buffer) - 1);
     uint8_t retries = 0;
     while (!uart0_ready() && retries++ < 8)
         ;
     uint32_t result = 0;
-    uart0_read(&result, sizeof(uint32_t));
+    sam_read(&result, sizeof(uint32_t));
     return result;
 }
 
@@ -102,12 +144,21 @@ void sam_ba_write_efc_fcr(uint8_t command, uint32_t arg) {
 int sam_ba_copy(uint32_t destination, void *src, uint32_t length) {
 
     uint16_t crc;
-
+    char ack[1];
     char buffer[20];
-    uart0_reset();
-    sprintf(buffer, "S%08X,%08X#", destination, length);
-    uart0_write(buffer, sizeof(buffer) - 1);
-    lf_assert(uart0_get() == 'C', E_UNIMPLEMENTED, "Failed to get CTS ACK.");
+    int tries = 0;
+
+    do {
+        lf_assert(uart0_reset(), E_UNIMPLEMENTED, "failed to reset");
+        sprintf(buffer, "S%08X,%08X#", destination, length);
+        sam_write(buffer, sizeof(buffer) - 1);
+        usleep(1000);
+        sam_read(ack, sizeof(ack));
+        if (!memcmp(ack, (const uint8_t[]){ 'C' }, 1)) return lf_success;
+
+    } while (tries++ < 4);
+
+    lf_assert(tries < 4, E_UNIMPLEMENTED, "Failed to get CTS ACK. (0x%02x)", ack[0]);
 
     /* Calculate the number of packets needed to perform the transfer. */
     int i = 0;
@@ -127,7 +178,7 @@ int sam_ba_copy(uint32_t destination, void *src, uint32_t length) {
         packet.crc = little(crc);
 
         /* Transfer the packet to the SAM-BA. */
-        uart0_write(&packet, sizeof(packet));
+        sam_write(&packet, sizeof(packet));
 
         char c = uart0_get();
 
@@ -181,9 +232,9 @@ int enter_normal_mode(void) {
 
     do {
         lf_assert(uart0_reset(), E_UNIMPLEMENTED, "failed to reset");
-        lf_assert(uart0_write("N#", 2), E_UNIMPLEMENTED, "failed to write");
+        sam_write("N#", 2);
         usleep(1000);
-        lf_assert(uart0_read(ack, sizeof(ack)), E_UNIMPLEMENTED, "failed to read");
+        sam_read(ack, sizeof(ack));
         if (!memcmp(ack, (const uint8_t[]){ '\n', '\r' }, 2)) return lf_success;
 
         /* If we failed the first time around, enter DFU. */
