@@ -26,4 +26,11 @@ LDFLAGS := -L/usr/local/lib -lflipper
 
 $(call ADD_TARGET,qux_host)
 
-all:: $(BUILD)/qux/qux.so $(BUILD)/qux_host/qux_host
+INC_DIRS := include
+SRC_DIRS := src $(BUILD)/qux/gen/api
+CFLAGS := -I/usr/local/include -I$(BUILD)/qux/gen/api
+LDFLAGS := -L/usr/local/lib -lflipper
+
+$(call ADD_TARGET,qux_fvm)
+
+all:: $(BUILD)/qux/qux.so $(BUILD)/qux_host/qux_host $(BUILD)/qux_fvm/qux_fvm.so

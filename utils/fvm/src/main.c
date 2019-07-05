@@ -1,5 +1,6 @@
 #include <arpa/inet.h>
 #include <flipper/flipper.h>
+#include <string.h>
 #include <unistd.h>
 #define _GNU_SOURCE
 #include "posix/network.h"
@@ -17,8 +18,8 @@ int main(int argc, char *argv[]) {
     if (argc > 1) {
         if (!strcmp(argv[1], "--version")) {
             printf("FVM version: %s\n\n", lf_get_git_hash());
+            return EXIT_SUCCESS;
         }
-        return EXIT_SUCCESS;
     }
 
     lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
@@ -121,9 +122,12 @@ int main(int argc, char *argv[]) {
             void *dlm = dlopen(lib, RTLD_LAZY);
             lf_assert(dlm, E_NULL, "failed to open module '%s'.", lib);
 
-            struct _lf_module *m = dlsym(dlm, module);
-            lf_assert(m, E_NULL, "failed to read module '%s' from '%s'.", module, lib);
-            printf("Successfully loaded module '%s'.", module);
+            char module_sym[32];
+            snprintf(module_sym, sizeof(module_sym), "_%s_module", module);
+
+            struct _lf_module *m = dlsym(dlm, module_sym);
+            lf_assert(m, E_NULL, "failed to read symbol '%s' from '%s'.", module_sym, lib);
+            printf("Successfully loaded symbol '%s'.", module_sym);
 
             e = dyld_register(fvm, m);
             lf_assert(e, E_NULL, "failed to register module '%s'.", m->name);
