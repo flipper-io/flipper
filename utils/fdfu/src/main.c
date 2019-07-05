@@ -1,7 +1,7 @@
-#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
 
-#define ATSAM4S
-#include <flipper/flipper.h>
+#include <flipper.h>
 
 /* Defines the XMODEM flow control bytes. */
 #define SOH 0x01
