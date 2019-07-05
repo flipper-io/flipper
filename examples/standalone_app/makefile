@@ -1,9 +1,12 @@
-##
-## Example Makefile for a Flipper package
-##
-
-# This sets the name of the Flipper package being built
-MODULE := example
-
-# This next line *MUST* come after MODULE has been set
 include flipper.mk
+
+COMPILER_PREFIX   := arm-none-eabi-
+INC_DIRS := include
+SRC_DIRS := src
+CFLAGS := -I/usr/local/include
+LDFLAGS := -Wl,-T /usr/local/share/flipper/ram.ld \
+           -Wl,-R /usr/local/share/flipper/atsam4s.elf \
+
+$(call ADD_TARGET,qux)
+
+all:: $(BUILD)/qux/qux.elf

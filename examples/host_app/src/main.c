@@ -1,8 +1,8 @@
 #include <flipper.h>
 
 int main(int argc, char *argv[]) {
+    carbon_attach();
     printf("Loaded my application!");
-    lf_attach();
     gpio_enable(IO_1, 0);
     gpio_write(IO_1, 0);
     return 0;
