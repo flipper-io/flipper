@@ -49,8 +49,9 @@ install-utils: utils | $(BUILD)/utils/fdwarf/.dir
 	$(_v)cp -r $(BUILD)/fdebug/fdebug $(PREFIX)/bin
 	$(_v)cp -r $(BUILD)/fvm/fvm $(PREFIX)/bin
 	$(_v)cp -r $(BUILD)/ftest/ftest $(PREFIX)/bin
-	$(_v)cp utils/fdwarf/fdwarf.py $(PREFIX)/bin
-	$(_v)chmod +x $(PREFIX)/bin/fdwarf.py
+	$(_v)cp -r $(BUILD)/fload/fload $(PREFIX)/bin
+	$(_v)cp utils/fdwarf/fdwarf.py $(PREFIX)/bin/fdwarf
+	$(_v)chmod +x $(PREFIX)/bin/fdwarf
 
 install:: install-utils
 
@@ -58,5 +59,7 @@ uninstall-utils:
 	$(_v)rm $(PREFIX)/bin/fdfu
 	$(_v)rm $(PREFIX)/bin/fdebug
 	$(_v)rm $(PREFIX)/bin/fload
+	$(_v)rm $(PREFIX)/bin/ftest
+	$(_v)rm $(PREFIX)/bin/fvm
 
 uninstall:: uninstall-utils

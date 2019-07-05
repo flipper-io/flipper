@@ -88,7 +88,7 @@ def generate_c(modules, outdir):
 #ifndef __$MODULE$_h__
 #define __$MODULE$_h__
 
-#include "libflipper.h"
+#include <flipper.h>
 
 extern const struct _lf_module _$MODULE$_module;
 
@@ -97,7 +97,7 @@ $FUNCTIONPROTOS$
 #endif
 """
         ctemplate = """\
-#include "libflipper.h"
+#include <flipper.h>
 #include "$MODULE$.h"
 
 enum { $TAGS$ };
