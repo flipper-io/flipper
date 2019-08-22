@@ -104,15 +104,20 @@ void sam_ba_write_word(uint32_t destination, uint32_t word) {
     sam_write(buffer, sizeof(buffer) - 1);
 }
 
+uint8_t getbyte(void)
+{
+    uint32_t retries = 0;
+    while (!uart0_ready() && retries++ < 8)
+        ;
+    return uart0_get();
+}
+
 /* Instructs the SAM-BA to read a byte from the address provided. */
 uint8_t sam_ba_read_byte(uint32_t source) {
     char buffer[12];
     sprintf(buffer, "o%08X,#", source);
     sam_write(buffer, sizeof(buffer) - 1);
-    uint32_t retries = 0;
-    while (!uart0_ready() && retries++ < 8)
-        ;
-    return uart0_get();
+    return getbyte();
 }
 
 /* Instructs the SAM-BA to write a byte from the address provided. */
@@ -152,9 +157,9 @@ int sam_ba_copy(uint32_t destination, void *src, uint32_t length) {
         lf_assert(uart0_reset(), E_UNIMPLEMENTED, "failed to reset");
         sprintf(buffer, "S%08X,%08X#", destination, length);
         sam_write(buffer, sizeof(buffer) - 1);
-        usleep(1000);
+        usleep(10000);
         sam_read(ack, sizeof(ack));
-        if (!memcmp(ack, (const uint8_t[]){ 'C' }, 1)) return lf_success;
+        if (!memcmp(ack, (const uint8_t[]){ 'C' }, 1)) break;
 
     } while (tries++ < 4);
 
@@ -163,9 +168,9 @@ int sam_ba_copy(uint32_t destination, void *src, uint32_t length) {
     /* Calculate the number of packets needed to perform the transfer. */
     int i = 0;
 
-    while (length) {
+    char c;
 
-        uart0_reset();
+    while (length) {
 
         uint32_t len = (length > XLEN) ? XLEN : length;
 
@@ -180,24 +185,28 @@ int sam_ba_copy(uint32_t destination, void *src, uint32_t length) {
         /* Transfer the packet to the SAM-BA. */
         sam_write(&packet, sizeof(packet));
 
-        char c = uart0_get();
+        c = getbyte();
 
         if (c == CAN) {
             lf_assert(false, E_TIMEOUT, "XMODEM cancelled transfer.");
             return lf_error;
         }
 
-        lf_assert(c == ACK, E_UNIMPLEMENTED, "Failed to get ACK.");
+        lf_assert(c == ACK, E_UNIMPLEMENTED, "Failed to get ACK. (0x%02X)", c);
 
         /* Decrement the length appropriately. */
         length -= len;
         i++;
+
+        usleep(1000);
     }
 
     /* Send end of transmission. */
     uart0_put(EOT);
 
-    lf_assert(uart0_get() == ACK, E_UNIMPLEMENTED, "Failed to get EOT ACK.");
+    c = getbyte();
+
+    lf_assert(c == ACK, E_UNIMPLEMENTED, "Failed to get EOT ACK. (0x%02X)", c);
 
     return lf_success;
 
@@ -228,23 +237,27 @@ void *load_page_data(FILE *firmware, size_t size) {
 
 int enter_normal_mode(void) {
     int tries = 0;
-    char ack[2];
+    char ack[3];
 
     do {
         lf_assert(uart0_reset(), E_UNIMPLEMENTED, "failed to reset");
         sam_write("N#", 2);
         usleep(1000);
         sam_read(ack, sizeof(ack));
-        if (!memcmp(ack, (const uint8_t[]){ '\n', '\r' }, 2)) return lf_success;
+        if (!memcmp(ack, (const uint8_t[]){ '\n', '\r' }, 3)) return lf_success;
 
         /* If we failed the first time around, enter DFU. */
         if (!tries) { sam_enter_dfu(); }
 
     } while (tries++ < 4);
 
+    sam_write("N#", 2);
+
 fail:
     return lf_error;
 }
+
+extern void lf_connect_debug_server(void);
 
 int main(int argc, char *argv[]) {
 
@@ -253,11 +266,16 @@ int main(int argc, char *argv[]) {
 
     /* Ensure the correct argument count. */
     if (argc < 2) {
-        fprintf(stderr, "Please provide a path to the firmware.\n");
+        lf_debug("Please provide a path to the firmware.\n");
         return EXIT_FAILURE;
     }
 
     // lf_set_debug_level(LF_DEBUG_LEVEL_ALL);
+
+    // Go to fdebug
+    lf_connect_debug_server();
+
+    lf_debug("\r\n\r\nFDEBUG - 1.0\r\n");
 
     /* Attach to a Flipper device. */
     lf_assert(carbon_attach(), E_NO_DEVICE, "failed to attach device");
@@ -276,12 +294,12 @@ int main(int argc, char *argv[]) {
     sam_reset();
 
     /* Enter normal mode. (Values are sent as binary.)*/
-    lf_debug("Entering device firmware update mode.");
+    lf_debug(KYEL "Entering device firmware update mode." KNRM);
     lf_assert(enter_normal_mode(), E_UNIMPLEMENTED, "Failed to enter normal mode.");
     lf_debug(KGRN " Successfully entered DFU mode." KNRM);
 
     /* Ensure the security bit is clear. */
-    lf_debug("Checking security bit.");
+    lf_debug(KYEL "Checking security bit." KNRM);
     sam_ba_write_efc_fcr(EEFC_FCR_FCMD_GGPB, 0);
     lf_assert((sam_ba_read_word(REGADDR(EFC0->EEFC_FRR)) & 0x01) == 0, E_UNIMPLEMENTED,
               KRED "The device's security bit is set." KNRM);
@@ -309,7 +327,7 @@ int main(int argc, char *argv[]) {
     /* Send the firmware, page by page. */
     for (size_t page = 0; page < pages; page++) {
         /* Print the page count. */
-        printf("Uploading page %zu / %zu. (%.2f%%)", page + 1, pages, ((float)(page + 1)) / pages * 100);
+        lf_debug("Uploading page %zu / %zu. (%.2f%%)", page + 1, pages, ((float)(page + 1)) / pages * 100);
         fflush(stdout);
         /* Copy the page. */
         int e = sam_ba_copy(_PAGEBUFFER, (void *)(pagedata + (page * IFLASH0_PAGE_SIZE)), IFLASH0_PAGE_SIZE);
@@ -323,27 +341,27 @@ int main(int argc, char *argv[]) {
         /* Wait until the EFC has finished writing the page. */
         uint8_t retries = 0, fsr = 0;
         while (!((fsr = sam_ba_read_byte(REGADDR(EFC0->EEFC_FSR))) & 1) && retries++ < 4) {
-            if (fsr & 0xE) { fprintf(stderr, KRED "Flash write error on page %zu.\n" KNRM, page); }
+            if (fsr & 0xE) { lf_debug(KRED "Flash write error on page %zu.\n" KNRM, page); }
         }
 
         retries = 0;
         /* Clear the progress message. */
-        if (page < pages - 1) printf("\33[2K\r");
+        if (page < pages - 1) lf_debug("\33[2K\r");
     }
 
     /* Print statistics about the memory usage. */
-    printf(KGRN "\n Successfully uploaded all pages. %zu bytes used. (%.2f%% of flash)\n" KNRM, firmware_size,
+    lf_debug(KGRN "\n Successfully uploaded all pages. %zu bytes used. (%.2f%% of flash)\n" KNRM, firmware_size,
            (float)firmware_size / IFLASH0_SIZE * 100);
 
     /* Set GPNVM1 to boot from flash memory. */
     sam_ba_write_efc_fcr(EEFC_FCR_FCMD_SGPB, 0x01);
 
-    printf("Checking GPNVM1 bit.\n");
+    lf_debug("Checking GPNVM1 bit.\n");
     sam_ba_write_efc_fcr(EEFC_FCR_FCMD_GGPB, 0);
     uint8_t retries = 0;
     if (!(sam_ba_read_byte(REGADDR(EFC0->EEFC_FRR)) & (1 << 1)) && retries++ < RETRIES) {
         if (retries > RETRIES) {
-            printf(KRED " GPNVM1 bit is not set.\n" KNRM);
+            lf_debug(KRED " GPNVM1 bit is not set.\n" KNRM);
             return EXIT_FAILURE;
         }
         /* Set GPNVM1 to boot from flash memory. */
@@ -351,23 +369,23 @@ int main(int argc, char *argv[]) {
         /* Read the state of the GPNVM bits. */
         sam_ba_write_efc_fcr(EEFC_FCR_FCMD_GGPB, 0);
     }
-    printf(KGRN "The device's GPNVM1 bit is set.\n" KNRM);
+    lf_debug(KGRN "The device's GPNVM1 bit is set.\n" KNRM);
 
     if (argc > 2) {
         if (!strcmp(argv[2], "verify")) {
-            printf("\nVerifying flash contents.\n");
+            lf_debug("\nVerifying flash contents.\n");
             uint32_t errors = 0, perrors = 0, total = lf_ceiling(firmware_size, sizeof(uint32_t));
             uint8_t retries = 0;
             for (uint32_t i = 0; i < total; i++) {
                 uint32_t addr = IFLASH0_ADDR + (i * sizeof(uint32_t));
                 if ((i % (IFLASH0_PAGE_SIZE / sizeof(uint32_t)) == 0)) {
-                    printf(" Checking address 0x%08x (page %lu)->%s\n", addr,
+                    lf_debug(" Checking address 0x%08x (page %lu)->%s\n", addr,
                            i / (IFLASH0_PAGE_SIZE / sizeof(uint32_t)), (!perrors) ? KGRN "GOOD" KNRM : KRED "BAD" KNRM);
                 }
                 uint32_t word = sam_ba_read_word(addr);
                 uint32_t _word = *(uint32_t *)(pagedata + (i * sizeof(uint32_t)));
                 uint8_t match = ((uint16_t)word == (uint16_t)_word);
-                // printf("0x%08x: 0x%08x (0x%08x)->%s\n", addr, word, _word, (match) ? KGRN "GOOD" KNRM : KRED "BAD"
+                // lf_debug("0x%08x: 0x%08x (0x%08x)->%s\n", addr, word, _word, (match) ? KGRN "GOOD" KNRM : KRED "BAD"
                 // KNRM);
                 if (!match && retries < RETRIES) {
                     if (retries == 0) {
@@ -380,7 +398,7 @@ int main(int argc, char *argv[]) {
                 retries = 0;
                 perrors = 0;
             }
-            printf("Verification complete. %s%i word errors detected.\n\n" KNRM, (errors) ? KRED : KGRN, errors);
+            lf_debug("Verification complete. %s%i word errors detected.\n\n" KNRM, (errors) ? KRED : KGRN, errors);
         }
     }
 

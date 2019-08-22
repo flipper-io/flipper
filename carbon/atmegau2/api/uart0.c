@@ -107,6 +107,7 @@ ISR(USART1_RX_vect) {
     if (FMR_IN & (1 << U2_FMR_PIN)) {
         usb_debug_putchar(c);
     } else {
+        printf("byte: 0x%02x\n", c);
         uart0_buffer[idx++] = c;
     }
 }

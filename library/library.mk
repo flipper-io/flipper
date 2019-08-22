@@ -28,7 +28,7 @@ $(call ADD_TARGET,libflipper)
 
 .PHONY: libflipper install-libflipper uninstall-libflipper
 
-libflipper: $(BUILD)/libflipper/libflipper.so | $(BUILD)/include/flipper/.dir
+libflipper: $(BUILD)/libflipper/libflipper.so | $(BUILD)/include/flipper/.dir $(BUILD)/include/flipper/posix/.dir
 	$(_v)cp -r $(BUILD)/atsam4s/gen/api/*.h $(BUILD)/include/flipper
 	$(_v)cp -r library/c/*.h $(BUILD)/include/flipper
 	$(_v)cp -r library/c/*.def $(BUILD)/include/flipper
@@ -36,6 +36,7 @@ libflipper: $(BUILD)/libflipper/libflipper.so | $(BUILD)/include/flipper/.dir
 	$(_v)cp -r carbon/atmegau2/include/* $(BUILD)/include/flipper
 	$(_v)cp -r carbon/atsam4s/include/* $(BUILD)/include/flipper
 	$(_v)cp -r carbon/atsam4s/asf/include/* $(BUILD)/include/flipper
+	$(_v)cp -r platforms/posix/*.h $(BUILD)/include/flipper/posix
 	$(_v)cp assets/flipper.mk $(BUILD)/include/flipper
 
 all:: libflipper
