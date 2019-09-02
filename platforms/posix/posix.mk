@@ -1,5 +1,12 @@
 GEN := git.mk
 
+CC = /usr/bin/clang
+AS = /usr/bin/clang
+AR = /usr/bin/ar
+LD = /usr/bin/clang
+OBJCOPY = /usr/bin/objcopy
+OBJDUMP = /usr/bin/objdump
+
 INC_DIRS := lib \
 			platforms/atmegau2/include \
 			platforms/atsam4s/include \

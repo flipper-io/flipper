@@ -33,12 +33,12 @@ SRC_EXTS := c S
 
 define _ADD_TARGET
 
-$1_CC := $$(COMPILER_PREFIX)gcc
-$1_AS := $$(COMPILER_PREFIX)gcc
-$1_AR := $$(COMPILER_PREFIX)ar
-$1_LD := $$(COMPILER_PREFIX)gcc
-$1_OBJCOPY := $$(COMPILER_PREFIX)objcopy
-$1_OBJDUMP := $$(COMPILER_PREFIX)objdump
+$1_CC := $$(CC)
+$1_AS := $$(AS)
+$1_AR := $$(AR)
+$1_LD := $$(LD)
+$1_OBJCOPY := $$(OBJCOPY)
+$1_OBJDUMP := $$(OBJDUMP)
 
 # Generate target-specific variables.
 ELF :=  $1.elf
