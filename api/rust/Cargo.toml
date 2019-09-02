@@ -1,7 +1,0 @@
-[package]
-name = "flipper"
-version = "0.1.0"
-authors = ["Nick Mosher <nicholastmosher@gmail.com>"]
-
-[dependencies]
-flipper_core = { path = "../../library/rust/" }

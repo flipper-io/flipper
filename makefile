@@ -26,8 +26,9 @@ help::
 	"  update              - Flash the built firmware images to the attached device\n" \
 	"  clean               - Remove the entire build directory, containing all built products\n"
 
-include library/library.mk
-include carbon/carbon.mk
+include platforms/atmegau2/atmegau2.mk
+include platforms/atsam4s/atsam4s.mk
+include platforms/posix/posix.mk
 include utils/utils.mk
 
 PKGCONFIG_DIR := $(PREFIX)/lib/pkgconfig

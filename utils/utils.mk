@@ -23,24 +23,17 @@ LDFLAGS  := -L$(BUILD)/libflipper -lflipper
 $(call ADD_TARGET,fload)
 
 DEPENDENCIES := libflipper
-INC_DIRS := $(BUILD)/include platforms
+INC_DIRS := $(BUILD)/include
 SRC_DIRS := utils/fvm/src
 LDFLAGS  := -L$(BUILD)/libflipper -lflipper -ldl
 
 $(call ADD_TARGET,fvm)
 
-DEPENDENCIES := libflipper
-INC_DIRS := $(BUILD)/include
-SRC_DIRS := utils/ftest/src
-LDFLAGS  :=  -L$(BUILD)/libflipper -lflipper
-
-$(call ADD_TARGET,ftest)
-
 # --- UTILS --- #
 
 .PHONY: utils install-utils uninstall-utils
 
-utils: $(BUILD)/fdfu/fdfu $(BUILD)/fdebug/fdebug $(BUILD)/fload/fload $(BUILD)/fvm/fvm $(BUILD)/ftest/ftest
+utils: $(BUILD)/fdfu/fdfu $(BUILD)/fdebug/fdebug $(BUILD)/fload/fload $(BUILD)/fvm/fvm
 
 all:: utils
 
@@ -48,7 +41,6 @@ install-utils: utils | $(BUILD)/utils/fdwarf/.dir
 	$(_v)cp -r $(BUILD)/fdfu/fdfu $(PREFIX)/bin
 	$(_v)cp -r $(BUILD)/fdebug/fdebug $(PREFIX)/bin
 	$(_v)cp -r $(BUILD)/fvm/fvm $(PREFIX)/bin
-	$(_v)cp -r $(BUILD)/ftest/ftest $(PREFIX)/bin
 	$(_v)cp -r $(BUILD)/fload/fload $(PREFIX)/bin
 	$(_v)cp utils/fdwarf/fdwarf.py $(PREFIX)/bin/fdwarf
 	$(_v)chmod +x $(PREFIX)/bin/fdwarf

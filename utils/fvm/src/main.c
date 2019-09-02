@@ -3,7 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #define _GNU_SOURCE
-#include "posix/network.h"
+#include <flipper/posix/network.h>
 #include <dlfcn.h>
 
 /* fvm - Creates a local server that acts as a virtual flipper device. */

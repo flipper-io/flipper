@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include <flipper.h>
+#include <flipper/atsam4s/atsam4s.h>
 
 /* Defines the XMODEM flow control bytes. */
 #define SOH 0x01
@@ -279,7 +280,6 @@ int main(int argc, char *argv[]) {
 
     /* Attach to a Flipper device. */
     lf_assert(carbon_attach(), E_NO_DEVICE, "failed to attach device");
-    carbon_select_u2(lf_get_selected());
 
     /* Open the firmware image. */
     firmware = fopen(argv[1], "rb");

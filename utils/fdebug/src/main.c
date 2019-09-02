@@ -1,16 +1,19 @@
-#include <flipper/flipper.h>
+#include <flipper.h>
 #include <libusb.h>
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
 #include <flipper/posix/network.h>
+#include <libusb.h>
 #include <pthread.h>
+
+#include <flipper/atmegau2/atmegau2.h>
 
 struct libusb_device_handle *usb_handle = NULL;
 
 #define BUFFER_SIZE 1024
 
-int server_fd, client_fd, err;
+int _server, client_fd;
 struct sockaddr_in server, client;
 
 static volatile int alive = 1;
@@ -65,7 +68,7 @@ void *network_debug_thread(void *vargp) {
     int timeout = 0;
 
     socklen_t client_len = sizeof(client);
-    client_fd = accept(server_fd, (struct sockaddr *) &client, &client_len);
+    client_fd = accept(_server, (struct sockaddr *) &client, &client_len);
 
     if (client_fd < 0) printf("Could not establish new connection\n");
 
@@ -118,20 +121,20 @@ int main(int argc, char *argv[]) {
 
     int port = 9872;
 
-    server_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_fd < 0) printf("Could not create socket\n");
+    _server = socket(AF_INET, SOCK_STREAM, 0);
+    if (_server < 0) printf("Could not create socket\n");
 
     server.sin_family = AF_INET;
     server.sin_port = htons(port);
     server.sin_addr.s_addr = htonl(INADDR_ANY);
 
     int opt_val = 1;
-    setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt_val, sizeof opt_val);
+    setsockopt(_server, SOL_SOCKET, SO_REUSEADDR, &opt_val, sizeof opt_val);
 
-    e = bind(server_fd, (struct sockaddr *) &server, sizeof(server));
+    e = bind(_server, (struct sockaddr *) &server, sizeof(server));
     if (e < 0) printf("Could not bind socket\n");
 
-    e = listen(server_fd, 128);
+    e = listen(_server, 128);
     if (e < 0) printf("Could not listen on socket\n");
 
     if (pthread_mutex_init(&lock, NULL) != 0)
