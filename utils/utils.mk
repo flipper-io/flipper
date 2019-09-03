@@ -3,47 +3,37 @@
 CC = /usr/bin/clang
 AS = /usr/bin/clang
 LD = /usr/bin/clang
+OBJCOPY =
+OBJDUMP =
 
-DEPENDENCIES := libflipper
-INC_DIRS := $(BUILD)/include
-SRC_DIRS := utils/fdfu/src
-LDFLAGS  := -L$(BUILD)/libflipper -lflipper
+DEPENDENCIES = libflipper
+INC_DIRS = $(BUILD)/include
+SRC_DIRS = utils/fdfu/src
+LDFLAGS  = -L$(BUILD)/libflipper -lflipper
 
-$(call ADD_TARGET,fdfu)
+$(eval $(call ADD_TARGET,fdfu))
 
-CC = /usr/bin/clang
-AS = /usr/bin/clang
-LD = /usr/bin/clang
+DEPENDENCIES = libflipper
+INC_DIRS = $(BUILD)/include
+SRC_DIRS = utils/fdebug/src
+CFLAGS   = $(shell pkg-config --cflags libusb-1.0)
+LDFLAGS  = -L$(BUILD)/libflipper -lflipper $(shell pkg-config --libs libusb-1.0)
 
-DEPENDENCIES := libflipper
-INC_DIRS := $(BUILD)/include
-SRC_DIRS := utils/fdebug/src
-CFLAGS   := $(shell pkg-config --cflags libusb-1.0)
-LDFLAGS  := -L$(BUILD)/libflipper -lflipper $(shell pkg-config --libs libusb-1.0)
+$(eval $(call ADD_TARGET,fdebug))
 
-$(call ADD_TARGET,fdebug)
+DEPENDENCIES = libflipper
+INC_DIRS = $(BUILD)/include
+SRC_DIRS = utils/fload/src
+LDFLAGS  = -L$(BUILD)/libflipper -lflipper
 
-CC = /usr/bin/clang
-AS = /usr/bin/clang
-LD = /usr/bin/clang
+$(eval $(call ADD_TARGET,fload))
 
-DEPENDENCIES := libflipper
-INC_DIRS := $(BUILD)/include
-SRC_DIRS := utils/fload/src
-LDFLAGS  := -L$(BUILD)/libflipper -lflipper
+DEPENDENCIES = libflipper
+INC_DIRS = $(BUILD)/include
+SRC_DIRS = utils/fvm/src
+LDFLAGS  = -L$(BUILD)/libflipper -lflipper -ldl
 
-$(call ADD_TARGET,fload)
-
-CC = /usr/bin/clang
-AS = /usr/bin/clang
-LD = /usr/bin/clang
-
-DEPENDENCIES := libflipper
-INC_DIRS := $(BUILD)/include
-SRC_DIRS := utils/fvm/src
-LDFLAGS  := -L$(BUILD)/libflipper -lflipper -ldl
-
-$(call ADD_TARGET,fvm)
+$(eval $(call ADD_TARGET,fvm))
 
 # --- UTILS --- #
 

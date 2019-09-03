@@ -1,12 +1,12 @@
 include flipper.mk
 
-COMPILER_PREFIX   := arm-none-eabi-
-INC_DIRS := include
-SRC_DIRS := src
-CFLAGS := -I/usr/local/include
-LDFLAGS := -Wl,-T /usr/local/share/flipper/ram.ld \
+COMPILER_PREFIX   = arm-none-eabi-
+INC_DIRS = include
+SRC_DIRS = src
+CFLAGS = -I/usr/local/include
+LDFLAGS = -Wl,-T /usr/local/share/flipper/ram.ld \
            -Wl,-R /usr/local/share/flipper/atsam4s.elf \
 
-$(call ADD_TARGET,qux)
+$(eval $(call ADD_TARGET,qux)
 
 all:: $(BUILD)/qux/qux.elf

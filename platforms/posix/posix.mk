@@ -1,4 +1,4 @@
-GEN := git.mk
+GEN = git.mk
 
 CC = /usr/bin/clang
 AS = /usr/bin/clang
@@ -7,26 +7,26 @@ LD = /usr/bin/clang
 OBJCOPY = /usr/bin/objcopy
 OBJDUMP = /usr/bin/objdump
 
-INC_DIRS := lib \
+INC_DIRS = lib \
 			platforms/atmegau2/include \
 			platforms/atsam4s/include \
 			platforms/atsam4s/asf/include \
 			platforms $(BUILD)/atsam4s/gen/api
 
-SRC_DIRS := lib \
+SRC_DIRS = lib \
 			os/arch/x64 \
 			platforms/posix \
 			$(BUILD)/atsam4s/gen/api
 
 ifdef DEBUG
-CFLAGS := -fsanitize=address -g -fPIC $(shell pkg-config --cflags libusb-1.0)
-LDFLAGS := -fsanitize=address $(shell pkg-config --libs libusb-1.0)
+CFLAGS = -fsanitize=address -g -fPIC $(shell pkg-config --cflags libusb-1.0)
+LDFLAGS = -fsanitize=address $(shell pkg-config --libs libusb-1.0)
 else
-CFLAGS := -g -fPIC $(shell pkg-config --cflags libusb-1.0)
-LDFLAGS := $(shell pkg-config --libs libusb-1.0)
+CFLAGS = -g -fPIC $(shell pkg-config --cflags libusb-1.0)
+LDFLAGS = $(shell pkg-config --libs libusb-1.0)
 endif
 
-$(call ADD_TARGET,libflipper)
+$(eval $(call ADD_TARGET,libflipper))
 
 # --- LIBFLIPPER --- #
 

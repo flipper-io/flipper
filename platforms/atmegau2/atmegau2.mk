@@ -37,7 +37,7 @@ LDFLAGS = -mavr35 \
 			-lgcc \
 			--gc-sections
 
-$(call ADD_TARGET,atmegau2)
+$(eval $(call ADD_TARGET,atmegau2))
 
 atmegau2: $(BUILD)/atmegau2/atmegau2.hex
 

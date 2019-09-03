@@ -1,11 +1,11 @@
 # Directory where build products are stored.
-BUILD := .build
+BUILD = .build
 
 # Print all commands executed when VERBOSE is defined
 ifdef VERBOSE
-_v :=
+_v =
 else #VERBOSE
-_v := @
+_v = @
 endif #VERBOSE
 
 # Global CFLAGS
@@ -22,7 +22,7 @@ find_srcs = $(foreach sd,$1,$(foreach ext,$(SRC_EXTS),$(shell find $(sd) -name '
 #####
 
 # All supported source file extensions.
-SRC_EXTS := c S
+SRC_EXTS = c S
 
 #####
 # generate_target($1: target prefix)
@@ -30,7 +30,7 @@ SRC_EXTS := c S
 # Generate all of the target-specific build rules for the given target.
 #####
 
-define _ADD_TARGET
+define ADD_TARGET
 
 $1_CC := $$(CC)
 $1_AS := $$(AS)
@@ -40,18 +40,18 @@ $1_OBJCOPY := $$(OBJCOPY)
 $1_OBJDUMP := $$(OBJDUMP)
 
 # Generate target-specific variables.
-ELF :=  $1.elf
-HEX := $1.hex
-BIN := $1.bin
-A := $1.a
-SO := $1.so
+ELF =  $1.elf
+HEX = $1.hex
+BIN = $1.bin
+A = $1.a
+SO = $1.so
 
 GEN_CFLAGS = -Wno-implicit-function-declaration -DAPIGEN
 
 # Generate!
 $(foreach gen,$(GEN),-include $(BUILD)/$1/$(gen))
 
-SRCS += $$(call find_srcs,$$(SRC_DIRS))
+SRCS = $$(call find_srcs,$$(SRC_DIRS))
 
 GEN_SRCS := $$(foreach d,$$(GEN_DIRS),$$(call find_srcs,$(BUILD)/$1/gen$(d)))
 
@@ -124,37 +124,7 @@ $(BUILD)/$1/gen/%.o: $(BUILD)/$1/gen/%.c
 # Rule to include build dependancies.
 -include $$(DEPS)
 
-undefine COMPILER_PREFIX
-undefine INC_DIRS
-undefine SRC_DIRS
-undefine LDFLAGS
-undefine GENERATED
-undefine DEPENDENCIES
-
-undefine CC
-undefine AS
-undefine AR
-undefine LD
-undefine OBJCOPY
-undefine OBJDUMP
-undefine ELF
-undefine HEX
-undefine BIN
-undefine A
-undefine SO
-undefine GEN
-undefine GEN_DIRS
-undefine SRCS
-undefine GEN_SRCS
-undefine OBJS
-undefine DEPS
-undefine BUILD_DIRS
-undefine BUILD_DIR_FILES
-undefine CFLAGS
-
 endef
-
-ADD_TARGET = $(eval $(call _ADD_TARGET,$1))
 
 # -------------------------------------------------------------------- #
 

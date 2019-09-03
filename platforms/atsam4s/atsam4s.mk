@@ -37,7 +37,7 @@ LDFLAGS  = -L/usr/local/arm-none-eabi/arm-none-eabi/lib/thumb/v7e-m+fp/softfp/ \
 		   -no-enum-size-warning
 
 
-$(call ADD_TARGET,atsam4s)
+$(eval $(call ADD_TARGET,atsam4s))
 
 .PHONY: atsam4s install-atsam4s
 

@@ -31,8 +31,8 @@ include platforms/atsam4s/atsam4s.mk
 include platforms/posix/posix.mk
 include utils/utils.mk
 
-PKGCONFIG_DIR := $(PREFIX)/lib/pkgconfig
-PKGCONFIG_PATH := $(PKGCONFIG_DIR)/libflipper.pc
+PKGCONFIG_DIR = $(PREFIX)/lib/pkgconfig
+PKGCONFIG_PATH = $(PKGCONFIG_DIR)/libflipper.pc
 
 define PKGCONFIG_BODY
 Name: libflipper
