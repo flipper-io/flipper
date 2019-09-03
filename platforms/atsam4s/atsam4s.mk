@@ -1,11 +1,11 @@
 # ARM target variables
 
-CC=arm-none-eabi-gcc
-AS=arm-none-eabi-gcc
-AR=arm-none-eabi-ar
-LD=arm-none-eabi-gcc
-OBJCOPY=arm-none-eabi-objcopy
-OBJDUMP=arm-none-eabi-objdump
+CC = /usr/bin/clang
+AS = /usr/bin/clang
+AR = arm-none-eabi-ar
+LD = arm-none-eabi-ld
+OBJCOPY = arm-none-eabi-objcopy
+OBJDUMP = arm-none-eabi-objdump
 
 GEN = git.mk api.mk
 
@@ -20,22 +20,21 @@ SRC_DIRS = platforms/atsam4s \
 		   os/arch/armv7 \
 		   lib
 
-CFLAGS   = -mcpu=cortex-m4 \
-           -mthumb \
-           -march=armv7e-m \
-           -mtune=cortex-m4 \
-           -mfloat-abi=soft \
-           -DATSAM4S \
-		   -D__SAM4S16B__
+CFLAGS   = -mthumb \
+		   --target=thumbv7em-unknown-none-elf \
+		   -mfloat-abi=soft \
+		   -I/usr/local/arm-none-eabi/arm-none-eabi/include \
+		   -DATSAM4S \
+		   -D__SAM4S16B__ \
+		   -gdwarf-2
 
-LDFLAGS  = -nostartfiles \
-           -mcpu=cortex-m4 \
-           -mthumb \
-           -march=armv7e-m \
-           -mtune=cortex-m4 \
-           -mfloat-abi=soft \
-           -Wl,--gc-sections \
-		   -Wl,-T platforms/atsam4s/config/sam4s16.ld
+LDFLAGS  = -L/usr/local/arm-none-eabi/arm-none-eabi/lib/thumb/v7e-m+fp/softfp/ \
+		   -lc \
+		   -lm \
+		   -L/usr/local/arm-none-eabi/lib/gcc/arm-none-eabi/9.1.0/thumb/v7e-m+fp/softfp \
+		   -lgcc \
+		   -T platforms/atsam4s/config/sam4s16.ld \
+		   -no-enum-size-warning
 
 
 $(call ADD_TARGET,atsam4s)

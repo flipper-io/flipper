@@ -1,11 +1,19 @@
 # --- UTILITIES --- #
 
+CC = /usr/bin/clang
+AS = /usr/bin/clang
+LD = /usr/bin/clang
+
 DEPENDENCIES := libflipper
 INC_DIRS := $(BUILD)/include
 SRC_DIRS := utils/fdfu/src
 LDFLAGS  := -L$(BUILD)/libflipper -lflipper
 
 $(call ADD_TARGET,fdfu)
+
+CC = /usr/bin/clang
+AS = /usr/bin/clang
+LD = /usr/bin/clang
 
 DEPENDENCIES := libflipper
 INC_DIRS := $(BUILD)/include
@@ -15,12 +23,20 @@ LDFLAGS  := -L$(BUILD)/libflipper -lflipper $(shell pkg-config --libs libusb-1.0
 
 $(call ADD_TARGET,fdebug)
 
+CC = /usr/bin/clang
+AS = /usr/bin/clang
+LD = /usr/bin/clang
+
 DEPENDENCIES := libflipper
 INC_DIRS := $(BUILD)/include
 SRC_DIRS := utils/fload/src
 LDFLAGS  := -L$(BUILD)/libflipper -lflipper
 
 $(call ADD_TARGET,fload)
+
+CC = /usr/bin/clang
+AS = /usr/bin/clang
+LD = /usr/bin/clang
 
 DEPENDENCIES := libflipper
 INC_DIRS := $(BUILD)/include

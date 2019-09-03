@@ -3,7 +3,7 @@
 CC = avr-gcc
 AS = avr-gcc
 AR = avr-ar
-LD = avr-gcc
+LD = avr-ld
 OBJCOPY = avr-objcopy
 OBJDUMP = avr-objdump
 
@@ -11,24 +11,31 @@ GEN = git.mk api.mk
 
 # Directories that need to be included for this target.
 INC_DIRS = platforms/atmegau2/include \
-           os/include \
-           lib
+			os/include \
+			lib
 
 SRC_DIRS = platforms/atmegau2 \
-           os/arch/avr8 \
-           lib
+			os/arch/avr8 \
+			lib
 
-CFLAGS   = -mmcu=atmega32u2 \
-           -DARCH=ARCH_AVR8 \
-           -D__AVR_ATmega32U2__ \
-           -DF_CPU=16000000UL \
-           -DATMEGAU2 \
-           -DLF_DISABLE_DEBUG \
-           -DLF_CONFIG_OMIT_ERRORS \
-           -Os
+CFLAGS	= -mmcu=atmega32u2 \
+			-DARCH=ARCH_AVR8 \
+			-D__AVR_ATmega32U2__ \
+			-DF_CPU=16000000UL \
+			-DATMEGAU2 \
+			-DLF_DISABLE_DEBUG \
+			-DLF_CONFIG_OMIT_ERRORS \
+			-Os \
+			-gdwarf-2
 
-LDFLAGS  = -mmcu=atmega32u2 \
-           -Wl,--gc-sections
+LDFLAGS = -mavr35 \
+			-L/usr/local/Cellar/avr-gcc/9.1.0/avr/lib/avr35 \
+			-lc \
+			-lm \
+			/usr/local/Cellar/avr-gcc/9.1.0/avr/lib/avr35/crtatmega32u2.o \
+			-L/usr/local/Cellar/avr-gcc/9.1.0/lib/avr-gcc/9/gcc/avr/9.1.0/avr35 \
+			-lgcc \
+			--gc-sections
 
 $(call ADD_TARGET,atmegau2)
 

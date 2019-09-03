@@ -38,7 +38,7 @@
 #define _LF_XSTR_RAW(x) #x
 #define _LF_XSTR(x) _LF_XSTR_RAW(x)
 
-#ifdef __clang__
+#ifdef __OSX__
 #define LF_FUNC __attribute__((section("__TEXT,.lm." _LF_XSTR(__FILE_NAME__)), used))
 #else
 #define LF_FUNC __attribute__((section(".lm." _LF_XSTR(__FILE_NAME__)), used))

@@ -10,7 +10,6 @@
 
 .syntax unified
 .global fmr_call
-.func fmr_call
 .thumb_func
 fmr_call:
     /* Save registers. */
@@ -164,5 +163,4 @@ _fail:
 _call_done:
     pop { _function-temp, pc }
 
-.endfunc
 .end

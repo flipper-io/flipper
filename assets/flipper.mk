@@ -9,12 +9,11 @@ _v := @
 endif #VERBOSE
 
 # Global CFLAGS
-GLOBAL_CFLAGS = -std=c99                  \
-				-Wall                     \
-				-Wextra                   \
-				-Wno-unused-parameter     \
-				-Wno-expansion-to-defined \
-	-g
+GLOBAL_CFLAGS = -std=c99 \
+	-Wall \
+	-Wextra \
+	-Wno-unused-parameter \
+	-Wno-expansion-to-defined
 
 #####
 # find_srcs($1: source directories, $2: source file extensions)
@@ -94,11 +93,11 @@ $(BUILD)/$1/$$(SO): $$(OBJS) $$(GEN_OBJS)
 
 # Rule to make ELF.
 $(BUILD)/$1/gen/$$(ELF): $$(OBJS)
-	$(_v)$$($1_LD) $$($1_LDFLAGS) -Wl,--unresolved-symbols=ignore-all -o $$@ $$^
+	$(_v)$$($1_LD) -o $$@ $$^ $$($1_LDFLAGS) --unresolved-symbols=ignore-all
 
 # Rule to make ELF.
 $(BUILD)/$1/$$(ELF): $$(OBJS) $$(GEN_OBJS)
-	$(_v)$$($1_LD) $$($1_LDFLAGS) -o $$@ $$^
+	$(_v)$$($1_LD) -o $$@ $$^ $$($1_LDFLAGS)
 
 # Rule to autogenerate the git hash file.
 $(BUILD)/$1/git.mk: | $(BUILD)/$1/gen/git/.dir
