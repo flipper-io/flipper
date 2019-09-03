@@ -31,7 +31,7 @@ const char *lf_get_git_hash(void);
 /* ---------- STATE ---------- */
 
 /* Attaches to a device. */
-int lf_attach(struct _lf_device *device);
+int lf_attach(void);
 
 /* Selects an attached device. */
 int lf_select(struct _lf_device *device);

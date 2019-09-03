@@ -26,7 +26,7 @@
 
 #include "carbon.h"
 
-#include <flipper/posix/network.h>
+#include <flipper/platforms/posix/network.h>
 #include "posix/usb.h"
 
 #include <unistd.h>

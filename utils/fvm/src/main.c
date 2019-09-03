@@ -3,7 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #define _GNU_SOURCE
-#include <flipper/posix/network.h>
+#include <flipper/platforms/posix/network.h>
 #include <dlfcn.h>
 
 /* fvm - Creates a local server that acts as a virtual flipper device. */
@@ -42,8 +42,6 @@ int main(int argc, char *argv[]) {
     struct _lf_network_context *context = (struct _lf_network_context *)fvm->_ep_ctx;
     lf_assert(context, E_NULL, "failed to allocate memory for context");
     context->fd = sd;
-
-    lf_attach(fvm);
 
     printf("Flipper Virtual Machine (FVM) v0.1.0\nListening on 'localhost'.\n\n");
 

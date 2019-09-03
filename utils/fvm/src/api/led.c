@@ -1,10 +1,10 @@
 #include <flipper/flipper.h>
 
-LF_FUNC int led_configure(void) {
+int led_configure(void) {
     printf("Configured the led.\n");
     return lf_success;
 }
 
-LF_FUNC void led_rgb(uint8_t r, uint8_t g, uint8_t b) {
+void led_rgb(uint8_t r, uint8_t g, uint8_t b) {
     printf("Setting the led color to R: %i, G: %i, B: %i.\n", r, g, b);
 }

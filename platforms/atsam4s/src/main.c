@@ -80,7 +80,6 @@ int main(void) {
     RSTC->RSTC_MR = RSTC_MR_KEY_PASSWD | RSTC_MR_URSTEN;
 
     _4s = lf_device_create(atsam4s_read, atsam4s_write, atsam4s_release);
-    lf_attach(_4s);
 
     /* peripheral configuration */
 

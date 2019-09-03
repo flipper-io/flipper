@@ -1,6 +1,6 @@
 #include <flipper/flipper.h>
 
-LF_FUNC int i2c_configure(void) {
+int i2c_configure(void) {
     printf("Configured the i2c bus.\n");
     return lf_success;
 }

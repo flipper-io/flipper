@@ -1,10 +1,16 @@
 /* libusb.c - USB endpoint wrapper using libusb. */
 
 #include "libflipper.h"
-#include "usb.h"
 #include <libusb.h>
 
 #define LF_USB_TIMEOUT_MS 200
+
+static struct _lf_libusb_context {
+    struct libusb_device_handle *handle;
+    struct libusb_context *context;
+    uint8_t in_sz, out_sz;
+    uint8_t in, out;
+};
 
 int lf_libusb_read(struct _lf_device *device, void *dst, uint32_t length) {
     uint32_t len;

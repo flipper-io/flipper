@@ -3,11 +3,11 @@
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
-#include <flipper/posix/network.h>
+#include <flipper/platforms/posix/network.h>
 #include <libusb.h>
 #include <pthread.h>
 
-#include <flipper/atmegau2/atmegau2.h>
+#include <flipper/platforms/atmegau2/atmegau2.h>
 
 struct libusb_device_handle *usb_handle = NULL;
 

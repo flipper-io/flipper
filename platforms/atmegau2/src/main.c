@@ -68,7 +68,6 @@ int main(void) {
 
     /* Create a flipper device. */
     _u2 = lf_device_create(atmegau2_read, atmegau2_write, atmegau2_release);
-    lf_attach(_u2);
 
     /* peripheral configuration */
 

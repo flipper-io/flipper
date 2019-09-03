@@ -32,15 +32,15 @@ $(eval $(call ADD_TARGET,libflipper))
 
 .PHONY: libflipper install-libflipper uninstall-libflipper
 
-libflipper: $(BUILD)/libflipper/libflipper.so | $(BUILD)/include/flipper/.dir $(BUILD)/include/flipper/atmegau2/.dir $(BUILD)/include/flipper/atsam4s/.dir $(BUILD)/include/flipper/posix/.dir
+libflipper: $(BUILD)/libflipper/libflipper.so | $(BUILD)/include/flipper/.dir $(BUILD)/include/flipper/platforms/atmegau2/.dir $(BUILD)/include/flipper/platforms/atsam4s/.dir $(BUILD)/include/flipper/platforms/posix/.dir
 	$(_v)cp -r $(BUILD)/atsam4s/gen/api/*.h $(BUILD)/include/flipper
 	$(_v)cp -r lib/*.h $(BUILD)/include/flipper
 	$(_v)cp -r lib/*.def $(BUILD)/include/flipper
 	$(_v)cp -r lib/carbon/*.h $(BUILD)/include/flipper
-	$(_v)cp -r platforms/atmegau2/include/* $(BUILD)/include/flipper/atmegau2
-	$(_v)cp -r platforms/atsam4s/include/* $(BUILD)/include/flipper/atsam4s
-	$(_v)cp -r platforms/atsam4s/asf/include/* $(BUILD)/include/flipper/atsam4s
-	$(_v)cp -r platforms/posix/*.h $(BUILD)/include/flipper/posix
+	$(_v)cp -r platforms/atmegau2/include/* $(BUILD)/include/flipper/platforms/atmegau2
+	$(_v)cp -r platforms/atsam4s/include/* $(BUILD)/include/flipper/platforms/atsam4s
+	$(_v)cp -r platforms/atsam4s/asf/include/* $(BUILD)/include/flipper/platforms/atsam4s
+	$(_v)cp -r platforms/posix/*.h $(BUILD)/include/flipper/platforms/posix
 	$(_v)cp assets/flipper.mk $(BUILD)/include/flipper
 
 all:: libflipper

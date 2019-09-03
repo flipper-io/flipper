@@ -19,12 +19,8 @@ static struct _lf_device *lf_get_current_device(void) {
     return lf_current_device;
 }
 
-int lf_attach(struct _lf_device *device) {
+int lf_attach(void) {
 
-    lf_assert(device, E_NULL, "Attempt to attach an invalid device.");
-
-    lf_ll_append(&lf_attached_devices, device, lf_device_release);
-    lf_select(device);
 
     return lf_success;
 fail:
