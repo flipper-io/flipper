@@ -12,9 +12,7 @@ LF_WEAK const char *const err_strs[] = {
 };
 
 LF_WEAK const char *lf_error_string(lf_err_t error) {
-    if (error >= (sizeof(err_strs)/sizeof(const char *const))) {
-        return "error out of bounds";
-    }
+    if (error >= (sizeof(err_strs) / sizeof(const char *const))) { return "error out of bounds"; }
     return err_strs[error];
 }
 
@@ -34,8 +32,7 @@ LF_WEAK void _lf_assert(lf_err_t err, const char *func, int line, const char *fm
     va_list args;
     va_start(args, fmt);
 
-    printf(KRED "flipper runtime error" KNRM ": " KBLU "%s" KNRM " (0x%02x)\n" KGRN "  %s:%i: " KYEL, lf_error_string(err),
-           err, func, line);
+    printf(KRED "flipper runtime error" KNRM ": " KBLU "%s" KNRM " (0x%02x)\n" KGRN "  %s:%i: " KYEL, lf_error_string(err), err, func, line);
     vprintf(fmt, args);
     printf(KNRM "\n\n");
 

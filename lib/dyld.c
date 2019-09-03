@@ -32,8 +32,7 @@ struct _lf_module *dyld_module(struct _lf_device *device, const char *module) {
 
     /* If the module hasn't already been registered, try to register it. */
     uint16_t idx;
-    lf_assert(lf_dyld(device, module, &idx), E_MODULE, "Failed to find counterpart for module '%s' on device '%s'.",
-              module, device->name);
+    lf_assert(lf_dyld(device, module, &idx), E_MODULE, "Failed to find counterpart for module '%s' on device '%s'.", module, device->name);
 
     struct _lf_module *m = lf_module_create(module, idx);
     lf_assert(module, E_NULL, "Failed to create new module '%s'.", module);

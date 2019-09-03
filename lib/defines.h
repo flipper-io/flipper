@@ -2,7 +2,6 @@
 #define __defines_h__
 
 #define FLIPPER_USB_VENDOR_ID 0x16C0
-#define FLIPPER_USB_CONTROL_INTERFACE 0
 
 /* Define bit manipulation macros. */
 #define lo(x) ((uint8_t)(x))

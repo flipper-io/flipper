@@ -20,10 +20,12 @@ static struct _lf_device *lf_get_current_device(void) {
 }
 
 int lf_attach(void) {
-
-
+#ifdef LF_POSIX
+    struct _lf_ll *usb_devices = lf_libusb_get_devices();
+    lf_ll_concat(&lf_attached_devices, usb_devices);
     return lf_success;
 fail:
+#endif
     return lf_error;
 }
 
@@ -58,8 +60,7 @@ int __attribute__((__destructor__)) lf_exit(void) {
     return lf_success;
 }
 
-int lf_invoke(struct _lf_device *device, const char *module, lf_function function, lf_type ret, lf_return_t *retval,
-              struct _lf_ll *args) {
+int lf_invoke(struct _lf_device *device, const char *module, lf_function function, lf_type ret, lf_return_t *retval, struct _lf_ll *args) {
 
     struct _fmr_packet _packet;
     struct _fmr_call_packet *packet = (struct _fmr_call_packet *)&_packet;

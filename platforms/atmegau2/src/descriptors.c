@@ -46,7 +46,7 @@ static const uint8_t PROGMEM configuration[CONFIGURATION_SIZE] = {
     /* Interface 0 descriptor. (USB spec 9.6.5, page 267-269, Table 9-12) */
     0x09,                           // bLength
     0x04,                           // bDescriptorType
-    FLIPPER_USB_CONTROL_INTERFACE,  // bInterfaceNumber
+    0,                              // bInterfaceNumber
     0x00,                           // bAlternateSetting
     0x02,                           // bNumEndpoints
     VENDOR_SPECIFIC,                // bInterfaceClass

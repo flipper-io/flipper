@@ -49,10 +49,7 @@ struct _lf_ll *fmr_build(int argc, ...) {
         int type = va_arg(argv, int);
         lf_arg value = va_arg(argv, lf_arg);
 
-        lf_assert(
-            type <= lf_max_t, E_TYPE,
-            "An invalid type was provided while appending the parameter '%llx' with type '%x' to the argument list.",
-            value, type);
+        lf_assert(type <= lf_max_t, E_TYPE, "An invalid type was provided while appending the parameter '%llx' with type '%x' to the argument list.", value, type);
 
         arg = lf_arg_create(type, value);
         lf_assert(arg, E_MALLOC, "failed to append new lf_arg");
@@ -71,8 +68,7 @@ fail:
     return NULL;
 }
 
-int lf_create_call(lf_module module, lf_function function, lf_type ret, struct _lf_ll *args, struct _fmr_header *header,
-                   struct _fmr_call *call) {
+int lf_create_call(lf_module module, lf_function function, lf_type ret, struct _lf_ll *args, struct _fmr_header *header, struct _fmr_call *call) {
 
     size_t argc = 0;
     uint8_t *offset = NULL;
@@ -219,14 +215,8 @@ static int fmr_free(struct _lf_device *device, const struct _fmr_packet *_packet
     return lf_success;
 }
 
-static int (* const fmr_dispatchers[FMR_CLASS_COUNT])(struct _lf_device *device, const struct _fmr_packet *_packet, lf_return_t *retval) = {
-    &fmr_rpc,
-    &fmr_push,
-    &fmr_pull,
-    &fmr_dyld,
-    &fmr_malloc,
-    &fmr_free
-};
+static int (*const fmr_dispatchers[FMR_CLASS_COUNT])(struct _lf_device *device, const struct _fmr_packet *_packet, lf_return_t *retval) = { &fmr_rpc,  &fmr_push,   &fmr_pull,
+                                                                                                                                            &fmr_dyld, &fmr_malloc, &fmr_free };
 
 int fmr_perform(struct _lf_device *device, struct _fmr_packet *packet) {
 

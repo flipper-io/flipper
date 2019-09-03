@@ -5,7 +5,9 @@
 
 #define LF_USB_TIMEOUT_MS 200
 
-static struct _lf_libusb_context {
+#define FLIPPER_USB_CONTROL_INTERFACE 0
+
+struct _lf_libusb_context {
     struct libusb_device_handle *handle;
     struct libusb_context *context;
     uint8_t in_sz, out_sz;

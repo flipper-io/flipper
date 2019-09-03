@@ -1,6 +1,6 @@
 BasedOnStyle: Google
 IndentWidth: 4
-ColumnLimit: 120
+ColumnLimit: 200
 IndentCaseLabels: true
 AllowShortFunctionsOnASingleLine: None
 IncludeCategories:

@@ -227,7 +227,3 @@ int sam_exit_dfu(void) {
 
     return lf_error;
 }
-
-struct _lf_device *carbon_attach(void) {
-    return NULL;
-}

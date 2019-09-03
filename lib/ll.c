@@ -29,6 +29,22 @@ fail:
     return lf_error;
 }
 
+int lf_ll_concat(struct _lf_ll **_lla, struct _lf_ll *_llb) {
+    lf_assert(_lla, E_NULL, "invalid list reference");
+
+    struct _lf_ll *head = *_lla;
+    if (head) {
+        while (head->next) head = head->next;
+        head->next = _llb;
+    } else {
+        *_lla = _llb;
+    }
+
+    return lf_success;
+fail:
+    return lf_error;
+}
+
 void *lf_ll_item(struct _lf_ll *ll, size_t index) {
     while (index-- && ll) ll = ll->next;
     lf_assert(ll, E_NULL, "End of list reached before item.");

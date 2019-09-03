@@ -1,8 +1,7 @@
 #include "libflipper.h"
 
 /* Creates a new libflipper device. */
-struct _lf_device *lf_device_create(int (*read)(struct _lf_device *device, void *dst, uint32_t length),
-                                    int (*write)(struct _lf_device *device, void *src, uint32_t length),
+struct _lf_device *lf_device_create(int (*read)(struct _lf_device *device, void *dst, uint32_t length), int (*write)(struct _lf_device *device, void *src, uint32_t length),
                                     int (*release)(void *device)) {
     struct _lf_device *device = NULL;
     device = (struct _lf_device *)calloc(1, sizeof(struct _lf_device));

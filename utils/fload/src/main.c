@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
     }
 
     /* Attach flipper. */
-    struct _lf_device *device = carbon_attach();
+    struct _lf_device *device = lf_attach();
 
     /* Obtain file size. */
     size_t fsize = 0;

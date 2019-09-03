@@ -20,6 +20,9 @@ size_t lf_ll_count(struct _lf_ll *ll);
 /* Appends the item to the list. Creates if necessary. */
 int lf_ll_append(struct _lf_ll **_ll, void *item, void (*deconstructor)(void *));
 
+/* Concatenate two linked lits together. */
+int lf_ll_concat(struct _lf_ll **_lla, struct _lf_ll *_llb);
+
 /* Retrieves an item from the list at the given index. */
 void *lf_ll_item(struct _lf_ll *ll, size_t index);
 

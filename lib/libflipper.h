@@ -25,6 +25,10 @@
 #include "ll.h"
 #include "module.h"
 
+#ifdef LF_POSIX
+#include "platforms/posix/posix.h"
+#endif
+
 /* Returns the short version string of the library. */
 const char *lf_get_git_hash(void);
 

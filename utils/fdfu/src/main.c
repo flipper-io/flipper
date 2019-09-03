@@ -279,7 +279,7 @@ int main(int argc, char *argv[]) {
     lf_debug("\r\n\r\nFDEBUG - 1.0\r\n");
 
     /* Attach to a Flipper device. */
-    lf_assert(carbon_attach(), E_NO_DEVICE, "failed to attach device");
+    lf_assert(lf_attach(), E_NO_DEVICE, "failed to attach device");
 
     /* Open the firmware image. */
     firmware = fopen(argv[1], "rb");
