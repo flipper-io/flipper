@@ -29,6 +29,7 @@ CFLAGS	= -mmcu=atmega32u2 \
 			-gdwarf-2
 
 LDFLAGS = -mavr35 \
+			-Tdata 0x800100 \
 			-L/usr/local/Cellar/avr-gcc/9.1.0/avr/lib/avr35 \
 			-lc \
 			-lm \
