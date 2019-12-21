@@ -8,7 +8,7 @@
 #ifndef __libflipper_h__
 #define __libflipper_h__
 
-/* Include the standard library headers. */
+/* include the standard library headers */
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* include the libflipper headers */
 #include "defines.h"
 #include "device.h"
 #include "dyld.h"
@@ -24,10 +25,6 @@
 #include "fmr.h"
 #include "ll.h"
 #include "module.h"
-
-#ifdef LF_POSIX
-#include "platforms/posix/posix.h"
-#endif
 
 /* Returns the short version string of the library. */
 const char *lf_get_git_hash(void);

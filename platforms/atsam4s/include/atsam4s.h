@@ -4,7 +4,9 @@
 #ifndef __atsam4s__
 #define __atsam4s__
 
-#define __SAM4S16B__
+/* include the configuration header for this platform */
+#include "lf_config.h"
+
 #include "sam4s.h"
 
 /* GPIO signals */

@@ -1,6 +1,6 @@
 include assets/flipper.mk
 
-# Prefix where build projects are installed
+# Prefix where build products are installed
 PREFIX ?= /usr/local
 
 help::
@@ -31,6 +31,8 @@ include platforms/atsam4s/atsam4s.mk
 include platforms/posix/posix.mk
 include utils/utils.mk
 
+# --- PKGCONFIG --- #
+
 PKGCONFIG_DIR = $(PREFIX)/lib/pkgconfig
 PKGCONFIG_PATH = $(PKGCONFIG_DIR)/libflipper.pc
 
@@ -51,29 +53,6 @@ install-pkgconfig:
 	$(_v)echo "$$PKGCONFIG_BODY" > $(PKGCONFIG_PATH)
 
 install:: install-pkgconfig
-
-# --- CONSOLE --- #
-
-.PHONY: console
-
-console: libflipper
-	$(_v)cargo build --manifest-path=console/Cargo.toml
-
-install-console: console
-	$(_v)cargo install --path=console --force
-
-# --- LANGUAGES --- #
-
-.PHONY: language-rust
-
-language-rust: libflipper
-	$(_v)cargo build --manifest-path=languages/rust/Cargo.toml
-
-languages:: language-rust
-
-.PHONY: languages
-
-languages:: language-rust
 
 # --- LANGUAGES --- #
 

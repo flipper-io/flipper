@@ -24,8 +24,6 @@ CFLAGS   = -mthumb \
 		   --target=thumbv7em-unknown-none-elf \
 		   -mfloat-abi=soft \
 		   -I/usr/local/arm-none-eabi/arm-none-eabi/include \
-		   -DATSAM4S \
-		   -D__SAM4S16B__ \
 		   -gdwarf-2
 
 LDFLAGS  = -L/usr/local/arm-none-eabi/arm-none-eabi/lib/thumb/v7e-m+fp/softfp/ \

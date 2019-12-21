@@ -29,7 +29,7 @@ int lf_libusb_read(struct _lf_device *device, void *dst, uint32_t length) {
 
         e = libusb_bulk_transfer(ctx->handle, ctx->in, (uint8_t *)dst, (int)len, &actual, LF_USB_TIMEOUT_MS);
         lf_assert(e == 0, E_LIBUSB, "read transfer failed (%s)", libusb_error_name(e));
-
+        
         dst += len;
         length -= len;
     }

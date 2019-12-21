@@ -6,6 +6,9 @@
 #ifndef __atmegau2__
 #define __atmegau2__
 
+/* include the configuration header for this platform */
+#include "lf_config.h"
+
 #ifdef ATMEGAU2
 
 /* Include the avr-libc standard library headers. */

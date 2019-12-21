@@ -19,22 +19,17 @@ SRC_DIRS = platforms/atmegau2 \
 			lib
 
 CFLAGS	= -mmcu=atmega32u2 \
-			-DARCH=ARCH_AVR8 \
-			-D__AVR_ATmega32U2__ \
-			-DF_CPU=16000000UL \
-			-DATMEGAU2 \
-			-DLF_DISABLE_DEBUG \
-			-DLF_CONFIG_OMIT_ERRORS \
 			-Os \
 			-gdwarf-2
 
+# WARNING: This is very platform/installation specific. Need to replace this.
 LDFLAGS = -mavr35 \
 			-Tdata 0x800100 \
-			-L/usr/local/Cellar/avr-gcc/9.1.0/avr/lib/avr35 \
+			-L/usr/local/Cellar/avr-gcc/9.2.0/avr/lib/avr35 \
 			-lc \
 			-lm \
-			/usr/local/Cellar/avr-gcc/9.1.0/avr/lib/avr35/crtatmega32u2.o \
-			-L/usr/local/Cellar/avr-gcc/9.1.0/lib/avr-gcc/9/gcc/avr/9.1.0/avr35 \
+			/usr/local/Cellar/avr-gcc/9.2.0/avr/lib/avr35/crtatmega32u2.o \
+			-L/usr/local/Cellar/avr-gcc/9.2.0/lib/avr-gcc/9/gcc/avr/9.2.0/avr35 \
 			-lgcc \
 			--gc-sections
 

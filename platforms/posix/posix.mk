@@ -7,7 +7,7 @@ LD = /usr/bin/clang
 OBJCOPY = /usr/bin/objcopy
 OBJDUMP = /usr/bin/objdump
 
-INC_DIRS = . \
+INC_DIRS =  . \
 			lib \
 			platforms/atmegau2/include \
 			platforms/atsam4s/include \
@@ -16,14 +16,14 @@ INC_DIRS = . \
 
 SRC_DIRS = lib \
 			os/arch/x64 \
-			platforms/posix \
+			platforms/posix/src \
 			$(BUILD)/atsam4s/gen/api
 
 ifdef DEBUG
-CFLAGS = -fsanitize=address -g -fPIC -DLF_POSIX $(shell pkg-config --cflags libusb-1.0)
+CFLAGS = -fsanitize=address -g -fPIC $(shell pkg-config --cflags libusb-1.0)
 LDFLAGS = -fsanitize=address $(shell pkg-config --libs libusb-1.0)
 else
-CFLAGS = -g -fPIC -DLF_POSIX $(shell pkg-config --cflags libusb-1.0)
+CFLAGS = -g -fPIC $(shell pkg-config --cflags libusb-1.0)
 LDFLAGS = $(shell pkg-config --libs libusb-1.0)
 endif
 
@@ -41,7 +41,7 @@ libflipper: $(BUILD)/libflipper/libflipper.so | $(BUILD)/include/flipper/.dir $(
 	$(_v)cp -r platforms/atmegau2/include/* $(BUILD)/include/flipper/platforms/atmegau2
 	$(_v)cp -r platforms/atsam4s/include/* $(BUILD)/include/flipper/platforms/atsam4s
 	$(_v)cp -r platforms/atsam4s/asf/include/* $(BUILD)/include/flipper/platforms/atsam4s
-	$(_v)cp -r platforms/posix/*.h $(BUILD)/include/flipper/platforms/posix
+	$(_v)cp -r platforms/posix/include/*.h $(BUILD)/include/flipper/platforms/posix
 	$(_v)cp assets/flipper.mk $(BUILD)/include/flipper
 
 all:: libflipper
