@@ -6,7 +6,6 @@
 
 /* define the flags needed to properly configure avr-libc for this chip */
 #define ARCH ARCH_AVR8
-#define __AVR_ATmega32U2__
 
 /* the chip has a 16MHz oscillator (https://github.com/flipper-io/flipper/wiki/Flipper-Carbon) */
 #define F_CPU 16000000UL
