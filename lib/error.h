@@ -4,8 +4,8 @@
 #define __lf_error_h__
 
 /* Success code macros. */
-#define lf_success 1
-#define lf_error 0
+#define lf_success 0
+#define lf_error 1
 
 /* Short hand for raising errors based on the truth of a condition. */
 
