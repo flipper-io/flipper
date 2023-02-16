@@ -2,17 +2,43 @@
 
 This example demonstrates how to build a package. A package is a collection of functions that are installed on the device and can be remotely invoked from any device with libflipper installed.
 
-### Build the Package
+#### Steps to Follow
+
+Install libflipper.
+```sh
+make libflipper
+make install-libflipper
 ```
+
+### Build the Package
+```sh
 make
 ```
+If using FVM open a seperate terminal window and run.
+```sh
+fvm
+```
+If working with FVM be sure to replace the following line inside your code. 
+```
+flipper_attach();
+```
+with 
+```
+struct _lf_device *fvm = flipper_attach_network("localhost");
+```
+
 
 ### Install the Package
 ```
 make install
 ```
-
 The executable code will now be on the attached Flipper device.
+
+If using FVM the run
+```
+fvm path/to/module.so
+```
+Observe the results that FVM returns. 
 
 ## Running
 
