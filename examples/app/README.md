@@ -10,7 +10,6 @@ to `IO_1`.
 Install libflipper.
 ```sh
 make libflipper
-make install-libflipper
 ```
 
 #### Build the Application
