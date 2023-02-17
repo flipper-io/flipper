@@ -7,7 +7,6 @@ This example demonstrates how to build a package. A package is a collection of f
 Install libflipper.
 ```sh
 make libflipper
-make install-libflipper
 ```
 
 ### Build the Package
