@@ -6,7 +6,7 @@ FVM creates a virtual device on `localhost`. This virtual device can then be att
 
 FVM is primarily used for debugging the runtime, event system, and other components that expect a valid flipper device to be attached, but don't yet have supporting hardware drivers to use a real Flipper device.
 
-When you attach to FVM via libflipper, you are calling a remote stub on the device. The stubs are exposed by adding the `LF_FUNC` macro to the function's declaration. This is what a "module" is. It's a dynamically linked library `(.so)` of these stubs
+When you attach to FVM via libflipper, you are calling a remote stub on the device. The stubs are exposed by adding the `LF_FUNC` macro to the function's declaration. This is what a "module" is. It's a dynamically linked library `(.so)` of these stubs.
 
 If you want to call stubs in a module using FVM, you have to have the dynamic loader bring those symbols into memory. That's what the arguments to FVM do. (i.e `fvm my_lib.so` will dynamically load all those stubs into FVM so that they can be called from libflipper.
 

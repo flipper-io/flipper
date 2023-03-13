@@ -33,11 +33,11 @@ make install
 ```
 The executable code will now be on the attached Flipper device.
 
-If using FVM the run
+If using FVM then run
 ```
 fvm path/to/module.so
 ```
-Observe the results that FVM returns. 
+FVM will now return results in the terminal window. These results can be analyzed in order to verify the programming pipleline and ensure that the package is working correctly. 
 
 ## Running
 
